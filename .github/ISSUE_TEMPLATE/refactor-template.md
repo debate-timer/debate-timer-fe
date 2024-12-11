@@ -1,5 +1,5 @@
 ---
-name: " Refactor Template"
+name: "Refactor Template"
 about: '리팩토링 '
 title: "[REFACTOR] "
 labels: refactor
