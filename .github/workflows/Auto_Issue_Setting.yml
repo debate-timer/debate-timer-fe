@@ -6,29 +6,25 @@ on:
 
 permissions:
   issues: write
-  repository-projects: write
 
 jobs:
   auto-assign:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      # GitHub CLI 인증
-      - name: Authenticate GitHub CLI
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+      # 리포지토리 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Auto-assign issue creator
+      # 이슈 생성자를 자동 할당
       - name: Auto-assign issue creator
         uses: pozil/auto-assign-issue@v2
         with:
           assignees: ${{ github.actor }}
 
-      # Add issue to project
-      - name: Add issue to GitHub Project
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 클래식 프로젝트에 이슈 추가
+      - name: Add issue to classic project
         run: |
-          PROJECT_ID=$(gh project list --format json | jq -r '.[] | select(.name == "debate-timer") | .id')
-          ISSUE_ID=$(gh issue view ${{ github.event.issue.number }} --json id --jq .id)
-          gh project item add $PROJECT_ID --item-id $ISSUE_ID
+          ISSUE_NUMBER=${{ github.event.issue.number }}
+          gh issue edit "$ISSUE_NUMBER" --add-project "debate-timer" --repo debate-timer/debate-timer-fe
