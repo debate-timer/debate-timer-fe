@@ -1,0 +1,31 @@
+# 예시: 불필요한 jq 설치 스텝 제거
+name: Auto Issue Setting
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto-assign:
+    runs-on: ubuntu-latest
+    steps:
+      # GitHub CLI 인증
+      - name: Authenticate GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      # Auto-assign issue creator
+      - name: Auto-assign issue creator
+        uses: pozil/auto-assign-issue@v2
+        with:
+          assignees: ${{ github.actor }}
+
+      # Add issue to project
+      - name: Add issue to GitHub Project
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PROJECT_ID=$(gh project list --format json | jq -r '.[] | select(.name == "debate-timer") | .id')
+          ISSUE_ID=$(gh issue view ${{ github.event.issue.number }} --json id --jq .id)
+          gh project item add $PROJECT_ID --item-id $ISSUE_ID
