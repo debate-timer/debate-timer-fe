@@ -1,0 +1,58 @@
+name: Auto PR Setting
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  assign-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Auth Token
+        run: echo "GH_TOKEN=${{ secrets.PERSONAL_ACCESS_TOKEN }}" >> $GITHUB_ENV
+        # Personal Access Token을 환경 변수에 설정하여 gh CLI에서 인증에 사용.
+
+      - name: Get Issue Number
+        id: get_issue
+        run: |
+          # PR 정보를 가져와 브랜치 이름 확인.
+          PR_DATA=$(gh pr view ${{ github.event.pull_request.number }} --json headRefName)
+          echo "PR_DATA=${PR_DATA}" >> $GITHUB_ENV
+          # 브랜치 이름에서 이슈 번호 추출.
+          BRANCH_NAME=$(echo "${PR_DATA}" | jq -r '.headRefName')
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          ISSUE_NUMBER=$(echo "${BRANCH_NAME}" | awk -F'#' '{print $2}' | grep -Eo '^[0-9]+')
+          echo "ISSUE_NUMBER=${ISSUE_NUMBER}" >> $GITHUB_ENV
+
+      - name: Get Issue Details
+        id: get_issue_details
+        run: |
+          # 이슈 정보를 가져와 할당된 사람, 레이블, 프로젝트 항목 정보를 추출.
+          ISSUE_DATA=$(gh issue view "${ISSUE_NUMBER}" --json assignees,labels,projectItems --jq '{assignees: [.assignees[].login], labels: [.labels[].name], projects: [.projectItems[].title]}')
+          echo "ISSUE_DATA=${ISSUE_DATA}" >> $GITHUB_ENV
+
+      - name: Setting PR
+        id: setting_pr
+        run: |
+          # 이슈 데이터에서 할당된 사람, 레이블, 프로젝트 정보를 환경 변수로 설정.
+          ASSIGNEES=$(echo "${ISSUE_DATA}" | jq -r '.assignees | join(",")')
+          LABELS=$(echo "${ISSUE_DATA}" | jq -r '.labels | join(",")')
+          PROJECTS=$(echo "${ISSUE_DATA}" | jq -r '.projects | join(",")')
+
+          # 팀 멤버 목록을 정의하고, 할당되지 않은 멤버를 리뷰어로 추가.
+          TEAM_MEMBERS=("jaeml06" "i-meant-to-be" "eunwoo-levi")
+          IFS=', ' read -r -a ASSIGNEE_ARRAY <<< "${ASSIGNEES}"
+          REVIEWERS=()
+          for MEMBER in "${TEAM_MEMBERS[@]}"; do
+            if [[ ! " ${ASSIGNEE_ARRAY[@]} " =~ " ${MEMBER} " ]]; then
+              REVIEWERS+=("${MEMBER}")
+            fi
+          done
+          REVIEWER_LIST=$(IFS=', '; echo "${REVIEWERS[*]}")
+
+          # PR에 할당된 사람, 레이블, 리뷰어, 프로젝트를 추가.
+          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${ASSIGNEES}" --add-label "${LABELS}" --add-reviewer "${REVIEWER_LIST}" --add-project "${PROJECTS}"
