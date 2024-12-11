@@ -41,6 +41,7 @@ jobs:
           # 이슈 데이터에서 할당된 사람, 레이블, 프로젝트 정보를 환경 변수로 설정.
           ASSIGNEES=$(echo "${ISSUE_DATA}" | jq -r '.assignees | join(",")')
           LABELS=$(echo "${ISSUE_DATA}" | jq -r '.labels | join(",")')
+          PROJECTS=$(echo "${ISSUE_DATA}" | jq -r '.projects | join(",")')
 
           # 팀 멤버 목록을 정의하고, 할당되지 않은 멤버를 리뷰어로 추가.
           TEAM_MEMBERS=("jaeml06" "i-meant-to-be" "eunwoo-levi")
@@ -54,4 +55,4 @@ jobs:
           REVIEWER_LIST=$(IFS=', '; echo "${REVIEWERS[*]}")
 
           # PR에 할당된 사람, 레이블, 리뷰어, 프로젝트를 추가.
-          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${ASSIGNEES}" --add-label "${LABELS}" --add-reviewer "${REVIEWER_LIST}"
+          gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${ASSIGNEES}" --add-label "${LABELS}" --add-reviewer "${REVIEWER_LIST}" --add-project "${PROJECTS}"
