@@ -22,9 +22,3 @@ jobs:
         uses: pozil/auto-assign-issue@v2
         with:
           assignees: ${{ github.actor }}
-
-      # 클래식 프로젝트에 이슈 추가
-      - name: Add issue to classic project
-        run: |
-          ISSUE_NUMBER=${{ github.event.issue.number }}
-          gh issue edit "$ISSUE_NUMBER" --add-project "debate-timer" --repo debate-timer/debate-timer-fe
