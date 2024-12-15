@@ -1,7 +1,9 @@
+import TableSetup from './page/TableSetupPage/TableSetup';
+
 function App() {
   return (
     <>
-      <div className="p-4 font-bold text-red-500">HI</div>
+      <TableSetup />
     </>
   );
 }
