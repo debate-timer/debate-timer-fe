@@ -3,6 +3,7 @@ import { GlobalPortal } from '../util/GlobalPortal';
 
 interface UseModalOptions {
   closeOnOverlayClick?: boolean;
+  onSubmit?: () => void; // 제출 버튼 클릭 시 실행되는 콜백
 }
 
 /**
@@ -12,7 +13,7 @@ interface UseModalOptions {
  */
 export function useModal(content: ReactNode, options: UseModalOptions = {}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { closeOnOverlayClick = true } = options;
+  const { closeOnOverlayClick = true, onSubmit } = options;
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -31,6 +32,13 @@ export function useModal(content: ReactNode, options: UseModalOptions = {}) {
     [closeModal, closeOnOverlayClick],
   );
 
+  const handleSubmit = useCallback(() => {
+    if (onSubmit) {
+      onSubmit();
+    }
+    closeModal(); // 제출 후 모달 닫기
+  }, [onSubmit, closeModal]);
+
   const ModalComponent = () => {
     if (!isOpen) return null;
 
@@ -42,6 +50,24 @@ export function useModal(content: ReactNode, options: UseModalOptions = {}) {
         >
           <div className="relative rounded-lg bg-white p-5 shadow-lg">
             {content}
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300"
+              >
+                닫기
+              </button>
+              {onSubmit && (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                >
+                  제출
+                </button>
+              )}
+            </div>
             <button
               type="button"
               onClick={closeModal}
