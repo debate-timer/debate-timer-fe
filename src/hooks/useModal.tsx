@@ -3,7 +3,6 @@ import { GlobalPortal } from '../util/GlobalPortal';
 
 interface UseModalOptions {
   closeOnOverlayClick?: boolean;
-  onSubmit?: () => void; // 제출 버튼 클릭 시 실행되는 콜백
 }
 
 /**
@@ -11,9 +10,9 @@ interface UseModalOptions {
  * @param content 모달 내부에 렌더링할 ReactNode
  * @param options 모달 표시 옵션
  */
-export function useModal(content: ReactNode, options: UseModalOptions = {}) {
+export function useModal(options: UseModalOptions = {}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { closeOnOverlayClick = true, onSubmit } = options;
+  const { closeOnOverlayClick = true } = options;
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -32,14 +31,7 @@ export function useModal(content: ReactNode, options: UseModalOptions = {}) {
     [closeModal, closeOnOverlayClick],
   );
 
-  const handleSubmit = useCallback(() => {
-    if (onSubmit) {
-      onSubmit();
-    }
-    closeModal(); // 제출 후 모달 닫기
-  }, [onSubmit, closeModal]);
-
-  const ModalComponent = () => {
+  const ModalWrapper = ({ children }: { children: ReactNode }) => {
     if (!isOpen) return null;
 
     return (
@@ -48,30 +40,12 @@ export function useModal(content: ReactNode, options: UseModalOptions = {}) {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           onClick={handleOverlayClick}
         >
-          <div className="relative rounded-lg bg-white p-5 shadow-lg">
-            {content}
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300"
-              >
-                닫기
-              </button>
-              {onSubmit && (
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                >
-                  제출
-                </button>
-              )}
-            </div>
+          <div className="relative w-2/3 rounded-lg bg-white p-5 shadow-lg">
+            {children}
             <button
               type="button"
               onClick={closeModal}
-              className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"
+              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
             >
               X
             </button>
@@ -81,5 +55,5 @@ export function useModal(content: ReactNode, options: UseModalOptions = {}) {
     );
   };
 
-  return { isOpen, openModal, closeModal, ModalComponent };
+  return { isOpen, openModal, closeModal, ModalWrapper };
 }
