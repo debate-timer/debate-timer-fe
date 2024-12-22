@@ -1,4 +1,5 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import LinkButton from './components/LinkButton';
 
 export default function LoginPage() {
   return (
@@ -17,6 +18,7 @@ export default function LoginPage() {
             placeholder="닉네임을 입력해주세요"
             className="text-center bg-slate-300 placeholder:text-black p-5 rounded-lg"
           />
+          <LinkButton />
         </section>
       </div>
     </DefaultLayout>
