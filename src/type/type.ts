@@ -1,5 +1,10 @@
-type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
-type DebateType = 'OPENING' | 'REBUTTAL' | 'CROSS' | 'CLOSING' | 'TIME_OUT';
+export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
+export type DebateType =
+  | 'OPENING'
+  | 'REBUTTAL'
+  | 'CROSS'
+  | 'CLOSING'
+  | 'TIME_OUT';
 
 export interface DebateInfo {
   stance: Stance;
