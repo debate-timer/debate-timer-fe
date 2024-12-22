@@ -47,12 +47,12 @@ export default tseslint.config(
 
     // 플러그인 등록
     plugins: {
-      'react': react, // React 관련 규칙
+      react: react, // React 관련 규칙
       'react-hooks': reactHooks, // React Hooks 관련 규칙
       'react-refresh': reactRefresh, // React Refresh 관련 규칙
       'jsx-a11y': jsxA11y, // 웹 접근성 관련 규칙
-      'prettier': prettier, // Prettier 규칙
-      'tailwindcss': tailwindcss, // Tailwind CSS 클래스명 검사
+      prettier: prettier, // Prettier 규칙
+      tailwindcss: tailwindcss, // Tailwind CSS 클래스명 검사
     },
 
     // 규칙 설정
