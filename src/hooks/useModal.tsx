@@ -7,7 +7,6 @@ interface UseModalOptions {
 
 /**
  * 모달을 쉽게 열고 닫을 수 있는 훅.
- * @param content 모달 내부에 렌더링할 ReactNode
  * @param options 모달 표시 옵션
  */
 export function useModal(options: UseModalOptions = {}) {
