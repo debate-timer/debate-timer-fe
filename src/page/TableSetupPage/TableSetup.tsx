@@ -9,7 +9,7 @@ export default function TableSetup() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>헤더</DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>의회식</DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right>wpahr</DefaultLayout.Header.Right>
+        <DefaultLayout.Header.Right>제목</DefaultLayout.Header.Right>
       </DefaultLayout.Header>
       <DefaultLayout.ContentContanier>
         <PropsAndConsTitle />
