@@ -13,7 +13,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest",
-    "chromatic": "npx chromatic --project-token=chpt_637c2c749fa348f"
+    "chromatic": "npx chromatic --project-token=chpt_a6dc39eba6488b2"
   },
   "dependencies": {
     "react": "^18.3.1",
