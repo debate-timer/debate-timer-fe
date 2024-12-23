@@ -4,7 +4,7 @@ export default function LinkButton() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/');
+    navigate('/table');
   };
 
   return (
