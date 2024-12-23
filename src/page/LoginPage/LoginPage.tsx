@@ -13,7 +13,7 @@ export default function LoginPage() {
         <div className="pb-[200px]">
           <h1 className="text-[70px] font-semibold">Debate Timer</h1>
         </div>
-        <section className="w-[300px] text-lg flex flex-col gap-8">
+        <section className="w-[300px] flex flex-col gap-8 text-lg font-semibold">
           <input
             placeholder="닉네임을 입력해주세요"
             className="text-center bg-slate-300 placeholder:text-black p-5 rounded-lg"

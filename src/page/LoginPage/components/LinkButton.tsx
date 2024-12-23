@@ -8,7 +8,10 @@ export default function LinkButton() {
   };
 
   return (
-    <button onClick={handleClick} className="bg-amber-300 p-5 rounded-lg">
+    <button
+      onClick={handleClick}
+      className="bg-amber-300 p-5 rounded-lg hover:scale-105 transition-transform duration-200"
+    >
       로그인
     </button>
   );
