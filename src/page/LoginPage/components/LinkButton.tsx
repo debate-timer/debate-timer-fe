@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { LinkButtonProps } from '../../../type/type';
 
-export default function LinkButton() {
+export default function LinkButton({ url, title }: LinkButtonProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/table');
+    navigate(url);
   };
 
   return (
@@ -12,7 +13,7 @@ export default function LinkButton() {
       onClick={handleClick}
       className="bg-amber-300 p-5 rounded-lg hover:scale-105 transition-transform duration-200"
     >
-      로그인
+      {title}
     </button>
   );
 }
