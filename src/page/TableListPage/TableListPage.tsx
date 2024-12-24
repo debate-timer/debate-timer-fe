@@ -7,7 +7,6 @@ const data = [
   { name: '테이블 2', type: '의회식 토론', time: 30 },
   { name: '테이블 3', type: '의회식 토론', time: 30 },
   { name: '테이블 4', type: '의회식 토론', time: 30 },
-  { name: '테이블 5', type: '의회식 토론', time: 30 },
 ];
 
 interface TableProps {
@@ -22,7 +21,7 @@ export default function TableListPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>테이블 목록화면</DefaultLayout.Header.Left>
       </DefaultLayout.Header>
-      <div className="flex h-screen flex-col border-2 border-red-200 px-4 py-6">
+      <div className="flex h-screen flex-col px-4 py-6">
         <main className="grid grid-cols-3 justify-items-center gap-6">
           {data.map((table: TableProps, idx: number) => (
             <Table
