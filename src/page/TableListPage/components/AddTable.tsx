@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ModalToMakeTable from './Modal/ModalToMakeTable';
+import CreateTableModal from './Modal/CreateTableModal';
 
 export default function AddTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +16,7 @@ export default function AddTable() {
       >
         +
       </button>
-      <ModalToMakeTable isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <CreateTableModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
 }

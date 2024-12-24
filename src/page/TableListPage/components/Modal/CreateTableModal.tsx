@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import ToggleForDebateType from './ToggleForDebateType';
+import CreateTableButton from './CreateTableButton';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
+export default function CreateTableModal({ isOpen, onClose }: ModalProps) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -45,9 +46,7 @@ export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
             <ToggleForDebateType />
           </div>
         </section>
-        <button className="h-[80px] w-full bg-amber-500 text-4xl font-semibold transition duration-300 hover:bg-red-300">
-          테이블 만들기
-        </button>
+        <CreateTableButton />
       </div>
     </div>
   );
