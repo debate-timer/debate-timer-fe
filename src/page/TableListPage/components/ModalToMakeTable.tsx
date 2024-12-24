@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -6,6 +6,8 @@ interface ModalProps {
 }
 
 export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
+  const [isToggleOpen, setIsToggleOpen] = useState(false);
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -41,9 +43,19 @@ export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
           </div>
           <div className="flex items-center justify-center gap-4">
             <h1 className="w-[400px] text-5xl font-bold">토론 유형</h1>
-            <button className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white">
-              ▼ &nbsp; &nbsp; 의회식 토론 (디폴트)
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setIsToggleOpen(!isToggleOpen)}
+                className=" w-[600px] rounded-sm bg-neutral-300 p-6 text-center text-3xl font-semibold text-white duration-200 hover:bg-neutral-400"
+              >
+                ▼ &nbsp; &nbsp; 의회식 토론 (디폴트)
+              </button>
+              {isToggleOpen && (
+                <button className="absolute left-0 right-0 top-full mt-1 w-[600px] rounded-sm bg-neutral-300 p-6 text-center text-3xl font-semibold text-white duration-200 hover:bg-neutral-400">
+                  시간 총량제 토론
+                </button>
+              )}
+            </div>
           </div>
         </section>
         <button className="h-[80px] w-full bg-red-200 text-4xl font-semibold transition duration-300 hover:bg-red-300">
