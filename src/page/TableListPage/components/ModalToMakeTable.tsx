@@ -21,20 +21,29 @@ export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative flex h-[600px] w-[1200px] flex-col rounded-md bg-white">
+      <div className="relative flex h-[800px] w-[1200px] flex-col bg-white">
         <div className="flex h-[100px] items-center justify-center bg-neutral-300 text-5xl font-semibold">
           <h1>어떤 토론을 원하시나요?</h1>
           <button
             onClick={onClose}
-            className="absolute right-1 top-1 text-xl font-bold"
+            className="absolute right-2 top-2 text-4xl font-semibold hover:scale-110"
           >
             X
           </button>
         </div>
-        <section className="flex-1 border-2 border-blue-100">
-          <div className="p-6">
-            <div>111</div>
-            <div>222</div>
+        <section className="flex flex-1 flex-col justify-center gap-14 p-6">
+          <div className="flex items-center justify-center gap-4">
+            <h1 className="w-[400px] text-5xl font-bold">토론 시간표 이름</h1>
+            <input
+              placeholder="시간표#1(디폴트 값)"
+              className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white placeholder-white"
+            />
+          </div>
+          <div className="flex items-center justify-center gap-4">
+            <h1 className="w-[400px] text-5xl font-bold">토론 유형</h1>
+            <button className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white">
+              ▼ &nbsp; &nbsp; 의회식 토론 (디폴트)
+            </button>
           </div>
         </section>
         <button className="h-[80px] w-full bg-red-200 text-4xl font-semibold transition duration-300 hover:bg-red-300">
