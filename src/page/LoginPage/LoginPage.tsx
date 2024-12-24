@@ -9,15 +9,15 @@ export default function LoginPage() {
         <DefaultLayout.Header.Center>의회식</DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right>제목</DefaultLayout.Header.Right>
       </DefaultLayout.Header>
-      <div className="flex flex-col h-screen items-center justify-center">
+      <div className="flex h-screen flex-col items-center justify-center">
         <div className="pb-48">
           <h1 className="text-6xl font-semibold">Debate Timer</h1>
         </div>
-        <section className="w-72 flex flex-col gap-8 text-lg font-semibold">
+        <section className="flex w-72 flex-col gap-8 text-lg font-semibold">
           <input
             id="nickname"
             placeholder="닉네임을 입력해주세요"
-            className="text-center bg-slate-300 placeholder-black p-5 rounded-lg"
+            className="rounded-lg bg-slate-300 p-5 text-center placeholder-black"
           />
           <LinkButton url="/table" title="로그인" />
         </section>
