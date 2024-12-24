@@ -45,7 +45,7 @@ export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
             <ToggleForDebateType />
           </div>
         </section>
-        <button className="h-[80px] w-full bg-red-200 text-4xl font-semibold transition duration-300 hover:bg-red-300">
+        <button className="h-[80px] w-full bg-amber-500 text-4xl font-semibold transition duration-300 hover:bg-red-300">
           테이블 만들기
         </button>
       </div>

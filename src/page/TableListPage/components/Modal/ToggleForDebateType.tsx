@@ -9,7 +9,6 @@ export default function ToggleForDebateType() {
     setIsToggleOpen(false);
   };
 
-  // 현재 선택된 값의 반대 옵션을 반환하는 함수
   const getAlternativeOption = () => {
     return selectedType === '의회식 토론 (디폴트)'
       ? '시간 총량제 토론'
