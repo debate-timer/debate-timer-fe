@@ -1,4 +1,5 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import Table from '../LoginPage/components/Table';
 
 const data = [
   { name: '테이블1', type: '의회식 토론', time: 30 },
@@ -21,13 +22,14 @@ export default function TableListPage() {
         <DefaultLayout.Header.Left>테이블 목록화면</DefaultLayout.Header.Left>
       </DefaultLayout.Header>
       <div className="flex h-screen flex-col border-2 border-red-200 px-4 py-6">
-        <main className="grid grid-cols-3">
+        <main className="grid grid-cols-3 justify-items-center gap-4">
           {data.map((table: TableProps, idx: number) => (
-            <section key={idx} className="w-[300px] p-2">
-              <h1>{table.name}</h1>
-              <div>유형 : {table.type}</div>
-              <div>소요시간 : {table.time}</div>
-            </section>
+            <Table
+              key={idx}
+              name={table.name}
+              type={table.type}
+              time={table.time}
+            />
           ))}
         </main>
       </div>
