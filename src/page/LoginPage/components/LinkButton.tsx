@@ -11,7 +11,7 @@ export default function LinkButton({ url, title }: LinkButtonProps) {
   return (
     <button
       onClick={handleClick}
-      className="bg-amber-300 p-5 rounded-lg hover:scale-105 transition-transform duration-200"
+      className="rounded-lg bg-amber-300 p-5 transition-transform duration-200 hover:scale-105"
     >
       {title}
     </button>
