@@ -17,7 +17,7 @@ export default function LoginPage() {
           <input
             id="nickname"
             placeholder="닉네임을 입력해주세요"
-            className="rounded-lg bg-slate-300 p-5 text-center placeholder-black"
+            className="rounded-lg bg-slate-300 p-5 text-center placeholder-slate-500"
           />
           <LinkButton url="/table" title="로그인" />
         </section>
