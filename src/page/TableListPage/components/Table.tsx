@@ -1,8 +1,4 @@
-interface TableProps {
-  name: string;
-  type: string;
-  time: number;
-}
+import { TableProps } from '../../../type/type';
 
 export default function Table({ name, type, time }: TableProps) {
   return (
