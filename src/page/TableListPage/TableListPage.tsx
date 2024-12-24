@@ -1,4 +1,5 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import AddTable from './components/AddTable';
 import Table from './components/Table';
 
 const data = [
@@ -31,6 +32,7 @@ export default function TableListPage() {
               time={table.time}
             />
           ))}
+          <AddTable />
         </main>
       </div>
     </DefaultLayout>
