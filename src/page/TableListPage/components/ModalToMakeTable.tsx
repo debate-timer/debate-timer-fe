@@ -7,6 +7,7 @@ interface ModalProps {
 
 export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
   const [isToggleOpen, setIsToggleOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState('의회식 토론 (디폴트)');
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -20,6 +21,18 @@ export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
   }, [onClose]);
 
   if (!isOpen) return null;
+
+  const handleTypeSelect = (type: string) => {
+    setSelectedType(type);
+    setIsToggleOpen(false);
+  };
+
+  // 현재 선택된 값의 반대 옵션을 반환하는 함수
+  const getAlternativeOption = () => {
+    return selectedType === '의회식 토론 (디폴트)'
+      ? '시간 총량제 토론'
+      : '의회식 토론 (디폴트)';
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -46,14 +59,17 @@ export default function ModalToMakeTable({ isOpen, onClose }: ModalProps) {
             <div className="relative">
               <button
                 onClick={() => setIsToggleOpen(!isToggleOpen)}
-                className=" w-[600px] rounded-sm bg-neutral-300 p-6 text-center text-3xl font-semibold text-white duration-200 hover:bg-neutral-400"
+                className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white"
               >
-                ▼ &nbsp; &nbsp; 의회식 토론 (디폴트)
+                ▼ &nbsp; &nbsp; {selectedType}
               </button>
               {isToggleOpen && (
-                <button className="absolute left-0 right-0 top-full mt-1 w-[600px] rounded-sm bg-neutral-300 p-6 text-center text-3xl font-semibold text-white duration-200 hover:bg-neutral-400">
-                  시간 총량제 토론
-                </button>
+                <div
+                  onClick={() => handleTypeSelect(getAlternativeOption())}
+                  className="absolute left-0 right-0 top-full mt-2 cursor-pointer rounded-md bg-neutral-300 p-4 text-center text-3xl font-semibold text-white hover:bg-neutral-400"
+                >
+                  {getAlternativeOption()}
+                </div>
               )}
             </div>
           </div>
