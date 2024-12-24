@@ -20,3 +20,8 @@ export const DEBATE_TYPE_LABELS: Record<DebateType, string> = {
   CLOSING: '최종발언',
   TIME_OUT: '작전 시간',
 };
+
+export interface LinkButtonProps {
+  url: string;
+  title: string;
+}
