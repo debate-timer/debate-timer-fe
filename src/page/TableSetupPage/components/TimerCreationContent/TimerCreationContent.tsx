@@ -31,7 +31,7 @@ export default function TimerCreationContent({
   };
 
   return (
-    <div className="p-4">
+    <div className="p-8">
       <h2 className="mb-4 text-xl font-bold">타임박스 설정</h2>
       <div className="flex flex-col space-y-6">
         <div className="flex items-center space-x-2">
