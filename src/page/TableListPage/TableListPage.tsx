@@ -2,12 +2,12 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import AddTable from './components/AddTable';
 import Table from './components/Table';
 
-// const data = [
-//   { name: '테이블1', type: '의회식 토론', time: 30 },
-//   { name: '테이블 2', type: '의회식 토론', time: 30 },
-//   { name: '테이블 3', type: '의회식 토론', time: 30 },
-//   { name: '테이블 4', type: '의회식 토론', time: 30 },
-// ];
+const data = [
+  { name: '테이블1', type: '의회식 토론', time: 30 },
+  { name: '테이블 2', type: '의회식 토론', time: 30 },
+  { name: '테이블 3', type: '의회식 토론', time: 30 },
+  { name: '테이블 4', type: '의회식 토론', time: 30 },
+];
 
 interface TableProps {
   name: string;
