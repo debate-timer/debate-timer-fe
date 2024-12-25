@@ -1,23 +1,32 @@
 import { useState } from 'react';
 import { DebateInfo, DebateType, Stance } from '../../../../type/type';
+import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
-  initStance: Stance;
+  selectedStance: Stance;
+  initDate?: DebateInfo;
   onSubmit: (data: DebateInfo) => void;
   onClose: () => void; // 모달 닫기 함수
 }
 
 export default function TimerCreationContent({
-  initStance,
+  selectedStance,
+  initDate,
   onSubmit,
   onClose,
 }: TimerCreationContentProps) {
-  const [stance, setStance] = useState<Stance>(initStance);
-  const [debateType, setDebateType] = useState<DebateType>('OPENING');
+  const [stance, setStance] = useState<Stance>(selectedStance);
+  const [debateType, setDebateType] = useState<DebateType>(
+    initDate?.debateType || 'OPENING',
+  );
+  const { minutes: initMinutes, seconds: initSeconds } =
+    Formatting.formatSecondsToMinutes(initDate?.time || 180);
 
-  const [minutes, setMinutes] = useState(2);
-  const [seconds, setSeconds] = useState(30);
-  const [speakerNumber, setSpeakerNumber] = useState(3);
+  const [minutes, setMinutes] = useState(initMinutes);
+  const [seconds, setSeconds] = useState(initSeconds);
+  const [speakerNumber, setSpeakerNumber] = useState(
+    initDate?.speakerNumber || 1,
+  );
 
   const handleSubmit = () => {
     const totalTime = minutes * 60 + seconds;
@@ -80,7 +89,7 @@ export default function TimerCreationContent({
               if (e.target.value === 'TIME_OUT') {
                 setStance('NEUTRAL');
               } else {
-                setStance(initStance);
+                setStance(selectedStance);
               }
               setDebateType(e.target.value as DebateType);
             }}

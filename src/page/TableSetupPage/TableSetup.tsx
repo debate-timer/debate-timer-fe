@@ -58,7 +58,8 @@ export default function TableSetup() {
       </DefaultLayout.FixedFooterWrapper>
       <ProsModalWrapper>
         <TimerCreationContent
-          initStance={'PROS'}
+          selectedStance={'PROS'}
+          initDate={data[data.length - 1]}
           onSubmit={(data) => {
             setDate((prev) => [...prev, data]);
           }}
@@ -68,7 +69,8 @@ export default function TableSetup() {
       </ProsModalWrapper>
       <ConsModalWrapper>
         <TimerCreationContent
-          initStance={'CONS'}
+          selectedStance={'CONS'}
+          initDate={data[data.length - 1]}
           onSubmit={(data) => {
             setDate((prev) => [...prev, data]);
           }}
