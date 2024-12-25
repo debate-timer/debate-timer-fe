@@ -4,19 +4,19 @@ import DropdownForDebateType from './DropdownForDebateType';
 export default function CreateTableModal() {
   return (
     <div className="flex h-[700px] w-full flex-col">
-      <div className="flex h-[100px] items-center justify-center bg-neutral-300 text-5xl font-semibold">
+      <div className="flex h-[100px] items-center justify-center bg-neutral-300 text-3xl font-semibold lg:text-5xl">
         <h1>어떤 토론을 원하시나요?</h1>
       </div>
-      <section className="flex flex-1 flex-col justify-center gap-14 p-6">
-        <div className="flex items-center justify-center gap-4">
-          <h1 className="w-[400px] text-5xl font-bold">토론 시간표 이름</h1>
+      <section className="flex flex-1 flex-col justify-center gap-14 p-8 lg:items-center">
+        <div className="flex w-full items-center justify-between">
+          <h1 className="text-md font-bold lg:text-5xl">토론 시간표 이름</h1>
           <input
             placeholder="시간표#1(디폴트 값)"
-            className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white placeholder-white"
+            className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
           />
         </div>
-        <div className="flex items-center justify-center gap-4">
-          <h1 className="w-[400px] text-5xl font-bold">토론 유형</h1>
+        <div className="flex w-full items-center justify-between">
+          <h1 className="text-md font-bold lg:text-5xl">토론 유형</h1>
           <DropdownForDebateType />
         </div>
       </section>

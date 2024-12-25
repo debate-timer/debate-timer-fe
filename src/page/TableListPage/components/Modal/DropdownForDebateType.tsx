@@ -16,17 +16,17 @@ export default function DropdownForDebateType() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-8/12">
       <button
         onClick={() => setIsToggleOpen(!isToggleOpen)}
-        className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white"
+        className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white lg:text-3xl"
       >
         ▼ {selectedType}
       </button>
       {isToggleOpen && (
         <div
           onClick={() => handleTypeSelect(getAlternativeOption())}
-          className="absolute left-0 right-0 top-full mt-2 cursor-pointer rounded-md bg-neutral-300 p-4 text-center text-3xl font-semibold text-white hover:bg-neutral-400"
+          className="absolute left-0 right-0 top-full mt-2 cursor-pointer rounded-md bg-neutral-300 p-4 text-center font-semibold text-white hover:bg-neutral-400 lg:text-3xl"
         >
           {getAlternativeOption()}
         </div>

@@ -8,7 +8,7 @@ export default function AddTable() {
     <>
       <button
         onClick={openModal}
-        className="flex h-[200px] w-[200px] items-center justify-center rounded-md bg-neutral-300 text-4xl font-bold duration-200 hover:scale-105 md:w-[250px] lg:w-[500px]"
+        className="flex h-[200px] w-11/12 items-center justify-center rounded-md bg-neutral-300 text-4xl font-bold duration-200 hover:scale-105"
       >
         +
       </button>
