@@ -2,7 +2,7 @@ import CreateTableModal from './Modal/CreateTableModal';
 import { useModal } from '../../../hooks/useModal';
 
 export default function AddTable() {
-  const { openModal, closeModal, ModalWrapper } = useModal();
+  const { openModal, ModalWrapper } = useModal();
 
   return (
     <>
@@ -12,7 +12,9 @@ export default function AddTable() {
       >
         +
       </button>
-      <CreateTableModal closeModal={closeModal} ModalWrapper={ModalWrapper} />
+      <ModalWrapper>
+        <CreateTableModal />
+      </ModalWrapper>
     </>
   );
 }

@@ -1,5 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { LinkButtonProps } from '../../../type/type';
+
+export interface LinkButtonProps {
+  url: string;
+  title: string;
+}
 
 export default function LinkButton({ url, title }: LinkButtonProps) {
   const navigate = useNavigate();
