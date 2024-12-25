@@ -10,7 +10,7 @@ export interface DebateInfo {
   stance: Stance;
   debateType: DebateType;
   time: number;
-  speakerNumber: number;
+  speakerNumber?: number;
 }
 
 export const DEBATE_TYPE_LABELS: Record<DebateType, string> = {

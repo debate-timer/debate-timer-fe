@@ -17,15 +17,15 @@ export default function TimerCreationContent({
 }: TimerCreationContentProps) {
   const [stance, setStance] = useState<Stance>(selectedStance);
   const [debateType, setDebateType] = useState<DebateType>(
-    initDate?.debateType || 'OPENING',
+    initDate?.debateType ?? 'OPENING',
   );
   const { minutes: initMinutes, seconds: initSeconds } =
-    Formatting.formatSecondsToMinutes(initDate?.time || 180);
+    Formatting.formatSecondsToMinutes(initDate?.time ?? 180);
 
   const [minutes, setMinutes] = useState(initMinutes);
   const [seconds, setSeconds] = useState(initSeconds);
-  const [speakerNumber, setSpeakerNumber] = useState(
-    initDate?.speakerNumber || 1,
+  const [speakerNumber, setSpeakerNumber] = useState<number | null>(
+    initDate?.speakerNumber ?? 1,
   );
 
   const handleSubmit = () => {
@@ -34,7 +34,7 @@ export default function TimerCreationContent({
       stance,
       debateType,
       time: totalTime,
-      speakerNumber,
+      ...(speakerNumber !== null && { speakerNumber }),
     });
     onClose();
   };
@@ -139,10 +139,13 @@ export default function TimerCreationContent({
           <select
             id="speaker-number-input"
             className="flex-1 rounded border p-1"
-            value={speakerNumber}
+            value={stance === 'NEUTRAL' ? 0 : (speakerNumber ?? 0)}
             onChange={(e) => {
-              setSpeakerNumber(Number(e.target.value));
+              setSpeakerNumber(
+                e.target.value === '0' ? null : Number(e.target.value),
+              );
             }}
+            disabled={stance === 'NEUTRAL'}
           >
             <option value="0">없음</option>
             <option value="1">1번 토론자</option>
