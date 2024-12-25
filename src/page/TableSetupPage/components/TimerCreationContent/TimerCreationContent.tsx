@@ -62,6 +62,7 @@ export default function TimerCreationContent({
             onChange={(e) => setStance(e.target.value as Stance)}
             disabled={stance === 'NEUTRAL'}
           >
+            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
             <option value="PROS">찬성</option>
             <option value="CONS">반대</option>
           </select>
