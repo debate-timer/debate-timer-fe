@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function ToggleForDebateType() {
+export default function DropdownForDebateType() {
   const [isToggleOpen, setIsToggleOpen] = useState(false);
   const [selectedType, setSelectedType] = useState('의회식 토론 (디폴트)');
 
@@ -21,7 +21,7 @@ export default function ToggleForDebateType() {
         onClick={() => setIsToggleOpen(!isToggleOpen)}
         className="w-[600px] rounded-md bg-neutral-300 p-6 text-center text-3xl font-semibold text-white"
       >
-        ▼ &nbsp; &nbsp; {selectedType}
+        ▼ {selectedType}
       </button>
       {isToggleOpen && (
         <div

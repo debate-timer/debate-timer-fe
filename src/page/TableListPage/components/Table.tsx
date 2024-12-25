@@ -1,5 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { TableProps } from '../../../type/type';
+
+export interface TableProps {
+  name: string;
+  type: string;
+  time: number;
+}
 
 export default function Table({ name, type, time }: TableProps) {
   const navigate = useNavigate();

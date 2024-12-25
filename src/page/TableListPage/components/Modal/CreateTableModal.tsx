@@ -1,5 +1,5 @@
-import ToggleForDebateType from './ToggleForDebateType';
 import CreateTableButton from './CreateTableButton';
+import DropdownForDebateType from './DropdownForDebateType';
 
 interface ModalProps {
   closeModal: () => void;
@@ -27,7 +27,7 @@ export default function CreateTableModal({ ModalWrapper }: ModalProps) {
           </div>
           <div className="flex items-center justify-center gap-4">
             <h1 className="w-[400px] text-5xl font-bold">토론 유형</h1>
-            <ToggleForDebateType />
+            <DropdownForDebateType />
           </div>
         </section>
         <CreateTableButton />

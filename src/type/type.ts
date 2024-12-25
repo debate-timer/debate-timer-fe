@@ -25,9 +25,3 @@ export interface LinkButtonProps {
   url: string;
   title: string;
 }
-
-export interface TableProps {
-  name: string;
-  type: string;
-  time: number;
-}
