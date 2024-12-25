@@ -1,4 +1,5 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import { TableProps } from '../../type/type';
 import AddTable from './components/AddTable';
 import Table from './components/Table';
 
@@ -8,12 +9,6 @@ const data = [
   { name: '테이블 3', type: '의회식 토론', time: 30 },
   { name: '테이블 4', type: '의회식 토론', time: 30 },
 ];
-
-interface TableProps {
-  name: string;
-  type: string;
-  time: number;
-}
 
 export default function TableListPage() {
   return (
