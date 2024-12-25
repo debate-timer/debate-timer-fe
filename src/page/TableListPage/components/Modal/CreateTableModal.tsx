@@ -1,11 +1,7 @@
 import { useEffect } from 'react';
 import ToggleForDebateType from './ToggleForDebateType';
 import CreateTableButton from './CreateTableButton';
-
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { ModalProps } from '../../../../type/type';
 
 export default function CreateTableModal({ isOpen, onClose }: ModalProps) {
   useEffect(() => {

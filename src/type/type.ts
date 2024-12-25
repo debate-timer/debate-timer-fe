@@ -31,3 +31,8 @@ export interface TableProps {
   type: string;
   time: number;
 }
+
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
