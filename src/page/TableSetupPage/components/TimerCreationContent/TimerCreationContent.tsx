@@ -30,6 +30,19 @@ export default function TimerCreationContent({
     onClose();
   };
 
+  const getStanceColor = () => {
+    switch (stance) {
+      case 'PROS':
+        return 'text-blue-500';
+      case 'CONS':
+        return 'text-red-500';
+      case 'NEUTRAL':
+        return 'text-gray-400';
+      default:
+        return 'text-gray-400';
+    }
+  };
+
   return (
     <div className="p-4">
       <h2 className={`mb-4 text-xl font-bold ${getStanceColor()}`}>
