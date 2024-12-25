@@ -17,7 +17,9 @@ export default function TimerCreationContent({
 }: TimerCreationContentProps) {
   const [stance, setStance] = useState<Stance>(selectedStance);
   const [debateType, setDebateType] = useState<DebateType>(
-    initDate?.debateType ?? 'OPENING',
+    initDate?.stance === 'NEUTRAL'
+      ? 'OPENING'
+      : (initDate?.debateType ?? 'OPENING'),
   );
   const { minutes: initMinutes, seconds: initSeconds } =
     Formatting.formatSecondsToMinutes(initDate?.time ?? 180);
@@ -25,7 +27,7 @@ export default function TimerCreationContent({
   const [minutes, setMinutes] = useState(initMinutes);
   const [seconds, setSeconds] = useState(initSeconds);
   const [speakerNumber, setSpeakerNumber] = useState<number | null>(
-    initDate?.speakerNumber ?? 1,
+    initDate?.stance === 'NEUTRAL' ? 1 : (initDate?.speakerNumber ?? 1),
   );
 
   const handleSubmit = () => {
