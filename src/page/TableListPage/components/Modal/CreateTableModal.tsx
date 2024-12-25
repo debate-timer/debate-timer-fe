@@ -28,7 +28,7 @@ export default function CreateTableModal({ isOpen, onClose }: ModalProps) {
           <h1>어떤 토론을 원하시나요?</h1>
           <button
             onClick={onClose}
-            className="absolute right-2 top-2 text-4xl font-semibold hover:scale-110"
+            className="absolute right-4 top-7 text-5xl font-semibold hover:scale-110"
           >
             X
           </button>
