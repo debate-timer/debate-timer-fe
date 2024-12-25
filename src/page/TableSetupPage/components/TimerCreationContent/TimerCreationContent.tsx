@@ -104,7 +104,7 @@ export default function TimerCreationContent({
                 type="number"
                 min={0}
                 className="min-w-10 flex-grow rounded border p-1 text-center"
-                value={minutes}
+                value={minutes.toString()}
                 onChange={(e) => setMinutes(Number(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">분</span>
@@ -115,7 +115,7 @@ export default function TimerCreationContent({
                 type="number"
                 min={0}
                 className="min-w-10 flex-grow rounded border p-1 text-center"
-                value={seconds}
+                value={seconds.toString()}
                 onChange={(e) => setSeconds(Number(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">초</span>
@@ -127,7 +127,6 @@ export default function TimerCreationContent({
           <label htmlFor="speaker-number-input" className="w-16 flex-shrink-0">
             발언자
           </label>
-          <input
           <select
             id="speaker-number-input"
             className="flex-1 rounded border p-1"
