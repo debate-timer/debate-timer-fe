@@ -114,13 +114,21 @@ export default function TimerCreationContent({
             발언자
           </label>
           <input
+          <select
             id="speaker-number-input"
-            type="number"
-            min={1}
-            className="min-w-0 flex-grow rounded border p-1 text-center"
+            className="flex-1 rounded border p-1"
             value={speakerNumber}
-            onChange={(e) => setSpeakerNumber(Number(e.target.value))}
-          />
+            onChange={(e) => {
+              setSpeakerNumber(Number(e.target.value));
+            }}
+          >
+            <option value="0">없음</option>
+            <option value="1">1번 토론자</option>
+            <option value="2">2번 토론자</option>
+            <option value="3">3번 토론자</option>
+            <option value="4">4번 토론자</option>
+            <option value="4">5번 토론자</option>
+          </select>
         </div>
 
         <button
