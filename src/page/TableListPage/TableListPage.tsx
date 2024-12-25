@@ -1,6 +1,7 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { TableProps } from '../../type/type';
 import AddTable from './components/AddTable';
+import TableModal from './components/Modal/TableModal';
 import Table from './components/Table';
 
 const data = [
@@ -27,6 +28,7 @@ export default function TableListPage() {
             />
           ))}
           <AddTable />
+          <TableModal />
         </main>
       </div>
     </DefaultLayout>

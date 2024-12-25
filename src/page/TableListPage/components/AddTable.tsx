@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import CreateTableModal from './Modal/CreateTableModal';
+import { useModal } from '../../../hooks/useModal';
 
 export default function AddTable() {
+  const { openModal, closeModal, ModalWrapper } = useModal();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = () => {

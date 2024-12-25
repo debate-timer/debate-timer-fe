@@ -1,4 +1,4 @@
-import { ReactNode, useState, useCallback } from 'react';
+import { ReactNode, useState, useCallback, useEffect } from 'react';
 import { GlobalPortal } from '../util/GlobalPortal';
 
 interface UseModalOptions {
@@ -20,6 +20,17 @@ export function useModal(options: UseModalOptions = {}) {
   const closeModal = useCallback(() => {
     setIsOpen(false);
   }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [closeModal]);
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
