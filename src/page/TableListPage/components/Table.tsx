@@ -1,12 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { DebateTable } from '../../../type/type';
 
-export interface TableProps {
-  name: string;
-  type: string;
-  time: number;
-}
-
-export default function Table({ name, type, time }: TableProps) {
+export default function Table({ name, type, time }: DebateTable) {
   const navigate = useNavigate();
 
   const handleClick = () => {
