@@ -1,7 +1,7 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useModal } from '../../hooks/useModal';
 import DebatePanel from './components/DebatePanel/DebatePanel';
-import PropsAndConsTitle from './components/ProsAndConsTitle/PropsAndConsTitle';
+import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import TimerCreationButton from './components/TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from './components/TimerCreationContent/TimerCreationContent';
 import { useState } from 'react';
