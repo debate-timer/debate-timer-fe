@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 
-export default function FixedFooterWrapper(props: PropsWithChildren) {
+export default function StickyFooterWrapper(props: PropsWithChildren) {
   const { children } = props;
 
   return (
