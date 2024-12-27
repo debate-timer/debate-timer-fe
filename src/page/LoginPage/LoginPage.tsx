@@ -1,5 +1,5 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import LinkButton from './components/LinkButton';
+import LinkButton from './components/LinkButton/LinkButton';
 
 export default function LoginPage() {
   return (

@@ -55,10 +55,8 @@ export default function TimerCreationContent({
   };
 
   return (
-    <div className="p-4">
-      <h2 className={`mb-4 text-xl font-bold ${getStanceColor()}`}>
-        타임박스 설정
-      </h2>
+    <div className="p-10">
+      <h2 className="mb-4 text-xl font-bold">타임박스 설정</h2>
       <div className="flex flex-col space-y-6">
         <div className="flex items-center space-x-2">
           <label htmlFor="stance-select" className="w-16 flex-shrink-0">

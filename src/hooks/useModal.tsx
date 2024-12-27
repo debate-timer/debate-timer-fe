@@ -1,4 +1,4 @@
-import { ReactNode, useState, useCallback } from 'react';
+import { ReactNode, useState, useCallback, useEffect } from 'react';
 import { GlobalPortal } from '../util/GlobalPortal';
 
 interface UseModalOptions {
@@ -21,6 +21,17 @@ export function useModal(options: UseModalOptions = {}) {
     setIsOpen(false);
   }, []);
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [closeModal]);
+
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
       if (e.target === e.currentTarget && closeOnOverlayClick) {
@@ -39,12 +50,12 @@ export function useModal(options: UseModalOptions = {}) {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           onClick={handleOverlayClick}
         >
-          <div className="relative w-2/3 rounded-lg bg-white p-5 shadow-lg">
+          <div className="relative w-2/3 rounded-lg bg-white shadow-lg">
             {children}
             <button
               type="button"
               onClick={closeModal}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+              className="absolute right-4 top-8 text-3xl text-gray-500 hover:text-gray-700"
             >
               X
             </button>
