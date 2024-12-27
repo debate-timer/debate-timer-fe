@@ -1,7 +1,12 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
+import { useLocation } from 'react-router-dom';
+import { DebateInfo } from '../../type/type';
+import DebatePanel from '../TableSetupPage/components/DebatePanel/DebatePanel';
 
 export default function TableOverview() {
+  const location = useLocation();
+  const data = location.state as DebateInfo[];
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -24,13 +29,17 @@ export default function TableOverview() {
       </DefaultLayout.Header>
       <DefaultLayout.ContentContanier>
         <PropsAndConsTitle />
-        {/* {data.map((info) => (
-          <DebatePanel key={info.time} info={info} />
-        ))} */}
+        {data &&
+          data.map((info) => <DebatePanel key={info.time} info={info} />)}
       </DefaultLayout.ContentContanier>
-      <DefaultLayout.FixedFooterWrapper>
-        <button className="h-20 w-screen bg-amber-300">버튼</button>
-      </DefaultLayout.FixedFooterWrapper>
+      <DefaultLayout.StickyFooterWrapper>
+        <button className="h-20 w-screen rounded-md bg-blue-300 text-2xl">
+          테이블 수정하기
+        </button>
+        <button className="h-20 w-screen rounded-md bg-red-300 text-2xl">
+          토론하기
+        </button>
+      </DefaultLayout.StickyFooterWrapper>
     </DefaultLayout>
   );
 }
