@@ -1,23 +1,34 @@
 import { useState } from 'react';
 import { DebateInfo, DebateType, Stance } from '../../../../type/type';
+import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
-  initStance: Stance;
+  selectedStance: Stance;
+  initDate?: DebateInfo;
   onSubmit: (data: DebateInfo) => void;
   onClose: () => void; // 모달 닫기 함수
 }
 
 export default function TimerCreationContent({
-  initStance,
+  selectedStance,
+  initDate,
   onSubmit,
   onClose,
 }: TimerCreationContentProps) {
-  const [stance, setStance] = useState<Stance>(initStance);
-  const [debateType, setDebateType] = useState<DebateType>('OPENING');
+  const [stance, setStance] = useState<Stance>(selectedStance);
+  const [debateType, setDebateType] = useState<DebateType>(
+    initDate?.stance === 'NEUTRAL'
+      ? 'OPENING'
+      : (initDate?.debateType ?? 'OPENING'),
+  );
+  const { minutes: initMinutes, seconds: initSeconds } =
+    Formatting.formatSecondsToMinutes(initDate?.time ?? 180);
 
-  const [minutes, setMinutes] = useState(2);
-  const [seconds, setSeconds] = useState(30);
-  const [speakerNumber, setSpeakerNumber] = useState(3);
+  const [minutes, setMinutes] = useState(initMinutes);
+  const [seconds, setSeconds] = useState(initSeconds);
+  const [speakerNumber, setSpeakerNumber] = useState<number | null>(
+    initDate?.stance === 'NEUTRAL' ? 1 : (initDate?.speakerNumber ?? 1),
+  );
 
   const handleSubmit = () => {
     const totalTime = minutes * 60 + seconds;
@@ -25,9 +36,22 @@ export default function TimerCreationContent({
       stance,
       debateType,
       time: totalTime,
-      speakerNumber,
+      ...(speakerNumber !== null && { speakerNumber }),
     });
     onClose();
+  };
+
+  const getStanceColor = () => {
+    switch (stance) {
+      case 'PROS':
+        return 'text-blue-500';
+      case 'CONS':
+        return 'text-red-500';
+      case 'NEUTRAL':
+        return 'text-gray-400';
+      default:
+        return 'text-gray-400';
+    }
   };
 
   return (
@@ -47,6 +71,7 @@ export default function TimerCreationContent({
             onChange={(e) => setStance(e.target.value as Stance)}
             disabled={stance === 'NEUTRAL'}
           >
+            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
             <option value="PROS">찬성</option>
             <option value="CONS">반대</option>
           </select>
@@ -64,7 +89,7 @@ export default function TimerCreationContent({
               if (e.target.value === 'TIME_OUT') {
                 setStance('NEUTRAL');
               } else {
-                setStance(initStance);
+                setStance(selectedStance);
               }
               setDebateType(e.target.value as DebateType);
             }}
@@ -88,7 +113,7 @@ export default function TimerCreationContent({
                 type="number"
                 min={0}
                 className="min-w-10 flex-grow rounded border p-1 text-center"
-                value={minutes}
+                value={minutes.toString()}
                 onChange={(e) => setMinutes(Number(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">분</span>
@@ -99,7 +124,7 @@ export default function TimerCreationContent({
                 type="number"
                 min={0}
                 className="min-w-10 flex-grow rounded border p-1 text-center"
-                value={seconds}
+                value={seconds.toString()}
                 onChange={(e) => setSeconds(Number(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">초</span>
@@ -111,14 +136,24 @@ export default function TimerCreationContent({
           <label htmlFor="speaker-number-input" className="w-16 flex-shrink-0">
             발언자
           </label>
-          <input
+          <select
             id="speaker-number-input"
-            type="number"
-            min={1}
-            className="min-w-0 flex-grow rounded border p-1 text-center"
-            value={speakerNumber}
-            onChange={(e) => setSpeakerNumber(Number(e.target.value))}
-          />
+            className="flex-1 rounded border p-1"
+            value={stance === 'NEUTRAL' ? 0 : (speakerNumber ?? 0)}
+            onChange={(e) => {
+              setSpeakerNumber(
+                e.target.value === '0' ? null : Number(e.target.value),
+              );
+            }}
+            disabled={stance === 'NEUTRAL'}
+          >
+            <option value="0">없음</option>
+            <option value="1">1번 토론자</option>
+            <option value="2">2번 토론자</option>
+            <option value="3">3번 토론자</option>
+            <option value="4">4번 토론자</option>
+            <option value="4">5번 토론자</option>
+          </select>
         </div>
 
         <button
