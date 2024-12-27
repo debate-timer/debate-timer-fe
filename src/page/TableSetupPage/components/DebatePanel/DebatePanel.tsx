@@ -13,8 +13,8 @@ export default function DebatePanel({ info }: DebatePanelProps) {
   const isPros = stance === 'PROS';
   const isCons = stance === 'CONS';
   const isNeutralTimeout = debateType === 'TIME_OUT' && stance === 'NEUTRAL';
-
-  const timeStr = Formatting.formatSecondsToMinutes(time);
+  const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
+  const timeStr = `${minutes}분 ${seconds}초`;
 
   return (
     <div
