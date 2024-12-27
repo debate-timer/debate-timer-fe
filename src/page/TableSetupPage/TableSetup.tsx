@@ -26,7 +26,7 @@ export default function TableSetup() {
 
         <DefaultLayout.Header.Right>
           <div className="flex flex-wrap items-center gap-2 px-2 md:w-auto md:gap-3">
-            <span className="text-sm md:text-base">주제</span>
+            <span className="text-sm md:text-base">토론 주제</span>
             <input
               type="text"
               className="w-full rounded-md bg-slate-100 p-2 text-base md:w-[30rem] md:text-2xl"
@@ -41,7 +41,8 @@ export default function TableSetup() {
       </DefaultLayout.FixedFooterWrapper>
       <ProsModalWrapper>
         <TimerCreationContent
-          initStance={'PROS'}
+          selectedStance={'PROS'}
+          initDate={data[data.length - 1]}
           onSubmit={(data) => {
             setDate((prev) => [...prev, data]);
           }}
@@ -51,7 +52,8 @@ export default function TableSetup() {
       </ProsModalWrapper>
       <ConsModalWrapper>
         <TimerCreationContent
-          initStance={'CONS'}
+          selectedStance={'CONS'}
+          initDate={data[data.length - 1]}
           onSubmit={(data) => {
             setDate((prev) => [...prev, data]);
           }}
