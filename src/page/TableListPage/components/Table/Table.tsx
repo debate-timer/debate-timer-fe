@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { DebateTable } from '../../../type/type';
+import { DebateTable } from '../../../../type/type';
 
 export default function Table({ name, type, time }: DebateTable) {
   const navigate = useNavigate();

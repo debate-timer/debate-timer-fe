@@ -1,7 +1,7 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { DebateTable } from '../../type/type';
-import AddTable from './components/AddTable';
-import Table from './components/Table';
+import AddTable from './components/Table/AddTable';
+import Table from './components/Table/Table';
 
 const data = [
   { name: '테이블1', type: '의회식 토론', time: 30 },
