@@ -61,7 +61,7 @@ export default function TableSetup() {
           className="h-20 w-screen bg-amber-300"
           onClick={() => navigate('/overview/1', { state: data })}
         >
-          버튼
+          테이블 추가하기
         </button>
       </DefaultLayout.StickyFooterWrapper>
       <ProsModalWrapper>
