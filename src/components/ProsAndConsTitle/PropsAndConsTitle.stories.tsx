@@ -11,5 +11,4 @@ export default meta;
 
 type Story = StoryObj<typeof PropsAndConsTitle>;
 
-// 기본 렌더링
 export const Default: Story = {};
