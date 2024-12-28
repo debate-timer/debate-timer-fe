@@ -4,7 +4,7 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
   return (
-    <header className="sticky top-0 h-20 bg-slate-300 px-2">
+    <header className="sticky top-0 min-h-20 bg-slate-300 px-2">
       <div className="relative flex h-full items-center justify-between gap-x-6">
         {children}
       </div>
