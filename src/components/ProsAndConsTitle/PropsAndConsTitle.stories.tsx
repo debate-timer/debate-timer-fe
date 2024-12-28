@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import PropsAndConsTitle from './PropsAndConsTitle';
 
 const meta: Meta<typeof PropsAndConsTitle> = {
-  title: 'page/TableSetup/Components/PropsAndConsTitle',
+  title: 'Components/PropsAndConsTitle',
   component: PropsAndConsTitle,
   tags: ['autodocs'],
 };
