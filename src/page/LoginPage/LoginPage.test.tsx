@@ -13,7 +13,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 describe('LoginPage', () => {
-  it('renders the LoginPage correctly', () => {
+  it('LoginPage에서 라우팅이 잘 동작하는지 검증', () => {
     render(
       <MemoryRouter>
         <LoginPage />
@@ -35,7 +35,7 @@ describe('LoginPage', () => {
     expect(screen.getByText('로그인')).toBeInTheDocument();
   });
 
-  it('navigates to /table when the button is clicked', async () => {
+  it('로그인 버튼 클릭 시 /table 경로로 라우팅 검증', async () => {
     const navigate = vi.fn();
     (useNavigate as jest.Mock).mockReturnValue(navigate);
 
