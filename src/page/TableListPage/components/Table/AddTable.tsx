@@ -1,5 +1,5 @@
-import CreateTableModal from './Modal/CreateTableModal';
-import { useModal } from '../../../hooks/useModal';
+import { useModal } from '../../../../hooks/useModal';
+import CreateTableModal from '../Modal/CreateTableModal';
 
 export default function AddTable() {
   const { openModal, ModalWrapper } = useModal();
