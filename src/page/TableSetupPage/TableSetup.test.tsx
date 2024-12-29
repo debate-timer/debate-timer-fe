@@ -3,11 +3,14 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TableSetup from './TableSetup';
 import { GlobalPortal } from '../../util/GlobalPortal';
+import { MemoryRouter } from 'react-router-dom';
 function TestTableSetupt() {
   return (
-    <GlobalPortal.Provider>
-      <TableSetup />
-    </GlobalPortal.Provider>
+    <MemoryRouter>
+      <GlobalPortal.Provider>
+        <TableSetup />
+      </GlobalPortal.Provider>
+    </MemoryRouter>
   );
 }
 describe('TableSetup', () => {

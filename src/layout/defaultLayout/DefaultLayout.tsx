@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import StickyTriSectionHeader from '../components/header/StickyTriSectionHeader';
-import FixedFooterWrapper from '../components/footer/FixedFooterWrapper';
+import StickyFooterWrapper from '../components/footer/StickyFooterWrapper';
 import ContentContanier from '../components/main/ContentContanier';
 
 function DefaultLayout(props: PropsWithChildren) {
@@ -11,5 +11,5 @@ function DefaultLayout(props: PropsWithChildren) {
 
 DefaultLayout.Header = StickyTriSectionHeader;
 DefaultLayout.ContentContanier = ContentContanier;
-DefaultLayout.FixedFooterWrapper = FixedFooterWrapper;
+DefaultLayout.StickyFooterWrapper = StickyFooterWrapper;
 export default DefaultLayout;
