@@ -1,11 +1,12 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useModal } from '../../hooks/useModal';
 import DebatePanel from './components/DebatePanel/DebatePanel';
-import PropsAndConsTitle from './components/ProsAndConsTitle/PropsAndConsTitle';
+import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import TimerCreationButton from './components/TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from './components/TimerCreationContent/TimerCreationContent';
 import { useState } from 'react';
 import { DebateInfo } from '../../type/type';
+import { useNavigate } from 'react-router-dom';
 
 export default function TableSetup() {
   const {
@@ -19,6 +20,8 @@ export default function TableSetup() {
     ModalWrapper: ConsModalWrapper,
   } = useModal();
   const [data, setDate] = useState<DebateInfo[]>([]);
+
+  const navigate = useNavigate();
 
   return (
     <DefaultLayout>
@@ -53,9 +56,14 @@ export default function TableSetup() {
           rightOnClick={ConsOpenModal}
         />
       </DefaultLayout.ContentContanier>
-      <DefaultLayout.FixedFooterWrapper>
-        <button className="h-20 w-screen bg-amber-300">버튼</button>
-      </DefaultLayout.FixedFooterWrapper>
+      <DefaultLayout.StickyFooterWrapper>
+        <button
+          className="h-20 w-screen bg-amber-300"
+          onClick={() => navigate('/overview/1', { state: data })}
+        >
+          테이블 추가하기
+        </button>
+      </DefaultLayout.StickyFooterWrapper>
       <ProsModalWrapper>
         <TimerCreationContent
           selectedStance={'PROS'}
