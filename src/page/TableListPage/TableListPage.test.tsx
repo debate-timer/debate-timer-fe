@@ -69,30 +69,30 @@ describe('TableListPage', () => {
     );
   };
 
-  it('renders DefaultLayout correctly', () => {
+  it('DefaultLayout 렌더링 검증', () => {
     renderTableListPage();
     expect(screen.getByTestId('default-layout')).toBeInTheDocument();
   });
 
-  it('renders header with correct text', () => {
+  it('헤더 렌더링 검증', () => {
     renderTableListPage();
     const headerLeft = screen.getByTestId('header-left');
     expect(headerLeft).toBeInTheDocument();
     expect(headerLeft).toHaveTextContent('테이블 목록화면');
   });
 
-  it('renders the correct number of tables', () => {
+  it('Table 렌더링 검증', () => {
     renderTableListPage();
     const tables = screen.getAllByTestId('table-component');
     expect(tables).toHaveLength(4);
   });
 
-  it('renders AddTable component', () => {
+  it('AddTable 렌더링 검증', () => {
     renderTableListPage();
     expect(screen.getByTestId('add-table')).toBeInTheDocument();
   });
 
-  it('renders main container with correct grid classes', () => {
+  it('main container with correct grid classes 검증', () => {
     renderTableListPage();
     const mainContainer = document.querySelector('main');
     expect(mainContainer).toHaveClass('grid');
@@ -101,7 +101,7 @@ describe('TableListPage', () => {
     expect(mainContainer).toHaveClass('gap-6');
   });
 
-  it('renders tables with correct data', () => {
+  it('tables 컴포넌트 data 검증', () => {
     renderTableListPage();
     const tables = screen.getAllByTestId('table-component');
 
@@ -118,7 +118,7 @@ describe('TableListPage', () => {
     expect(secondTable).toHaveTextContent('30');
   });
 
-  it('renders parent container with correct classes', () => {
+  it('parent container with correct classes 검증', () => {
     renderTableListPage();
     const container = screen
       .getByTestId('default-layout')
