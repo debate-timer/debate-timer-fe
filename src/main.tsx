@@ -7,34 +7,41 @@ import router from './route';
 import './index.css';
 
 // Functions that calls msw mocking worker
-async function enableMocking() {
-  // If project is running or built on development mode, exit.
-  if (process.env.NODE_ENV !== 'development') {
-    return;
-  }
+if (import.meta.env.VITE_MOCK_API === 'true') {
+  console.log('[msw] Mocking enabled.');
 
-  // Bring worker from specified file
-  const { worker } = await import('./mocks/browser.tsx');
+  // Import worker and start it
+  import('./mocks/browser.tsx').then(({ worker }) => {
+    worker
+      .start({
+        onUnhandledRequest: (request, print) => {
+          // Let worker dismiss non-api calls by check whether url includes '/api/'
+          if (!request.url.includes('/api/')) {
+            console.log(
+              "Dismissed request that doesn't include /api/: " + request.url,
+            );
+          }
 
-  // Let worker dismiss non-api calls by check whether url includes '/api/'
-  return worker.start({
-    onUnhandledRequest: (request, print) => {
-      if (!request.url.includes('/api/')) {
-        console.log(
-          "Dismissed request that doesn't include /api/: " + request.url,
-        );
-      }
-
-      print.warning();
-    },
+          print.warning();
+        },
+      })
+      .then(() => {
+        // After all jobs are done, initialize main React app
+        initializeApp();
+      });
   });
+} else {
+  console.log('[msw] Mocking disabled.');
+
+  // If mocking is disabled, directly initialize main React app
+  initializeApp();
 }
 
-enableMocking().then(() => {
+// Function that initializes main React app
+function initializeApp() {
   // Call queryClient for TanStack Query
   const queryClient = new QueryClient();
 
-  // Main React app
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -44,4 +51,4 @@ enableMocking().then(() => {
       </QueryClientProvider>
     </StrictMode>,
   );
-});
+}
