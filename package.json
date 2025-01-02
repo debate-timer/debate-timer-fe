@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev-mock": "vite --mode dev-mock", 
+    "dev-mock": "vite --mode dev-mock",
     "build": "tsc -b && vite build",
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"**/*.{css,scss}\"",
