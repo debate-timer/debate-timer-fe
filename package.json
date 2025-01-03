@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev-mock": "vite --mode dev-mock",
     "build": "tsc -b && vite build",
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"**/*.{css,scss}\"",
@@ -16,6 +17,9 @@
     "chromatic": "npx chromatic --project-token=chpt_a6dc39eba6488b2"
   },
   "dependencies": {
+    "@tanstack/eslint-plugin-query": "^5.62.9",
+    "@tanstack/react-query": "^5.62.11",
+    "axios": "^1.7.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.0"
@@ -53,6 +57,7 @@
     "eslint-plugin-tailwindcss": "^3.17.5",
     "globals": "^15.12.0",
     "jsdom": "^25.0.1",
+    "msw": "^2.7.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
@@ -69,6 +74,11 @@
   "eslintConfig": {
     "extends": [
       "plugin:storybook/recommended"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }
