@@ -3,7 +3,16 @@ import { DebateTable } from '../../../../type/type';
 import EditModalButton from '../Modal/EditModalButton';
 import DeleteModalButton from '../Modal/DeleteModalButton';
 
-export default function Table({ name, type, time, onDelete }: DebateTable) {
+interface DebateTableWithDelete extends DebateTable {
+  onDelete: () => void;
+}
+
+export default function Table({
+  name,
+  type,
+  time,
+  onDelete,
+}: DebateTableWithDelete) {
   const navigate = useNavigate();
 
   const handleClick = () => {
