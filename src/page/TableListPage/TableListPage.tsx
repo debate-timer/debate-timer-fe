@@ -5,7 +5,7 @@ import AddTable from './components/Table/AddTable';
 import Table from './components/Table/Table';
 
 const initialData = [
-  { name: '테이블1', type: '의회식 토론', time: 30, onDelete: () => {} },
+  { name: '테이블 1', type: '의회식 토론', time: 30, onDelete: () => {} },
   { name: '테이블 2', type: '의회식 토론', time: 30, onDelete: () => {} },
   { name: '테이블 3', type: '의회식 토론', time: 30, onDelete: () => {} },
   { name: '테이블 4', type: '의회식 토론', time: 30, onDelete: () => {} },

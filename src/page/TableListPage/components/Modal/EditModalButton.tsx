@@ -10,7 +10,7 @@ export default function EditModalButton({
   name: string;
   type: string;
 }) {
-  const { openModal, ModalWrapper } = useModal();
+  const { openModal, closeModal, ModalWrapper } = useModal();
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -26,7 +26,7 @@ export default function EditModalButton({
         <AiOutlineEdit />
       </button>
       <ModalWrapper>
-        <EditTableModal name={name} type={type} />
+        <EditTableModal name={name} type={type} closeModal={closeModal} />
       </ModalWrapper>
     </>
   );

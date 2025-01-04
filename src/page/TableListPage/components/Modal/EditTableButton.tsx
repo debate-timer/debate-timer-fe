@@ -1,10 +1,10 @@
-import { useNavigate } from 'react-router-dom';
-
-export default function EditTableButton() {
-  const navigate = useNavigate();
-
+export default function EditTableButton({
+  closeModal,
+}: {
+  closeModal: () => void;
+}) {
   const handleClick = () => {
-    navigate('/');
+    closeModal();
   };
 
   return (

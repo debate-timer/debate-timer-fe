@@ -3,9 +3,11 @@ import EditTableButton from './EditTableButton';
 export default function EditTableModal({
   name,
   type,
+  closeModal,
 }: {
   name: string;
   type: string;
+  closeModal: () => void;
 }) {
   return (
     <div className="flex h-[700px] w-full flex-col">
@@ -27,7 +29,7 @@ export default function EditTableModal({
           </div>
         </div>
       </section>
-      <EditTableButton />
+      <EditTableButton closeModal={closeModal} />
     </div>
   );
 }
