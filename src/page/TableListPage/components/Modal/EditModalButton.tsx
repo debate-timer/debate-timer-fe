@@ -4,7 +4,7 @@ import { useModal } from '../../../../hooks/useModal';
 import CreateTableModal from './CreateTableModal';
 
 export default function EditModalButton() {
-  const { openModal, closeModal, ModalWrapper } = useModal();
+  const { openModal, ModalWrapper } = useModal();
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
