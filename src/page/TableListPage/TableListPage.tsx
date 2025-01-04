@@ -11,11 +11,17 @@ const initialData = [
   { name: '테이블 4', type: '의회식 토론', time: 30, onDelete: () => {} },
 ];
 
+interface DebateTableWithDelete extends DebateTable {
+  onDelete: (name: string) => void;
+}
+
 export default function TableListPage() {
-  const [tables, setTables] = useState<DebateTable[]>(initialData);
+  const [tables, setTables] = useState<DebateTableWithDelete[]>(initialData);
 
   const handleDelete = (targetName: string) => {
-    setTables(tables.filter((table) => table.name !== targetName));
+    setTables((prevTables) =>
+      prevTables.filter((table) => table.name !== targetName),
+    );
   };
 
   return (
@@ -25,7 +31,7 @@ export default function TableListPage() {
       </DefaultLayout.Header>
       <div className="flex h-screen flex-col px-4 py-6">
         <main className="grid grid-cols-3 justify-items-center gap-6">
-          {tables.map((table: DebateTable, idx: number) => (
+          {tables.map((table: DebateTableWithDelete, idx: number) => (
             <Table
               key={idx}
               name={table.name}

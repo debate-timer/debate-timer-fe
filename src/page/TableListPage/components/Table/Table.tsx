@@ -4,7 +4,7 @@ import EditModalButton from '../Modal/EditModalButton';
 import DeleteModalButton from '../Modal/DeleteModalButton';
 
 interface DebateTableWithDelete extends DebateTable {
-  onDelete: () => void;
+  onDelete: (name: string) => void;
 }
 
 export default function Table({
