@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { useModal } from '../../../../hooks/useModal';
+import CreateTableModal from './CreateTableModal';
 
 export default function EditModalButton() {
   const { openModal, closeModal, ModalWrapper } = useModal();
@@ -19,7 +20,7 @@ export default function EditModalButton() {
         <AiOutlineEdit />
       </button>
       <ModalWrapper>
-        <div>hi!</div>
+        <CreateTableModal />
       </ModalWrapper>
     </Fragment>
   );
