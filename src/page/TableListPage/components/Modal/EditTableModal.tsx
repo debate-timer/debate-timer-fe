@@ -1,7 +1,13 @@
 import DropdownForDebateType from './DropdownForDebateType';
 import EditTableButton from './EditTableButton';
 
-export default function EditTableModal({ name }: { name: string }) {
+export default function EditTableModal({
+  name,
+  type,
+}: {
+  name: string;
+  type: string;
+}) {
   return (
     <div className="flex h-[700px] w-full flex-col">
       <div className="flex h-[100px] items-center justify-center bg-neutral-300 text-3xl font-semibold lg:text-5xl">
@@ -17,7 +23,9 @@ export default function EditTableModal({ name }: { name: string }) {
         </div>
         <div className="flex w-full items-center justify-between">
           <h1 className="text-md font-bold lg:text-5xl">토론 유형</h1>
-          <DropdownForDebateType />
+          <div className="w-8/12 bg-neutral-300 p-6 text-center text-3xl font-semibold text-white">
+            {type} (수정 불가)
+          </div>
         </div>
       </section>
       <EditTableButton />
