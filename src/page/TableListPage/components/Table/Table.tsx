@@ -2,11 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import { DebateTable } from '../../../../type/type';
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
 
-export default function Table({ name, type, time }: DebateTable) {
+export default function Table({ name, type, time, onDelete }: DebateTable) {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate('/');
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(name);
   };
 
   return (
@@ -18,7 +23,10 @@ export default function Table({ name, type, time }: DebateTable) {
         <button className="transform text-lg  duration-200 hover:scale-125 lg:text-2xl">
           <AiOutlineEdit />
         </button>
-        <button className="transform text-lg duration-200 hover:scale-125  lg:text-2xl">
+        <button
+          onClick={handleDelete}
+          className="transform text-lg duration-200 hover:scale-125  lg:text-2xl"
+        >
           <AiOutlineDelete />
         </button>
       </div>

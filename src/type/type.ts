@@ -25,4 +25,5 @@ export interface DebateTable {
   name: string;
   type: string;
   time: number;
+  onDelete: (name: string) => void;
 }
