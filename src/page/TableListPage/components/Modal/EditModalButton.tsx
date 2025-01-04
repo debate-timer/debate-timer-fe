@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { useModal } from '../../../../hooks/useModal';
 import CreateTableModal from './CreateTableModal';
@@ -12,7 +12,7 @@ export default function EditModalButton() {
   };
 
   return (
-    <Fragment>
+    <>
       <button
         onClick={handleEdit}
         className="transform text-lg  duration-200 hover:scale-125 lg:text-2xl"
@@ -22,6 +22,6 @@ export default function EditModalButton() {
       <ModalWrapper>
         <CreateTableModal />
       </ModalWrapper>
-    </Fragment>
+    </>
   );
 }
