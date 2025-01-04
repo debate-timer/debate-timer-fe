@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { DebateTable } from '../../../../type/type';
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
+import { AiOutlineDelete } from 'react-icons/ai';
+import EditModalButton from '../Modal/EditModalButton';
 
 export default function Table({ name, type, time, onDelete }: DebateTable) {
   const navigate = useNavigate();
@@ -20,9 +21,7 @@ export default function Table({ name, type, time, onDelete }: DebateTable) {
       className="flex h-[200px] w-11/12 flex-col items-center rounded-md bg-amber-500 p-5 duration-200 hover:scale-105"
     >
       <div className="flex w-full justify-end gap-4 pb-2 lg:pb-0">
-        <button className="transform text-lg  duration-200 hover:scale-125 lg:text-2xl">
-          <AiOutlineEdit />
-        </button>
+        <EditModalButton />
         <button
           onClick={handleDelete}
           className="transform text-lg duration-200 hover:scale-125  lg:text-2xl"
