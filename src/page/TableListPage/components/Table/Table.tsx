@@ -16,7 +16,7 @@ export default function Table({ name, type, time, onDelete }: DebateTable) {
       className="flex h-[200px] w-11/12 flex-col items-center rounded-md bg-amber-500 p-5 duration-200 hover:scale-105"
     >
       <div className="flex w-full justify-end gap-4 pb-2 lg:pb-0">
-        <EditModalButton />
+        <EditModalButton name={name} />
         <DeleteModalButton name={name} onDelete={onDelete} />
       </div>
       <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>

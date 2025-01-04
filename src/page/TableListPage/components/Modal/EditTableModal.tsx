@@ -1,11 +1,11 @@
 import DropdownForDebateType from './DropdownForDebateType';
 import EditTableButton from './EditTableButton';
 
-export default function EditTableModal() {
+export default function EditTableModal({ name }: { name: string }) {
   return (
     <div className="flex h-[700px] w-full flex-col">
       <div className="flex h-[100px] items-center justify-center bg-neutral-300 text-3xl font-semibold lg:text-5xl">
-        <h1>테이블 수정</h1>
+        <h1>{name} 수정</h1>
       </div>
       <section className="flex flex-1 flex-col justify-center gap-14 p-8 lg:items-center">
         <div className="flex w-full items-center justify-between">
