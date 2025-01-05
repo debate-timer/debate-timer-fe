@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export function makeUrl(endpoint: string): string {
-  return `${BASE_URL}/${endpoint}`;
+  return BASE_URL + endpoint;
 }
 
 export async function request<T>(
@@ -27,7 +27,7 @@ export async function request<T>(
   try {
     const response: AxiosResponse<T> = await axiosInstance({
       method,
-      url: makeUrl(endpoint),
+      url: endpoint,
       data: data ? JSON.stringify(data) : null,
       params,
     });
