@@ -25,10 +25,10 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
   return (
     <>
       <div className="flex w-full justify-end gap-2">
-        <button onClick={openEditModal}>
+        <button onClick={openEditModal} aria-label="수정하기">
           <AiOutlineEdit />
         </button>
-        <button onClick={deleteOpenModal}>
+        <button onClick={deleteOpenModal} aria-label="삭제하기">
           <AiOutlineDelete />
         </button>
       </div>
