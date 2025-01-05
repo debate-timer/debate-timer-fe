@@ -107,7 +107,7 @@ describe('TableListPage', () => {
 
     // Check first table
     const firstTable = tables[0];
-    expect(firstTable).toHaveTextContent('테이블1');
+    expect(firstTable).toHaveTextContent('테이블 1');
     expect(firstTable).toHaveTextContent('의회식 토론');
     expect(firstTable).toHaveTextContent('30');
 
