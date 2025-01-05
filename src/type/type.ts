@@ -6,13 +6,6 @@ export type DebateType =
   | 'CLOSING'
   | 'TIME_OUT';
 
-export interface DebateInfo {
-  stance: Stance;
-  debateType: DebateType;
-  time: number;
-  speakerNumber?: number;
-}
-
 export const DEBATE_TYPE_LABELS: Record<DebateType, string> = {
   OPENING: '입론',
   REBUTTAL: '반론',
@@ -21,8 +14,21 @@ export const DEBATE_TYPE_LABELS: Record<DebateType, string> = {
   TIME_OUT: '작전 시간',
 };
 
+export interface User {
+  id: string;
+  name: string;
+}
+
+export interface DebateInfo {
+  stance: Stance;
+  type: DebateType;
+  time: number;
+  speakerNumber?: number;
+}
+
 export interface DebateTable {
+  id: number;
   name: string;
   type: string;
-  time: number;
+  duration: number;
 }

@@ -16,13 +16,13 @@ const meta: Meta<typeof TableOverview> = {
             state: [
               {
                 stance: 'PROS',
-                debateType: 'OPENING',
+                type: 'OPENING',
                 time: 150,
                 speakerNumber: 1,
               },
               {
                 stance: 'CONS',
-                debateType: 'REBUTTAL',
+                type: 'REBUTTAL',
                 time: 180,
                 speakerNumber: 2,
               },

@@ -6,7 +6,7 @@ interface DebatePanelProps {
 }
 
 export default function DebatePanel({ info }: DebatePanelProps) {
-  const { stance, debateType, time, speakerNumber } = info;
+  const { stance, type: debateType, time, speakerNumber } = info;
 
   const debateTypeLabel = DEBATE_TYPE_LABELS[debateType];
 

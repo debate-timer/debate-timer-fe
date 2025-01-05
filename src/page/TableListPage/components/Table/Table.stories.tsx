@@ -21,7 +21,7 @@ export const Default: Story = {
   args: {
     name: '테이블 1',
     type: '의회식 토론',
-    time: 30,
+    duration: 30,
   },
   decorators: [
     (Story) => (

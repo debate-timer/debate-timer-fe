@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { DebateTable } from '../../../../type/type';
 
-export default function Table({ name, type, time }: DebateTable) {
+export default function Table({ name, type, duration }: DebateTable) {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -16,7 +16,7 @@ export default function Table({ name, type, time }: DebateTable) {
       <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>
       <div className="flex w-full flex-grow flex-col items-start justify-center text-lg font-semibold lg:text-2xl">
         <h1>유형 : {type}</h1>
-        <h1>소요시간 : {time}분</h1>
+        <h1>소요시간 : {duration}분</h1>
       </div>
     </button>
   );

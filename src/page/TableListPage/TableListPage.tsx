@@ -23,7 +23,7 @@ export default function TableListPage() {
               key={idx}
               name={table.name}
               type={table.type}
-              time={table.time}
+              duration={table.duration}
             />
           ))}
           <AddTable />
