@@ -48,13 +48,12 @@ export async function getTableData(
   tableId: number,
   memberId: number,
 ): Promise<GetTableDataResponseType> {
-  const requestUrl: string = ApiUrl.table;
+  const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<GetTableDataResponseType>(
     'GET',
-    requestUrl,
+    requestUrl + `/${tableId}`,
     null,
     {
-      tableId: tableId,
       memberId: memberId,
     },
   );
@@ -90,6 +89,7 @@ export async function postDebateTable(
 
 // PUT /api/table/parliamentary/{tableId}?memberId={memberId}
 export async function putDebateTable(
+  tableId: number,
   memberId: number,
   tableName: string,
   tableAgenda: string,
@@ -98,7 +98,7 @@ export async function putDebateTable(
   const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<PutDebateTableResponseType>(
     'PUT',
-    requestUrl,
+    requestUrl + `/${tableId}`,
     {
       info: {
         name: tableName,
@@ -119,9 +119,8 @@ export async function deleteDebateTable(
   tableId: number,
   memberId: number,
 ): Promise<boolean> {
-  const requestUrl: string = ApiUrl.member;
-  const response = await request('DELETE', requestUrl, null, {
-    tableId: tableId,
+  const requestUrl: string = ApiUrl.parliamentary;
+  const response = await request('DELETE', requestUrl + `/${tableId}`, null, {
     memberId: memberId,
   });
 
@@ -133,7 +132,7 @@ export async function deleteDebateTable(
 export async function apiFunc(
   
 ): Promise<ReturnType> {
-    const requestUrl: string = ApiUrl.member
+    const requestUrl: string = ApiUrl.
     const response = await request<ReturnType>(
         method,
         requestUrl,

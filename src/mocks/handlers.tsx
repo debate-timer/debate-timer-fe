@@ -2,15 +2,19 @@ import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../apis/endpoints';
 
 export const handlers = [
-  // POST new member
-  http.post(ApiUrl.member, () => {
+  // POST "/api/member"
+  http.post(ApiUrl.member, async () => {
     return HttpResponse.json({
       nickname: '홍길동',
     });
   }),
 
-  // GET specific member's tables
-  http.get(ApiUrl.table, () => {
+  // GET /api/table?memberId={memberId}
+  http.get(ApiUrl.table, ({ request }) => {
+    const url = new URL(request.url);
+    const memberId = url.searchParams.get('memberId');
+    console.log(`# memberId = ${memberId}`);
+
     return HttpResponse.json({
       tables: [
         {
@@ -29,8 +33,13 @@ export const handlers = [
     });
   }),
 
-  // GET specific table data
-  http.get(ApiUrl.parliamentary, () => {
+  // GET /api/table/parliamentary/{tableId}?memberId={memberId}
+  http.get(ApiUrl.parliamentary + '/:tableId', ({ request, params }) => {
+    const url = new URL(request.url);
+    const memberId = url.searchParams.get('memberId');
+    const { tableId } = params;
+    console.log(`# memberId = ${memberId}, tableId  = ${tableId}`);
+
     return HttpResponse.json({
       id: 1,
       info: {
@@ -72,8 +81,16 @@ export const handlers = [
     });
   }),
 
-  // POST new table data
-  http.post(ApiUrl.parliamentary, () => {
+  // POST /api/table/parliamentary?memberId={memberId}
+  http.post(ApiUrl.parliamentary, async ({ request }) => {
+    const url = new URL(request.url);
+    const memberId = url.searchParams.get('memberId');
+    const result = await request.json();
+    // This console log calling shows error(ts(2339)) but will be executed with any problems.
+    console.log(
+      `# memberId = ${memberId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
+    );
+
     return HttpResponse.json({
       info: {
         name: '테이블1',
@@ -114,8 +131,16 @@ export const handlers = [
     });
   }),
 
-  // PUT specific table data to new one
-  http.put(ApiUrl.parliamentary, () => {
+  // PUT /api/table/parliamentary/{tableId}?memberId={memberId}
+  http.put(ApiUrl.parliamentary + '/:tableId', async ({ request, params }) => {
+    const url = new URL(request.url);
+    const memberId = url.searchParams.get('memberId');
+    const { tableId } = params;
+    const result = await request.json();
+    console.log(
+      `# tableId = ${tableId}, memberId = ${memberId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
+    );
+
     return HttpResponse.json({
       info: {
         name: '테이블1',
@@ -156,8 +181,15 @@ export const handlers = [
     });
   }),
 
-  // DELETE specific table data
-  http.delete(ApiUrl.parliamentary, () => {
-    return HttpResponse.text('', { status: 204 });
+  // DELETE /api/table/parliamentary/{tableId}?memberId={memberId}
+  http.delete(ApiUrl.parliamentary + '/:tableId', ({ request, params }) => {
+    const url = new URL(request.url);
+    const memberId = url.searchParams.get('memberId');
+    const { tableId } = params;
+    console.log(`# memberId = ${memberId}, tableId  = ${tableId}`);
+
+    return new HttpResponse(null, {
+      status: 204,
+    });
   }),
 ];
