@@ -34,6 +34,7 @@ export function useModal(options: UseModalOptions = {}) {
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
+      e.stopPropagation();
       if (e.target === e.currentTarget && closeOnOverlayClick) {
         closeModal();
       }
