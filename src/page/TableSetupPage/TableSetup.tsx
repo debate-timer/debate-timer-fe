@@ -19,9 +19,23 @@ export default function TableSetup() {
     closeModal: ConsCloseModal,
     ModalWrapper: ConsModalWrapper,
   } = useModal();
-  const [data, setDate] = useState<DebateInfo[]>([]);
+  const [data, setData] = useState<DebateInfo[]>([]);
 
   const navigate = useNavigate();
+
+  const handleSubmitEdit = (indexToEdit: number, updatedInfo: DebateInfo) => {
+    setData((prevData) =>
+      prevData.map((item, index) =>
+        index === indexToEdit ? updatedInfo : item,
+      ),
+    );
+  };
+
+  const handleSubmitDelete = (indexToRemove: number) => {
+    setData((prevData) =>
+      prevData.filter((_, index) => index !== indexToRemove),
+    );
+  };
 
   return (
     <DefaultLayout>
@@ -47,8 +61,13 @@ export default function TableSetup() {
       </DefaultLayout.Header>
       <DefaultLayout.ContentContanier>
         <PropsAndConsTitle />
-        {data.map((info) => (
-          <DebatePanel key={info.time} info={info} />
+        {data.map((info, index) => (
+          <DebatePanel
+            key={index}
+            info={info}
+            onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
+            onSubmitDelete={() => handleSubmitDelete(index)}
+          />
         ))}
 
         <TimerCreationButton
@@ -69,7 +88,7 @@ export default function TableSetup() {
           selectedStance={'PROS'}
           initDate={data[data.length - 1]}
           onSubmit={(data) => {
-            setDate((prev) => [...prev, data]);
+            setData((prev) => [...prev, data]);
           }}
           onClose={ProsCloseModal}
         />
@@ -80,7 +99,7 @@ export default function TableSetup() {
           selectedStance={'CONS'}
           initDate={data[data.length - 1]}
           onSubmit={(data) => {
-            setDate((prev) => [...prev, data]);
+            setData((prev) => [...prev, data]);
           }}
           onClose={ConsCloseModal}
         />
