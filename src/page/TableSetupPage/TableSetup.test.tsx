@@ -1,10 +1,10 @@
 // TableSetup.test.tsx
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TableSetup from './TableSetup';
 import { GlobalPortal } from '../../util/GlobalPortal';
 import { MemoryRouter } from 'react-router-dom';
-function TestTableSetupt() {
+function TestTableSetup() {
   return (
     <MemoryRouter>
       <GlobalPortal.Provider>
@@ -15,7 +15,7 @@ function TestTableSetupt() {
 }
 describe('TableSetup', () => {
   it('왼쪽 + 버튼 클릭 → 모달 → "타임박스 설정하기" → 찬성 박스 생성', async () => {
-    render(<TestTableSetupt />);
+    render(<TestTableSetup />);
     const user = userEvent.setup();
 
     // "+" 버튼: [0] = left, [1] = right
@@ -43,7 +43,7 @@ describe('TableSetup', () => {
   });
 
   it('오른쪽 + 버튼 클릭 → 반대 박스 생성', async () => {
-    render(<TestTableSetupt />);
+    render(<TestTableSetup />);
     const user = userEvent.setup();
 
     const plusButtons = screen.getAllByRole('button', { name: '+' });
@@ -67,7 +67,7 @@ describe('TableSetup', () => {
   });
 
   it('"유형"에 작전시간을 선택하면 입장 드롭박스가 비활성화되고, 설정 시 작전시간 박스가 생성된다.', async () => {
-    render(<TestTableSetupt />);
+    render(<TestTableSetup />);
     const user = userEvent.setup();
 
     // 왼쪽 + 버튼 클릭
@@ -97,5 +97,66 @@ describe('TableSetup', () => {
 
     // DebatePanel이 "작전시간" 인지 확인
     expect(screen.getByText('작전 시간', { exact: false })).toBeInTheDocument();
+  });
+  it('DebatePanel 수정 기능: Edit 버튼 클릭 → 모달에서 시간 변경 → 반영 여부 확인', async () => {
+    render(<TestTableSetup />);
+    const user = userEvent.setup();
+
+    // 1) 새로운 DebatePanel 하나 추가(예: 찬성)
+    const plusButtons = screen.getAllByRole('button', { name: '+' });
+    await user.click(plusButtons[0]);
+
+    await user.click(screen.getByRole('button', { name: '타임박스 설정하기' }));
+
+    expect(screen.getByText('3분 0초')).toBeInTheDocument();
+
+    const editButton = screen.getByRole('button', { name: '수정하기' });
+
+    await user.click(editButton);
+
+    // 모달 열림 확인: "타임박스 설정" 타이틀
+    expect(
+      screen.getByRole('heading', { name: '타임박스 설정' }),
+    ).toBeInTheDocument();
+
+    const spinButtons = screen.getAllByRole('spinbutton');
+    await user.clear(spinButtons[0]);
+    await user.type(spinButtons[0], '4');
+    await user.clear(spinButtons[1]);
+    await user.type(spinButtons[1], '30');
+
+    await user.click(screen.getByRole('button', { name: '타임박스 설정하기' }));
+    expect(
+      screen.queryByRole('heading', { name: '타임박스 설정' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByText('4분 30초')).toBeInTheDocument();
+  });
+
+  it('DebatePanel 삭제 기능: Delete 버튼 클릭 → 확인 모달에서 "삭제하기" → DebatePanel 제거', async () => {
+    render(<TestTableSetup />);
+    const user = userEvent.setup();
+
+    const plusButtons = screen.getAllByRole('button', { name: '+' });
+    await user.click(plusButtons[0]);
+    await user.click(screen.getByRole('button', { name: '타임박스 설정하기' }));
+
+    expect(screen.getByText('3분 0초')).toBeInTheDocument();
+
+    const deleteButton = screen.getByRole('button', { name: '삭제하기' });
+    await user.click(deleteButton);
+
+    expect(screen.getByText(/삭제하시겠습니까/i)).toBeInTheDocument();
+
+    const modal = screen
+      .getByText('타임 박스를 삭제하시겠습니까?')
+      .closest('div')!;
+
+    const confirmDeleteBtn = within(modal).getByRole('button', {
+      name: '삭제하기',
+    });
+    await user.click(confirmDeleteBtn);
+
+    expect(screen.queryByText('3분 0초')).not.toBeInTheDocument();
   });
 });
