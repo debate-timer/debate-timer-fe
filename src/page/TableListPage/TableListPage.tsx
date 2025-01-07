@@ -4,11 +4,35 @@ import { DebateTable } from '../../type/type';
 import AddTable from './components/Table/AddTable';
 import Table from './components/Table/Table';
 
-const initialData = [
-  { name: '테이블 1', type: '의회식 토론', time: 30, onDelete: () => {} },
-  { name: '테이블 2', type: '의회식 토론', time: 30, onDelete: () => {} },
-  { name: '테이블 3', type: '의회식 토론', time: 30, onDelete: () => {} },
-  { name: '테이블 4', type: '의회식 토론', time: 30, onDelete: () => {} },
+const initialData: DebateTableWithDelete[] = [
+  {
+    id: 0,
+    name: '테이블 1',
+    type: '의회식 토론',
+    duration: 30,
+    onDelete: () => {},
+  },
+  {
+    id: 1,
+    name: '테이블 2',
+    type: '의회식 토론',
+    duration: 30,
+    onDelete: () => {},
+  },
+  {
+    id: 2,
+    name: '테이블 3',
+    type: '의회식 토론',
+    duration: 30,
+    onDelete: () => {},
+  },
+  {
+    id: 3,
+    name: '테이블 4',
+    type: '의회식 토론',
+    duration: 30,
+    onDelete: () => {},
+  },
 ];
 
 interface DebateTableWithDelete extends DebateTable {
@@ -34,6 +58,7 @@ export default function TableListPage() {
           {tables.map((table: DebateTableWithDelete, idx: number) => (
             <Table
               key={idx}
+              id={table.id}
               name={table.name}
               type={table.type}
               duration={table.duration}

@@ -13,7 +13,6 @@ export default function Table({
   duration,
   onDelete,
 }: DebateTableWithDelete) {
-  
   const navigate = useNavigate();
   const handleClick = () => {
     navigate('/');
