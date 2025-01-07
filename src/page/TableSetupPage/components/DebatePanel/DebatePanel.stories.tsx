@@ -8,7 +8,7 @@ const meta: Meta<typeof DebatePanel> = {
   args: {
     info: {
       stance: 'PROS',
-      debateType: 'OPENING',
+      type: 'OPENING',
       time: 150,
       speakerNumber: 1,
     },
@@ -23,7 +23,7 @@ export const ProsOpening: Story = {
   args: {
     info: {
       stance: 'PROS',
-      debateType: 'OPENING',
+      type: 'OPENING',
       time: 150,
       speakerNumber: 1,
     },
@@ -35,7 +35,7 @@ export const ConsRebuttal: Story = {
   args: {
     info: {
       stance: 'CONS',
-      debateType: 'REBUTTAL',
+      type: 'REBUTTAL',
       time: 120,
       speakerNumber: 2,
     },
@@ -47,7 +47,7 @@ export const NeutralTimeout: Story = {
   args: {
     info: {
       stance: 'NEUTRAL',
-      debateType: 'TIME_OUT',
+      type: 'TIME_OUT',
       time: 60,
       speakerNumber: 0,
     },

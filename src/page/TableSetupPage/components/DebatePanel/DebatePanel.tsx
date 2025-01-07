@@ -9,7 +9,7 @@ interface DebatePanelProps {
 }
 
 export default function DebatePanel(props: DebatePanelProps) {
-  const { stance, debateType, time, speakerNumber } = props.info;
+  const { stance, type: debateType, time, speakerNumber } = props.info;
   const { onSubmitEdit, onSubmitDelete } = props;
 
   const debateTypeLabel = DEBATE_TYPE_LABELS[debateType];
