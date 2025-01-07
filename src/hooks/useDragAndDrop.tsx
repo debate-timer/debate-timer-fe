@@ -39,7 +39,7 @@ export function useDragAndDrop<T>({
     },
     [],
   );
-  // Throttle the handleMouseMove function
+
   const throttledHandleMouseMove = useThrottle(handleMouseMove, throttleDelay);
 
   const handleMouseUp = useCallback(() => {
