@@ -9,6 +9,12 @@ import {
 } from './responseTypes';
 import { DebateInfo } from '../type/type';
 
+// String type identifier for TanStack Query's 'useQuery' function
+export const queryKeyIdentifier = {
+  getDebateTableList: 'DebateTableList',
+  getParliamentaryTableData: 'ParliamentaryTableData',
+};
+
 // POST "/api/member"
 export async function postUser(
   nickname: string,
@@ -44,7 +50,7 @@ export async function getDebateTableList(
 }
 
 // GET /api/table/parliamentary/{tableId}?memberId={memberId}
-export async function getTableData(
+export async function getParliamentaryTableData(
   tableId: number,
   memberId: number,
 ): Promise<GetTableDataResponseType> {
@@ -62,7 +68,7 @@ export async function getTableData(
 }
 
 // POST /api/table/parliamentary?memberId={memberId}
-export async function postDebateTable(
+export async function postParliamentaryDebateTable(
   memberId: number,
   tableName: string,
   tableAgenda: string,
@@ -88,7 +94,7 @@ export async function postDebateTable(
 }
 
 // PUT /api/table/parliamentary/{tableId}?memberId={memberId}
-export async function putDebateTable(
+export async function putParliamentaryDebateTable(
   tableId: number,
   memberId: number,
   tableName: string,
@@ -115,7 +121,7 @@ export async function putDebateTable(
 }
 
 // DELETE /api/table/parliamentary/{tableId}?memberId={memberId}
-export async function deleteDebateTable(
+export async function deleteParliamentaryDebateTable(
   tableId: number,
   memberId: number,
 ): Promise<boolean> {
