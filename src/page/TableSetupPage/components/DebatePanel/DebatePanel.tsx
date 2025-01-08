@@ -10,9 +10,9 @@ interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export default function DebatePanel(props: DebatePanelProps) {
-  const { stance, debateType, time, speakerNumber } = props.info;
-  const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
-
+  const { stance, type: debateType, time, speakerNumber } = props.info;
+  const { onSubmitEdit, onSubmitDelete } = props;
+  
   const debateTypeLabel = DEBATE_TYPE_LABELS[debateType];
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
   const timeStr = `${minutes}분 ${seconds}초`;
