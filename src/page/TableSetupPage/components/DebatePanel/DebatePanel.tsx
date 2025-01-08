@@ -4,8 +4,8 @@ import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
 
 interface DebatePanelProps {
   info: DebateInfo;
-  onSubmitEdit: (updatedInfo: DebateInfo) => void;
-  onSubmitDelete: () => void;
+  onSubmitEdit?: (updatedInfo: DebateInfo) => void;
+  onSubmitDelete?: () => void;
 }
 
 export default function DebatePanel(props: DebatePanelProps) {
@@ -32,11 +32,13 @@ export default function DebatePanel(props: DebatePanelProps) {
         isPros ? 'bg-blue-500' : 'bg-red-500'
       } h-24 p-2 font-bold text-white`}
     >
-      <EditDeleteButtons
-        info={props.info}
-        onSubmitEdit={onSubmitEdit}
-        onSubmitDelete={onSubmitDelete}
-      />
+      {onSubmitEdit && onSubmitDelete && (
+        <EditDeleteButtons
+          info={props.info}
+          onSubmitEdit={onSubmitEdit}
+          onSubmitDelete={onSubmitDelete}
+        />
+      )}
       <div>
         {debateTypeLabel} / {speakerNumber}번 토론자
       </div>
@@ -47,11 +49,13 @@ export default function DebatePanel(props: DebatePanelProps) {
   const renderNeutralTimeoutPanel = () => (
     <div className="flex h-24 w-full items-center text-center">
       <div className="flex h-4/5 w-full flex-col items-center justify-start rounded-md bg-gray-200 p-2 font-medium text-gray-600">
-        <EditDeleteButtons
-          info={props.info}
-          onSubmitEdit={onSubmitEdit}
-          onSubmitDelete={onSubmitDelete}
-        />
+        {onSubmitEdit && onSubmitDelete && (
+          <EditDeleteButtons
+            info={props.info}
+            onSubmitEdit={onSubmitEdit}
+            onSubmitDelete={onSubmitDelete}
+          />
+        )}
         {debateTypeLabel} | {timeStr}
       </div>
     </div>
