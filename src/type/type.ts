@@ -32,11 +32,3 @@ export interface DebateTable {
   type: string;
   duration: number;
 }
-
-export interface TableInfo {
-  info: {
-    name: string;
-    agenda: string;
-  };
-  table: DebateInfo[];
-}

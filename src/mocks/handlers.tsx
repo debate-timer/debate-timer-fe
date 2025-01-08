@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../apis/endpoints';
-import { TableInfo } from '../type/type';
+import { PostDebateTableResponseType } from '../apis/responseTypes';
 
 export const handlers = [
   // POST "/api/member"
@@ -86,7 +86,7 @@ export const handlers = [
   http.post(ApiUrl.parliamentary, async ({ request }) => {
     const url = new URL(request.url);
     const memberId = url.searchParams.get('memberId');
-    const result = (await request.json()) as TableInfo;
+    const result = (await request.json()) as PostDebateTableResponseType;
     // This console log calling shows error(ts(2339)) but will be executed with any problems.
     console.log(
       `# memberId = ${memberId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
@@ -137,7 +137,7 @@ export const handlers = [
     const url = new URL(request.url);
     const memberId = url.searchParams.get('memberId');
     const { tableId } = params;
-    const result = (await request.json()) as TableInfo;
+    const result = (await request.json()) as PostDebateTableResponseType;
     console.log(
       `# tableId = ${tableId}, memberId = ${memberId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
     );
