@@ -5,14 +5,14 @@ import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
 
 interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   info: DebateInfo;
-  onSubmitEdit: (updatedInfo: DebateInfo) => void;
-  onSubmitDelete: () => void;
+  onSubmitEdit?: (updatedInfo: DebateInfo) => void;
+  onSubmitDelete?: () => void;
 }
 
 export default function DebatePanel(props: DebatePanelProps) {
   const { stance, type: debateType, time, speakerNumber } = props.info;
-  const { onSubmitEdit, onSubmitDelete } = props;
-  
+  const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
+
   const debateTypeLabel = DEBATE_TYPE_LABELS[debateType];
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
   const timeStr = `${minutes}분 ${seconds}초`;
@@ -39,13 +39,17 @@ export default function DebatePanel(props: DebatePanelProps) {
           className="h-2 flex-1 rounded-sm bg-gray-300"
           onMouseDown={onMouseDown}
         />
-        <div className="flex-1">
-          <EditDeleteButtons
-            info={props.info}
-            onSubmitEdit={onSubmitEdit}
-            onSubmitDelete={onSubmitDelete}
-          />
-        </div>
+        {onSubmitEdit && onSubmitDelete && (
+          <div className="flex-1">
+            (
+            <EditDeleteButtons
+              info={props.info}
+              onSubmitEdit={onSubmitEdit}
+              onSubmitDelete={onSubmitDelete}
+            />
+            )
+          </div>
+        )}
       </div>
 
       <div>
@@ -64,13 +68,17 @@ export default function DebatePanel(props: DebatePanelProps) {
             className="h-2 flex-1 rounded-sm bg-gray-300"
             onMouseDown={onMouseDown}
           />
-          <div className="flex-1">
-            <EditDeleteButtons
-              info={props.info}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-            />
-          </div>
+          {onSubmitEdit && onSubmitDelete && (
+            <div className="flex-1">
+              (
+              <EditDeleteButtons
+                info={props.info}
+                onSubmitEdit={onSubmitEdit}
+                onSubmitDelete={onSubmitDelete}
+              />
+              )
+            </div>
+          )}
         </div>
         {debateTypeLabel} | {timeStr}
       </div>
