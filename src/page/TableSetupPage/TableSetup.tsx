@@ -4,9 +4,10 @@ import DebatePanel from './components/DebatePanel/DebatePanel';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import TimerCreationButton from './components/TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from './components/TimerCreationContent/TimerCreationContent';
-import { useState } from 'react';
 import { DebateInfo } from '../../type/type';
 import { useNavigate } from 'react-router-dom';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { useState } from 'react';
 
 export default function TableSetup() {
   const {
@@ -20,6 +21,13 @@ export default function TableSetup() {
     ModalWrapper: ConsModalWrapper,
   } = useModal();
   const [data, setData] = useState<DebateInfo[]>([]);
+
+  const { handleMouseDown, getDraggingStyles, DragAndDropWrapper } =
+    useDragAndDrop({
+      data,
+      setData,
+      throttleDelay: 50,
+    });
 
   const navigate = useNavigate();
 
@@ -59,22 +67,31 @@ export default function TableSetup() {
           </div>
         </DefaultLayout.Header.Right>
       </DefaultLayout.Header>
+
       <DefaultLayout.ContentContanier>
         <PropsAndConsTitle />
-        {data.map((info, index) => (
-          <DebatePanel
-            key={index}
-            info={info}
-            onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
-            onSubmitDelete={() => handleSubmitDelete(index)}
-          />
-        ))}
+        <DragAndDropWrapper>
+          {data.map((info, index) => (
+            <div key={info.time} style={getDraggingStyles(index)}>
+              <DebatePanel
+                key={index}
+                info={info}
+                onSubmitEdit={(updatedInfo) =>
+                  handleSubmitEdit(index, updatedInfo)
+                }
+                onSubmitDelete={() => handleSubmitDelete(index)}
+                onMouseDown={() => handleMouseDown(index)}
+              />
+            </div>
+          ))}
+        </DragAndDropWrapper>
 
         <TimerCreationButton
           leftOnClick={ProsOpenModal}
           rightOnClick={ConsOpenModal}
         />
       </DefaultLayout.ContentContanier>
+
       <DefaultLayout.StickyFooterWrapper>
         <button
           className="h-20 w-screen bg-amber-300"
@@ -83,6 +100,7 @@ export default function TableSetup() {
           테이블 추가하기
         </button>
       </DefaultLayout.StickyFooterWrapper>
+
       <ProsModalWrapper>
         <TimerCreationContent
           selectedStance={'PROS'}
