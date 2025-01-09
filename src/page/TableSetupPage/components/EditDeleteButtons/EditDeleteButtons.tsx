@@ -24,7 +24,7 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
   const { info, onSubmitEdit, onSubmitDelete } = props;
   return (
     <>
-      <div className="flex w-full justify-end gap-2">
+      <div className="flex justify-end gap-2">
         <button onClick={openEditModal} aria-label="수정하기">
           <AiOutlineEdit />
         </button>
