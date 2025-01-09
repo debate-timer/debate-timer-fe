@@ -27,7 +27,7 @@ type Story = StoryObj<typeof EditDeleteButtons>;
 
 const mockInfo: DebateInfo = {
   stance: 'PROS',
-  debateType: 'OPENING',
+  type: 'OPENING',
   time: 150,
   speakerNumber: 1,
 };
