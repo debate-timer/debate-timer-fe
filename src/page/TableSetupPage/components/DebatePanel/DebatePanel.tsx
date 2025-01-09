@@ -51,7 +51,6 @@ export default function DebatePanel(props: DebatePanelProps) {
           </div>
         )}
       </div>
-
       <div>
         {debateTypeLabel} / {speakerNumber}번 토론자
       </div>
