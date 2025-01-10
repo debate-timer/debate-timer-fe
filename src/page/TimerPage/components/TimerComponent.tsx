@@ -46,7 +46,7 @@ export default function TimerComponent({
 
   return (
     <div
-      className={`flex flex-col items-center space-y-4 rounded-[50px] border-8 border-zinc-50 px-24 py-8 ${bgColor}`}
+      className={`flex flex-col items-center space-y-4 rounded-[50px] border-4 border-zinc-50 px-24 py-8 shadow-2xl ${bgColor}`}
     >
       <div className="m-2 flex flex-col items-center space-y-2">
         <h1 className="text-5xl font-bold">{titleText}</h1>

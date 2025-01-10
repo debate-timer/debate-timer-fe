@@ -42,7 +42,7 @@ export default function DebateInfoSummary({
         {!isPrev && <IoChevronForward className="size-[30px]" />}
       </div>
       <div
-        className={`m-4 flex h-[120px] flex-row items-center justify-center space-x-4 rounded-2xl p-4 ${bgColor}`}
+        className={`m-4 flex h-[120px] flex-row items-center justify-center space-x-4 rounded-2xl border-2 border-zinc-50 p-4 shadow-2xl ${bgColor}`}
       >
         <h1 className="text-4xl font-bold text-zinc-50">{titleText}</h1>
         <div className="flex flex-col items-start rounded-2xl bg-zinc-50 px-5 py-3">

@@ -1,8 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { DebateInfo } from '../../type/type';
 import DebateInfoSummary from './components/DebateInfoSummary';
 import TimerComponent from './components/TimerComponent';
+import dingOnce from '/sounds/ding-once-edit.mp3';
+import dingTwice from '/sounds/ding-twice-edit.mp3';
+import useSound from 'use-sound';
 
 interface TimerPageProps {
   debateInfoItems: DebateInfo[];
@@ -11,10 +14,20 @@ interface TimerPageProps {
 export type TimerState = 'STOPPED' | 'RESET' | 'RUNNING';
 
 export default function TimerPage({ debateInfoItems }: TimerPageProps) {
+  const [dingOnceSfx] = useSound(dingOnce);
+  const [dingTwiceSfx] = useSound(dingTwice);
   const [index, setIndex] = useState<number>(0);
   const [timerState, setTimerState] = useState<TimerState>('RESET');
   const [timer, setTimer] = useState<number>(debateInfoItems[index].time);
   const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (timer === 30) {
+      dingOnceSfx();
+    } else if (timer === 0) {
+      dingTwiceSfx();
+    }
+  });
 
   const startTimer = () => {
     if (intervalRef.current) return;
