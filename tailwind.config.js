@@ -20,7 +20,7 @@ export default {
         },
       },
       animation: {
-        gradient: 'gradient 8s ease infinite',
+        gradient: 'gradient 10s ease infinite',
       },
       fontFamily: {
         pretendard: [

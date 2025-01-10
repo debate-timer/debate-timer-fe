@@ -17,10 +17,12 @@ export default function DebateInfoSummary({
   debateInfo,
   isPrev,
 }: DebateInfoSummaryProps) {
+  const alignOption = isPrev ? 'items-start' : 'items-end';
+  const prevNextText = isPrev ? '이전 순서' : '다음 순서';
   const titleText =
-    debateInfo.debateType !== 'TIME_OUT'
-      ? `${Formatting.formatStanceToString(debateInfo.stance)} ${Formatting.formatDebateTypeToString(debateInfo.debateType)}`
-      : Formatting.formatDebateTypeToString(debateInfo.debateType);
+    debateInfo.type !== 'TIME_OUT'
+      ? `${Formatting.formatStanceToString(debateInfo.stance)} ${Formatting.formatDebateTypeToString(debateInfo.type)}`
+      : Formatting.formatDebateTypeToString(debateInfo.type);
   const speakerText =
     debateInfo.stance === 'NEUTRAL'
       ? ''
@@ -31,8 +33,17 @@ export default function DebateInfoSummary({
       : debateInfo.stance === 'PROS'
         ? 'bg-blue-500'
         : 'bg-red-500';
-  const alignOption = isPrev ? 'items-start' : 'items-end';
-  const prevNextText = isPrev ? '이전 순서' : '다음 순서';
+  let timeText: string;
+
+  if (debateInfo.time < 60) {
+    timeText = `${debateInfo.time % 60}초`;
+  } else {
+    if (debateInfo.time % 60 === 0) {
+      timeText = `${Math.floor(debateInfo.time / 60)}분`;
+    } else {
+      timeText = `${Math.floor(debateInfo.time / 60)}분 ${debateInfo.time % 60}초`;
+    }
+  }
 
   return (
     <div className={`flex flex-col space-y-4 p-4 ${alignOption}`}>
@@ -57,7 +68,7 @@ export default function DebateInfoSummary({
           {/* Available speaking time */}
           <div className="flex flex-row items-center justify-center space-x-3">
             <IoTime />
-            <h1 className="text-xl text-zinc-900">3분 0초</h1>
+            <h1 className="text-xl text-zinc-900">{timeText}</h1>
           </div>
         </div>
       </div>

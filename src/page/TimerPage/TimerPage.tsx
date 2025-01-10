@@ -1,98 +1,62 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { DebateInfo } from '../../type/type';
 import DebateInfoSummary from './components/DebateInfoSummary';
 import TimerComponent from './components/TimerComponent';
-import dingOnce from '/sounds/ding-once-edit.mp3';
-import dingTwice from '/sounds/ding-twice-edit.mp3';
-import useSound from 'use-sound';
+import { useQuery } from '@tanstack/react-query';
+import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
 
-interface TimerPageProps {
-  debateInfoItems: DebateInfo[];
-}
+export default function TimerPage() {
+  // Prepare data before requesting query
+  const tableId = 1024;
+  const memberId = 1024;
+  const queryKey = [
+    queryKeyIdentifier.getParliamentaryTableData,
+    tableId,
+    memberId,
+  ];
 
-export type TimerState = 'STOPPED' | 'RESET' | 'RUNNING';
-
-export default function TimerPage({ debateInfoItems }: TimerPageProps) {
-  const [dingOnceSfx] = useSound(dingOnce);
-  const [dingTwiceSfx] = useSound(dingTwice);
-  const [index, setIndex] = useState<number>(0);
-  const [timerState, setTimerState] = useState<TimerState>('RESET');
-  const [timer, setTimer] = useState<number>(debateInfoItems[index].time);
-  const intervalRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (timer === 30) {
-      dingOnceSfx();
-    } else if (timer === 0) {
-      dingTwiceSfx();
-    }
+  // Get query
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKey,
+    queryFn: () => getParliamentaryTableData(tableId, memberId),
   });
 
-  const startTimer = () => {
-    if (intervalRef.current) return;
+  // Declare states
+  const [index, setIndex] = useState<number>(0);
+  const [bg, setBg] = useState<string>('');
 
-    setTimerState('RUNNING');
-    intervalRef.current = window.setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 1000);
-  };
-  const stopTimer = () => {
-    setTimerState('STOPPED');
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
-  const resetTimer = () => {
-    setTimerState('RESET');
-    setTimer(debateInfoItems[index].time);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
-  const moveToOtherItem = (isPrev: boolean) => {
-    if (isPrev) {
-      decreaseIndex();
-    } else {
-      increaseIndex();
-    }
-    resetTimer();
-  };
-  const increaseIndex = () => {
-    console.log(`# index = ${index}`);
-    if (index >= debateInfoItems.length) {
+  // Declare functions that manages array's index
+  const increaseIndex = (max: number) => {
+    // console.log(`# index = ${index}`);
+    if (index >= max) {
       return;
     }
     setIndex(index + 1);
   };
   const decreaseIndex = () => {
-    console.log(`# index = ${index}`);
+    // console.log(`# index = ${index}`);
     if (index <= 0) {
       return;
     }
     setIndex(index - 1);
   };
-  let bg: string;
 
-  if (timerState !== 'RUNNING') {
-    bg = '';
-  } else {
-    if (timer > 30) {
-      bg = 'gradient-timer-running';
-    } else if (timer <= 30 && timer > 0) {
-      bg = 'gradient-timer-warning';
-    } else {
-      bg = 'gradient-timer-timeout';
-    }
+  // Handle exceptions
+  if (isLoading) {
+    return <div>Loading</div>;
+  }
+  if (isError || data === null) {
+    return <div>Error</div>;
   }
 
+  // Return React component
   return (
     <div className="relative h-full w-full">
+      {/* Let animated background be located behind of the timer */}
       <div
         className={`absolute inset-0 h-full w-full animate-gradient opacity-80 ${bg}`}
       />
+
       <DefaultLayout>
         {/* Header */}
         <DefaultLayout.Header>
@@ -105,12 +69,10 @@ export default function TimerPage({ debateInfoItems }: TimerPageProps) {
         <DefaultLayout.ContentContanier>
           <div className="relative z-10 flex h-full w-full flex-col items-center justify-center">
             <TimerComponent
-              debateInfo={debateInfoItems[index]}
-              timer={timer}
-              resetTimer={resetTimer}
-              startTimer={startTimer}
-              stopTimer={stopTimer}
-              moveToOtherItem={moveToOtherItem}
+              debateInfo={data!.table[index]}
+              increaseIndex={increaseIndex}
+              decreaseIndex={decreaseIndex}
+              setBg={setBg}
             />
           </div>
         </DefaultLayout.ContentContanier>
@@ -122,15 +84,15 @@ export default function TimerPage({ debateInfoItems }: TimerPageProps) {
               {index !== 0 && (
                 <DebateInfoSummary
                   isPrev={true}
-                  debateInfo={debateInfoItems[index - 1]}
+                  debateInfo={data!.table[index - 1]}
                 />
               )}
             </div>
             <div className="flex">
-              {index !== debateInfoItems.length - 1 && (
+              {index !== data!.table.length - 1 && (
                 <DebateInfoSummary
                   isPrev={false}
-                  debateInfo={debateInfoItems[index + 1]}
+                  debateInfo={data!.table[index + 1]}
                 />
               )}
             </div>
