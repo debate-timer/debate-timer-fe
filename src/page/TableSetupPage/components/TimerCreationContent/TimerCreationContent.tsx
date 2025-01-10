@@ -17,9 +17,7 @@ export default function TimerCreationContent({
 }: TimerCreationContentProps) {
   const [stance, setStance] = useState<Stance>(selectedStance);
   const [debateType, setDebateType] = useState<DebateType>(
-    initDate?.stance === 'NEUTRAL'
-      ? 'OPENING'
-      : (initDate?.debateType ?? 'OPENING'),
+    initDate?.stance === 'NEUTRAL' ? 'OPENING' : (initDate?.type ?? 'OPENING'),
   );
   const { minutes: initMinutes, seconds: initSeconds } =
     Formatting.formatSecondsToMinutes(initDate?.time ?? 180);
@@ -34,7 +32,7 @@ export default function TimerCreationContent({
     const totalTime = minutes * 60 + seconds;
     onSubmit({
       stance,
-      debateType,
+      type: debateType,
       time: totalTime,
       ...(speakerNumber !== null && { speakerNumber }),
     });

@@ -36,19 +36,22 @@ vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
 
 vi.mock('./components/Table/Table', () => ({
   default: function Table({
+    id,
     name,
     type,
-    time,
+    duration,
   }: {
+    id: number;
     name: string;
     type: string;
-    time: number;
+    duration: number;
   }) {
     return (
       <div data-testid="table-component">
+        <div>{id}</div>
         <div>{name}</div>
         <div>{type}</div>
-        <div>{time}</div>
+        <div>{duration}</div>
       </div>
     );
   },
