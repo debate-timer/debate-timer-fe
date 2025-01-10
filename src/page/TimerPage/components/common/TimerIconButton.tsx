@@ -24,7 +24,7 @@ export default function TimerIconButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full p-4 font-bold ${bgText} ${hoverText} ${contentText}`}
+      className={`rounded-full border-2 border-zinc-50 p-4 font-bold ${bgText} ${hoverText} ${contentText}`}
     >
       {icon}
     </button>
