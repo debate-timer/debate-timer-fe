@@ -19,7 +19,7 @@ interface TimerComponentProps {
 // - PAUSED: When timer is paused
 // - STOPPED: When timer is rendered or reset
 // - RUNNING: When timer is running
-type TimerState = 'PAUSED' | 'STOPPED' | 'RUNNING';
+export type TimerState = 'PAUSED' | 'STOPPED' | 'RUNNING';
 
 // Main timer component that user can control
 export default function TimerComponent({
@@ -73,7 +73,7 @@ export default function TimerComponent({
       setTimer((prev) => prev - 1);
     }, 1000);
   };
-  const stopTimer = () => {
+  const pauseTimer = () => {
     setTimerState('PAUSED');
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -112,6 +112,32 @@ export default function TimerComponent({
     }
   }
 
+  // Add keyboard event listener
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.code) {
+        case 'Space':
+          if (timerState === 'RUNNING') {
+            pauseTimer();
+          } else {
+            startTimer();
+          }
+          break;
+        case 'ArrowLeft':
+          moveToOtherItem(true);
+          break;
+        case 'ArrowRight':
+          moveToOtherItem(false);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  });
+
   // Return React component
   return (
     <div
@@ -135,7 +161,7 @@ export default function TimerComponent({
       <TimerController
         onReset={resetTimer}
         onStart={startTimer}
-        onStop={stopTimer}
+        onPause={pauseTimer}
         toOtherItem={moveToOtherItem}
       />
     </div>

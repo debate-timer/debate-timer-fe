@@ -1,16 +1,16 @@
 import TimerIconButton from '../common/TimerIconButton';
 import TimerTextButton from '../common/TimerTextButton';
-import { IoPlayOutline, IoStopOutline, IoTimerOutline } from 'react-icons/io5';
+import { IoPauseOutline, IoPlayOutline, IoTimerOutline } from 'react-icons/io5';
 
 interface TimerControllerProps {
-  onStop: () => void;
+  onPause: () => void;
   onStart: () => void;
   onReset: () => void;
   toOtherItem: (isPrev: boolean) => void;
 }
 
 export default function TimerController({
-  onStop,
+  onPause,
   onStart,
   onReset,
   toOtherItem,
@@ -37,15 +37,15 @@ export default function TimerController({
         }}
       />
 
-      {/* Timer stop button */}
+      {/* Timer pause button */}
       <div className="w-4" />
       <TimerIconButton
-        icon={<IoStopOutline className="size-8" />}
+        icon={<IoPauseOutline className="size-8" />}
         bgColor="bg-amber-500"
         hoverColor="hover:bg-amber-600"
         contentColor="text-zinc-50"
         onClick={() => {
-          onStop();
+          onPause();
         }}
       />
 
