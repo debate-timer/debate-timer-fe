@@ -10,7 +10,7 @@ import { IoPerson } from 'react-icons/io5';
 
 interface TimerComponentProps {
   debateInfo: DebateInfo;
-  increaseIndex: (max: number) => void;
+  increaseIndex: () => void;
   decreaseIndex: () => void;
   setBg: (newValue: string) => void;
 }
@@ -94,7 +94,7 @@ export default function TimerComponent({
     if (isPrev) {
       decreaseIndex();
     } else {
-      increaseIndex(debateInfo.time);
+      increaseIndex();
     }
     resetTimer();
   };

@@ -27,18 +27,18 @@ export default function TimerPage() {
 
   // Declare functions that manages array's index
   const increaseIndex = (max: number) => {
-    // console.log(`# index = ${index}`);
-    if (index >= max) {
+    if (index >= max - 1) {
       return;
     }
     setIndex(index + 1);
+    // console.log(`# index = ${index}, max = ${max}`);
   };
   const decreaseIndex = () => {
-    // console.log(`# index = ${index}`);
     if (index <= 0) {
       return;
     }
     setIndex(index - 1);
+    // console.log(`# index = ${index}`);
   };
 
   // Handle exceptions
@@ -49,56 +49,57 @@ export default function TimerPage() {
     return <div>Error</div>;
   }
 
+  console.log(`# index = ${index}, max = ${data!.table.length}`);
+
   // Return React component
   return (
-    <div className="relative h-full w-full">
-      {/* Let animated background be located behind of the timer */}
-      <div
-        className={`absolute inset-0 h-full w-full animate-gradient opacity-80 ${bg}`}
-      />
+    <DefaultLayout>
+      {/* Header */}
+      <DefaultLayout.Header>
+        <DefaultLayout.Header.Left>왼쪽</DefaultLayout.Header.Left>
+        <DefaultLayout.Header.Center>가운데</DefaultLayout.Header.Center>
+        <DefaultLayout.Header.Right>오른쪽</DefaultLayout.Header.Right>
+      </DefaultLayout.Header>
 
-      <DefaultLayout>
-        {/* Header */}
-        <DefaultLayout.Header>
-          <DefaultLayout.Header.Left>왼쪽</DefaultLayout.Header.Left>
-          <DefaultLayout.Header.Center>가운데</DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right>오른쪽</DefaultLayout.Header.Right>
-        </DefaultLayout.Header>
-
-        {/* Content */}
-        <DefaultLayout.ContentContanier>
+      {/* Content */}
+      <DefaultLayout.ContentContanier>
+        <div className="relative h-full w-full">
+          {/* Let animated background be located behind of the timer */}
+          <div
+            className={`absolute inset-0 h-full w-full animate-gradient opacity-80 ${bg}`}
+          />
           <div className="relative z-10 flex h-full w-full flex-col items-center justify-center">
             <TimerComponent
               debateInfo={data!.table[index]}
-              increaseIndex={increaseIndex}
+              increaseIndex={() => increaseIndex(data!.table.length)}
               decreaseIndex={decreaseIndex}
               setBg={setBg}
             />
           </div>
-        </DefaultLayout.ContentContanier>
+        </div>
+      </DefaultLayout.ContentContanier>
 
-        {/* Footer */}
-        <DefaultLayout.StickyFooterWrapper>
-          <div className="flex w-full flex-row justify-between">
-            <div className="flex">
-              {index !== 0 && (
-                <DebateInfoSummary
-                  isPrev={true}
-                  debateInfo={data!.table[index - 1]}
-                />
-              )}
-            </div>
-            <div className="flex">
-              {index !== data!.table.length - 1 && (
-                <DebateInfoSummary
-                  isPrev={false}
-                  debateInfo={data!.table[index + 1]}
-                />
-              )}
-            </div>
+      {/* Footer */}
+      <DefaultLayout.StickyFooterWrapper>
+        <div className="flex w-full flex-row justify-between">
+          <div className="flex">
+            {index !== 0 && (
+              <DebateInfoSummary
+                isPrev={true}
+                debateInfo={data!.table[index - 1]}
+              />
+            )}
           </div>
-        </DefaultLayout.StickyFooterWrapper>
-      </DefaultLayout>
-    </div>
+          <div className="flex">
+            {index !== data!.table.length - 1 && (
+              <DebateInfoSummary
+                isPrev={false}
+                debateInfo={data!.table[index + 1]}
+              />
+            )}
+          </div>
+        </div>
+      </DefaultLayout.StickyFooterWrapper>
+    </DefaultLayout>
   );
 }

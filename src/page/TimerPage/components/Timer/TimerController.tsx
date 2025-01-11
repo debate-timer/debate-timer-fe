@@ -28,7 +28,7 @@ export default function TimerController({
       {/* Timer start button */}
       <div className="w-8" />
       <TimerIconButton
-        icon={<IoPlayOutline className="size-8" />}
+        icon={<IoPlayOutline className="size-12" />}
         bgColor="bg-emerald-500"
         hoverColor="hover:bg-emerald-600"
         contentColor="text-zinc-50"
@@ -40,7 +40,7 @@ export default function TimerController({
       {/* Timer pause button */}
       <div className="w-4" />
       <TimerIconButton
-        icon={<IoPauseOutline className="size-8" />}
+        icon={<IoPauseOutline className="size-12" />}
         bgColor="bg-amber-500"
         hoverColor="hover:bg-amber-600"
         contentColor="text-zinc-50"
@@ -52,7 +52,7 @@ export default function TimerController({
       {/* Timer reset button */}
       <div className="w-4" />
       <TimerIconButton
-        icon={<IoTimerOutline className="size-8" />}
+        icon={<IoTimerOutline className="size-12" />}
         bgColor="bg-red-500"
         hoverColor="hover:bg-red-600"
         contentColor="text-zinc-50"
