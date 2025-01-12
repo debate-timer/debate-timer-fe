@@ -1,12 +1,15 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
-import { useLocation } from 'react-router-dom';
-import { DebateInfo } from '../../type/type';
 import DebatePanel from '../TableSetupPage/components/DebatePanel/DebatePanel';
+import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function TableOverview() {
-  const location = useLocation();
-  const data = location.state as DebateInfo[];
+  const [searchParams] = useSearchParams();
+  const tableId = Number(searchParams.get('tableId') || 0);
+  const { data } = useGetParliamentaryTableData(tableId, 1);
+
+  const navigate = useNavigate();
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -30,10 +33,15 @@ export default function TableOverview() {
       <DefaultLayout.ContentContanier>
         <PropsAndConsTitle />
         {data &&
-          data.map((info) => <DebatePanel key={info.time} info={info} />)}
+          data.table.map((info, index) => (
+            <DebatePanel key={index} info={info} />
+          ))}
       </DefaultLayout.ContentContanier>
       <DefaultLayout.StickyFooterWrapper>
-        <button className="h-20 w-screen rounded-md bg-blue-300 text-2xl">
+        <button
+          className="h-20 w-screen rounded-md bg-blue-300 text-2xl"
+          onClick={() => navigate(`/composition?mode=edit&tableId=${data?.id}`)}
+        >
           테이블 수정하기
         </button>
         <button className="h-20 w-screen rounded-md bg-red-300 text-2xl">
