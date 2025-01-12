@@ -93,6 +93,7 @@ export const handlers = [
     );
 
     return HttpResponse.json({
+      id: 1,
       info: {
         name: '테이블1',
         agenda: '촉법소년 연령 인하',
