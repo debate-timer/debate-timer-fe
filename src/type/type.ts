@@ -1,4 +1,4 @@
-export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
+export type Stance = 'PROS' | 'CONS' | 'NETURAL';
 export type DebateType =
   | 'OPENING'
   | 'REBUTTAL'
@@ -38,3 +38,5 @@ export interface DebateTable {
   type: string;
   duration: number;
 }
+
+export type Agenda = '의회식 토론' | '시간 총량제 토론' | '';
