@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
-export default function EditModalButton({ tableId }: { tableId: number }) {
+export default function EditButton({ tableId }: { tableId: number }) {
   const navigate = useNavigate();
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
