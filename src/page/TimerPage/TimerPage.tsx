@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import DebateInfoSummary from './components/DebateInfoSummary';
 import TimerComponent from './components/TimerComponent';
 import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
@@ -24,6 +23,9 @@ export default function TimerPage() {
   // Declare states
   const [index, setIndex] = useState<number>(0);
   const [bg, setBg] = useState<string>('');
+  const updateBg = (bg: string) => {
+    setBg(bg);
+  };
 
   // Declare functions that manages array's index
   const increaseIndex = (max: number) => {
@@ -49,57 +51,55 @@ export default function TimerPage() {
     return <div>Error</div>;
   }
 
-  console.log(`# index = ${index}, max = ${data!.table.length}`);
-
   // Return React component
+  /**
+      <DefaultLayout>
+      <div className="relative z-10 p-8">
+        <h1 className="text-4xl font-bold mb-4">Welcome to My App</h1>
+        <p className="text-lg">
+          This is the main content of the application. The gradient background should be behind this layout.
+        </p>
+      </div>
+      <div className="absolute inset-0 z-0 animate-gradient gradient-running-animation opacity-80"></div>
+    </DefaultLayout> */
   return (
     <DefaultLayout>
-      {/* Header */}
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>왼쪽</DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center>가운데</DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right>오른쪽</DefaultLayout.Header.Right>
+        <DefaultLayout.Header.Left>
+          <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
+            <h1 className="mr-2">
+              {data === undefined
+                ? '테이블 이름 불러오기 실패'
+                : data!.info.name}
+            </h1>
+            <div className="mx-3 h-6 w-[2px] bg-black"></div>
+            <span className="text-lg font-normal md:text-xl">의회식</span>
+          </div>
+        </DefaultLayout.Header.Left>
+        <DefaultLayout.Header.Right>
+          <div className="flex flex-wrap items-center gap-2 px-2 md:w-auto md:gap-3">
+            <span className="text-lg md:text-base md:text-xl">토론 주제</span>
+            <h1 className="w-full p-2 text-base font-bold md:w-[30rem] md:text-2xl">
+              {data === undefined ? '주제 불러오기 실패' : data!.info.agenda}
+            </h1>
+          </div>
+        </DefaultLayout.Header.Right>
       </DefaultLayout.Header>
 
-      {/* Content */}
       <DefaultLayout.ContentContanier>
-        <div className="relative h-full w-full">
-          {/* Let animated background be located behind of the timer */}
-          <div
-            className={`absolute inset-0 h-full w-full animate-gradient opacity-80 ${bg}`}
+        <div className="relative z-10 h-full">
+          <TimerComponent
+            debateInfoList={data!.table}
+            index={index}
+            increaseIndex={() => increaseIndex(data!.table.length)}
+            decreaseIndex={() => decreaseIndex()}
+            updateBg={(bg: string) => updateBg(bg)}
           />
-          <div className="relative z-10 flex h-full w-full flex-col items-center justify-center">
-            <TimerComponent
-              debateInfo={data!.table[index]}
-              increaseIndex={() => increaseIndex(data!.table.length)}
-              decreaseIndex={decreaseIndex}
-              setBg={setBg}
-            />
-          </div>
         </div>
+        <div
+          className={`absolute inset-0 top-[80px] z-0 animate-gradient opacity-80 ${bg}`}
+        ></div>
       </DefaultLayout.ContentContanier>
-
-      {/* Footer */}
-      <DefaultLayout.StickyFooterWrapper>
-        <div className="flex w-full flex-row justify-between">
-          <div className="flex">
-            {index !== 0 && (
-              <DebateInfoSummary
-                isPrev={true}
-                debateInfo={data!.table[index - 1]}
-              />
-            )}
-          </div>
-          <div className="flex">
-            {index !== data!.table.length - 1 && (
-              <DebateInfoSummary
-                isPrev={false}
-                debateInfo={data!.table[index + 1]}
-              />
-            )}
-          </div>
-        </div>
-      </DefaultLayout.StickyFooterWrapper>
     </DefaultLayout>
   );
 }

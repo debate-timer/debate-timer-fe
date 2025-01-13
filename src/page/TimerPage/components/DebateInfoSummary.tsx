@@ -6,19 +6,22 @@ import {
 } from 'react-icons/io5';
 import { DebateInfo } from '../../../type/type';
 import { Formatting } from '../../../util/formatting';
+import TimerIconButton from './common/TimerIconButton';
 
 interface DebateInfoSummaryProps {
   debateInfo: DebateInfo;
   isPrev: boolean;
+  moveToOtherItem: (isPrev: boolean) => void;
 }
 
 // Main timer component that user can control
 export default function DebateInfoSummary({
   debateInfo,
   isPrev,
+  moveToOtherItem,
 }: DebateInfoSummaryProps) {
-  const alignOption = isPrev ? 'items-start' : 'items-end';
-  const prevNextText = isPrev ? '이전 순서' : '다음 순서';
+  // const alignOption = isPrev ? 'items-start' : 'items-end';
+  // const prevNextText = isPrev ? '이전 순서' : '다음 순서';
   const titleText =
     debateInfo.type !== 'TIME_OUT'
       ? `${Formatting.formatStanceToString(debateInfo.stance)} ${Formatting.formatDebateTypeToString(debateInfo.type)}`
@@ -46,17 +49,39 @@ export default function DebateInfoSummary({
   }
 
   return (
-    <div className={`flex flex-col space-y-4 p-4 ${alignOption}`}>
-      <div className="mx-4 flex flex-row items-center space-x-2">
-        {isPrev && <IoChevronBack className="size-[30px]" />}
-        <h1 className="text-3xl font-bold">{prevNextText}</h1>
-        {!isPrev && <IoChevronForward className="size-[30px]" />}
+    <div className={`flex flex-col items-center space-y-4 p-4`}>
+      <div className="flex">
+        {isPrev && (
+          <TimerIconButton
+            icon={<IoChevronBack className="size-10" />}
+            bgColor="bg-zinc-300"
+            hoverColor="hover:bg-zinc-500"
+            contentColor="text-zinc-900"
+            className="shadow-2xl"
+            onClick={() => {
+              moveToOtherItem(isPrev);
+            }}
+          />
+        )}
+        {!isPrev && (
+          <TimerIconButton
+            icon={<IoChevronForward className="size-10" />}
+            bgColor="bg-zinc-300"
+            hoverColor="hover:bg-zinc-500"
+            contentColor="text-zinc-900"
+            className="shadow-2xl"
+            onClick={() => {
+              moveToOtherItem(isPrev);
+            }}
+          />
+        )}
       </div>
+
       <div
-        className={`m-4 flex h-[120px] flex-row items-center justify-center space-x-4 rounded-2xl border-2 border-zinc-50 p-4 shadow-2xl ${bgColor}`}
+        className={`m-4 flex w-[240px] flex-col items-center justify-center space-y-4 rounded-2xl border-2 border-zinc-50 p-4 shadow-2xl ${bgColor}`}
       >
-        <h1 className="text-4xl font-bold text-zinc-50">{titleText}</h1>
-        <div className="flex flex-col items-start rounded-2xl bg-zinc-50 px-5 py-3">
+        <h1 className="text-3xl font-bold text-zinc-50">{titleText}</h1>
+        <div className="flex w-full flex-col items-start rounded-2xl bg-zinc-50 p-4">
           {/* Next speaker */}
           {debateInfo.stance !== 'NEUTRAL' && (
             <div className="flex flex-row items-center justify-center space-x-3">

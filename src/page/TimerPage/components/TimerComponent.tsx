@@ -7,12 +7,15 @@ import useSound from 'use-sound';
 import dingOnce from '/sounds/ding-once-edit.mp3';
 import dingTwice from '/sounds/ding-twice-edit.mp3';
 import { IoPerson } from 'react-icons/io5';
+import DebateInfoSummary from './DebateInfoSummary';
 
 interface TimerComponentProps {
-  debateInfo: DebateInfo;
+  className?: string;
+  debateInfoList: DebateInfo[];
+  index: number;
   increaseIndex: () => void;
   decreaseIndex: () => void;
-  setBg: (newValue: string) => void;
+  updateBg: (newValue: string) => void;
 }
 
 // Define timer's state:
@@ -23,10 +26,12 @@ export type TimerState = 'PAUSED' | 'STOPPED' | 'RUNNING';
 
 // Main timer component that user can control
 export default function TimerComponent({
-  debateInfo,
+  className,
+  debateInfoList,
+  index,
   increaseIndex,
   decreaseIndex,
-  setBg,
+  updateBg,
 }: TimerComponentProps) {
   // Load sounds
   const [dingOnceSfx] = useSound(dingOnce);
@@ -34,35 +39,26 @@ export default function TimerComponent({
 
   // Declare states
   const [timerState, setTimerState] = useState<TimerState>('STOPPED');
-  const [timer, setTimer] = useState<number>(debateInfo.time);
+  const [timer, setTimer] = useState<number>(debateInfoList[index].time);
   const intervalRef = useRef<number | null>(null);
 
   // Set texts to be displayed
   const titleText =
-    debateInfo.type !== 'TIME_OUT'
-      ? `${Formatting.formatStanceToString(debateInfo.stance)} ${Formatting.formatDebateTypeToString(debateInfo.type)}`
-      : Formatting.formatDebateTypeToString(debateInfo.type);
+    debateInfoList[index].type !== 'TIME_OUT'
+      ? `${Formatting.formatStanceToString(debateInfoList[index].stance)} ${Formatting.formatDebateTypeToString(debateInfoList[index].type)}`
+      : Formatting.formatDebateTypeToString(debateInfoList[index].type);
   const speakerText =
-    debateInfo.stance === 'NEUTRAL'
+    debateInfoList[index].stance === 'NEUTRAL'
       ? ''
-      : `${debateInfo.speakerNumber}번 발언자`;
+      : `${debateInfoList[index].speakerNumber}번 발언자`;
 
   // Set background color by debateInfo's stance
   const bgColor =
-    debateInfo.stance === 'NEUTRAL'
+    debateInfoList[index].stance === 'NEUTRAL'
       ? 'bg-zinc-500'
-      : debateInfo.stance === 'PROS'
+      : debateInfoList[index].stance === 'PROS'
         ? 'bg-blue-500'
         : 'bg-red-500';
-
-  // Let timer play sounds when only 30 seconds left or timeout
-  useEffect(() => {
-    if (timer === 30) {
-      dingOnceSfx();
-    } else if (timer === 0) {
-      dingTwiceSfx();
-    }
-  });
 
   // Declare functions to handle timer
   const startTimer = () => {
@@ -82,7 +78,7 @@ export default function TimerComponent({
   };
   const resetTimer = () => {
     setTimerState('STOPPED');
-    setTimer(debateInfo.time);
+    setTimer(debateInfoList[index].time);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -91,6 +87,7 @@ export default function TimerComponent({
 
   // Declare function to manage parant component's index
   const moveToOtherItem = (isPrev: boolean) => {
+    console.log("# 'moveToOtherItem' called.");
     if (isPrev) {
       decreaseIndex();
     } else {
@@ -100,17 +97,19 @@ export default function TimerComponent({
   };
 
   // Set parant component's background animation by timer's state and remaining time
-  if (timerState !== 'RUNNING') {
-    setBg('');
-  } else {
-    if (timer > 30) {
-      setBg('gradient-timer-running');
-    } else if (timer <= 30 && timer > 0) {
-      setBg('gradient-timer-warning');
+  useEffect(() => {
+    if (timerState !== 'RUNNING') {
+      updateBg('');
     } else {
-      setBg('gradient-timer-timeout');
+      if (timer > 30) {
+        updateBg('gradient-timer-running');
+      } else if (timer <= 30 && timer > 0) {
+        updateBg('gradient-timer-warning');
+      } else {
+        updateBg('gradient-timer-timeout');
+      }
     }
-  }
+  }, [timerState, timer, updateBg]);
 
   // Add keyboard event listener
   useEffect(() => {
@@ -138,32 +137,71 @@ export default function TimerComponent({
     };
   });
 
+  // Let timer play sounds when only 30 seconds left or timeout
+  useEffect(() => {
+    if (timer === 30) {
+      dingOnceSfx();
+    } else if (timer === 0) {
+      dingTwiceSfx();
+    }
+  });
+
   // Return React component
   return (
-    <div
-      className={`flex flex-col items-center rounded-[50px] border-4 border-zinc-50 px-24 py-8 shadow-2xl ${bgColor}`}
-    >
-      {/* Title */}
-      <div className="m-2 mb-16 flex flex-col items-center space-y-3">
-        <h1 className="text-6xl font-bold text-zinc-50">{titleText}</h1>
-        <div className="flex flex-row items-center space-x-3 text-zinc-50">
-          {debateInfo.stance !== 'NEUTRAL' && (
-            <IoPerson className="size-[25px]" />
-          )}
-          <h1 className="text-3xl">{speakerText}</h1>
-        </div>
+    <div className="flex h-full flex-row items-center space-x-4">
+      <div className="flex-1">
+        {index !== 0 && (
+          <DebateInfoSummary
+            isPrev={true}
+            moveToOtherItem={(isPrev: boolean) => {
+              moveToOtherItem(isPrev);
+            }}
+            debateInfo={debateInfoList[index - 1]}
+          />
+        )}
+        {index === 0 && <div className="m-8 w-[240px]"></div>}
       </div>
 
-      {/* Timer */}
-      <Timer timer={timer} />
+      <div
+        className={`flex w-min flex-col items-center rounded-[50px] border-4 border-zinc-50 px-8 py-8 shadow-2xl ${bgColor} ${className !== undefined ? className : ''}`}
+      >
+        {/* Title */}
+        <div className="m-2 mb-8 flex flex-col items-center space-y-3">
+          <h1 className="text-6xl font-bold text-zinc-50">{titleText}</h1>
+          <div className="flex flex-row items-center space-x-3 text-zinc-50">
+            {debateInfoList[index].stance !== 'NEUTRAL' && (
+              <IoPerson className="size-[25px]" />
+            )}
+            <h1 className="text-3xl">{speakerText}</h1>
+          </div>
+        </div>
 
-      {/* Timer controller that includes buttons that can handle timer */}
-      <TimerController
-        onReset={resetTimer}
-        onStart={startTimer}
-        onPause={pauseTimer}
-        toOtherItem={moveToOtherItem}
-      />
+        {/* Timer */}
+        <Timer timer={timer} />
+
+        {/* Timer controller that includes buttons that can handle timer */}
+        <TimerController
+          onReset={resetTimer}
+          onStart={startTimer}
+          onPause={pauseTimer}
+          toOtherItem={moveToOtherItem}
+        />
+      </div>
+
+      <div className="flex-1">
+        {index !== debateInfoList.length - 1 && (
+          <DebateInfoSummary
+            isPrev={false}
+            moveToOtherItem={(isPrev: boolean) => {
+              moveToOtherItem(isPrev);
+            }}
+            debateInfo={debateInfoList[index + 1]}
+          />
+        )}
+        {index === debateInfoList.length - 1 && (
+          <div className="m-8 w-[240px]"></div>
+        )}
+      </div>
     </div>
   );
 }

@@ -9,7 +9,7 @@ function formatTwoDigits(num: number): string {
 
 export default function Timer({ timer }: TimerProps) {
   return (
-    <div className="mb-20 flex w-[720px] flex-row items-center justify-center space-x-4 rounded-[50px] bg-zinc-50 p-8">
+    <div className="mb-12 flex flex-row items-center justify-center space-x-4 rounded-[50px] bg-zinc-50 p-8">
       {/* Prints -(minus) if remaining time is negative */}
       {timer < 0 && <h1 className="py-2 text-9xl font-bold">-</h1>}
 

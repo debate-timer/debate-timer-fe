@@ -5,6 +5,7 @@ interface TimerIconButtonProps {
   bgColor?: string;
   hoverColor?: string;
   contentColor?: string;
+  className?: string;
   onClick: () => void;
   icon: ReactElement<ChildProps>;
 }
@@ -13,6 +14,7 @@ export default function TimerIconButton({
   bgColor,
   hoverColor,
   contentColor,
+  className,
   icon,
   onClick,
 }: TimerIconButtonProps) {
@@ -24,7 +26,7 @@ export default function TimerIconButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border-2 border-zinc-50 p-4 font-bold ${bgText} ${hoverText} ${contentText}`}
+      className={`rounded-full border-2 border-zinc-50 p-4 font-bold ${bgText} ${hoverText} ${contentText} ${className}`}
     >
       {icon}
     </button>
