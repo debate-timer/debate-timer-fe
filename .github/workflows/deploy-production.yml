@@ -22,14 +22,11 @@ jobs:
       - name: Setup .env
         run: echo "${{secrets.PRODUCTION_ENV}}" > .env
 
-      - name: Install pnpm package manager
-        run: npm install -g pnpm
-
       - name: Install Dependencies
-        run: pnpm install
+        run: npm ci
 
       - name: Build Production
-        run: pnpm run build
+        run: npm run build
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
