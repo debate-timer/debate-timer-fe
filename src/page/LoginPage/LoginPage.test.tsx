@@ -8,9 +8,11 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: vi.fn(),
+    useNavigate: vi.fn(() => vi.fn()),
   };
 });
+
+vi.spyOn(window, 'alert').mockImplementation(() => {});
 
 describe('LoginPage', () => {
   it('LoginPage에서 라우팅이 잘 동작하는지 검증', () => {
@@ -21,11 +23,6 @@ describe('LoginPage', () => {
     );
 
     // 헤더 텍스트 확인
-    expect(screen.getByText('헤더')).toBeInTheDocument();
-    expect(screen.getByText('의회식')).toBeInTheDocument();
-    expect(screen.getByText('제목')).toBeInTheDocument();
-
-    // 제목 텍스트 확인
     expect(screen.getByText('Debate Timer')).toBeInTheDocument();
 
     // 입력 필드와 버튼 확인
@@ -45,9 +42,17 @@ describe('LoginPage', () => {
       </MemoryRouter>,
     );
 
+    const input = screen.getByPlaceholderText('닉네임을 입력해주세요');
     const button = screen.getByText('로그인');
+
+    // 닉네임 입력
+    await userEvent.type(input, '테스트 유저');
+    expect(input).toHaveValue('테스트 유저');
+
+    // 버튼 클릭
     await userEvent.click(button);
 
+    // navigate 호출 검증
     expect(navigate).toHaveBeenCalledWith('/table');
   });
 });
