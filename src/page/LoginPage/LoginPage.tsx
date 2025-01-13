@@ -1,17 +1,13 @@
 import { useState } from 'react';
-import useLoginUser from '../../hooks/mutations/useLoginUser';
 
 export default function LoginPage() {
   const [nickname, setNickname] = useState('');
-  const mutation = useLoginUser();
 
   const handleLogin = () => {
     if (!nickname) {
       alert('닉네임을 입력해주세요.');
       return;
     }
-
-    mutation.mutate({ nickname });
   };
 
   return (
@@ -27,12 +23,6 @@ export default function LoginPage() {
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
         />
-        {mutation.isError && (
-          <p className="text-center text-sm text-red-500">
-            {mutation.error?.response?.data?.message ||
-              '로그인 중 에러가 발생했습니다.'}
-          </p>
-        )}
         <button
           onClick={handleLogin}
           className="rounded-lg bg-blue-500 p-5 text-white hover:bg-blue-700"
