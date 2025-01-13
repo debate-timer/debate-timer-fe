@@ -1,16 +1,17 @@
+import { HTMLAttributes } from 'react';
 import { DEBATE_TYPE_LABELS, DebateInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
 
-interface DebatePanelProps {
+interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   info: DebateInfo;
-  onSubmitEdit: (updatedInfo: DebateInfo) => void;
-  onSubmitDelete: () => void;
+  onSubmitEdit?: (updatedInfo: DebateInfo) => void;
+  onSubmitDelete?: () => void;
 }
 
 export default function DebatePanel(props: DebatePanelProps) {
   const { stance, type: debateType, time, speakerNumber } = props.info;
-  const { onSubmitEdit, onSubmitDelete } = props;
+  const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
 
   const debateTypeLabel = DEBATE_TYPE_LABELS[debateType];
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
@@ -30,13 +31,26 @@ export default function DebatePanel(props: DebatePanelProps) {
     <div
       className={`flex w-1/2 flex-col items-center rounded-md ${
         isPros ? 'bg-blue-500' : 'bg-red-500'
-      } h-24 p-2 font-bold text-white`}
+      } h-24 select-none p-2 font-bold text-white`}
     >
-      <EditDeleteButtons
-        info={props.info}
-        onSubmitEdit={onSubmitEdit}
-        onSubmitDelete={onSubmitDelete}
-      />
+      <div className="flex h-4 w-full items-center gap-2">
+        <div className="flex-1" />
+        <div
+          className="h-2 flex-1 rounded-sm bg-gray-300"
+          onMouseDown={onMouseDown}
+        />
+        {onSubmitEdit && onSubmitDelete && (
+          <div className="flex-1">
+            (
+            <EditDeleteButtons
+              info={props.info}
+              onSubmitEdit={onSubmitEdit}
+              onSubmitDelete={onSubmitDelete}
+            />
+            )
+          </div>
+        )}
+      </div>
       <div>
         {debateTypeLabel} / {speakerNumber}번 토론자
       </div>
@@ -45,13 +59,26 @@ export default function DebatePanel(props: DebatePanelProps) {
   );
 
   const renderNeutralTimeoutPanel = () => (
-    <div className="flex h-24 w-full items-center text-center">
+    <div className="flex h-24 w-full select-none items-center text-center">
       <div className="flex h-4/5 w-full flex-col items-center justify-start rounded-md bg-gray-200 p-2 font-medium text-gray-600">
-        <EditDeleteButtons
-          info={props.info}
-          onSubmitEdit={onSubmitEdit}
-          onSubmitDelete={onSubmitDelete}
-        />
+        <div className="flex h-4 w-full items-center gap-2">
+          <div className="flex-1" />
+          <div
+            className="h-2 flex-1 rounded-sm bg-gray-300"
+            onMouseDown={onMouseDown}
+          />
+          {onSubmitEdit && onSubmitDelete && (
+            <div className="flex-1">
+              (
+              <EditDeleteButtons
+                info={props.info}
+                onSubmitEdit={onSubmitEdit}
+                onSubmitDelete={onSubmitDelete}
+              />
+              )
+            </div>
+          )}
+        </div>
         {debateTypeLabel} | {timeStr}
       </div>
     </div>
