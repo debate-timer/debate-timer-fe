@@ -3,6 +3,8 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/TimerComponent';
 import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
+import Spinner from '../common/Spinner';
+import { RiErrorWarningLine } from 'react-icons/ri';
 
 export default function TimerPage() {
   // Prepare data before requesting query
@@ -45,23 +47,25 @@ export default function TimerPage() {
 
   // Handle exceptions
   if (isLoading) {
-    return <div>Loading</div>;
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
+        <Spinner />
+        <h1 className="text-xl font-bold">데이터를 불러오고 있습니다...</h1>
+      </div>
+    );
   }
   if (isError || data === null) {
-    return <div>Error</div>;
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
+        <RiErrorWarningLine className="size-[120px]" />
+        <h1 className="text-xl font-bold">
+          데이터를 불러오는 중 오류가 발생했어요.
+        </h1>
+      </div>
+    );
   }
 
   // Return React component
-  /**
-      <DefaultLayout>
-      <div className="relative z-10 p-8">
-        <h1 className="text-4xl font-bold mb-4">Welcome to My App</h1>
-        <p className="text-lg">
-          This is the main content of the application. The gradient background should be behind this layout.
-        </p>
-      </div>
-      <div className="absolute inset-0 z-0 animate-gradient gradient-running-animation opacity-80"></div>
-    </DefaultLayout> */
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
