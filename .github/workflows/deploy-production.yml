@@ -3,7 +3,7 @@ name: Deploy-Production
 on:
   workflow_dispatch:
   pull_request:
-    branches: ['release']
+    branches: ['develop']
     types: ['closed']
 
 jobs:
