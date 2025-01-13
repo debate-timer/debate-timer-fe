@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
 
   const handleLogin = () => {
@@ -8,6 +10,7 @@ export default function LoginPage() {
       alert('닉네임을 입력해주세요.');
       return;
     }
+    navigate('/table');
   };
 
   return (
