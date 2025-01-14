@@ -1,8 +1,8 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
-import DebatePanel from '../TableSetupPage/components/DebatePanel/DebatePanel';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
 
 export default function TableOverview() {
   const [searchParams] = useSearchParams();
