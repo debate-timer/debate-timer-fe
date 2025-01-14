@@ -7,7 +7,7 @@ import TableComposition from './page/TableComposition/TableComposition';
 
 const router = createBrowserRouter([
   {
-    path: '/login',
+    path: '/',
     element: <LoginPage />,
   },
   {
