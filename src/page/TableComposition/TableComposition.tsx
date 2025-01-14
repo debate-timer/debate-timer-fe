@@ -6,8 +6,10 @@ import TimeBoxStep from './components/TimeBoxStep/TimeBoxStep';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
+import { Type } from '../../type/type';
 
 export type TableCompositionStep = '이름타입입력' | '타임박스입력';
+type Mode = 'edit' | 'add';
 
 export default function TableComposition() {
   const { Funnel, currentStep, goNextStep } =
@@ -15,7 +17,8 @@ export default function TableComposition() {
 
   // 1) URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
-  const mode = searchParams.get('mode');
+  const mode = searchParams.get('mode') as Mode;
+  const type = (searchParams.get('type') ?? '') as Type;
   const tableId = Number(searchParams.get('tableId') || 0);
 
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
@@ -30,12 +33,14 @@ export default function TableComposition() {
         info: {
           name: fetchedTableData.info.name,
           agenda: fetchedTableData.info.agenda,
+          type: type,
         },
         table: fetchedTableData.table,
       };
     }
     return undefined;
-  }, [mode, fetchedTableData]);
+  }, [mode, fetchedTableData, type]);
+
   const { formData, updateInfo, updateTable, AddTable, EditTable } =
     useTableFrom(currentStep, initData);
 
@@ -65,6 +70,7 @@ export default function TableComposition() {
           이름타입입력: (
             <TableNameAndType
               info={formData.info}
+              isEdit={mode === 'edit'}
               onNameAndTypeChange={updateInfo}
               onButtonClick={() => goNextStep('타임박스입력')}
             />

@@ -1,27 +1,34 @@
 import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
-import { PutDebateTableResponseType } from '../../../apis/responseTypes';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { Agenda, DebateInfo } from '../../../type/type';
+import { DebateInfo, Type } from '../../../type/type';
 import useAddTable from '../../../hooks/mutations/useAddTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
-type TableFromData = Omit<PutDebateTableResponseType, 'id'>;
+export interface TableFormData {
+  info: {
+    name: string;
+    agenda: string;
+    type: Type; // 새로 추가된 속성
+  };
+  table: DebateInfo[];
+}
 const useTableFrom = (
   currentStep: TableCompositionStep,
-  initData?: TableFromData,
+  initData?: TableFormData,
 ) => {
   const navigationType = useNavigationType();
   const navigate = useNavigate();
 
-  const [formData, setFormData, removeValue] = useBrowserStorage<TableFromData>(
+  const [formData, setFormData, removeValue] = useBrowserStorage<TableFormData>(
     {
       key: 'moimCreationInfo',
       initialState: {
         info: {
           name: '테이블 1',
-          agenda: '의회식 토론',
+          agenda: '',
+          type: '의회식 토론',
         },
         table: [],
       },
@@ -49,10 +56,10 @@ const useTableFrom = (
   }, [currentStep, navigationType, navigate]);
 
   const updateInfo: React.Dispatch<
-    React.SetStateAction<{ name: string; agenda: Agenda }>
+    React.SetStateAction<{ name: string; agenda: string; type: Type }>
   > = (action) => {
     setFormData((prev) => {
-      let newInfo: { name: string; agenda: Agenda };
+      let newInfo: { name: string; agenda: string; type: Type };
       if (typeof action === 'function') {
         newInfo = (action as (arg: typeof prev.info) => typeof prev.info)(
           prev.info,

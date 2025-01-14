@@ -1,4 +1,4 @@
-import { Agenda, DebateInfo, DebateTable } from '../type/type';
+import { DebateInfo, DebateTable } from '../type/type';
 
 // POST "/api/member"
 export interface PostUserResponseType {
@@ -15,7 +15,7 @@ export interface GetTableDataResponseType {
   id: number;
   info: {
     name: string;
-    agenda: Agenda;
+    agenda: string;
   };
   table: DebateInfo[];
 }
@@ -25,7 +25,7 @@ export interface PostDebateTableResponseType {
   id: number;
   info: {
     name: string;
-    agenda: Agenda;
+    agenda: string;
   };
   table: DebateInfo[];
 }
@@ -35,7 +35,7 @@ export interface PutDebateTableResponseType {
   id: number;
   info: {
     name: string;
-    agenda: Agenda;
+    agenda: string;
   };
   table: DebateInfo[];
 }

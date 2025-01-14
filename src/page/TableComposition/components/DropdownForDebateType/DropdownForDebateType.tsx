@@ -1,27 +1,27 @@
 import { useState } from 'react';
-import { Agenda } from '../../../../type/type';
+import { Type } from '../../../../type/type';
 
 interface DropdownForDebateTypeProps {
-  agenda: Agenda;
-  onChange: (agenda: Agenda) => void;
+  type: Type;
+  onChange: (agenda: Type) => void;
 }
 
 export default function DropdownForDebateType(
   props: DropdownForDebateTypeProps,
 ) {
-  const { agenda, onChange } = props;
-  const agendas: Agenda[] = ['의회식 토론', '시간 총량제 토론'];
+  const { type, onChange } = props;
+  const agendas: Type[] = ['의회식 토론', '시간 총량제 토론'];
 
   // 열림/닫힘만 로컬 state
   const [isToggleOpen, setIsToggleOpen] = useState(false);
 
-  const handleTypeSelect = (type: Agenda) => {
+  const handleTypeSelect = (type: Type) => {
     onChange(type); // 상위에 보고
     setIsToggleOpen(false);
   };
 
   // 선택되지 않은 항목만 보여주기
-  const getAlternativeOption = agendas.filter((it) => it !== agenda);
+  const getAlternativeOption = agendas.filter((it) => it !== type);
 
   return (
     <div className="relative w-8/12">
@@ -29,7 +29,7 @@ export default function DropdownForDebateType(
         onClick={() => setIsToggleOpen(!isToggleOpen)}
         className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white lg:text-3xl"
       >
-        ▼ {agenda}
+        ▼ {type}
       </button>
 
       {isToggleOpen && (

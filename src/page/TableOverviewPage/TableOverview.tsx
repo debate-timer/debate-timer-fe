@@ -25,7 +25,7 @@ export default function TableOverview() {
           <div className="flex flex-wrap items-center gap-2 px-2 md:w-auto md:gap-3">
             <span className="text-sm md:text-base">토론 주제</span>
             <span className="w-full rounded-md bg-slate-100 p-2 text-base md:w-[30rem] md:text-2xl">
-              토론주제
+              {data?.info.agenda}
             </span>
           </div>
         </DefaultLayout.Header.Right>
@@ -40,7 +40,11 @@ export default function TableOverview() {
       <DefaultLayout.StickyFooterWrapper>
         <button
           className="h-20 w-screen rounded-md bg-blue-300 text-2xl"
-          onClick={() => navigate(`/composition?mode=edit&tableId=${data?.id}`)}
+          onClick={() =>
+            navigate(
+              `/composition?mode=edit&tableId=${data?.id}&type=의회식 토론`,
+            )
+          }
         >
           테이블 수정하기
         </button>

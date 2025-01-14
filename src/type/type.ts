@@ -35,8 +35,8 @@ export interface DebateInfo {
 export interface DebateTable {
   id: number;
   name: string;
-  type: string;
+  type: Type;
   duration: number;
 }
 
-export type Agenda = '의회식 토론' | '시간 총량제 토론' | '';
+export type Type = '의회식 토론' | '시간 총량제 토론' | '';

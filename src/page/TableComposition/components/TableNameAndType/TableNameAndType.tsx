@@ -1,18 +1,24 @@
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { Agenda } from '../../../../type/type';
+import { Type } from '../../../../type/type';
 import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
 
 interface TableNameAndTypeProps {
   info: {
     name: string;
-    agenda: Agenda;
+    agenda: string;
+    type: Type;
   };
-  onNameAndTypeChange: (newInfo: { name: string; agenda: Agenda }) => void;
+  isEdit?: boolean;
+  onNameAndTypeChange: (newInfo: {
+    name: string;
+    agenda: string;
+    type: Type;
+  }) => void;
   onButtonClick: () => void;
 }
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
-  const { info, onNameAndTypeChange, onButtonClick } = props;
+  const { info, isEdit = false, onNameAndTypeChange, onButtonClick } = props;
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onNameAndTypeChange({
@@ -21,10 +27,10 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
     });
   };
 
-  const handleAgendaChange = (agenda: Agenda) => {
+  const handleTypeChange = (type: Type) => {
     onNameAndTypeChange({
       ...info,
-      agenda,
+      type,
     });
   };
 
@@ -51,13 +57,15 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             />
           </div>
 
-          <div className="flex w-full items-center justify-between">
-            <h3 className="text-md font-bold lg:text-5xl">토론 유형</h3>
-            <DropdownForDebateType
-              agenda={info.agenda}
-              onChange={handleAgendaChange}
-            />
-          </div>
+          {!isEdit && (
+            <div className="flex w-full items-center justify-between">
+              <h3 className="text-md font-bold lg:text-5xl">토론 유형</h3>
+              <DropdownForDebateType
+                type={info.type}
+                onChange={handleTypeChange}
+              />
+            </div>
+          )}
         </section>
       </DefaultLayout.ContentContanier>
 
