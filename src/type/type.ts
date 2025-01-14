@@ -39,4 +39,4 @@ export interface DebateTable {
   duration: number;
 }
 
-export type Type = '의회식 토론' | '시간 총량제 토론' | '';
+export type Type = 'PARLIAMENTARY' | '';

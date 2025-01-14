@@ -3,25 +3,36 @@ import { Type } from '../../../../type/type';
 
 interface DropdownForDebateTypeProps {
   type: Type;
-  onChange: (agenda: Type) => void;
+  onChange: (type: Type) => void;
 }
 
 export default function DropdownForDebateType(
   props: DropdownForDebateTypeProps,
 ) {
   const { type, onChange } = props;
-  const agendas: Type[] = ['의회식 토론', '시간 총량제 토론'];
 
-  // 열림/닫힘만 로컬 state
+  const typeMapping: Record<string, string> = {
+    parliamentary: '의회식 토론',
+    timeBased: '시간 총량제 토론',
+  };
+
+  const reverseTypeMapping: Record<string, string> = Object.fromEntries(
+    Object.entries(typeMapping).map(([key, value]) => [value, key]),
+  );
+
+  const koreanTypes = Object.values(typeMapping);
+
   const [isToggleOpen, setIsToggleOpen] = useState(false);
 
-  const handleTypeSelect = (type: Type) => {
-    onChange(type); // 상위에 보고
+  const handleTypeSelect = (selectedKoreanType: string) => {
+    const selectedEnglishType = reverseTypeMapping[selectedKoreanType];
+    onChange(selectedEnglishType as Type);
     setIsToggleOpen(false);
   };
 
-  // 선택되지 않은 항목만 보여주기
-  const getAlternativeOption = agendas.filter((it) => it !== type);
+  const getAlternativeOptions = koreanTypes.filter(
+    (koreanType) => reverseTypeMapping[koreanType] !== type,
+  );
 
   return (
     <div className="relative w-8/12">
@@ -29,7 +40,7 @@ export default function DropdownForDebateType(
         onClick={() => setIsToggleOpen(!isToggleOpen)}
         className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white lg:text-3xl"
       >
-        ▼ {type}
+        ▼ {typeMapping[type]}
       </button>
 
       {isToggleOpen && (
@@ -37,15 +48,15 @@ export default function DropdownForDebateType(
           className="absolute left-0 right-0 mt-2 rounded-md bg-neutral-200 shadow-lg"
           role="listbox"
         >
-          {getAlternativeOption.map((it) => (
+          {getAlternativeOptions.map((koreanType) => (
             <li
-              key={it}
-              onClick={() => handleTypeSelect(it)}
+              key={koreanType}
+              onClick={() => handleTypeSelect(koreanType)}
               role="option"
               tabIndex={0}
               className="cursor-pointer p-2 text-center font-semibold text-white hover:bg-neutral-400 focus:bg-neutral-400 focus:outline-none"
             >
-              {it}
+              {koreanType}
             </li>
           ))}
         </ul>

@@ -28,7 +28,7 @@ const useTableFrom = (
         info: {
           name: '테이블 1',
           agenda: '',
-          type: '의회식 토론',
+          type: 'PARLIAMENTARY',
         },
         table: [],
       },
