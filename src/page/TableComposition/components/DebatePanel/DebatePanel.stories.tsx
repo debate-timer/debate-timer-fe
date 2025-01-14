@@ -46,7 +46,7 @@ export const ConsRebuttal: Story = {
 export const NeutralTimeout: Story = {
   args: {
     info: {
-      stance: 'NEUTRAL',
+      stance: 'NETURAL',
       type: 'TIME_OUT',
       time: 60,
       speakerNumber: 0,
