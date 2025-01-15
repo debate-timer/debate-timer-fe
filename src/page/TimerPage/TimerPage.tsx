@@ -28,59 +28,41 @@ export default function TimerPage() {
 
   // Declare states
   const [index, setIndex] = useState<number>(0);
-  const [timer, setTimer] = useState<number>(data ? data.table[index].time : 1);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [timer, setTimer] = useState<number>(1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [bg, setBg] = useState<string>('');
 
-  // Function that changes background
-  const updateBg = useCallback((bg: string) => {
-    setBg(bg);
-  }, []);
-
   // Declare functions to handle timer
   const startTimer = useCallback(() => {
-    console.log('# start timer');
-
-    if (intervalRef.current === null) {
+    if (!intervalRef.current) {
+      setIsRunning(true);
       intervalRef.current = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-      updateBg(
-        timer > 30
-          ? 'gradient-timer-running'
-          : timer < 0
-            ? 'gradient-timer-timeout'
-            : 'gradient-timer-warning',
-      );
+        setTimer((prev) => prev - 10);
+      }, 10);
     }
-  }, [timer, updateBg]);
+  }, []);
 
   const pauseTimer = useCallback(() => {
-    console.log('# pause timer');
-
-    if (intervalRef.current !== null) {
+    if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
-      updateBg('');
     }
-  }, [updateBg]);
+    setIsRunning(false);
+  }, []);
 
   const resetTimer = useCallback(() => {
-    console.log('# reset timer');
-
-    if (data) setTimer(data.table[index].time);
-    if (intervalRef.current !== null) {
+    if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
-      updateBg('');
     }
-  }, [data, index, updateBg]);
+    setIsRunning(false);
+    if (data) setTimer(data.table[index].time * 1000);
+  }, [data, index]);
 
   // Declare function to manage parent component's index
   const moveToOtherItem = useCallback(
     (goToPrev: boolean) => {
-      resetTimer();
-
       if (goToPrev) {
         if (index > 0) {
           setIndex((prev) => prev - 1);
@@ -90,33 +72,39 @@ export default function TimerPage() {
           setIndex((prev) => prev + 1);
         }
       }
+      resetTimer();
     },
-    [resetTimer, data, index],
+    [data, index, resetTimer],
   );
 
   // Set parent component's background animation by timer's state and remaining time
   useEffect(() => {
-    if (intervalRef.current === null) {
-      updateBg('');
-    } else if (timer > 30) {
-      updateBg('gradient-timer-running');
-    } else if (timer > 0) {
-      updateBg('gradient-timer-warning');
+    if (!isRunning) {
+      setBg('');
+    } else if (timer > 30 * 1000) {
+      setBg('gradient-timer-running');
+    } else if (timer >= 0) {
+      setBg('gradient-timer-warning');
     } else {
-      updateBg('gradient-timer-timeout');
+      setBg('gradient-timer-timeout');
     }
-  }, [timer, updateBg]);
+  }, [timer, isRunning]);
 
   // Add keyboard event listener
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Clear focus on the keyboard event
+      if (event.target instanceof HTMLElement) {
+        event.target.blur();
+      }
+
       switch (event.code) {
         case 'Space':
-          if (intervalRef.current !== null) {
-            console.log('# timer paused');
+          if (isRunning) {
+            // console.log('# timer paused');
             pauseTimer();
           } else {
-            console.log('# timer started');
+            // console.log('# timer started');
             startTimer();
           }
           break;
@@ -125,6 +113,9 @@ export default function TimerPage() {
           break;
         case 'ArrowRight':
           moveToOtherItem(false);
+          break;
+        case 'KeyR':
+          resetTimer();
           break;
       }
     };
@@ -135,11 +126,11 @@ export default function TimerPage() {
       // Remove listener when component is rendered
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [pauseTimer, startTimer, moveToOtherItem]);
+  }, [pauseTimer, startTimer, moveToOtherItem, isRunning, resetTimer]);
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30) {
+    if (dingOnceRef.current && timer === 30 * 1000) {
       dingOnceRef.current.play();
     } else if (dingTwiceRef.current && timer === 0) {
       dingTwiceRef.current.play();
@@ -148,8 +139,22 @@ export default function TimerPage() {
 
   // Let timer initialize itself when data is loaded via api
   useEffect(() => {
-    if (data) setTimer(data.table[index].time);
-  }, [data, index]);
+    if (data) {
+      setTimer(data.table[index].time * 1000);
+    }
+  }, [data, index, resetTimer]);
+
+  /*
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
+  */
 
   // Handle exceptions
   if (isLoading) {
@@ -173,7 +178,7 @@ export default function TimerPage() {
   }
 
   // console.log(`# index = ${index}, data = ` + data!.table[index].time);
-  console.log(`# isRunning = ${intervalRef.current === null}`);
+  // console.log(`# isRunning = ${isRunning}`);
 
   // Return React component
   return (

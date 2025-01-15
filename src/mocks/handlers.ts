@@ -63,19 +63,19 @@ export const handlers = [
         {
           stance: 'NEUTRAL',
           type: 'CROSS',
-          time: 40,
+          time: 32,
           speakerNumber: null,
         },
         {
           stance: 'CONS',
           type: 'CLOSING',
-          time: 40,
+          time: 35,
           speakerNumber: 2,
         },
         {
           stance: 'PROS',
           type: 'CLOSING',
-          time: 40,
+          time: 35,
           speakerNumber: 2,
         },
       ],
