@@ -5,7 +5,6 @@ interface TimerControllerProps {
   onPause: () => void;
   onStart: () => void;
   onReset: () => void;
-  toOtherItem: (isPrev: boolean) => void;
 }
 
 export default function TimerController({

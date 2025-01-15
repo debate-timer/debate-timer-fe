@@ -6,11 +6,6 @@ import {
 } from '../../../type/type';
 import Timer from './Timer/Timer';
 import TimerController from './Timer/TimerController';
-/*
-import useSound from 'use-sound';
-import dingOnce from '/sounds/ding-once-edit.mp3';
-import dingTwice from '/sounds/ding-twice-edit.mp3';
-*/
 import { IoPerson } from 'react-icons/io5';
 import DebateInfoSummary from './DebateInfoSummary';
 
@@ -196,7 +191,6 @@ export default function TimerComponent({
           onReset={resetTimer}
           onStart={startTimer}
           onPause={pauseTimer}
-          toOtherItem={moveToOtherItem}
         />
       </div>
 
