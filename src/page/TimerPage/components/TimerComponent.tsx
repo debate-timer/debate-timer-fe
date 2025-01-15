@@ -6,9 +6,11 @@ import {
 } from '../../../type/type';
 import Timer from './Timer/Timer';
 import TimerController from './Timer/TimerController';
+/*
 import useSound from 'use-sound';
 import dingOnce from '/sounds/ding-once-edit.mp3';
 import dingTwice from '/sounds/ding-twice-edit.mp3';
+*/
 import { IoPerson } from 'react-icons/io5';
 import DebateInfoSummary from './DebateInfoSummary';
 
@@ -37,8 +39,8 @@ export default function TimerComponent({
   updateBg,
 }: TimerComponentProps) {
   // Load sounds
-  const [dingOnceSfx] = useSound(dingOnce);
-  const [dingTwiceSfx] = useSound(dingTwice);
+  const dingOnceRef = useRef<HTMLAudioElement>(null);
+  const dingTwiceRef = useRef<HTMLAudioElement>(null);
 
   // Declare states
   const [timerState, setTimerState] = useState<TimerState>('STOPPED');
@@ -140,10 +142,10 @@ export default function TimerComponent({
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
-    if (timer === 30) {
-      dingOnceSfx();
-    } else if (timer === 0) {
-      dingTwiceSfx();
+    if (dingOnceRef.current && timer === 30) {
+      dingOnceRef.current.play();
+    } else if (dingTwiceRef.current && timer === 0) {
+      dingTwiceRef.current.play();
     }
   });
 
@@ -156,6 +158,9 @@ export default function TimerComponent({
   // Return React component
   return (
     <div className="flex h-full flex-row items-center space-x-4">
+      <audio ref={dingOnceRef} src="/sounds/ding-once-edit.mp3" />
+      <audio ref={dingTwiceRef} src="/sounds/ding-twice-edit.mp3" />
+
       <div className="flex-1">
         {index !== 0 && (
           <DebateInfoSummary

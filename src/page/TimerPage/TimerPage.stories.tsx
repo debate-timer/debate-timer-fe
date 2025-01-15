@@ -5,7 +5,6 @@ const meta: Meta<typeof TimerPage> = {
   title: 'page/TimerPage',
   component: TimerPage,
   tags: ['autodocs'],
-  decorators: [(Story) => <Story />],
 };
 
 export default meta;

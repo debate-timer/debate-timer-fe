@@ -3,7 +3,7 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/TimerComponent';
 import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
-import Spinner from '../common/Spinner';
+// import Spinner from '../common/Spinner';
 import { RiErrorWarningLine } from 'react-icons/ri';
 
 export default function TimerPage() {
@@ -49,7 +49,6 @@ export default function TimerPage() {
   if (isLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
-        <Spinner />
         <h1 className="text-xl font-bold">데이터를 불러오고 있습니다...</h1>
       </div>
     );
