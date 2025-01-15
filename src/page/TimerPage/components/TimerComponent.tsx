@@ -81,7 +81,6 @@ export default function TimerComponent({
   };
   const resetTimer = () => {
     setTimerState('STOPPED');
-    setTimer(debateInfoList[index].time);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -90,7 +89,6 @@ export default function TimerComponent({
 
   // Declare function to manage parant component's index
   const moveToOtherItem = (isPrev: boolean) => {
-    console.log("# 'moveToOtherItem' called.");
     if (isPrev) {
       decreaseIndex();
     } else {
@@ -148,6 +146,14 @@ export default function TimerComponent({
       dingTwiceSfx();
     }
   });
+
+  // Let timer be initiated with default time that is defined in current debateInfo's time when index is changed
+  useEffect(() => {
+    setTimer(debateInfoList[index].time);
+    console.log(
+      `# Timer has set to index ${index} and ${debateInfoList[index].time}`,
+    );
+  }, [debateInfoList, setTimer, index]);
 
   // Return React component
   return (
