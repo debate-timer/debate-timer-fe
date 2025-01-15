@@ -150,9 +150,7 @@ export default function TimerComponent({
   // Let timer be initiated with default time that is defined in current debateInfo's time when index is changed
   useEffect(() => {
     setTimer(debateInfoList[index].time);
-    console.log(
-      `# Timer has set to index ${index} and ${debateInfoList[index].time}`,
-    );
+    // console.log(`# Timer has set to index ${index} and ${debateInfoList[index].time}`);
   }, [debateInfoList, setTimer, index]);
 
   // Return React component

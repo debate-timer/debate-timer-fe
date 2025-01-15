@@ -65,7 +65,7 @@ export default function TimerPage() {
     );
   }
 
-  console.log(`# index = ${index}, data = ` + data!.table[index].time);
+  // console.log(`# index = ${index}, data = ` + data!.table[index].time);
 
   // Return React component
   return (

@@ -4,7 +4,7 @@ interface TimerProps {
   timer: number;
 }
 export default function Timer({ timer }: TimerProps) {
-  console.log(`# timer = ${timer}`);
+  // console.log(`# timer = ${timer}`);
 
   return (
     <div className="mb-12 flex flex-row items-center justify-center space-x-4 rounded-[50px] bg-zinc-50 p-8">
