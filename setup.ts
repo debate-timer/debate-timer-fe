@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 
 // msw 서버 시작
 beforeAll(() => {
+  cleanup();
   vi.resetAllMocks(); // Mock 초기화
   server.listen({ onUnhandledRequest: 'warn' });
 });
