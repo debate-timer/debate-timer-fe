@@ -18,9 +18,11 @@ export default function TimerController({
       {/* Timer start button */}
       <TimerIconButton
         icon={<IoPlayOutline className="size-12" />}
-        bgColor="bg-emerald-500"
-        hoverColor="hover:bg-emerald-600"
-        contentColor="text-zinc-50"
+        style={{
+          bgColor: 'bg-emerald-500',
+          hoverColor: 'hover:bg-emerald-600',
+          contentColor: 'text-zinc-50',
+        }}
         onClick={() => {
           onStart();
         }}
@@ -29,9 +31,11 @@ export default function TimerController({
       {/* Timer pause button */}
       <TimerIconButton
         icon={<IoPauseOutline className="size-12" />}
-        bgColor="bg-amber-500"
-        hoverColor="hover:bg-amber-600"
-        contentColor="text-zinc-50"
+        style={{
+          bgColor: 'bg-amber-500',
+          hoverColor: 'hover:bg-amber-600',
+          contentColor: 'text-zinc-50',
+        }}
         onClick={() => {
           onPause();
         }}
@@ -40,9 +44,11 @@ export default function TimerController({
       {/* Timer reset button */}
       <TimerIconButton
         icon={<IoTimerOutline className="size-12" />}
-        bgColor="bg-red-500"
-        hoverColor="hover:bg-red-600"
-        contentColor="text-zinc-50"
+        style={{
+          bgColor: 'bg-red-500',
+          hoverColor: 'hover:bg-red-600',
+          contentColor: 'text-zinc-50',
+        }}
         onClick={() => {
           onReset();
         }}

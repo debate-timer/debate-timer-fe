@@ -6,7 +6,13 @@ export type DebateType =
   | 'CLOSING'
   | 'TIME_OUT';
 
-export const DEBATE_TYPE_LABELS: Record<DebateType, string> = {
+export const StanceToString: Record<Stance, string> = {
+  PROS: '찬성',
+  CONS: '반대',
+  NEUTRAL: '중립',
+};
+
+export const DebateTypeToString: Record<DebateType, string> = {
   OPENING: '입론',
   REBUTTAL: '반론',
   CROSS: '교차질의',

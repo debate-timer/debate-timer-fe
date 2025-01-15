@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react';
-import { DEBATE_TYPE_LABELS, DebateInfo } from '../../../../type/type';
+import { DebateTypeToString, DebateInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
 
@@ -13,7 +13,7 @@ export default function DebatePanel(props: DebatePanelProps) {
   const { stance, type: debateType, time, speakerNumber } = props.info;
   const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
 
-  const debateTypeLabel = DEBATE_TYPE_LABELS[debateType];
+  const debateTypeLabel = DebateTypeToString[debateType];
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
   const timeStr = `${minutes}분 ${seconds}초`;
 

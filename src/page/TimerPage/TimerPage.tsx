@@ -35,14 +35,14 @@ export default function TimerPage() {
       return;
     }
     setIndex(index + 1);
-    // console.log(`# index = ${index}, max = ${max}`);
+    //console.log(`# index = ${index}, max = ${max - 1}, data = ` + data!.table[index].time);
   };
   const decreaseIndex = () => {
     if (index <= 0) {
       return;
     }
     setIndex(index - 1);
-    // console.log(`# index = ${index}`);
+    //console.log(`# index = ${index}, data = ` + data!.table[index]);
   };
 
   // Handle exceptions
@@ -65,6 +65,8 @@ export default function TimerPage() {
     );
   }
 
+  console.log(`# index = ${index}, data = ` + data!.table[index].time);
+
   // Return React component
   return (
     <DefaultLayout>
@@ -81,9 +83,9 @@ export default function TimerPage() {
           </div>
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Right>
-          <div className="flex flex-wrap items-center gap-2 px-2 md:w-auto md:gap-3">
-            <span className="text-lg md:text-base md:text-xl">토론 주제</span>
-            <h1 className="w-full p-2 text-base font-bold md:w-[30rem] md:text-2xl">
+          <div className="flex flex-row items-center space-x-3 md:w-auto md:gap-3">
+            <h1 className="text-lg md:text-xl">토론 주제</h1>
+            <h1 className="text-xl font-bold md:w-auto md:text-2xl">
               {data === undefined ? '주제 불러오기 실패' : data!.info.agenda}
             </h1>
           </div>

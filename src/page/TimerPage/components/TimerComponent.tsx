@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { DebateInfo } from '../../../type/type';
-import { Formatting } from '../../../util/formatting';
+import {
+  DebateInfo,
+  DebateTypeToString,
+  StanceToString,
+} from '../../../type/type';
 import Timer from './Timer/Timer';
 import TimerController from './Timer/TimerController';
 import useSound from 'use-sound';
@@ -45,8 +48,8 @@ export default function TimerComponent({
   // Set texts to be displayed
   const titleText =
     debateInfoList[index].type !== 'TIME_OUT'
-      ? `${Formatting.formatStanceToString(debateInfoList[index].stance)} ${Formatting.formatDebateTypeToString(debateInfoList[index].type)}`
-      : Formatting.formatDebateTypeToString(debateInfoList[index].type);
+      ? `${StanceToString[debateInfoList[index].stance]} ${DebateTypeToString[debateInfoList[index].type]}`
+      : DebateTypeToString[debateInfoList[index].type];
   const speakerText =
     debateInfoList[index].stance === 'NEUTRAL'
       ? ''

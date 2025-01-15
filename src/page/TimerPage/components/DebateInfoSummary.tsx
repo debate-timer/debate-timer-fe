@@ -4,8 +4,11 @@ import {
   IoPerson,
   IoTime,
 } from 'react-icons/io5';
-import { DebateInfo } from '../../../type/type';
-import { Formatting } from '../../../util/formatting';
+import {
+  DebateInfo,
+  DebateTypeToString,
+  StanceToString,
+} from '../../../type/type';
 import TimerIconButton from './common/TimerIconButton';
 
 interface DebateInfoSummaryProps {
@@ -24,8 +27,8 @@ export default function DebateInfoSummary({
   // const prevNextText = isPrev ? '이전 순서' : '다음 순서';
   const titleText =
     debateInfo.type !== 'TIME_OUT'
-      ? `${Formatting.formatStanceToString(debateInfo.stance)} ${Formatting.formatDebateTypeToString(debateInfo.type)}`
-      : Formatting.formatDebateTypeToString(debateInfo.type);
+      ? `${StanceToString[debateInfo.stance]} ${DebateTypeToString[debateInfo.type]}`
+      : DebateTypeToString[debateInfo.type];
   const speakerText =
     debateInfo.stance === 'NEUTRAL'
       ? ''
@@ -54,10 +57,12 @@ export default function DebateInfoSummary({
         {isPrev && (
           <TimerIconButton
             icon={<IoChevronBack className="size-10" />}
-            bgColor="bg-zinc-300"
-            hoverColor="hover:bg-zinc-500"
-            contentColor="text-zinc-900"
-            className="shadow-2xl"
+            style={{
+              bgColor: 'bg-zinc-300',
+              hoverColor: 'hover:bg-zinc-500',
+              contentColor: 'text-zinc-900',
+              className: 'shadow-2xl',
+            }}
             onClick={() => {
               moveToOtherItem(isPrev);
             }}
@@ -66,10 +71,12 @@ export default function DebateInfoSummary({
         {!isPrev && (
           <TimerIconButton
             icon={<IoChevronForward className="size-10" />}
-            bgColor="bg-zinc-300"
-            hoverColor="hover:bg-zinc-500"
-            contentColor="text-zinc-900"
-            className="shadow-2xl"
+            style={{
+              bgColor: 'bg-zinc-300',
+              hoverColor: 'hover:bg-zinc-500',
+              contentColor: 'text-zinc-900',
+              className: 'shadow-2xl',
+            }}
             onClick={() => {
               moveToOtherItem(isPrev);
             }}
