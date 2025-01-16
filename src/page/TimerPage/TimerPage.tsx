@@ -3,8 +3,8 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/TimerComponent';
 import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
-import { RiErrorWarningLine } from 'react-icons/ri';
 import DebateInfoSummary from './components/DebateInfoSummary';
+import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
 
 export default function TimerPage() {
   // Load sounds
@@ -167,14 +167,7 @@ export default function TimerPage() {
   }
 
   if (isError || data === null) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
-        <RiErrorWarningLine className="size-[120px]" />
-        <h1 className="text-xl font-bold">
-          데이터를 불러오는 중 오류가 발생했어요.
-        </h1>
-      </div>
-    );
+    throw new Error('Failed to get data from server.');
   }
 
   // console.log(`# index = ${index}, data = ` + data!.table[index].time);
@@ -182,83 +175,85 @@ export default function TimerPage() {
 
   // Return React component
   return (
-    <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>
-          <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">
-              {data === undefined
-                ? '테이블 이름 불러오기 실패'
-                : data!.info.name}
-            </h1>
-            <div className="mx-3 h-6 w-[2px] bg-black"></div>
-            <span className="text-lg font-normal md:text-xl">의회식</span>
-          </div>
-        </DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Right>
-          <div className="flex flex-row items-center space-x-3 md:w-auto md:gap-3">
-            <h1 className="text-lg md:text-xl">토론 주제</h1>
-            <h1 className="text-xl font-bold md:w-auto md:text-2xl">
-              {data === undefined ? '주제 불러오기 실패' : data!.info.agenda}
-            </h1>
-          </div>
-        </DefaultLayout.Header.Right>
-      </DefaultLayout.Header>
-
-      <DefaultLayout.ContentContanier>
-        <audio ref={dingOnceRef} src="/sounds/ding-once-edit.mp3" />
-        <audio ref={dingTwiceRef} src="/sounds/ding-twice-edit.mp3" />
-
-        <div className="relative z-10 h-full">
-          <div className="flex h-full flex-row items-center space-x-4">
-            <div className="flex-1">
-              {index !== 0 && (
-                <DebateInfoSummary
-                  isPrev={true}
-                  moveToOtherItem={(isPrev: boolean) => {
-                    moveToOtherItem(isPrev);
-                  }}
-                  debateInfo={data!.table[index - 1]}
-                />
-              )}
-              {index === 0 && <div className="m-8 w-[240px]"></div>}
+    <ErrorBoundary>
+      <DefaultLayout>
+        <DefaultLayout.Header>
+          <DefaultLayout.Header.Left>
+            <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
+              <h1 className="mr-2">
+                {data === undefined
+                  ? '테이블 이름 불러오기 실패'
+                  : data!.info.name}
+              </h1>
+              <div className="mx-3 h-6 w-[2px] bg-black"></div>
+              <span className="text-lg font-normal md:text-xl">의회식</span>
             </div>
+          </DefaultLayout.Header.Left>
+          <DefaultLayout.Header.Right>
+            <div className="flex flex-row items-center space-x-3 md:w-auto md:gap-3">
+              <h1 className="text-lg md:text-xl">토론 주제</h1>
+              <h1 className="text-xl font-bold md:w-auto md:text-2xl">
+                {data === undefined ? '주제 불러오기 실패' : data!.info.agenda}
+              </h1>
+            </div>
+          </DefaultLayout.Header.Right>
+        </DefaultLayout.Header>
 
-            <TimerComponent
-              debateInfo={data!.table[index]}
-              timer={timer}
-              startTimer={() => {
-                startTimer();
-              }}
-              pauseTimer={() => {
-                pauseTimer();
-              }}
-              resetTimer={() => {
-                resetTimer();
-              }}
-            />
+        <DefaultLayout.ContentContanier>
+          <audio ref={dingOnceRef} src="/sounds/ding-once-edit.mp3" />
+          <audio ref={dingTwiceRef} src="/sounds/ding-twice-edit.mp3" />
 
-            <div className="flex-1">
-              {index !== data!.table.length - 1 && (
-                <DebateInfoSummary
-                  isPrev={false}
-                  moveToOtherItem={(isPrev: boolean) => {
-                    moveToOtherItem(isPrev);
-                  }}
-                  debateInfo={data!.table[index + 1]}
-                />
-              )}
-              {index === data!.table.length - 1 && (
-                <div className="m-8 w-[240px]"></div>
-              )}
+          <div className="relative z-10 h-full">
+            <div className="flex h-full flex-row items-center space-x-4">
+              <div className="flex-1">
+                {index !== 0 && (
+                  <DebateInfoSummary
+                    isPrev={true}
+                    moveToOtherItem={(isPrev: boolean) => {
+                      moveToOtherItem(isPrev);
+                    }}
+                    debateInfo={data!.table[index - 1]}
+                  />
+                )}
+                {index === 0 && <div className="m-8 w-[240px]"></div>}
+              </div>
+
+              <TimerComponent
+                debateInfo={data!.table[index]}
+                timer={timer}
+                startTimer={() => {
+                  startTimer();
+                }}
+                pauseTimer={() => {
+                  pauseTimer();
+                }}
+                resetTimer={() => {
+                  resetTimer();
+                }}
+              />
+
+              <div className="flex-1">
+                {index !== data!.table.length - 1 && (
+                  <DebateInfoSummary
+                    isPrev={false}
+                    moveToOtherItem={(isPrev: boolean) => {
+                      moveToOtherItem(isPrev);
+                    }}
+                    debateInfo={data!.table[index + 1]}
+                  />
+                )}
+                {index === data!.table.length - 1 && (
+                  <div className="m-8 w-[240px]"></div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div
-          className={`absolute inset-0 top-[80px] z-0 animate-gradient opacity-80 ${bg}`}
-        ></div>
-      </DefaultLayout.ContentContanier>
-    </DefaultLayout>
+          <div
+            className={`absolute inset-0 top-[80px] z-0 animate-gradient opacity-80 ${bg}`}
+          ></div>
+        </DefaultLayout.ContentContanier>
+      </DefaultLayout>
+    </ErrorBoundary>
   );
 }

@@ -4,6 +4,7 @@ import TableListPage from './page/TableListPage/TableListPage';
 import TableOverview from './page/TableOverviewPage/TableOverview';
 import TimerPage from './page/TimerPage/TimerPage';
 import TableSetup from './page/TableSetupPage/TableSetup';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/table/parliamentary/:id',
-    element: <TimerPage />,
+    element: (
+      <ErrorBoundary>
+        <TimerPage />
+      </ErrorBoundary>
+    ),
   },
 ]);
 
