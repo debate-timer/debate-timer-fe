@@ -42,7 +42,7 @@ export default function TableOverview() {
           className="h-20 w-screen rounded-md bg-blue-300 text-2xl"
           onClick={() =>
             navigate(
-              `/composition?mode=edit&tableId=${data?.id}&type=의회식 토론`,
+              `/composition?mode=edit&tableId=${data?.id}&type=PARLIAMENTARY`,
             )
           }
         >
