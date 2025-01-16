@@ -3,7 +3,7 @@ import { postParliamentaryDebateTable } from '../../apis/apis';
 import { DebateInfo } from '../../type/type';
 import { PostDebateTableResponseType } from '../../apis/responseTypes';
 
-interface UseAddMoimParams {
+interface UseAddTableParams {
   id: number;
   tableName: string;
   tableAgenda: string;
@@ -12,7 +12,7 @@ interface UseAddMoimParams {
 
 export default function useAddTable(onSuccess: (id: number) => void) {
   return useMutation({
-    mutationFn: async (params: UseAddMoimParams) => {
+    mutationFn: async (params: UseAddTableParams) => {
       const response = await postParliamentaryDebateTable(
         params.id,
         params.tableName,
