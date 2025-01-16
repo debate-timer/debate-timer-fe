@@ -19,7 +19,7 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const isPros = stance === 'PROS';
   const isCons = stance === 'CONS';
-  const isNeutralTimeout = type === 'TIME_OUT' && stance === 'NETURAL';
+  const isNeutralTimeout = type === 'TIME_OUT' && stance === 'NEUTRAL';
 
   const containerClass = isPros
     ? 'justify-start'

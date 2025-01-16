@@ -112,7 +112,7 @@ export const handlers = [
           speakerNumber: 1,
         },
         {
-          stance: 'NETURAL',
+          stance: 'NEUTRAL',
           type: 'TIME_OUT',
           time: 180,
           speakerNumber: null,
@@ -162,7 +162,7 @@ export const handlers = [
           speakerNumber: 1,
         },
         {
-          stance: 'NETURAL',
+          stance: 'NEUTRAL',
           type: 'TIME_OUT',
           time: 180,
           speakerNumber: null,

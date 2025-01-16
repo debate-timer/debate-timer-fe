@@ -1,4 +1,4 @@
-export type Stance = 'PROS' | 'CONS' | 'NETURAL';
+export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type DebateType =
   | 'OPENING'
   | 'REBUTTAL'
