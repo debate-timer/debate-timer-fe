@@ -1,6 +1,6 @@
 import { HTMLAttributes } from 'react';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
-import { DEBATE_TYPE_LABELS, DebateInfo } from '../../../../type/type';
+import { DebateInfo, DebateTypeToString } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
@@ -13,7 +13,7 @@ export default function DebatePanel(props: DebatePanelProps) {
   const { stance, type, time, speakerNumber } = props.info;
   const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
 
-  const debateTypeLabel = DEBATE_TYPE_LABELS[type];
+  const debateTypeLabel = DebateTypeToString[type];
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
   const timeStr = `${minutes}분 ${seconds}초`;
 
