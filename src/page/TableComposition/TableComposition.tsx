@@ -18,7 +18,7 @@ export default function TableComposition() {
   // 1) URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode') as Mode;
-  const type = (searchParams.get('type') ?? '') as Type;
+  const type = (searchParams.get('type') as Type) ?? '';
   const tableId = Number(searchParams.get('tableId') || 0);
 
   // (2) edit 모드일 때만 서버에서 initData를 가져옴

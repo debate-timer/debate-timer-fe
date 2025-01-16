@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Type } from '../../../../type/type';
+import { typeMapping } from '../../../../constants/languageMapping';
 
 interface DropdownForDebateTypeProps {
   type: Type;
@@ -10,11 +11,6 @@ export default function DropdownForDebateType(
   props: DropdownForDebateTypeProps,
 ) {
   const { type, onChange } = props;
-
-  const typeMapping: Record<string, string> = {
-    parliamentary: '의회식 토론',
-    timeBased: '시간 총량제 토론',
-  };
 
   const reverseTypeMapping: Record<string, string> = Object.fromEntries(
     Object.entries(typeMapping).map(([key, value]) => [value, key]),

@@ -39,4 +39,4 @@ export interface DebateTable {
   duration: number;
 }
 
-export type Type = 'PARLIAMENTARY' | '';
+export type Type = 'PARLIAMENTARY' | 'TIMEBASED';
