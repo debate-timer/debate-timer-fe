@@ -8,12 +8,12 @@ import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { Type } from '../../type/type';
 
-export type TableCompositionStep = '이름타입입력' | '타임박스입력';
+export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
 
 export default function TableComposition() {
   const { Funnel, currentStep, goNextStep } =
-    useFunnel<TableCompositionStep>('이름타입입력');
+    useFunnel<TableCompositionStep>('NameAndType');
 
   // 1) URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
@@ -67,15 +67,15 @@ export default function TableComposition() {
     <DefaultLayout>
       <Funnel
         step={{
-          이름타입입력: (
+          NameAndType: (
             <TableNameAndType
               info={formData.info}
               isEdit={mode === 'edit'}
               onNameAndTypeChange={updateInfo}
-              onButtonClick={() => goNextStep('타임박스입력')}
+              onButtonClick={() => goNextStep('TimeBox')}
             />
           ),
-          타임박스입력: (
+          TimeBox: (
             <TimeBoxStep
               initTimeBox={formData.table}
               onTimeBoxChange={updateTable}
