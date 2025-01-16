@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
 import { RiErrorWarningLine } from 'react-icons/ri';
 import DebateInfoSummary from './components/DebateInfoSummary';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function TimerPage() {
   // Load sounds
@@ -12,19 +13,34 @@ export default function TimerPage() {
   const dingTwiceRef = useRef<HTMLAudioElement>(null);
 
   // Prepare data before requesting query
-  const tableId = 1024;
-  const memberId = 1024;
+  const [searchParams] = useSearchParams();
+  const pathParams = useParams();
+  const memberId = searchParams.get('memberId');
+  const tableId = pathParams.id;
   const queryKey = [
     queryKeyIdentifier.getParliamentaryTableData,
     tableId,
     memberId,
   ];
 
+  // Validate parameters is prepared
+  if (memberId === null && tableId === undefined) {
+    throw new Error(
+      "Failed to resolve 'memberId' and 'tableId' from request URL",
+    );
+  } else if (tableId === undefined) {
+    throw new Error("Failed to resolve 'tableId' from request URL");
+  } else if (memberId === null) {
+    throw new Error("Failed to resolve 'memberId' from request URL");
+  }
+
   // Get query
   const { data, isLoading, isError } = useQuery({
     queryKey: queryKey,
-    queryFn: () => getParliamentaryTableData(tableId, memberId),
+    queryFn: () => getParliamentaryTableData(Number(tableId), Number(memberId)),
   });
+
+  console.log(`# memberId: ${memberId}, tableId: ${tableId}`);
 
   // Declare states
   const [index, setIndex] = useState<number>(0);
