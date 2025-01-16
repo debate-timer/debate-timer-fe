@@ -28,18 +28,16 @@ export default function TimerPage() {
 
   // Declare states
   const [index, setIndex] = useState<number>(0);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [timer, setTimer] = useState<number>(1);
+  const [timer, setTimer] = useState<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [bg, setBg] = useState<string>('');
 
   // Declare functions to handle timer
   const startTimer = useCallback(() => {
     if (!intervalRef.current) {
-      setIsRunning(true);
       intervalRef.current = setInterval(() => {
-        setTimer((prev) => prev - 10);
-      }, 10);
+        setTimer((prev) => prev - 1);
+      }, 1000);
     }
   }, []);
 
@@ -48,7 +46,6 @@ export default function TimerPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setIsRunning(false);
   }, []);
 
   const resetTimer = useCallback(() => {
@@ -56,8 +53,7 @@ export default function TimerPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setIsRunning(false);
-    if (data) setTimer(data.table[index].time * 1000);
+    if (data) setTimer(data.table[index].time);
   }, [data, index]);
 
   // Declare function to manage parent component's index
@@ -77,18 +73,24 @@ export default function TimerPage() {
     [data, index, resetTimer],
   );
 
+  const changeBg = (condition: NodeJS.Timeout | null, timer: number) => {
+    if (condition) {
+      if (timer > 30) {
+        setBg('gradient-timer-running');
+      } else if (timer >= 0 && timer <= 30) {
+        setBg('gradient-timer-warning');
+      } else {
+        setBg('gradient-timer-timeout');
+      }
+    } else {
+      setBg('');
+    }
+  };
+
   // Set parent component's background animation by timer's state and remaining time
   useEffect(() => {
-    if (!isRunning) {
-      setBg('');
-    } else if (timer > 30 * 1000) {
-      setBg('gradient-timer-running');
-    } else if (timer >= 0) {
-      setBg('gradient-timer-warning');
-    } else {
-      setBg('gradient-timer-timeout');
-    }
-  }, [timer, isRunning]);
+    changeBg(intervalRef.current, timer);
+  }, [timer]);
 
   // Add keyboard event listener
   useEffect(() => {
@@ -100,22 +102,27 @@ export default function TimerPage() {
 
       switch (event.code) {
         case 'Space':
-          if (isRunning) {
+          if (intervalRef.current) {
             // console.log('# timer paused');
             pauseTimer();
+            changeBg(intervalRef.current, timer);
           } else {
             // console.log('# timer started');
             startTimer();
+            changeBg(intervalRef.current, timer);
           }
           break;
         case 'ArrowLeft':
           moveToOtherItem(true);
+          changeBg(intervalRef.current, timer);
           break;
         case 'ArrowRight':
           moveToOtherItem(false);
+          changeBg(intervalRef.current, timer);
           break;
         case 'KeyR':
           resetTimer();
+          changeBg(intervalRef.current, timer);
           break;
       }
     };
@@ -126,11 +133,11 @@ export default function TimerPage() {
       // Remove listener when component is rendered
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [pauseTimer, startTimer, moveToOtherItem, isRunning, resetTimer]);
+  }, [pauseTimer, startTimer, timer, moveToOtherItem, resetTimer]);
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30 * 1000) {
+    if (dingOnceRef.current && timer === 30) {
       dingOnceRef.current.play();
     } else if (dingTwiceRef.current && timer === 0) {
       dingTwiceRef.current.play();
@@ -140,7 +147,7 @@ export default function TimerPage() {
   // Let timer initialize itself when data is loaded via api
   useEffect(() => {
     if (data) {
-      setTimer(data.table[index].time * 1000);
+      setTimer(data.table[index].time);
     }
   }, [data, index, resetTimer]);
 
@@ -229,12 +236,15 @@ export default function TimerPage() {
               timer={timer}
               startTimer={() => {
                 startTimer();
+                changeBg(intervalRef.current, timer);
               }}
               pauseTimer={() => {
                 pauseTimer();
+                changeBg(intervalRef.current, timer);
               }}
               resetTimer={() => {
                 resetTimer();
+                changeBg(intervalRef.current, timer);
               }}
             />
 
