@@ -11,20 +11,23 @@ interface ErrorBoundaryState {
   stack: string;
 }
 
+const defaultMessage = '오류 정보 없음';
+const defaultStack = '오류 정보 없음';
+
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
-      message: '오류 정보 없음',
-      stack: '스택 정보 없음',
+      message: defaultMessage,
+      stack: defaultStack,
     };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     // Update state so the next render will show the fallback UI.
-    const message = error.message;
-    const stack = error.stack ? error.stack : '스택 정보 없음';
+    const message = error.message === '' ? defaultMessage : error.message;
+    const stack = error.stack === undefined ? defaultStack : error.stack;
     return { hasError: true, message: message, stack: stack };
   }
 

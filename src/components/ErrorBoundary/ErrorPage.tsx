@@ -41,7 +41,7 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
             onClick={() => window.location.reload()}
           >
             <div className="flex flex-row items-center justify-center space-x-4">
-              <IoRefresh className="size-[30px]" />
+              <IoRefresh size={30} />
               <h1 className="mt-0.5 text-2xl font-bold">다시 시도해보기</h1>
             </div>
           </button>
