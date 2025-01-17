@@ -52,5 +52,10 @@ export interface PutDebateTableResponseType {
 
 // Response types for error cases
 export interface ErrorResponseType {
+  type: string;
+  title: string;
+  status: number;
+  detail: string;
+  instance: string;
   message: string;
 }

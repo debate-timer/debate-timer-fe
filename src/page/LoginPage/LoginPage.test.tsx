@@ -38,4 +38,20 @@ describe('LoginPage', () => {
     // 입력 필드와 버튼 확인
     expect(screen.getByText('구글 계정으로 로그인')).toBeInTheDocument();
   });
+  it('닉네임이 비어 있으면 경고 메시지를 표시', async () => {
+    render(
+      <TestWrapper>
+        <LoginPage />
+      </TestWrapper>,
+    );
+
+    const loginButton = screen.getByText('로그인');
+    window.alert = vi.fn(); // alert를 mock으로 설정
+
+    // 로그인 버튼 클릭 (닉네임 비어 있음)
+    await userEvent.click(loginButton);
+
+    // alert가 호출되었는지 확인
+    expect(window.alert).toHaveBeenCalledWith('닉네임을 입력해주세요.');
+  });
 });
