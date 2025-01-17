@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { DebateTable } from '../../../../type/type';
-import EditModalButton from '../Modal/EditModalButton';
+import EditButton from '../Modal/EditButton';
 import DeleteModalButton from '../Modal/DeleteModalButton';
 
 interface DebateTableWithDelete extends DebateTable {
@@ -8,6 +8,7 @@ interface DebateTableWithDelete extends DebateTable {
 }
 
 export default function Table({
+  id,
   name,
   type,
   duration,
@@ -15,7 +16,7 @@ export default function Table({
 }: DebateTableWithDelete) {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate('/');
+    navigate(`/overview/${id}`);
   };
 
   return (
@@ -24,7 +25,7 @@ export default function Table({
       className="flex h-[200px] w-11/12 flex-col items-center rounded-md bg-amber-500 p-5 duration-200 hover:scale-105"
     >
       <div className="flex w-full justify-end gap-4 pb-2 lg:pb-0">
-        <EditModalButton name={name} type={type} />
+        <EditButton tableId={id} type={type} />
         <DeleteModalButton name={name} onDelete={onDelete} />
       </div>
       <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>

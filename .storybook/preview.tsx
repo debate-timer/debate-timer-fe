@@ -22,6 +22,7 @@ const preview: Preview = {
       },
     },
   },
+  loaders: [mswLoader],
   decorators: [
     (Story, context) => {
       const { route = '/', routeState } = context.parameters;
@@ -42,7 +43,6 @@ const preview: Preview = {
       );
     },
   ],
-  loaders: [mswLoader],
 };
 
 export default preview;

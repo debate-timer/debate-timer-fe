@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import DropdownForDebateType from './DropdownForDebateType';
 
 const meta: Meta<typeof DropdownForDebateType> = {
-  title: 'page/TableListPage/Components/DropdownForDebateType',
+  title: 'page/TableCompositon/Components/DropdownForDebateType',
   component: DropdownForDebateType,
   tags: ['autodocs'],
 };

@@ -93,6 +93,7 @@ export const handlers = [
     );
 
     return HttpResponse.json({
+      id: 1,
       info: {
         name: '테이블1',
         agenda: '촉법소년 연령 인하',
@@ -111,7 +112,7 @@ export const handlers = [
           speakerNumber: 1,
         },
         {
-          stance: 'NETURAL',
+          stance: 'NEUTRAL',
           type: 'TIME_OUT',
           time: 180,
           speakerNumber: null,
@@ -161,7 +162,7 @@ export const handlers = [
           speakerNumber: 1,
         },
         {
-          stance: 'NETURAL',
+          stance: 'NEUTRAL',
           type: 'TIME_OUT',
           time: 180,
           speakerNumber: null,

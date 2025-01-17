@@ -3,6 +3,7 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/TimerComponent';
 import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
+import { RiErrorWarningLine } from 'react-icons/ri';
 import DebateInfoSummary from './components/DebateInfoSummary';
 
 export default function TimerPage() {
@@ -20,7 +21,7 @@ export default function TimerPage() {
   ];
 
   // Get query
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: queryKey,
     queryFn: () => getParliamentaryTableData(tableId, memberId),
   });
@@ -161,6 +162,17 @@ export default function TimerPage() {
       <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
         <img src="/spinner.gif" className="size-[120px]" alt="불러오는 중" />
         <h1 className="text-xl font-bold">데이터를 불러오고 있습니다...</h1>
+      </div>
+    );
+  }
+
+  if (isError || data === null) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
+        <RiErrorWarningLine className="size-[120px]" />
+        <h1 className="text-xl font-bold">
+          데이터를 불러오는 중 오류가 발생했어요.
+        </h1>
       </div>
     );
   }

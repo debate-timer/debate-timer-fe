@@ -1,7 +1,24 @@
+import { useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import LinkButton from './components/LinkButton/LinkButton';
+import { useNavigate } from 'react-router-dom';
+import { usePostUser } from '../../hooks/mutations/usePostUser';
 
 export default function LoginPage() {
+  const [nickname, setNickname] = useState('');
+  const navigate = useNavigate();
+  const { mutate } = usePostUser(() => navigate('/table'));
+
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
+
+  const handleLogin = () => {
+    if (!nickname.trim()) {
+      alert('닉네임을 입력해주세요.');
+      return;
+    }
+    mutate(nickname);
+  };
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -16,10 +33,17 @@ export default function LoginPage() {
         <section className="flex w-72 flex-col gap-8 text-lg font-semibold">
           <input
             id="nickname"
+            value={nickname}
+            onChange={handleNicknameChange}
             placeholder="닉네임을 입력해주세요"
             className="rounded-lg bg-slate-300 p-5 text-center placeholder-slate-500"
           />
-          <LinkButton url="/table" title="로그인" />
+          <button
+            onClick={handleLogin}
+            className="rounded-lg bg-amber-300 p-5 transition-transform duration-200 hover:scale-105"
+          >
+            로그인
+          </button>
         </section>
       </div>
     </DefaultLayout>

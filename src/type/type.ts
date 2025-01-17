@@ -35,6 +35,8 @@ export interface DebateInfo {
 export interface DebateTable {
   id: number;
   name: string;
-  type: string;
+  type: Type;
   duration: number;
 }
+
+export type Type = 'PARLIAMENTARY' | 'TIMEBASED';
