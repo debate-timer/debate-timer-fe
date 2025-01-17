@@ -3,7 +3,7 @@ import LoginPage from './page/LoginPage/LoginPage';
 import TableListPage from './page/TableListPage/TableListPage';
 import TableOverview from './page/TableOverviewPage/TableOverview';
 import TimerPage from './page/TimerPage/TimerPage';
-import TableSetup from './page/TableSetupPage/TableSetup';
+import TableComposition from './page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from './components/ErrorBoundary/ErrorBoundaryWrapper';
 
 const router = createBrowserRouter([
@@ -12,15 +12,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <TableSetup />,
-      },
-      {
-        path: '/login',
         element: <LoginPage />,
       },
       {
         path: '/table',
         element: <TableListPage />,
+      },
+      {
+        path: '/composition',
+        element: <TableComposition />,
       },
       {
         path: '/overview/:id',
