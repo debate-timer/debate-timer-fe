@@ -55,7 +55,6 @@ const preview: Preview = {
       );
     },
   ],
-  loaders: [mswLoader],
 };
 
 export default preview;
