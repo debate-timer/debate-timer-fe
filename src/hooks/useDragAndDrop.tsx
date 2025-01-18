@@ -90,7 +90,7 @@ export function useDragAndDrop<T>({
   const DragAndDropWrapper = ({ children }: { children: ReactNode }) => {
     return (
       <div
-        className="w-full"
+        className="flex w-full flex-col gap-2"
         onMouseMove={(e) =>
           throttledHandleMouseMove(
             e,

@@ -1,7 +1,22 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import TableListPage from './TableListPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
+import { waitFor } from '@testing-library/react';
+import { GlobalPortal } from '../../util/GlobalPortal';
+
+function TestWrapper({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <GlobalPortal.Provider>
+        <MemoryRouter>{children}</MemoryRouter>
+      </GlobalPortal.Provider>
+    </QueryClientProvider>
+  );
+}
 
 vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
   const HeaderLeft = function HeaderLeft({
@@ -11,12 +26,10 @@ vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
   }) {
     return <div data-testid="header-left">{children}</div>;
   };
-  HeaderLeft.displayName = 'HeaderLeft';
 
   const Header = function Header({ children }: { children: React.ReactNode }) {
     return <div data-testid="header">{children}</div>;
   };
-  Header.displayName = 'Header';
   Header.Left = HeaderLeft;
 
   const DefaultLayout = function DefaultLayout({
@@ -34,41 +47,27 @@ vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
   };
 });
 
-vi.mock('./components/Table/Table', () => ({
-  default: function Table({
-    id,
-    name,
-    type,
-    duration,
-  }: {
-    id: number;
-    name: string;
-    type: string;
-    duration: number;
-  }) {
-    return (
-      <div data-testid="table-component">
-        <div>{id}</div>
-        <div>{name}</div>
-        <div>{type}</div>
-        <div>{duration}</div>
-      </div>
-    );
-  },
-}));
-
 vi.mock('./components/Table/AddTable', () => ({
   default: function AddTable() {
     return <div data-testid="add-table">테이블 추가</div>;
   },
 }));
 
+// react-router-dom의 useNavigate 모의(Mock)
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+  };
+});
+
 describe('TableListPage', () => {
   const renderTableListPage = () => {
     return render(
-      <BrowserRouter>
+      <TestWrapper>
         <TableListPage />
-      </BrowserRouter>,
+      </TestWrapper>,
     );
   };
 
@@ -84,10 +83,12 @@ describe('TableListPage', () => {
     expect(headerLeft).toHaveTextContent('테이블 목록화면');
   });
 
-  it('Table 렌더링 검증', () => {
+  it('Table 렌더링 검증', async () => {
     renderTableListPage();
-    const tables = screen.getAllByTestId('table-component');
-    expect(tables).toHaveLength(4);
+    await waitFor(() => {
+      const tables = screen.getAllByRole('button', { name: /테이블 \d+/i });
+      expect(tables).toHaveLength(2);
+    });
   });
 
   it('AddTable 렌더링 검증', () => {
@@ -95,42 +96,38 @@ describe('TableListPage', () => {
     expect(screen.getByTestId('add-table')).toBeInTheDocument();
   });
 
-  it('main container with correct grid classes 검증', () => {
+  it('삭제 버튼 클릭 동작 검증', async () => {
     renderTableListPage();
-    const mainContainer = document.querySelector('main');
-    expect(mainContainer).toHaveClass('grid');
-    expect(mainContainer).toHaveClass('grid-cols-3');
-    expect(mainContainer).toHaveClass('justify-items-center');
-    expect(mainContainer).toHaveClass('gap-6');
+    await waitFor(() => {
+      screen.getAllByRole('button', { name: /테이블 \d+/i });
+    });
+
+    const deleteButtons = screen.getAllByRole('button', { name: '삭제하기' });
+    expect(deleteButtons).toHaveLength(2);
+
+    await userEvent.click(deleteButtons[0]);
+    const modalHeader = await screen.findByRole('heading', {
+      name: '삭제하시겠습니까?',
+    });
+    expect(modalHeader).toBeInTheDocument();
   });
 
-  it('tables 컴포넌트 data 검증', () => {
+  it('수정 버튼 클릭 동작 검증', async () => {
+    const navigate = vi.fn();
+    (useNavigate as jest.Mock).mockReturnValue(navigate);
+
     renderTableListPage();
-    const tables = screen.getAllByTestId('table-component');
 
-    // Check first table
-    const firstTable = tables[0];
-    expect(firstTable).toHaveTextContent('테이블 1');
-    expect(firstTable).toHaveTextContent('의회식 토론');
-    expect(firstTable).toHaveTextContent('30');
+    await waitFor(() => {
+      screen.getAllByRole('button', { name: /테이블 \d+/i });
+    });
 
-    // Check second table
-    const secondTable = tables[1];
-    expect(secondTable).toHaveTextContent('테이블 2');
-    expect(secondTable).toHaveTextContent('의회식 토론');
-    expect(secondTable).toHaveTextContent('30');
-  });
+    const editButtons = screen.getAllByRole('button', { name: '수정하기' });
+    expect(editButtons).toHaveLength(2);
 
-  it('parent container with correct classes 검증', () => {
-    renderTableListPage();
-    const container = screen
-      .getByTestId('default-layout')
-      .querySelector('.flex.h-screen');
-    expect(container).toBeInTheDocument();
-    expect(container).toHaveClass('flex');
-    expect(container).toHaveClass('h-screen');
-    expect(container).toHaveClass('flex-col');
-    expect(container).toHaveClass('px-4');
-    expect(container).toHaveClass('py-6');
+    await userEvent.click(editButtons[0]);
+    expect(navigate).toHaveBeenCalledWith(
+      '/composition?mode=edit&tableId=1&type=PARLIAMENTARY',
+    );
   });
 });
