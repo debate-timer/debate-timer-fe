@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/TimerComponent';
-import { useQuery } from '@tanstack/react-query';
-import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
 import DebateInfoSummary from './components/DebateInfoSummary';
 import { useParams, useSearchParams } from 'react-router-dom';
 import TimerLoadingPage from './TimerLoadingPage';
@@ -18,11 +16,6 @@ export default function TimerPage() {
   const pathParams = useParams();
   const memberId = searchParams.get('memberId');
   const tableId = pathParams.id;
-  const queryKey = [
-    queryKeyIdentifier.getParliamentaryTableData,
-    tableId,
-    memberId,
-  ];
 
   // Validate parameters is prepared
   if (memberId === null && tableId === undefined) {
