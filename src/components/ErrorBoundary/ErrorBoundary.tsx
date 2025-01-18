@@ -12,7 +12,7 @@ interface ErrorBoundaryState {
 }
 
 const defaultMessage = '오류 정보 없음';
-const defaultStack = '오류 정보 없음';
+const defaultStack = '스택 정보 없음';
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {

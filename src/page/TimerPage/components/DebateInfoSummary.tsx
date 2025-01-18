@@ -17,6 +17,8 @@ interface DebateInfoSummaryProps {
   moveToOtherItem: (isPrev: boolean) => void;
 }
 
+const iconSize = 30;
+
 // Main timer component that user can control
 export default function DebateInfoSummary({
   debateInfo,
@@ -56,7 +58,7 @@ export default function DebateInfoSummary({
       <div className="flex">
         {isPrev && (
           <TimerIconButton
-            icon={<IoChevronBack className="size-10" />}
+            icon={<IoChevronBack size={iconSize} />}
             style={{
               bgColor: 'bg-zinc-300',
               hoverColor: 'hover:bg-zinc-500',
@@ -70,7 +72,7 @@ export default function DebateInfoSummary({
         )}
         {!isPrev && (
           <TimerIconButton
-            icon={<IoChevronForward className="size-10" />}
+            icon={<IoChevronForward size={iconSize} />}
             style={{
               bgColor: 'bg-zinc-300',
               hoverColor: 'hover:bg-zinc-500',
