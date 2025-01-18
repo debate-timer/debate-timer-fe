@@ -1,4 +1,4 @@
-import DefaultLayout from '../../../layout/defaultLayout/DefaultLayout';
+import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 
 export default function TimerLoadingPage() {
   return (

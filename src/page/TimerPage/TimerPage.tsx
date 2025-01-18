@@ -5,7 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
 import DebateInfoSummary from './components/DebateInfoSummary';
 import { useParams, useSearchParams } from 'react-router-dom';
-import TimerLoadingPage from './components/TimerLoadingPage';
+import TimerLoadingPage from './TimerLoadingPage';
+import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 
 export default function TimerPage() {
   // Load sounds
@@ -35,11 +36,10 @@ export default function TimerPage() {
   }
 
   // Get query
-  const { data, isLoading } = useQuery({
-    queryKey: queryKey,
-    queryFn: () => getParliamentaryTableData(Number(tableId), Number(memberId)),
-  });
-
+  const { data, isLoading } = useGetParliamentaryTableData(
+    Number(tableId),
+    Number(memberId),
+  );
   console.log(`# memberId: ${memberId}, tableId: ${tableId}`);
 
   // Declare states
@@ -167,18 +167,6 @@ export default function TimerPage() {
     }
   }, [data, index, resetTimer]);
 
-  /*
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, []);
-  */
-
   // Handle exceptions
   if (isLoading) {
     return <TimerLoadingPage />;
@@ -213,66 +201,61 @@ export default function TimerPage() {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContanier>
-        {isLoading && <div></div>}
-        {!isLoading && (
-          <div>
-            <audio ref={dingOnceRef} src="/sounds/ding-once-edit.mp3" />
-            <audio ref={dingTwiceRef} src="/sounds/ding-twice-edit.mp3" />
+        <audio ref={dingOnceRef} src="/sounds/ding-once-edit.mp3" />
+        <audio ref={dingTwiceRef} src="/sounds/ding-twice-edit.mp3" />
 
-            <div className="relative z-10 h-full">
-              <div className="flex h-full flex-row items-center space-x-4">
-                <div className="flex-1">
-                  {index !== 0 && (
-                    <DebateInfoSummary
-                      isPrev={true}
-                      moveToOtherItem={(isPrev: boolean) => {
-                        moveToOtherItem(isPrev);
-                      }}
-                      debateInfo={data!.table[index - 1]}
-                    />
-                  )}
-                  {index === 0 && <div className="m-8 w-[240px]"></div>}
-                </div>
-
-                <TimerComponent
-                  debateInfo={data!.table[index]}
-                  timer={timer}
-                  startTimer={() => {
-                    startTimer();
-                    changeBg(intervalRef.current, timer);
+        <div className="relative z-10 h-full">
+          <div className="flex h-full flex-row items-center space-x-4">
+            <div className="flex-1">
+              {index !== 0 && (
+                <DebateInfoSummary
+                  isPrev={true}
+                  moveToOtherItem={(isPrev: boolean) => {
+                    moveToOtherItem(isPrev);
                   }}
-                  pauseTimer={() => {
-                    pauseTimer();
-                    changeBg(intervalRef.current, timer);
-                  }}
-                  resetTimer={() => {
-                    resetTimer();
-                    changeBg(intervalRef.current, timer);
-                  }}
+                  debateInfo={data!.table[index - 1]}
                 />
-
-                <div className="flex-1">
-                  {index !== data!.table.length - 1 && (
-                    <DebateInfoSummary
-                      isPrev={false}
-                      moveToOtherItem={(isPrev: boolean) => {
-                        moveToOtherItem(isPrev);
-                      }}
-                      debateInfo={data!.table[index + 1]}
-                    />
-                  )}
-                  {index === data!.table.length - 1 && (
-                    <div className="m-8 w-[240px]"></div>
-                  )}
-                </div>
-              </div>
+              )}
+              {index === 0 && <div className="m-8 w-[240px]"></div>}
             </div>
 
-            <div
-              className={`absolute inset-0 top-[80px] z-0 animate-gradient opacity-80 ${bg}`}
-            ></div>
+            <TimerComponent
+              debateInfo={data!.table[index]}
+              timer={timer}
+              startTimer={() => {
+                startTimer();
+                changeBg(intervalRef.current, timer);
+              }}
+              pauseTimer={() => {
+                pauseTimer();
+                changeBg(intervalRef.current, timer);
+              }}
+              resetTimer={() => {
+                resetTimer();
+                changeBg(intervalRef.current, timer);
+              }}
+            />
+
+            <div className="flex-1">
+              {index !== data!.table.length - 1 && (
+                <DebateInfoSummary
+                  isPrev={false}
+                  moveToOtherItem={(isPrev: boolean) => {
+                    moveToOtherItem(isPrev);
+                  }}
+                  debateInfo={data!.table[index + 1]}
+                />
+              )}
+              {index === data!.table.length - 1 && (
+                <div className="m-8 w-[240px]"></div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
+
+        <div
+          className={`absolute inset-0 top-[80px] z-0 animate-gradient opacity-80 ${bg}`}
+        ></div>
       </DefaultLayout.ContentContanier>
     </DefaultLayout>
   );
