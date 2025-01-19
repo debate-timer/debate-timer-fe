@@ -1,8 +1,8 @@
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
+import DeleteConfirmContent from '../DeleteConfirmContent/DeleteConfirmContent';
+import { DebateInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
-import { DebateInfo } from '../../../../type/type';
-import DeleteConfirmContent from '../DeleteConfirmContent/DeleteConfirmContent';
 
 interface EditDeleteButtonsPros {
   info: DebateInfo;

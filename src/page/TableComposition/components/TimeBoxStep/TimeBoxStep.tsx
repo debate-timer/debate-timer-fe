@@ -1,15 +1,21 @@
-import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { useModal } from '../../hooks/useModal';
-import DebatePanel from './components/DebatePanel/DebatePanel';
-import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
-import TimerCreationButton from './components/TimerCreationButton/TimerCreationButton';
-import TimerCreationContent from './components/TimerCreationContent/TimerCreationContent';
-import { DebateInfo } from '../../type/type';
+import DebatePanel from '../DebatePanel/DebatePanel';
+import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
+import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { useNavigate } from 'react-router-dom';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
-import { useState } from 'react';
+import { useModal } from '../../../../hooks/useModal';
+import { DebateInfo } from '../../../../type/type';
+import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
+import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
+import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
 
-export default function TableSetup() {
+interface TimeBoxStepProps {
+  initTimeBox: DebateInfo[];
+  onTimeBoxChange: React.Dispatch<React.SetStateAction<DebateInfo[]>>;
+  onButtonClick: () => void;
+}
+export default function TimeBoxStep(props: TimeBoxStepProps) {
+  const { initTimeBox, onTimeBoxChange, onButtonClick } = props;
+  console.log(initTimeBox);
   const {
     openModal: ProsOpenModal,
     closeModal: ProsCloseModal,
@@ -20,19 +26,18 @@ export default function TableSetup() {
     closeModal: ConsCloseModal,
     ModalWrapper: ConsModalWrapper,
   } = useModal();
-  const [data, setData] = useState<DebateInfo[]>([]);
 
   const { handleMouseDown, getDraggingStyles, DragAndDropWrapper } =
     useDragAndDrop({
-      data,
-      setData,
+      data: initTimeBox,
+      setData: onTimeBoxChange,
       throttleDelay: 50,
     });
 
   const navigate = useNavigate();
 
   const handleSubmitEdit = (indexToEdit: number, updatedInfo: DebateInfo) => {
-    setData((prevData) =>
+    onTimeBoxChange((prevData) =>
       prevData.map((item, index) =>
         index === indexToEdit ? updatedInfo : item,
       ),
@@ -40,7 +45,7 @@ export default function TableSetup() {
   };
 
   const handleSubmitDelete = (indexToRemove: number) => {
-    setData((prevData) =>
+    onTimeBoxChange((prevData) =>
       prevData.filter((_, index) => index !== indexToRemove),
     );
   };
@@ -71,7 +76,7 @@ export default function TableSetup() {
       <DefaultLayout.ContentContanier>
         <PropsAndConsTitle />
         <DragAndDropWrapper>
-          {data.map((info, index) => (
+          {initTimeBox.map((info, index) => (
             <div key={info.time} style={getDraggingStyles(index)}>
               <DebatePanel
                 key={index}
@@ -94,8 +99,11 @@ export default function TableSetup() {
 
       <DefaultLayout.StickyFooterWrapper>
         <button
-          className="h-20 w-screen bg-amber-300"
-          onClick={() => navigate('/overview/1', { state: data })}
+          className="h-20 w-screen bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
+          onClick={() => {
+            onButtonClick();
+            navigate('/overview/1', { state: initTimeBox });
+          }}
         >
           테이블 추가하기
         </button>
@@ -104,9 +112,9 @@ export default function TableSetup() {
       <ProsModalWrapper>
         <TimerCreationContent
           selectedStance={'PROS'}
-          initDate={data[data.length - 1]}
+          initDate={initTimeBox[initTimeBox.length - 1]}
           onSubmit={(data) => {
-            setData((prev) => [...prev, data]);
+            onTimeBoxChange((prev) => [...prev, data]);
           }}
           onClose={ProsCloseModal}
         />
@@ -115,9 +123,9 @@ export default function TableSetup() {
       <ConsModalWrapper>
         <TimerCreationContent
           selectedStance={'CONS'}
-          initDate={data[data.length - 1]}
+          initDate={initTimeBox[initTimeBox.length - 1]}
           onSubmit={(data) => {
-            setData((prev) => [...prev, data]);
+            onTimeBoxChange((prev) => [...prev, data]);
           }}
           onClose={ConsCloseModal}
         />

@@ -4,7 +4,7 @@ import { GlobalPortal } from '../src/util/GlobalPortal/index';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
-import { initialize, mswDecorator } from 'msw-storybook-addon';
+import { initialize, mswLoader } from 'msw-storybook-addon';
 import { handlers } from '../src/mocks/handlers';
 
 initialize();
@@ -12,16 +12,17 @@ initialize();
 const queryClient = new QueryClient();
 const preview: Preview = {
   parameters: {
+    msw: {
+      handlers: { ...handlers },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
       },
-      msw: {
-        handlers: [...handlers],
-      },
     },
   },
+  loaders: [mswLoader],
   decorators: [
     (Story, context) => {
       const { route = '/', routeState } = context.parameters;
@@ -41,7 +42,6 @@ const preview: Preview = {
         </QueryClientProvider>
       );
     },
-    mswDecorator,
   ],
 };
 

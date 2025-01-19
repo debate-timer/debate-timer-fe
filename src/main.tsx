@@ -11,7 +11,7 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
   console.log('[msw] Mocking enabled.');
 
   // Import worker and start it
-  import('./mocks/browser.tsx').then(({ worker }) => {
+  import('./mocks/browser.ts').then(({ worker }) => {
     worker
       .start({
         onUnhandledRequest: (request, print) => {
