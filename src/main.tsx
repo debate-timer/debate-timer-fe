@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { GlobalPortal } from './util/GlobalPortal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import router from './route';
+import router from './routes/routes.tsx';
 import './index.css';
 
 // Functions that calls msw mocking worker
