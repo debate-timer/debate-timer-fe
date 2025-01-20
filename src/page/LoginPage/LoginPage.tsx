@@ -9,7 +9,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { mutate } = usePostUser((data) => {
     setMemberIdToken(data.id);
-    navigate('/table');
+    navigate('/');
   });
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
