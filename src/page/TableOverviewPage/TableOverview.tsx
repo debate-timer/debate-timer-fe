@@ -3,11 +3,12 @@ import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTit
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
+import { getMemberIdToken } from '../../util/memberIdToken';
 
 export default function TableOverview() {
   const [searchParams] = useSearchParams();
   const tableId = Number(searchParams.get('tableId') || 0);
-  const { data } = useGetParliamentaryTableData(tableId, 1);
+  const { data } = useGetParliamentaryTableData(tableId, getMemberIdToken());
 
   const navigate = useNavigate();
   return (

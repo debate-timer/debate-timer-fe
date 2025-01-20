@@ -2,11 +2,15 @@ import { useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useNavigate } from 'react-router-dom';
 import { usePostUser } from '../../hooks/mutations/usePostUser';
+import { setMemberIdToken } from '../../util/memberIdToken';
 
 export default function LoginPage() {
   const [nickname, setNickname] = useState('');
   const navigate = useNavigate();
-  const { mutate } = usePostUser(() => navigate('/table'));
+  const { mutate } = usePostUser((data) => {
+    setMemberIdToken(data.id);
+    navigate('/table');
+  });
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
