@@ -6,6 +6,7 @@ export const handlers = [
   // POST "/api/member"
   http.post(ApiUrl.member, async () => {
     return HttpResponse.json({
+      id: 1,
       nickname: '홍길동',
     });
   }),
