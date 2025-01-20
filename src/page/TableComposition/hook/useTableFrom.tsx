@@ -36,7 +36,7 @@ const useTableFrom = (
     },
   );
   const isNewMoimCreation =
-    currentStep === '이름타입입력' && navigationType === 'PUSH';
+    currentStep === 'NameAndType' && navigationType === 'PUSH';
 
   if (isNewMoimCreation) {
     removeValue();
@@ -50,7 +50,7 @@ const useTableFrom = (
   }, [initData]);
 
   useEffect(() => {
-    if (currentStep === '타임박스입력' && navigationType === 'POP') {
+    if (currentStep === 'TimeBox' && navigationType === 'POP') {
       navigate('/table');
     }
   }, [currentStep, navigationType, navigate]);
