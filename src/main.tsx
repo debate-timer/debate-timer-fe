@@ -42,7 +42,16 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
 // Function that initializes main React app
 function initializeApp() {
   // Call queryClient for TanStack Query
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        throwOnError: true,
+      },
+      mutations: {
+        throwOnError: true,
+      },
+    },
+  });
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
