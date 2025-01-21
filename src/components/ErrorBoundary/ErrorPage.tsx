@@ -1,9 +1,11 @@
 import { IoRefresh } from 'react-icons/io5';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+
 interface ErrorPageProps {
   message: string;
   stack: string;
 }
+
 export default function ErrorPage({ message, stack }: ErrorPageProps) {
   return (
     <DefaultLayout>
@@ -14,6 +16,7 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
           </div>
         </DefaultLayout.Header.Left>
       </DefaultLayout.Header>
+
       <DefaultLayout.ContentContanier>
         <div className="flex w-full flex-col items-start justify-start px-8 py-20">
           <div className="mb-20 flex flex-col">
@@ -21,14 +24,17 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
               오류가 발생했어요... 😭
             </h1>
           </div>
+
           <div className="mb-10 flex flex-col space-y-2">
             <h1 className="text-xl font-bold">오류 내용</h1>
             <p className="text-lg">{message}</p>
           </div>
+
           <div className="mb-20 flex flex-col space-y-2">
             <h1 className="text-xl font-bold">스택</h1>
             <p className="text-lg">{stack}</p>
           </div>
+
           <button
             className="rounded-full bg-zinc-300 px-8 py-4 hover:bg-zinc-400"
             type="button"
