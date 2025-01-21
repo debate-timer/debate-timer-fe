@@ -34,7 +34,7 @@ const CurrentRoute = () => {
 export const Default: Story = {
   args: {
     name: '테이블 1',
-    type: '의회식 토론',
+    type: 'PARLIAMENTARY',
     duration: 30,
   },
 };
