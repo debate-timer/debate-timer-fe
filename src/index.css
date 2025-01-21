@@ -7,3 +7,17 @@
     @apply font-pretendard;
   }
 }
+
+p {
+  white-space: pre-wrap;
+}
+
+.gradient-timer-running {
+  background-image: linear-gradient(270deg, #21c494, #21bdc4, #21c45d);
+}
+.gradient-timer-warning {
+  background-image: linear-gradient(270deg, #f5d60a, #f5ba0a, #f5f30a);
+}
+.gradient-timer-timeout {
+  background-image: linear-gradient(270deg, #f87171, #dc2626, #f43f5e);
+}

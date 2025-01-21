@@ -22,6 +22,7 @@ export interface GetTableDataResponseType {
 
 // POST /api/table/parliamentary?memberId={memberId}
 export interface PostDebateTableResponseType {
+  id: number;
   info: {
     name: string;
     agenda: string;
@@ -31,6 +32,7 @@ export interface PostDebateTableResponseType {
 
 // PUT /api/table/parliamentary/{tableId}?memberId={memberId}
 export interface PutDebateTableResponseType {
+  id: number;
   info: {
     name: string;
     agenda: string;
@@ -43,10 +45,5 @@ export interface PutDebateTableResponseType {
 
 // Response types for error cases
 export interface ErrorResponseType {
-  type: string;
-  title: string;
-  status: number;
-  detail: string;
-  instance: string;
   message: string;
 }

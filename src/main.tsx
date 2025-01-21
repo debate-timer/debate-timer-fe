@@ -11,7 +11,7 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
   console.log('[msw] Mocking enabled.');
 
   // Import worker and start it
-  import('./mocks/browser.tsx').then(({ worker }) => {
+  import('./mocks/browser.ts').then(({ worker }) => {
     worker
       .start({
         onUnhandledRequest: (request, print) => {
@@ -40,7 +40,16 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
 // Function that initializes main React app
 function initializeApp() {
   // Call queryClient for TanStack Query
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        throwOnError: true,
+      },
+      mutations: {
+        throwOnError: true,
+      },
+    },
+  });
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
