@@ -31,18 +31,18 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-access-key-id: ${{secrets.AWS_DEV_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_DEV_SECRET_ACCESS_KEY}}
           aws-region: ap-northeast-2
 
       - name: Deploy to AWS S3
         env:
           BUCKET_NAME: ${{secrets.AWS_BUCKET_NAME}}
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-access-key-id: ${{secrets.AWS_DEV_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_DEV_SECRET_ACCESS_KEY}}
         run: aws s3 sync ./dist s3://$BUCKET_NAME --delete
 
       - name: Invalidate AWS Cloudfront Cache
         run: |
           aws cloudfront create-invalidation \
-          --distribution-id ${{secrets.AWS_CLOUDFRONT_ID}} --paths /*
+          --distribution-id ${{secrets.AWS_DEV_CLOUDFRONT_ID}} --paths /*
