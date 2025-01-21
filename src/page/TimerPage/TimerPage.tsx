@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/TimerComponent';
-import { useQuery } from '@tanstack/react-query';
-import { getParliamentaryTableData, queryKeyIdentifier } from '../../apis/apis';
 import DebateInfoSummary from './components/DebateInfoSummary';
+import { useParams, useSearchParams } from 'react-router-dom';
+import TimerLoadingPage from './TimerLoadingPage';
+import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 
 export default function TimerPage() {
   // Load sounds
@@ -11,34 +12,41 @@ export default function TimerPage() {
   const dingTwiceRef = useRef<HTMLAudioElement>(null);
 
   // Prepare data before requesting query
-  const tableId = 1024;
-  const memberId = 1024;
-  const queryKey = [
-    queryKeyIdentifier.getParliamentaryTableData,
-    tableId,
-    memberId,
-  ];
+  const [searchParams] = useSearchParams();
+  const pathParams = useParams();
+  const memberId = searchParams.get('memberId');
+  const tableId = pathParams.id;
+
+  // Validate parameters is prepared
+  if (memberId === null && tableId === undefined) {
+    throw new Error(
+      "Failed to resolve 'memberId' and 'tableId' from request URL",
+    );
+  } else if (tableId === undefined) {
+    throw new Error("Failed to resolve 'tableId' from request URL");
+  } else if (memberId === null) {
+    throw new Error("Failed to resolve 'memberId' from request URL");
+  }
 
   // Get query
-  const { data, isLoading } = useQuery({
-    queryKey: queryKey,
-    queryFn: () => getParliamentaryTableData(tableId, memberId),
-  });
+  const { data, isLoading } = useGetParliamentaryTableData(
+    Number(tableId),
+    Number(memberId),
+  );
+  console.log(`# memberId: ${memberId}, tableId: ${tableId}`);
 
   // Declare states
   const [index, setIndex] = useState<number>(0);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [timer, setTimer] = useState<number>(1);
+  const [timer, setTimer] = useState<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [bg, setBg] = useState<string>('');
 
   // Declare functions to handle timer
   const startTimer = useCallback(() => {
     if (!intervalRef.current) {
-      setIsRunning(true);
       intervalRef.current = setInterval(() => {
-        setTimer((prev) => prev - 10);
-      }, 10);
+        setTimer((prev) => prev - 1);
+      }, 1000);
     }
   }, []);
 
@@ -47,7 +55,6 @@ export default function TimerPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setIsRunning(false);
   }, []);
 
   const resetTimer = useCallback(() => {
@@ -55,8 +62,7 @@ export default function TimerPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setIsRunning(false);
-    if (data) setTimer(data.table[index].time * 1000);
+    if (data) setTimer(data.table[index].time);
   }, [data, index]);
 
   // Declare function to manage parent component's index
@@ -76,18 +82,24 @@ export default function TimerPage() {
     [data, index, resetTimer],
   );
 
+  const changeBg = (condition: NodeJS.Timeout | null, timer: number) => {
+    if (condition) {
+      if (timer > 30) {
+        setBg('gradient-timer-running');
+      } else if (timer >= 0 && timer <= 30) {
+        setBg('gradient-timer-warning');
+      } else {
+        setBg('gradient-timer-timeout');
+      }
+    } else {
+      setBg('');
+    }
+  };
+
   // Set parent component's background animation by timer's state and remaining time
   useEffect(() => {
-    if (!isRunning) {
-      setBg('');
-    } else if (timer > 30 * 1000) {
-      setBg('gradient-timer-running');
-    } else if (timer >= 0) {
-      setBg('gradient-timer-warning');
-    } else {
-      setBg('gradient-timer-timeout');
-    }
-  }, [timer, isRunning]);
+    changeBg(intervalRef.current, timer);
+  }, [timer]);
 
   // Add keyboard event listener
   useEffect(() => {
@@ -99,22 +111,27 @@ export default function TimerPage() {
 
       switch (event.code) {
         case 'Space':
-          if (isRunning) {
+          if (intervalRef.current) {
             // console.log('# timer paused');
             pauseTimer();
+            changeBg(intervalRef.current, timer);
           } else {
             // console.log('# timer started');
             startTimer();
+            changeBg(intervalRef.current, timer);
           }
           break;
         case 'ArrowLeft':
           moveToOtherItem(true);
+          changeBg(intervalRef.current, timer);
           break;
         case 'ArrowRight':
           moveToOtherItem(false);
+          changeBg(intervalRef.current, timer);
           break;
         case 'KeyR':
           resetTimer();
+          changeBg(intervalRef.current, timer);
           break;
       }
     };
@@ -125,11 +142,11 @@ export default function TimerPage() {
       // Remove listener when component is rendered
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [pauseTimer, startTimer, moveToOtherItem, isRunning, resetTimer]);
+  }, [pauseTimer, startTimer, timer, moveToOtherItem, resetTimer]);
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30 * 1000) {
+    if (dingOnceRef.current && timer === 30) {
       dingOnceRef.current.play();
     } else if (dingTwiceRef.current && timer === 0) {
       dingTwiceRef.current.play();
@@ -139,30 +156,13 @@ export default function TimerPage() {
   // Let timer initialize itself when data is loaded via api
   useEffect(() => {
     if (data) {
-      setTimer(data.table[index].time * 1000);
+      setTimer(data.table[index].time);
     }
   }, [data, index, resetTimer]);
 
-  /*
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, []);
-  */
-
   // Handle exceptions
   if (isLoading) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center space-y-5">
-        <img src="/spinner.gif" className="size-[120px]" alt="불러오는 중" />
-        <h1 className="text-xl font-bold">데이터를 불러오고 있습니다...</h1>
-      </div>
-    );
+    return <TimerLoadingPage />;
   }
 
   // console.log(`# index = ${index}, data = ` + data!.table[index].time);
@@ -217,12 +217,15 @@ export default function TimerPage() {
               timer={timer}
               startTimer={() => {
                 startTimer();
+                changeBg(intervalRef.current, timer);
               }}
               pauseTimer={() => {
                 pauseTimer();
+                changeBg(intervalRef.current, timer);
               }}
               resetTimer={() => {
                 resetTimer();
+                changeBg(intervalRef.current, timer);
               }}
             />
 
