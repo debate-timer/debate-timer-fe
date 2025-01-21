@@ -1,0 +1,48 @@
+name: Deploy-Production
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ['main']
+    types: ['closed']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .env
+        run: echo "${{secrets.PRODUCTION_ENV}}" > .env
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Production
+        run: npm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_PROD_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_PROD_SECRET_ACCESS_KEY}}
+          aws-region: ap-northeast-2
+
+      - name: Deploy to AWS S3
+        env:
+          BUCKET_NAME: ${{secrets.AWS_PROD_BUCKET_NAME}}
+          aws-access-key-id: ${{secrets.AWS_PROD_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_PROD_SECRET_ACCESS_KEY}}
+        run: aws s3 sync ./dist s3://$BUCKET_NAME --delete
+
+      - name: Invalidate AWS Cloudfront Cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{secrets.AWS_PROD_CLOUDFRONT_ID}} --paths /*
