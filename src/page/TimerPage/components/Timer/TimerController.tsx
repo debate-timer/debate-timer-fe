@@ -7,6 +7,8 @@ interface TimerControllerProps {
   onReset: () => void;
 }
 
+const iconSize = 40;
+
 export default function TimerController({
   onPause,
   onStart,
@@ -16,7 +18,7 @@ export default function TimerController({
     <div className="flex flex-row items-center space-x-8">
       {/* Timer start button */}
       <TimerIconButton
-        icon={<IoPlayOutline className="size-12" />}
+        icon={<IoPlayOutline size={iconSize} />}
         style={{
           bgColor: 'bg-emerald-500',
           hoverColor: 'hover:bg-emerald-600',
@@ -29,7 +31,7 @@ export default function TimerController({
 
       {/* Timer pause button */}
       <TimerIconButton
-        icon={<IoPauseOutline className="size-12" />}
+        icon={<IoPauseOutline size={iconSize} />}
         style={{
           bgColor: 'bg-amber-500',
           hoverColor: 'hover:bg-amber-600',
@@ -42,7 +44,7 @@ export default function TimerController({
 
       {/* Timer reset button */}
       <TimerIconButton
-        icon={<IoTimerOutline className="size-12" />}
+        icon={<IoTimerOutline size={iconSize} />}
         style={{
           bgColor: 'bg-red-500',
           hoverColor: 'hover:bg-red-600',

@@ -51,9 +51,7 @@ export default function TimerComponent({
         <div className="m-2 mb-8 flex flex-col items-center space-y-3">
           <h1 className="text-6xl font-bold text-zinc-50">{titleText}</h1>
           <div className="flex flex-row items-center space-x-3 text-zinc-50">
-            {debateInfo.stance !== 'NEUTRAL' && (
-              <IoPerson className="size-[25px]" />
-            )}
+            {debateInfo.stance !== 'NEUTRAL' && <IoPerson size={25} />}
             <h1 className="text-3xl">{speakerText}</h1>
           </div>
         </div>
