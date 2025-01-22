@@ -51,7 +51,7 @@ const useTableFrom = (
 
   useEffect(() => {
     if (currentStep === 'TimeBox' && navigationType === 'POP') {
-      navigate('/table');
+      navigate('/');
     }
   }, [currentStep, navigationType, navigate]);
 

@@ -69,7 +69,7 @@ describe('LoginPage', () => {
     await userEvent.click(button);
 
     // useNavigate가 "/table" 경로로 호출되었는지 확인
-    expect(navigate).toHaveBeenCalledWith('/table');
+    expect(navigate).toHaveBeenCalledWith('/');
   });
   it('닉네임이 비어 있으면 경고 메시지를 표시', async () => {
     render(

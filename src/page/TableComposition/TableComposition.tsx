@@ -7,6 +7,7 @@ import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliament
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { Type } from '../../type/type';
+import { getMemberIdToken } from '../../util/memberIdToken';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
@@ -47,7 +48,7 @@ export default function TableComposition() {
   const handleButtonClick = () => {
     if (mode) {
       EditTable({
-        memberId: 1,
+        memberId: getMemberIdToken(),
         tableId: tableId, // etc
         tableName: formData.info.name,
         tableAgenda: formData.info.agenda,
@@ -55,7 +56,7 @@ export default function TableComposition() {
       });
     } else {
       AddTable({
-        id: 1,
+        id: getMemberIdToken(),
         tableName: formData.info.name,
         tableAgenda: formData.info.agenda,
         table: formData.table,

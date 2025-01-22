@@ -3,13 +3,15 @@ import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTit
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
+import { getMemberIdToken } from '../../util/memberIdToken';
 
 export default function TableOverview() {
   const [searchParams] = useSearchParams();
   const tableId = Number(searchParams.get('tableId') || 0);
-  const { data } = useGetParliamentaryTableData(tableId, 1);
+  const { data } = useGetParliamentaryTableData(tableId, getMemberIdToken());
 
   const navigate = useNavigate();
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -48,7 +50,14 @@ export default function TableOverview() {
         >
           테이블 수정하기
         </button>
-        <button className="h-20 w-screen rounded-md bg-red-300 text-2xl">
+        <button
+          className="h-20 w-screen rounded-md bg-red-300 text-2xl"
+          onClick={() =>
+            navigate(
+              `/table/parliamentary/${data?.id}?memberId=${getMemberIdToken()}`,
+            )
+          }
+        >
           토론하기
         </button>
       </DefaultLayout.StickyFooterWrapper>
