@@ -22,7 +22,7 @@ export default function AdditionalTimerSummary({
 }: AdditionalTimerSummaryProps) {
   return (
     <div className="flex h-full flex-row items-start space-x-4">
-      <div className="mt-4 flex flex-1 flex-col items-center space-y-2">
+      <div className="flex flex-1 flex-col items-center space-y-2">
         {/* Text that displays item's sequence */}
         <h1 className="font-bold ">{SummaryItemTypeToString['PREV']}</h1>
 
@@ -38,7 +38,7 @@ export default function AdditionalTimerSummary({
         <AdditionalTimerSummaryItem item={currItem} />
       </div>
 
-      <div className="mt-4 flex flex-1 flex-col items-center space-y-2">
+      <div className="flex flex-1 flex-col items-center space-y-2">
         {/* Text that displays item's sequence */}
         <h1 className="font-bold ">{SummaryItemTypeToString['NEXT']}</h1>
 
