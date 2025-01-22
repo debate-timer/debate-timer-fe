@@ -1,18 +1,22 @@
-import { defineConfig as defineViteConfig, mergeConfig } from 'vite';
+import { defineConfig as defineViteConfig, loadEnv, mergeConfig } from 'vite';
 import { defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
-const viteConfig = defineViteConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://api.dev.debate-timer.com',
-        changeOrigin: true,
-        ws: true,
+const viteConfig = defineViteConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
+    plugins: [react()],
+    server: {
+      proxy: {
+        '/api': {
+          target: env.VITE_API_BASE_URL,
+          changeOrigin: true,
+          ws: true,
+        },
       },
     },
-  },
+  };
 });
 
 const vitestConfig = defineVitestConfig({
@@ -23,4 +27,6 @@ const vitestConfig = defineVitestConfig({
   },
 });
 
-export default mergeConfig(viteConfig, vitestConfig);
+export default defineViteConfig((configEnv) => {
+  return mergeConfig(viteConfig(configEnv), vitestConfig);
+});

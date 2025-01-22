@@ -46,7 +46,7 @@ export async function request<T>(
       const axiosError = error as AxiosError<ErrorResponseType>;
       console.error('Error message:', axiosError.message);
       if (axiosError.response) {
-        console.error('Error response data:', axiosError.response.data);
+        console.error('Error response data:', axiosError.response.data.message);
       }
     } else {
       console.error('Unexpected error:', error);
