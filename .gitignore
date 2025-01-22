@@ -25,6 +25,4 @@ yarn-error.log*
 .eslintcache
 .idea
 
-
-
 *storybook.log
