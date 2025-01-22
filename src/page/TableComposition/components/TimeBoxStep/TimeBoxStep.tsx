@@ -15,7 +15,6 @@ interface TimeBoxStepProps {
 }
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initTimeBox, onTimeBoxChange, onButtonClick } = props;
-  console.log(initTimeBox);
   const {
     openModal: ProsOpenModal,
     closeModal: ProsCloseModal,
@@ -77,9 +76,9 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         <PropsAndConsTitle />
         <DragAndDropWrapper>
           {initTimeBox.map((info, index) => (
-            <div key={info.time} style={getDraggingStyles(index)}>
+            <div key={index + info.stance} style={getDraggingStyles(index)}>
               <DebatePanel
-                key={index}
+                key={index + info.stance}
                 info={info}
                 onSubmitEdit={(updatedInfo) =>
                   handleSubmitEdit(index, updatedInfo)
