@@ -3,7 +3,7 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { ErrorResponseType } from './responseTypes';
 
 // Base URL
-const BASE_URL = 'http://api.dev.debate-timer.com';
+// const BASE_URL = 'http://api.dev.debate-timer.com';
 
 // Singleton Axios instance
 const axiosInstance = axios.create({
