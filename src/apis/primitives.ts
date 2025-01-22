@@ -2,12 +2,8 @@ import axios from 'axios';
 import { AxiosResponse, AxiosError } from 'axios';
 import { ErrorResponseType } from './responseTypes';
 
-// Base URL
-// const BASE_URL = 'http://api.dev.debate-timer.com';
-
 // Singleton Axios instance
 const axiosInstance = axios.create({
-  // baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -17,12 +13,6 @@ const axiosInstance = axios.create({
 // HTTP request methods
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-// Function that makes URLs that is going to be used to call APIs
-export function makeUrl(endpoint: string): string {
-  // return BASE_URL + endpoint;
-  return '/api' + endpoint;
-}
-
 // Low-level http request function
 export async function request<T>(
   method: HttpMethod,
@@ -30,6 +20,8 @@ export async function request<T>(
   data: object | null,
   params: object | null,
 ): Promise<AxiosResponse<T>> {
+  // console.log(`# endpoint = ${endpoint}`);
+
   try {
     // Get response
     const response: AxiosResponse<T> = await axiosInstance({
