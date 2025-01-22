@@ -3,11 +3,11 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { ErrorResponseType } from './responseTypes';
 
 // Base URL
-const BASE_URL = 'http://example.debatetimer.com/api';
+const BASE_URL = 'http://api.dev.debate-timer.com';
 
 // Singleton Axios instance
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+  // baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -19,7 +19,8 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 // Function that makes URLs that is going to be used to call APIs
 export function makeUrl(endpoint: string): string {
-  return BASE_URL + endpoint;
+  // return BASE_URL + endpoint;
+  return '/api' + endpoint;
 }
 
 // Low-level http request function

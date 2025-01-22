@@ -4,6 +4,15 @@ import react from '@vitejs/plugin-react';
 
 const viteConfig = defineViteConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api.dev.debate-timer.com',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  },
 });
 
 const vitestConfig = defineVitestConfig({
