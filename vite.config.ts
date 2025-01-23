@@ -1,12 +1,18 @@
 import { defineConfig as defineViteConfig, loadEnv, mergeConfig } from 'vite';
 import { defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import compression from 'vite-plugin-compression2';
 
 const viteConfig = defineViteConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      compression({
+        algorithm: 'gzip',
+      }),
+    ],
     server: {
       proxy: {
         '/api': {
