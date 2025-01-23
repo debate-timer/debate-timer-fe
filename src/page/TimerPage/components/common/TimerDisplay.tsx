@@ -3,9 +3,9 @@ import { Formatting } from '../../../../util/formatting';
 interface TimerProps {
   timer: number;
 }
-export default function Timer({ timer }: TimerProps) {
+export default function TimerDisplay({ timer }: TimerProps) {
   return (
-    <div className="mb-12 flex flex-row items-center justify-center space-x-4 rounded-[50px] bg-zinc-50 p-8">
+    <div className="mb-12 flex flex-row items-center justify-center space-x-4 rounded-[50px] bg-zinc-100 p-8">
       {/* Prints -(minus) if remaining time is negative */}
       {timer < 0 && <h1 className="py-2 text-9xl font-bold">-</h1>}
 

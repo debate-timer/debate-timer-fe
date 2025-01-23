@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import router from './routes/routes.tsx';
 import './index.css';
 
+// console.log(`# URL = ${import.meta.env.VITE_API_BASE_URL}`);
+
 // Functions that calls msw mocking worker
 if (import.meta.env.VITE_MOCK_API === 'true') {
   console.log('[msw] Mocking enabled.');

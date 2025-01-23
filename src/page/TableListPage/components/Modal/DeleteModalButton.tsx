@@ -30,7 +30,7 @@ export default function DeleteModalButton({
         <AiOutlineDelete />
       </button>
       <ModalWrapper>
-        <div className="flex flex-col items-center gap-6 py-8">
+        <div className="flex flex-col items-center gap-6 px-12 py-8">
           <h1 className="text-xl font-bold">삭제하시겠습니까?</h1>
           <h2 className="text-lg font-semibold">테이블명: {name}</h2>
           <button
