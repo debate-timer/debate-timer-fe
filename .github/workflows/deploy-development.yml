@@ -7,7 +7,7 @@ on:
     types: ['closed']
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     environment: DEPLOY_DEV
 
