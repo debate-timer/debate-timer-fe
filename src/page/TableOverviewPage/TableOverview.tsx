@@ -44,7 +44,7 @@ export default function TableOverview() {
           className="h-20 w-screen rounded-md bg-blue-300 text-2xl"
           onClick={() =>
             navigate(
-              `/composition?mode=edit&tableId=${data?.id}&type=PARLIAMENTARY`,
+              `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
             )
           }
         >
@@ -54,7 +54,7 @@ export default function TableOverview() {
           className="h-20 w-screen rounded-md bg-red-300 text-2xl"
           onClick={() =>
             navigate(
-              `/table/parliamentary/${data?.id}?memberId=${getMemberIdToken()}`,
+              `/table/parliamentary/${tableId}?memberId=${getMemberIdToken()}`,
             )
           }
         >
