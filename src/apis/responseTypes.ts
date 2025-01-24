@@ -2,7 +2,7 @@ import { DebateInfo, DebateTable } from '../type/type';
 
 // POST "/api/member"
 export interface PostUserResponseType {
-  id: 1;
+  id: number;
   nickname: string;
 }
 
