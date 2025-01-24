@@ -22,6 +22,7 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
     ModalWrapper: DeleteModalWrapper,
   } = useModal();
   const { info, onSubmitEdit, onSubmitDelete } = props;
+
   return (
     <>
       <div className="flex justify-end gap-2">

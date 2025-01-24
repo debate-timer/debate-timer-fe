@@ -2,9 +2,9 @@ import {
   DebateInfo,
   DebateTypeToString,
   StanceToString,
-} from '../../../type/type';
-import Timer from './Timer/Timer';
-import TimerController from './Timer/TimerController';
+} from '../../../../type/type';
+import TimerDisplay from '../common/TimerDisplay';
+import TimerController from './TimerController';
 import { IoPerson } from 'react-icons/io5';
 
 interface TimerComponentProps {
@@ -13,6 +13,7 @@ interface TimerComponentProps {
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimer: () => void;
+  onOpenModal: () => void;
 }
 
 // Main timer component that user can control
@@ -22,6 +23,7 @@ export default function TimerComponent({
   startTimer,
   pauseTimer,
   resetTimer,
+  onOpenModal,
 }: TimerComponentProps) {
   // Set texts to be displayed
   const titleText =
@@ -57,13 +59,14 @@ export default function TimerComponent({
         </div>
 
         {/* Timer */}
-        <Timer timer={timer} />
+        <TimerDisplay timer={timer} />
 
         {/* Timer controller that includes buttons that can handle timer */}
         <TimerController
           onReset={resetTimer}
           onStart={startTimer}
           onPause={pauseTimer}
+          onOpenModal={onOpenModal}
         />
       </div>
     </div>

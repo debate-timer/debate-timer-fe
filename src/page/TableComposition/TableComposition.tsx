@@ -63,7 +63,7 @@ export default function TableComposition() {
       });
     }
   };
-  console.log(formData);
+
   return (
     <DefaultLayout>
       <Funnel

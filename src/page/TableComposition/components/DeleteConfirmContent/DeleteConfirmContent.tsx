@@ -12,7 +12,7 @@ export default function DeleteConfirmContent({
     onClose();
   };
   return (
-    <div className="p-10">
+    <div className="px-12 py-8">
       <h2 className={`mb-4 text-xl font-bold`}>
         타임 박스를 삭제하시겠습니까?
       </h2>

@@ -1,4 +1,8 @@
-import { makeUrl } from './primitives';
+// Function that makes URLs that is going to be used to call APIs
+function makeUrl(endpoint: string): string {
+  // return BASE_URL + endpoint;
+  return '/api' + endpoint;
+}
 
 // URL 테이블
 export const ApiUrl = {
