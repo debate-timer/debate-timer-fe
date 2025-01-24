@@ -1,13 +1,13 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
 import { getMemberIdToken } from '../../util/memberIdToken';
 
 export default function TableOverview() {
-  const [searchParams] = useSearchParams();
-  const tableId = Number(searchParams.get('tableId') || 0);
+  const pathParams = useParams();
+  const tableId = Number(pathParams.id);
   const { data } = useGetParliamentaryTableData(tableId, getMemberIdToken());
 
   const navigate = useNavigate();

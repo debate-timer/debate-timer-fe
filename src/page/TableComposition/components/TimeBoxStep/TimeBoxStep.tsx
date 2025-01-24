@@ -1,7 +1,6 @@
 import DebatePanel from '../DebatePanel/DebatePanel';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
-import { useNavigate } from 'react-router-dom';
 import { useModal } from '../../../../hooks/useModal';
 import { DebateInfo } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
@@ -15,7 +14,7 @@ interface TimeBoxStepProps {
 }
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initTimeBox, onTimeBoxChange, onButtonClick } = props;
-  console.log(initTimeBox);
+
   const {
     openModal: ProsOpenModal,
     closeModal: ProsCloseModal,
@@ -33,8 +32,6 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       setData: onTimeBoxChange,
       throttleDelay: 50,
     });
-
-  const navigate = useNavigate();
 
   const handleSubmitEdit = (indexToEdit: number, updatedInfo: DebateInfo) => {
     onTimeBoxChange((prevData) =>
@@ -102,7 +99,6 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           className="h-20 w-screen bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
           onClick={() => {
             onButtonClick();
-            navigate('/overview/1', { state: initTimeBox });
           }}
         >
           테이블 추가하기
