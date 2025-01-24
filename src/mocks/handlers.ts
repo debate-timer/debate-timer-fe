@@ -63,7 +63,7 @@ export const handlers = [
         },
         {
           stance: 'NEUTRAL',
-          type: 'CROSS',
+          type: 'TIME_OUT',
           time: 32,
           speakerNumber: null,
         },
