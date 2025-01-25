@@ -2,18 +2,28 @@ import DebatePanel from '../DebatePanel/DebatePanel';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { useModal } from '../../../../hooks/useModal';
-import { DebateInfo } from '../../../../type/type';
+import { DebateInfo, Type } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
 
 interface TimeBoxStepProps {
+  initAgenda: string;
   initTimeBox: DebateInfo[];
   onTimeBoxChange: React.Dispatch<React.SetStateAction<DebateInfo[]>>;
   onButtonClick: () => void;
+  onAgendaChange: React.Dispatch<
+    React.SetStateAction<{ name: string; agenda: string; type: Type }>
+  >;
 }
 export default function TimeBoxStep(props: TimeBoxStepProps) {
-  const { initTimeBox, onTimeBoxChange, onButtonClick } = props;
+  const {
+    initAgenda,
+    initTimeBox,
+    onTimeBoxChange,
+    onButtonClick,
+    onAgendaChange,
+  } = props;
 
   const {
     openModal: ProsOpenModal,
@@ -63,8 +73,15 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             <span className="text-sm md:text-base">토론 주제</span>
             <input
               type="text"
+              value={initAgenda}
               className="w-full rounded-md bg-slate-100 p-2 text-base md:w-[30rem] md:text-2xl"
               placeholder="주제를 입력해주세요"
+              onChange={(e) =>
+                onAgendaChange((prev) => ({
+                  ...prev,
+                  agenda: e.target.value,
+                }))
+              }
             />
           </div>
         </DefaultLayout.Header.Right>

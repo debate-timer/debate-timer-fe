@@ -46,7 +46,7 @@ export default function TableComposition() {
     useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
-    if (mode) {
+    if (mode === 'edit') {
       EditTable({
         memberId: getMemberIdToken(),
         tableId: tableId, // etc
@@ -78,7 +78,9 @@ export default function TableComposition() {
           ),
           TimeBox: (
             <TimeBoxStep
+              initAgenda={formData.info.agenda}
               initTimeBox={formData.table}
+              onAgendaChange={updateInfo}
               onTimeBoxChange={updateTable}
               onButtonClick={handleButtonClick}
             />
