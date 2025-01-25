@@ -190,8 +190,8 @@ export default function TimerPage() {
           <DefaultLayout.Header.Left>
             <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
               <h1 className="mr-2">
-                {data === undefined
-                  ? '테이블 이름 불러오기 실패'
+                {data === undefined || data!.info.name.trim() === ''
+                  ? '테이블 이름 없음'
                   : data!.info.name}
               </h1>
               <div className="mx-3 h-6 w-[2px] bg-black"></div>
@@ -202,7 +202,9 @@ export default function TimerPage() {
             <div className="flex flex-col items-center">
               <h1 className="text-m md:text-lg">토론 주제</h1>
               <h1 className="text-xl font-bold md:text-2xl">
-                {data === undefined ? '주제 불러오기 실패' : data!.info.agenda}
+                {data === undefined || data!.info.agenda.trim() === ''
+                  ? '주제 없음'
+                  : data!.info.agenda}
               </h1>
             </div>
           </DefaultLayout.Header.Center>
