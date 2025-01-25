@@ -57,6 +57,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     );
   };
 
+  const isAbledSummitButton = initTimeBox.length !== 0;
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -113,10 +115,13 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
       <DefaultLayout.StickyFooterWrapper>
         <button
-          className="h-20 w-screen bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
-          onClick={() => {
-            onButtonClick();
-          }}
+          className={`h-20 w-screen text-2xl font-semibold transition duration-300 ${
+            isAbledSummitButton
+              ? 'bg-amber-500 hover:bg-amber-600'
+              : 'cursor-not-allowed bg-gray-400'
+          }`}
+          onClick={onButtonClick}
+          disabled={!isAbledSummitButton}
         >
           테이블 추가하기
         </button>
