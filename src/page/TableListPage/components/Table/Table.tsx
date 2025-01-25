@@ -30,7 +30,9 @@ export default function Table({
       </div>
       <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>
       <div className="flex w-full flex-grow flex-col items-start justify-center text-lg font-semibold lg:text-2xl">
-        <h1>유형 : {type}</h1>
+        <h1>
+          유형 : {type === 'PARLIAMENTARY' ? '의회식 토론' : '시간 총량제 토론'}
+        </h1>
         <h1>소요시간 : {duration}분</h1>
       </div>
     </button>
