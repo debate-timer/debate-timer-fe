@@ -39,8 +39,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">어떤 토론을 원하시나요?</h1>
+          <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
+            <h1>어떤 토론을 원하시나요?</h1>
           </div>
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right></DefaultLayout.Header.Right>

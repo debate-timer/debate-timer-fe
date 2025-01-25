@@ -3,6 +3,7 @@ import TimerIconButton from '../common/TimerIconButton';
 import TimerTextButton from '../common/TimerTextButton';
 
 interface AdditionalTimerControllerProps {
+  isRunning: boolean;
   onPause: () => void;
   onStart: () => void;
   addOnTimer: (value: number) => void;
@@ -11,6 +12,7 @@ interface AdditionalTimerControllerProps {
 const iconSize = 40;
 
 export default function AdditionalTimerController({
+  isRunning,
   onPause,
   onStart,
   addOnTimer,
@@ -18,31 +20,33 @@ export default function AdditionalTimerController({
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="flex flex-row items-center space-x-8">
-        {/* Timer start button */}
-        <TimerIconButton
-          icon={<IoPlayOutline size={iconSize} />}
-          style={{
-            bgColor: 'bg-emerald-500',
-            hoverColor: 'hover:bg-emerald-600',
-            contentColor: 'text-zinc-50',
-          }}
-          onClick={() => {
-            onStart();
-          }}
-        />
+        {isRunning && (
+          <TimerIconButton
+            icon={<IoPauseOutline size={iconSize} />}
+            style={{
+              bgColor: 'bg-amber-500',
+              hoverColor: 'hover:bg-amber-600',
+              contentColor: 'text-zinc-50',
+            }}
+            onClick={() => {
+              onPause();
+            }}
+          />
+        )}
 
-        {/* Timer pause button */}
-        <TimerIconButton
-          icon={<IoPauseOutline size={iconSize} />}
-          style={{
-            bgColor: 'bg-amber-500',
-            hoverColor: 'hover:bg-amber-600',
-            contentColor: 'text-zinc-50',
-          }}
-          onClick={() => {
-            onPause();
-          }}
-        />
+        {!isRunning && (
+          <TimerIconButton
+            icon={<IoPlayOutline size={iconSize} />}
+            style={{
+              bgColor: 'bg-emerald-500',
+              hoverColor: 'hover:bg-emerald-600',
+              contentColor: 'text-zinc-50',
+            }}
+            onClick={() => {
+              onStart();
+            }}
+          />
+        )}
       </div>
 
       <div className="flex flex-row items-center space-x-4">
