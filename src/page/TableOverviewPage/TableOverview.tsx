@@ -4,6 +4,7 @@ import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliament
 import { useNavigate, useParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
 import { getMemberIdToken } from '../../util/memberIdToken';
+import { IoMdHome } from 'react-icons/io';
 
 export default function TableOverview() {
   const pathParams = useParams();
@@ -16,22 +17,38 @@ export default function TableOverview() {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">테이블 1</h1>
+          <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
+            <h1 className="mr-2">
+              {data === undefined || data!.info.name.trim() === ''
+                ? '테이블 이름 없음'
+                : data!.info.name}
+            </h1>
             <div className="mx-3 h-6 w-[2px] bg-black"></div>
             <span className="text-lg font-normal md:text-xl">의회식</span>
           </div>
         </DefaultLayout.Header.Left>
-
-        <DefaultLayout.Header.Right>
-          <div className="flex flex-wrap items-center justify-end gap-2 p-2 md:gap-3">
-            <span className="flex basis-full items-start whitespace-nowrap text-sm md:basis-auto md:text-base">
-              토론 주제
-            </span>
-            <span className="flex w-full items-start rounded-md bg-slate-100 p-2 text-base md:flex-1 md:text-2xl">
-              {data?.info.agenda}
-            </span>
+        <DefaultLayout.Header.Center>
+          <div className="flex flex-col items-center">
+            <h1 className="text-m md:text-lg">토론 주제</h1>
+            <h1 className="text-xl font-bold md:text-2xl">
+              {data === undefined || data!.info.agenda.trim() === ''
+                ? '주제 없음'
+                : data!.info.agenda}
+            </h1>
           </div>
+        </DefaultLayout.Header.Center>
+        <DefaultLayout.Header.Right>
+          <button
+            onClick={() => {
+              navigate('/');
+            }}
+            className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+          >
+            <div className="flex flex-row items-center space-x-4">
+              <IoMdHome size={24} />
+              <h1>홈 화면</h1>
+            </div>
+          </button>
         </DefaultLayout.Header.Right>
       </DefaultLayout.Header>
       <DefaultLayout.ContentContanier>
