@@ -33,7 +33,7 @@ export default function Table({
         <h1>
           유형 : {type === 'PARLIAMENTARY' ? '의회식 토론' : '시간 총량제 토론'}
         </h1>
-        <h1>소요시간 : {duration}분</h1>
+        <h1>소요시간 : {duration}초</h1>
       </div>
     </button>
   );
