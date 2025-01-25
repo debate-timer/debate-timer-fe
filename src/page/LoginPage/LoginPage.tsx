@@ -26,9 +26,11 @@ export default function LoginPage() {
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>헤더</DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center>의회식</DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right>제목</DefaultLayout.Header.Right>
+        <DefaultLayout.Header.Left>
+          <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
+            <h1 className="mr-2">로그인 페이지</h1>
+          </div>
+        </DefaultLayout.Header.Left>
       </DefaultLayout.Header>
       <div className="flex h-screen flex-col items-center justify-center">
         <div className="pb-48">
