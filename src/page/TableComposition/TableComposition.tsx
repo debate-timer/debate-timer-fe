@@ -25,7 +25,7 @@ export default function TableComposition() {
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
   const { data: fetchedTableData } = useGetParliamentaryTableData(
     tableId,
-    1,
+    getMemberIdToken(),
     mode === 'edit',
   );
   const initData = useMemo(() => {
