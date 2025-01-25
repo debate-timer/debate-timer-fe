@@ -2,16 +2,18 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/Timer/TimerComponent';
 import DebateInfoSummary from './components/DebateInfoSummary';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import TimerLoadingPage from './TimerLoadingPage';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useModal } from '../../hooks/useModal';
 import AdditionalTimerComponent from './components/AdditionalTimer/AdditionalTimerComponent';
+import { IoMdHome } from 'react-icons/io';
 
 export default function TimerPage() {
   // Load sounds
   const dingOnceRef = useRef<HTMLAudioElement>(null);
   const dingTwiceRef = useRef<HTMLAudioElement>(null);
+  const navigate = useNavigate();
 
   // Prepare data before requesting query
   const [searchParams] = useSearchParams();
@@ -153,11 +155,11 @@ export default function TimerPage() {
     };
   }, [pauseTimer, startTimer, timer, moveToOtherItem, resetTimer, isOpen]);
 
-  // Let timer play sounds when only 30 seconds left or timeout
+  // Let timer play sounds when o nly 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30 && intervalRef) {
+    if (dingOnceRef.current && timer === 30 && intervalRef.current) {
       dingOnceRef.current.play();
-    } else if (dingTwiceRef.current && timer === 0 && intervalRef) {
+    } else if (dingTwiceRef.current && timer === 0 && intervalRef.current) {
       dingTwiceRef.current.play();
     }
   }, [timer]);
@@ -206,10 +208,15 @@ export default function TimerPage() {
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
             <button
-              onClick={() => {}}
-              className="rounded-full bg-zinc-200 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+              onClick={() => {
+                navigate('/');
+              }}
+              className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
             >
-              <h1>홈 화면으로 </h1>
+              <div className="flex flex-row items-center space-x-4">
+                <IoMdHome size={24} />
+                <h1>홈 화면</h1>
+              </div>
             </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
