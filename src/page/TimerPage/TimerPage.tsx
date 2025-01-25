@@ -155,9 +155,9 @@ export default function TimerPage() {
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30) {
+    if (dingOnceRef.current && timer === 30 && intervalRef) {
       dingOnceRef.current.play();
-    } else if (dingTwiceRef.current && timer === 0) {
+    } else if (dingTwiceRef.current && timer === 0 && intervalRef) {
       dingTwiceRef.current.play();
     }
   }, [timer]);
@@ -186,7 +186,7 @@ export default function TimerPage() {
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
+            <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
               <h1 className="mr-2">
                 {data === undefined
                   ? '테이블 이름 불러오기 실패'
@@ -196,13 +196,21 @@ export default function TimerPage() {
               <span className="text-lg font-normal md:text-xl">의회식</span>
             </div>
           </DefaultLayout.Header.Left>
-          <DefaultLayout.Header.Right>
-            <div className="flex flex-row items-center space-x-3 md:w-auto md:gap-3">
-              <h1 className="text-lg md:text-xl">토론 주제</h1>
-              <h1 className="text-xl font-bold md:w-auto md:text-2xl">
+          <DefaultLayout.Header.Center>
+            <div className="flex flex-col items-center">
+              <h1 className="text-m md:text-lg">토론 주제</h1>
+              <h1 className="text-xl font-bold md:text-2xl">
                 {data === undefined ? '주제 불러오기 실패' : data!.info.agenda}
               </h1>
             </div>
+          </DefaultLayout.Header.Center>
+          <DefaultLayout.Header.Right>
+            <button
+              onClick={() => {}}
+              className="rounded-full bg-zinc-200 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+            >
+              <h1>홈 화면으로 </h1>
+            </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 
