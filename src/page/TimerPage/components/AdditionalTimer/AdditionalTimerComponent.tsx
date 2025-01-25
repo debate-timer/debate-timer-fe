@@ -21,12 +21,14 @@ export default function AdditionalTimerComponent({
 
   const [timer, setTimer] = useState<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isRunning, setRunning] = useState<boolean>(false);
 
   const startTimer = useCallback(() => {
     if (!intervalRef.current) {
       intervalRef.current = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
+      setRunning(true);
     }
   }, []);
 
@@ -34,6 +36,7 @@ export default function AdditionalTimerComponent({
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      setRunning(false);
     }
   }, []);
 
@@ -57,6 +60,7 @@ export default function AdditionalTimerComponent({
 
       <TimerDisplay timer={timer} />
       <AdditionalTimerController
+        isRunning={isRunning}
         addOnTimer={(value: number) =>
           setTimer((prev: number) => (prev + value > 0 ? prev + value : 0))
         }
