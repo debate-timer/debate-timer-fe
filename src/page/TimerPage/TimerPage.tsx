@@ -2,17 +2,12 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/Timer/TimerComponent';
 import DebateInfoSummary from './components/DebateInfoSummary';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import TimerLoadingPage from './TimerLoadingPage';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useModal } from '../../hooks/useModal';
 import AdditionalTimerComponent from './components/AdditionalTimer/AdditionalTimerComponent';
 import { IoMdHome } from 'react-icons/io';
-import useLogout from '../../hooks/mutations/useLogout';
-import { useTimer } from './hooks/useTimer';
-import FirstUseToolTip from './components/common/FirstUseToolTip';
-import useMobile from '../../hooks/useMobile';
-import { IoHelpCircle } from 'react-icons/io5';
 
 export default function TimerPage() {
   // Load sounds
@@ -21,39 +16,61 @@ export default function TimerPage() {
   const navigate = useNavigate();
 
   // Prepare data before requesting query
+  const [searchParams] = useSearchParams();
   const pathParams = useParams();
+  const memberId = searchParams.get('memberId');
   const tableId = pathParams.id;
 
   // Validate parameters is prepared
-  if (tableId === undefined) {
+  if (memberId === null && tableId === undefined) {
+    throw new Error(
+      "Failed to resolve 'memberId' and 'tableId' from request URL",
+    );
+  } else if (tableId === undefined) {
     throw new Error("Failed to resolve 'tableId' from request URL");
+  } else if (memberId === null) {
+    throw new Error("Failed to resolve 'memberId' from request URL");
   }
 
   // Prepare for modal
   const { isOpen, openModal, ModalWrapper } = useModal();
 
   // Get query
-  const { data, isLoading } = useGetParliamentaryTableData(Number(tableId));
-  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
-
-  // Use timer hook
-  const {
-    timer,
-    setTimer,
-    pauseTimer,
-    startTimer,
-    isRunning,
-    actOnTime,
-    resetTimer,
-    setDefaultValue,
-  } = useTimer();
+  const { data, isLoading } = useGetParliamentaryTableData(
+    Number(tableId),
+    Number(memberId),
+  );
+  console.log(`# memberId: ${memberId}, tableId: ${tableId}`);
 
   // Declare states
-  const [index, setIndex] = useState(0);
-  const [sfxFlag, setSfxFlag] = useState(0); // (30s, 0s) / (XX) = 0, (XO) = 1, (OX) = 2, (OO) = 3
-  const [isFirst, setIsFirst] = useState(false);
-  const [bg, setBg] = useState('');
-  const isMobile = useMobile();
+  const [index, setIndex] = useState<number>(0);
+  const [timer, setTimer] = useState<number>(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [bg, setBg] = useState<string>('');
+
+  // Declare functions to handle timer
+  const startTimer = useCallback(() => {
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+  }, []);
+
+  const pauseTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const resetTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (data) setTimer(data.table[index].time);
+  }, [data, index]);
 
   // Declare function to manage parent component's index
   const moveToOtherItem = useCallback(
@@ -72,7 +89,7 @@ export default function TimerPage() {
     [data, index, resetTimer],
   );
 
-  const changeBg = (condition: boolean, timer: number) => {
+  const changeBg = (condition: NodeJS.Timeout | null, timer: number) => {
     if (condition) {
       if (timer > 30) {
         setBg('gradient-timer-running');
@@ -88,8 +105,8 @@ export default function TimerPage() {
 
   // Set parent component's background animation by timer's state and remaining time
   useEffect(() => {
-    changeBg(isRunning, timer);
-  }, [timer, isRunning]);
+    changeBg(intervalRef.current, timer);
+  }, [timer]);
 
   // Add keyboard event listener
   useEffect(() => {
@@ -105,27 +122,27 @@ export default function TimerPage() {
 
       switch (event.code) {
         case 'Space':
-          if (isRunning) {
+          if (intervalRef.current) {
             // console.log('# timer paused');
             pauseTimer();
-            changeBg(isRunning, timer);
+            changeBg(intervalRef.current, timer);
           } else {
             // console.log('# timer started');
             startTimer();
-            changeBg(isRunning, timer);
+            changeBg(intervalRef.current, timer);
           }
           break;
         case 'ArrowLeft':
           moveToOtherItem(true);
-          changeBg(isRunning, timer);
+          changeBg(intervalRef.current, timer);
           break;
         case 'ArrowRight':
           moveToOtherItem(false);
-          changeBg(isRunning, timer);
+          changeBg(intervalRef.current, timer);
           break;
         case 'KeyR':
           resetTimer();
-          changeBg(isRunning, timer);
+          changeBg(intervalRef.current, timer);
           break;
       }
     };
@@ -136,60 +153,26 @@ export default function TimerPage() {
       // Remove listener when component is rendered
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [
-    isRunning,
-    isOpen,
-    moveToOtherItem,
-    pauseTimer,
-    resetTimer,
-    startTimer,
-    timer,
-  ]);
+  }, [pauseTimer, startTimer, timer, moveToOtherItem, resetTimer, isOpen]);
 
   // Let timer play sounds when o nly 30 seconds left or timeout
   useEffect(() => {
-    actOnTime(30, () => {
-      if (dingOnceRef.current && isRunning) {
-        dingOnceRef.current.play();
-      }
-    });
-
-    actOnTime(0, () => {
-      if (dingTwiceRef.current && isRunning) {
-        dingTwiceRef.current.play();
-      }
-    });
-  }, [actOnTime, isRunning]);
+    if (dingOnceRef.current && timer === 30 && intervalRef.current) {
+      dingOnceRef.current.play();
+    } else if (dingTwiceRef.current && timer === 0 && intervalRef.current) {
+      dingTwiceRef.current.play();
+    }
+  }, [timer]);
 
   // Let timer initialize itself when data is loaded via api
   useEffect(() => {
     if (data) {
-      setDefaultValue(data.table[index].time);
       setTimer(data.table[index].time);
-
-      if (data.info.warningBell && data.info.finishBell) {
-        setSfxFlag(3);
-      } else if (data.info.warningBell && !data.info.finishBell) {
-        setSfxFlag(2);
-      } else if (!data.info.warningBell && data.info.finishBell) {
-        setSfxFlag(1);
-      } else {
-        setSfxFlag(0);
-      }
     }
-  }, [data, index, setDefaultValue, setTimer]);
-
-  useEffect(() => {
-    const storedIsFirst = localStorage.getItem('isFirst');
-    if (storedIsFirst) {
-      setIsFirst(storedIsFirst.trim() === 'true' ? true : false);
-    }
-  }, []);
+  }, [data, index, resetTimer]);
 
   // Handle exceptions
   if (isLoading) {
-    // TODO: HAVE TO CLEARED
-    setSfxFlag(sfxFlag);
     return <TimerLoadingPage />;
   }
 
@@ -216,7 +199,7 @@ export default function TimerPage() {
             </div>
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <div className="my-2 flex flex-col items-center">
+            <div className="flex flex-col items-center">
               <h1 className="text-m md:text-lg">토론 주제</h1>
               <h1 className="text-xl font-bold md:text-2xl">
                 {data === undefined || data!.info.agenda.trim() === ''
@@ -226,56 +209,24 @@ export default function TimerPage() {
             </div>
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
-            <div className="flex flex-row justify-end space-x-2">
-              <button
-                onClick={() => {
-                  navigate('/');
-                }}
-                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
-              >
-                <div className="flex flex-row items-center space-x-4">
-                  <IoMdHome size={24} />
-                  {!isMobile && <h1>홈 화면</h1>}
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsFirst(true);
-                  localStorage.setItem('isFirst', 'true');
-                }}
-                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
-              >
-                <div className="flex flex-row items-center space-x-4">
-                  <IoHelpCircle size={24} />
-                  {!isMobile && <h1>도움말</h1>}
-                </div>
-              </button>
-              <button
-                onClick={() => logoutMutate()}
-                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
-              >
-                <div className="flex flex-row items-center space-x-4">
-                  <h2>로그아웃</h2>
-                </div>
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                navigate('/');
+              }}
+              className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+            >
+              <div className="flex flex-row items-center space-x-4">
+                <IoMdHome size={24} />
+                <h1>홈 화면</h1>
+              </div>
+            </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 
         <DefaultLayout.ContentContanier>
           {!isOpen && (
             <div className="relative z-10 h-full">
-              {isFirst && (
-                <FirstUseToolTip
-                  onClose={() => {
-                    setIsFirst(false);
-                    localStorage.setItem('isFirst', 'false');
-                  }}
-                />
-              )}
-
-              <div className="z-2 absolute inset-0 flex h-full flex-row items-center justify-center space-x-4">
+              <div className="flex h-full flex-row items-center space-x-4">
                 <div className="flex-1">
                   {index !== 0 && (
                     <DebateInfoSummary
@@ -290,21 +241,20 @@ export default function TimerPage() {
                 </div>
 
                 <TimerComponent
-                  isRunning={isRunning}
                   debateInfo={data!.table[index]}
                   timer={timer}
                   onOpenModal={() => openModal()}
                   startTimer={() => {
                     startTimer();
-                    changeBg(isRunning, timer);
+                    changeBg(intervalRef.current, timer);
                   }}
                   pauseTimer={() => {
                     pauseTimer();
-                    changeBg(isRunning, timer);
+                    changeBg(intervalRef.current, timer);
                   }}
                   resetTimer={() => {
-                    resetTimer(data!.table[index].time);
-                    changeBg(isRunning, timer);
+                    resetTimer();
+                    changeBg(intervalRef.current, timer);
                   }}
                 />
 

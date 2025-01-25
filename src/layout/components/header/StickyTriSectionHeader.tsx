@@ -24,11 +24,7 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
 
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const { children } = props;
-  return (
-    <div className="flex flex-1 items-end justify-end gap-1 text-right">
-      {children}
-    </div>
-  );
+  return <div className="flex-1 items-end text-right">{children}</div>;
 };
 
 export default StickyTriSectionHeader;
