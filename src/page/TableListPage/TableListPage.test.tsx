@@ -80,7 +80,7 @@ describe('TableListPage', () => {
     renderTableListPage();
     const headerLeft = screen.getByTestId('header-left');
     expect(headerLeft).toBeInTheDocument();
-    expect(headerLeft).toHaveTextContent('테이블 목록화면');
+    expect(headerLeft).toHaveTextContent('테이블 목록');
   });
 
   it('Table 렌더링 검증', async () => {
