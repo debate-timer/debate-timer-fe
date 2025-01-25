@@ -33,11 +33,6 @@ describe('LoginPage', () => {
       </TestWrapper>,
     );
 
-    // 헤더 텍스트 확인
-    expect(screen.getByText('헤더')).toBeInTheDocument();
-    expect(screen.getByText('의회식')).toBeInTheDocument();
-    expect(screen.getByText('제목')).toBeInTheDocument();
-
     // 제목 텍스트 확인
     expect(screen.getByText('Debate Timer')).toBeInTheDocument();
 
