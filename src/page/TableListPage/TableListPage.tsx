@@ -14,7 +14,11 @@ export default function TableListPage() {
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>테이블 목록화면</DefaultLayout.Header.Left>
+        <DefaultLayout.Header.Left>
+          <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
+            <h1 className="mr-2">테이블 목록</h1>
+          </div>
+        </DefaultLayout.Header.Left>
       </DefaultLayout.Header>
       <div className="flex h-screen flex-col px-4 py-6">
         <main className="grid grid-cols-3 justify-items-center gap-6">
