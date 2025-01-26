@@ -108,8 +108,15 @@ describe('TableComposition', () => {
     expect(screen.getByText('토론 주제')).toBeInTheDocument();
 
     // 4. "완료" (혹은 "제출") 버튼 클릭
-    // 실제 버튼 텍스트 확인
     const submitButton = screen.getByText('테이블 추가하기');
+    expect(submitButton).toBeDisabled();
+
+    const leftAddButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
+    await userEvent.click(leftAddButton);
+
+    const addButton = screen.getByText('타임박스 설정하기');
+    await userEvent.click(addButton);
+
     await userEvent.click(submitButton);
 
     await waitFor(() => {
