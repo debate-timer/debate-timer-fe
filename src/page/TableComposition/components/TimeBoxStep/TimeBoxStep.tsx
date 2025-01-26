@@ -2,18 +2,28 @@ import DebatePanel from '../DebatePanel/DebatePanel';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { useModal } from '../../../../hooks/useModal';
-import { DebateInfo } from '../../../../type/type';
+import { DebateInfo, Type } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
 
 interface TimeBoxStepProps {
+  initAgenda: string;
   initTimeBox: DebateInfo[];
   onTimeBoxChange: React.Dispatch<React.SetStateAction<DebateInfo[]>>;
   onButtonClick: () => void;
+  onAgendaChange: React.Dispatch<
+    React.SetStateAction<{ name: string; agenda: string; type: Type }>
+  >;
 }
 export default function TimeBoxStep(props: TimeBoxStepProps) {
-  const { initTimeBox, onTimeBoxChange, onButtonClick } = props;
+  const {
+    initAgenda,
+    initTimeBox,
+    onTimeBoxChange,
+    onButtonClick,
+    onAgendaChange,
+  } = props;
 
   const {
     openModal: ProsOpenModal,
@@ -47,6 +57,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     );
   };
 
+  const isAbledSummitButton = initTimeBox.length !== 0;
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -64,8 +76,15 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             </span>
             <input
               type="text"
+              value={initAgenda}
               className="w-full rounded-md bg-slate-100 p-2 text-base md:flex-1 md:text-2xl"
               placeholder="주제를 입력해주세요"
+              onChange={(e) =>
+                onAgendaChange((prev) => ({
+                  ...prev,
+                  agenda: e.target.value,
+                }))
+              }
             />
           </div>
         </DefaultLayout.Header.Right>
@@ -97,10 +116,13 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
       <DefaultLayout.StickyFooterWrapper>
         <button
-          className="h-20 w-screen bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
-          onClick={() => {
-            onButtonClick();
-          }}
+          className={`h-20 w-screen text-2xl font-semibold transition duration-300 ${
+            isAbledSummitButton
+              ? 'bg-amber-500 hover:bg-amber-600'
+              : 'cursor-not-allowed bg-gray-400'
+          }`}
+          onClick={onButtonClick}
+          disabled={!isAbledSummitButton}
         >
           테이블 추가하기
         </button>
