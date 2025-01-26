@@ -10,7 +10,7 @@
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"**/*.{css,scss}\"",
     "lint": "npm run lint:eslint && npm run lint:stylelint",
-    "preview": "vite preview",
+    "preview": "vite preview --port 3000",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest",

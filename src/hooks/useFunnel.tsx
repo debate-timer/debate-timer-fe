@@ -14,7 +14,7 @@ export default function useFunnel<Step extends string | number | symbol>(
   };
 
   const goNextStep = (nextStep: Step) => {
-    navigate(location.pathname, {
+    navigate(`${location.pathname}${location.search}`, {
       state: { step: nextStep },
     });
   };
