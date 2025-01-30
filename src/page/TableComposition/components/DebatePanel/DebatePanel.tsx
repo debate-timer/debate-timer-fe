@@ -40,7 +40,7 @@ export default function DebatePanel(props: DebatePanelProps) {
   );
   const renderProsConsPanel = () => (
     <div
-      className={`flex w-1/2 flex-col items-center rounded-md ${
+      className={`relative flex w-1/2 flex-col items-center rounded-md ${
         isPros ? 'bg-blue-500' : 'bg-red-500'
       } h-24 select-none p-2 font-bold text-white`}
     >
@@ -65,7 +65,7 @@ export default function DebatePanel(props: DebatePanelProps) {
   );
 
   const renderNeutralTimeoutPanel = () => (
-    <div className="flex h-24 w-full select-none items-center text-center">
+    <div className="relative flex h-24 w-full select-none items-center text-center">
       <div className="flex h-4/5 w-full flex-col items-center justify-start rounded-md bg-gray-200 p-2 font-medium text-gray-600">
         {onSubmitEdit && onSubmitDelete && (
           <div className="flex h-4 w-full items-center gap-2">
