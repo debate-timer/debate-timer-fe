@@ -6,25 +6,27 @@ import { DebateInfo, Type } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
+import { TableFormData } from '../../hook/useTableFrom';
 
 interface TimeBoxStepProps {
-  initAgenda: string;
-  initTimeBox: DebateInfo[];
+  initData: TableFormData;
   onTimeBoxChange: React.Dispatch<React.SetStateAction<DebateInfo[]>>;
   onButtonClick: () => void;
   onAgendaChange: React.Dispatch<
     React.SetStateAction<{ name: string; agenda: string; type: Type }>
   >;
+  isEdit?: boolean;
 }
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const {
-    initAgenda,
-    initTimeBox,
+    initData,
     onTimeBoxChange,
     onButtonClick,
     onAgendaChange,
+    isEdit = false,
   } = props;
-
+  const initAgenda = initData.info.agenda;
+  const initTimeBox = initData.table;
   const {
     openModal: ProsOpenModal,
     closeModal: ProsCloseModal,
@@ -64,7 +66,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
           <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">테이블 1</h1>
+            <h1 className="mr-2">{initData.info.name}</h1>
             <div className="mx-3 h-6 w-[2px] bg-black"></div>
             <span className="text-lg font-normal md:text-xl">의회식</span>
           </div>
@@ -124,7 +126,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           onClick={onButtonClick}
           disabled={!isAbledSummitButton}
         >
-          테이블 추가하기
+          {isEdit ? '테이블 수정하기' : '테이블 추가하기'}
         </button>
       </DefaultLayout.StickyFooterWrapper>
 
