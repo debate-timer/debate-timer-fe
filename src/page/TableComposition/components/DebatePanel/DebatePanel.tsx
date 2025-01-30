@@ -2,7 +2,7 @@ import { HTMLAttributes } from 'react';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
 import { DebateInfo, DebateTypeToString } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-
+import { LuArrowUpDown } from 'react-icons/lu';
 interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   info: DebateInfo;
   onSubmitEdit?: (updatedInfo: DebateInfo) => void;
@@ -27,6 +27,17 @@ export default function DebatePanel(props: DebatePanelProps) {
       ? 'justify-end'
       : 'justify-center';
 
+  const renderDragHandle = () => (
+    <div
+      className="left-0x absolute top-4 flex h-2/3 w-4 flex-1 cursor-grab items-center 
+                justify-center rounded-md bg-slate-100 "
+      onMouseDown={onMouseDown}
+      title="위아래로 드래그"
+    >
+      {/* 세로줄 아이콘을 중앙에 표시해줍니다 */}
+      <LuArrowUpDown className="text-gray-600" />
+    </div>
+  );
   const renderProsConsPanel = () => (
     <div
       className={`flex w-1/2 flex-col items-center rounded-md ${
@@ -36,11 +47,7 @@ export default function DebatePanel(props: DebatePanelProps) {
       {onSubmitEdit && onSubmitDelete && (
         <div className="flex h-4 w-full items-center gap-2">
           <div className="flex-1" />
-          <div
-            className="h-2 flex-1 rounded-sm bg-gray-300"
-            onMouseDown={onMouseDown}
-          />
-
+          {renderDragHandle()}
           <div className="flex-1">
             <EditDeleteButtons
               info={props.info}
@@ -63,10 +70,7 @@ export default function DebatePanel(props: DebatePanelProps) {
         {onSubmitEdit && onSubmitDelete && (
           <div className="flex h-4 w-full items-center gap-2">
             <div className="flex-1" />
-            <div
-              className="h-2 flex-1 rounded-sm bg-gray-300"
-              onMouseDown={onMouseDown}
-            />
+            {renderDragHandle()}
             <div className="flex-1">
               <EditDeleteButtons
                 info={props.info}
