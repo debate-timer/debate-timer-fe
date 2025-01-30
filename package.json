@@ -14,8 +14,7 @@
     "preview": "vite preview --port 3000",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "vitest",
-    "chromatic": "npx chromatic --project-token=chpt_a6dc39eba6488b2"
+    "test": "vitest"
   },
   "dependencies": {
     "@tanstack/eslint-plugin-query": "^5.62.9",
