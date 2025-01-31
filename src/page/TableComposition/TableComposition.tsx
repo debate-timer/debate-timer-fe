@@ -78,8 +78,8 @@ export default function TableComposition() {
           ),
           TimeBox: (
             <TimeBoxStep
-              initAgenda={formData.info.agenda}
-              initTimeBox={formData.table}
+              initData={formData}
+              isEdit={mode === 'edit'}
               onAgendaChange={updateInfo}
               onTimeBoxChange={updateTable}
               onButtonClick={handleButtonClick}
