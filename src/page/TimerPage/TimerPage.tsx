@@ -241,6 +241,7 @@ export default function TimerPage() {
                 </div>
 
                 <TimerComponent
+                  isRunning={intervalRef.current !== null}
                   debateInfo={data!.table[index]}
                   timer={timer}
                   onOpenModal={() => openModal()}

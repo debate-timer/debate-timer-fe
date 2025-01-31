@@ -8,6 +8,7 @@ import TimerController from './TimerController';
 import { IoPerson } from 'react-icons/io5';
 
 interface TimerComponentProps {
+  isRunning: boolean;
   debateInfo: DebateInfo;
   timer: number;
   startTimer: () => void;
@@ -18,6 +19,7 @@ interface TimerComponentProps {
 
 // Main timer component that user can control
 export default function TimerComponent({
+  isRunning,
   debateInfo,
   timer,
   startTimer,
@@ -63,6 +65,7 @@ export default function TimerComponent({
 
         {/* Timer controller that includes buttons that can handle timer */}
         <TimerController
+          isRunning={isRunning}
           onReset={resetTimer}
           onStart={startTimer}
           onPause={pauseTimer}
