@@ -70,10 +70,10 @@ describe('TableComposition', () => {
 
     expect(
       screen.findByRole('heading', {
-        name: '어떤 토론을 원하시나요?',
+        name: '토론 정보를 수정해주세요',
       }),
     );
-    const nameInput = await screen.findByPlaceholderText('시간표#1(디폴트 값)');
+    const nameInput = await screen.findByPlaceholderText('테이블 1(디폴트 값)');
 
     expect((nameInput as HTMLInputElement).value).toBe('테이블 1');
   });
