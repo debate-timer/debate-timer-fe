@@ -9,7 +9,7 @@ import { IoMdHome } from 'react-icons/io';
 export default function TableOverview() {
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
-  const { data } = useGetParliamentaryTableData(tableId, getMemberIdToken());
+  const { data } = useGetParliamentaryTableData(tableId);
 
   const navigate = useNavigate();
 
@@ -71,11 +71,7 @@ export default function TableOverview() {
         </button>
         <button
           className="h-20 w-screen rounded-md bg-red-300 text-2xl"
-          onClick={() =>
-            navigate(
-              `/table/parliamentary/${data?.id}?memberId=${getMemberIdToken()}`,
-            )
-          }
+          onClick={() => navigate(`/table/parliamentary/${data?.id}}`)}
         >
           토론하기
         </button>

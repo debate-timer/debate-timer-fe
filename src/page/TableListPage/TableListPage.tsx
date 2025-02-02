@@ -7,7 +7,7 @@ import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDele
 import { getMemberIdToken } from '../../util/memberIdToken';
 
 export default function TableListPage() {
-  const { data: tables } = useGetDebateTableList(getMemberIdToken());
+  const { data: tables } = useGetDebateTableList();
 
   const { mutate } = useDeleteParliamentaryDebateTable();
 
@@ -30,9 +30,7 @@ export default function TableListPage() {
                 name={table.name}
                 type={table.type}
                 duration={table.duration}
-                onDelete={() =>
-                  mutate({ tableId: table.id, memberId: getMemberIdToken() })
-                }
+                onDelete={() => mutate({ tableId: table.id })}
               />
             ))}
           <AddTable />

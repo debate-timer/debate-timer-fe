@@ -16,15 +16,13 @@ export const queryKeyIdentifier = {
 };
 
 // POST "/api/member"
-export async function postUser(
-  nickname: string,
-): Promise<PostUserResponseType> {
+export async function postUser(code: string): Promise<PostUserResponseType> {
   const requestUrl: string = ApiUrl.member;
   const response = await request<PostUserResponseType>(
     'POST',
     requestUrl,
     {
-      nickname: nickname,
+      code: code,
     },
     null,
   );
@@ -32,44 +30,36 @@ export async function postUser(
   return response.data;
 }
 
-// GET /api/table?memberId={memberId}
-export async function getDebateTableList(
-  memberId: number,
-): Promise<GetDebateTableListResponseType> {
+// GET /api/table
+export async function getDebateTableList(): Promise<GetDebateTableListResponseType> {
   const requestUrl: string = ApiUrl.table;
   const response = await request<GetDebateTableListResponseType>(
     'GET',
     requestUrl,
     null,
-    {
-      memberId: memberId,
-    },
+    null,
   );
 
   return response.data;
 }
 
-// GET /api/table/parliamentary/{tableId}?memberId={memberId}
+// GET /api/table/parliamentary/{tableId}
 export async function getParliamentaryTableData(
   tableId: number,
-  memberId: number,
 ): Promise<GetTableDataResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<GetTableDataResponseType>(
     'GET',
     requestUrl + `/${tableId}`,
     null,
-    {
-      memberId: memberId,
-    },
+    null,
   );
 
   return response.data;
 }
 
-// POST /api/table/parliamentary?memberId={memberId}
+// POST /api/table/parliamentary
 export async function postParliamentaryDebateTable(
-  memberId: number,
   tableName: string,
   tableAgenda: string,
   tables: DebateInfo[],
@@ -85,18 +75,15 @@ export async function postParliamentaryDebateTable(
       },
       table: tables,
     },
-    {
-      memberId: memberId,
-    },
+    null,
   );
 
   return response.data;
 }
 
-// PUT /api/table/parliamentary/{tableId}?memberId={memberId}
+// PUT /api/table/parliamentary/{tableId}
 export async function putParliamentaryDebateTable(
   tableId: number,
-  memberId: number,
   tableName: string,
   tableAgenda: string,
   tables: DebateInfo[],
@@ -112,23 +99,23 @@ export async function putParliamentaryDebateTable(
       },
       table: tables,
     },
-    {
-      memberId: memberId,
-    },
+    null,
   );
 
   return response.data;
 }
 
-// DELETE /api/table/parliamentary/{tableId}?memberId={memberId}
+// DELETE /api/table/parliamentary/{tableId}
 export async function deleteParliamentaryDebateTable(
   tableId: number,
-  memberId: number,
 ): Promise<boolean> {
   const requestUrl: string = ApiUrl.parliamentary;
-  const response = await request('DELETE', requestUrl + `/${tableId}`, null, {
-    memberId: memberId,
-  });
+  const response = await request(
+    'DELETE',
+    requestUrl + `/${tableId}`,
+    null,
+    null,
+  );
 
   return response.status === 204 ? true : false;
 }
@@ -149,3 +136,10 @@ export async function apiFunc(
     return response.data;
 }
 */
+
+export async function logout(): Promise<boolean> {
+  const requestUrl: string = ApiUrl.member;
+  const response = await request('POST', requestUrl + `logout`, null, null);
+
+  return response.status === 204 ? true : false;
+}
