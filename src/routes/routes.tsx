@@ -6,6 +6,7 @@ import TimerPage from '../page/TimerPage/TimerPage';
 import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
+import OAuth from '../page/LoginPage/OAuth';
 
 const routesConfig = [
   {
@@ -32,6 +33,11 @@ const routesConfig = [
     path: '/table/parliamentary/:id',
     element: <TimerPage />,
     requiresAuth: true,
+  },
+  {
+    path: '/oauth',
+    element: <OAuth />,
+    requiresAuth: false,
   },
 ];
 
