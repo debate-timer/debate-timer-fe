@@ -22,9 +22,7 @@ export default function TimerPage() {
 
   // Validate parameters is prepared
   if (tableId === undefined) {
-    throw new Error(
-      "Failed to resolve 'memberId' and 'tableId' from request URL",
-    );
+    throw new Error("Failed to resolve 'tableId' from request URL");
   }
 
   // Prepare for modal
