@@ -3,13 +3,14 @@ import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTit
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useNavigate, useParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
-import { getMemberIdToken } from '../../util/memberIdToken';
 import { IoMdHome } from 'react-icons/io';
+import useLogout from '../../hooks/mutations/useLogout';
 
 export default function TableOverview() {
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
   const { data } = useGetParliamentaryTableData(tableId);
+  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
 
   const navigate = useNavigate();
 
@@ -42,11 +43,19 @@ export default function TableOverview() {
             onClick={() => {
               navigate('/');
             }}
-            className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+            className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
           >
             <div className="flex flex-row items-center space-x-4">
               <IoMdHome size={24} />
               <h1>홈 화면</h1>
+            </div>
+          </button>
+          <button
+            onClick={() => logoutMutate()}
+            className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
+          >
+            <div className="flex flex-row items-center space-x-4">
+              <h2>로그아웃</h2>
             </div>
           </button>
         </DefaultLayout.Header.Right>
