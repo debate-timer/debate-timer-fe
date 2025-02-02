@@ -8,6 +8,7 @@ import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliament
 import { useModal } from '../../hooks/useModal';
 import AdditionalTimerComponent from './components/AdditionalTimer/AdditionalTimerComponent';
 import { IoMdHome } from 'react-icons/io';
+import { useTimer } from './hooks/useTimer';
 
 export default function TimerPage() {
   // Load sounds
@@ -42,35 +43,21 @@ export default function TimerPage() {
   );
   console.log(`# memberId: ${memberId}, tableId: ${tableId}`);
 
+  // Use timer hook
+  const {
+    timer,
+    setTimer,
+    pauseTimer,
+    startTimer,
+    isRunning,
+    actOnTime,
+    resetTimer,
+    setDefaultValue,
+  } = useTimer();
+
   // Declare states
   const [index, setIndex] = useState<number>(0);
-  const [timer, setTimer] = useState<number>(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [bg, setBg] = useState<string>('');
-
-  // Declare functions to handle timer
-  const startTimer = useCallback(() => {
-    if (!intervalRef.current) {
-      intervalRef.current = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    }
-  }, []);
-
-  const pauseTimer = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
-  const resetTimer = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    if (data) setTimer(data.table[index].time);
-  }, [data, index]);
 
   // Declare function to manage parent component's index
   const moveToOtherItem = useCallback(
@@ -89,7 +76,7 @@ export default function TimerPage() {
     [data, index, resetTimer],
   );
 
-  const changeBg = (condition: NodeJS.Timeout | null, timer: number) => {
+  const changeBg = (condition: boolean, timer: number) => {
     if (condition) {
       if (timer > 30) {
         setBg('gradient-timer-running');
@@ -105,8 +92,8 @@ export default function TimerPage() {
 
   // Set parent component's background animation by timer's state and remaining time
   useEffect(() => {
-    changeBg(intervalRef.current, timer);
-  }, [timer]);
+    changeBg(isRunning, timer);
+  }, [timer, isRunning]);
 
   // Add keyboard event listener
   useEffect(() => {
@@ -122,27 +109,27 @@ export default function TimerPage() {
 
       switch (event.code) {
         case 'Space':
-          if (intervalRef.current) {
+          if (isRunning) {
             // console.log('# timer paused');
             pauseTimer();
-            changeBg(intervalRef.current, timer);
+            changeBg(isRunning, timer);
           } else {
             // console.log('# timer started');
             startTimer();
-            changeBg(intervalRef.current, timer);
+            changeBg(isRunning, timer);
           }
           break;
         case 'ArrowLeft':
           moveToOtherItem(true);
-          changeBg(intervalRef.current, timer);
+          changeBg(isRunning, timer);
           break;
         case 'ArrowRight':
           moveToOtherItem(false);
-          changeBg(intervalRef.current, timer);
+          changeBg(isRunning, timer);
           break;
         case 'KeyR':
           resetTimer();
-          changeBg(intervalRef.current, timer);
+          changeBg(isRunning, timer);
           break;
       }
     };
@@ -153,23 +140,38 @@ export default function TimerPage() {
       // Remove listener when component is rendered
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [pauseTimer, startTimer, timer, moveToOtherItem, resetTimer, isOpen]);
+  }, [
+    isRunning,
+    isOpen,
+    moveToOtherItem,
+    pauseTimer,
+    resetTimer,
+    startTimer,
+    timer,
+  ]);
 
   // Let timer play sounds when o nly 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30 && intervalRef.current) {
-      dingOnceRef.current.play();
-    } else if (dingTwiceRef.current && timer === 0 && intervalRef.current) {
-      dingTwiceRef.current.play();
-    }
-  }, [timer]);
+    actOnTime(30, () => {
+      if (dingOnceRef.current && isRunning) {
+        dingOnceRef.current.play();
+      }
+    });
+
+    actOnTime(0, () => {
+      if (dingTwiceRef.current && isRunning) {
+        dingTwiceRef.current.play();
+      }
+    });
+  }, [actOnTime, isRunning]);
 
   // Let timer initialize itself when data is loaded via api
   useEffect(() => {
     if (data) {
+      setDefaultValue(data.table[index].time);
       setTimer(data.table[index].time);
     }
-  }, [data, index, resetTimer]);
+  }, [data, index, setDefaultValue, setTimer]);
 
   // Handle exceptions
   if (isLoading) {
@@ -241,21 +243,21 @@ export default function TimerPage() {
                 </div>
 
                 <TimerComponent
-                  isRunning={intervalRef.current !== null}
+                  isRunning={isRunning}
                   debateInfo={data!.table[index]}
                   timer={timer}
                   onOpenModal={() => openModal()}
                   startTimer={() => {
                     startTimer();
-                    changeBg(intervalRef.current, timer);
+                    changeBg(isRunning, timer);
                   }}
                   pauseTimer={() => {
                     pauseTimer();
-                    changeBg(intervalRef.current, timer);
+                    changeBg(isRunning, timer);
                   }}
                   resetTimer={() => {
-                    resetTimer();
-                    changeBg(intervalRef.current, timer);
+                    resetTimer(data!.table[index].time);
+                    changeBg(isRunning, timer);
                   }}
                 />
 
