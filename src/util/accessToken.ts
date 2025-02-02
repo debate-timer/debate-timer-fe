@@ -4,3 +4,7 @@ export const setAccessToken = (token: number): void => {
 export const getAccessToken = () => {
   return Number(sessionStorage.getItem('accessToken'));
 };
+
+export const removeAccessToken = (): void => {
+  sessionStorage.removeItem('accessToken');
+};
