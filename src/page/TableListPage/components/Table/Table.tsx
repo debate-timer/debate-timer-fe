@@ -37,10 +37,10 @@ export default function Table({
       </div>
       <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>
       <div className="flex w-full flex-grow flex-col items-start justify-center text-lg font-semibold lg:text-2xl">
-        <h1>유형 : {typeMapping[type]}</h1>
-        <h1>
+        <span>유형 : {typeMapping[type]}</span>
+        <span>
           소요시간 : {durationMinutes}분 {durationSeconds}초
-        </h1>
+        </span>
       </div>
     </button>
   );
