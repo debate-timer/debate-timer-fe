@@ -8,6 +8,7 @@ import {
   PutDebateTableResponseType,
 } from './responseTypes';
 import { DebateInfo } from '../type/type';
+import { setAccessToken } from '../util/accessToken';
 
 // String type identifier for TanStack Query's 'useQuery' function
 export const queryKeyIdentifier = {
@@ -21,11 +22,20 @@ export async function postUser(code: string): Promise<PostUserResponseType> {
   const response = await request<PostUserResponseType>(
     'POST',
     requestUrl,
-    {
-      code: code,
-    },
+    { code },
     null,
   );
+
+  // 응답 헤더에서 Authorization 값을 추출합니다.
+  const authHeader =
+    response.headers?.authorization || response.headers?.Authorization;
+
+  if (authHeader) {
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    setAccessToken(token);
+  } else {
+    throw new Error('Authorization 헤더가 존재하지 않습니다.');
+  }
 
   return response.data;
 }

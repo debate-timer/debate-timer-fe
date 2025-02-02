@@ -1,10 +1,10 @@
-export const setAccessToken = (token: number): void => {
-  sessionStorage.setItem('accessToken', token.toString());
+export const setAccessToken = (token: string): void => {
+  localStorage.setItem('accessToken', token);
 };
 export const getAccessToken = () => {
-  return Number(sessionStorage.getItem('accessToken'));
+  return Number(localStorage.getItem('accessToken'));
 };
 
 export const removeAccessToken = (): void => {
-  sessionStorage.removeItem('accessToken');
+  localStorage.removeItem('accessToken');
 };
