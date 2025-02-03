@@ -11,6 +11,7 @@ import { IoMdHome } from 'react-icons/io';
 import { useTimer } from './hooks/useTimer';
 import FirstUseToolTip from './components/common/FirstUseToolTip';
 import useMobile from '../../hooks/useMobile';
+import { IoHelp, IoHelpCircle } from 'react-icons/io5';
 
 export default function TimerPage() {
   // Load sounds
@@ -222,17 +223,32 @@ export default function TimerPage() {
             </div>
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
-            <button
-              onClick={() => {
-                navigate('/');
-              }}
-              className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
-            >
-              <div className="flex flex-row items-center space-x-4">
-                <IoMdHome size={24} />
-                {!isMobile && <h1>홈 화면</h1>}
-              </div>
-            </button>
+            <div className="flex flex-row justify-end space-x-2">
+              <button
+                onClick={() => {
+                  navigate('/');
+                }}
+                className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+              >
+                <div className="flex flex-row items-center space-x-4">
+                  <IoMdHome size={24} />
+                  {!isMobile && <h1>홈 화면</h1>}
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsFirst(true);
+                  localStorage.setItem('isFirst', 'true');
+                }}
+                className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+              >
+                <div className="flex flex-row items-center space-x-4">
+                  <IoHelpCircle size={24} />
+                  {!isMobile && <h1>도움말</h1>}
+                </div>
+              </button>
+            </div>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 
