@@ -75,7 +75,7 @@ describe('TableComposition', () => {
     );
     const nameInput = await screen.findByPlaceholderText('테이블 1(디폴트 값)');
 
-    expect((nameInput as HTMLInputElement).value).toBe('테이블 1');
+    expect((nameInput as HTMLInputElement).value).toBe('');
   });
 
   it('다음 버튼 클릭 시 "타임박스입력" 단계로 이동한다', async () => {

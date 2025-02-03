@@ -26,7 +26,7 @@ const useTableFrom = (
       key: 'moimCreationInfo',
       initialState: {
         info: {
-          name: '테이블 1',
+          name: '',
           agenda: '',
           type: 'PARLIAMENTARY',
         },
@@ -35,6 +35,7 @@ const useTableFrom = (
       storage: 'sessionStorage',
     },
   );
+
   const isNewMoimCreation =
     currentStep === 'NameAndType' && navigationType === 'PUSH';
 
