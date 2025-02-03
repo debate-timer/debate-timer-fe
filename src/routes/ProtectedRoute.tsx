@@ -6,7 +6,7 @@ import { getMemberIdToken } from '../util/memberIdToken';
 export default function ProtectedRoute(props: PropsWithChildren) {
   const { children } = props;
 
-  const isAuthenticated = getMemberIdToken() || true;
+  const isAuthenticated = getMemberIdToken() || false;
   const location = useLocation();
 
   return isAuthenticated ? (
