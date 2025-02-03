@@ -239,11 +239,11 @@ export default function TimerPage() {
         <DefaultLayout.ContentContanier>
           {!isOpen && (
             <div className="relative z-10 h-full">
-              {!isFirst && (
+              {isFirst && (
                 <FirstUseToolTip
                   onClose={() => {
-                    setIsFirst(true);
-                    localStorage.setItem('isFirst', 'true');
+                    setIsFirst(false);
+                    localStorage.setItem('isFirst', 'false');
                   }}
                 />
               )}
