@@ -1,7 +1,9 @@
+import { LuRefreshCcw } from 'react-icons/lu';
 import TimerIconButton from '../common/TimerIconButton';
-import { IoPauseOutline, IoPlayOutline, IoTimerOutline } from 'react-icons/io5';
+import { IoPauseOutline, IoPlayOutline } from 'react-icons/io5';
 
 interface TimerControllerProps {
+  isRunning: boolean;
   onPause: () => void;
   onStart: () => void;
   onReset: () => void;
@@ -11,6 +13,7 @@ interface TimerControllerProps {
 const iconSize = 40;
 
 export default function TimerController({
+  isRunning,
   onPause,
   onStart,
   onReset,
@@ -19,34 +22,38 @@ export default function TimerController({
   return (
     <div className="flex flex-row items-center space-x-8">
       {/* Timer start button */}
-      <TimerIconButton
-        icon={<IoPlayOutline size={iconSize} />}
-        style={{
-          bgColor: 'bg-emerald-500',
-          hoverColor: 'hover:bg-emerald-600',
-          contentColor: 'text-zinc-50',
-        }}
-        onClick={() => {
-          onStart();
-        }}
-      />
+      {isRunning && (
+        <TimerIconButton
+          icon={<IoPauseOutline size={iconSize} />}
+          style={{
+            bgColor: 'bg-amber-500',
+            hoverColor: 'hover:bg-amber-600',
+            contentColor: 'text-zinc-50',
+          }}
+          onClick={() => {
+            onPause();
+          }}
+        />
+      )}
 
       {/* Timer pause button */}
-      <TimerIconButton
-        icon={<IoPauseOutline size={iconSize} />}
-        style={{
-          bgColor: 'bg-amber-500',
-          hoverColor: 'hover:bg-amber-600',
-          contentColor: 'text-zinc-50',
-        }}
-        onClick={() => {
-          onPause();
-        }}
-      />
+      {!isRunning && (
+        <TimerIconButton
+          icon={<IoPlayOutline size={iconSize} />}
+          style={{
+            bgColor: 'bg-emerald-500',
+            hoverColor: 'hover:bg-emerald-600',
+            contentColor: 'text-zinc-50',
+          }}
+          onClick={() => {
+            onStart();
+          }}
+        />
+      )}
 
       {/* Timer reset button */}
       <TimerIconButton
-        icon={<IoTimerOutline size={iconSize} />}
+        icon={<LuRefreshCcw size={iconSize} />}
         style={{
           bgColor: 'bg-red-500',
           hoverColor: 'hover:bg-red-600',
@@ -65,7 +72,7 @@ export default function TimerController({
           onOpenModal();
         }}
       >
-        <h1 className="text-2xl font-bold">추가 작전 시간</h1>
+        <h1 className="text-2xl font-bold">작전 시간 사용</h1>
       </button>
     </div>
   );
