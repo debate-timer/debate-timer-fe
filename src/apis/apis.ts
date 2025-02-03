@@ -22,13 +22,11 @@ export async function postUser(code: string): Promise<PostUserResponseType> {
   const response = await request<PostUserResponseType>(
     'POST',
     requestUrl,
-    { code },
+    { code, redirectUrl: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI },
     null,
   );
-
   // 응답 헤더에서 Authorization 값을 추출합니다.
-  const authHeader =
-    response.headers?.authorization || response.headers?.Authorization;
+  const authHeader = response.headers['authorization'];
 
   if (authHeader) {
     const token = authHeader.replace(/^Bearer\s+/i, '').trim();
@@ -149,7 +147,7 @@ export async function apiFunc(
 
 export async function logout(): Promise<boolean> {
   const requestUrl: string = ApiUrl.member;
-  const response = await request('POST', requestUrl + `logout`, null, null);
+  const response = await request('POST', requestUrl + `/logout`, null, null);
 
   return response.status === 204 ? true : false;
 }
