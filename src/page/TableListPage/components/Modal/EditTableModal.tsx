@@ -18,7 +18,7 @@ export default function EditTableModal({
         <div className="flex w-full items-center justify-between">
           <h1 className="text-md font-bold lg:text-5xl">토론 시간표 이름</h1>
           <input
-            placeholder="시간표#1(디폴트 값)"
+            placeholder="시간표 1"
             className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
           />
         </div>
