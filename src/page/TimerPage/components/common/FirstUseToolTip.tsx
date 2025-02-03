@@ -22,10 +22,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
   return (
     <div className="relative">
       <FirstUseToolTipBackground height={height} />
-      <FirstUseToolTipContent
-        setHeight={(value) => setHeight(value)}
-        onClose={() => onClose()}
-      />
+      <FirstUseToolTipContent setHeight={setHeight} onClose={onClose} />
     </div>
   );
 }

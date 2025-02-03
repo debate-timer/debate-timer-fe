@@ -11,7 +11,7 @@ import { IoMdHome } from 'react-icons/io';
 import { useTimer } from './hooks/useTimer';
 import FirstUseToolTip from './components/common/FirstUseToolTip';
 import useMobile from '../../hooks/useMobile';
-import { IoHelp, IoHelpCircle } from 'react-icons/io5';
+import { IoHelpCircle } from 'react-icons/io5';
 
 export default function TimerPage() {
   // Load sounds
