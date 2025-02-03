@@ -19,7 +19,7 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use((config) => {
   const accessToken = getAccessToken();
   if (accessToken && config.headers) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+    config.headers.Authorization = `${accessToken}`;
   }
   return config;
 });
@@ -43,16 +43,16 @@ axiosInstance.interceptors.response.use(
         );
 
         // **새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정**
-        const headerAuth = refreshResponse.headers['Authorization'] || '';
+        const headerAuth = refreshResponse.headers['authorization'] || '';
 
         // Authorization: Bearer <새토큰> 형태라면 "Bearer " 부분 제거
-        const newAccessToken = headerAuth.replace('Bearer ', '').trim();
+        const newAccessToken = headerAuth.replace(/^Bearer\s+/i, '').trim();
 
         // 로컬 스토리지에 저장
         setAccessToken(newAccessToken);
 
         // 원본 요청 헤더도 새 토큰으로 교체 후 재요청
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error('Refresh Token is invalid or expired', refreshError);
