@@ -18,6 +18,7 @@ export default function OAuth() {
     };
 
     loginOAuth();
-  }, [navigate, searchParams, mutate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return null;
 }
