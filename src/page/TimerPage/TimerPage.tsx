@@ -9,6 +9,8 @@ import { useModal } from '../../hooks/useModal';
 import AdditionalTimerComponent from './components/AdditionalTimer/AdditionalTimerComponent';
 import { IoMdHome } from 'react-icons/io';
 import { useTimer } from './hooks/useTimer';
+import FirstUseToolTip from './components/common/FirstUseToolTip';
+import useMobile from '../../hooks/useMobile';
 
 export default function TimerPage() {
   // Load sounds
@@ -56,8 +58,10 @@ export default function TimerPage() {
   } = useTimer();
 
   // Declare states
-  const [index, setIndex] = useState<number>(0);
-  const [bg, setBg] = useState<string>('');
+  const [index, setIndex] = useState(0);
+  const [isFirst, setIsFirst] = useState(false);
+  const [bg, setBg] = useState('');
+  const isMobile = useMobile();
 
   // Declare function to manage parent component's index
   const moveToOtherItem = useCallback(
@@ -173,6 +177,13 @@ export default function TimerPage() {
     }
   }, [data, index, setDefaultValue, setTimer]);
 
+  useEffect(() => {
+    const storedIsFirst = localStorage.getItem('isFirst');
+    if (storedIsFirst) {
+      setIsFirst(storedIsFirst.trim() === 'true' ? true : false);
+    }
+  }, []);
+
   // Handle exceptions
   if (isLoading) {
     return <TimerLoadingPage />;
@@ -201,7 +212,7 @@ export default function TimerPage() {
             </div>
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <div className="flex flex-col items-center">
+            <div className="my-2 flex flex-col items-center">
               <h1 className="text-m md:text-lg">토론 주제</h1>
               <h1 className="text-xl font-bold md:text-2xl">
                 {data === undefined || data!.info.agenda.trim() === ''
@@ -219,7 +230,7 @@ export default function TimerPage() {
             >
               <div className="flex flex-row items-center space-x-4">
                 <IoMdHome size={24} />
-                <h1>홈 화면</h1>
+                {!isMobile && <h1>홈 화면</h1>}
               </div>
             </button>
           </DefaultLayout.Header.Right>
@@ -228,7 +239,16 @@ export default function TimerPage() {
         <DefaultLayout.ContentContanier>
           {!isOpen && (
             <div className="relative z-10 h-full">
-              <div className="flex h-full flex-row items-center space-x-4">
+              {!isFirst && (
+                <FirstUseToolTip
+                  onClose={() => {
+                    setIsFirst(true);
+                    localStorage.setItem('isFirst', 'true');
+                  }}
+                />
+              )}
+
+              <div className="z-2 absolute inset-0 flex h-full flex-row items-center justify-center space-x-4">
                 <div className="flex-1">
                   {index !== 0 && (
                     <DebateInfoSummary

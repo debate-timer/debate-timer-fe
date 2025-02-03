@@ -47,31 +47,29 @@ export default function TimerComponent({
 
   // Return React component
   return (
-    <div className="flex h-full flex-row items-center space-x-4">
-      <div
-        className={`flex w-min flex-col ${bgColor} items-center rounded-[50px] border-4 border-zinc-50 px-8 py-8 shadow-2xl`}
-      >
-        {/* Title */}
-        <div className="m-2 mb-8 flex flex-col items-center space-y-3">
-          <h1 className="text-6xl font-bold text-zinc-50">{titleText}</h1>
-          <div className="flex flex-row items-center space-x-3 text-zinc-50">
-            {debateInfo.stance !== 'NEUTRAL' && <IoPerson size={25} />}
-            <h1 className="text-3xl">{speakerText}</h1>
-          </div>
+    <div
+      className={`flex w-min flex-col ${bgColor} items-center rounded-[50px] border-4 border-zinc-50 px-8 py-8 shadow-2xl`}
+    >
+      {/* Title */}
+      <div className="m-2 mb-8 flex flex-col items-center space-y-3">
+        <h1 className="text-6xl font-bold text-zinc-50">{titleText}</h1>
+        <div className="flex flex-row items-center space-x-3 text-zinc-50">
+          {debateInfo.stance !== 'NEUTRAL' && <IoPerson size={25} />}
+          <h1 className="text-3xl">{speakerText}</h1>
         </div>
-
-        {/* Timer */}
-        <TimerDisplay timer={timer} />
-
-        {/* Timer controller that includes buttons that can handle timer */}
-        <TimerController
-          isRunning={isRunning}
-          onReset={resetTimer}
-          onStart={startTimer}
-          onPause={pauseTimer}
-          onOpenModal={onOpenModal}
-        />
       </div>
+
+      {/* Timer */}
+      <TimerDisplay timer={timer} />
+
+      {/* Timer controller that includes buttons that can handle timer */}
+      <TimerController
+        isRunning={isRunning}
+        onReset={resetTimer}
+        onStart={startTimer}
+        onPause={pauseTimer}
+        onOpenModal={onOpenModal}
+      />
     </div>
   );
 }
