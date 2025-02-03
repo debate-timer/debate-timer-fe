@@ -21,9 +21,7 @@ export default function AdditionalTimerComponent({
   const dingTwiceRef = useRef<HTMLAudioElement>(null);
 
   const { timer, isRunning, startTimer, pauseTimer, setTimer, actOnTime } =
-    useTimer({
-      initialTimer: 0,
-    });
+    useTimer();
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
