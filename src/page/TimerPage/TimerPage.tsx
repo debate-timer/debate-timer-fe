@@ -239,13 +239,13 @@ export default function TimerPage() {
                 </div>
               </button>
               <button
-              onClick={() => logoutMutate()}
-              className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
-            >
-              <div className="flex flex-row items-center space-x-4">
-                <h2>로그아웃</h2>
-              </div>
-            </button>
+                onClick={() => logoutMutate()}
+                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
+              >
+                <div className="flex flex-row items-center space-x-4">
+                  <h2>로그아웃</h2>
+                </div>
+              </button>
             </div>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
