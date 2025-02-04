@@ -60,6 +60,7 @@ export default function TimerPage() {
 
   // Declare states
   const [index, setIndex] = useState(0);
+  const [sfxFlag, setSfxFlag] = useState(0); // (30s, 0s) / (XX) = 0, (XO) = 1, (OX) = 2, (OO) = 3
   const [isFirst, setIsFirst] = useState(false);
   const [bg, setBg] = useState('');
   const isMobile = useMobile();
@@ -175,6 +176,16 @@ export default function TimerPage() {
     if (data) {
       setDefaultValue(data.table[index].time);
       setTimer(data.table[index].time);
+
+      if (data.info.warningBell && data.info.finishBell) {
+        setSfxFlag(3);
+      } else if (data.info.warningBell && !data.info.finishBell) {
+        setSfxFlag(2);
+      } else if (!data.info.warningBell && data.info.finishBell) {
+        setSfxFlag(1);
+      } else {
+        setSfxFlag(0);
+      }
     }
   }, [data, index, setDefaultValue, setTimer]);
 
@@ -187,6 +198,8 @@ export default function TimerPage() {
 
   // Handle exceptions
   if (isLoading) {
+    // TODO: HAVE TO CLEARED
+    setSfxFlag(sfxFlag);
     return <TimerLoadingPage />;
   }
 

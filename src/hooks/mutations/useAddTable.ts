@@ -7,6 +7,8 @@ interface UseAddTableParams {
   id: number;
   tableName: string;
   tableAgenda: string;
+  warningBell: boolean;
+  finishBell: boolean;
   table: DebateInfo[];
 }
 
@@ -17,6 +19,8 @@ export default function useAddTable(onSuccess: (id: number) => void) {
         params.id,
         params.tableName,
         params.tableAgenda,
+        params.warningBell,
+        params.finishBell,
         params.table,
       );
       return response;

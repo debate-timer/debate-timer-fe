@@ -17,6 +17,8 @@ export interface GetTableDataResponseType {
   info: {
     name: string;
     agenda: string;
+    warningBell: boolean;
+    finishBell: boolean;
   };
   table: DebateInfo[];
 }
@@ -27,6 +29,8 @@ export interface PostDebateTableResponseType {
   info: {
     name: string;
     agenda: string;
+    warningBell: boolean;
+    finishBell: boolean;
   };
   table: DebateInfo[];
 }
@@ -37,6 +41,8 @@ export interface PutDebateTableResponseType {
   info: {
     name: string;
     agenda: string;
+    warningBell: boolean;
+    finishBell: boolean;
   };
   table: DebateInfo[];
 }

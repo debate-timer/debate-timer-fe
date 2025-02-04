@@ -52,6 +52,8 @@ export default function TableComposition() {
         tableId: tableId, // etc
         tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
+        warningBell: true,
+        finishBell: true,
         table: formData.table,
       });
     } else {
@@ -59,6 +61,8 @@ export default function TableComposition() {
         id: getMemberIdToken(),
         tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
+        warningBell: true,
+        finishBell: true,
         table: formData.table,
       });
     }

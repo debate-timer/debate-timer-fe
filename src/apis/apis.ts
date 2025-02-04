@@ -72,6 +72,8 @@ export async function postParliamentaryDebateTable(
   memberId: number,
   tableName: string,
   tableAgenda: string,
+  warningBell: boolean,
+  finishBell: boolean,
   tables: DebateInfo[],
 ): Promise<PostDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
@@ -82,6 +84,8 @@ export async function postParliamentaryDebateTable(
       info: {
         name: tableName === '' ? '테이블 1' : tableName,
         agenda: tableAgenda,
+        warningBell: warningBell,
+        finishBell: finishBell,
       },
       table: tables,
     },
@@ -99,6 +103,8 @@ export async function putParliamentaryDebateTable(
   memberId: number,
   tableName: string,
   tableAgenda: string,
+  warningBell: boolean,
+  finishBell: boolean,
   tables: DebateInfo[],
 ): Promise<PutDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
@@ -109,6 +115,8 @@ export async function putParliamentaryDebateTable(
       info: {
         name: tableName,
         agenda: tableAgenda,
+        warningBell: warningBell,
+        finishBell: finishBell,
       },
       table: tables,
     },
