@@ -5,7 +5,6 @@ import { DebateInfo } from '../../type/type';
 
 interface PutParliamentaryTableParams {
   tableId: number;
-  memberId: number;
   tableName: string;
   tableAgenda: string;
   warningBell: boolean;
@@ -23,7 +22,6 @@ export function usePutParliamentaryDebateTable(
   >({
     mutationFn: ({
       tableId,
-      memberId,
       tableName,
       tableAgenda,
       table,
@@ -32,7 +30,6 @@ export function usePutParliamentaryDebateTable(
     }) =>
       putParliamentaryDebateTable(
         tableId,
-        memberId,
         tableName,
         tableAgenda,
         warningBell,

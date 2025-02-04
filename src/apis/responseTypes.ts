@@ -3,15 +3,15 @@ import { DebateInfo, DebateTable } from '../type/type';
 // POST "/api/member"
 export interface PostUserResponseType {
   id: number;
-  nickname: string;
+  email: string;
 }
 
-// GET /api/table?memberId={memberId}
+// GET /api/table
 export interface GetDebateTableListResponseType {
   tables: DebateTable[];
 }
 
-// GET /api/table/parliamentary/{tableId}?memberId={memberId}
+// GET /api/table/parliamentary/{tableId}
 export interface GetTableDataResponseType {
   id: number;
   info: {
@@ -23,7 +23,7 @@ export interface GetTableDataResponseType {
   table: DebateInfo[];
 }
 
-// POST /api/table/parliamentary?memberId={memberId}
+// POST /api/table/parliamentary
 export interface PostDebateTableResponseType {
   id: number;
   info: {
@@ -35,7 +35,7 @@ export interface PostDebateTableResponseType {
   table: DebateInfo[];
 }
 
-// PUT /api/table/parliamentary/{tableId}?memberId={memberId}
+// PUT /api/table/parliamentary/{tableId}
 export interface PutDebateTableResponseType {
   id: number;
   info: {
@@ -47,7 +47,7 @@ export interface PutDebateTableResponseType {
   table: DebateInfo[];
 }
 
-// DELETE /api/table/parliamentary/{tableId}?memberId={memberId}
+// DELETE /api/table/parliamentary/{tableId}
 // This API only contains HTTP response code 204
 
 // Response types for error cases

@@ -4,7 +4,6 @@ import { DebateInfo } from '../../type/type';
 import { PostDebateTableResponseType } from '../../apis/responseTypes';
 
 interface UseAddTableParams {
-  id: number;
   tableName: string;
   tableAgenda: string;
   warningBell: boolean;
@@ -16,7 +15,6 @@ export default function useAddTable(onSuccess: (id: number) => void) {
   return useMutation({
     mutationFn: async (params: UseAddTableParams) => {
       const response = await postParliamentaryDebateTable(
-        params.id,
         params.tableName,
         params.tableAgenda,
         params.warningBell,

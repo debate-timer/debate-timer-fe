@@ -3,15 +3,13 @@ import { deleteParliamentaryDebateTable } from '../../apis/apis';
 
 interface DeleteParliamentaryTableParams {
   tableId: number;
-  memberId: number;
 }
 
 export function useDeleteParliamentaryDebateTable() {
   const queryClient = useQueryClient();
-
-  return useMutation<boolean, Error, DeleteParliamentaryTableParams>({
-    mutationFn: ({ tableId, memberId }) =>
-      deleteParliamentaryDebateTable(tableId, memberId),
+  return useMutation({
+    mutationFn: async ({ tableId }: DeleteParliamentaryTableParams) =>
+      await deleteParliamentaryDebateTable(tableId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['DebateTableList'] });
 

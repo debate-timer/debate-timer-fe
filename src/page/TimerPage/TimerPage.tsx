@@ -2,12 +2,13 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimerComponent from './components/Timer/TimerComponent';
 import DebateInfoSummary from './components/DebateInfoSummary';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import TimerLoadingPage from './TimerLoadingPage';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import { useModal } from '../../hooks/useModal';
 import AdditionalTimerComponent from './components/AdditionalTimer/AdditionalTimerComponent';
 import { IoMdHome } from 'react-icons/io';
+import useLogout from '../../hooks/mutations/useLogout';
 import { useTimer } from './hooks/useTimer';
 import FirstUseToolTip from './components/common/FirstUseToolTip';
 import useMobile from '../../hooks/useMobile';
@@ -20,31 +21,20 @@ export default function TimerPage() {
   const navigate = useNavigate();
 
   // Prepare data before requesting query
-  const [searchParams] = useSearchParams();
   const pathParams = useParams();
-  const memberId = searchParams.get('memberId');
   const tableId = pathParams.id;
 
   // Validate parameters is prepared
-  if (memberId === null && tableId === undefined) {
-    throw new Error(
-      "Failed to resolve 'memberId' and 'tableId' from request URL",
-    );
-  } else if (tableId === undefined) {
+  if (tableId === undefined) {
     throw new Error("Failed to resolve 'tableId' from request URL");
-  } else if (memberId === null) {
-    throw new Error("Failed to resolve 'memberId' from request URL");
   }
 
   // Prepare for modal
   const { isOpen, openModal, ModalWrapper } = useModal();
 
   // Get query
-  const { data, isLoading } = useGetParliamentaryTableData(
-    Number(tableId),
-    Number(memberId),
-  );
-  console.log(`# memberId: ${memberId}, tableId: ${tableId}`);
+  const { data, isLoading } = useGetParliamentaryTableData(Number(tableId));
+  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
 
   // Use timer hook
   const {
@@ -241,7 +231,7 @@ export default function TimerPage() {
                 onClick={() => {
                   navigate('/');
                 }}
-                className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
               >
                 <div className="flex flex-row items-center space-x-4">
                   <IoMdHome size={24} />
@@ -254,11 +244,19 @@ export default function TimerPage() {
                   setIsFirst(true);
                   localStorage.setItem('isFirst', 'true');
                 }}
-                className="rounded-full bg-slate-300 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
               >
                 <div className="flex flex-row items-center space-x-4">
                   <IoHelpCircle size={24} />
                   {!isMobile && <h1>도움말</h1>}
+                </div>
+              </button>
+              <button
+                onClick={() => logoutMutate()}
+                className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
+              >
+                <div className="flex flex-row items-center space-x-4">
+                  <h2>로그아웃</h2>
                 </div>
               </button>
             </div>

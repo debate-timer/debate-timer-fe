@@ -1,28 +1,27 @@
-import { useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { useNavigate } from 'react-router-dom';
-import { usePostUser } from '../../hooks/mutations/usePostUser';
-import { setMemberIdToken } from '../../util/memberIdToken';
+import GoogleButton from '../../components/GoogleButton';
 
 export default function LoginPage() {
-  const [nickname, setNickname] = useState('');
-  const navigate = useNavigate();
-  const { mutate } = usePostUser((data) => {
-    setMemberIdToken(data.id);
-    navigate('/');
-  });
-
-  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
-  };
-
-  const handleLogin = () => {
-    if (!nickname.trim()) {
-      alert('닉네임을 입력해주세요.');
-      return;
+  const AuthLogin = () => {
+    if (
+      !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID ||
+      !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI
+    ) {
+      throw new Error('OAuth 정보가 없습니다.');
     }
-    mutate(nickname);
+
+    const params = {
+      client_id: import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID,
+      redirect_uri: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI,
+      response_type: 'code',
+      scope: 'openid profile email',
+    };
+    const queryString = new URLSearchParams(params).toString();
+    const googleOAuthUrl = `${import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL}?${queryString}`;
+
+    window.location.href = googleOAuthUrl;
   };
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -37,19 +36,7 @@ export default function LoginPage() {
           <h1 className="text-6xl font-semibold">Debate Timer</h1>
         </div>
         <section className="flex w-72 flex-col gap-8 text-lg font-semibold">
-          <input
-            id="nickname"
-            value={nickname}
-            onChange={handleNicknameChange}
-            placeholder="닉네임을 입력해주세요"
-            className="rounded-lg bg-slate-300 p-5 text-center placeholder-slate-500"
-          />
-          <button
-            onClick={handleLogin}
-            className="rounded-lg bg-amber-300 p-5 transition-transform duration-200 hover:scale-105"
-          >
-            로그인
-          </button>
+          <GoogleButton onClick={AuthLogin} />
         </section>
       </div>
     </DefaultLayout>
