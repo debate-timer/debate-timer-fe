@@ -5,7 +5,6 @@ import { DebateInfo } from '../../type/type';
 
 interface PutParliamentaryTableParams {
   tableId: number;
-  memberId: number;
   tableName: string;
   tableAgenda: string;
   table: DebateInfo[];
@@ -19,14 +18,8 @@ export function usePutParliamentaryDebateTable(
     Error,
     PutParliamentaryTableParams
   >({
-    mutationFn: ({ tableId, memberId, tableName, tableAgenda, table }) =>
-      putParliamentaryDebateTable(
-        tableId,
-        memberId,
-        tableName,
-        tableAgenda,
-        table,
-      ),
+    mutationFn: ({ tableId, tableName, tableAgenda, table }) =>
+      putParliamentaryDebateTable(tableId, tableName, tableAgenda, table),
     onSuccess: (response: PutDebateTableResponseType) => {
       onSuccess(response.id);
     },

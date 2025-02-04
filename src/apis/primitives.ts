@@ -1,18 +1,7 @@
 import axios from 'axios';
 import { AxiosResponse, AxiosError } from 'axios';
 import { ErrorResponseType } from './responseTypes';
-
-// Singleton Axios instance
-const axiosInstance = axios.create({
-  baseURL:
-    import.meta.env.MODE !== 'production'
-      ? undefined
-      : import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import axiosInstance from './axiosInstance';
 
 // HTTP request methods
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
