@@ -81,10 +81,6 @@ export function useDragAndDrop<T>({
         };
       }
     }
-
-    return {
-      transform: 'translateY(0)',
-    };
   };
 
   const DragAndDropWrapper = ({ children }: { children: ReactNode }) => {

@@ -70,12 +70,12 @@ describe('TableComposition', () => {
 
     expect(
       screen.findByRole('heading', {
-        name: '어떤 토론을 원하시나요?',
+        name: '토론 정보를 수정해주세요',
       }),
     );
-    const nameInput = await screen.findByPlaceholderText('시간표#1(디폴트 값)');
+    const nameInput = await screen.findByPlaceholderText('테이블 1(디폴트 값)');
 
-    expect((nameInput as HTMLInputElement).value).toBe('테이블 1');
+    expect((nameInput as HTMLInputElement).value).toBe('');
   });
 
   it('다음 버튼 클릭 시 "타임박스입력" 단계로 이동한다', async () => {
@@ -108,8 +108,15 @@ describe('TableComposition', () => {
     expect(screen.getByText('토론 주제')).toBeInTheDocument();
 
     // 4. "완료" (혹은 "제출") 버튼 클릭
-    // 실제 버튼 텍스트 확인
     const submitButton = screen.getByText('테이블 추가하기');
+    expect(submitButton).toBeDisabled();
+
+    const leftAddButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
+    await userEvent.click(leftAddButton);
+
+    const addButton = screen.getByText('타임박스 설정하기');
+    await userEvent.click(addButton);
+
     await userEvent.click(submitButton);
 
     await waitFor(() => {

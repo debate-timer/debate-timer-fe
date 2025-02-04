@@ -19,26 +19,27 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
 }
 
 vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
-  const HeaderLeft = function HeaderLeft({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) {
-    return <div data-testid="header-left">{children}</div>;
-  };
+  const HeaderLeft = ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="header-left">{children}</div>
+  );
+  const HeaderCenter = ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="header-center">{children}</div>
+  );
+  const HeaderRight = ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="header-right">{children}</div>
+  );
 
-  const Header = function Header({ children }: { children: React.ReactNode }) {
-    return <div data-testid="header">{children}</div>;
-  };
+  const Header = ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="header">{children}</div>
+  );
+
   Header.Left = HeaderLeft;
+  Header.Center = HeaderCenter;
+  Header.Right = HeaderRight;
 
-  const DefaultLayout = function DefaultLayout({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) {
-    return <div data-testid="default-layout">{children}</div>;
-  };
+  const DefaultLayout = ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="default-layout">{children}</div>
+  );
   DefaultLayout.displayName = 'DefaultLayout';
   DefaultLayout.Header = Header;
 
@@ -80,7 +81,7 @@ describe('TableListPage', () => {
     renderTableListPage();
     const headerLeft = screen.getByTestId('header-left');
     expect(headerLeft).toBeInTheDocument();
-    expect(headerLeft).toHaveTextContent('테이블 목록화면');
+    expect(headerLeft).toHaveTextContent('테이블 목록');
   });
 
   it('Table 렌더링 검증', async () => {

@@ -39,8 +39,10 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <div className="flex flex-wrap items-center px-2 text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">어떤 토론을 원하시나요?</h1>
+          <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
+            <h1>
+              {isEdit ? '토론 정보를 수정해주세요' : '어떤 토론을 원하시나요?'}
+            </h1>
           </div>
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right></DefaultLayout.Header.Right>
@@ -50,7 +52,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           <div className="flex w-full items-center justify-between">
             <h3 className="text-md font-bold lg:text-5xl">토론 시간표 이름</h3>
             <input
-              placeholder="시간표#1(디폴트 값)"
+              placeholder="테이블 1(디폴트 값)"
               className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
               value={info.name}
               onChange={handleNameChange}
@@ -74,7 +76,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           onClick={onButtonClick}
           className="h-20 w-full bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
         >
-          타임박스 만들기
+          {isEdit ? '타임박스 수정하기' : '타임박스 만들기'}
         </button>
       </DefaultLayout.StickyFooterWrapper>
     </DefaultLayout>

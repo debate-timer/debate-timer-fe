@@ -47,6 +47,8 @@ export const handlers = [
       info: {
         name: '테이블 1',
         agenda: '촉법소년 기준 연령을 인하해야 한다.',
+        warningBell: true,
+        finishBell: true,
       },
       table: [
         {
@@ -63,7 +65,7 @@ export const handlers = [
         },
         {
           stance: 'NEUTRAL',
-          type: 'CROSS',
+          type: 'TIME_OUT',
           time: 32,
           speakerNumber: null,
         },
@@ -98,6 +100,8 @@ export const handlers = [
       info: {
         name: '테이블1',
         agenda: '촉법소년 연령 인하',
+        warningBell: true,
+        finishBell: true,
       },
       table: [
         {
@@ -148,6 +152,8 @@ export const handlers = [
       info: {
         name: '테이블1',
         agenda: '촉법소년 연령 인하',
+        warningBell: true,
+        finishBell: true,
       },
       table: [
         {

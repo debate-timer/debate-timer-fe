@@ -26,7 +26,7 @@ const useTableFrom = (
       key: 'moimCreationInfo',
       initialState: {
         info: {
-          name: '테이블 1',
+          name: '',
           agenda: '',
           type: 'PARLIAMENTARY',
         },
@@ -35,6 +35,7 @@ const useTableFrom = (
       storage: 'sessionStorage',
     },
   );
+
   const isNewMoimCreation =
     currentStep === 'NameAndType' && navigationType === 'PUSH';
 
@@ -89,15 +90,15 @@ const useTableFrom = (
   };
 
   const { mutate: AddTable, isPending: isAddTablePending } = useAddTable(
-    (id: number) => {
+    (tableId: number) => {
       removeValue();
-      navigate(`/overview/${id}`);
+      navigate(`/overview/${tableId}`);
     },
   );
   const { mutate: EditTable, isPending: isEditTablePending } =
-    usePutParliamentaryDebateTable((id: number) => {
+    usePutParliamentaryDebateTable((tableId: number) => {
       removeValue();
-      navigate(`/overview/${id}`);
+      navigate(`/overview/${tableId}`);
     });
 
   return {

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import TimerDisplay from '../common/TimerDisplay';
 import AdditionalTimerController from './AdditionalTimerController';
 import AdditionalTimerSummary from './AdditionalTimerSummary';
 import { DebateInfo } from '../../../../type/type';
+import { useTimer } from '../../hooks/useTimer';
 
 interface AdditionalTimerComponentProps {
   prevItem?: DebateInfo;
@@ -19,34 +20,23 @@ export default function AdditionalTimerComponent({
   const dingOnceRef = useRef<HTMLAudioElement>(null);
   const dingTwiceRef = useRef<HTMLAudioElement>(null);
 
-  const [timer, setTimer] = useState<number>(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const startTimer = useCallback(() => {
-    if (!intervalRef.current) {
-      intervalRef.current = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    }
-  }, []);
-
-  const pauseTimer = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
+  const { timer, isRunning, startTimer, pauseTimer, setTimer, actOnTime } =
+    useTimer();
 
   // Let timer play sounds when only 30 seconds left or timeout
   useEffect(() => {
-    if (dingOnceRef.current && timer === 30 && intervalRef.current) {
-      dingOnceRef.current.play();
-    } else if (timer === 0 && intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      if (dingTwiceRef.current) dingTwiceRef.current.play();
-    }
-  }, [timer]);
+    actOnTime(30, () => {
+      if (dingOnceRef.current && isRunning) {
+        dingOnceRef.current.play();
+      }
+    });
+
+    actOnTime(0, () => {
+      if (dingTwiceRef.current && isRunning) {
+        dingTwiceRef.current.play();
+      }
+    });
+  }, [actOnTime, isRunning]);
 
   return (
     <div className="flex flex-col items-center space-y-12 px-12 pb-8">
@@ -57,6 +47,7 @@ export default function AdditionalTimerComponent({
 
       <TimerDisplay timer={timer} />
       <AdditionalTimerController
+        isRunning={isRunning}
         addOnTimer={(value: number) =>
           setTimer((prev: number) => (prev + value > 0 ? prev + value : 0))
         }

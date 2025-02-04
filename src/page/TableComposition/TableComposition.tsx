@@ -7,7 +7,6 @@ import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliament
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { Type } from '../../type/type';
-import { getMemberIdToken } from '../../util/memberIdToken';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
@@ -25,7 +24,6 @@ export default function TableComposition() {
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
   const { data: fetchedTableData } = useGetParliamentaryTableData(
     tableId,
-    1,
     mode === 'edit',
   );
   const initData = useMemo(() => {
@@ -46,19 +44,21 @@ export default function TableComposition() {
     useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
-    if (mode) {
+    if (mode === 'edit') {
       EditTable({
-        memberId: getMemberIdToken(),
         tableId: tableId, // etc
-        tableName: formData.info.name,
+        tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
+        warningBell: true,
+        finishBell: true,
         table: formData.table,
       });
     } else {
       AddTable({
-        id: getMemberIdToken(),
-        tableName: formData.info.name,
+        tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
+        warningBell: true,
+        finishBell: true,
         table: formData.table,
       });
     }
@@ -78,7 +78,9 @@ export default function TableComposition() {
           ),
           TimeBox: (
             <TimeBoxStep
-              initTimeBox={formData.table}
+              initData={formData}
+              isEdit={mode === 'edit'}
+              onAgendaChange={updateInfo}
               onTimeBoxChange={updateTable}
               onButtonClick={handleButtonClick}
             />
