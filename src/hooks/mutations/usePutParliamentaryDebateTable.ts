@@ -7,6 +7,8 @@ interface PutParliamentaryTableParams {
   tableId: number;
   tableName: string;
   tableAgenda: string;
+  warningBell: boolean;
+  finishBell: boolean;
   table: DebateInfo[];
 }
 
@@ -18,8 +20,22 @@ export function usePutParliamentaryDebateTable(
     Error,
     PutParliamentaryTableParams
   >({
-    mutationFn: ({ tableId, tableName, tableAgenda, table }) =>
-      putParliamentaryDebateTable(tableId, tableName, tableAgenda, table),
+    mutationFn: ({
+      tableId,
+      tableName,
+      tableAgenda,
+      table,
+      warningBell,
+      finishBell,
+    }) =>
+      putParliamentaryDebateTable(
+        tableId,
+        tableName,
+        tableAgenda,
+        warningBell,
+        finishBell,
+        table,
+      ),
     onSuccess: (response: PutDebateTableResponseType) => {
       onSuccess(response.id);
     },
