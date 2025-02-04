@@ -47,13 +47,13 @@ export default function TableComposition() {
     if (mode === 'edit') {
       EditTable({
         tableId: tableId, // etc
-        tableName: formData.info.name,
+        tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
         table: formData.table,
       });
     } else {
       AddTable({
-        tableName: formData.info.name,
+        tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
         table: formData.table,
       });

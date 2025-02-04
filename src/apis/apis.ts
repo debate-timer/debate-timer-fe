@@ -78,7 +78,7 @@ export async function postParliamentaryDebateTable(
     requestUrl,
     {
       info: {
-        name: tableName,
+        name: tableName === '' ? '테이블 1' : tableName,
         agenda: tableAgenda,
       },
       table: tables,
