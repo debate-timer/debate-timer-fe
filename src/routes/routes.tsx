@@ -7,6 +7,7 @@ import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
+import GoogleAnalytics from '../util/GoogleAnalytics';
 
 const routesConfig = [
   {
@@ -43,7 +44,12 @@ const routesConfig = [
 
 const router = createBrowserRouter([
   {
-    element: <ErrorBoundaryWrapper />,
+    element: (
+      <>
+        <GoogleAnalytics />
+        <ErrorBoundaryWrapper />
+      </>
+    ),
     children: routesConfig.map((route) => ({
       ...route,
       element: route.requiresAuth ? (
