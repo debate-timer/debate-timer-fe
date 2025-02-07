@@ -5,11 +5,9 @@ import { GlobalPortal } from './util/GlobalPortal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import router from './routes/routes.tsx';
 import './index.css';
-import ReactGA from 'react-ga4';
+import { setupGoogleAnalytics } from './util/setupGoogleAnalytics.tsx';
 
 // console.log(`# URL = ${import.meta.env.VITE_API_BASE_URL}`);
-
-const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
 
 // Functions that calls msw mocking worker
 if (import.meta.env.VITE_MOCK_API === 'true') {
@@ -42,7 +40,7 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
   initializeApp();
 }
 
-ReactGA.initialize(GA_TRACKING_ID);
+setupGoogleAnalytics();
 
 // Function that initializes main React app
 function initializeApp() {
