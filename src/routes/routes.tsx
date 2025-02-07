@@ -7,7 +7,6 @@ import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
-import GoogleAnalytics from '../util/GoogleAnalytics';
 
 const routesConfig = [
   {
@@ -46,7 +45,6 @@ const router = createBrowserRouter([
   {
     element: (
       <>
-        <GoogleAnalytics />
         <ErrorBoundaryWrapper />
       </>
     ),
