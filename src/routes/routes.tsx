@@ -7,6 +7,7 @@ import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
+import ReactGA from 'react-ga4';
 
 const routesConfig = [
   {
@@ -58,5 +59,10 @@ const router = createBrowserRouter([
     })),
   },
 ]);
+
+// 라우트 변경 시 Google Analytics 이벤트 전송
+router.subscribe(({ location }) => {
+  ReactGA.send({ hitType: 'pageview', page: location.pathname });
+});
 
 export default router;
