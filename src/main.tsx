@@ -40,10 +40,10 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
   initializeApp();
 }
 
-setupGoogleAnalytics();
-
 // Function that initializes main React app
 function initializeApp() {
+  setupGoogleAnalytics();
+
   // Call queryClient for TanStack Query
   const queryClient = new QueryClient({
     defaultOptions: {
