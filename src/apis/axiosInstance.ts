@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { getAccessToken, setAccessToken } from '../util/accessToken';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 axios.defaults.withCredentials = true;
 export const axiosInstance = axios.create({
   baseURL:
@@ -38,7 +37,7 @@ axiosInstance.interceptors.response.use(
         // Refresh Token은 HttpOnly 쿠키에 있다고 가정 (JS 접근 X)
         // => withCredentials로 자동 전송되거나, 백엔드가 쿠키로 다룸
         const refreshResponse = await axios.post(
-          `${BASE_URL}/v1/member/reissue`,
+          `${import.meta.env.VITE_API_BASE_URL}api/member/reissue`,
           null,
         );
 
