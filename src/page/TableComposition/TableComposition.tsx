@@ -33,6 +33,8 @@ export default function TableComposition() {
           name: fetchedTableData.info.name,
           agenda: fetchedTableData.info.agenda,
           type: type,
+          warningBell: fetchedTableData.info.warningBell,
+          finishBell: fetchedTableData.info.finishBell,
         },
         table: fetchedTableData.table,
       };
@@ -49,16 +51,16 @@ export default function TableComposition() {
         tableId: tableId, // etc
         tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
-        warningBell: true,
-        finishBell: true,
+        warningBell: formData.info.warningBell,
+        finishBell: formData.info.finishBell,
         table: formData.table,
       });
     } else {
       AddTable({
         tableName: formData.info.name ?? '테이블 1',
         tableAgenda: formData.info.agenda,
-        warningBell: true,
-        finishBell: true,
+        warningBell: formData.info.warningBell,
+        finishBell: formData.info.finishBell,
         table: formData.table,
       });
     }
@@ -72,7 +74,7 @@ export default function TableComposition() {
             <TableNameAndType
               info={formData.info}
               isEdit={mode === 'edit'}
-              onNameAndTypeChange={updateInfo}
+              onInfoChange={updateInfo}
               onButtonClick={() => goNextStep('TimeBox')}
             />
           ),

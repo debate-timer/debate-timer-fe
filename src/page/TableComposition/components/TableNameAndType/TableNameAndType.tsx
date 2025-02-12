@@ -7,37 +7,55 @@ interface TableNameAndTypeProps {
     name: string;
     agenda: string;
     type: Type;
+    warningBell: boolean;
+    finishBell: boolean;
   };
   isEdit?: boolean;
-  onNameAndTypeChange: (newInfo: {
+  onInfoChange: (newInfo: {
     name: string;
     agenda: string;
     type: Type;
+    warningBell: boolean;
+    finishBell: boolean;
   }) => void;
   onButtonClick: () => void;
 }
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
-  const { info, isEdit = false, onNameAndTypeChange, onButtonClick } = props;
+  const { info, isEdit = false, onInfoChange, onButtonClick } = props;
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onNameAndTypeChange({
+    onInfoChange({
       ...info,
       name: e.target.value,
     });
   };
 
   const handleAgenda = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onNameAndTypeChange({
+    onInfoChange({
       ...info,
       agenda: e.target.value,
     });
   };
 
   const handleTypeChange = (type: Type) => {
-    onNameAndTypeChange({
+    onInfoChange({
       ...info,
       type,
+    });
+  };
+
+  const handleWarningBell = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onInfoChange({
+      ...info,
+      warningBell: e.target.checked,
+    });
+  };
+
+  const handleFinishBell = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onInfoChange({
+      ...info,
+      finishBell: e.target.checked,
     });
   };
 
@@ -55,36 +73,54 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
         <DefaultLayout.Header.Right></DefaultLayout.Header.Right>
       </DefaultLayout.Header>
       <DefaultLayout.ContentContanier>
-        <section className="flex w-full flex-col justify-center gap-14 p-8 lg:items-center">
-          <div className="flex w-full items-center justify-between">
-            <h3 className="text-md font-bold lg:text-5xl">토론 시간표 이름</h3>
-            <input
-              placeholder="테이블 1(디폴트 값)"
-              className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
-              value={info.name}
-              onChange={handleNameChange}
-            />
-          </div>
+        <section className="grid w-full grid-cols-[1fr_2fr] gap-10 p-8">
+          <h3 className="text-md font-bold lg:text-5xl">토론 템플릿 이름</h3>
+          <input
+            placeholder="테이블 1(디폴트 값)"
+            className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
+            value={info.name}
+            onChange={handleNameChange}
+          />
 
-          <div className="flex w-full items-center justify-between">
-            <h3 className="text-md font-bold lg:text-5xl">토론 주제</h3>
-            <input
-              placeholder="토론 주제를 입력해주세요"
-              className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
-              value={info.agenda}
-              onChange={handleAgenda}
-            />
-          </div>
+          <h3 className="text-md font-bold lg:text-5xl">토론 주제</h3>
+          <input
+            placeholder="토론 주제를 입력해주세요"
+            className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
+            value={info.agenda}
+            onChange={handleAgenda}
+          />
 
           {!isEdit && (
-            <div className="flex w-full items-center justify-between">
+            <>
               <h3 className="text-md font-bold lg:text-5xl">토론 유형</h3>
               <DropdownForDebateType
                 type={info.type}
                 onChange={handleTypeChange}
               />
-            </div>
+            </>
           )}
+
+          <h3 className="text-md font-bold lg:text-5xl">종소리 설정</h3>
+          <div className="flex flex-col gap-5">
+            <label className="flex items-center gap-4 text-lg">
+              <input
+                type="checkbox"
+                checked={info.warningBell}
+                onChange={handleWarningBell}
+                className="h-5 w-5"
+              />
+              발언종료 30초 전 알림
+            </label>
+            <label className="flex items-center gap-4 text-lg">
+              <input
+                type="checkbox"
+                checked={info.finishBell}
+                onChange={handleFinishBell}
+                className="h-5 w-5"
+              />
+              발언종료 알림
+            </label>
+          </div>
         </section>
       </DefaultLayout.ContentContanier>
 
@@ -92,7 +128,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
         <button
           onClick={() => {
             if (info.name === '') {
-              onNameAndTypeChange({
+              onInfoChange({
                 ...info,
                 name: '테이블 1',
               });

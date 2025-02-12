@@ -11,6 +11,8 @@ export interface TableFormData {
     name: string;
     agenda: string;
     type: Type; // 새로 추가된 속성
+    warningBell: boolean;
+    finishBell: boolean;
   };
   table: DebateInfo[];
 }
@@ -29,6 +31,8 @@ const useTableFrom = (
           name: '',
           agenda: '',
           type: 'PARLIAMENTARY',
+          warningBell: true,
+          finishBell: true,
         },
         table: [],
       },
@@ -57,10 +61,22 @@ const useTableFrom = (
   }, [currentStep, navigationType, navigate]);
 
   const updateInfo: React.Dispatch<
-    React.SetStateAction<{ name: string; agenda: string; type: Type }>
+    React.SetStateAction<{
+      name: string;
+      agenda: string;
+      type: Type;
+      warningBell: boolean;
+      finishBell: boolean;
+    }>
   > = (action) => {
     setFormData((prev) => {
-      let newInfo: { name: string; agenda: string; type: Type };
+      let newInfo: {
+        name: string;
+        agenda: string;
+        type: Type;
+        warningBell: boolean;
+        finishBell: boolean;
+      };
       if (typeof action === 'function') {
         newInfo = (action as (arg: typeof prev.info) => typeof prev.info)(
           prev.info,
