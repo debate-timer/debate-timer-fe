@@ -27,6 +27,13 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
     });
   };
 
+  const handleAgenda = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onNameAndTypeChange({
+      ...info,
+      agenda: e.target.value,
+    });
+  };
+
   const handleTypeChange = (type: Type) => {
     onNameAndTypeChange({
       ...info,
@@ -56,6 +63,16 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
               value={info.name}
               onChange={handleNameChange}
+            />
+          </div>
+
+          <div className="flex w-full items-center justify-between">
+            <h3 className="text-md font-bold lg:text-5xl">토론 주제</h3>
+            <input
+              placeholder="토론 주제를 입력해주세요"
+              className="w-8/12 rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
+              value={info.agenda}
+              onChange={handleAgenda}
             />
           </div>
 

@@ -80,7 +80,6 @@ export default function TableComposition() {
             <TimeBoxStep
               initData={formData}
               isEdit={mode === 'edit'}
-              onAgendaChange={updateInfo}
               onTimeBoxChange={updateTable}
               onButtonClick={handleButtonClick}
             />
