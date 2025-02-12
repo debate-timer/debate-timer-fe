@@ -73,7 +73,15 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
 
       <DefaultLayout.StickyFooterWrapper>
         <button
-          onClick={onButtonClick}
+          onClick={() => {
+            if (info.name === '') {
+              onNameAndTypeChange({
+                ...info,
+                name: '테이블 1',
+              });
+            }
+            onButtonClick();
+          }}
           className="h-20 w-full bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
         >
           {isEdit ? '타임박스 수정하기' : '타임박스 만들기'}
