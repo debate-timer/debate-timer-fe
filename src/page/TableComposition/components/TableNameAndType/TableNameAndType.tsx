@@ -1,6 +1,9 @@
+import { IoMdHome } from 'react-icons/io';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { Type } from '../../../../type/type';
 import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
+import useLogout from '../../../../hooks/mutations/useLogout';
+import { useNavigate } from 'react-router-dom';
 
 interface TableNameAndTypeProps {
   info: {
@@ -22,6 +25,8 @@ interface TableNameAndTypeProps {
 }
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
+  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
+  const navigate = useNavigate();
   const { info, isEdit = false, onInfoChange, onButtonClick } = props;
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +75,27 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             </h1>
           </div>
         </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right></DefaultLayout.Header.Right>
+        <DefaultLayout.Header.Right>
+          <button
+            onClick={() => {
+              navigate('/');
+            }}
+            className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
+          >
+            <div className="flex flex-row items-center space-x-4">
+              <IoMdHome size={24} />
+              <h1>홈 화면</h1>
+            </div>
+          </button>
+          <button
+            onClick={() => logoutMutate()}
+            className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
+          >
+            <div className="flex flex-row items-center space-x-4">
+              <h2>로그아웃</h2>
+            </div>
+          </button>
+        </DefaultLayout.Header.Right>
       </DefaultLayout.Header>
       <DefaultLayout.ContentContanier>
         <section className="grid w-full grid-cols-[1fr_2fr] gap-10 p-8">
