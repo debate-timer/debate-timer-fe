@@ -49,18 +49,22 @@ export default function TableComposition() {
     if (mode === 'edit') {
       EditTable({
         tableId: tableId, // etc
-        tableName: formData.info.name ?? '테이블 1',
-        tableAgenda: formData.info.agenda,
-        warningBell: formData.info.warningBell,
-        finishBell: formData.info.finishBell,
+        info: {
+          name: formData.info.name ?? '테이블 1',
+          agenda: formData.info.agenda,
+          warningBell: formData.info.warningBell,
+          finishBell: formData.info.finishBell,
+        },
         table: formData.table,
       });
     } else {
       AddTable({
-        tableName: formData.info.name ?? '테이블 1',
-        tableAgenda: formData.info.agenda,
-        warningBell: formData.info.warningBell,
-        finishBell: formData.info.finishBell,
+        info: {
+          name: formData.info.name ?? '테이블 1',
+          agenda: formData.info.agenda,
+          warningBell: formData.info.warningBell,
+          finishBell: formData.info.finishBell,
+        },
         table: formData.table,
       });
     }

@@ -1,14 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { putParliamentaryDebateTable } from '../../apis/apis';
 import { PutDebateTableResponseType } from '../../apis/responseTypes';
-import { TimeBoxInfo } from '../../type/type';
+import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
 
 interface PutParliamentaryTableParams {
   tableId: number;
-  tableName: string;
-  tableAgenda: string;
-  warningBell: boolean;
-  finishBell: boolean;
+  info: DetailDebateInfo;
   table: TimeBoxInfo[];
 }
 
@@ -20,22 +17,8 @@ export function usePutParliamentaryDebateTable(
     Error,
     PutParliamentaryTableParams
   >({
-    mutationFn: ({
-      tableId,
-      tableName,
-      tableAgenda,
-      table,
-      warningBell,
-      finishBell,
-    }) =>
-      putParliamentaryDebateTable(
-        tableId,
-        tableName,
-        tableAgenda,
-        warningBell,
-        finishBell,
-        table,
-      ),
+    mutationFn: ({ tableId, info, table }) =>
+      putParliamentaryDebateTable(tableId, info, table),
     onSuccess: (response: PutDebateTableResponseType) => {
       onSuccess(response.id);
     },

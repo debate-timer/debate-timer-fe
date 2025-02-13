@@ -32,6 +32,13 @@ export interface TimeBoxInfo {
   speakerNumber?: number;
 }
 
+export interface DetailDebateInfo {
+  name: string;
+  agenda: string;
+  warningBell: boolean;
+  finishBell: boolean;
+}
+
 export interface DebateTable {
   id: number;
   name: string;

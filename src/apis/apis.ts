@@ -7,7 +7,7 @@ import {
   PostUserResponseType,
   PutDebateTableResponseType,
 } from './responseTypes';
-import { TimeBoxInfo } from '../type/type';
+import { DetailDebateInfo, TimeBoxInfo } from '../type/type';
 import { setAccessToken } from '../util/accessToken';
 
 // String type identifier for TanStack Query's 'useQuery' function
@@ -68,10 +68,7 @@ export async function getParliamentaryTableData(
 
 // POST /api/table/parliamentary
 export async function postParliamentaryDebateTable(
-  tableName: string,
-  tableAgenda: string,
-  warningBell: boolean,
-  finishBell: boolean,
+  info: DetailDebateInfo,
   tables: TimeBoxInfo[],
 ): Promise<PostDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
@@ -80,10 +77,10 @@ export async function postParliamentaryDebateTable(
     requestUrl,
     {
       info: {
-        name: tableName === '' ? '테이블 1' : tableName,
-        agenda: tableAgenda,
-        warningBell: warningBell,
-        finishBell: finishBell,
+        name: info.name === '' ? '테이블 1' : info.name,
+        agenda: info.agenda,
+        warningBell: info.warningBell,
+        finishBell: info.finishBell,
       },
       table: tables,
     },
@@ -96,10 +93,7 @@ export async function postParliamentaryDebateTable(
 // PUT /api/table/parliamentary/{tableId}
 export async function putParliamentaryDebateTable(
   tableId: number,
-  tableName: string,
-  tableAgenda: string,
-  warningBell: boolean,
-  finishBell: boolean,
+  info: DetailDebateInfo,
   tables: TimeBoxInfo[],
 ): Promise<PutDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
@@ -108,10 +102,10 @@ export async function putParliamentaryDebateTable(
     requestUrl + `/${tableId}`,
     {
       info: {
-        name: tableName,
-        agenda: tableAgenda,
-        warningBell: warningBell,
-        finishBell: finishBell,
+        name: info.name,
+        agenda: info.agenda,
+        warningBell: info.warningBell,
+        finishBell: info.finishBell,
       },
       table: tables,
     },

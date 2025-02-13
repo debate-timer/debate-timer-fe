@@ -1,13 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { postParliamentaryDebateTable } from '../../apis/apis';
-import { TimeBoxInfo } from '../../type/type';
+import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
 import { PostDebateTableResponseType } from '../../apis/responseTypes';
 
 interface UseAddTableParams {
-  tableName: string;
-  tableAgenda: string;
-  warningBell: boolean;
-  finishBell: boolean;
+  info: DetailDebateInfo;
   table: TimeBoxInfo[];
 }
 

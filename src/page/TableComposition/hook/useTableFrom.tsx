@@ -2,18 +2,12 @@ import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { TimeBoxInfo, Type } from '../../../type/type';
+import { DetailDebateInfo, TimeBoxInfo, Type } from '../../../type/type';
 import useAddTable from '../../../hooks/mutations/useAddTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
 export interface TableFormData {
-  info: {
-    name: string;
-    agenda: string;
-    type: Type; // 새로 추가된 속성
-    warningBell: boolean;
-    finishBell: boolean;
-  };
+  info: DetailDebateInfo & { type: Type };
   table: TimeBoxInfo[];
 }
 const useTableFrom = (
