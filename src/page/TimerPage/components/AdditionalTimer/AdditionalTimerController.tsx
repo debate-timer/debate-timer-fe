@@ -24,9 +24,9 @@ export default function AdditionalTimerController({
           <TimerIconButton
             icon={<IoPauseOutline size={iconSize} />}
             style={{
-              bgColor: 'bg-amber-500',
-              hoverColor: 'hover:bg-amber-600',
-              contentColor: 'text-zinc-50',
+              bgColor: 'bg-slate-200',
+              hoverColor: 'hover:bg-slate-400',
+              contentColor: 'text-slate-900',
             }}
             onClick={() => {
               onPause();
@@ -38,9 +38,9 @@ export default function AdditionalTimerController({
           <TimerIconButton
             icon={<IoPlayOutline size={iconSize} />}
             style={{
-              bgColor: 'bg-emerald-500',
-              hoverColor: 'hover:bg-emerald-600',
-              contentColor: 'text-zinc-50',
+              bgColor: 'bg-slate-200',
+              hoverColor: 'hover:bg-slate-400',
+              contentColor: 'text-slate-900',
             }}
             onClick={() => {
               onStart();
