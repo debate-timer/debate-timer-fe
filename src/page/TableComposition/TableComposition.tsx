@@ -33,6 +33,8 @@ export default function TableComposition() {
           name: fetchedTableData.info.name,
           agenda: fetchedTableData.info.agenda,
           type: type,
+          warningBell: fetchedTableData.info.warningBell,
+          finishBell: fetchedTableData.info.finishBell,
         },
         table: fetchedTableData.table,
       };
@@ -47,18 +49,22 @@ export default function TableComposition() {
     if (mode === 'edit') {
       EditTable({
         tableId: tableId, // etc
-        tableName: formData.info.name ?? '테이블 1',
-        tableAgenda: formData.info.agenda,
-        warningBell: true,
-        finishBell: true,
+        info: {
+          name: formData.info.name ?? '테이블 1',
+          agenda: formData.info.agenda,
+          warningBell: formData.info.warningBell,
+          finishBell: formData.info.finishBell,
+        },
         table: formData.table,
       });
     } else {
       AddTable({
-        tableName: formData.info.name ?? '테이블 1',
-        tableAgenda: formData.info.agenda,
-        warningBell: true,
-        finishBell: true,
+        info: {
+          name: formData.info.name ?? '테이블 1',
+          agenda: formData.info.agenda,
+          warningBell: formData.info.warningBell,
+          finishBell: formData.info.finishBell,
+        },
         table: formData.table,
       });
     }
@@ -72,7 +78,7 @@ export default function TableComposition() {
             <TableNameAndType
               info={formData.info}
               isEdit={mode === 'edit'}
-              onNameAndTypeChange={updateInfo}
+              onInfoChange={updateInfo}
               onButtonClick={() => goNextStep('TimeBox')}
             />
           ),
@@ -80,7 +86,6 @@ export default function TableComposition() {
             <TimeBoxStep
               initData={formData}
               isEdit={mode === 'edit'}
-              onAgendaChange={updateInfo}
               onTimeBoxChange={updateTable}
               onButtonClick={handleButtonClick}
             />

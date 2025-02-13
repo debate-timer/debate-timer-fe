@@ -2,13 +2,13 @@ import { useEffect, useRef } from 'react';
 import TimerDisplay from '../common/TimerDisplay';
 import AdditionalTimerController from './AdditionalTimerController';
 import AdditionalTimerSummary from './AdditionalTimerSummary';
-import { DebateInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../type/type';
 import { useTimer } from '../../hooks/useTimer';
 
 interface AdditionalTimerComponentProps {
-  prevItem?: DebateInfo;
-  currItem: DebateInfo;
-  nextItem?: DebateInfo;
+  prevItem?: TimeBoxInfo;
+  currItem: TimeBoxInfo;
+  nextItem?: TimeBoxInfo;
 }
 
 export default function AdditionalTimerComponent({

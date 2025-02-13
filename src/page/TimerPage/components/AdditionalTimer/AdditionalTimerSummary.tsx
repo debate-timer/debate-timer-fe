@@ -1,4 +1,4 @@
-import { DebateInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../type/type';
 import AdditionalTimerSummaryItem from './AdditionalTimerSummaryItem';
 
 type SummaryItemType = 'PREV' | 'CURR' | 'NEXT';
@@ -10,9 +10,9 @@ const SummaryItemTypeToString: Record<SummaryItemType, string> = {
 };
 
 interface AdditionalTimerSummaryProps {
-  prevItem?: DebateInfo;
-  currItem: DebateInfo;
-  nextItem?: DebateInfo;
+  prevItem?: TimeBoxInfo;
+  currItem: TimeBoxInfo;
+  nextItem?: TimeBoxInfo;
 }
 
 export default function AdditionalTimerSummary({
