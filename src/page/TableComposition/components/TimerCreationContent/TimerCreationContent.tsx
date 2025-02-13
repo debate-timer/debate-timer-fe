@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { DebateInfo, DebateType, Stance } from '../../../../type/type';
+import { TimeBoxInfo, DebateType, Stance } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
   selectedStance: Stance;
-  initDate?: DebateInfo;
-  onSubmit: (data: DebateInfo) => void;
+  initDate?: TimeBoxInfo;
+  onSubmit: (data: TimeBoxInfo) => void;
   onClose: () => void; // 모달 닫기 함수
 }
 

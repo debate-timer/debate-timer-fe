@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { DebateInfo, Type } from '../../../type/type';
+import { TimeBoxInfo, Type } from '../../../type/type';
 import useAddTable from '../../../hooks/mutations/useAddTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
@@ -14,7 +14,7 @@ export interface TableFormData {
     warningBell: boolean;
     finishBell: boolean;
   };
-  table: DebateInfo[];
+  table: TimeBoxInfo[];
 }
 const useTableFrom = (
   currentStep: TableCompositionStep,
@@ -88,13 +88,15 @@ const useTableFrom = (
     });
   };
 
-  const updateTable: React.Dispatch<React.SetStateAction<DebateInfo[]>> = (
+  const updateTable: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>> = (
     action,
   ) => {
     setFormData((prev) => {
-      let newTable: DebateInfo[];
+      let newTable: TimeBoxInfo[];
       if (typeof action === 'function') {
-        newTable = (action as (arg: DebateInfo[]) => DebateInfo[])(prev.table);
+        newTable = (action as (arg: TimeBoxInfo[]) => TimeBoxInfo[])(
+          prev.table,
+        );
       } else {
         newTable = action;
       }

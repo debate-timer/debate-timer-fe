@@ -25,7 +25,7 @@ export interface User {
   name: string;
 }
 
-export interface DebateInfo {
+export interface TimeBoxInfo {
   stance: Stance;
   type: DebateType;
   time: number;

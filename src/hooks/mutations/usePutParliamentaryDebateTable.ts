@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { putParliamentaryDebateTable } from '../../apis/apis';
 import { PutDebateTableResponseType } from '../../apis/responseTypes';
-import { DebateInfo } from '../../type/type';
+import { TimeBoxInfo } from '../../type/type';
 
 interface PutParliamentaryTableParams {
   tableId: number;
@@ -9,7 +9,7 @@ interface PutParliamentaryTableParams {
   tableAgenda: string;
   warningBell: boolean;
   finishBell: boolean;
-  table: DebateInfo[];
+  table: TimeBoxInfo[];
 }
 
 export function usePutParliamentaryDebateTable(

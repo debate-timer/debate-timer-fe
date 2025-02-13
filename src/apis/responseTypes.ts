@@ -1,4 +1,4 @@
-import { DebateInfo, DebateTable } from '../type/type';
+import { TimeBoxInfo, DebateTable } from '../type/type';
 
 // POST "/api/member"
 export interface PostUserResponseType {
@@ -20,7 +20,7 @@ export interface GetTableDataResponseType {
     warningBell: boolean;
     finishBell: boolean;
   };
-  table: DebateInfo[];
+  table: TimeBoxInfo[];
 }
 
 // POST /api/table/parliamentary
@@ -32,7 +32,7 @@ export interface PostDebateTableResponseType {
     warningBell: boolean;
     finishBell: boolean;
   };
-  table: DebateInfo[];
+  table: TimeBoxInfo[];
 }
 
 // PUT /api/table/parliamentary/{tableId}
@@ -44,7 +44,7 @@ export interface PutDebateTableResponseType {
     warningBell: boolean;
     finishBell: boolean;
   };
-  table: DebateInfo[];
+  table: TimeBoxInfo[];
 }
 
 // DELETE /api/table/parliamentary/{tableId}

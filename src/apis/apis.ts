@@ -7,7 +7,7 @@ import {
   PostUserResponseType,
   PutDebateTableResponseType,
 } from './responseTypes';
-import { DebateInfo } from '../type/type';
+import { TimeBoxInfo } from '../type/type';
 import { setAccessToken } from '../util/accessToken';
 
 // String type identifier for TanStack Query's 'useQuery' function
@@ -72,7 +72,7 @@ export async function postParliamentaryDebateTable(
   tableAgenda: string,
   warningBell: boolean,
   finishBell: boolean,
-  tables: DebateInfo[],
+  tables: TimeBoxInfo[],
 ): Promise<PostDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<PostDebateTableResponseType>(
@@ -100,7 +100,7 @@ export async function putParliamentaryDebateTable(
   tableAgenda: string,
   warningBell: boolean,
   finishBell: boolean,
-  tables: DebateInfo[],
+  tables: TimeBoxInfo[],
 ): Promise<PutDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<PutDebateTableResponseType>(

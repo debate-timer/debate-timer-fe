@@ -2,7 +2,7 @@ import DebatePanel from '../DebatePanel/DebatePanel';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { useModal } from '../../../../hooks/useModal';
-import { DebateInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface TimeBoxStepProps {
   initData: TableFormData;
-  onTimeBoxChange: React.Dispatch<React.SetStateAction<DebateInfo[]>>;
+  onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
   onButtonClick: () => void;
   isEdit?: boolean;
 }
@@ -41,7 +41,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       throttleDelay: 50,
     });
 
-  const handleSubmitEdit = (indexToEdit: number, updatedInfo: DebateInfo) => {
+  const handleSubmitEdit = (indexToEdit: number, updatedInfo: TimeBoxInfo) => {
     onTimeBoxChange((prevData) =>
       prevData.map((item, index) =>
         index === indexToEdit ? updatedInfo : item,

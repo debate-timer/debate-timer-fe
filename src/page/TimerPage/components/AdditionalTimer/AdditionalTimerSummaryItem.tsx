@@ -1,12 +1,12 @@
 import { IoTimeOutline } from 'react-icons/io5';
 import {
-  DebateInfo,
+  TimeBoxInfo,
   DebateTypeToString,
   StanceToString,
 } from '../../../../type/type';
 
 interface AdditionalTimerSummaryItemProps {
-  item: DebateInfo;
+  item: TimeBoxInfo;
 }
 
 export default function AdditionalTimerSummaryItem({

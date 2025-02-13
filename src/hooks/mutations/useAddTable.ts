@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { postParliamentaryDebateTable } from '../../apis/apis';
-import { DebateInfo } from '../../type/type';
+import { TimeBoxInfo } from '../../type/type';
 import { PostDebateTableResponseType } from '../../apis/responseTypes';
 
 interface UseAddTableParams {
@@ -8,7 +8,7 @@ interface UseAddTableParams {
   tableAgenda: string;
   warningBell: boolean;
   finishBell: boolean;
-  table: DebateInfo[];
+  table: TimeBoxInfo[];
 }
 
 export default function useAddTable(onSuccess: (id: number) => void) {
