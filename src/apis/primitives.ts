@@ -13,11 +13,20 @@ export async function request<T>(
   data: object | null,
   params: object | null,
 ): Promise<AxiosResponse<T>> {
-  // console.log(`# endpoint = ${endpoint}`);
+  const instance =
+    import.meta.env.MODE !== 'production'
+      ? axios.create({
+          timeout: 10000,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        })
+      : axiosInstance;
 
   try {
     // Get response
-    const response: AxiosResponse<T> = await axiosInstance({
+    const response: AxiosResponse<T> = await instance({
       method,
       url: endpoint,
       data: data ? JSON.stringify(data) : null,

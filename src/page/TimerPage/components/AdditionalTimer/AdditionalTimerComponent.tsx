@@ -1,21 +1,9 @@
 import { useEffect, useRef } from 'react';
 import TimerDisplay from '../common/TimerDisplay';
 import AdditionalTimerController from './AdditionalTimerController';
-import AdditionalTimerSummary from './AdditionalTimerSummary';
-import { DebateInfo } from '../../../../type/type';
 import { useTimer } from '../../hooks/useTimer';
 
-interface AdditionalTimerComponentProps {
-  prevItem?: DebateInfo;
-  currItem: DebateInfo;
-  nextItem?: DebateInfo;
-}
-
-export default function AdditionalTimerComponent({
-  prevItem,
-  currItem,
-  nextItem,
-}: AdditionalTimerComponentProps) {
+export default function AdditionalTimerComponent() {
   // Load sounds
   const dingOnceRef = useRef<HTMLAudioElement>(null);
   const dingTwiceRef = useRef<HTMLAudioElement>(null);
@@ -32,11 +20,12 @@ export default function AdditionalTimerComponent({
     });
 
     actOnTime(0, () => {
+      pauseTimer();
       if (dingTwiceRef.current && isRunning) {
         dingTwiceRef.current.play();
       }
     });
-  }, [actOnTime, isRunning]);
+  }, [actOnTime, isRunning, pauseTimer]);
 
   return (
     <div className="flex flex-col items-center space-y-12 px-12 pb-8">
@@ -55,11 +44,6 @@ export default function AdditionalTimerComponent({
         onStart={() => {
           if (timer > 0) startTimer();
         }}
-      />
-      <AdditionalTimerSummary
-        prevItem={prevItem}
-        currItem={currItem}
-        nextItem={nextItem}
       />
     </div>
   );

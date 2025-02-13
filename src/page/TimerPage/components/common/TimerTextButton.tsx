@@ -10,7 +10,7 @@ export default function TimerTextButton({
   return (
     <button
       onClick={onClick}
-      className="rounded-full bg-zinc-200 px-6 py-2 text-lg font-bold text-zinc-900 hover:bg-zinc-400"
+      className="rounded-full bg-slate-200 px-6 py-2 text-lg font-bold text-slate-900 hover:bg-zinc-400"
     >
       {name}
     </button>

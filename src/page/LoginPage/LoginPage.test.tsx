@@ -36,6 +36,6 @@ describe('LoginPage', () => {
     expect(screen.getByText('Debate Timer')).toBeInTheDocument();
 
     // 입력 필드와 버튼 확인
-    expect(screen.getByText('구글 계정으로 로그인')).toBeInTheDocument();
+    expect(screen.getByText('Google 계정으로 로그인')).toBeInTheDocument();
   });
 });
