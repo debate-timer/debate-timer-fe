@@ -327,7 +327,7 @@ export default function TimerPage() {
           )}
 
           <div
-            className={`absolute inset-0 top-[80px] z-0 animate-gradient opacity-80 ${bg}`}
+            className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}
           ></div>
         </DefaultLayout.ContentContanier>
       </DefaultLayout>
