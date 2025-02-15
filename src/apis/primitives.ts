@@ -13,16 +13,7 @@ export async function request<T>(
   data: object | null,
   params: object | null,
 ): Promise<AxiosResponse<T>> {
-  const instance =
-    import.meta.env.MODE !== 'production'
-      ? axios.create({
-          timeout: 10000,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        })
-      : axiosInstance;
+  const instance = axiosInstance;
 
   try {
     // Get response

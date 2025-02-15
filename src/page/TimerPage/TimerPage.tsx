@@ -38,8 +38,6 @@ export default function TimerPage() {
 
   // Set states
   const [isFirst, setIsFirst] = useState(false);
-  const [direction, setDirection] = useState('flex-row');
-  const [space, setSpace] = useState('space-x-20');
   const [index, setIndex] = useState(0);
   const [bg, setBg] = useState('');
   const [isWarningBellOn, setWarningBell] = useState(false);
@@ -78,17 +76,6 @@ export default function TimerPage() {
       setIsFirst(storedIsFirst.trim() === 'true' ? true : false);
     }
   }, []);
-
-  // Change direction of row
-  useEffect(() => {
-    if (isMobile) {
-      setDirection('flex-col');
-      setSpace('space-y-20');
-    } else {
-      setDirection('flex-row');
-      setSpace('space-x-20');
-    }
-  }, [isMobile]);
 
   // Change background color
   useEffect(() => {
@@ -228,7 +215,7 @@ export default function TimerPage() {
 
               {/* Timer and timetable */}
               <div
-                className={`z-2 absolute inset-0 ${isMobile ? 'top-[50px]' : ''} flex h-full ${direction} items-center justify-center ${space}`}
+                className={`z-2 absolute inset-0 ${isMobile ? 'top-[50px]' : ''} flex h-full ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center ${isMobile ? 'space-y-20' : 'space-x-20'}`}
               >
                 <TimerComponent
                   isRunning={isRunning}
