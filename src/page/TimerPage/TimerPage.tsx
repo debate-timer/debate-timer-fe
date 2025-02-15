@@ -215,7 +215,7 @@ export default function TimerPage() {
 
               {/* Timer and timetable */}
               <div
-                className={`z-2 absolute inset-0 ${isMobile ? 'top-[50px]' : ''} flex h-full ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center ${isMobile ? 'space-y-20' : 'space-x-20'}`}
+                className={`absolute inset-0 ${isMobile ? 'top-[50px]' : ''} flex h-full ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center ${isMobile ? 'space-y-20' : 'space-x-20'}`}
               >
                 <TimerComponent
                   isRunning={isRunning}
