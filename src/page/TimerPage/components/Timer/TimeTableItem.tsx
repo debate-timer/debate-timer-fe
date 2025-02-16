@@ -1,11 +1,11 @@
 import {
-  DebateInfo,
+  TimeBoxInfo,
   DebateTypeToString,
   StanceToString,
 } from '../../../../type/type';
 
 interface TimeTableItemProps {
-  item: DebateInfo;
+  item: TimeBoxInfo;
   isCurrent: boolean;
 }
 

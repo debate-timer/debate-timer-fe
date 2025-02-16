@@ -1,10 +1,10 @@
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
-import { DebateInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../type/type';
 import TimeTableItem from './TimeTableItem';
 
 interface TimerTimeTableProps {
   currIndex: number;
-  tables: DebateInfo[];
+  tables: TimeBoxInfo[];
   moveToOtherItem: (goToPrev: boolean) => void;
 }
 
