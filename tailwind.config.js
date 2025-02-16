@@ -4,6 +4,10 @@ export default {
   theme: {
     extend: {
       keyframes: {
+        rotate: {
+          '0%': { transform: 'rotate(0deg) scale(10)' },
+          '100%': { transform: 'rotate(-360deg) scale(10)' },
+        },
         gradient: {
           '0%, 100%': {
             'background-size': '300% 300%',
@@ -18,9 +22,19 @@ export default {
             'background-position': 'right center',
           },
         },
+        colorTransition: {
+          '0%, 100%': {
+            backgroundColor: '#ffa2a2',
+          },
+          '50%': {
+            backgroundColor: '#ff6467',
+          },
+        },
       },
       animation: {
+        rotate: 'rotate 5s linear infinite',
         gradient: 'gradient 10s ease infinite',
+        'color-transition': 'colorTransition 5s ease-in-out infinite',
       },
       fontFamily: {
         pretendard: [
