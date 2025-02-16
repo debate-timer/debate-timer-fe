@@ -25,11 +25,18 @@ export interface User {
   name: string;
 }
 
-export interface DebateInfo {
+export interface TimeBoxInfo {
   stance: Stance;
   type: DebateType;
   time: number;
   speakerNumber?: number;
+}
+
+export interface DetailDebateInfo {
+  name: string;
+  agenda: string;
+  warningBell: boolean;
+  finishBell: boolean;
 }
 
 export interface DebateTable {
@@ -39,4 +46,4 @@ export interface DebateTable {
   duration: number;
 }
 
-export type Type = 'PARLIAMENTARY' | 'TIMEBASED';
+export type Type = 'PARLIAMENTARY';

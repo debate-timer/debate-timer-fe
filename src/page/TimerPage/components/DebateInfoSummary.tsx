@@ -5,14 +5,14 @@ import {
   IoTime,
 } from 'react-icons/io5';
 import {
-  DebateInfo,
+  TimeBoxInfo,
   DebateTypeToString,
   StanceToString,
 } from '../../../type/type';
 import TimerIconButton from './common/TimerIconButton';
 
 interface DebateInfoSummaryProps {
-  debateInfo: DebateInfo;
+  debateInfo: TimeBoxInfo;
   isPrev: boolean;
   moveToOtherItem: (isPrev: boolean) => void;
 }

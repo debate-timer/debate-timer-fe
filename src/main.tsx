@@ -5,6 +5,7 @@ import { GlobalPortal } from './util/GlobalPortal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import router from './routes/routes.tsx';
 import './index.css';
+import { setupGoogleAnalytics } from './util/setupGoogleAnalytics.tsx';
 
 // console.log(`# URL = ${import.meta.env.VITE_API_BASE_URL}`);
 
@@ -41,6 +42,8 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
 
 // Function that initializes main React app
 function initializeApp() {
+  setupGoogleAnalytics();
+
   // Call queryClient for TanStack Query
   const queryClient = new QueryClient({
     defaultOptions: {

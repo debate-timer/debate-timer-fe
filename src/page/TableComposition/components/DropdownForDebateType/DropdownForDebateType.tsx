@@ -31,7 +31,7 @@ export default function DropdownForDebateType(
   );
 
   return (
-    <div className="relative w-8/12">
+    <div className="relative w-full">
       <button
         onClick={() => setIsToggleOpen(!isToggleOpen)}
         className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white lg:text-3xl"

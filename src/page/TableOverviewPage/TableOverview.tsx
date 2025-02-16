@@ -31,7 +31,7 @@ export default function TableOverview() {
         <DefaultLayout.Header.Center>
           <div className="flex flex-col items-center">
             <h1 className="text-m md:text-lg">토론 주제</h1>
-            <h1 className="text-xl font-bold md:text-2xl">
+            <h1 className="max-w-md truncate text-xl font-bold md:text-2xl">
               {data === undefined || data!.info.agenda.trim() === ''
                 ? '주제 없음'
                 : data!.info.agenda}

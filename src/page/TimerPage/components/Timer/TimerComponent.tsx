@@ -1,5 +1,6 @@
+import useMobile from '../../../../hooks/useMobile';
 import {
-  DebateInfo,
+  TimeBoxInfo,
   DebateTypeToString,
   StanceToString,
 } from '../../../../type/type';
@@ -9,12 +10,16 @@ import { IoPerson } from 'react-icons/io5';
 
 interface TimerComponentProps {
   isRunning: boolean;
-  debateInfo: DebateInfo;
+  debateInfo: TimeBoxInfo;
   timer: number;
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimer: () => void;
   onOpenModal: () => void;
+  isWarningBellOn: boolean;
+  isFinishBellOn: boolean;
+  onChangeWarningBell: () => void;
+  onChangeFinishBell: () => void;
 }
 
 // Main timer component that user can control
@@ -26,6 +31,10 @@ export default function TimerComponent({
   pauseTimer,
   resetTimer,
   onOpenModal,
+  isWarningBellOn,
+  isFinishBellOn,
+  onChangeWarningBell,
+  onChangeFinishBell,
 }: TimerComponentProps) {
   // Set texts to be displayed
   const titleText =
@@ -45,6 +54,8 @@ export default function TimerComponent({
         ? 'bg-blue-500'
         : 'bg-red-500';
 
+  const isMobile = useMobile();
+
   // Return React component
   return (
     <div
@@ -52,10 +63,14 @@ export default function TimerComponent({
     >
       {/* Title */}
       <div className="m-2 mb-8 flex flex-col items-center space-y-3">
-        <h1 className="text-6xl font-bold text-zinc-50">{titleText}</h1>
+        <h1 className="text-5xl font-bold text-zinc-50 md:text-6xl">
+          {titleText}
+        </h1>
         <div className="flex flex-row items-center space-x-3 text-zinc-50">
-          {debateInfo.stance !== 'NEUTRAL' && <IoPerson size={25} />}
-          <h1 className="text-3xl">{speakerText}</h1>
+          {debateInfo.stance !== 'NEUTRAL' && (
+            <IoPerson size={isMobile ? 15 : 25} />
+          )}
+          <h1 className="text-2xl md:text-3xl">{speakerText}</h1>
         </div>
       </div>
 
@@ -69,6 +84,10 @@ export default function TimerComponent({
         onStart={startTimer}
         onPause={pauseTimer}
         onOpenModal={onOpenModal}
+        isWarningBellOn={isWarningBellOn}
+        isFinishBellOn={isFinishBellOn}
+        onChangeWarningBell={() => onChangeWarningBell()}
+        onChangeFinishBell={() => onChangeFinishBell()}
       />
     </div>
   );
