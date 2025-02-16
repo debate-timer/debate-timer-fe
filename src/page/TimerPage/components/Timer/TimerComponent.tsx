@@ -1,6 +1,6 @@
 import useMobile from '../../../../hooks/useMobile';
 import {
-  DebateInfo,
+  TimeBoxInfo,
   DebateTypeToString,
   StanceToString,
 } from '../../../../type/type';
@@ -10,7 +10,7 @@ import { IoPerson } from 'react-icons/io5';
 
 interface TimerComponentProps {
   isRunning: boolean;
-  debateInfo: DebateInfo;
+  debateInfo: TimeBoxInfo;
   timer: number;
   startTimer: () => void;
   pauseTimer: () => void;

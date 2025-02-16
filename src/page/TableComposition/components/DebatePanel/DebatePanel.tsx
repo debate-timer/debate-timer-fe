@@ -1,11 +1,11 @@
 import { HTMLAttributes } from 'react';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
-import { DebateInfo, DebateTypeToString } from '../../../../type/type';
+import { TimeBoxInfo, DebateTypeToString } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
 interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
-  info: DebateInfo;
-  onSubmitEdit?: (updatedInfo: DebateInfo) => void;
+  info: TimeBoxInfo;
+  onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
   onSubmitDelete?: () => void;
 }
 

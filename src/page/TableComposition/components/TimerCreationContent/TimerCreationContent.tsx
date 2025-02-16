@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { DebateInfo, DebateType, Stance } from '../../../../type/type';
+import { TimeBoxInfo, DebateType, Stance } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
   selectedStance: Stance;
-  initDate?: DebateInfo;
-  onSubmit: (data: DebateInfo) => void;
+  initDate?: TimeBoxInfo;
+  onSubmit: (data: TimeBoxInfo) => void;
   onClose: () => void; // 모달 닫기 함수
 }
 
@@ -17,7 +17,7 @@ export default function TimerCreationContent({
 }: TimerCreationContentProps) {
   const [stance, setStance] = useState<Stance>(selectedStance);
   const [debateType, setDebateType] = useState<DebateType>(
-    initDate?.stance === 'NEUTRAL' ? 'OPENING' : (initDate?.type ?? 'OPENING'),
+    initDate?.type ?? 'OPENING',
   );
   const { minutes: initMinutes, seconds: initSeconds } =
     Formatting.formatSecondsToMinutes(initDate?.time ?? 180);
@@ -89,7 +89,9 @@ export default function TimerCreationContent({
               if (e.target.value === 'TIME_OUT') {
                 setStance('NEUTRAL');
               } else {
-                setStance(selectedStance);
+                setStance(
+                  selectedStance === 'NEUTRAL' ? 'CONS' : selectedStance,
+                );
               }
               setDebateType(e.target.value as DebateType);
             }}
