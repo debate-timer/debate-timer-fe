@@ -214,7 +214,7 @@ export default function TimerPage() {
         {/* Headers */}
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <div className="flex flex-col items-center space-y-[4px]">
+            <div className="flex flex-col space-y-[4px]">
               <h1 className="text-sm">의회식</h1>
               <h1 className="text-2xl font-bold">
                 {data === undefined || data.info.name.trim() === ''

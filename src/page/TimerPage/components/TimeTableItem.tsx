@@ -37,13 +37,14 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
         {minute !== 0 && <h1>{minute}분 </h1>}
         <h1>{second}초</h1>
       </>
-      {item.speakerNumber !== undefined && (
-        <>
-          <h1>|</h1>
-          <RiSpeakFill className="size-[27px]" />
-          <h1>{item.speakerNumber}번</h1>
-        </>
-      )}
+      {item.stance === 'NEUTRAL' ||
+        (item.speakerNumber !== undefined && (
+          <>
+            <h1>|</h1>
+            <RiSpeakFill className="size-[27px]" />
+            <h1>{item.speakerNumber}번</h1>
+          </>
+        ))}
     </div>
   );
 }
