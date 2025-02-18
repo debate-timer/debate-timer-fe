@@ -5,7 +5,7 @@ interface TimerControllerProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
-  onChangeTimer: () => void;
+  onChangingTimer: () => void;
   isTimerChangeable: boolean;
   isRunning: boolean;
 }
@@ -14,14 +14,14 @@ export default function TimerController({
   onStart,
   onPause,
   onReset,
-  onChangeTimer,
+  onChangingTimer,
   isTimerChangeable,
   isRunning,
 }: TimerControllerProps) {
   return (
     <div
       data-testid="timer-controller"
-      className="w-max flex-row items-center space-x-[35px]"
+      className="flex w-max flex-row items-center space-x-[35px]"
     >
       <button
         className="size-[82px] rounded-full bg-slate-900 p-[18px] hover:bg-[#000000]"
@@ -50,7 +50,7 @@ export default function TimerController({
       {isTimerChangeable && (
         <button
           className="h-[133px] w-[165px] flex-col items-center space-y-2 rounded-[23px] border-[3px] border-slate-900 bg-slate-50 text-[30px] font-bold leading-[37px] hover:bg-slate-200"
-          onClick={() => onChangeTimer()}
+          onClick={() => onChangingTimer()}
         >
           <p>작전 시간</p>
           <p>사용</p>

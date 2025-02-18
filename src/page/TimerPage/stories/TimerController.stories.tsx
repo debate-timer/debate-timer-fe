@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import TimerController from './TimerController';
+import TimerController from '../components/TimerController';
 
 const meta: Meta<typeof TimerController> = {
   title: 'page/TimerPage/Components/TimerController',
@@ -11,9 +11,9 @@ export default meta;
 
 type Story = StoryObj<typeof TimerController>;
 
-export const Stopped: Story = {
+export const OnStopped: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -22,9 +22,9 @@ export const Stopped: Story = {
   },
 };
 
-export const Running: Story = {
+export const OnRunning: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -33,9 +33,9 @@ export const Running: Story = {
   },
 };
 
-export const AdditionalTimerAvailable: Story = {
+export const WhenAdditionalTimerAvailable: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},

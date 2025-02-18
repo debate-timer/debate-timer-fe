@@ -28,6 +28,7 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
 
   return (
     <div
+      data-testid="time-table-item"
       className={`flex h-[69px] ${width} flex-row items-center justify-center space-x-2 ${pos} ${bgColorClass} ${roundedClass} p-[16px] text-[28px] font-bold ${textColorClass}`}
     >
       <h1>{DebateTypeToString[item.type]}</h1>

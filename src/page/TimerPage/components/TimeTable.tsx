@@ -16,7 +16,10 @@ export default function TimeTable({
   titles,
 }: TimeTableProps) {
   return (
-    <div className="flex w-[651px] flex-col rounded-[23px] bg-slate-100 pb-[20px]">
+    <div
+      data-testid="time-table"
+      className="flex w-[651px] flex-col rounded-[23px] bg-slate-100 pb-[20px]"
+    >
       <div className="mb-[15px] flex h-[78px] w-full flex-row items-center justify-center rounded-t-[23px] bg-slate-900 text-[28px] font-bold text-slate-50">
         <h1 className="w-[320px] text-center">
           {titles !== undefined ? titles.pros : '찬성'}

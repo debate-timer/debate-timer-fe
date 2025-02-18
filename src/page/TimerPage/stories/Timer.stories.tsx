@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import Timer from './Timer';
+import Timer from '../components/Timer';
 
 const meta: Meta<typeof Timer> = {
   title: 'page/TimerPage/Components/Timer',
@@ -11,9 +11,9 @@ export default meta;
 
 type Story = StoryObj<typeof Timer>;
 
-export const Pros: Story = {
+export const OnPros: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -32,9 +32,9 @@ export const Pros: Story = {
   },
 };
 
-export const Cons: Story = {
+export const OnCons: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -53,9 +53,9 @@ export const Cons: Story = {
   },
 };
 
-export const Neutral: Story = {
+export const OnNeutral: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -73,9 +73,9 @@ export const Neutral: Story = {
   },
 };
 
-export const Running: Story = {
+export const OnRunning: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -96,7 +96,7 @@ export const Running: Story = {
 
 export const Under0sec: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -115,9 +115,9 @@ export const Under0sec: Story = {
   },
 };
 
-export const AdditionalTimerAvailable: Story = {
+export const WhenAdditionalTimerAvailable: Story = {
   args: {
-    onChangeTimer: () => {},
+    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -125,6 +125,28 @@ export const AdditionalTimerAvailable: Story = {
       console.log(isPrev);
     },
     timer: 150,
+    isTimerChangeable: true,
+    isRunning: false,
+    item: {
+      stance: 'CONS',
+      type: 'OPENING',
+      time: 60,
+      speakerNumber: 1,
+    },
+  },
+};
+
+export const OnAdditionalTimerEnabled: Story = {
+  args: {
+    onChangingTimer: () => {},
+    onPause: () => {},
+    onReset: () => {},
+    onStart: () => {},
+    goToOtherItem: (isPrev: boolean) => {
+      console.log(isPrev);
+    },
+    timer: 150,
+    isAdditionalTimerOn: true,
     isTimerChangeable: true,
     isRunning: false,
     item: {

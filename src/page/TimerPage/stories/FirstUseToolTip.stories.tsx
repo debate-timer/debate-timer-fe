@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import FirstUseToolTip from './FirstUseToolTip';
+import FirstUseToolTip from '../components/FirstUseToolTip';
 
 const meta: Meta<typeof FirstUseToolTip> = {
   title: 'page/TimerPage/Components/FirstUseToolTip',

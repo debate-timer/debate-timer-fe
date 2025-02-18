@@ -31,8 +31,13 @@ export default function TimerPage() {
   const TRUE = 'true';
   const FALSE = 'false';
 
-  // Prepare state for changing background
+  // Prepare for changing background
   const [bg, setBg] = useState('');
+
+  // Prepare for additional timer
+  const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
+  const [savedTimer, saveTimer] = useState(0);
+  const [isTimerChangeable, setIsTimerChangeable] = useState(true);
 
   // Prepare for index-related constants
   const [index, setIndex] = useState(0);
@@ -43,12 +48,12 @@ export default function TimerPage() {
           setIndex((prev) => prev - 1);
         }
       } else {
-        if (index < 10) {
+        if (index < data!.table.length - 1) {
           setIndex((prev) => prev + 1);
         }
       }
     },
-    [index],
+    [index, data],
   );
 
   // Prepare for timer hook
@@ -121,6 +126,13 @@ export default function TimerPage() {
   // Add keyboard event listener
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const keysToDisable = ['Space', 'ArrowLeft', 'ArrowRight', 'KeyR'];
+
+      // Disable web browsers' default actions
+      if (keysToDisable.includes(event.key)) {
+        event.preventDefault();
+      }
+
       // Clear focus on the keyboard event
       if (event.target instanceof HTMLElement) {
         event.target.blur();
@@ -136,15 +148,18 @@ export default function TimerPage() {
           break;
         case 'ArrowLeft':
           goToOtherItem(true);
+          resetTimer();
           break;
         case 'ArrowRight':
           goToOtherItem(false);
+          resetTimer();
           break;
         case 'KeyR':
           resetTimer();
           break;
       }
     };
+
     // Set listener when component is rendered
     window.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -152,6 +167,32 @@ export default function TimerPage() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isRunning, resetTimer, startTimer, goToOtherItem, pauseTimer]);
+
+  // Calculate whether timer should show additional timer button
+  useEffect(() => {
+    data!.table.forEach((value) => {
+      if (value.type === 'TIME_OUT') {
+        setIsTimerChangeable(false);
+      }
+    });
+  });
+
+  // Stop timer on 0 sec when additional timer is enabled
+  useEffect(() => {
+    if (isAdditionalTimerOn && timer === 0 && isRunning) {
+      pauseTimer();
+      setTimer(savedTimer);
+      setIsAdditionalTimerOn(!isAdditionalTimerOn);
+    }
+  }, [
+    isAdditionalTimerOn,
+    timer,
+    savedTimer,
+    pauseTimer,
+    setIsAdditionalTimerOn,
+    setTimer,
+    isRunning,
+  ]);
 
   return (
     <>
@@ -184,16 +225,37 @@ export default function TimerPage() {
               />
             )}
 
-            <div className="absolute inset-0 flex h-full w-full flex-row items-center justify-center space-x-[50px]">
+            <div
+              data-testid="timer-page-body"
+              className="absolute inset-0 flex h-full w-full flex-row items-center justify-center space-x-[50px]"
+            >
               <Timer
+                isAdditionalTimerOn={isAdditionalTimerOn}
                 onStart={() => startTimer()}
                 onPause={() => pauseTimer()}
                 onReset={() => resetTimer()}
+                addOnTimer={(delta: number) => setTimer(timer + delta)}
                 isRunning={isRunning}
                 timer={timer}
-                goToOtherItem={(isPrev: boolean) => goToOtherItem(isPrev)}
-                isTimerChangeable={false}
-                onChangeTimer={() => {}}
+                isLastItem={index === data!.table.length - 1}
+                isFirstItem={index === 0}
+                goToOtherItem={(isPrev: boolean) => {
+                  goToOtherItem(isPrev);
+                  resetTimer();
+                }}
+                isTimerChangeable={isTimerChangeable}
+                onChangingTimer={() => {
+                  pauseTimer();
+
+                  if (!isAdditionalTimerOn) {
+                    saveTimer(timer);
+                    setTimer(0);
+                  } else {
+                    setTimer(savedTimer);
+                  }
+
+                  setIsAdditionalTimerOn(!isAdditionalTimerOn);
+                }}
                 item={data!.table[index]}
               />
               <TimeTable currIndex={index} items={data!.table} />
@@ -201,6 +263,7 @@ export default function TimerPage() {
           </div>
 
           <div
+            data-testid="timer-page-background"
             className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}
           />
         </DefaultLayout.ContentContanier>

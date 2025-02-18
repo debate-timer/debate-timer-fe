@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import TimeTableItem from './TimeTableItem';
+import TimeTableItem from '../components/TimeTableItem';
 
 const meta: Meta<typeof TimeTableItem> = {
   title: 'page/TimerPage/Components/TimeTableItem',
