@@ -66,11 +66,9 @@ function FirstUseToolTipContent({
         <div className="text-m flex flex-col space-y-1 md:text-lg">
           <ListItem>초록색 시작 버튼을 눌러 타이머를 시작</ListItem>
           <ListItem>
-            타이머가 동작 중일 때, 주황색 일시정지 버튼을 눌러 타이머를 일시정지
+            타이머가 동작 중일 때, 일시정지 버튼을 눌러 타이머를 일시정지
           </ListItem>
-          <ListItem>
-            붉은색 초기화 버튼을 눌러 타이머를 원래 시간으로 초기화
-          </ListItem>
+          <ListItem>초기화 버튼을 눌러 타이머를 원래 시간으로 초기화</ListItem>
           <ListItem>
             작전 시간 사용 버튼을 눌러 별도의 작전 시간 타이머 사용 가능
           </ListItem>
