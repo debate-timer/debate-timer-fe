@@ -31,12 +31,17 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
       data-testid="time-table-item"
       className={`flex h-[69px] ${width} flex-row items-center justify-center space-x-2 ${pos} ${bgColorClass} ${roundedClass} p-[16px] text-[28px] font-bold ${textColorClass}`}
     >
+      {/* Print what type is this sequence (e.g., opening, time-out, etc.) */}
       <h1>{DebateTypeToString[item.type]}</h1>
+
+      {/* Print running time */}
       <>
         <h1>| </h1>
         {minute !== 0 && <h1>{minute}분 </h1>}
         <h1>{second}초</h1>
       </>
+
+      {/* Print speaker's number, if necessary */}
       {item.stance === 'NEUTRAL' ||
         (item.speakerNumber !== undefined && (
           <>

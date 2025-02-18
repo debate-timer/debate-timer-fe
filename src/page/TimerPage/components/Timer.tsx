@@ -61,12 +61,16 @@ export default function Timer({
       data-testid="timer"
       className="flex min-h-[300px] w-[810px] flex-col items-center rounded-[45px] bg-slate-200"
     >
+      {/* Title of timer */}
       <div
         className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-slate-50`}
       >
+        {/* Title text  */}
         <h1 className="absolute left-1/2 -translate-x-1/2 transform">
           {titleText}
         </h1>
+
+        {/* Close button, if additional timer is enabled */}
         {isAdditionalTimerOn && (
           <button
             className="ml-auto px-[30px]"
@@ -77,6 +81,7 @@ export default function Timer({
         )}
       </div>
 
+      {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
         {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
           <div className="flex w-full flex-row items-center space-x-2 text-slate-900">
@@ -86,7 +91,9 @@ export default function Timer({
         )}
       </div>
 
+      {/* Timer display */}
       <div className="flex flex-row items-center space-x-[20px]">
+        {/* Button that moves to previous sequence(timebox) */}
         <div className="size-[90px]">
           {!isFirstItem && (
             <button
@@ -98,6 +105,7 @@ export default function Timer({
           )}
         </div>
 
+        {/* Prints remaining time  */}
         <div
           className={`flex h-[230px] w-[550px] flex-row items-center justify-center ${horizontalSpaceClass} bg-slate-50 text-[150px] font-bold text-slate-900`}
         >
@@ -107,6 +115,7 @@ export default function Timer({
           <p className="w-[200px]">{second}</p>
         </div>
 
+        {/* Button that moves to next sequence(timebox) */}
         <div className="size-[90px]">
           {!isLastItem && (
             <button
@@ -119,6 +128,7 @@ export default function Timer({
         </div>
       </div>
 
+      {/* Timer controller and additional timer controller */}
       <div className="my-[30px]">
         {!isAdditionalTimerOn && (
           <TimerController

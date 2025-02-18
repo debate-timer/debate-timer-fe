@@ -245,6 +245,7 @@ export default function TimerPage() {
         {/* Containers */}
         <DefaultLayout.ContentContanier>
           <div className="relative z-10 h-full w-full">
+            {/* Tooltip */}
             {isFirst && (
               <FirstUseToolTip
                 onClose={() => {
@@ -254,10 +255,12 @@ export default function TimerPage() {
               />
             )}
 
+            {/* Timer body */}
             <div
               data-testid="timer-page-body"
               className="absolute inset-0 flex h-full w-full flex-row items-center justify-center space-x-[50px]"
             >
+              {/* Timer on the left side */}
               <Timer
                 isAdditionalTimerOn={isAdditionalTimerOn}
                 onStart={() => startTimer()}
@@ -297,6 +300,8 @@ export default function TimerPage() {
                       }
                 }
               />
+
+              {/* Time table on the right side */}
               <TimeTable
                 currIndex={index}
                 items={data !== undefined ? data.table : []}
@@ -304,6 +309,7 @@ export default function TimerPage() {
             </div>
           </div>
 
+          {/* Gradient background */}
           <div
             data-testid="timer-page-background"
             className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}

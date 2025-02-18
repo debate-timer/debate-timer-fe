@@ -19,6 +19,7 @@ export default function AdditionalTimerController({
       data-testid="additional-timer-controller"
       className="flex w-max flex-row items-center"
     >
+      {/* Buttons that subtracts times */}
       <AdditionalTimerControlButton
         text="-1분"
         addOnTimer={() => addOnTimer(-60)}
@@ -29,6 +30,7 @@ export default function AdditionalTimerController({
         addOnTimer={() => addOnTimer(-30)}
       />
 
+      {/* Start and pause buttons */}
       {isRunning && (
         <button
           className="mx-[25px] size-[152px] rounded-full bg-slate-900 p-[45px] hover:bg-[#000000]"
@@ -46,6 +48,7 @@ export default function AdditionalTimerController({
         </button>
       )}
 
+      {/* Buttons that adds times */}
       <AdditionalTimerControlButton
         text="+30초"
         addOnTimer={() => addOnTimer(30)}

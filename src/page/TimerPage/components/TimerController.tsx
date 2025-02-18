@@ -23,6 +23,7 @@ export default function TimerController({
       data-testid="timer-controller"
       className="flex w-max flex-row items-center space-x-[35px]"
     >
+      {/* Reset button */}
       <button
         className="size-[82px] rounded-full bg-slate-900 p-[18px] hover:bg-[#000000]"
         onClick={() => onReset()}
@@ -30,6 +31,7 @@ export default function TimerController({
         <FiRefreshCcw className="size-full justify-center text-slate-50" />
       </button>
 
+      {/* Start and pause button */}
       {isRunning && (
         <button
           className="size-[152px] rounded-full bg-slate-900 p-[45px] hover:bg-[#000000]"
@@ -47,6 +49,7 @@ export default function TimerController({
         </button>
       )}
 
+      {/* Additional timer button, if necessary */}
       {isTimerChangeable && (
         <button
           data-testid="additional-timer-button"
