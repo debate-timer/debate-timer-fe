@@ -55,6 +55,35 @@ export default {
           'sans-serif',
         ],
       },
+      colors: {
+        brand: {
+          main: '#FF9900',   
+          sub1: '#01204E',
+          sub2: '#028391',  
+          sub3: '#37474F',   
+          sub4: '#FF5622'
+        },
+        neutral: {
+          900: '#121212',
+          700: '#3C3C3C',
+          500: '#B9B9B9',
+          300: '#E5E5E5',
+          0: '#FFFFFF',
+        },
+        system: {
+          warning: '#FFBF40',
+          success: '#4BD964',
+          danger: '#FF3F2F',
+        },
+        camp : {
+          red : '#FF3B2F',
+          blue: '#007AFF'
+        },
+        background: {
+          default: '#FFFFFF',
+          secondary: '#FFF3DD',
+        },
+      },
     },
   },
   plugins: [],
