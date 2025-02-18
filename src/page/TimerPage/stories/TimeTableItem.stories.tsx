@@ -11,7 +11,7 @@ export default meta;
 
 type Story = StoryObj<typeof TimeTableItem>;
 
-export const CurrentPros: Story = {
+export const IfCurrentIsPros: Story = {
   args: {
     isCurrent: true,
     item: {
@@ -23,7 +23,7 @@ export const CurrentPros: Story = {
   },
 };
 
-export const CurrentCons: Story = {
+export const IfCurrentIsCons: Story = {
   args: {
     isCurrent: true,
     item: {
@@ -35,7 +35,7 @@ export const CurrentCons: Story = {
   },
 };
 
-export const CurrentNeutral: Story = {
+export const IfCurrentIsNeutral: Story = {
   args: {
     isCurrent: true,
     item: {
@@ -46,7 +46,7 @@ export const CurrentNeutral: Story = {
   },
 };
 
-export const NotCurrent: Story = {
+export const IfNotCurrent: Story = {
   args: {
     isCurrent: false,
     item: {
@@ -77,6 +77,18 @@ export const LessThan60sec: Story = {
       stance: 'PROS',
       type: 'OPENING',
       time: 30,
+      speakerNumber: 1,
+    },
+  },
+};
+
+export const OnPossibleOverflow: Story = {
+  args: {
+    isCurrent: true,
+    item: {
+      stance: 'PROS',
+      type: 'CLOSING',
+      time: 630,
       speakerNumber: 1,
     },
   },

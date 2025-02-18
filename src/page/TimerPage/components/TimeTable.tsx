@@ -18,14 +18,14 @@ export default function TimeTable({
   return (
     <div
       data-testid="time-table"
-      className="flex w-[651px] flex-col rounded-[23px] bg-slate-100 pb-[20px]"
+      className="flex w-[891px] flex-col rounded-[23px] bg-slate-100 pb-[20px]"
     >
       <div className="mb-[15px] flex h-[78px] w-full flex-row items-center justify-center rounded-t-[23px] bg-slate-900 text-[28px] font-bold text-slate-50">
-        <h1 className="w-[320px] text-center">
+        <h1 className="w-[420px] text-center">
           {titles !== undefined ? titles.pros : '찬성'}
         </h1>
         <h1 className="text-slate-500">|</h1>
-        <h1 className="w-[320px] text-center">
+        <h1 className="w-[420px] text-center">
           {titles !== undefined ? titles.cons : '반대'}
         </h1>
       </div>

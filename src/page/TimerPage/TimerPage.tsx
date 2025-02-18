@@ -48,7 +48,7 @@ export default function TimerPage() {
           setIndex((prev) => prev - 1);
         }
       } else {
-        if (index < data!.table.length - 1) {
+        if (data !== undefined && index < data.table.length - 1) {
           setIndex((prev) => prev + 1);
         }
       }
@@ -170,11 +170,13 @@ export default function TimerPage() {
 
   // Calculate whether timer should show additional timer button
   useEffect(() => {
-    data!.table.forEach((value) => {
-      if (value.type === 'TIME_OUT') {
-        setIsTimerChangeable(false);
-      }
-    });
+    if (data !== undefined) {
+      data.table.forEach((value) => {
+        if (value.type === 'TIME_OUT') {
+          setIsTimerChangeable(false);
+        }
+      });
+    }
   });
 
   // Stop timer on 0 sec when additional timer is enabled
@@ -237,7 +239,9 @@ export default function TimerPage() {
                 addOnTimer={(delta: number) => setTimer(timer + delta)}
                 isRunning={isRunning}
                 timer={timer}
-                isLastItem={index === data!.table.length - 1}
+                isLastItem={
+                  data !== undefined && index === data.table.length - 1
+                }
                 isFirstItem={index === 0}
                 goToOtherItem={(isPrev: boolean) => {
                   goToOtherItem(isPrev);
@@ -256,9 +260,20 @@ export default function TimerPage() {
 
                   setIsAdditionalTimerOn(!isAdditionalTimerOn);
                 }}
-                item={data!.table[index]}
+                item={
+                  data !== undefined
+                    ? data.table[index]
+                    : {
+                        stance: 'NEUTRAL',
+                        type: 'TIME_OUT',
+                        time: 0,
+                      }
+                }
               />
-              <TimeTable currIndex={index} items={data!.table} />
+              <TimeTable
+                currIndex={index}
+                items={data !== undefined ? data.table : []}
+              />
             </div>
           </div>
 

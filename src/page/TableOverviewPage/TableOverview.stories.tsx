@@ -10,6 +10,7 @@ const meta: Meta<typeof TableOverview> = {
 };
 
 export default meta;
+
 type Story = StoryObj<typeof TableOverview>;
 
 // 2) 스토리 정의
