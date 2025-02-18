@@ -49,6 +49,7 @@ export default function TimerController({
 
       {isTimerChangeable && (
         <button
+          data-testid="additional-timer-button"
           className="h-[133px] w-[165px] flex-col items-center space-y-2 rounded-[23px] border-[3px] border-slate-900 bg-slate-50 text-[30px] font-bold leading-[37px] hover:bg-slate-200"
           onClick={() => onChangingTimer()}
         >

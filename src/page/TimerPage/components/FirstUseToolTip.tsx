@@ -53,7 +53,10 @@ function FirstUseToolTipContent({
   }, [ref, setHeight]);
 
   return (
-    <div className="relative z-40 flex flex-col space-y-6 p-6">
+    <div
+      data-testid="tooltip"
+      className="relative z-40 flex flex-col space-y-6 p-6"
+    >
       <div className="flex flex-col text-slate-50">
         <div className="mb-2 flex flex-row items-center space-x-4">
           <MdOutlineTimer size={18} />
@@ -110,6 +113,7 @@ function FirstUseToolTipContent({
 
       <div className="flex justify-end">
         <button
+          data-testid="tooltip-button"
           className="w-fit justify-end rounded-2xl bg-slate-50 px-6 py-2 font-bold text-slate-900 hover:bg-slate-300"
           onClick={() => onClose()}
         >
