@@ -14,7 +14,7 @@ type Story = StoryObj<typeof TimeTableItem>;
 export const CurrentPros: Story = {
   args: {
     isCurrent: true,
-    data: {
+    item: {
       stance: 'PROS',
       type: 'OPENING',
       time: 60,
@@ -26,7 +26,7 @@ export const CurrentPros: Story = {
 export const CurrentCons: Story = {
   args: {
     isCurrent: true,
-    data: {
+    item: {
       stance: 'CONS',
       type: 'OPENING',
       time: 60,
@@ -38,7 +38,7 @@ export const CurrentCons: Story = {
 export const CurrentNeutral: Story = {
   args: {
     isCurrent: true,
-    data: {
+    item: {
       stance: 'NEUTRAL',
       type: 'TIME_OUT',
       time: 60,
@@ -49,7 +49,7 @@ export const CurrentNeutral: Story = {
 export const NotCurrent: Story = {
   args: {
     isCurrent: false,
-    data: {
+    item: {
       stance: 'CONS',
       type: 'OPENING',
       time: 60,
@@ -61,7 +61,7 @@ export const NotCurrent: Story = {
 export const MoreThan60sec: Story = {
   args: {
     isCurrent: true,
-    data: {
+    item: {
       stance: 'PROS',
       type: 'OPENING',
       time: 90,
@@ -73,7 +73,7 @@ export const MoreThan60sec: Story = {
 export const LessThan60sec: Story = {
   args: {
     isCurrent: true,
-    data: {
+    item: {
       stance: 'PROS',
       type: 'OPENING',
       time: 30,
