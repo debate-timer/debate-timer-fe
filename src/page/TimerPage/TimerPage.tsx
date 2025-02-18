@@ -3,9 +3,11 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import Timer from './components/Timer';
 import TimeTable from './components/TimeTable';
 import { useTimer } from './hooks/useTimer';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import FirstUseToolTip from './components/FirstUseToolTip';
+import HeaderButtons from './components/HeaderButtons';
+import useLogout from '../../hooks/mutations/useLogout';
 
 export default function TimerPage() {
   // ######################################
@@ -33,6 +35,10 @@ export default function TimerPage() {
 
   // Prepare for changing background
   const [bg, setBg] = useState('');
+
+  // Prepare for logout and navigation
+  const navigate = useNavigate();
+  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
 
   // Prepare for additional timer
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
@@ -196,6 +202,9 @@ export default function TimerPage() {
     isRunning,
   ]);
 
+  // ######################################
+  // ########### COMPONENT AREA ###########
+  // ######################################
   return (
     <>
       <audio ref={warningBellRef} src="/sounds/bell-warning.mp3" />
@@ -205,13 +214,31 @@ export default function TimerPage() {
         {/* Headers */}
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <h1>Left of header</h1>
+            <div className="flex flex-col items-center space-y-[4px]">
+              <h1 className="text-sm">의회식</h1>
+              <h1 className="text-2xl font-bold">
+                {data === undefined || data.info.name.trim() === ''
+                  ? '테이블 이름 없음'
+                  : data.info.name}
+              </h1>
+            </div>
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <h1>Center of header</h1>
+            <h1 className="text-3xl font-bold">
+              {data === undefined || data.info.agenda.trim() === ''
+                ? '주제 없음'
+                : data.info.agenda}
+            </h1>
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
-            <h1>Right of header</h1>
+            <HeaderButtons
+              onClickHome={() => navigate('/')}
+              onClickHelp={() => {
+                setIsFirst(true);
+                localStorage.setItem(IS_FIRST, TRUE);
+              }}
+              onClickLogout={() => logoutMutate()}
+            />
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 
