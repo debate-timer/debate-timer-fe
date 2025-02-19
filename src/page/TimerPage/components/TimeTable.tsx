@@ -19,7 +19,7 @@ export default function TimeTable({
   titles,
 }: TimeTableProps) {
   return (
-    <div className="flex w-[811px] flex-col items-center justify-center">
+    <div className="flex min-w-[720px] flex-col items-center justify-center">
       <div
         data-testid="time-table"
         className="mb-[30px] flex w-full flex-col rounded-[23px] bg-slate-100 pb-[20px]"
@@ -36,7 +36,7 @@ export default function TimeTable({
         </div>
 
         {/** Print time table items(timeboxes) */}
-        <div className="flex w-full flex-col space-y-[15px] px-[28px]">
+        <div className="flex w-full flex-col space-y-[15px] px-[20px]">
           {items.map((item, index) => (
             <TimeTableItem
               key={index}

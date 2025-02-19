@@ -61,7 +61,7 @@ export default function Timer({
         className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-slate-50`}
       >
         {/* Title text  */}
-        <h1 className="absolute left-1/2 -translate-x-1/2 transform">
+        <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
           {titleText}
         </h1>
 
