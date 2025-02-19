@@ -303,6 +303,7 @@ export default function TimerPage() {
 
               {/* Time table on the right side */}
               <TimeTable
+                goToOtherItem={(isPrev: boolean) => goToOtherItem(isPrev)}
                 currIndex={index}
                 items={data !== undefined ? data.table : []}
               />

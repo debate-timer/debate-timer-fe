@@ -3,6 +3,7 @@ import { TimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
 
 interface TimeTableProps {
+  goToOtherItem: (isPrev: boolean) => void;
   currIndex: number;
   items: TimeBoxInfo[];
   titles?: {
@@ -12,6 +13,7 @@ interface TimeTableProps {
 }
 
 export default function TimeTable({
+  goToOtherItem,
   currIndex,
   items,
   titles,
@@ -47,11 +49,17 @@ export default function TimeTable({
 
       {/** Prev/next buttons */}
       <div className="flex w-max flex-row items-center justify-center space-x-[20px]">
-        <button className="flex flex-row items-center space-x-[20px] rounded-full border border-slate-300 bg-slate-200 px-[32px] py-[20px] hover:bg-amber-400">
+        <button
+          className="flex flex-row items-center space-x-[20px] rounded-full border border-slate-300 bg-slate-200 px-[32px] py-[20px] hover:bg-amber-400"
+          onClick={() => goToOtherItem(true)}
+        >
           <IoArrowUp className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">이전 차례</h1>
         </button>
-        <button className="flex flex-row items-center space-x-[20px] rounded-full border border-slate-300 bg-slate-200 px-[32px] py-[20px] hover:bg-amber-400">
+        <button
+          className="flex flex-row items-center space-x-[20px] rounded-full border border-slate-300 bg-slate-200 px-[32px] py-[20px] hover:bg-amber-400"
+          onClick={() => goToOtherItem(false)}
+        >
           <IoArrowDown className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">다음 차례</h1>
         </button>
