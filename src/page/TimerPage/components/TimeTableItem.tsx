@@ -1,5 +1,6 @@
 import { RiSpeakFill } from 'react-icons/ri';
 import { DebateTypeToString, TimeBoxInfo } from '../../../type/type';
+import { Formatting } from '../../../util/formatting';
 
 interface TimeTableItem {
   isCurrent: boolean;
@@ -22,9 +23,10 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
         ? 'self-start'
         : 'self-end'
       : 'self-center';
-  const width = item.stance !== 'NEUTRAL' ? 'w-[420px]' : 'w-full';
+  const width = item.stance !== 'NEUTRAL' ? 'w-[380px]' : 'w-full';
   const minute = Math.floor(Math.abs(item.time) / 60);
   const second = Math.abs(item.time % 60);
+  const timeText = `${Formatting.formatTwoDigits(minute)}:${Formatting.formatTwoDigits(second)}`;
 
   return (
     <div
@@ -35,11 +37,7 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
       <h1>{DebateTypeToString[item.type]}</h1>
 
       {/* Print running time */}
-      <>
-        <h1>| </h1>
-        {minute !== 0 && <h1>{minute}분 </h1>}
-        <h1>{second}초</h1>
-      </>
+      <p>| {timeText}</p>
 
       {/* Print speaker's number, if necessary */}
       {item.stance === 'NEUTRAL' ||

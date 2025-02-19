@@ -17,7 +17,7 @@ export default function AdditionalTimerController({
   return (
     <div
       data-testid="additional-timer-controller"
-      className="flex w-max flex-row items-center"
+      className="flex h-[180px] w-[730px] flex-row items-center justify-center"
     >
       {/* Buttons that subtracts times */}
       <AdditionalTimerControlButton
