@@ -3,6 +3,10 @@ import { IoHourglassOutline } from 'react-icons/io5';
 import { LuKeyboard } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
 
+// z-index
+// - 30: Tooltip background
+// - 40: Tooltip content
+
 interface FirstUseToolTipProps {
   onClose: () => void;
 }
@@ -49,7 +53,10 @@ function FirstUseToolTipContent({
   }, [ref, setHeight]);
 
   return (
-    <div className="relative z-40 flex flex-col space-y-6 p-6">
+    <div
+      data-testid="tooltip"
+      className="relative z-40 flex flex-col space-y-6 p-6"
+    >
       <div className="flex flex-col text-slate-50">
         <div className="mb-2 flex flex-row items-center space-x-4">
           <MdOutlineTimer size={18} />
@@ -59,11 +66,9 @@ function FirstUseToolTipContent({
         <div className="text-m flex flex-col space-y-1 md:text-lg">
           <ListItem>초록색 시작 버튼을 눌러 타이머를 시작</ListItem>
           <ListItem>
-            타이머가 동작 중일 때, 주황색 일시정지 버튼을 눌러 타이머를 일시정지
+            타이머가 동작 중일 때, 일시정지 버튼을 눌러 타이머를 일시정지
           </ListItem>
-          <ListItem>
-            붉은색 초기화 버튼을 눌러 타이머를 원래 시간으로 초기화
-          </ListItem>
+          <ListItem>초기화 버튼을 눌러 타이머를 원래 시간으로 초기화</ListItem>
           <ListItem>
             작전 시간 사용 버튼을 눌러 별도의 작전 시간 타이머 사용 가능
           </ListItem>
@@ -106,6 +111,7 @@ function FirstUseToolTipContent({
 
       <div className="flex justify-end">
         <button
+          data-testid="tooltip-button"
           className="w-fit justify-end rounded-2xl bg-slate-50 px-6 py-2 font-bold text-slate-900 hover:bg-slate-300"
           onClick={() => onClose()}
         >

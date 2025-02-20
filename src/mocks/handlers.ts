@@ -64,12 +64,6 @@ export const handlers = [
           speakerNumber: 1,
         },
         {
-          stance: 'NEUTRAL',
-          type: 'TIME_OUT',
-          time: 32,
-          speakerNumber: null,
-        },
-        {
           stance: 'CONS',
           type: 'CLOSING',
           time: 35,
