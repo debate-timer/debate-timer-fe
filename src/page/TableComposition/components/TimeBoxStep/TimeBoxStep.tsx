@@ -57,7 +57,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={initData.info.name} />
+          <HeaderTableInfo name={initData.info.name} type={'PARLIAMENTARY'} />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <HeaderTitle title={initData.info.agenda} />

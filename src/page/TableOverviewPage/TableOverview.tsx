@@ -16,7 +16,7 @@ export default function TableOverview() {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={data?.info.name} />
+          <HeaderTableInfo name={data?.info.name} type={'PARLIAMENTARY'} />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <HeaderTitle title={data?.info.agenda} />
