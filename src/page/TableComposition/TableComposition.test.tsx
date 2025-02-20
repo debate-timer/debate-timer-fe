@@ -90,7 +90,7 @@ describe('TableComposition', () => {
 
     // TimeBoxStep 컴포넌트가 표시된다고 가정
     // 예: TimeBoxStep에 data-testid="time-box-step"가 있다면:
-    expect(screen.getByText('토론 주제')).toBeInTheDocument();
+    expect(screen.getByText('주제 없음')).toBeInTheDocument();
   });
 
   it('타임박스 단계에서 "완료" 버튼 클릭 시, overview 페이지로 이동한다 (mode=add)', async () => {
@@ -105,7 +105,7 @@ describe('TableComposition', () => {
     await userEvent.click(nextButton);
 
     // 3. TimeBoxStep 노출 확인
-    expect(screen.getByText('토론 주제')).toBeInTheDocument();
+    expect(screen.getByText('주제 없음')).toBeInTheDocument();
 
     // 4. "완료" (혹은 "제출") 버튼 클릭
     const submitButton = screen.getByText('테이블 추가하기');
