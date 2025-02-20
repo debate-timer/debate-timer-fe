@@ -10,10 +10,7 @@ import HeaderButtons from './components/HeaderButtons';
 import useLogout from '../../hooks/mutations/useLogout';
 
 export default function TimerPage() {
-  // ######################################
   // ########## DECLARATION AREA ##########
-  // ######################################
-
   // Load sounds and prepare for bell-related constants
   const warningBellRef = useRef<HTMLAudioElement>(null);
   const finishBellRef = useRef<HTMLAudioElement>(null);
@@ -73,10 +70,7 @@ export default function TimerPage() {
     setDefaultValue,
   } = useTimer();
 
-  // ######################################
   // ########### useEffect AREA ###########
-  // ######################################
-
   // Open tooltip when value of 'isFirst' is true
   useEffect(() => {
     const storedIsFirst = localStorage.getItem(IS_FIRST);
@@ -202,9 +196,7 @@ export default function TimerPage() {
     isRunning,
   ]);
 
-  // ######################################
   // ########### COMPONENT AREA ###########
-  // ######################################
   return (
     <>
       <audio ref={warningBellRef} src="/sounds/bell-warning.mp3" />
