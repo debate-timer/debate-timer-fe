@@ -5,8 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
-import IconButton from '../../components/IconButton/IconButton';
-import { IoHelpCircle } from 'react-icons/io5';
 export default function TableOverview() {
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
