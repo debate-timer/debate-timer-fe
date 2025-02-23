@@ -34,7 +34,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
 function FirstUseToolTipBackground({ height }: FirstUseToolTipBackgroundProps) {
   return (
     <div
-      className="absolute inset-0 z-30 rounded-2xl bg-slate-900 opacity-80"
+      className="absolute inset-0 z-30 rounded-2xl bg-neutral-900 opacity-80"
       style={{ height }}
     ></div>
   );
@@ -57,7 +57,7 @@ function FirstUseToolTipContent({
       data-testid="tooltip"
       className="relative z-40 flex flex-col space-y-6 p-6"
     >
-      <div className="flex flex-col text-slate-50">
+      <div className="flex flex-col text-neutral-50">
         <div className="mb-2 flex flex-row items-center space-x-4">
           <MdOutlineTimer size={18} />
           <h1 className="text-xl font-bold">타이머 조작</h1>
@@ -112,7 +112,7 @@ function FirstUseToolTipContent({
       <div className="flex justify-end">
         <button
           data-testid="tooltip-button"
-          className="w-fit justify-end rounded-2xl bg-slate-50 px-6 py-2 font-bold text-slate-900 hover:bg-slate-300"
+          className="w-fit justify-end rounded-2xl bg-neutral-50 px-6 py-2 font-bold text-neutral-900 hover:bg-neutral-300"
           onClick={() => onClose()}
         >
           닫기
