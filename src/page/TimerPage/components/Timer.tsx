@@ -90,7 +90,7 @@ export default function Timer({
       <div className="flex flex-row items-center space-x-[20px]">
         {/* Prints remaining time  */}
         <div
-          className={`flex h-[230px] w-[550px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[150px] font-bold text-neutral-900`}
+          className={`flex h-[230px] w-[600px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[150px] font-bold text-neutral-900`}
         >
           {timer < 0 && <p className="w-[70px]">-</p>}
           <p className="w-[200px]">{minute}</p>
