@@ -93,9 +93,9 @@ export default function Timer({
           className={`flex h-[230px] w-[550px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[150px] font-bold text-neutral-900`}
         >
           {timer < 0 && <p className="w-[70px]">-</p>}
-          <p className="w-[180px]">{minute}</p>
+          <p className="w-[200px]">{minute}</p>
           <p className="w-[50px]">:</p>
-          <p className="w-[180px]">{second}</p>
+          <p className="w-[200px]">{second}</p>
         </div>
       </div>
 
