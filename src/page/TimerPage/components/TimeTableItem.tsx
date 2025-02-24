@@ -10,12 +10,12 @@ interface TimeTableItem {
 export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
   const bgColorClass = isCurrent
     ? item.stance === 'NEUTRAL'
-      ? 'bg-slate-500'
+      ? 'bg-neutral-500'
       : item.stance === 'PROS'
-        ? 'bg-blue-500'
-        : 'bg-red-500'
-    : 'bg-slate-300';
-  const textColorClass = isCurrent ? 'text-slate-50' : 'text-slate-900';
+        ? 'bg-camp-blue'
+        : 'bg-camp-red'
+    : 'bg-neutral-300';
+  const textColorClass = isCurrent ? 'text-neutral-50' : 'text-neutral-900';
   const roundedClass = isCurrent ? 'rounded-[23px]' : '';
   const pos =
     item.stance !== 'NEUTRAL'

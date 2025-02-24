@@ -41,10 +41,10 @@ export default function Timer({
   const second = Formatting.formatTwoDigits(Math.abs(timer % 60));
   const bgColorClass =
     item.stance === 'NEUTRAL' || isAdditionalTimerOn
-      ? 'bg-slate-500'
+      ? 'bg-neutral-500'
       : item.stance === 'PROS'
-        ? 'bg-blue-500'
-        : 'bg-red-500';
+        ? 'bg-camp-blue'
+        : 'bg-camp-red';
   const titleText = isAdditionalTimerOn
     ? DebateTypeToString['TIME_OUT']
     : item.stance === 'NEUTRAL'
@@ -54,11 +54,11 @@ export default function Timer({
   return (
     <div
       data-testid="timer"
-      className="flex min-h-[300px] w-[736px] flex-col items-center rounded-[45px] bg-slate-200"
+      className="flex min-h-[300px] w-[736px] flex-col items-center rounded-[45px] bg-neutral-200"
     >
       {/* Title of timer */}
       <div
-        className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-slate-50`}
+        className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
       >
         {/* Title text  */}
         <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
@@ -71,7 +71,7 @@ export default function Timer({
             className="ml-auto px-[30px]"
             onClick={() => onChangingTimer()}
           >
-            <IoCloseOutline className="size-[40px] hover:text-slate-300" />
+            <IoCloseOutline className="size-[40px] hover:text-neutral-300" />
           </button>
         )}
       </div>
@@ -79,7 +79,7 @@ export default function Timer({
       {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
         {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
-          <div className="flex w-full flex-row items-center space-x-2 text-slate-900">
+          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
             <RiSpeakFill className="size-[40px]" />
             <h1 className="text-[28px] font-bold">1번 토론자</h1>
           </div>
@@ -90,12 +90,12 @@ export default function Timer({
       <div className="flex flex-row items-center space-x-[20px]">
         {/* Prints remaining time  */}
         <div
-          className={`flex h-[230px] w-[550px] flex-row items-center justify-center space-x-5 bg-slate-50 text-[150px] font-bold text-slate-900`}
+          className={`flex h-[230px] w-[600px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[150px] font-bold text-neutral-900`}
         >
           {timer < 0 && <p className="w-[70px]">-</p>}
-          <p className="w-[180px]">{minute}</p>
+          <p className="w-[200px]">{minute}</p>
           <p className="w-[50px]">:</p>
-          <p className="w-[180px]">{second}</p>
+          <p className="w-[200px]">{second}</p>
         </div>
       </div>
 

@@ -15,7 +15,7 @@ export const StanceToString: Record<Stance, string> = {
 export const DebateTypeToString: Record<DebateType, string> = {
   OPENING: '입론',
   REBUTTAL: '반론',
-  CROSS: '교차질의',
+  CROSS: '교차 질의',
   CLOSING: '최종 발언',
   TIME_OUT: '작전 시간',
 };

@@ -3,11 +3,13 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import Timer from './components/Timer';
 import TimeTable from './components/TimeTable';
 import { useTimer } from './hooks/useTimer';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import FirstUseToolTip from './components/FirstUseToolTip';
-import HeaderButtons from './components/HeaderButtons';
-import useLogout from '../../hooks/mutations/useLogout';
+import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
+import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
+import IconButton from '../../components/IconButton/IconButton';
+import { IoHelpCircle } from 'react-icons/io5';
 
 export default function TimerPage() {
   // ########## DECLARATION AREA ##########
@@ -32,10 +34,6 @@ export default function TimerPage() {
 
   // Prepare for changing background
   const [bg, setBg] = useState('');
-
-  // Prepare for logout and navigation
-  const navigate = useNavigate();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
 
   // Prepare for additional timer
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
@@ -206,30 +204,31 @@ export default function TimerPage() {
         {/* Headers */}
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <div className="flex flex-col space-y-[4px]">
-              <h1 className="text-sm">의회식</h1>
-              <h1 className="text-2xl font-bold">
-                {data === undefined || data.info.name.trim() === ''
+            <HeaderTableInfo
+              name={
+                data === undefined || data.info.name.trim() === ''
                   ? '테이블 이름 없음'
-                  : data.info.name}
-              </h1>
-            </div>
+                  : data.info.name
+              }
+              type={'PARLIAMENTARY'}
+            />
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <h1 className="text-3xl font-bold">
-              {data === undefined || data.info.agenda.trim() === ''
-                ? '주제 없음'
-                : data.info.agenda}
-            </h1>
+            <HeaderTitle
+              title={
+                data === undefined || data.info.agenda.trim() === ''
+                  ? '주제 없음'
+                  : data.info.agenda
+              }
+            />
           </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right>
-            <HeaderButtons
-              onClickHome={() => navigate('/')}
-              onClickHelp={() => {
+          <DefaultLayout.Header.Right defaultIcons={['home', 'logout']}>
+            <IconButton
+              icon={<IoHelpCircle size={24} />}
+              onClick={() => {
                 setIsFirst(true);
                 localStorage.setItem(IS_FIRST, TRUE);
               }}
-              onClickLogout={() => logoutMutate()}
             />
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>

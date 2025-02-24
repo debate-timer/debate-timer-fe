@@ -33,18 +33,18 @@ export default function AdditionalTimerController({
       {/* Start and pause buttons */}
       {isRunning && (
         <button
-          className="mx-[25px] size-[152px] rounded-full bg-slate-900 p-[45px] hover:bg-[#000000]"
+          className="mx-[25px] size-[152px] rounded-full bg-neutral-900 p-[45px] hover:bg-[#000000]"
           onClick={() => onPause()}
         >
-          <FaStop className="size-full justify-center text-slate-50" />
+          <FaStop className="size-full justify-center text-neutral-50" />
         </button>
       )}
       {!isRunning && (
         <button
-          className="mx-[25px] size-[152px] rounded-full bg-slate-900 p-[45px] hover:bg-[#000000]"
+          className="mx-[25px] size-[152px] rounded-full bg-neutral-900 p-[45px] hover:bg-[#000000]"
           onClick={() => onStart()}
         >
-          <FaPlay className="size-full justify-center text-slate-50" />
+          <FaPlay className="size-full justify-center text-neutral-50" />
         </button>
       )}
 
