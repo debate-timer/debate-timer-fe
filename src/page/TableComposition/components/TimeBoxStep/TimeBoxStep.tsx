@@ -7,9 +7,8 @@ import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
 import { TableFormData } from '../../hook/useTableFrom';
-import { IoMdHome } from 'react-icons/io';
-import useLogout from '../../../../hooks/mutations/useLogout';
-import { useNavigate } from 'react-router-dom';
+import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableInfo';
+import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 
 interface TimeBoxStepProps {
   initData: TableFormData;
@@ -19,9 +18,6 @@ interface TimeBoxStepProps {
 }
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initData, onTimeBoxChange, onButtonClick, isEdit = false } = props;
-  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
-
-  const navigate = useNavigate();
   const initTimeBox = initData.table;
   const {
     openModal: ProsOpenModal,
@@ -61,47 +57,12 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">
-              {initData === undefined || initData!.info.name.trim() === ''
-                ? '테이블 이름 없음'
-                : initData!.info.name}
-            </h1>
-            <div className="mx-3 h-6 w-[2px] bg-black"></div>
-            <span className="text-lg font-normal md:text-xl">의회식</span>
-          </div>
+          <HeaderTableInfo name={initData.info.name} type={'PARLIAMENTARY'} />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <div className="flex flex-col items-center">
-            <h1 className="text-m md:text-lg">토론 주제</h1>
-            <h1 className="max-w-md truncate text-xl font-bold md:text-2xl">
-              {initData === undefined || initData.info.agenda.trim() === ''
-                ? '주제 없음'
-                : initData.info.agenda}
-            </h1>
-          </div>
+          <HeaderTitle title={initData.info.agenda} />
         </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right>
-          <button
-            onClick={() => {
-              navigate('/');
-            }}
-            className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
-          >
-            <div className="flex flex-row items-center space-x-4">
-              <IoMdHome size={24} />
-              <h1>홈 화면</h1>
-            </div>
-          </button>
-          <button
-            onClick={() => logoutMutate()}
-            className="rounded-full bg-slate-300 px-2 py-1 font-bold text-zinc-900 hover:bg-zinc-400"
-          >
-            <div className="flex flex-row items-center space-x-4">
-              <h2>로그아웃</h2>
-            </div>
-          </button>
-        </DefaultLayout.Header.Right>
+        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContanier>

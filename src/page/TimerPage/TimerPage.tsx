@@ -1,28 +1,63 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import useLogout from '../../hooks/mutations/useLogout';
-import HeaderButtons from './components/common/HeaderButtons';
-import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
-import TimerLoadingPage from './TimerLoadingPage';
-import { useModal } from '../../hooks/useModal';
+import Timer from './components/Timer';
+import TimeTable from './components/TimeTable';
 import { useTimer } from './hooks/useTimer';
-import TimerComponent from './components/Timer/TimerComponent';
-import TimerTimeTable from './components/Timer/TimerTimeTable';
-import FirstUseToolTip from './components/common/FirstUseToolTip';
-import useMobile from '../../hooks/useMobile';
-import AdditionalTimerComponent from './components/AdditionalTimer/AdditionalTimerComponent';
+import { useParams } from 'react-router-dom';
+import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
+import FirstUseToolTip from './components/FirstUseToolTip';
+import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
+import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
+import IconButton from '../../components/IconButton/IconButton';
+import { IoHelpCircle } from 'react-icons/io5';
 
 export default function TimerPage() {
-  // Load sounds
-  const dingOnceRef = useRef<HTMLAudioElement>(null);
-  const dingTwiceRef = useRef<HTMLAudioElement>(null);
+  // ########## DECLARATION AREA ##########
+  // Load sounds and prepare for bell-related constants
+  const warningBellRef = useRef<HTMLAudioElement>(null);
+  const finishBellRef = useRef<HTMLAudioElement>(null);
+  const [isWarningBellOn, setWarningBell] = useState(false);
+  const [isFinishBellOn, setFinishBell] = useState(false);
 
-  // Prepare parameter
+  // Parse params
   const pathParams = useParams();
   const tableId = pathParams.id;
 
-  // Use timer hook
+  // Get query
+  const { data } = useGetParliamentaryTableData(Number(tableId));
+
+  // Prepare for tooltip-related constants
+  const [isFirst, setIsFirst] = useState(false);
+  const IS_FIRST = 'isFirst';
+  const TRUE = 'true';
+  const FALSE = 'false';
+
+  // Prepare for changing background
+  const [bg, setBg] = useState('');
+
+  // Prepare for additional timer
+  const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
+  const [savedTimer, saveTimer] = useState(0);
+  const [isTimerChangeable, setIsTimerChangeable] = useState(true);
+
+  // Prepare for index-related constants
+  const [index, setIndex] = useState(0);
+  const goToOtherItem = useCallback(
+    (isPrev: boolean) => {
+      if (isPrev) {
+        if (index > 0) {
+          setIndex((prev) => prev - 1);
+        }
+      } else {
+        if (data !== undefined && index < data.table.length - 1) {
+          setIndex((prev) => prev + 1);
+        }
+      }
+    },
+    [index, data],
+  );
+
+  // Prepare for timer hook
   const {
     timer,
     setTimer,
@@ -33,47 +68,15 @@ export default function TimerPage() {
     setDefaultValue,
   } = useTimer();
 
-  // Get query
-  const { data, isLoading } = useGetParliamentaryTableData(Number(tableId));
-
-  // Set states
-  const [isFirst, setIsFirst] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [bg, setBg] = useState('');
-  const [isWarningBellOn, setWarningBell] = useState(false);
-  const [isFinishBellOn, setFinishBell] = useState(false);
-
-  // Prepare other hooks
-  const isMobile = useMobile();
-  const navigate = useNavigate();
-  const { isOpen, openModal, ModalWrapper } = useModal();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
-
-  // Declare functions
-  const moveToOtherItem = useCallback(
-    (goToPrev: boolean) => {
-      if (goToPrev) {
-        if (index > 0) {
-          setIndex((prev) => prev - 1);
-        }
-      } else {
-        if (data && index < data.table.length - 1) {
-          setIndex((prev) => prev + 1);
-        }
-      }
-      resetTimer();
-    },
-    [data, index, resetTimer],
-  );
-
+  // ########### useEffect AREA ###########
   // Open tooltip when value of 'isFirst' is true
   useEffect(() => {
-    const storedIsFirst = localStorage.getItem('isFirst');
+    const storedIsFirst = localStorage.getItem(IS_FIRST);
 
     if (storedIsFirst === null) {
       setIsFirst(true);
     } else {
-      setIsFirst(storedIsFirst.trim() === 'true' ? true : false);
+      setIsFirst(storedIsFirst.trim() === TRUE ? true : false);
     }
   }, []);
 
@@ -94,12 +97,17 @@ export default function TimerPage() {
 
   // Play bells
   useEffect(() => {
-    if (dingOnceRef.current && isRunning && isWarningBellOn && timer === 30) {
-      dingOnceRef.current.play();
+    if (
+      warningBellRef.current &&
+      isRunning &&
+      isWarningBellOn &&
+      timer === 30
+    ) {
+      warningBellRef.current.play();
     }
 
-    if (dingTwiceRef.current && isRunning && isFinishBellOn && timer === 0) {
-      dingTwiceRef.current.play();
+    if (finishBellRef.current && isRunning && isFinishBellOn && timer === 0) {
+      finishBellRef.current.play();
     }
   }, [timer, isFinishBellOn, isWarningBellOn, isRunning]);
 
@@ -116,13 +124,16 @@ export default function TimerPage() {
   // Add keyboard event listener
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const keysToDisable = ['Space', 'ArrowLeft', 'ArrowRight', 'KeyR'];
+
+      // Disable web browsers' default actions
+      if (keysToDisable.includes(event.key)) {
+        event.preventDefault();
+      }
+
       // Clear focus on the keyboard event
       if (event.target instanceof HTMLElement) {
         event.target.blur();
-      }
-
-      if (isOpen) {
-        return;
       }
 
       switch (event.code) {
@@ -134,129 +145,169 @@ export default function TimerPage() {
           }
           break;
         case 'ArrowLeft':
-          moveToOtherItem(true);
+          goToOtherItem(true);
+          resetTimer();
           break;
         case 'ArrowRight':
-          moveToOtherItem(false);
+          goToOtherItem(false);
+          resetTimer();
           break;
         case 'KeyR':
           resetTimer();
           break;
       }
     };
+
     // Set listener when component is rendered
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       // Remove listener when component is rendered
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, isRunning, resetTimer, startTimer, moveToOtherItem, pauseTimer]);
+  }, [isRunning, resetTimer, startTimer, goToOtherItem, pauseTimer]);
 
-  // Print loading page
-  if (isLoading) {
-    return <TimerLoadingPage />;
-  }
+  // Calculate whether timer should show additional timer button
+  useEffect(() => {
+    if (data !== undefined) {
+      data.table.forEach((value) => {
+        if (value.type === 'TIME_OUT') {
+          setIsTimerChangeable(false);
+        }
+      });
+    }
+  });
 
-  // Return TimerPage
+  // Stop timer on 0 sec when additional timer is enabled
+  useEffect(() => {
+    if (isAdditionalTimerOn && timer === 0 && isRunning) {
+      pauseTimer();
+      setTimer(savedTimer);
+      setIsAdditionalTimerOn(!isAdditionalTimerOn);
+    }
+  }, [
+    isAdditionalTimerOn,
+    timer,
+    savedTimer,
+    pauseTimer,
+    setIsAdditionalTimerOn,
+    setTimer,
+    isRunning,
+  ]);
+
+  // ########### COMPONENT AREA ###########
   return (
     <>
-      <audio ref={dingOnceRef} src="/sounds/ding-once-edit.mp3" />
-      <audio ref={dingTwiceRef} src="/sounds/ding-twice-edit.mp3" />
+      <audio ref={warningBellRef} src="/sounds/bell-warning.mp3" />
+      <audio ref={finishBellRef} src="/sounds/bell-finish.mp3" />
 
       <DefaultLayout>
         {/* Headers */}
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
-              <h1 className="mr-2">
-                {data === undefined || data!.info.name.trim() === ''
+            <HeaderTableInfo
+              name={
+                data === undefined || data.info.name.trim() === ''
                   ? '테이블 이름 없음'
-                  : data!.info.name}
-              </h1>
-              <div className="mx-3 h-6 w-[2px] bg-black"></div>
-              <span className="text-lg font-normal md:text-xl">의회식</span>
-            </div>
+                  : data.info.name
+              }
+              type={'PARLIAMENTARY'}
+            />
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <div className="my-2 flex flex-col items-center">
-              <h1 className="text-m md:text-lg">토론 주제</h1>
-              <h1 className="text-xl font-bold md:text-2xl">
-                {data === undefined || data!.info.agenda.trim() === ''
+            <HeaderTitle
+              title={
+                data === undefined || data.info.agenda.trim() === ''
                   ? '주제 없음'
-                  : data!.info.agenda}
-              </h1>
-            </div>
+                  : data.info.agenda
+              }
+            />
           </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right>
-            <HeaderButtons
-              onClickHome={() => navigate('/')}
-              onClickHelp={() => {
+          <DefaultLayout.Header.Right defaultIcons={['home', 'logout']}>
+            <IconButton
+              icon={<IoHelpCircle size={24} />}
+              onClick={() => {
                 setIsFirst(true);
-                localStorage.setItem('isFirst', 'true');
+                localStorage.setItem(IS_FIRST, TRUE);
               }}
-              onClickLogout={() => logoutMutate()}
             />
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 
         {/* Containers */}
         <DefaultLayout.ContentContanier>
-          {!isOpen && (
-            <div className="relative z-10 h-full">
-              {/* Tooltip */}
-              {isFirst && (
-                <FirstUseToolTip
-                  onClose={() => {
-                    setIsFirst(false);
-                    localStorage.setItem('isFirst', 'false');
-                  }}
-                />
-              )}
+          <div className="relative z-10 h-full w-full">
+            {/* Tooltip */}
+            {isFirst && (
+              <FirstUseToolTip
+                onClose={() => {
+                  setIsFirst(false);
+                  localStorage.setItem(IS_FIRST, FALSE);
+                }}
+              />
+            )}
 
-              {/* Timer and timetable */}
-              <div
-                className={`absolute inset-0 ${isMobile ? 'top-[50px]' : ''} flex h-full ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center ${isMobile ? 'space-y-20' : 'space-x-20'}`}
-              >
-                <TimerComponent
-                  isRunning={isRunning}
-                  debateInfo={data!.table[index]}
-                  timer={timer}
-                  onOpenModal={() => openModal()}
-                  startTimer={() => {
-                    startTimer();
-                  }}
-                  pauseTimer={() => {
-                    pauseTimer();
-                  }}
-                  resetTimer={() => {
-                    resetTimer(data!.table[index].time);
-                  }}
-                  isWarningBellOn={isWarningBellOn}
-                  isFinishBellOn={isFinishBellOn}
-                  onChangeWarningBell={() => setWarningBell(!isWarningBellOn)}
-                  onChangeFinishBell={() => setFinishBell(!isFinishBellOn)}
-                />
+            {/* Timer body */}
+            <div
+              data-testid="timer-page-body"
+              className="absolute inset-0 flex h-full w-full flex-row items-center justify-center space-x-[50px]"
+            >
+              {/* Timer on the left side */}
+              <Timer
+                isAdditionalTimerOn={isAdditionalTimerOn}
+                onStart={() => startTimer()}
+                onPause={() => pauseTimer()}
+                onReset={() => resetTimer()}
+                addOnTimer={(delta: number) => setTimer(timer + delta)}
+                isRunning={isRunning}
+                timer={timer}
+                isLastItem={
+                  data !== undefined && index === data.table.length - 1
+                }
+                isFirstItem={index === 0}
+                goToOtherItem={(isPrev: boolean) => {
+                  goToOtherItem(isPrev);
+                  resetTimer();
+                }}
+                isTimerChangeable={isTimerChangeable}
+                onChangingTimer={() => {
+                  pauseTimer();
 
-                <TimerTimeTable
-                  currIndex={index}
-                  tables={data!.table}
-                  moveToOtherItem={(goToPrev: boolean) =>
-                    moveToOtherItem(goToPrev)
+                  if (!isAdditionalTimerOn) {
+                    saveTimer(timer);
+                    setTimer(0);
+                  } else {
+                    setTimer(savedTimer);
                   }
-                />
-              </div>
-            </div>
-          )}
 
+                  setIsAdditionalTimerOn(!isAdditionalTimerOn);
+                }}
+                item={
+                  data !== undefined
+                    ? data.table[index]
+                    : {
+                        stance: 'NEUTRAL',
+                        type: 'TIME_OUT',
+                        time: 0,
+                      }
+                }
+              />
+
+              {/* Time table on the right side */}
+              <TimeTable
+                goToOtherItem={(isPrev: boolean) => goToOtherItem(isPrev)}
+                currIndex={index}
+                items={data !== undefined ? data.table : []}
+              />
+            </div>
+          </div>
+
+          {/* Gradient background */}
           <div
+            data-testid="timer-page-background"
             className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}
-          ></div>
+          />
         </DefaultLayout.ContentContanier>
       </DefaultLayout>
-
-      <ModalWrapper>
-        <AdditionalTimerComponent />
-      </ModalWrapper>
     </>
   );
 }
