@@ -51,7 +51,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContanier>
-        <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-6 p-6 md:p-8">
+        <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
           <label className="flex items-center text-base font-semibold md:text-2xl">
             토론 시간표 이름
           </label>
