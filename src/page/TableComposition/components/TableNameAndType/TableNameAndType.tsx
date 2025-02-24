@@ -113,7 +113,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               if (info.name === '') {
                 onInfoChange({
                   ...info,
-                  name: '시간표 1',
+                  name: '템플릿 1',
                 });
               }
               onButtonClick();
