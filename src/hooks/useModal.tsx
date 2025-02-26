@@ -58,6 +58,7 @@ export function useModal(options: UseModalOptions = {}) {
               type="button"
               onClick={closeModal}
               className="absolute right-4 top-4 text-3xl text-neutral-0 hover:text-gray-300"
+              aria-label="모달 닫기"
             >
               <IoMdClose />
             </button>
