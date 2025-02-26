@@ -42,22 +42,24 @@ export default function TimerCreationContent({
   const getStanceColor = () => {
     switch (stance) {
       case 'PROS':
-        return 'text-blue-500';
+        return 'bg-camp-blue';
       case 'CONS':
-        return 'text-red-500';
+        return 'bg-camp-red';
       case 'NEUTRAL':
-        return 'text-gray-400';
+        return 'bg-neutral-500';
       default:
-        return 'text-gray-400';
+        return 'bg-neutral-500';
     }
   };
 
   return (
-    <div className="p-10">
-      <h2 className={`mb-4 text-xl font-bold ${getStanceColor()}`}>
+    <>
+      <h2
+        className={`mb-4 px-4 py-4 text-xl font-bold text-neutral-0 ${getStanceColor()}`}
+      >
         타임박스 설정
       </h2>
-      <div className="flex flex-col space-y-6">
+      <div className="flex flex-col gap-4 p-4">
         <div className="flex items-center space-x-2">
           <label htmlFor="stance-select" className="w-16 flex-shrink-0">
             입장
@@ -154,7 +156,7 @@ export default function TimerCreationContent({
             <option value="2">2번 토론자</option>
             <option value="3">3번 토론자</option>
             <option value="4">4번 토론자</option>
-            <option value="4">5번 토론자</option>
+            <option value="5">5번 토론자</option>
           </select>
         </div>
 
@@ -165,6 +167,6 @@ export default function TimerCreationContent({
           타임박스 설정하기
         </button>
       </div>
-    </div>
+    </>
   );
 }
