@@ -1,13 +1,11 @@
 ---
 name: Feat Template
 about: 기능 추가
-title: "[FEAT] "
+title: '[FEAT] '
 labels: feat
 assignees: ''
-
 ---
 
-### ✨ Description
+# ✨ Description
 
-
-### ✨ Time(마감기한)
+# ✨ Time (마감 기한)
