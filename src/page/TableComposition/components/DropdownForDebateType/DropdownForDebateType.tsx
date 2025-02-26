@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Type } from '../../../../type/type';
 import { typeMapping } from '../../../../constants/languageMapping';
+import { IoMdArrowDropdown } from 'react-icons/io';
 
 interface DropdownForDebateTypeProps {
   type: Type;
@@ -34,14 +35,19 @@ export default function DropdownForDebateType(
     <div className="relative w-full">
       <button
         onClick={() => setIsToggleOpen(!isToggleOpen)}
-        className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white lg:text-3xl"
+        className="flex w-full items-center justify-between rounded-md border border-neutral-300 bg-white p-3 text-sm text-black focus:outline-none md:text-base"
       >
-        ▼ {typeMapping[type]}
+        <span>{typeMapping[type]}</span>
+        <IoMdArrowDropdown
+          className={`ml-2 text-xl transition-transform ${
+            isToggleOpen ? 'rotate-180' : ''
+          }`}
+        />
       </button>
 
-      {isToggleOpen && (
+      {isToggleOpen && getAlternativeOptions.length !== 0 && (
         <ul
-          className="absolute left-0 right-0 mt-2 rounded-md bg-neutral-200 shadow-lg"
+          className="absolute left-0 right-0 mt-1 rounded-md border border-neutral-300 bg-white shadow-md"
           role="listbox"
         >
           {getAlternativeOptions.map((koreanType) => (
@@ -50,7 +56,7 @@ export default function DropdownForDebateType(
               onClick={() => handleTypeSelect(koreanType)}
               role="option"
               tabIndex={0}
-              className="cursor-pointer p-2 text-center font-semibold text-white hover:bg-neutral-400 focus:bg-neutral-400 focus:outline-none"
+              className="cursor-pointer px-3 py-2 text-sm text-black hover:bg-neutral-100 focus:bg-neutral-100 focus:outline-none md:text-base"
             >
               {koreanType}
             </li>

@@ -50,7 +50,7 @@ export default function TableComposition() {
       EditTable({
         tableId: tableId, // etc
         info: {
-          name: formData.info.name ?? '테이블 1',
+          name: formData.info.name ?? '템플릿 1',
           agenda: formData.info.agenda,
           warningBell: formData.info.warningBell,
           finishBell: formData.info.finishBell,
@@ -60,7 +60,7 @@ export default function TableComposition() {
     } else {
       AddTable({
         info: {
-          name: formData.info.name ?? '테이블 1',
+          name: formData.info.name ?? '템플릿 1',
           agenda: formData.info.agenda,
           warningBell: formData.info.warningBell,
           finishBell: formData.info.finishBell,
