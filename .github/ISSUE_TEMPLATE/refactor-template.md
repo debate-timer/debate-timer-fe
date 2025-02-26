@@ -1,13 +1,11 @@
 ---
-name: "Refactor Template"
+name: 'Refactor Template'
 about: '리팩토링 '
-title: "[REFACTOR] "
+title: '[REFACTOR] '
 labels: refactor
 assignees: ''
-
 ---
 
-### ✨ Description
+# ✨ Description
 
-
-### ✨ Time(마감기한)
+# ✨ Time (마감 기한)

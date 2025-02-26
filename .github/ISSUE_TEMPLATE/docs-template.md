@@ -1,13 +1,11 @@
 ---
 name: Docs Template
 about: 문서화
-title: "[DOCS] "
+title: '[DOCS] '
 labels: docs
 assignees: ''
-
 ---
 
-### ✨ Description
+# ✨ Description
 
-
-### ✨ Time(마감기한)
+# ✨ Time (마감 기한)

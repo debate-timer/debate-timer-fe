@@ -65,7 +65,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <PropsAndConsTitle />
         <DragAndDropWrapper>
           {initTimeBox.map((info, index) => (
@@ -87,7 +87,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           leftOnClick={ProsOpenModal}
           rightOnClick={ConsOpenModal}
         />
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
         <button

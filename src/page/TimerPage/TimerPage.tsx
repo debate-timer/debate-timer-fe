@@ -234,7 +234,7 @@ export default function TimerPage() {
         </DefaultLayout.Header>
 
         {/* Containers */}
-        <DefaultLayout.ContentContanier>
+        <DefaultLayout.ContentContainer>
           <div className="relative z-10 h-full w-full">
             {/* Tooltip */}
             {isFirst && (
@@ -306,7 +306,7 @@ export default function TimerPage() {
             data-testid="timer-page-background"
             className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}
           />
-        </DefaultLayout.ContentContanier>
+        </DefaultLayout.ContentContainer>
       </DefaultLayout>
     </>
   );

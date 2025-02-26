@@ -4,7 +4,7 @@ interface ContentContainerProps extends PropsWithChildren {
   noPadding?: boolean;
 }
 
-export default function ContentContanier({
+export default function ContentContainer({
   children,
   noPadding = false,
 }: ContentContainerProps) {
