@@ -8,6 +8,7 @@ import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapp
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
 import ReactGA from 'react-ga4';
+import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 
 const routesConfig = [
   {
@@ -38,6 +39,11 @@ const routesConfig = [
   {
     path: '/oauth',
     element: <OAuth />,
+    requiresAuth: false,
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
     requiresAuth: false,
   },
 ];
