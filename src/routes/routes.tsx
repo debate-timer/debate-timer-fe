@@ -9,6 +9,7 @@ import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
 import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
+import BackActionHandler from '../components/BackActionHandler';
 
 const routesConfig = [
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <ErrorBoundaryWrapper />
+        <BackActionHandler />
       </>
     ),
     children: routesConfig.map((route) => ({
