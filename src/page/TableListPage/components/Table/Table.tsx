@@ -29,18 +29,21 @@ export default function Table({
   return (
     <button
       onClick={handleClick}
-      className="flex h-[200px] w-11/12 flex-col items-center rounded-md bg-amber-500 p-5 duration-200 hover:scale-105"
+      className="relative m-5 h-[243px] w-[500px] rounded-md bg-[#FECD4C] px-[40px] duration-200 hover:scale-105"
     >
-      <div className="flex w-full justify-end gap-4 pb-2 lg:pb-0">
+      <div className="absolute right-[40px] top-[40px] flex flex-row space-x-2">
         <EditButton tableId={id} type={type} />
         <DeleteModalButton name={name} onDelete={onDelete} />
       </div>
-      <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>
-      <div className="flex w-full flex-grow flex-col items-start justify-center text-lg font-semibold lg:text-2xl">
-        <span>유형 : {typeMapping[type]}</span>
-        <span>
-          소요시간 : {durationMinutes}분 {durationSeconds}초
-        </span>
+
+      <div className="flex h-full flex-col items-start justify-center">
+        <h1 className="mb-[30px] text-[40px] font-bold">{name}</h1>
+        <div className="flex flex-col items-start justify-center text-[36px] font-bold">
+          <span>유형 | {typeMapping[type]}</span>
+          <span>
+            시간 | {durationMinutes}분 {durationSeconds}초
+          </span>
+        </div>
       </div>
     </button>
   );
