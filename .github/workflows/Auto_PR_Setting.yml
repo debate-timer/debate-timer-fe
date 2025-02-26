@@ -2,11 +2,12 @@ name: Auto PR Setting
 
 on:
   pull_request:
-    branches: ['develop']
     types: [opened]
 
 jobs:
   assign-issue:
+    # Works only if target branch name is not 'main'
+    if: github.base_ref != 'main'
     runs-on: ubuntu-latest
 
     steps:
