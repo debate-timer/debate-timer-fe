@@ -31,6 +31,42 @@ export const handlers = [
           type: 'PARLIAMENTARY',
           duration: '1750',
         },
+        {
+          id: 3,
+          name: '테이블 1',
+          type: 'PARLIAMENTARY',
+          duration: '1800',
+        },
+        {
+          id: 4,
+          name: '테이블 2',
+          type: 'PARLIAMENTARY',
+          duration: '1750',
+        },
+        {
+          id: 5,
+          name: '테이블 1',
+          type: 'PARLIAMENTARY',
+          duration: '1800',
+        },
+        {
+          id: 6,
+          name: '테이블 2',
+          type: 'PARLIAMENTARY',
+          duration: '1750',
+        },
+        {
+          id: 7,
+          name: '테이블 1',
+          type: 'PARLIAMENTARY',
+          duration: '1800',
+        },
+        {
+          id: 8,
+          name: '테이블 2',
+          type: 'PARLIAMENTARY',
+          duration: '1750',
+        },
       ],
     });
   }),
