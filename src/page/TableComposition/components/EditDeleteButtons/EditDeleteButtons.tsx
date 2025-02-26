@@ -1,4 +1,4 @@
-import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
+import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
 import DeleteConfirmContent from '../DeleteConfirmContent/DeleteConfirmContent';
 import { TimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
@@ -26,11 +26,19 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
   return (
     <>
       <div className="flex justify-end gap-2">
-        <button onClick={openEditModal} aria-label="수정하기">
-          <AiOutlineEdit />
+        <button
+          onClick={openEditModal}
+          className="rounded-sm bg-neutral-0"
+          aria-label="수정하기"
+        >
+          <RiEditFill className="text-neutral-900" />
         </button>
-        <button onClick={deleteOpenModal} aria-label="삭제하기">
-          <AiOutlineDelete />
+        <button
+          onClick={deleteOpenModal}
+          className="rounded-sm bg-neutral-0"
+          aria-label="삭제하기"
+        >
+          <RiDeleteBinFill className="text-neutral-900" />
         </button>
       </div>
       <EditModalWrapper>
