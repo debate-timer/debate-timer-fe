@@ -108,7 +108,7 @@ describe('TableComposition', () => {
     expect(screen.getByText('주제 없음')).toBeInTheDocument();
 
     // 4. "완료" (혹은 "제출") 버튼 클릭
-    const submitButton = screen.getByText('테이블 추가하기');
+    const submitButton = screen.getByText('시간표 추가완료하기');
     expect(submitButton).toBeDisabled();
 
     const leftAddButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
