@@ -72,7 +72,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <section className="grid w-full grid-cols-[1fr_2fr] gap-10 p-8">
           <h3 className="text-md font-bold lg:text-5xl">토론 템플릿 이름</h3>
           <input
@@ -122,7 +122,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             </label>
           </div>
         </section>
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
         <button

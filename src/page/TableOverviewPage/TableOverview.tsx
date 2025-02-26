@@ -23,13 +23,13 @@ export default function TableOverview() {
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <PropsAndConsTitle />
         {data &&
           data.table.map((info, index) => (
             <DebatePanel key={index} info={info} />
           ))}
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
       <DefaultLayout.StickyFooterWrapper>
         <button
           className="h-20 w-screen rounded-md bg-blue-300 text-2xl"

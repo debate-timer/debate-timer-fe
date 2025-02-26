@@ -17,7 +17,7 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
         </DefaultLayout.Header.Left>
       </DefaultLayout.Header>
 
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <div className="flex w-full flex-col items-start justify-start px-8 py-20">
           <div className="mb-20 flex flex-col">
             <h1 className="text-4xl font-bold md:text-5xl">
@@ -46,7 +46,7 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
             </div>
           </button>
         </div>
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
     </DefaultLayout>
   );
 }
