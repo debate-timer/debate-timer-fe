@@ -44,7 +44,7 @@ vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
   );
   DefaultLayout.displayName = 'DefaultLayout';
   DefaultLayout.Header = Header;
-  DefaultLayout.ContentContanier = ContentContainer;
+  DefaultLayout.ContentContainer = ContentContainer;
 
   return {
     default: DefaultLayout,
