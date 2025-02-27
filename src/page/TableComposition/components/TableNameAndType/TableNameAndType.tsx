@@ -1,144 +1,128 @@
+import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
+import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
+import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { Type } from '../../../../type/type';
+import { DetailDebateInfo, Type } from '../../../../type/type';
 import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
 
+type ExtendedDebateInfo = DetailDebateInfo & {
+  type: Type;
+};
 interface TableNameAndTypeProps {
-  info: {
-    name: string;
-    agenda: string;
-    type: Type;
-    warningBell: boolean;
-    finishBell: boolean;
-  };
+  info: ExtendedDebateInfo;
   isEdit?: boolean;
-  onInfoChange: (newInfo: {
-    name: string;
-    agenda: string;
-    type: Type;
-    warningBell: boolean;
-    finishBell: boolean;
-  }) => void;
+  onInfoChange: (newInfo: ExtendedDebateInfo) => void;
   onButtonClick: () => void;
 }
+
+type ExtendedDebateInfoField = keyof ExtendedDebateInfo;
+type ExtendedDebateInfoValue = ExtendedDebateInfo[ExtendedDebateInfoField];
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
   const { info, isEdit = false, onInfoChange, onButtonClick } = props;
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFieldChange = (
+    field: ExtendedDebateInfoField,
+    value: ExtendedDebateInfoValue,
+  ) => {
     onInfoChange({
       ...info,
-      name: e.target.value,
+      [field]: value,
     });
   };
 
-  const handleAgenda = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const clearField = (field: 'name' | 'agenda') => {
     onInfoChange({
       ...info,
-      agenda: e.target.value,
-    });
-  };
-
-  const handleTypeChange = (type: Type) => {
-    onInfoChange({
-      ...info,
-      type,
-    });
-  };
-
-  const handleWarningBell = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onInfoChange({
-      ...info,
-      warningBell: e.target.checked,
-    });
-  };
-
-  const handleFinishBell = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onInfoChange({
-      ...info,
-      finishBell: e.target.checked,
+      [field]: '',
     });
   };
 
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
+        <DefaultLayout.Header.Left />
         <DefaultLayout.Header.Center>
-          <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
-            <h1>
-              {isEdit ? '토론 정보를 수정해주세요' : '어떤 토론을 원하시나요?'}
-            </h1>
-          </div>
+          <HeaderTitle
+            title={`토론 정보를 ${isEdit ? '수정' : '설정'}해주세요`}
+          />
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
+
       <DefaultLayout.ContentContanier>
-        <section className="grid w-full grid-cols-[1fr_2fr] gap-10 p-8">
-          <h3 className="text-md font-bold lg:text-5xl">토론 템플릿 이름</h3>
-          <input
-            placeholder="테이블 1(디폴트 값)"
-            className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
+        <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
+          <label className="flex items-center text-base font-semibold md:text-2xl">
+            토론 시간표 이름
+          </label>
+          <ClearableInput
             value={info.name}
-            onChange={handleNameChange}
+            onChange={(e) => handleFieldChange('name', e.target.value)}
+            onClear={() => clearField('name')}
+            placeholder="테이블 1"
           />
 
-          <h3 className="text-md font-bold lg:text-5xl">토론 주제</h3>
-          <input
-            placeholder="토론 주제를 입력해주세요"
-            className="w-full rounded-md bg-neutral-300 p-6 text-center font-semibold text-white placeholder-white lg:text-3xl"
+          <label className="flex items-center text-base font-semibold md:text-2xl">
+            토론 주제
+          </label>
+          <ClearableInput
             value={info.agenda}
-            onChange={handleAgenda}
+            onChange={(e) => handleFieldChange('agenda', e.target.value)}
+            onClear={() => clearField('agenda')}
+            placeholder="토론 주제를 입력해주세요"
           />
-
           {!isEdit && (
             <>
-              <h3 className="text-md font-bold lg:text-5xl">토론 유형</h3>
+              <label className="flex items-center text-base font-semibold md:text-2xl">
+                토론 유형
+              </label>
               <DropdownForDebateType
                 type={info.type}
-                onChange={handleTypeChange}
+                onChange={(selectedType) =>
+                  handleFieldChange('type', selectedType)
+                }
               />
             </>
           )}
 
-          <h3 className="text-md font-bold lg:text-5xl">종소리 설정</h3>
-          <div className="flex flex-col gap-5">
-            <label className="flex items-center gap-4 text-lg">
-              <input
-                type="checkbox"
-                checked={info.warningBell}
-                onChange={handleWarningBell}
-                className="h-5 w-5"
-              />
-              발언종료 30초 전 알림
-            </label>
-            <label className="flex items-center gap-4 text-lg">
-              <input
-                type="checkbox"
-                checked={info.finishBell}
-                onChange={handleFinishBell}
-                className="h-5 w-5"
-              />
-              발언종료 알림
-            </label>
+          <label className="text-base font-semibold md:text-2xl">
+            종소리 설정
+          </label>
+          <div className="flex flex-col gap-3">
+            <LabeledCheckbox
+              label="발언 종료 30초 전 알림"
+              checked={info.warningBell}
+              onChange={(e) =>
+                handleFieldChange('warningBell', e.target.checked)
+              }
+            />
+            <LabeledCheckbox
+              label="발언 종료 알림"
+              checked={info.finishBell}
+              onChange={(e) =>
+                handleFieldChange('finishBell', e.target.checked)
+              }
+            />
           </div>
         </section>
       </DefaultLayout.ContentContanier>
-
       <DefaultLayout.StickyFooterWrapper>
-        <button
-          onClick={() => {
-            if (info.name === '') {
-              onInfoChange({
-                ...info,
-                name: '테이블 1',
-              });
-            }
-            onButtonClick();
-          }}
-          className="h-20 w-full bg-amber-500 text-2xl font-semibold transition duration-300 hover:bg-amber-600"
-        >
-          {isEdit ? '타임박스 수정하기' : '타임박스 만들기'}
-        </button>
+        <div className="mx-auto mb-4 w-full max-w-4xl px-6 md:px-8">
+          <button
+            onClick={() => {
+              if (info.name === '') {
+                onInfoChange({
+                  ...info,
+                  name: '템플릿 1',
+                });
+              }
+              onButtonClick();
+            }}
+            className="font-semibol h-16 w-full rounded-md bg-brand-main text-lg transition-colors duration-300 hover:bg-amber-500 md:text-xl"
+          >
+            {isEdit ? '시간표 수정하기' : '시간표 추가하기'}
+          </button>
+        </div>
       </DefaultLayout.StickyFooterWrapper>
     </DefaultLayout>
   );
