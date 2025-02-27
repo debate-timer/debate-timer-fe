@@ -90,14 +90,14 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           </label>
           <div className="flex flex-col gap-3">
             <LabeledCheckbox
-              label="발언종료 30초 전 알림"
+              label="발언 종료 30초 전 알림"
               checked={info.warningBell}
               onChange={(e) =>
                 handleFieldChange('warningBell', e.target.checked)
               }
             />
             <LabeledCheckbox
-              label="발언종료 알림"
+              label="발언 종료 알림"
               checked={info.finishBell}
               onChange={(e) =>
                 handleFieldChange('finishBell', e.target.checked)
