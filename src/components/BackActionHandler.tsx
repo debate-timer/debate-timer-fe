@@ -25,5 +25,5 @@ export default function BackActionHandler() {
     };
   }, [handleBackAction]);
 
-  return <div></div>;
+  return <></>;
 }
