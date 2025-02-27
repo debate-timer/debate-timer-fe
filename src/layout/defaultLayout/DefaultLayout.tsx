@@ -12,4 +12,5 @@ function DefaultLayout(props: PropsWithChildren) {
 DefaultLayout.Header = StickyTriSectionHeader;
 DefaultLayout.ContentContainer = ContentContainer;
 DefaultLayout.StickyFooterWrapper = StickyFooterWrapper;
+
 export default DefaultLayout;

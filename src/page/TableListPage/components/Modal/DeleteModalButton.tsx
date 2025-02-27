@@ -24,7 +24,7 @@ export default function DeleteModalButton({
     <>
       <button
         onClick={handleOpenModal}
-        className="transform text-lg duration-200 hover:scale-125  lg:text-2xl"
+        className="transform text-2xl duration-200 hover:scale-125"
         aria-label="삭제하기"
       >
         <AiOutlineDelete />
