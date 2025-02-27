@@ -21,7 +21,7 @@ export default function TableListPage() {
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <div className="flex flex-wrap px-20 py-6">
           {data &&
             data.tables.map((table: DebateTable, idx: number) => (
@@ -36,7 +36,7 @@ export default function TableListPage() {
             ))}
           <AddTable />
         </div>
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
     </DefaultLayout>
   );
 }
