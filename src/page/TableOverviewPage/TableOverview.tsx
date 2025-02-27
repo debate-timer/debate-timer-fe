@@ -36,7 +36,7 @@ export default function TableOverview() {
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 flex w-full max-w-4xl gap-1 px-6 md:px-8">
           <button
-            className="flex h-16 w-screen items-center justify-center gap-2 rounded-md  bg-neutral-300 text-2xl"
+            className="flex h-16 w-screen items-center justify-center gap-2 rounded-md bg-neutral-300 text-2xl  transition-colors duration-300 hover:bg-neutral-500"
             onClick={() =>
               navigate(
                 `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
@@ -47,7 +47,7 @@ export default function TableOverview() {
             수정하기
           </button>
           <button
-            className="flex h-16 w-screen items-center justify-center gap-2 rounded-md bg-brand-main text-2xl"
+            className="flex h-16 w-screen items-center justify-center gap-2 rounded-md bg-brand-main text-2xl transition-colors duration-300 hover:bg-amber-600"
             onClick={() => navigate(`/table/parliamentary/${tableId}`)}
           >
             <RiSpeakFill />
