@@ -61,25 +61,6 @@ export default function TimerCreationContent({
       </h2>
       <div className="flex flex-col gap-4 p-4">
         <div className="flex items-center space-x-2">
-          <label htmlFor="stance-select" className="w-16 flex-shrink-0">
-            입장
-          </label>
-          <select
-            id="stance-select"
-            className={`flex-1 rounded border p-1 ${
-              stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-200' : ''
-            }`}
-            value={stance}
-            onChange={(e) => setStance(e.target.value as Stance)}
-            disabled={stance === 'NEUTRAL'}
-          >
-            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
-            <option value="PROS">찬성</option>
-            <option value="CONS">반대</option>
-          </select>
-        </div>
-
-        <div className="flex items-center space-x-2">
           <label htmlFor="debate-type-select" className="w-16 flex-shrink-0">
             유형
           </label>
@@ -103,6 +84,25 @@ export default function TimerCreationContent({
             <option value="CROSS">교차질의</option>
             <option value="CLOSING">최종발언</option>
             <option value="TIME_OUT">작전시간</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <label htmlFor="stance-select" className="w-16 flex-shrink-0">
+            입장
+          </label>
+          <select
+            id="stance-select"
+            className={`flex-1 rounded border p-1 ${
+              stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-200' : ''
+            }`}
+            value={stance}
+            onChange={(e) => setStance(e.target.value as Stance)}
+            disabled={stance === 'NEUTRAL'}
+          >
+            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
+            <option value="PROS">찬성</option>
+            <option value="CONS">반대</option>
           </select>
         </div>
 
