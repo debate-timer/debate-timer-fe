@@ -6,25 +6,25 @@ import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
 import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDeleteParliamentaryDebateTable';
 
 export default function TableListPage() {
-  const { data: tables } = useGetDebateTableList();
-
+  const { data } = useGetDebateTableList();
   const { mutate } = useDeleteParliamentaryDebateTable();
 
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>
-          <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
-            <h1 className="mr-2">테이블 목록</h1>
+        <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
+        <DefaultLayout.Header.Center>
+          <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
+            <h1>토론 시간표를 선택해주세요.</h1>
           </div>
-        </DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center />
+        </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
-      <div className="flex h-screen flex-col px-4 py-6">
-        <main className="grid grid-cols-3 justify-items-center gap-6">
-          {tables &&
-            tables.tables.map((table: DebateTable, idx: number) => (
+
+      <DefaultLayout.ContentContanier>
+        <div className="flex flex-wrap px-20 py-6">
+          {data &&
+            data.tables.map((table: DebateTable, idx: number) => (
               <Table
                 key={idx}
                 id={table.id}
@@ -35,8 +35,8 @@ export default function TableListPage() {
               />
             ))}
           <AddTable />
-        </main>
-      </div>
+        </div>
+      </DefaultLayout.ContentContanier>
     </DefaultLayout>
   );
 }

@@ -28,7 +28,6 @@ vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
   const HeaderRight = ({ children }: { children: React.ReactNode }) => (
     <div data-testid="header-right">{children}</div>
   );
-
   const Header = ({ children }: { children: React.ReactNode }) => (
     <div data-testid="header">{children}</div>
   );
@@ -37,11 +36,15 @@ vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
   Header.Center = HeaderCenter;
   Header.Right = HeaderRight;
 
+  const ContentContainer = ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="content-container">{children}</div>
+  );
   const DefaultLayout = ({ children }: { children: React.ReactNode }) => (
     <div data-testid="default-layout">{children}</div>
   );
   DefaultLayout.displayName = 'DefaultLayout';
   DefaultLayout.Header = Header;
+  DefaultLayout.ContentContanier = ContentContainer;
 
   return {
     default: DefaultLayout,
@@ -72,23 +75,23 @@ describe('TableListPage', () => {
     );
   };
 
-  it('DefaultLayout 렌더링 검증', () => {
+  it('DefaultLayout 렌더링 검증', async () => {
     renderTableListPage();
     expect(screen.getByTestId('default-layout')).toBeInTheDocument();
   });
 
   it('헤더 렌더링 검증', () => {
     renderTableListPage();
-    const headerLeft = screen.getByTestId('header-left');
-    expect(headerLeft).toBeInTheDocument();
-    expect(headerLeft).toHaveTextContent('테이블 목록');
+    const headerCenter = screen.getByTestId('header-center');
+    expect(headerCenter).toBeInTheDocument();
+    expect(headerCenter).toHaveTextContent('토론 시간표를 선택해주세요.');
   });
 
   it('Table 렌더링 검증', async () => {
     renderTableListPage();
     await waitFor(() => {
       const tables = screen.getAllByRole('button', { name: /테이블 \d+/i });
-      expect(tables).toHaveLength(2);
+      expect(tables).toHaveLength(8);
     });
   });
 
@@ -104,7 +107,7 @@ describe('TableListPage', () => {
     });
 
     const deleteButtons = screen.getAllByRole('button', { name: '삭제하기' });
-    expect(deleteButtons).toHaveLength(2);
+    expect(deleteButtons).toHaveLength(8);
 
     await userEvent.click(deleteButtons[0]);
     const modalHeader = await screen.findByRole('heading', {
@@ -124,7 +127,7 @@ describe('TableListPage', () => {
     });
 
     const editButtons = screen.getAllByRole('button', { name: '수정하기' });
-    expect(editButtons).toHaveLength(2);
+    expect(editButtons).toHaveLength(8);
 
     await userEvent.click(editButtons[0]);
     expect(navigate).toHaveBeenCalledWith(

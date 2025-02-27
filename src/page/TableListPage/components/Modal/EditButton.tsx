@@ -17,7 +17,7 @@ export default function EditButton({ tableId, type }: EditButtonProps) {
     <>
       <button
         onClick={handleEdit}
-        className="transform text-lg  duration-200 hover:scale-125 lg:text-2xl"
+        className="transform text-2xl duration-200 hover:scale-125"
         aria-label="수정하기"
       >
         <AiOutlineEdit />
