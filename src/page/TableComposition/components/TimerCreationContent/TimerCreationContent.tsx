@@ -164,7 +164,7 @@ export default function TimerCreationContent({
           className="mt-4 w-full rounded bg-amber-300 p-2 hover:bg-amber-500"
           onClick={handleSubmit}
         >
-          타임박스 설정하기
+          시간표 설정
         </button>
       </div>
     </>

@@ -120,7 +120,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             }}
             className="font-semibol h-16 w-full rounded-md bg-brand-main text-lg transition-colors duration-300 hover:bg-amber-500 md:text-xl"
           >
-            {isEdit ? '시간표 수정하기' : '시간표 추가하기'}
+            {isEdit ? '시간표 수정' : '시간표 추가'}
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
