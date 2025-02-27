@@ -29,36 +29,49 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderDragHandle = () => (
     <div
-      className="left-0x absolute top-4 flex h-2/3 w-4 flex-1 cursor-grab items-center 
-                justify-center rounded-md bg-slate-100 "
+      className={`${isPros ? 'right-2' : 'left-2'} absolute top-4 flex h-2/3 w-4 flex-1 cursor-grab items-center 
+                justify-center rounded-md bg-neutral-0 hover:bg-neutral-300`}
       onMouseDown={onMouseDown}
       title="위아래로 드래그"
     >
-      {/* 세로줄 아이콘을 중앙에 표시해줍니다 */}
-      <LuArrowUpDown className="text-gray-600" />
+      <LuArrowUpDown className="text-neutral-900" />
     </div>
   );
   const renderProsConsPanel = () => (
     <div
-      className={`relative flex w-1/2 flex-col items-center rounded-md ${
-        isPros ? 'bg-blue-500' : 'bg-red-500'
-      } h-24 select-none p-2 font-bold text-white`}
+      className={`relative flex w-1/2 flex-col items-center justify-center rounded-md ${
+        isPros ? 'bg-camp-blue' : 'bg-camp-red'
+      } h-24 select-none p-2 font-bold text-neutral-0`}
     >
       {onSubmitEdit && onSubmitDelete && (
-        <div className="flex h-4 w-full items-center gap-2">
-          <div className="flex-1" />
-          {renderDragHandle()}
-          <div className="flex-1">
-            <EditDeleteButtons
-              info={props.info}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-            />
-          </div>
-        </div>
+        <>
+          {isPros ? (
+            <>
+              <div className="absolute left-2 top-2">
+                <EditDeleteButtons
+                  info={props.info}
+                  onSubmitEdit={onSubmitEdit}
+                  onSubmitDelete={onSubmitDelete}
+                />
+              </div>
+              {renderDragHandle()}
+            </>
+          ) : (
+            <>
+              {renderDragHandle()}
+              <div className="absolute right-2 top-2">
+                <EditDeleteButtons
+                  info={props.info}
+                  onSubmitEdit={onSubmitEdit}
+                  onSubmitDelete={onSubmitDelete}
+                />
+              </div>
+            </>
+          )}
+        </>
       )}
       <div>
-        {debateTypeLabel} / {speakerNumber}번 토론자
+        {debateTypeLabel} | {speakerNumber}번 토론자
       </div>
       <div className="text-2xl">{timeStr}</div>
     </div>
@@ -66,21 +79,21 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralTimeoutPanel = () => (
     <div className="relative flex h-24 w-full select-none items-center text-center">
-      <div className="flex h-4/5 w-full flex-col items-center justify-start rounded-md bg-gray-200 p-2 font-medium text-gray-600">
+      <div className="relative flex h-4/5 w-full flex-col items-center justify-center rounded-md bg-neutral-500 p-2 font-medium ">
         {onSubmitEdit && onSubmitDelete && (
-          <div className="flex h-4 w-full items-center gap-2">
-            <div className="flex-1" />
+          <>
             {renderDragHandle()}
-            <div className="flex-1">
+            <div className="absolute right-2 top-2">
               <EditDeleteButtons
                 info={props.info}
                 onSubmitEdit={onSubmitEdit}
                 onSubmitDelete={onSubmitDelete}
               />
             </div>
-          </div>
+          </>
         )}
-        {debateTypeLabel} | {timeStr}
+        <span className="text-sm">{debateTypeLabel}</span>
+        <span className="text-xl">{timeStr}</span>
       </div>
     </div>
   );
