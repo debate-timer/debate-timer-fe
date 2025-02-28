@@ -6,6 +6,6 @@ labels: deploy
 assignees: ''
 ---
 
-### ✨ Description
+# ✨ Description
 
-### ✨ Time(마감기한)
+# ✨ Time (마감 기한)

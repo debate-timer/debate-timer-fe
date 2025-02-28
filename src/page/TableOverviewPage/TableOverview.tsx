@@ -24,7 +24,8 @@ export default function TableOverview() {
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
-      <DefaultLayout.ContentContanier>
+
+      <DefaultLayout.ContentContainer>
         <section className="mx-auto flex w-full max-w-4xl flex-col">
           <PropsAndConsTitle />
           {data &&
@@ -32,7 +33,8 @@ export default function TableOverview() {
               <DebatePanel key={index} info={info} />
             ))}
         </section>
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
+
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 flex w-full max-w-4xl gap-1 px-6 md:px-8">
           <button

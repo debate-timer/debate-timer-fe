@@ -59,11 +59,12 @@ export default {
         brand: {
           main: '#F8B62D',   
           sub1: '#01204E',
-          sub2: '#028391',  
-          sub3: '#37474F',   
-          sub4: '#FF5622'
+          sub2: '#028391',
+          sub3: '#37474F',
+          sub4: '#FF5622',
         },
         neutral: {
+          1000: '#000000',
           900: '#121212',
           700: '#3C3C3C',
           500: '#B9B9B9',
@@ -75,9 +76,9 @@ export default {
           success: '#4BD964',
           danger: '#FF3F2F',
         },
-        camp : {
-          red : '#FF3B2F',
-          blue: '#007AFF'
+        camp: {
+          red: '#FF3B2F',
+          blue: '#007AFF',
         },
         background: {
           default: '#FFFFFF',

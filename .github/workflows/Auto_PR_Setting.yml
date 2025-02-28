@@ -6,6 +6,8 @@ on:
 
 jobs:
   assign-issue:
+    # Works only if target branch name is not 'main'
+    if: github.base_ref != 'main'
     runs-on: ubuntu-latest
 
     steps:

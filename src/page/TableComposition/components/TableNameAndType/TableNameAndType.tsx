@@ -50,7 +50,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
           <label className="flex items-center text-base font-semibold md:text-2xl">
             토론 시간표 이름
@@ -105,7 +105,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             />
           </div>
         </section>
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
+      
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 w-full max-w-4xl px-6 md:px-8">
           <button

@@ -56,7 +56,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
-      <DefaultLayout.ContentContanier>
+      <DefaultLayout.ContentContainer>
         <section className="mx-auto flex w-full max-w-4xl flex-col">
           <PropsAndConsTitle />
           <DragAndDropWrapper>
@@ -77,7 +77,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
           <TimerCreationButton onClick={openModal} />
         </section>
-      </DefaultLayout.ContentContanier>
+      </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 w-full max-w-4xl px-6 md:px-8">
