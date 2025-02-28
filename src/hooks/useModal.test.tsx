@@ -98,8 +98,7 @@ describe('useModal Hook 테스트', () => {
     expect(screen.getByTestId('modal-content')).toBeInTheDocument();
 
     // 'X' 버튼(모달 내부 right-4 top-4) 클릭
-    const closeButton = screen.getByRole('button', { name: /x/i });
-    await user.click(closeButton);
+    await user.click(screen.getByTestId('close-btn'));
 
     expect(screen.queryByTestId('modal-content')).not.toBeInTheDocument();
   });

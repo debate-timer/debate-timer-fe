@@ -42,41 +42,24 @@ export default function TimerCreationContent({
   const getStanceColor = () => {
     switch (stance) {
       case 'PROS':
-        return 'text-blue-500';
+        return 'bg-camp-blue';
       case 'CONS':
-        return 'text-red-500';
+        return 'bg-camp-red';
       case 'NEUTRAL':
-        return 'text-gray-400';
+        return 'bg-neutral-500';
       default:
-        return 'text-gray-400';
+        return 'bg-neutral-500';
     }
   };
 
   return (
-    <div className="p-10">
-      <h2 className={`mb-4 text-xl font-bold ${getStanceColor()}`}>
+    <>
+      <h2
+        className={`mb-4 px-4 py-4 text-xl font-bold text-neutral-0 ${getStanceColor()}`}
+      >
         타임박스 설정
       </h2>
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center space-x-2">
-          <label htmlFor="stance-select" className="w-16 flex-shrink-0">
-            입장
-          </label>
-          <select
-            id="stance-select"
-            className={`flex-1 rounded border p-1 ${
-              stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-200' : ''
-            }`}
-            value={stance}
-            onChange={(e) => setStance(e.target.value as Stance)}
-            disabled={stance === 'NEUTRAL'}
-          >
-            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
-            <option value="PROS">찬성</option>
-            <option value="CONS">반대</option>
-          </select>
-        </div>
-
+      <div className="flex flex-col gap-4 p-4">
         <div className="flex items-center space-x-2">
           <label htmlFor="debate-type-select" className="w-16 flex-shrink-0">
             유형
@@ -101,6 +84,25 @@ export default function TimerCreationContent({
             <option value="CROSS">교차질의</option>
             <option value="CLOSING">최종발언</option>
             <option value="TIME_OUT">작전시간</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <label htmlFor="stance-select" className="w-16 flex-shrink-0">
+            입장
+          </label>
+          <select
+            id="stance-select"
+            className={`flex-1 rounded border p-1 ${
+              stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-200' : ''
+            }`}
+            value={stance}
+            onChange={(e) => setStance(e.target.value as Stance)}
+            disabled={stance === 'NEUTRAL'}
+          >
+            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
+            <option value="PROS">찬성</option>
+            <option value="CONS">반대</option>
           </select>
         </div>
 
@@ -154,7 +156,7 @@ export default function TimerCreationContent({
             <option value="2">2번 토론자</option>
             <option value="3">3번 토론자</option>
             <option value="4">4번 토론자</option>
-            <option value="4">5번 토론자</option>
+            <option value="5">5번 토론자</option>
           </select>
         </div>
 
@@ -162,9 +164,9 @@ export default function TimerCreationContent({
           className="mt-4 w-full rounded bg-amber-300 p-2 hover:bg-amber-500"
           onClick={handleSubmit}
         >
-          타임박스 설정하기
+          시간표 설정
         </button>
       </div>
-    </div>
+    </>
   );
 }

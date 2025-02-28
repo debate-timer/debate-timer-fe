@@ -52,12 +52,12 @@ describe('TableComposition', () => {
 
     expect(
       screen.findByRole('heading', {
-        name: '어떤 토론을 원하시나요?',
+        name: '토론 정보를 설정해주세요',
       }),
     );
     expect(screen.getByText('토론 유형')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: '타임박스 만들기' }),
+      screen.getByRole('button', { name: '시간표 추가' }),
     ).toBeInTheDocument();
   });
 
@@ -73,7 +73,7 @@ describe('TableComposition', () => {
         name: '토론 정보를 수정해주세요',
       }),
     );
-    const nameInput = await screen.findByPlaceholderText('테이블 1(디폴트 값)');
+    const nameInput = await screen.findByPlaceholderText('테이블 1');
 
     expect((nameInput as HTMLInputElement).value).toBe('');
   });
@@ -85,7 +85,7 @@ describe('TableComposition', () => {
       </TestWrapper>,
     );
 
-    const nextButton = screen.getByText('타임박스 만들기');
+    const nextButton = screen.getByText('시간표 추가');
     await userEvent.click(nextButton);
 
     // TimeBoxStep 컴포넌트가 표시된다고 가정
@@ -101,20 +101,20 @@ describe('TableComposition', () => {
       </TestWrapper>,
     );
 
-    const nextButton = screen.getByText('타임박스 만들기');
+    const nextButton = screen.getByText('시간표 추가');
     await userEvent.click(nextButton);
 
     // 3. TimeBoxStep 노출 확인
     expect(screen.getByText('주제 없음')).toBeInTheDocument();
 
     // 4. "완료" (혹은 "제출") 버튼 클릭
-    const submitButton = screen.getByText('테이블 추가하기');
+    const submitButton = screen.getByText('시간표 추가 완료');
     expect(submitButton).toBeDisabled();
 
     const leftAddButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
     await userEvent.click(leftAddButton);
 
-    const addButton = screen.getByText('타임박스 설정하기');
+    const addButton = screen.getByText('시간표 설정');
     await userEvent.click(addButton);
 
     await userEvent.click(submitButton);

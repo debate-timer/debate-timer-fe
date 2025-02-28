@@ -57,7 +57,7 @@ export default {
       },
       colors: {
         brand: {
-          main: '#FF9900',
+          main: '#F8B62D',   
           sub1: '#01204E',
           sub2: '#028391',
           sub3: '#37474F',

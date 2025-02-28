@@ -13,7 +13,6 @@ type Story = StoryObj<typeof TimerCreationButton>;
 
 export const Default: Story = {
   args: {
-    leftOnClick: () => alert('Left button clicked!'),
-    rightOnClick: () => alert('Right button clicked!'),
+    onClick: () => alert('Left button clicked!'),
   },
 };
