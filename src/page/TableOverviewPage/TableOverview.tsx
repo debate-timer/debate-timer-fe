@@ -26,7 +26,7 @@ export default function TableOverview() {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <section className="mx-auto flex w-full max-w-4xl flex-col">
+        <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
           <PropsAndConsTitle />
           <div className="flex w-full flex-col gap-2">
             {data &&
@@ -38,7 +38,7 @@ export default function TableOverview() {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-4 flex w-full max-w-4xl gap-1 px-6 md:px-8">
+        <div className="mx-auto mb-4 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
             className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-neutral-300 text-2xl font-semibold  transition-colors duration-300 hover:bg-neutral-500"
             onClick={() =>
