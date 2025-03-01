@@ -83,7 +83,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         <div className="mx-auto mb-4 w-full max-w-4xl px-6 md:px-8">
           <button
             onClick={onButtonClick}
-            className={`font-semibol h-16 w-full rounded-md text-lg transition-colors duration-300 md:text-xl ${
+            className={`font-semibol h-16 w-full rounded-md text-lg font-semibold transition-colors duration-300 md:text-xl ${
               isAbledSummitButton
                 ? 'bg-brand-main hover:bg-amber-600'
                 : 'cursor-not-allowed bg-neutral-500'

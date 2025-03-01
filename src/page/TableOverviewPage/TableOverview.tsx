@@ -28,17 +28,19 @@ export default function TableOverview() {
       <DefaultLayout.ContentContainer>
         <section className="mx-auto flex w-full max-w-4xl flex-col">
           <PropsAndConsTitle />
-          {data &&
-            data.table.map((info, index) => (
-              <DebatePanel key={index} info={info} />
-            ))}
+          <div className="flex w-full flex-col gap-2">
+            {data &&
+              data.table.map((info, index) => (
+                <DebatePanel key={index} info={info} />
+              ))}
+          </div>
         </section>
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 flex w-full max-w-4xl gap-1 px-6 md:px-8">
           <button
-            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-neutral-300 text-2xl  transition-colors duration-300 hover:bg-neutral-500"
+            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-neutral-300 text-2xl font-semibold  transition-colors duration-300 hover:bg-neutral-500"
             onClick={() =>
               navigate(
                 `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
@@ -49,7 +51,7 @@ export default function TableOverview() {
             수정하기
           </button>
           <button
-            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-brand-main text-2xl transition-colors duration-300 hover:bg-amber-600"
+            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-brand-main text-2xl font-semibold transition-colors duration-300 hover:bg-amber-600"
             onClick={() => navigate(`/table/parliamentary/${tableId}`)}
           >
             <RiSpeakFill />
