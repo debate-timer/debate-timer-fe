@@ -6,7 +6,7 @@ interface TimerCreationContentProps {
   selectedStance: Stance;
   initDate?: TimeBoxInfo;
   onSubmit: (data: TimeBoxInfo) => void;
-  onClose: () => void; // 모달 닫기 함수
+  onClose: () => void;
 }
 
 export default function TimerCreationContent({
@@ -125,6 +125,7 @@ export default function TimerCreationContent({
                 id="minutes-input"
                 type="number"
                 min={0}
+                max={59}
                 className="min-w-8 flex-grow rounded border p-1"
                 value={minutes.toString()}
                 onChange={(e) => setMinutes(Number(e.target.value))}
@@ -136,6 +137,7 @@ export default function TimerCreationContent({
                 id="seconds-input"
                 type="number"
                 min={0}
+                max={59}
                 className="min-w-8 flex-grow rounded border p-1"
                 value={seconds.toString()}
                 onChange={(e) => setSeconds(Number(e.target.value))}
