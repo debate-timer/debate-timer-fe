@@ -1,6 +1,6 @@
-import { IoArrowDown, IoArrowUp } from 'react-icons/io5';
 import { TimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface TimeTableProps {
   goToOtherItem: (isPrev: boolean) => void;
@@ -53,14 +53,14 @@ export default function TimeTable({
           className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
           onClick={() => goToOtherItem(true)}
         >
-          <IoArrowUp className="size-[36px]" />
+          <FaArrowLeft className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">이전 차례</h1>
         </button>
         <button
           className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
           onClick={() => goToOtherItem(false)}
         >
-          <IoArrowDown className="size-[36px]" />
+          <FaArrowRight className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">다음 차례</h1>
         </button>
       </div>
