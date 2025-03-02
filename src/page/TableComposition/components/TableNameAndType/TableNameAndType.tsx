@@ -106,9 +106,9 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           </div>
         </section>
       </DefaultLayout.ContentContainer>
-      
+
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-4 w-full max-w-4xl px-6 md:px-8">
+        <div className="mx-auto mb-4 w-full max-w-4xl">
           <button
             onClick={() => {
               if (info.name === '') {
@@ -119,9 +119,9 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               }
               onButtonClick();
             }}
-            className="font-semibol h-16 w-full rounded-md bg-brand-main text-lg transition-colors duration-300 hover:bg-amber-500 md:text-xl"
+            className="h-16 w-full rounded-md bg-brand-main text-lg font-semibold transition-colors duration-300 hover:bg-amber-500 md:text-xl"
           >
-            {isEdit ? '시간표 수정' : '시간표 추가'}
+            다음
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>

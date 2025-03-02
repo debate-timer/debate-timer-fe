@@ -34,7 +34,7 @@ export default function DeleteModalButton({
           <h1 className="text-xl font-bold">삭제하시겠습니까?</h1>
           <h2 className="text-lg font-semibold">테이블명: {name}</h2>
           <button
-            className="mt-8 rounded-lg bg-red-500 px-8 py-2 text-white"
+            className="mt-8 rounded-lg bg-red-500 px-8 py-2 font-semibold text-white"
             onClick={handleDelete}
           >
             삭제
