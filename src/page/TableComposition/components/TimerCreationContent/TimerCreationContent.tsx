@@ -53,7 +53,7 @@ export default function TimerCreationContent({
   };
 
   return (
-    <div className="relative aspect-[6/5]">
+    <div className="relative aspect-square min-w-[400px]">
       <h2
         className={`mb-4 px-4 py-4 text-xl font-bold text-neutral-0 ${getStanceColor()}`}
       >
