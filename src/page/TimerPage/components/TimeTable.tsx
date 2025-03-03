@@ -60,8 +60,8 @@ export default function TimeTable({
           className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
           onClick={() => goToOtherItem(false)}
         >
-          <FaArrowRight className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">다음 차례</h1>
+          <FaArrowRight className="size-[36px]" />
         </button>
       </div>
     </div>
