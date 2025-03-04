@@ -97,14 +97,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
       <ModalWrapper>
         <TimerCreationContent
-          selectedStance={
-            initTimeBox.length === 0
-              ? 'PROS'
-              : initTimeBox[initTimeBox.length - 1].stance === 'PROS'
-                ? 'CONS'
-                : 'PROS'
-          }
-          initDate={initTimeBox[initTimeBox.length - 1]}
+          beforeData={initTimeBox[initTimeBox.length - 1]}
           onSubmit={(data) => {
             onTimeBoxChange((prev) => [...prev, data]);
           }}

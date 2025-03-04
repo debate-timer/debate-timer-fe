@@ -106,7 +106,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           </div>
         </section>
       </DefaultLayout.ContentContainer>
-      
+
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 w-full max-w-4xl px-6 md:px-8">
           <button
