@@ -3,29 +3,33 @@ import { TimeBoxInfo, DebateType, Stance } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
-  selectedStance: Stance;
-  initDate?: TimeBoxInfo;
+  beforeData?: TimeBoxInfo;
+  initData?: TimeBoxInfo;
   onSubmit: (data: TimeBoxInfo) => void;
   onClose: () => void; // 모달 닫기 함수
 }
 
 export default function TimerCreationContent({
-  selectedStance,
-  initDate,
+  beforeData,
+  initData,
   onSubmit,
   onClose,
 }: TimerCreationContentProps) {
-  const [stance, setStance] = useState<Stance>(selectedStance);
+  const [stance, setStance] = useState<Stance>(
+    beforeData?.stance === 'NEUTRAL'
+      ? 'PROS'
+      : (beforeData?.stance ?? initData?.stance ?? 'PROS'),
+  );
   const [debateType, setDebateType] = useState<DebateType>(
-    initDate?.type ?? 'OPENING',
+    initData?.type ?? 'OPENING',
   );
   const { minutes: initMinutes, seconds: initSeconds } =
-    Formatting.formatSecondsToMinutes(initDate?.time ?? 180);
+    Formatting.formatSecondsToMinutes(initData?.time ?? 180);
 
   const [minutes, setMinutes] = useState(initMinutes);
   const [seconds, setSeconds] = useState(initSeconds);
   const [speakerNumber, setSpeakerNumber] = useState<number | null>(
-    initDate?.stance === 'NEUTRAL' ? 1 : (initDate?.speakerNumber ?? 1),
+    initData?.stance === 'NEUTRAL' ? 1 : (initData?.speakerNumber ?? 1),
   );
 
   const handleSubmit = () => {
@@ -71,10 +75,11 @@ export default function TimerCreationContent({
             onChange={(e) => {
               if (e.target.value === 'TIME_OUT') {
                 setStance('NEUTRAL');
-              } else {
-                setStance(
-                  selectedStance === 'NEUTRAL' ? 'CONS' : selectedStance,
-                );
+              } else if (
+                stance === 'NEUTRAL' &&
+                e.target.value !== 'TIME_OUT'
+              ) {
+                setStance('PROS');
               }
               setDebateType(e.target.value as DebateType);
             }}
@@ -100,7 +105,7 @@ export default function TimerCreationContent({
             onChange={(e) => setStance(e.target.value as Stance)}
             disabled={stance === 'NEUTRAL'}
           >
-            {stance === 'NEUTRAL' && <option value="NEUTRAL"></option>}
+            {stance === 'NEUTRAL' && <option value="NEUTRAL" />}
             <option value="PROS">찬성</option>
             <option value="CONS">반대</option>
           </select>

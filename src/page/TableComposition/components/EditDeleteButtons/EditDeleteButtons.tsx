@@ -43,8 +43,7 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
       </div>
       <EditModalWrapper>
         <TimerCreationContent
-          selectedStance={info.stance}
-          initDate={info}
+          initData={info}
           onSubmit={(newInfo) => {
             onSubmitEdit(newInfo);
           }}
