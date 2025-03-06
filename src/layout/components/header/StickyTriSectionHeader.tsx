@@ -9,7 +9,7 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
   return (
-    <header className="sticky top-0 min-h-20 border-b-[1px] border-neutral-900 bg-background-default px-6">
+    <header className="sticky top-0 min-h-20 border-b-[1px] border-neutral-900 px-6">
       <div className="relative flex h-full items-center justify-between">
         {children}
       </div>
