@@ -5,6 +5,7 @@
 @layer base {
   body {
     @apply font-pretendard;
+    @apply bg-background-default;
   }
 }
 
