@@ -77,7 +77,7 @@ export default {
           blue: '#007AFF',
         },
         background: {
-          default: '#FFFFFF',
+          default: '#F6F5F4',
           secondary: '#FFF3DD',
         },
       },
