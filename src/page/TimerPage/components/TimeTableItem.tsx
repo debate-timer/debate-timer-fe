@@ -23,7 +23,7 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
         ? 'self-start'
         : 'self-end'
       : 'self-center';
-  const width = item.stance !== 'NEUTRAL' ? 'w-[360px]' : 'w-full';
+  const width = item.stance !== 'NEUTRAL' ? 'w-1/2' : 'w-full';
   const minute = Math.floor(Math.abs(item.time) / 60);
   const second = Math.abs(item.time % 60);
   const timeText = `${Formatting.formatTwoDigits(minute)}:${Formatting.formatTwoDigits(second)}`;
