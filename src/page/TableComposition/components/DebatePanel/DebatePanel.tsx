@@ -41,7 +41,7 @@ export default function DebatePanel(props: DebatePanelProps) {
     <div
       className={`relative flex w-1/2 flex-col items-center justify-center rounded-md ${
         isPros ? 'bg-camp-blue' : 'bg-camp-red'
-      } h-24 select-none p-2 font-bold text-neutral-0`}
+      } h-20 select-none p-2 font-bold text-neutral-0`}
     >
       {onSubmitEdit && onSubmitDelete && (
         <>
@@ -70,31 +70,29 @@ export default function DebatePanel(props: DebatePanelProps) {
           )}
         </>
       )}
-      <div>
-        {debateTypeLabel} | {speakerNumber}번 토론자
+      <div className="font-semibold">
+        {debateTypeLabel} {speakerNumber && `| ${speakerNumber}번 토론자`}
       </div>
-      <div className="text-2xl">{timeStr}</div>
+      <div className="text-2xl font-semibold">{timeStr}</div>
     </div>
   );
 
   const renderNeutralTimeoutPanel = () => (
-    <div className="relative flex h-24 w-full select-none items-center text-center">
-      <div className="relative flex h-4/5 w-full flex-col items-center justify-center rounded-md bg-neutral-500 p-2 font-medium ">
-        {onSubmitEdit && onSubmitDelete && (
-          <>
-            {renderDragHandle()}
-            <div className="absolute right-2 top-2">
-              <EditDeleteButtons
-                info={props.info}
-                onSubmitEdit={onSubmitEdit}
-                onSubmitDelete={onSubmitDelete}
-              />
-            </div>
-          </>
-        )}
-        <span className="text-sm">{debateTypeLabel}</span>
-        <span className="text-xl">{timeStr}</span>
-      </div>
+    <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-500 p-2 font-medium ">
+      {onSubmitEdit && onSubmitDelete && (
+        <>
+          {renderDragHandle()}
+          <div className="absolute right-2 top-2">
+            <EditDeleteButtons
+              info={props.info}
+              onSubmitEdit={onSubmitEdit}
+              onSubmitDelete={onSubmitDelete}
+            />
+          </div>
+        </>
+      )}
+      <span className="font-semibold">{debateTypeLabel}</span>
+      <span className="text-2xl font-semibold">{timeStr}</span>
     </div>
   );
 
