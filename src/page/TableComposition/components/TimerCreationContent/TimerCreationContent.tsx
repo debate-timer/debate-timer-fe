@@ -6,7 +6,7 @@ interface TimerCreationContentProps {
   selectedStance: Stance;
   initDate?: TimeBoxInfo;
   onSubmit: (data: TimeBoxInfo) => void;
-  onClose: () => void; // 모달 닫기 함수
+  onClose: () => void;
 }
 
 export default function TimerCreationContent({
@@ -52,16 +52,25 @@ export default function TimerCreationContent({
     }
   };
 
+  const validateTime = (value: string) => {
+    if (value === '') return 0; // 빈 값 허용
+    const num = Math.max(0, Math.min(59, Number(value))); // 0~59 범위 유지
+    return num;
+  };
+
   return (
-    <>
+    <div className="relative aspect-square min-w-[400px]">
       <h2
         className={`mb-4 px-4 py-4 text-xl font-bold text-neutral-0 ${getStanceColor()}`}
       >
-        타임박스 설정
+        시간표 설정
       </h2>
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center space-x-2">
-          <label htmlFor="debate-type-select" className="w-16 flex-shrink-0">
+          <label
+            htmlFor="debate-type-select"
+            className="w-16 flex-shrink-0 font-semibold"
+          >
             유형
           </label>
           <select
@@ -88,7 +97,10 @@ export default function TimerCreationContent({
         </div>
 
         <div className="flex items-center space-x-2">
-          <label htmlFor="stance-select" className="w-16 flex-shrink-0">
+          <label
+            htmlFor="stance-select"
+            className="w-16 flex-shrink-0 font-semibold"
+          >
             입장
           </label>
           <select
@@ -107,29 +119,34 @@ export default function TimerCreationContent({
         </div>
 
         <div className="flex w-full items-center space-x-2">
-          <label htmlFor="minutes-input" className="w-16 flex-shrink-0">
+          <label
+            htmlFor="minutes-input"
+            className="w-16 flex-shrink-0 font-semibold"
+          >
             시간
           </label>
           <div className="flex w-full min-w-1 flex-wrap space-x-2">
-            <div className="flex min-w-12 flex-1 items-center">
+            <div className="flex min-w-10 flex-1 items-center">
               <input
                 id="minutes-input"
                 type="number"
                 min={0}
-                className="min-w-10 flex-grow rounded border p-1 text-center"
+                max={59}
+                className="min-w-8 flex-grow rounded border p-1"
                 value={minutes.toString()}
-                onChange={(e) => setMinutes(Number(e.target.value))}
+                onChange={(e) => setMinutes(validateTime(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">분</span>
             </div>
-            <div className="flex min-w-12 flex-1 items-center">
+            <div className="flex min-w-10 flex-1 items-center">
               <input
                 id="seconds-input"
                 type="number"
                 min={0}
-                className="min-w-10 flex-grow rounded border p-1 text-center"
+                max={59}
+                className="min-w-8 flex-grow rounded border p-1"
                 value={seconds.toString()}
-                onChange={(e) => setSeconds(Number(e.target.value))}
+                onChange={(e) => setSeconds(validateTime(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">초</span>
             </div>
@@ -137,7 +154,10 @@ export default function TimerCreationContent({
         </div>
 
         <div className="flex min-w-0 items-center space-x-2">
-          <label htmlFor="speaker-number-input" className="w-16 flex-shrink-0">
+          <label
+            htmlFor="speaker-number-input"
+            className="w-16 flex-shrink-0 font-semibold"
+          >
             발언자
           </label>
           <select
@@ -161,12 +181,12 @@ export default function TimerCreationContent({
         </div>
 
         <button
-          className="mt-4 w-full rounded bg-amber-300 p-2 hover:bg-amber-500"
+          className="absolute bottom-4 left-4 right-4 mt-4 rounded bg-amber-300 p-2 font-semibold hover:bg-amber-500"
           onClick={handleSubmit}
         >
           시간표 설정
         </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -42,7 +42,7 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
           >
             <div className="flex flex-row items-center justify-center space-x-4">
               <IoHome size={30} />
-              <h1 className="mt-0.5 text-2xl font-bold">홈으로 돌아가기</h1>
+              <h1 className="mt-0.5 text-2xl font-semibold">홈으로 돌아가기</h1>
             </div>
           </button>
         </div>

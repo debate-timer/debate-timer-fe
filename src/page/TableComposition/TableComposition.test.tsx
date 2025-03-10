@@ -56,9 +56,7 @@ describe('TableComposition', () => {
       }),
     );
     expect(screen.getByText('토론 유형')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: '시간표 추가' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '다음' })).toBeInTheDocument();
   });
 
   it('mode=edit일 때 서버에서 가져온 초기값이 반영된다 (tableId=1)', async () => {
@@ -85,7 +83,7 @@ describe('TableComposition', () => {
       </TestWrapper>,
     );
 
-    const nextButton = screen.getByText('시간표 추가');
+    const nextButton = screen.getByText('다음');
     await userEvent.click(nextButton);
 
     // TimeBoxStep 컴포넌트가 표시된다고 가정
@@ -101,7 +99,7 @@ describe('TableComposition', () => {
       </TestWrapper>,
     );
 
-    const nextButton = screen.getByText('시간표 추가');
+    const nextButton = screen.getByText('다음');
     await userEvent.click(nextButton);
 
     // 3. TimeBoxStep 노출 확인
@@ -111,11 +109,11 @@ describe('TableComposition', () => {
     const submitButton = screen.getByText('시간표 추가 완료');
     expect(submitButton).toBeDisabled();
 
-    const leftAddButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
-    await userEvent.click(leftAddButton);
-
-    const addButton = screen.getByText('시간표 설정');
+    const addButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
     await userEvent.click(addButton);
+
+    const confirmButton = screen.getByRole('button', { name: '시간표 설정' });
+    await userEvent.click(confirmButton);
 
     await userEvent.click(submitButton);
 
