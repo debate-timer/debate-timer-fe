@@ -52,6 +52,12 @@ export default function TimerCreationContent({
     }
   };
 
+  const validateTime = (value: string) => {
+    if (value === '') return 0; // 빈 값 허용
+    const num = Math.max(0, Math.min(59, Number(value))); // 0~59 범위 유지
+    return num;
+  };
+
   return (
     <div className="relative aspect-square min-w-[400px]">
       <h2
@@ -128,7 +134,7 @@ export default function TimerCreationContent({
                 max={59}
                 className="min-w-8 flex-grow rounded border p-1"
                 value={minutes.toString()}
-                onChange={(e) => setMinutes(Number(e.target.value))}
+                onChange={(e) => setMinutes(validateTime(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">분</span>
             </div>
@@ -140,7 +146,7 @@ export default function TimerCreationContent({
                 max={59}
                 className="min-w-8 flex-grow rounded border p-1"
                 value={seconds.toString()}
-                onChange={(e) => setSeconds(Number(e.target.value))}
+                onChange={(e) => setSeconds(validateTime(e.target.value))}
               />
               <span className="ml-1 flex-shrink-0">초</span>
             </div>
