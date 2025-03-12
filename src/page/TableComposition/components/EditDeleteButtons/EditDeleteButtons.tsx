@@ -14,12 +14,12 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
     openModal: openEditModal,
     closeModal: closeEditModal,
     ModalWrapper: EditModalWrapper,
-  } = useModal();
+  } = useModal({ isCloseButtonExist: false });
   const {
     openModal: openDeleteModal,
     closeModal: closeDeleteModal,
     ModalWrapper: DeleteModalWrapper,
-  } = useModal();
+  } = useModal({ isCloseButtonExist: false });
   const { info, onSubmitEdit, onSubmitDelete } = props;
 
   return (
