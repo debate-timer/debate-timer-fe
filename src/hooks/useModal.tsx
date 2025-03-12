@@ -4,6 +4,7 @@ import { IoMdClose } from 'react-icons/io';
 
 interface UseModalOptions {
   closeOnOverlayClick?: boolean;
+  isCloseButtonExist?: boolean;
 }
 
 /**
@@ -12,7 +13,7 @@ interface UseModalOptions {
  */
 export function useModal(options: UseModalOptions = {}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { closeOnOverlayClick = true } = options;
+  const { closeOnOverlayClick = true, isCloseButtonExist = true } = options;
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -54,14 +55,16 @@ export function useModal(options: UseModalOptions = {}) {
         >
           <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
             {children}
-            <button
-              type="button"
-              onClick={closeModal}
-              className="absolute right-4 top-4 text-3xl text-neutral-0 hover:text-gray-300"
-              aria-label="모달 닫기"
-            >
-              <IoMdClose />
-            </button>
+            {isCloseButtonExist && (
+              <button
+                type="button"
+                onClick={closeModal}
+                className="absolute right-4 top-4 text-3xl text-neutral-0 hover:text-gray-300"
+                aria-label="모달 닫기"
+              >
+                <IoMdClose />
+              </button>
+            )}
           </div>
         </div>
       </GlobalPortal.Consumer>
