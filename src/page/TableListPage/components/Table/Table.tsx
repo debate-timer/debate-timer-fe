@@ -35,7 +35,7 @@ export default function Table({
         <div className="flex max-w-full flex-col items-start justify-center text-[36px] font-bold">
           <span>유형 | {typeMapping[type]}</span>
           <span
-            className="w-full truncate hover:delay-0"
+            className="w-full truncate"
             title={agenda && agenda?.length > 15 ? agenda : undefined}
           >
             주제 | {agenda || '주제 없음'}
