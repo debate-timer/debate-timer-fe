@@ -30,7 +30,7 @@ export default function TableListPage() {
                 id={table.id}
                 name={table.name}
                 type={table.type}
-                duration={table.duration}
+                agenda={table.agenda}
                 onDelete={() => mutate({ tableId: table.id })}
               />
             ))}

@@ -35,6 +35,6 @@ export const Default: Story = {
   args: {
     name: '테이블 1',
     type: 'PARLIAMENTARY',
-    duration: 30,
+    agenda: '테이블 1의 주제',
   },
 };
