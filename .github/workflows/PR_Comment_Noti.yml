@@ -11,11 +11,9 @@ jobs:
 
     steps:
       - name: Set Environment Variables
-        env:
-          TITLE: ${{ github.event.issue.title }}
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
-          echo "COMMENT_BODY=${{ github.event.comment.body }}" >> $GITHUB_ENV
+          echo "COMMENT_BODY=$(echo '${{ github.event.comment.body }}' | jq -Rs .)" >> $GITHUB_ENV
           echo "USERNAME=망곰" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
 
