@@ -37,13 +37,49 @@ export default function TimeTable({
 
         {/** Print time table items(timeboxes) */}
         <div className="flex w-full flex-col space-y-[15px] px-[20px]">
-          {items.map((item, index) => (
-            <TimeTableItem
-              key={index}
-              isCurrent={currIndex === index}
-              item={item}
-            />
-          ))}
+          {items.length > 0 && (
+            <div className="flex w-full flex-col space-y-2">
+              <div className="h-[70px] w-full">
+                {currIndex - 2 >= 0 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex - 2]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex - 1 >= 0 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex - 1]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                <TimeTableItem isCurrent={true} item={items[currIndex]} />
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex + 1 <= items.length - 1 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex + 1]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex + 2 <= items.length - 1 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex + 2]}
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
