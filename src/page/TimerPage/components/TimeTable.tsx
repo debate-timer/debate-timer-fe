@@ -38,7 +38,7 @@ export default function TimeTable({
         {/** Print time table items(timeboxes) */}
         <div className="flex w-full flex-col space-y-[15px] px-[20px]">
           {items.length > 0 && (
-            <div className="flex w-full flex-col space-y-2">
+            <div className="flex w-full flex-col space-y-[15px]">
               <div className="h-[70px] w-full">
                 {currIndex - 2 >= 0 && (
                   <TimeTableItem
