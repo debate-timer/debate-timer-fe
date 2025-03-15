@@ -27,18 +27,23 @@ export default function DialogModal({
       {children}
 
       {/** Buttons */}
-      <div
-        data-testid="container"
-        className="w-full border-t border-neutral-300"
-      />
+      <div className="w-full border-t border-neutral-300" />
       <div className="flex w-full flex-row items-center justify-center py-4">
         {/** Left button */}
-        <button className="w-1/2" onClick={() => onLeftClick()}>
+        <button
+          data-testid="button-left"
+          className="w-1/2"
+          onClick={() => onLeftClick()}
+        >
           <p className={`w-full ${isLeftBold} text-brand-sub2`}>{leftText}</p>
         </button>
 
         {/** Right button */}
-        <button className="w-1/2" onClick={() => onRightClick()}>
+        <button
+          data-testid="button-right"
+          className="w-1/2"
+          onClick={() => onRightClick()}
+        >
           <p className={`w-full ${isRightBold} text-brand-sub2`}>{rightText}</p>
         </button>
       </div>
