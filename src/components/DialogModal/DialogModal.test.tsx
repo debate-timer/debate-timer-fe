@@ -52,5 +52,8 @@ describe('DialogModal', () => {
 
     expect(leftButton).toBeInTheDocument();
     expect(rightButton).toBeInTheDocument();
+
+    // Checks whether right button text's font weight is bold
+    expect(screen.getByText('오른쪽')).toHaveClass('font-bold');
   });
 });
