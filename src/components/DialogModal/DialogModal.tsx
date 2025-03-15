@@ -35,7 +35,11 @@ export default function DialogModal({
           className="w-1/2"
           onClick={() => onLeftClick()}
         >
-          <p className={`w-full ${isLeftBold} text-brand-sub2`}>{leftText}</p>
+          <p
+            className={`w-full ${isLeftBold ? 'font-bold' : ''} text-brand-sub2`}
+          >
+            {leftText}
+          </p>
         </button>
 
         {/** Right button */}
@@ -44,7 +48,11 @@ export default function DialogModal({
           className="w-1/2"
           onClick={() => onRightClick()}
         >
-          <p className={`w-full ${isRightBold} text-brand-sub2`}>{rightText}</p>
+          <p
+            className={`w-full ${isRightBold ? 'font-bold' : ''} text-brand-sub2`}
+          >
+            {rightText}
+          </p>
         </button>
       </div>
     </div>
