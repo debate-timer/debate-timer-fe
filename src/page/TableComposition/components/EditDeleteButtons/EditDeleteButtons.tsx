@@ -2,6 +2,7 @@ import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
 import { TimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
+import DialogModal from '../../../../components/DialogModal/DialogModal';
 
 interface EditDeleteButtonsPros {
   info: TimeBoxInfo;
@@ -50,27 +51,20 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
         />
       </EditModalWrapper>
       <DeleteModalWrapper>
-        <div className="flex flex-col items-center">
+        <DialogModal
+          leftText="취소"
+          rightText="삭제"
+          onLeftClick={() => closeDeleteModal()}
+          onRightClick={() => {
+            onSubmitDelete();
+            closeDeleteModal();
+          }}
+          isRightBold={true}
+        >
           <h1 className="px-20 py-10 text-xl font-bold">
             이 순서를 삭제하시겠습니까?
           </h1>
-
-          <div className="w-full border-t border-neutral-300" />
-          <div className="flex w-full flex-row items-center justify-center py-4">
-            <button className="w-1/2" onClick={() => closeDeleteModal()}>
-              <p className="w-full text-brand-sub2">취소</p>
-            </button>
-            <button
-              className="w-1/2"
-              onClick={() => {
-                onSubmitDelete();
-                closeDeleteModal();
-              }}
-            >
-              <p className="w-full font-bold text-brand-sub2">삭제</p>
-            </button>
-          </div>
-        </div>
+        </DialogModal>
       </DeleteModalWrapper>
     </>
   );
