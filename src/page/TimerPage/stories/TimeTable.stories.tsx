@@ -33,6 +33,24 @@ export const Default: Story = {
         time: 60,
       },
       {
+        stance: 'PROS',
+        type: 'REBUTTAL',
+        time: 175,
+        speakerNumber: 1,
+      },
+      {
+        stance: 'CONS',
+        type: 'REBUTTAL',
+        time: 175,
+        speakerNumber: 1,
+      },
+      {
+        stance: 'NEUTRAL',
+        type: 'TIME_OUT',
+        time: 180,
+        speakerNumber: 0,
+      },
+      {
         stance: 'CONS',
         type: 'CLOSING',
         time: 60,

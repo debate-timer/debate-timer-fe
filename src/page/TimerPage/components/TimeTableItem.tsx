@@ -20,9 +20,9 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
   const pos =
     item.stance !== 'NEUTRAL'
       ? item.stance === 'PROS'
-        ? 'self-start'
-        : 'self-end'
-      : 'self-center';
+        ? 'justify-self-start'
+        : 'justify-self-end'
+      : 'justify-self-center';
   const width = item.stance !== 'NEUTRAL' ? 'w-1/2' : 'w-full';
   const minute = Math.floor(Math.abs(item.time) / 60);
   const second = Math.abs(item.time % 60);
@@ -31,7 +31,7 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
   return (
     <div
       data-testid="time-table-item"
-      className={`flex h-[69px] ${width} flex-row items-center justify-center space-x-2 ${pos} ${bgColorClass} ${roundedClass} p-[16px] text-[28px] font-bold ${textColorClass}`}
+      className={`flex h-max ${width} flex-row items-center justify-center space-x-2 ${pos} ${bgColorClass} ${roundedClass} p-[16px] text-[28px] font-bold ${textColorClass}`}
     >
       {/* Print what type is this sequence (e.g., opening, time-out, etc.) */}
       <h1>{DebateTypeToString[item.type]}</h1>
