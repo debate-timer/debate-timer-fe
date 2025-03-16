@@ -5,11 +5,15 @@ import { useNavigate } from 'react-router-dom';
 interface ErrorPageProps {
   message: string;
   stack: string;
+  onReset: () => void;
 }
 
-export default function ErrorPage({ message, stack }: ErrorPageProps) {
+export default function ErrorPage({ message, stack, onReset }: ErrorPageProps) {
   const navigate = useNavigate();
-
+  const goToHome = () => {
+    onReset();
+    navigate('/', { replace: true }); // 현재 라우트가 "/"여도 강제 이동
+  };
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -38,7 +42,7 @@ export default function ErrorPage({ message, stack }: ErrorPageProps) {
           <button
             className="rounded-full bg-zinc-300 px-8 py-4 hover:bg-zinc-400"
             type="button"
-            onClick={() => navigate('/')}
+            onClick={goToHome}
           >
             <div className="flex flex-row items-center justify-center space-x-4">
               <IoHome size={30} />

@@ -44,10 +44,22 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     console.log(error, errorInfo);
   }
 
+  resetError = () => {
+    this.setState({
+      hasError: false,
+      message: defaultMessage,
+      stack: defaultStack,
+    });
+  };
+
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <ErrorPage message={this.state.message} stack={this.state.stack} />
+        <ErrorPage
+          message={this.state.message}
+          stack={this.state.stack}
+          onReset={this.resetError}
+        />
       );
     }
 
