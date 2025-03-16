@@ -26,7 +26,11 @@ export default function TimerCreationContent({
   );
 
   const [debateType, setDebateType] = useState<DebateType>(
-    beforeData?.type ?? initData?.type ?? 'OPENING',
+    beforeData?.type
+      ? beforeData?.type !== 'TIME_OUT'
+        ? beforeData?.type
+        : 'OPENING'
+      : (initData?.type ?? 'OPENING'),
   );
   const { minutes: initMinutes, seconds: initSeconds } =
     Formatting.formatSecondsToMinutes(
