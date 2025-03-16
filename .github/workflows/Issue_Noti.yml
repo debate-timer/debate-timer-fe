@@ -1,29 +1,30 @@
-name: Discord Notification on PR Comment
+name: Discord notification on new issues
 
 on:
-  issue_comment:
-    types: [created, edited]
+  issues:
+    types: [opened, reopened]
 
 jobs:
-  notify-discord-comment:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+  notify-discord-issue:
     runs-on: ubuntu-latest
 
     steps:
       - name: Set Environment Variables
+        env:
+          TITLE: ${{ github.event.issue.title }}
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
-          echo "COMMENT_BODY=$(echo '${{ github.event.comment.body }}' | jq -Rs .)" >> $GITHUB_ENV
+          echo "COMMENT_BODY=${{ github.event.issue.body }}" >> $GITHUB_ENV
           echo "USERNAME=망곰" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
 
       - name: Notify Discord
         env:
           COMMENT_BODY: ${{ env.COMMENT_BODY }}
-          AUTHOR_NAME: ${{ github.event.comment.user.login }}
-          PR_URL: ${{ github.event.issue.pull_request.html_url }}
-          PR_TITLE: ${{ github.event.issue.title }}
-          AUTHOR_URL: ${{ github.event.comment.user.avatar_url }}
+          AUTHOR_NAME: ${{ github.event.issue.user.login }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          AUTHOR_URL: ${{ github.event.issue.user.avatar_url }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
@@ -33,8 +34,8 @@ jobs:
               --arg comment_body "$COMMENT_BODY" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
-              --arg pr_title "$PR_TITLE" \
-              --arg pr_url "$PR_URL" \
+              --arg issue_title "$ISSUE_TITLE" \
+              --arg issue_url "$ISSUE_URL" \
               --arg author_url "$AUTHOR_URL" \
               --arg author_name "$AUTHOR_NAME" \
               --arg color "5814783" \
@@ -43,8 +44,8 @@ jobs:
                 username: $username,
                 avatar_url: $avatar_url,
                 embeds: [{
-                  title: $pr_title,
-                  url: $pr_url,
+                  title: $issue_title,
+                  url: $issue_url,
                   author: {
                     name: $author_name,
                     icon_url: $author_url

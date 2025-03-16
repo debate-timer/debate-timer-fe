@@ -19,16 +19,7 @@ interface TimeBoxStepProps {
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initData, onTimeBoxChange, onButtonClick, isEdit = false } = props;
   const initTimeBox = initData.table;
-  const {
-    openModal: ProsOpenModal,
-    closeModal: ProsCloseModal,
-    ModalWrapper: ProsModalWrapper,
-  } = useModal();
-  const {
-    openModal: ConsOpenModal,
-    closeModal: ConsCloseModal,
-    ModalWrapper: ConsModalWrapper,
-  } = useModal();
+  const { openModal, closeModal, ModalWrapper } = useModal();
 
   const { handleMouseDown, getDraggingStyles, DragAndDropWrapper } =
     useDragAndDrop({
@@ -65,66 +56,54 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
-      <DefaultLayout.ContentContanier>
-        <PropsAndConsTitle />
-        <DragAndDropWrapper>
-          {initTimeBox.map((info, index) => (
-            <div key={index + info.stance} style={getDraggingStyles(index)}>
-              <DebatePanel
-                key={index + info.stance}
-                info={info}
-                onSubmitEdit={(updatedInfo) =>
-                  handleSubmitEdit(index, updatedInfo)
-                }
-                onSubmitDelete={() => handleSubmitDelete(index)}
-                onMouseDown={() => handleMouseDown(index)}
-              />
-            </div>
-          ))}
-        </DragAndDropWrapper>
+      <DefaultLayout.ContentContainer>
+        <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
+          <PropsAndConsTitle />
+          <DragAndDropWrapper>
+            {initTimeBox.map((info, index) => (
+              <div key={index + info.stance} style={getDraggingStyles(index)}>
+                <DebatePanel
+                  key={index + info.stance}
+                  info={info}
+                  onSubmitEdit={(updatedInfo) =>
+                    handleSubmitEdit(index, updatedInfo)
+                  }
+                  onSubmitDelete={() => handleSubmitDelete(index)}
+                  onMouseDown={() => handleMouseDown(index)}
+                />
+              </div>
+            ))}
+          </DragAndDropWrapper>
 
-        <TimerCreationButton
-          leftOnClick={ProsOpenModal}
-          rightOnClick={ConsOpenModal}
-        />
-      </DefaultLayout.ContentContanier>
+          <TimerCreationButton onClick={openModal} />
+        </section>
+      </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <button
-          className={`h-20 w-screen text-2xl font-semibold transition duration-300 ${
-            isAbledSummitButton
-              ? 'bg-amber-500 hover:bg-amber-600'
-              : 'cursor-not-allowed bg-gray-400'
-          }`}
-          onClick={onButtonClick}
-          disabled={!isAbledSummitButton}
-        >
-          {isEdit ? '테이블 수정하기' : '테이블 추가하기'}
-        </button>
+        <div className="mx-auto mb-4 w-full max-w-4xl">
+          <button
+            onClick={onButtonClick}
+            className={`font-semibol h-16 w-full rounded-md text-lg font-semibold transition-colors duration-300 md:text-xl ${
+              isAbledSummitButton
+                ? 'bg-brand-main hover:bg-amber-600'
+                : 'cursor-not-allowed bg-neutral-500'
+            }`}
+            disabled={!isAbledSummitButton}
+          >
+            {isEdit ? '시간표 수정 완료' : '시간표 추가 완료'}
+          </button>
+        </div>
       </DefaultLayout.StickyFooterWrapper>
 
-      <ProsModalWrapper>
+      <ModalWrapper>
         <TimerCreationContent
-          selectedStance={'PROS'}
-          initDate={initTimeBox[initTimeBox.length - 1]}
+          beforeData={initTimeBox[initTimeBox.length - 1]}
           onSubmit={(data) => {
             onTimeBoxChange((prev) => [...prev, data]);
           }}
-          onClose={ProsCloseModal}
+          onClose={closeModal}
         />
-        ,
-      </ProsModalWrapper>
-      <ConsModalWrapper>
-        <TimerCreationContent
-          selectedStance={'CONS'}
-          initDate={initTimeBox[initTimeBox.length - 1]}
-          onSubmit={(data) => {
-            onTimeBoxChange((prev) => [...prev, data]);
-          }}
-          onClose={ConsCloseModal}
-        />
-        ,
-      </ConsModalWrapper>
+      </ModalWrapper>
     </DefaultLayout>
   );
 }

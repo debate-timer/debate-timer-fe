@@ -8,7 +8,9 @@ export default function DeleteModalButton({
   name: string;
   onDelete: (name: string) => void;
 }) {
-  const { openModal, closeModal, ModalWrapper } = useModal();
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
+  });
 
   const handleOpenModal = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -24,21 +26,30 @@ export default function DeleteModalButton({
     <>
       <button
         onClick={handleOpenModal}
-        className="transform text-lg duration-200 hover:scale-125  lg:text-2xl"
+        className="transform text-2xl duration-200 hover:scale-125"
         aria-label="삭제하기"
       >
         <AiOutlineDelete />
       </button>
       <ModalWrapper>
-        <div className="flex flex-col items-center gap-6 px-12 py-8">
-          <h1 className="text-xl font-bold">삭제하시겠습니까?</h1>
-          <h2 className="text-lg font-semibold">테이블명: {name}</h2>
-          <button
-            className="mt-8 rounded-lg bg-red-500 px-8 py-2 text-white"
-            onClick={handleDelete}
-          >
-            삭제
-          </button>
+        <div className="flex flex-col items-center">
+          <h1 className="px-20 pb-4 pt-10 text-xl font-bold">
+            삭제하시겠습니까?
+          </h1>
+          <div className="flex flex-row items-center justify-center space-x-2 pb-10">
+            <p className="text-sm">테이블 이름</p>
+            <p className="text-sm font-semibold">{name}</p>
+          </div>
+
+          <div className="w-full border-t border-neutral-300" />
+          <div className="flex w-full flex-row items-center justify-center py-4">
+            <button className="w-1/2" onClick={() => closeModal()}>
+              <p className="w-full text-brand-sub2">취소</p>
+            </button>
+            <button className="w-1/2" onClick={() => handleDelete()}>
+              <p className="w-full font-bold text-brand-sub2">삭제</p>
+            </button>
+          </div>
         </div>
       </ModalWrapper>
     </>

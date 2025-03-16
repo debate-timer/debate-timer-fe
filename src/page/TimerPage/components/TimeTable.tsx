@@ -1,6 +1,6 @@
-import { IoArrowDown, IoArrowUp } from 'react-icons/io5';
 import { TimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface TimeTableProps {
   goToOtherItem: (isPrev: boolean) => void;
@@ -37,13 +37,49 @@ export default function TimeTable({
 
         {/** Print time table items(timeboxes) */}
         <div className="flex w-full flex-col space-y-[15px] px-[20px]">
-          {items.map((item, index) => (
-            <TimeTableItem
-              key={index}
-              isCurrent={currIndex === index}
-              item={item}
-            />
-          ))}
+          {items.length > 0 && (
+            <div className="flex w-full flex-col space-y-[15px]">
+              <div className="h-[70px] w-full">
+                {currIndex - 2 >= 0 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex - 2]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex - 1 >= 0 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex - 1]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                <TimeTableItem isCurrent={true} item={items[currIndex]} />
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex + 1 <= items.length - 1 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex + 1]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex + 2 <= items.length - 1 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex + 2]}
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -53,15 +89,15 @@ export default function TimeTable({
           className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
           onClick={() => goToOtherItem(true)}
         >
-          <IoArrowUp className="size-[36px]" />
+          <FaArrowLeft className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">이전 차례</h1>
         </button>
         <button
           className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
           onClick={() => goToOtherItem(false)}
         >
-          <IoArrowDown className="size-[36px]" />
           <h1 className="text-[28px] font-semibold">다음 차례</h1>
+          <FaArrowRight className="size-[36px]" />
         </button>
       </div>
     </div>

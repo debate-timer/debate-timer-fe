@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
+import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
 export default function TableOverview() {
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
@@ -23,30 +24,40 @@ export default function TableOverview() {
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
-      <DefaultLayout.ContentContanier>
-        <PropsAndConsTitle />
-        {data &&
-          data.table.map((info, index) => (
-            <DebatePanel key={index} info={info} />
-          ))}
-      </DefaultLayout.ContentContanier>
+
+      <DefaultLayout.ContentContainer>
+        <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
+          <PropsAndConsTitle />
+          <div className="flex w-full flex-col gap-2">
+            {data &&
+              data.table.map((info, index) => (
+                <DebatePanel key={index} info={info} />
+              ))}
+          </div>
+        </section>
+      </DefaultLayout.ContentContainer>
+
       <DefaultLayout.StickyFooterWrapper>
-        <button
-          className="h-20 w-screen rounded-md bg-blue-300 text-2xl"
-          onClick={() =>
-            navigate(
-              `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
-            )
-          }
-        >
-          테이블 수정하기
-        </button>
-        <button
-          className="h-20 w-screen rounded-md bg-red-300 text-2xl"
-          onClick={() => navigate(`/table/parliamentary/${tableId}`)}
-        >
-          토론하기
-        </button>
+        <div className="mx-auto mb-4 flex w-full max-w-4xl items-center justify-between gap-2">
+          <button
+            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-neutral-300 text-2xl font-semibold  transition-colors duration-300 hover:bg-neutral-500"
+            onClick={() =>
+              navigate(
+                `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
+              )
+            }
+          >
+            <RiEditFill />
+            수정하기
+          </button>
+          <button
+            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-brand-main text-2xl font-semibold transition-colors duration-300 hover:bg-amber-600"
+            onClick={() => navigate(`/table/parliamentary/${tableId}`)}
+          >
+            <RiSpeakFill />
+            토론하기
+          </button>
+        </div>
       </DefaultLayout.StickyFooterWrapper>
     </DefaultLayout>
   );

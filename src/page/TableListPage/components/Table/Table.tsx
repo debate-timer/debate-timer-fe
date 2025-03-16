@@ -3,7 +3,6 @@ import { DebateTable } from '../../../../type/type';
 import EditButton from '../Modal/EditButton';
 import DeleteModalButton from '../Modal/DeleteModalButton';
 import { typeMapping } from '../../../../constants/languageMapping';
-import { Formatting } from '../../../../util/formatting';
 
 interface DebateTableWithDelete extends DebateTable {
   onDelete: (name: string) => void;
@@ -13,7 +12,7 @@ export default function Table({
   id,
   name,
   type,
-  duration,
+  agenda,
   onDelete,
 }: DebateTableWithDelete) {
   const navigate = useNavigate();
@@ -21,26 +20,27 @@ export default function Table({
     navigate(`/overview/${id}`);
   };
 
-  const { minutes, seconds } = Formatting.formatSecondsToMinutes(duration);
-  const [durationMinutes, durationSeconds] = [minutes, seconds].map(
-    Formatting.formatTwoDigits,
-  );
-
   return (
     <button
       onClick={handleClick}
-      className="flex h-[200px] w-11/12 flex-col items-center rounded-md bg-amber-500 p-5 duration-200 hover:scale-105"
+      className="relative m-5 h-[243px] w-[500px] rounded-md bg-[#FECD4C] px-[40px] text-left duration-200 hover:scale-105"
     >
-      <div className="flex w-full justify-end gap-4 pb-2 lg:pb-0">
+      <div className="absolute right-[40px] top-[40px] flex flex-row space-x-2">
         <EditButton tableId={id} type={type} />
         <DeleteModalButton name={name} onDelete={onDelete} />
       </div>
-      <h1 className="text-3xl font-semibold lg:text-5xl">{name}</h1>
-      <div className="flex w-full flex-grow flex-col items-start justify-center text-lg font-semibold lg:text-2xl">
-        <span>유형 : {typeMapping[type]}</span>
-        <span>
-          소요시간 : {durationMinutes}분 {durationSeconds}초
-        </span>
+
+      <div className="flex h-full flex-col items-start justify-center">
+        <h1 className="mb-[30px] text-[40px] font-bold">{name}</h1>
+        <div className="flex max-w-full flex-col items-start justify-center text-[36px] font-bold">
+          <span>유형 | {typeMapping[type]}</span>
+          <span
+            className="w-full truncate"
+            title={agenda && agenda?.length > 15 ? agenda : undefined}
+          >
+            주제 | {agenda || '주제 없음'}
+          </span>
+        </div>
       </div>
     </button>
   );
