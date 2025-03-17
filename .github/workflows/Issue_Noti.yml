@@ -14,7 +14,7 @@ jobs:
           TITLE: ${{ github.event.issue.title }}
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
-          echo "COMMENT_BODY=${{ github.event.issue.body }}" >> $GITHUB_ENV
+          echo "COMMENT_BODY=$(echo "${{ github.event.issue.body }}" | base64)" >> $GITHUB_ENV
           echo "USERNAME=망곰" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
 
@@ -30,8 +30,9 @@ jobs:
           WEB_HOOK: ${{ env.WEB_HOOK }}
         run: |
           if [ -n "$WEB_HOOK" ]; then
+            DECODED_COMMENT_BODY=$(echo "$COMMENT_BODY" | base64 --decode)
             JSON_PAYLOAD=$(jq -n \
-              --arg comment_body "$COMMENT_BODY" \
+              --arg comment_body "$(echo "$DECODED_COMMENT_BODY" | jq -R @json)" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
               --arg issue_title "$ISSUE_TITLE" \
