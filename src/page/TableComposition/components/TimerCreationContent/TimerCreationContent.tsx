@@ -40,9 +40,15 @@ export default function TimerCreationContent({
   const [minutes, setMinutes] = useState(initMinutes);
   const [seconds, setSeconds] = useState(initSeconds);
   const [speakerNumber, setSpeakerNumber] = useState<number | null>(
-    (beforeData?.speakerNumber ?? initData?.stance === 'NEUTRAL')
-      ? null
-      : (initData?.speakerNumber ?? 1),
+    beforeData?.speakerNumber
+      ? beforeData.speakerNumber
+      : initData
+        ? initData.stance === 'NEUTRAL'
+          ? null
+          : initData.speakerNumber
+            ? initData.speakerNumber
+            : null
+        : 1,
   );
 
   const handleSubmit = () => {
