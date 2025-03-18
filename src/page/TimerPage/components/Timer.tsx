@@ -78,12 +78,16 @@ export default function Timer({
 
       {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
-        {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
-          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-            <RiSpeakFill className="size-[40px]" />
-            <h1 className="text-[28px] font-bold">1번 토론자</h1>
-          </div>
-        )}
+        {item.stance !== 'NEUTRAL' &&
+          !isAdditionalTimerOn &&
+          item.speakerNumber !== undefined && (
+            <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
+              <RiSpeakFill className="size-[40px]" />
+              <h1 className="text-[28px] font-bold">
+                {item.speakerNumber}번 토론자
+              </h1>
+            </div>
+          )}
       </div>
 
       {/* Timer display */}
