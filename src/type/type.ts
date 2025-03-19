@@ -43,7 +43,7 @@ export interface DebateTable {
   id: number;
   name: string;
   type: Type;
-  duration: number;
+  agenda: string;
 }
 
 export type Type = 'PARLIAMENTARY';
