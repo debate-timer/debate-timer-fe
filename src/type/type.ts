@@ -85,3 +85,5 @@ export interface DebateTable {
   type: DebateType;
   agenda: string;
 }
+
+export type Type = 'PARLIAMENTARY';
