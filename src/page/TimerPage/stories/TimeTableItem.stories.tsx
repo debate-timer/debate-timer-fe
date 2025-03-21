@@ -87,9 +87,9 @@ export const OnPossibleOverflow: Story = {
     isCurrent: true,
     item: {
       stance: 'PROS',
-      type: 'CLOSING',
+      type: 'CROSS',
       time: 1830,
-      speakerNumber: 30,
+      speakerNumber: 33,
     },
   },
 };
