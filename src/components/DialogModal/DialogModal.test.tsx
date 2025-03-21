@@ -21,11 +21,8 @@ describe('DialogModal', () => {
     return render(
       <TestWrapper>
         <DialogModal
-          leftText="왼쪽"
-          rightText="오른쪽"
-          onLeftClick={() => {}}
-          onRightClick={() => {}}
-          isRightBold={true}
+          left={{ text: '왼쪽', onClick: () => {} }}
+          right={{ text: '오른쪽', onClick: () => {}, isBold: true }}
         >
           <h1 data-testid="container-text">컨테이너 텍스트</h1>
         </DialogModal>

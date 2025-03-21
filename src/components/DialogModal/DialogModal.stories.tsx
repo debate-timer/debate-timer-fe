@@ -19,11 +19,14 @@ export const Default: Story = {
         <h1>알림 끄기 → 알림 켜기</h1>
       </div>
     ),
-    leftText: '취소',
-    rightText: '적용',
-    onLeftClick: () => {},
-    onRightClick: () => {},
-    isLeftBold: false,
-    isRightBold: true,
+    left: {
+      text: '취소',
+      onClick: () => {},
+    },
+    right: {
+      text: '적용',
+      onClick: () => {},
+      isBold: true,
+    },
   },
 };
