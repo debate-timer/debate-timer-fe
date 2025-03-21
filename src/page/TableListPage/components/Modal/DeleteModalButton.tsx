@@ -34,11 +34,11 @@ export default function DeleteModalButton({
       </button>
       <ModalWrapper>
         <DialogModal
-          leftText="취소"
-          rightText="삭제"
-          onLeftClick={() => closeModal()}
-          onRightClick={() => handleDelete()}
-          isRightBold={true}
+          left={{
+            text: '취소',
+            onClick: () => closeModal(),
+          }}
+          right={{ text: '삭제', onClick: () => handleDelete(), isBold: true }}
         >
           <div className="flex flex-col items-center space-y-2 px-20 py-10">
             <h1 className="text-xl font-bold">삭제하시겠습니까?</h1>

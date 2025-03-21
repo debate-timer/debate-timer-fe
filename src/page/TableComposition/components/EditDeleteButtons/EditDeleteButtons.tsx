@@ -52,14 +52,15 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
       </EditModalWrapper>
       <DeleteModalWrapper>
         <DialogModal
-          leftText="취소"
-          rightText="삭제"
-          onLeftClick={() => closeDeleteModal()}
-          onRightClick={() => {
-            onSubmitDelete();
-            closeDeleteModal();
+          left={{ text: '취소', onClick: () => closeDeleteModal() }}
+          right={{
+            text: '삭제',
+            onClick: () => {
+              onSubmitDelete();
+              closeDeleteModal();
+            },
+            isBold: true,
           }}
-          isRightBold={true}
         >
           <h1 className="px-20 py-10 text-xl font-bold">
             이 순서를 삭제하시겠습니까?
