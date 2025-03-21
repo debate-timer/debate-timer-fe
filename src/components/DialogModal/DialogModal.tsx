@@ -1,23 +1,30 @@
 import { PropsWithChildren } from 'react';
 
 interface DialogModalProps extends PropsWithChildren {
-  leftText: string;
-  rightText: string;
-  onLeftClick: () => void;
-  onRightClick: () => void;
-  isLeftBold?: boolean;
-  isRightBold?: boolean;
+  left: {
+    text: string;
+    onClick: () => void;
+    isBold?: boolean;
+  };
+  right: {
+    text: string;
+    onClick: () => void;
+    isBold?: boolean;
+  };
 }
 
 export default function DialogModal({
   children,
-  leftText,
-  rightText,
-  onLeftClick,
-  onRightClick,
-  isLeftBold = false,
-  isRightBold = false,
+  left,
+  right,
 }: DialogModalProps) {
+  if (left.isBold === undefined || null) {
+    left.isBold = false;
+  }
+  if (right.isBold === undefined || null) {
+    right.isBold = false;
+  }
+
   return (
     <div
       data-testid="container"
@@ -33,12 +40,12 @@ export default function DialogModal({
         <button
           data-testid="button-left"
           className="w-1/2"
-          onClick={() => onLeftClick()}
+          onClick={() => left.onClick()}
         >
           <p
-            className={`w-full ${isLeftBold ? 'font-bold' : ''} text-brand-sub2`}
+            className={`w-full ${left.isBold ? 'font-bold' : ''} text-brand-sub2`}
           >
-            {leftText}
+            {left.text}
           </p>
         </button>
 
@@ -46,12 +53,12 @@ export default function DialogModal({
         <button
           data-testid="button-right"
           className="w-1/2"
-          onClick={() => onRightClick()}
+          onClick={() => right.onClick()}
         >
           <p
-            className={`w-full ${isRightBold ? 'font-bold' : ''} text-brand-sub2`}
+            className={`w-full ${right.isBold ? 'font-bold' : ''} text-brand-sub2`}
           >
-            {rightText}
+            {right.text}
           </p>
         </button>
       </div>
