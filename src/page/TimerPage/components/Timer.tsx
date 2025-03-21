@@ -80,7 +80,7 @@ export default function Timer({
       <div className="my-[20px] h-[40px]">
         {item.stance !== 'NEUTRAL' &&
           !isAdditionalTimerOn &&
-          item.speakerNumber !== undefined && (
+          item.speakerNumber && (
             <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
               <RiSpeakFill className="size-[40px]" />
               <h1 className="text-[28px] font-bold">
