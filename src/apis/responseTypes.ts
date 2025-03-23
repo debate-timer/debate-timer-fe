@@ -40,7 +40,7 @@ export interface ErrorResponseType {
   message: string;
 }
 
-// PATCH /api/table/parliamentary/{tableId}
+// PATCH /api/table/parliamentary/{tableId}/debate
 export interface PatchDebateTableResponseType {
   id: number;
   info: DetailDebateInfo;
