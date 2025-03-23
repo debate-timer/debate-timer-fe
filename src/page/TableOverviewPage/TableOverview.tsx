@@ -6,12 +6,19 @@ import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel'
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
+import { usePatchParliamentaryDebateTable } from '../../hooks/mutations/usePatchParliamentaryDebateTable';
+
 export default function TableOverview() {
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
   const { data } = useGetParliamentaryTableData(tableId);
 
   const navigate = useNavigate();
+
+  // 토론하기 클릭 시 patch 요청 후 이동
+  const patchTableMutation = usePatchParliamentaryDebateTable((tableId) => {
+    navigate(`/table/parliamentary/${tableId}`);
+  });
 
   return (
     <DefaultLayout>
@@ -52,7 +59,7 @@ export default function TableOverview() {
           </button>
           <button
             className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-brand-main text-2xl font-semibold transition-colors duration-300 hover:bg-amber-600"
-            onClick={() => navigate(`/table/parliamentary/${tableId}`)}
+            onClick={() => patchTableMutation.mutate({ tableId })}
           >
             <RiSpeakFill />
             토론하기

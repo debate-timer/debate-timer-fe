@@ -6,6 +6,7 @@ import {
   PostDebateTableResponseType,
   PostUserResponseType,
   PutDebateTableResponseType,
+  PatchDebateTableResponseType,
 } from './responseTypes';
 import { DetailDebateInfo, TimeBoxInfo } from '../type/type';
 import { setAccessToken } from '../util/accessToken';
@@ -152,4 +153,18 @@ export async function logout(): Promise<boolean> {
   const response = await request('POST', requestUrl + `/logout`, null, null);
 
   return response.status === 204 ? true : false;
+}
+
+export async function patchParliamentaryDebateTable(
+  tableId: number,
+): Promise<PatchDebateTableResponseType> {
+  const requestUrl: string = ApiUrl.parliamentary;
+  const response = await request<PatchDebateTableResponseType>(
+    'PATCH',
+    requestUrl + `/${tableId}/debate`,
+    null,
+    null,
+  );
+
+  return response.data;
 }

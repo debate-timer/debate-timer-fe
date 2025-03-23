@@ -4,7 +4,7 @@ import { ErrorResponseType } from './responseTypes';
 import axiosInstance from './axiosInstance';
 
 // HTTP request methods
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // Low-level http request function
 export async function request<T>(
