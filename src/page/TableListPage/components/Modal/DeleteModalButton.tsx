@@ -1,5 +1,6 @@
 import { AiOutlineDelete } from 'react-icons/ai';
 import { useModal } from '../../../../hooks/useModal';
+import DialogModal from '../../../../components/DialogModal/DialogModal';
 
 export default function DeleteModalButton({
   name,
@@ -32,25 +33,21 @@ export default function DeleteModalButton({
         <AiOutlineDelete />
       </button>
       <ModalWrapper>
-        <div className="flex flex-col items-center">
-          <h1 className="px-20 pb-4 pt-10 text-xl font-bold">
-            삭제하시겠습니까?
-          </h1>
-          <div className="flex flex-row items-center justify-center space-x-2 pb-10">
-            <p className="text-sm">테이블 이름</p>
-            <p className="text-sm font-semibold">{name}</p>
+        <DialogModal
+          left={{
+            text: '취소',
+            onClick: () => closeModal(),
+          }}
+          right={{ text: '삭제', onClick: () => handleDelete(), isBold: true }}
+        >
+          <div className="flex flex-col items-center space-y-2 px-20 py-10">
+            <h1 className="text-xl font-bold">삭제하시겠습니까?</h1>
+            <div className="flex flex-row items-center space-x-2">
+              <h1 className="text-sm">테이블 이름</h1>
+              <h1 className="text-sm font-semibold">{name}</h1>
+            </div>
           </div>
-
-          <div className="w-full border-t border-neutral-300" />
-          <div className="flex w-full flex-row items-center justify-center py-4">
-            <button className="w-1/2" onClick={() => closeModal()}>
-              <p className="w-full text-brand-sub2">취소</p>
-            </button>
-            <button className="w-1/2" onClick={() => handleDelete()}>
-              <p className="w-full font-bold text-brand-sub2">삭제</p>
-            </button>
-          </div>
-        </div>
+        </DialogModal>
       </ModalWrapper>
     </>
   );
