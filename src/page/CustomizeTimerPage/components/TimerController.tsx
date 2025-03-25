@@ -37,7 +37,7 @@ export default function TimerController({
       {/* Center-sided element */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
         <button
-          className="size-[152px] rounded-full bg-neutral-900 p-[45px] hover:bg-brand-main"
+          className="size-[140px] rounded-full bg-neutral-900 p-[45px] hover:bg-brand-main"
           onClick={() => {
             if (isRunning) {
               onPause();
