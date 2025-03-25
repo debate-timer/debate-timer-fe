@@ -19,7 +19,7 @@ export default function TimeTable({
   titles,
 }: TimeTableProps) {
   return (
-    <div className="flex min-w-[720px] flex-col items-center justify-center">
+    <div className="flex min-w-[740px] flex-col items-center justify-center">
       <div
         data-testid="time-table"
         className="mb-[30px] flex w-full flex-col rounded-[23px] bg-neutral-100 pb-[20px]"
@@ -36,14 +36,50 @@ export default function TimeTable({
         </div>
 
         {/** Print time table items(timeboxes) */}
-        <div className="flex w-full flex-col space-y-[15px] px-[20px]">
-          {items.map((item, index) => (
-            <TimeTableItem
-              key={index}
-              isCurrent={currIndex === index}
-              item={item}
-            />
-          ))}
+        <div className="flex w-full flex-col space-y-[15px] px-[10px]">
+          {items.length > 0 && (
+            <div className="flex w-full flex-col space-y-[15px]">
+              <div className="h-[70px] w-full">
+                {currIndex - 2 >= 0 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex - 2]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex - 1 >= 0 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex - 1]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                <TimeTableItem isCurrent={true} item={items[currIndex]} />
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex + 1 <= items.length - 1 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex + 1]}
+                  />
+                )}
+              </div>
+
+              <div className="h-[70px] w-full">
+                {currIndex + 2 <= items.length - 1 && (
+                  <TimeTableItem
+                    isCurrent={false}
+                    item={items[currIndex + 2]}
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
