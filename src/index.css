@@ -11,7 +11,7 @@
 
 /* For buttons */
 .button {
-  @apply rounded-[24px] border-[2px] border-neutral-700 text-[32px] font-bold;
+  @apply rounded-[24px] border-[2px] border-neutral-700 text-[24px] font-bold transition-colors duration-200;
 }
 
 .button.enabled {
