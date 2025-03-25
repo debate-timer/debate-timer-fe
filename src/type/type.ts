@@ -57,10 +57,10 @@ export interface CustomizeTimeBoxInfo {
   stance: Stance;
   speechType: string;
   boxType: CustomizeTimeBoxType;
-  time: number;
-  timePerTeam: number;
-  timePerSpeaking: number;
-  speaker?: string;
+  time: number | null;
+  timePerTeam: number | null;
+  timePerSpeaking: number | null;
+  speaker: string;
 }
 
 export interface ParliamentaryDebateInfo {
@@ -85,5 +85,3 @@ export interface DebateTable {
   type: DebateType;
   agenda: string;
 }
-
-export type Type = 'PARLIAMENTARY';

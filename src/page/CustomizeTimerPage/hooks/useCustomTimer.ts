@@ -7,13 +7,13 @@ interface useDebateTimerProps {
 export function useDebateTimer({
   initIsSpeakingTimer = false,
 }: useDebateTimerProps) {
-  const [totalTimer, setTotalTimer] = useState(0);
+  const [totalTimer, setTotalTimer] = useState<number | null>(null);
   const [isSpeakingTimer, setIsSpeakingTimer] = useState(initIsSpeakingTimer);
-  const [speakingTimer, setSpeakingTimer] = useState(0);
+  const [speakingTimer, setSpeakingTimer] = useState<number | null>(null);
   const [defaultTime, setDefaultTime] = useState<{
-    defaultTotalTimer: number;
-    defaultSpeakingTimer?: number;
-  }>({ defaultTotalTimer: 0 });
+    defaultTotalTimer: number | null;
+    defaultSpeakingTimer: number | null;
+  }>({ defaultTotalTimer: 0, defaultSpeakingTimer: null });
 
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -23,9 +23,9 @@ export function useDebateTimer({
     if (intervalRef.current !== null) return;
 
     intervalRef.current = setInterval(() => {
-      setTotalTimer((prev) => Math.max(prev - 1, 0));
+      setTotalTimer((prev) => (prev == null ? null : prev - 1));
       if (isSpeakingTimer) {
-        setSpeakingTimer((prev) => Math.max(prev - 1, 0));
+        setSpeakingTimer((prev) => (prev == null ? null : prev - 1));
       }
     }, 1000);
     setIsRunning(true);
@@ -44,7 +44,7 @@ export function useDebateTimer({
   const resetTimer = useCallback(() => {
     pauseTimer();
     if (isSpeakingTimer) {
-      setSpeakingTimer(defaultTime.defaultSpeakingTimer ?? 0);
+      setSpeakingTimer(defaultTime.defaultSpeakingTimer);
       return;
     }
 
@@ -69,10 +69,10 @@ export function useDebateTimer({
 
   // ✅ 외부에서 타이머를 재설정할 수 있는 Setter 제공
   const setTimers = useCallback(
-    (total: number, speaking?: number) => {
+    (total: number | null, speaking: number | null = null) => {
       pauseTimer();
       setTotalTimer(total);
-      setSpeakingTimer(speaking ?? 0);
+      setSpeakingTimer(speaking);
     },
     [pauseTimer],
   );
