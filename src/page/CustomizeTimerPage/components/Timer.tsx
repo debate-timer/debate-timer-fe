@@ -1,13 +1,7 @@
 import { RiSpeakFill } from 'react-icons/ri';
-import {
-  DebateTypeToString,
-  StanceToString,
-  TimeBoxInfo,
-} from '../../../type/type';
+import { CustomizeTimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
-import AdditionalTimerController from './AdditionalTimerController';
-import { IoCloseOutline } from 'react-icons/io5';
 
 interface TimerProps {
   onStart: () => void;
@@ -17,32 +11,38 @@ interface TimerProps {
   onChangingTimer: () => void;
   goToOtherItem: (isPrev: boolean) => void;
   timer: number;
-  isAdditionalTimerOn: boolean;
   isTimerChangeable: boolean;
   isRunning: boolean;
   isLastItem: boolean;
   isFirstItem: boolean;
-  item: TimeBoxInfo;
+  item: CustomizeTimeBoxInfo;
 
   /** 🚩 추가된 Props */
-  speakingTimer?: number; // 발언시간용 타이머 추가
+  speakingTimer: number | null; // 발언시간용 타이머 추가
+  isSelected: boolean;
+  onActivate?: () => void;
+  prosCons: 'pros' | 'cons';
+  teamName: string;
 }
 
 export default function Timer({
   onStart,
   onPause,
   onReset,
-  addOnTimer,
   onChangingTimer,
   timer,
-  speakingTimer, // 🚩 추가된 부분
-  isAdditionalTimerOn,
-  isTimerChangeable,
+  speakingTimer,
   isRunning,
   item,
+  isSelected,
+  onActivate,
+  prosCons,
+  teamName,
 }: TimerProps) {
-  const minute = Formatting.formatTwoDigits(Math.floor(Math.abs(timer) / 60));
-  const second = Formatting.formatTwoDigits(Math.abs(timer % 60));
+  const minute = Formatting.formatTwoDigits(
+    Math.floor(Math.abs(timer ?? 0) / 60),
+  );
+  const second = Formatting.formatTwoDigits(Math.abs((timer ?? 0) % 60));
 
   /** 🚩 추가된 코드: 발언시간 표시 처리 */
   const speakingMinute = Formatting.formatTwoDigits(
@@ -52,98 +52,84 @@ export default function Timer({
     Math.abs((speakingTimer ?? 0) % 60),
   );
 
-  const bgColorClass =
-    item.stance === 'NEUTRAL' || isAdditionalTimerOn
-      ? 'bg-neutral-500'
-      : item.stance === 'PROS'
-        ? 'bg-camp-blue'
-        : 'bg-camp-red';
+  const bgColorClass = prosCons === 'pros' ? 'bg-camp-blue' : 'bg-camp-red';
 
-  const titleText = isAdditionalTimerOn
-    ? DebateTypeToString['TIME_OUT']
-    : item.stance === 'NEUTRAL'
-      ? DebateTypeToString[item.type]
-      : StanceToString[item.stance] + ' ' + DebateTypeToString[item.type];
+  const titleText = item.speechType;
 
   return (
-    <div
-      data-testid="timer"
-      className="flex min-h-[300px] w-[736px] flex-col items-center rounded-[45px] bg-neutral-200"
-    >
-      {/* Title of timer */}
+    <div onClick={onActivate}>
       <div
-        className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
+        data-testid="timer"
+        className={`flex min-h-[300px] w-[720px] flex-col items-center rounded-[45px] bg-neutral-200 transition-all duration-300 ${
+          isSelected ? '' : 'pointer-events-none opacity-50 grayscale'
+        }`}
       >
-        <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
-          {titleText}
-        </h1>
-
-        {isAdditionalTimerOn && (
-          <button
-            className="ml-auto px-[30px]"
-            onClick={() => onChangingTimer()}
-          >
-            <IoCloseOutline className="size-[40px] hover:text-neutral-300" />
-          </button>
-        )}
-      </div>
-
-      {/* Speaker's number */}
-      <div className="my-[20px] h-[40px]">
-        {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
-          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-            <RiSpeakFill className="size-[40px]" />
-            <h1 className="text-[28px] font-bold">1번 토론자</h1>
-          </div>
-        )}
-      </div>
-
-      {/* 🚩 변경된 코드: Timer display 영역 추가 확장 */}
-      <div className="flex flex-col items-center space-y-[10px]">
-        {/* 전체시간 타이머 (기존 유지) */}
+        {/* Timer Header */}
         <div
-          className={`flex h-[160px] w-[600px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[100px] font-bold text-neutral-900`}
+          className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
         >
-          {timer < 0 && <p className="w-[50px]">-</p>}
-          <p className="w-[150px]">{minute}</p>
-          <p className="w-[50px]">:</p>
-          <p className="w-[150px]">{second}</p>
+          <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
+            {titleText}
+          </h1>
         </div>
 
-        {/* ✅ 추가된 코드: 발언시간 Timer (조건부 렌더링) */}
-        {speakingTimer !== undefined && (
-          <div
-            className={`flex h-[90px] w-[600px] flex-row items-center justify-center space-x-5 bg-yellow-400 text-center text-[70px] font-bold text-neutral-900`}
-          >
-            {speakingTimer < 0 && <p className="w-[30px]">-</p>}
-            <p className="w-[100px]">{speakingMinute}</p>
-            <p className="w-[30px]">:</p>
-            <p className="w-[100px]">{speakingSecond}</p>
-          </div>
-        )}
-      </div>
+        {/* Team name */}
+        <div className="my-[20px] h-[40px]">
+          {item.stance !== 'NEUTRAL' && (
+            <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
+              <RiSpeakFill className="size-[40px]" />
+              <h1 className="text-[28px] font-bold">{teamName}</h1>
+            </div>
+          )}
+        </div>
 
-      {/* Timer controller 유지 */}
-      <div className="my-[30px]">
-        {!isAdditionalTimerOn && (
+        {/* 🚩 Timer 영역 */}
+        <div className="flex flex-col items-center space-y-[20px]">
+          {speakingTimer !== null ? (
+            <>
+              {/* 전체시간 타이머 (상단 작게 표시) */}
+              <div
+                className={`relative flex h-[80px] w-[600px] items-center justify-center text-[80px] font-bold text-neutral-900`}
+              >
+                <div className="absolute left-3 top-2 text-sm font-semibold">
+                  전체시간
+                </div>
+                {minute} : {second}
+              </div>
+
+              {/* 현재시간 타이머 (크게 표시) */}
+              <div
+                className={`relative flex h-[120px] w-[600px] items-center justify-center bg-white text-[100px] font-bold text-neutral-900 shadow-inner`}
+              >
+                <div className="absolute left-3 top-2 text-sm font-semibold">
+                  현재시간
+                </div>
+                {speakingMinute} : {speakingSecond}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* 타이머가 하나일 때 (크게 표시) */}
+              <div
+                className={`flex h-[220px] w-[600px] items-center justify-center bg-white text-[120px] font-bold text-neutral-900 shadow-inner`}
+              >
+                {minute} : {second}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Timer controller 유지 */}
+        <div className="my-[30px]">
           <TimerController
             isRunning={isRunning}
-            isTimerChangeable={isTimerChangeable}
-            onChangingTimer={() => onChangingTimer()}
-            onStart={() => onStart()}
-            onPause={() => onPause()}
-            onReset={() => onReset()}
+            isTimerChangeable={false}
+            onChangingTimer={onChangingTimer}
+            onStart={onStart}
+            onPause={onPause}
+            onReset={onReset}
           />
-        )}
-
-        {isAdditionalTimerOn && (
-          <AdditionalTimerController
-            isRunning={isRunning}
-            onStart={() => onStart()}
-            onPause={() => onPause()}
-            addOnTimer={(delta: number) => addOnTimer(delta)}
-          />
-        )}
+        </div>
       </div>
     </div>
   );
