@@ -80,7 +80,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-4 w-full max-w-4xl">
+        <div className="mx-auto mb-8 w-full max-w-4xl">
           <button
             onClick={onButtonClick}
             className={`h-16 w-full ${
