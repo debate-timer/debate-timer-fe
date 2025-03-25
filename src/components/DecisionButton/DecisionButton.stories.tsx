@@ -11,9 +11,17 @@ export default meta;
 
 type Story = StoryObj<typeof DecisionButton>;
 
-export const Default: Story = {
+export const Enabled: Story = {
   args: {
     children: '테이블 저장하기',
+    onClick: () => {},
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    children: '테이블 저장하기',
+    enabled: false,
     onClick: () => {},
   },
 };
