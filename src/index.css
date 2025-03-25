@@ -9,6 +9,19 @@
   }
 }
 
+/* For buttons */
+.button {
+  @apply rounded-[24px] border-[2px] border-neutral-700 text-[32px] font-bold;
+}
+
+.button.enabled {
+  @apply bg-background-default hover:bg-brand-main text-neutral-900;
+}
+
+.button.disabled {
+  @apply bg-neutral-300 text-neutral-500;
+}
+
 p {
   white-space: pre-wrap;
 }
