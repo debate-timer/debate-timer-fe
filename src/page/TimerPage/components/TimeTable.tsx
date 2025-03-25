@@ -1,4 +1,4 @@
-import PrevNextButton from '../../../components/PrevNextButton/RoundControlButton';
+import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
 import { TimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
 
@@ -85,8 +85,8 @@ export default function TimeTable({
 
       {/** Prev/next buttons */}
       <div className="flex w-max flex-row items-center justify-center space-x-[20px]">
-        <PrevNextButton type="PREV" onClick={() => goToOtherItem(true)} />
-        <PrevNextButton type="NEXT" onClick={() => goToOtherItem(false)} />
+        <RoundControlButton type="PREV" onClick={() => goToOtherItem(true)} />
+        <RoundControlButton type="NEXT" onClick={() => goToOtherItem(false)} />
       </div>
     </div>
   );
