@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
-import PrevNextButton from './PrevNextButton';
+import PrevNextButton from './RoundControlButton';
 
 const meta: Meta<typeof PrevNextButton> = {
   title: 'Components/PrevNextButton',
@@ -21,6 +21,13 @@ export const OnPrev: Story = {
 export const OnNext: Story = {
   args: {
     type: 'NEXT',
+    onClick: () => {},
+  },
+};
+
+export const OnDone: Story = {
+  args: {
+    type: 'DONE',
     onClick: () => {},
   },
 };

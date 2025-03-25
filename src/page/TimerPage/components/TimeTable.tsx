@@ -1,4 +1,4 @@
-import PrevNextButton from '../../../components/PrevNextButton/PrevNextButton';
+import PrevNextButton from '../../../components/PrevNextButton/RoundControlButton';
 import { TimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
 
