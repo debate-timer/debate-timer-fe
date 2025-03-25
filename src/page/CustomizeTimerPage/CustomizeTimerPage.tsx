@@ -483,14 +483,14 @@ export default function TimerPage() {
                   speakingTimer={timer1.speakingTimer}
                   isSelected={prosConsSelected === 'pros'}
                   onActivate={() => {
-                    if (prosConsSelected === 'pros') {
-                      if (timer1.isRunning) {
-                        timer1.pauseTimer();
-                        timer2.startTimer();
-                        setProsConsSelected('cons');
+                    if (prosConsSelected === 'cons') {
+                      if (timer2.isRunning) {
+                        timer2.pauseTimer();
+                        timer1.startTimer();
+                        setProsConsSelected('pros');
                       } else {
-                        timer1.pauseTimer();
-                        setProsConsSelected('cons');
+                        timer2.pauseTimer();
+                        setProsConsSelected('pros');
                       }
                     }
                   }}
