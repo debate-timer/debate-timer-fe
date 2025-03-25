@@ -18,6 +18,10 @@
   @apply bg-background-default hover:bg-brand-main text-neutral-900;
 }
 
+.button.enabled-no-hover {
+  @apply bg-background-default text-neutral-900;
+}
+
 .button.disabled {
   @apply bg-neutral-300 text-neutral-500;
 }

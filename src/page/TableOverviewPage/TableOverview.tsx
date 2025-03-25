@@ -40,7 +40,7 @@ export default function TableOverview() {
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-4 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
-            className="button enabled h-16 w-full"
+            className="button enabled-no-hover h-16 w-full"
             onClick={() =>
               navigate(
                 `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
