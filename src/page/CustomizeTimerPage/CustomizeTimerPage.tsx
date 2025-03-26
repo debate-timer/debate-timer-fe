@@ -7,7 +7,7 @@ import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import IconButton from '../../components/IconButton/IconButton';
 import { IoHelpCircle } from 'react-icons/io5';
-import { useDebateTimer } from './hooks/useCustomTimer';
+import { useCustomTimer } from './hooks/useCustomTimer';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import { FaArrowLeft, FaArrowRight, FaExchangeAlt } from 'react-icons/fa';
 import NomalTimer from './components/NomalTimer';
@@ -60,8 +60,8 @@ export default function TimerPage() {
   );
 
   // Prepare for timer hook
-  const timer1 = useDebateTimer({});
-  const timer2 = useDebateTimer({});
+  const timer1 = useCustomTimer({});
+  const timer2 = useCustomTimer({});
   const nomalTimer = useTimer();
   const [prosConsSelected, setProsConsSelected] = useState<'pros' | 'cons'>(
     'pros',
@@ -351,10 +351,10 @@ export default function TimerPage() {
 
   useEffect(() => {
     if (timer1.speakingTimer === 0 || timer1.totalTimer === 0) {
-      setProsConsSelected((prev) => (prev !== 'cons' ? 'cons' : prev));
+      // setProsConsSelected((prev) => (prev !== 'cons' ? 'cons' : prev));
       timer1.pauseTimer();
     } else if (timer2.speakingTimer === 0 || timer2.totalTimer === 0) {
-      setProsConsSelected((prev) => (prev !== 'pros' ? 'pros' : prev));
+      // setProsConsSelected((prev) => (prev !== 'pros' ? 'pros' : prev));
       timer2.pauseTimer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

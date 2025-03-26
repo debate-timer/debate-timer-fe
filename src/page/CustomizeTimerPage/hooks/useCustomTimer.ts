@@ -1,12 +1,12 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 
-interface useDebateTimerProps {
+interface useCustomTimerProps {
   initIsSpeakingTimer?: boolean;
 }
 
-export function useDebateTimer({
+export function useCustomTimer({
   initIsSpeakingTimer = false,
-}: useDebateTimerProps) {
+}: useCustomTimerProps) {
   const [totalTimer, setTotalTimer] = useState<number | null>(null);
   const [isSpeakingTimer, setIsSpeakingTimer] = useState(initIsSpeakingTimer);
   const [speakingTimer, setSpeakingTimer] = useState<number | null>(null);
