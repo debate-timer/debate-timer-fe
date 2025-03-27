@@ -17,19 +17,25 @@ export function useCustomTimer({
 
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isDone, setIsDone] = useState(false);
 
   // 타이머 시작
   const startTimer = useCallback(() => {
     if (intervalRef.current !== null) return;
-
-    intervalRef.current = setInterval(() => {
-      setTotalTimer((prev) => (prev == null ? null : prev - 1));
-      if (isSpeakingTimer) {
-        setSpeakingTimer((prev) => (prev == null ? null : prev - 1));
-      }
-    }, 1000);
-    setIsRunning(true);
-  }, [isSpeakingTimer]);
+    if (!isDone) {
+      intervalRef.current = setInterval(() => {
+        setTotalTimer((prev) =>
+          prev === null ? null : prev - 1 >= 0 ? prev - 1 : 0,
+        );
+        if (isSpeakingTimer) {
+          setSpeakingTimer((prev) =>
+            prev === null ? null : prev - 1 >= 0 ? prev - 1 : 0,
+          );
+        }
+      }, 1000);
+      setIsRunning(true);
+    }
+  }, [isDone, isSpeakingTimer]);
 
   // 타이머 일시정지
   const pauseTimer = useCallback(() => {
@@ -43,16 +49,28 @@ export function useCustomTimer({
   // 타이머 리셋
   const resetTimer = useCallback(() => {
     pauseTimer();
-    if (isSpeakingTimer) {
-      setSpeakingTimer(defaultTime.defaultSpeakingTimer);
+    if (
+      isSpeakingTimer &&
+      defaultTime.defaultSpeakingTimer !== null &&
+      totalTimer !== null
+    ) {
+      setSpeakingTimer(
+        defaultTime.defaultSpeakingTimer < totalTimer
+          ? defaultTime.defaultSpeakingTimer
+          : totalTimer,
+      );
+      if (totalTimer > 0) {
+        setIsDone(false);
+      }
       return;
     }
 
-    setSpeakingTimer(defaultTime.defaultTotalTimer);
+    setTotalTimer(defaultTime.defaultTotalTimer);
   }, [
     defaultTime.defaultSpeakingTimer,
     defaultTime.defaultTotalTimer,
     isSpeakingTimer,
+    totalTimer,
     pauseTimer,
   ]);
 
@@ -84,6 +102,7 @@ export function useCustomTimer({
     totalTimer,
     speakingTimer,
     isRunning,
+    isDone,
     startTimer,
     pauseTimer,
     resetTimer,
@@ -91,5 +110,6 @@ export function useCustomTimer({
     setTimers,
     setDefaultTime,
     setIsSpeakingTimer,
+    setIsDone,
   };
 }

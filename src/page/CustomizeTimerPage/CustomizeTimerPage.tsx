@@ -204,6 +204,8 @@ export default function TimerPage() {
           data.table[index].timePerSpeaking,
         );
         timer2.setIsSpeakingTimer(true);
+        timer1.setIsDone(false);
+        timer2.setIsDone(false);
       }
       // setWarningBell(data.info.warningBell);
       // setFinishBell(data.info.finishBell);
@@ -271,12 +273,14 @@ export default function TimerPage() {
           }
           break;
         case 'KeyA':
+          if (timer1.isDone) break;
           setProsConsSelected('pros');
           if (timer2.isRunning) {
             timer2.pauseTimer();
           }
           break;
         case 'KeyL':
+          if (timer2.isDone) break;
           setProsConsSelected('cons');
           if (timer1.isRunning) {
             timer1.pauseTimer();
@@ -284,6 +288,7 @@ export default function TimerPage() {
           break;
         case 'Enter':
           if (prosConsSelected === 'pros') {
+            if (timer2.isDone) break;
             if (timer1.isRunning) {
               timer1.pauseTimer();
               timer2.startTimer();
@@ -293,7 +298,9 @@ export default function TimerPage() {
               setProsConsSelected('cons');
             }
           } else if (prosConsSelected === 'cons') {
+            if (timer1.isDone) break;
             if (timer2.isRunning) {
+              if (timer1.isDone) break;
               timer2.pauseTimer();
               timer1.startTimer();
               setProsConsSelected('pros');
@@ -363,6 +370,36 @@ export default function TimerPage() {
     timer1.totalTimer,
     timer2.speakingTimer,
     timer2.totalTimer,
+  ]);
+
+  useEffect(() => {
+    if (prosConsSelected === 'pros') {
+      if (timer1.speakingTimer === null) {
+        if (timer1.totalTimer === 0) {
+          timer1.setIsDone(true);
+        }
+      } else {
+        if (timer1.speakingTimer === 0) {
+          timer1.setIsDone(true);
+        }
+      }
+    } else if (prosConsSelected === 'cons') {
+      if (timer2.speakingTimer === null) {
+        if (timer2.totalTimer === 0) {
+          timer2.setIsDone(true);
+        }
+      } else {
+        if (timer2.speakingTimer === 0) {
+          timer2.setIsDone(true);
+        }
+      }
+    }
+  }, [
+    prosConsSelected,
+    timer1.totalTimer,
+    timer1.speakingTimer,
+    timer2.totalTimer,
+    timer2.speakingTimer,
   ]);
   // ########### COMPONENT AREA ###########
   if (!data) {
@@ -483,6 +520,7 @@ export default function TimerPage() {
                   speakingTimer={timer1.speakingTimer}
                   isSelected={prosConsSelected === 'pros'}
                   onActivate={() => {
+                    if (timer1.isDone) return;
                     if (prosConsSelected === 'cons') {
                       if (timer2.isRunning) {
                         timer2.pauseTimer();
@@ -501,9 +539,13 @@ export default function TimerPage() {
                 {/* ENTER 버튼 */}
                 <button
                   onClick={() => {
-                    if (prosConsSelected === 'pros')
+                    if (prosConsSelected === 'pros') {
+                      if (timer2.isDone) return;
                       setProsConsSelected('cons');
-                    else setProsConsSelected('pros');
+                    } else {
+                      if (timer1.isDone) return;
+                      setProsConsSelected('pros');
+                    }
                   }}
                   className="z-20 flex h-[100px] w-[100px] flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
                 >
@@ -538,6 +580,7 @@ export default function TimerPage() {
                   speakingTimer={timer2.speakingTimer}
                   isSelected={prosConsSelected === 'cons'}
                   onActivate={() => {
+                    if (timer2.isDone) return;
                     if (prosConsSelected === 'pros') {
                       if (timer1.isRunning) {
                         timer1.pauseTimer();
