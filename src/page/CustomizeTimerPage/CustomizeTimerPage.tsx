@@ -343,21 +343,21 @@ export default function TimerPage() {
   });
 
   // Stop timer on 0 sec when additional timer is enabled
-  // useEffect(() => {
-  //   if (isAdditionalTimerOn && timer === 0 && isRunning) {
-  //     pauseTimer();
-  //     setTimer(savedTimer);
-  //     setIsAdditionalTimerOn(!isAdditionalTimerOn);
-  //   }
-  // }, [
-  //   isAdditionalTimerOn,
-  //   timer,
-  //   savedTimer,
-  //   pauseTimer,
-  //   setIsAdditionalTimerOn,
-  //   setTimer,
-  //   isRunning,
-  // ]);
+  useEffect(() => {
+    if (isAdditionalTimerOn && nomalTimer.timer === 0 && nomalTimer.isRunning) {
+      nomalTimer.pauseTimer();
+      nomalTimer.setTimer(savedTimer);
+      setIsAdditionalTimerOn(!isAdditionalTimerOn);
+    }
+  }, [
+    isAdditionalTimerOn,
+    nomalTimer.timer,
+    savedTimer,
+    nomalTimer.pauseTimer,
+    setIsAdditionalTimerOn,
+    nomalTimer.setTimer,
+    nomalTimer.isRunning,
+  ]);
   useEffect(() => {
     if (prosConsSelected === 'cons') {
       timer1.resetTimer();
