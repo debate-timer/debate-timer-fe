@@ -12,6 +12,14 @@ import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTable
 import { FaArrowLeft, FaArrowRight, FaExchangeAlt } from 'react-icons/fa';
 import NomalTimer from './components/NomalTimer';
 import { useTimer } from './hooks/useTimer';
+type TimerState = 'default' | 'warning' | 'danger' | 'expired';
+
+const bgColorMap: Record<TimerState, string> = {
+  default: '',
+  warning: 'bg-brand-main', // 30초 ~ 11초
+  danger: 'bg-[#FF8B87]', // 10초 이하
+  expired: 'bg-[#404040]', // 0초 이하
+};
 
 export default function TimerPage() {
   // ########## DECLARATION AREA ##########
@@ -35,7 +43,7 @@ export default function TimerPage() {
   const FALSE = 'false';
 
   // Prepare for changing background
-  const [bg, setBg] = useState('');
+  const [bg, setBg] = useState<TimerState>('default');
 
   // Prepare for additional timer
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
@@ -44,6 +52,15 @@ export default function TimerPage() {
 
   // Prepare for index-related constants
   const [index, setIndex] = useState(0);
+
+  // Prepare for timer hook
+  const timer1 = useCustomTimer({});
+  const timer2 = useCustomTimer({});
+  const nomalTimer = useTimer();
+  const [prosConsSelected, setProsConsSelected] = useState<'pros' | 'cons'>(
+    'pros',
+  );
+
   const goToOtherItem = useCallback(
     (isPrev: boolean) => {
       if (isPrev) {
@@ -57,14 +74,6 @@ export default function TimerPage() {
       }
     },
     [index, data],
-  );
-
-  // Prepare for timer hook
-  const timer1 = useCustomTimer({});
-  const timer2 = useCustomTimer({});
-  const nomalTimer = useTimer();
-  const [prosConsSelected, setProsConsSelected] = useState<'pros' | 'cons'>(
-    'pros',
   );
 
   // ########### useEffect AREA ###########
@@ -83,66 +92,68 @@ export default function TimerPage() {
   useEffect(() => {
     if (data?.table[index].boxType === 'PARLIAMENTARY') {
       if (nomalTimer.isRunning) {
-        if (nomalTimer.timer >= 0 && nomalTimer.timer <= 30) {
-          setBg('gradient-timer-warning');
+        if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) {
+          setBg('warning');
+        } else if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) {
+          setBg('danger');
         } else {
-          setBg('gradient-timer-timeout');
+          setBg('expired');
         }
       } else {
-        setBg('');
+        setBg('default');
       }
     } else if (data?.table[index].boxType === 'TIME_BASED') {
       if (prosConsSelected === 'pros') {
         if (timer1.isRunning) {
           if (timer1.speakingTimer !== null && timer1.totalTimer !== null) {
-            if (timer1.speakingTimer >= 0 && timer1.speakingTimer <= 30) {
-              setBg('gradient-timer-warning');
+            if (timer1.speakingTimer > 10 && timer1.speakingTimer <= 30) {
+              setBg('warning');
             } else if (
               timer1.speakingTimer >= 0 &&
               timer1.speakingTimer <= 10
             ) {
-              setBg('gradient-timer-timeout');
+              setBg('danger');
             }
           } else if (
             timer1.speakingTimer === null &&
             timer1.totalTimer !== null
           ) {
             if (timer1.totalTimer > 10 && timer1.totalTimer <= 30) {
-              setBg('gradient-timer-warning');
+              setBg('warning');
             } else if (timer1.totalTimer >= 0 && timer1.totalTimer <= 10) {
-              setBg('gradient-timer-timeout');
+              setBg('danger');
             }
           } else {
-            setBg('');
+            setBg('default');
           }
         } else {
-          setBg('');
+          setBg('default');
         }
       } else if (prosConsSelected === 'cons') {
         if (timer2.isRunning) {
           if (timer2.speakingTimer !== null && timer2.totalTimer !== null) {
-            if (timer2.speakingTimer >= 0 && timer2.speakingTimer <= 30) {
-              setBg('gradient-timer-warning');
+            if (timer2.speakingTimer > 10 && timer2.speakingTimer <= 30) {
+              setBg('warning');
             } else if (
               timer2.speakingTimer >= 0 &&
               timer2.speakingTimer <= 10
             ) {
-              setBg('gradient-timer-timeout');
+              setBg('danger');
             }
           } else if (
             timer2.speakingTimer === null &&
             timer2.totalTimer !== null
           ) {
-            if (timer2.totalTimer >= 0 && timer2.totalTimer <= 30) {
-              setBg('gradient-timer-warning');
+            if (timer2.totalTimer > 10 && timer2.totalTimer <= 30) {
+              setBg('warning');
             } else if (timer2.totalTimer >= 0 && timer2.totalTimer <= 10) {
-              setBg('gradient-timer-timeout');
+              setBg('danger');
             }
           } else {
-            setBg('');
+            setBg('default');
           }
         } else {
-          setBg('');
+          setBg('default');
         }
       }
     }
@@ -619,7 +630,7 @@ export default function TimerPage() {
           {/* Gradient background */}
           <div
             data-testid="timer-page-background"
-            className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}
+            className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bgColorMap[bg]}`}
           />
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
