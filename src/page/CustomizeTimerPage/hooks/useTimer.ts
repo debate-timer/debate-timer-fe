@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 
 export function useTimer() {
-  const [timer, setTimer] = useState(0);
+  const [timer, setTimer] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [defaultTimer, setDefaultTimer] = useState(0);
 
@@ -10,7 +10,9 @@ export function useTimer() {
   const startTimer = useCallback(() => {
     if (intervalRef.current === null) {
       intervalRef.current = setInterval(() => {
-        setTimer((prev) => prev - 1);
+        setTimer((prev) =>
+          prev === null ? null : prev - 1 >= 0 ? prev - 1 : 0,
+        );
       }, 1000);
       setIsRunning(true);
     }
@@ -45,6 +47,13 @@ export function useTimer() {
     [timer],
   );
 
+  const clearTimer = useCallback(() => {
+    setTimer(null);
+    setDefaultTimer(0);
+    setIsRunning(false);
+    intervalRef.current = null;
+  }, []);
+
   return {
     timer,
     isRunning,
@@ -53,6 +62,7 @@ export function useTimer() {
     pauseTimer,
     resetTimer,
     actOnTime,
-    setDefaultValue: setDefaultTimer,
+    setDefaultTimer,
+    clearTimer,
   };
 }

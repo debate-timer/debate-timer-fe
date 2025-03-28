@@ -64,6 +64,7 @@ export function useCustomTimer({
       }
       return;
     }
+    if (totalTimer === 0) return;
 
     setTotalTimer(defaultTime.defaultTotalTimer);
   }, [
@@ -94,6 +95,15 @@ export function useCustomTimer({
     },
     [pauseTimer],
   );
+  const clearTimer = useCallback(() => {
+    setDefaultTime({ defaultTotalTimer: 0, defaultSpeakingTimer: null });
+    setTotalTimer(null);
+    setIsSpeakingTimer(initIsSpeakingTimer);
+    setSpeakingTimer(null);
+    setIsRunning(false);
+    setIsDone(false);
+    intervalRef.current = null;
+  }, []);
 
   // Cleanup
   useEffect(() => () => pauseTimer(), [pauseTimer]);
@@ -111,5 +121,6 @@ export function useCustomTimer({
     setDefaultTime,
     setIsSpeakingTimer,
     setIsDone,
+    clearTimer,
   };
 }

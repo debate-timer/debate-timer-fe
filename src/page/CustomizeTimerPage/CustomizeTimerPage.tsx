@@ -26,8 +26,8 @@ export default function TimerPage() {
   // Load sounds and prepare for bell-related constants
   const warningBellRef = useRef<HTMLAudioElement>(null);
   const finishBellRef = useRef<HTMLAudioElement>(null);
-  // const [isWarningBellOn, setWarningBell] = useState(false);
-  // const [isFinishBellOn, setFinishBell] = useState(false);
+  const [isWarningBellOn, setWarningBell] = useState(false);
+  const [isFinishBellOn, setFinishBell] = useState(false);
 
   // Parse params
   const pathParams = useParams();
@@ -92,12 +92,14 @@ export default function TimerPage() {
   useEffect(() => {
     if (data?.table[index].boxType === 'PARLIAMENTARY') {
       if (nomalTimer.isRunning) {
-        if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) {
-          setBg('warning');
-        } else if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) {
-          setBg('danger');
-        } else {
-          setBg('expired');
+        if (nomalTimer.timer !== null) {
+          if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) {
+            setBg('warning');
+          } else if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) {
+            setBg('danger');
+          } else {
+            setBg('expired');
+          }
         }
       } else {
         setBg('default');
@@ -171,31 +173,57 @@ export default function TimerPage() {
   ]);
 
   // Play bells
-  // useEffect(() => {
-  //   if (
-  //     warningBellRef.current &&
-  //     isRunning &&
-  //     isWarningBellOn &&
-  //     timer === 30
-  //   ) {
-  //     warningBellRef.current.play();
-  //   }
+  useEffect(() => {
+    if (
+      warningBellRef.current &&
+      (timer1.isRunning || timer2.isRunning || nomalTimer.isRunning) &&
+      isWarningBellOn &&
+      (timer1.speakingTimer === 30 ||
+        timer1.totalTimer === 30 ||
+        timer2.speakingTimer === 30 ||
+        timer2.totalTimer === 30 ||
+        nomalTimer.timer === 30)
+    ) {
+      warningBellRef.current.play();
+    }
 
-  //   if (finishBellRef.current && isRunning && isFinishBellOn && timer === 0) {
-  //     finishBellRef.current.play();
-  //   }
-  // }, [timer, isFinishBellOn, isWarningBellOn, isRunning]);
+    if (
+      finishBellRef.current &&
+      (timer1.isRunning || timer2.isRunning || nomalTimer.isRunning) &&
+      isFinishBellOn &&
+      (timer1.speakingTimer === 0 ||
+        timer1.totalTimer === 0 ||
+        timer2.speakingTimer === 0 ||
+        timer2.totalTimer === 0 ||
+        nomalTimer.timer === 0)
+    ) {
+      finishBellRef.current.play();
+    }
+  }, [
+    isFinishBellOn,
+    isWarningBellOn,
+    timer1.isRunning,
+    timer2.isRunning,
+    nomalTimer.isRunning,
+    timer1.speakingTimer,
+    timer1.totalTimer,
+    timer2.speakingTimer,
+    timer2.totalTimer,
+    nomalTimer.timer,
+  ]);
 
   // Initiate timer
-
   useEffect(() => {
     if (data) {
       if (data.table[index].boxType === 'PARLIAMENTARY') {
-        nomalTimer.setDefaultValue(data.table[index].time ?? 0);
+        timer1.clearTimer();
+        timer2.clearTimer();
+        nomalTimer.setDefaultTimer(data.table[index].time ?? 0);
         nomalTimer.setTimer(data.table[index].time ?? 0);
-        // setWarningBell(data.info.warningBell);
-        // setFinishBell(data.info.finishBell);
+        setWarningBell(data.info.warningBell);
+        setFinishBell(data.info.finishBell);
       } else if (data.table[index].boxType === 'TIME_BASED') {
+        nomalTimer.clearTimer();
         timer1.setDefaultTime({
           defaultTotalTimer: data.table[index].timePerTeam,
           defaultSpeakingTimer: data.table[index].timePerSpeaking,
@@ -218,8 +246,8 @@ export default function TimerPage() {
         timer1.setIsDone(false);
         timer2.setIsDone(false);
       }
-      // setWarningBell(data.info.warningBell);
-      // setFinishBell(data.info.finishBell);
+      setWarningBell(data.info.warningBell);
+      setFinishBell(data.info.finishBell);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -358,6 +386,7 @@ export default function TimerPage() {
     nomalTimer.setTimer,
     nomalTimer.isRunning,
   ]);
+
   useEffect(() => {
     if (prosConsSelected === 'cons') {
       timer1.resetTimer();
@@ -474,10 +503,10 @@ export default function TimerPage() {
                 onPause={() => nomalTimer.pauseTimer()}
                 onReset={() => nomalTimer.resetTimer()}
                 addOnTimer={(delta: number) =>
-                  nomalTimer.setTimer(nomalTimer.timer + delta)
+                  nomalTimer.setTimer(nomalTimer.timer ?? 0 + delta)
                 }
                 isRunning={nomalTimer.isRunning}
-                timer={nomalTimer.timer}
+                timer={nomalTimer.timer ?? 0}
                 isLastItem={
                   data !== undefined && index === data.table.length - 1
                 }
@@ -491,7 +520,7 @@ export default function TimerPage() {
                   nomalTimer.pauseTimer();
 
                   if (!isAdditionalTimerOn) {
-                    saveTimer(nomalTimer.timer);
+                    saveTimer(nomalTimer.timer ?? 0);
                     nomalTimer.setTimer(0);
                   } else {
                     nomalTimer.setTimer(savedTimer);
@@ -636,119 +665,4 @@ export default function TimerPage() {
       </DefaultLayout>
     </>
   );
-}
-
-{
-  /* <div className="relative z-10 flex h-full w-full flex-col items-center justify-center space-y-[40px]">
-  {isFirst && (
-    <FirstUseToolTip
-      onClose={() => {
-        setIsFirst(false);
-        localStorage.setItem(IS_FIRST, FALSE);
-      }}
-    />
-  )}
-
-  <div className="flex flex-row items-center justify-center space-x-[30px]">
-    <Timer
-      isAdditionalTimerOn={isAdditionalTimerOn}
-      onStart={() => timer1.startTimer()}
-      onPause={() => timer1.pauseTimer()}
-      onReset={() => timer1.resetTimer()}
-      addOnTimer={(delta: number) =>
-        timer1.setTimers(timer1.totalTimer ?? 0 + delta)
-      }
-      isRunning={timer1.isRunning}
-      timer={timer1.totalTimer ?? 0}
-      isLastItem={data !== undefined && index === data.table.length - 1}
-      isFirstItem={index === 0}
-      goToOtherItem={(isPrev: boolean) => {
-        goToOtherItem(isPrev);
-        timer1.resetTimer();
-      }}
-      isTimerChangeable={isTimerChangeable}
-      onChangingTimer={() => {
-        timer1.pauseTimer();
-
-        // if (!isAdditionalTimerOn) {
-        //   saveTimer(totalTimer);
-        //   setTimer(0);
-        // } else {
-        //   setTimer(savedTimer);
-        // }
-
-        setIsAdditionalTimerOn(!isAdditionalTimerOn);
-      }}
-      item={data.table[index]}
-      speakingTimer={timer1.speakingTimer}
-      isSelected={prosConsSelected === 'pros'}
-      onActivate={() => setProsConsSelected('pros')}
-    />
-
-    <button
-      onClick={() => {
-        if (prosConsSelected === 'pros') setProsConsSelected('cons');
-        else setProsConsSelected('pros');
-      }}
-      className="flex h-[100px] w-[100px] flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
-    >
-      <FaExchangeAlt className="text-[36px]" />
-      <span className="text-[18px] font-bold">ENTER</span>
-    </button>
-
-    <Timer
-      isAdditionalTimerOn={isAdditionalTimerOn}
-      onStart={() => timer2.startTimer()}
-      onPause={() => timer2.pauseTimer()}
-      onReset={() => timer2.resetTimer()}
-      addOnTimer={(delta: number) =>
-        timer2.setTimers(timer2.totalTimer ?? 0 + delta)
-      }
-      isRunning={timer2.isRunning}
-      timer={timer2.totalTimer ?? 0}
-      isLastItem={data !== undefined && index === data.table.length - 1}
-      isFirstItem={index === 0}
-      goToOtherItem={(isPrev: boolean) => {
-        goToOtherItem(isPrev);
-        timer2.resetTimer();
-      }}
-      isTimerChangeable={isTimerChangeable}
-      onChangingTimer={() => {
-        timer2.pauseTimer();
-
-        // if (!isAdditionalTimerOn) {
-        //   saveTimer(timer);
-        //   setTimer(0);
-        // } else {
-        //   setTimer(savedTimer);
-        // }
-
-        setIsAdditionalTimerOn(!isAdditionalTimerOn);
-      }}
-      item={data.table[index]}
-      speakingTimer={timer2.speakingTimer}
-      isSelected={prosConsSelected === 'cons'}
-      onActivate={() => {
-        setProsConsSelected('cons');
-      }}
-    />
-    <div className="flex flex-row items-center justify-center space-x-[20px]">
-      <button
-        className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main"
-        onClick={() => goToOtherItem(true)}
-      >
-        <FaArrowLeft className="size-[36px]" />
-        <h1 className="text-[28px] font-semibold">이전 차례</h1>
-      </button>
-
-      <button
-        className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main"
-        onClick={() => goToOtherItem(false)}
-      >
-        <h1 className="text-[28px] font-semibold">다음 차례</h1>
-        <FaArrowRight className="size-[36px]" />
-      </button>
-    </div>
-  </div>
-</div>; */
 }
