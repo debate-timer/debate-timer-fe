@@ -1,7 +1,7 @@
-import { RiSpeakFill } from 'react-icons/ri';
 import { CustomizeTimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
+import { MdRecordVoiceOver } from 'react-icons/md';
 
 interface TimeBasedTimerProps {
   onStart: () => void;
@@ -68,17 +68,19 @@ export default function TimeBasedTimer({
         <div
           className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
         >
-          <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
+          <h2 className="absolute left-1/2 w-max -translate-x-1/2 transform">
             {titleText}
-          </h1>
+          </h2>
         </div>
 
         {/* Team name */}
         <div className="my-[20px] h-[40px]">
           {item.stance !== 'NEUTRAL' && (
             <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-              <RiSpeakFill className="size-[40px]" />
-              <h1 className="text-[28px] font-bold">{teamName}</h1>
+              <MdRecordVoiceOver className="size-[40px]" />
+              <h3 className="text-[28px] font-bold">
+                {teamName} 팀 | {item.speaker} 토론자
+              </h3>
             </div>
           )}
         </div>
