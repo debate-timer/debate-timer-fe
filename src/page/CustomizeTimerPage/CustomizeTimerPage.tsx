@@ -75,7 +75,30 @@ export default function TimerPage() {
     },
     [index, data],
   );
-
+  const switchCamp = useCallback(() => {
+    if (prosConsSelected === 'pros') {
+      if (timer2.isDone) return;
+      if (timer1.isRunning) {
+        timer1.pauseTimer();
+        timer2.startTimer();
+        setProsConsSelected('cons');
+      } else {
+        timer1.pauseTimer();
+        setProsConsSelected('cons');
+      }
+    } else if (prosConsSelected === 'cons') {
+      if (timer1.isDone) return;
+      if (timer2.isRunning) {
+        if (timer1.isDone) return;
+        timer2.pauseTimer();
+        timer1.startTimer();
+        setProsConsSelected('pros');
+      } else {
+        timer2.pauseTimer();
+        setProsConsSelected('pros');
+      }
+    }
+  }, [prosConsSelected, timer1, timer2]);
   // ########### useEffect AREA ###########
   // Open tooltip when value of 'isFirst' is true
   useEffect(() => {
@@ -90,76 +113,44 @@ export default function TimerPage() {
 
   // Change background color
   useEffect(() => {
-    if (data?.table[index].boxType === 'PARLIAMENTARY') {
-      if (nomalTimer.isRunning) {
+    const getBgStatus = () => {
+      const boxType = data?.table[index].boxType;
+
+      const getTimerStatus = (
+        speakingTimer: number | null,
+        totalTimer: number | null,
+      ) => {
+        const activeTimer = speakingTimer !== null ? speakingTimer : totalTimer;
+        if (activeTimer !== null) {
+          if (activeTimer > 10 && activeTimer <= 30) return 'warning';
+          if (activeTimer >= 0 && activeTimer <= 10) return 'danger';
+        }
+        return 'default';
+      };
+
+      if (boxType === 'PARLIAMENTARY') {
+        if (!nomalTimer.isRunning) return 'default';
+
         if (nomalTimer.timer !== null) {
-          if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) {
-            setBg('warning');
-          } else if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) {
-            setBg('danger');
-          } else {
-            setBg('expired');
-          }
-        }
-      } else {
-        setBg('default');
-      }
-    } else if (data?.table[index].boxType === 'TIME_BASED') {
-      if (prosConsSelected === 'pros') {
-        if (timer1.isRunning) {
-          if (timer1.speakingTimer !== null && timer1.totalTimer !== null) {
-            if (timer1.speakingTimer > 10 && timer1.speakingTimer <= 30) {
-              setBg('warning');
-            } else if (
-              timer1.speakingTimer >= 0 &&
-              timer1.speakingTimer <= 10
-            ) {
-              setBg('danger');
-            }
-          } else if (
-            timer1.speakingTimer === null &&
-            timer1.totalTimer !== null
-          ) {
-            if (timer1.totalTimer > 10 && timer1.totalTimer <= 30) {
-              setBg('warning');
-            } else if (timer1.totalTimer >= 0 && timer1.totalTimer <= 10) {
-              setBg('danger');
-            }
-          } else {
-            setBg('default');
-          }
-        } else {
-          setBg('default');
-        }
-      } else if (prosConsSelected === 'cons') {
-        if (timer2.isRunning) {
-          if (timer2.speakingTimer !== null && timer2.totalTimer !== null) {
-            if (timer2.speakingTimer > 10 && timer2.speakingTimer <= 30) {
-              setBg('warning');
-            } else if (
-              timer2.speakingTimer >= 0 &&
-              timer2.speakingTimer <= 10
-            ) {
-              setBg('danger');
-            }
-          } else if (
-            timer2.speakingTimer === null &&
-            timer2.totalTimer !== null
-          ) {
-            if (timer2.totalTimer > 10 && timer2.totalTimer <= 30) {
-              setBg('warning');
-            } else if (timer2.totalTimer >= 0 && timer2.totalTimer <= 10) {
-              setBg('danger');
-            }
-          } else {
-            setBg('default');
-          }
-        } else {
-          setBg('default');
+          if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) return 'warning';
+          if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) return 'danger';
+          return 'expired';
         }
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+      if (boxType === 'TIME_BASED') {
+        if (prosConsSelected === 'pros' && timer1.isRunning) {
+          return getTimerStatus(timer1.speakingTimer, timer1.totalTimer);
+        }
+        if (prosConsSelected === 'cons' && timer2.isRunning) {
+          return getTimerStatus(timer2.speakingTimer, timer2.totalTimer);
+        }
+      }
+
+      return 'default';
+    };
+
+    setBg(getBgStatus());
   }, [
     nomalTimer.isRunning,
     nomalTimer.timer,
@@ -169,7 +160,9 @@ export default function TimerPage() {
     timer2.isRunning,
     timer2.totalTimer,
     timer2.speakingTimer,
+    prosConsSelected,
     index,
+    data,
   ]);
 
   // Play bells
@@ -214,40 +207,33 @@ export default function TimerPage() {
 
   // Initiate timer
   useEffect(() => {
-    if (data) {
-      if (data.table[index].boxType === 'PARLIAMENTARY') {
-        timer1.clearTimer();
-        timer2.clearTimer();
-        nomalTimer.setDefaultTimer(data.table[index].time ?? 0);
-        nomalTimer.setTimer(data.table[index].time ?? 0);
-        setWarningBell(data.info.warningBell);
-        setFinishBell(data.info.finishBell);
-      } else if (data.table[index].boxType === 'TIME_BASED') {
-        nomalTimer.clearTimer();
-        timer1.setDefaultTime({
-          defaultTotalTimer: data.table[index].timePerTeam,
-          defaultSpeakingTimer: data.table[index].timePerSpeaking,
-        });
-        timer1.setTimers(
-          data.table[index].timePerTeam,
-          data.table[index].timePerSpeaking,
-        );
-        timer1.setIsSpeakingTimer(true);
+    if (!data) return;
 
-        timer2.setDefaultTime({
-          defaultTotalTimer: data.table[index].timePerTeam,
-          defaultSpeakingTimer: data.table[index].timePerSpeaking,
-        });
-        timer2.setTimers(
-          data.table[index].timePerTeam,
-          data.table[index].timePerSpeaking,
-        );
-        timer2.setIsSpeakingTimer(true);
-        timer1.setIsDone(false);
-        timer2.setIsDone(false);
-      }
-      setWarningBell(data.info.warningBell);
-      setFinishBell(data.info.finishBell);
+    const currentBox = data.table[index];
+    const { warningBell, finishBell } = data.info;
+
+    setWarningBell(warningBell);
+    setFinishBell(finishBell);
+
+    if (currentBox.boxType === 'PARLIAMENTARY') {
+      timer1.clearTimer();
+      timer2.clearTimer();
+
+      const defaultTime = currentBox.time ?? 0;
+      nomalTimer.setDefaultTimer(defaultTime);
+      nomalTimer.setTimer(defaultTime);
+    } else if (currentBox.boxType === 'TIME_BASED') {
+      nomalTimer.clearTimer();
+
+      const defaultTotalTimer = currentBox.timePerTeam;
+      const defaultSpeakingTimer = currentBox.timePerSpeaking;
+
+      [timer1, timer2].forEach((timer) => {
+        timer.setDefaultTime({ defaultTotalTimer, defaultSpeakingTimer });
+        timer.setTimers(defaultTotalTimer, defaultSpeakingTimer);
+        timer.setIsSpeakingTimer(true);
+        timer.setIsDone(false);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -272,30 +258,27 @@ export default function TimerPage() {
         'Enter',
       ];
 
-      // Disable web browsers' default actions
-      if (keysToDisable.includes(event.key)) {
+      if (keysToDisable.includes(event.code)) {
         event.preventDefault();
       }
-
-      // Clear focus on the keyboard event
       if (event.target instanceof HTMLElement) {
         event.target.blur();
       }
 
+      const toggleTimer = (timer: typeof timer1 | typeof timer2) => {
+        if (timer.isRunning) {
+          timer.pauseTimer();
+        } else {
+          timer.startTimer();
+        }
+      };
+
       switch (event.code) {
         case 'Space':
           if (prosConsSelected === 'pros') {
-            if (timer1.isRunning) {
-              timer1.pauseTimer();
-            } else {
-              timer1.startTimer();
-            }
+            toggleTimer(timer1);
           } else if (prosConsSelected === 'cons') {
-            if (timer2.isRunning) {
-              timer2.pauseTimer();
-            } else {
-              timer2.startTimer();
-            }
+            toggleTimer(timer2);
           }
           break;
         case 'ArrowLeft':
@@ -307,57 +290,38 @@ export default function TimerPage() {
         case 'KeyR':
           if (prosConsSelected === 'pros') {
             timer1.resetTimer();
-          } else if (prosConsSelected === 'cons') {
+          } else {
             timer2.resetTimer();
           }
           break;
         case 'KeyA':
-          if (timer1.isDone) break;
-          setProsConsSelected('pros');
-          if (timer2.isRunning) {
-            timer2.pauseTimer();
+          if (!timer1.isDone) {
+            setProsConsSelected('pros');
+            if (timer2.isRunning) timer2.pauseTimer();
           }
           break;
         case 'KeyL':
-          if (timer2.isDone) break;
-          setProsConsSelected('cons');
-          if (timer1.isRunning) {
-            timer1.pauseTimer();
+          if (!timer2.isDone) {
+            setProsConsSelected('cons');
+            if (timer1.isRunning) timer1.pauseTimer();
           }
           break;
         case 'Enter':
-          if (prosConsSelected === 'pros') {
-            if (timer2.isDone) break;
-            if (timer1.isRunning) {
-              timer1.pauseTimer();
-              timer2.startTimer();
-              setProsConsSelected('cons');
-            } else {
-              timer1.pauseTimer();
-              setProsConsSelected('cons');
-            }
-          } else if (prosConsSelected === 'cons') {
-            if (timer1.isDone) break;
-            if (timer2.isRunning) {
-              if (timer1.isDone) break;
-              timer2.pauseTimer();
-              timer1.startTimer();
-              setProsConsSelected('pros');
-            } else {
-              timer2.pauseTimer();
-              setProsConsSelected('pros');
-            }
-          }
+          switchCamp();
+          break;
       }
     };
 
-    // Set listener when component is rendered
     window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      // Remove listener when component is rendered
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [goToOtherItem, prosConsSelected, timer1, timer2]);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    goToOtherItem,
+    prosConsSelected,
+    timer1,
+    timer2,
+    setProsConsSelected,
+    switchCamp,
+  ]);
 
   // Calculate whether timer should show additional timer button
   useEffect(() => {
@@ -377,6 +341,7 @@ export default function TimerPage() {
       nomalTimer.setTimer(savedTimer);
       setIsAdditionalTimerOn(!isAdditionalTimerOn);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAdditionalTimerOn,
     nomalTimer.timer,
@@ -389,8 +354,10 @@ export default function TimerPage() {
 
   useEffect(() => {
     if (prosConsSelected === 'cons') {
+      if (timer1.speakingTimer === null) return;
       timer1.resetTimer();
     } else if (prosConsSelected === 'pros') {
+      if (timer2.speakingTimer === null) return;
       timer2.resetTimer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -398,10 +365,8 @@ export default function TimerPage() {
 
   useEffect(() => {
     if (timer1.speakingTimer === 0 || timer1.totalTimer === 0) {
-      // setProsConsSelected((prev) => (prev !== 'cons' ? 'cons' : prev));
       timer1.pauseTimer();
     } else if (timer2.speakingTimer === 0 || timer2.totalTimer === 0) {
-      // setProsConsSelected((prev) => (prev !== 'pros' ? 'pros' : prev));
       timer2.pauseTimer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -434,6 +399,7 @@ export default function TimerPage() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     prosConsSelected,
     timer1.totalTimer,
@@ -503,7 +469,7 @@ export default function TimerPage() {
                 onPause={() => nomalTimer.pauseTimer()}
                 onReset={() => nomalTimer.resetTimer()}
                 addOnTimer={(delta: number) =>
-                  nomalTimer.setTimer(nomalTimer.timer ?? 0 + delta)
+                  nomalTimer.setTimer((nomalTimer.timer ?? 0) + delta)
                 }
                 isRunning={nomalTimer.isRunning}
                 timer={nomalTimer.timer ?? 0}
@@ -579,13 +545,7 @@ export default function TimerPage() {
                 {/* ENTER 버튼 */}
                 <button
                   onClick={() => {
-                    if (prosConsSelected === 'pros') {
-                      if (timer2.isDone) return;
-                      setProsConsSelected('cons');
-                    } else {
-                      if (timer1.isDone) return;
-                      setProsConsSelected('pros');
-                    }
+                    switchCamp();
                   }}
                   className="z-20 flex h-[100px] w-[100px] flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
                 >

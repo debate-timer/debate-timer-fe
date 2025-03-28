@@ -65,7 +65,6 @@ export function useCustomTimer({
       return;
     }
     if (totalTimer === 0) return;
-
     setTotalTimer(defaultTime.defaultTotalTimer);
   }, [
     defaultTime.defaultSpeakingTimer,
