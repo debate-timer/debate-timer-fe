@@ -25,9 +25,12 @@ export const OnPros: Story = {
     isRunning: false,
     item: {
       stance: 'PROS',
-      type: 'OPENING',
-      time: 60,
-      speakerNumber: 1,
+      speechType: '입론1',
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 10,
+      timePerSpeaking: 10,
+      speaker: '나',
     },
   },
 };
@@ -46,29 +49,12 @@ export const OnCons: Story = {
     isRunning: false,
     item: {
       stance: 'CONS',
-      type: 'OPENING',
-      time: 60,
-      speakerNumber: 1,
-    },
-  },
-};
-
-export const OnNeutral: Story = {
-  args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
-    timer: 150,
-    isTimerChangeable: false,
-    isRunning: false,
-    item: {
-      stance: 'NEUTRAL',
-      type: 'TIME_OUT',
-      time: 60,
+      speechType: '입론1',
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 10,
+      timePerSpeaking: 10,
+      speaker: '나',
     },
   },
 };
@@ -86,15 +72,18 @@ export const OnRunning: Story = {
     isTimerChangeable: false,
     isRunning: true,
     item: {
-      stance: 'CONS',
-      type: 'OPENING',
-      time: 60,
-      speakerNumber: 1,
+      stance: 'PROS',
+      speechType: '입론1',
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 10,
+      timePerSpeaking: 10,
+      speaker: '나',
     },
   },
 };
 
-export const Under0sec: Story = {
+export const WhenOnlyTeamPerTime: Story = {
   args: {
     onChangingTimer: () => {},
     onPause: () => {},
@@ -103,57 +92,17 @@ export const Under0sec: Story = {
     goToOtherItem: (isPrev: boolean) => {
       console.log(isPrev);
     },
-    timer: -90,
-    isTimerChangeable: false,
-    isRunning: true,
+    timer: 150,
+    isTimerChangeable: true,
+    isRunning: false,
     item: {
       stance: 'PROS',
-      type: 'OPENING',
-      time: 60,
-      speakerNumber: 1,
-    },
-  },
-};
-
-export const WhenAdditionalTimerAvailable: Story = {
-  args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
-    timer: 150,
-    isTimerChangeable: true,
-    isRunning: false,
-    item: {
-      stance: 'CONS',
-      type: 'OPENING',
-      time: 60,
-      speakerNumber: 1,
-    },
-  },
-};
-
-export const OnAdditionalTimerEnabled: Story = {
-  args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
-    timer: 150,
-    isAdditionalTimerOn: true,
-    isTimerChangeable: true,
-    isRunning: false,
-    item: {
-      stance: 'CONS',
-      type: 'OPENING',
-      time: 60,
-      speakerNumber: 1,
+      speechType: '입론1',
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 10,
+      timePerSpeaking: null,
+      speaker: '나',
     },
   },
 };
