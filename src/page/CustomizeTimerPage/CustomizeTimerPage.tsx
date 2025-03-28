@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimeBasedTimer from './components/TimeBasedTimer';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import FirstUseToolTip from './components/FirstUseToolTip';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
@@ -32,6 +32,7 @@ export default function TimerPage() {
   // Parse params
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
+  const navigate = useNavigate();
 
   // Get query
   const { data } = useGetCustomizeTableData(tableId);
@@ -258,7 +259,7 @@ export default function TimerPage() {
         'Enter',
       ];
 
-      if (keysToDisable.includes(event.code)) {
+      if (keysToDisable.includes(event.key)) {
         event.preventDefault();
       }
       if (event.target instanceof HTMLElement) {
@@ -598,21 +599,37 @@ export default function TimerPage() {
               </div>
             )}
             {/* 하단의 이전차례/다음차례 버튼 */}
-            <div className="flex flex-row items-center justify-center space-x-[20px]">
+            <div className="flex flex-row items-center justify-center space-x-[30px]">
+              {/* 이전 차례 버튼 */}
               <button
-                className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main"
+                className={`flex min-w-60 flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main
+      ${index === 0 ? 'invisible' : ''}`}
                 onClick={() => goToOtherItem(true)}
               >
                 <FaArrowLeft className="size-[36px]" />
                 <h1 className="text-[28px] font-semibold">이전 차례</h1>
               </button>
 
+              {/* 다음 차례 / 토론 종료하기 버튼 */}
               <button
-                className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main"
-                onClick={() => goToOtherItem(false)}
+                className="flex min-w-60 flex-row items-center justify-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main"
+                onClick={() => {
+                  if (index === data.table.length - 1) {
+                    navigate(`/overview/${tableId}`);
+                  } else {
+                    goToOtherItem(false); // 다음 차례
+                  }
+                }}
               >
-                <h1 className="text-[28px] font-semibold">다음 차례</h1>
-                <FaArrowRight className="size-[36px]" />
+                {index !== data.table.length - 1 && (
+                  <>
+                    <h1 className="text-[28px] font-semibold">다음 차례</h1>
+                    <FaArrowRight className="size-[36px]" />
+                  </>
+                )}
+                {index === data.table.length - 1 && (
+                  <h1 className="text-[28px] font-semibold">토론 종료</h1>
+                )}
               </button>
             </div>
           </div>
