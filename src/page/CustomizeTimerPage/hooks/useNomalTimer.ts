@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-export function useTimer() {
+export function useNomalTimer() {
   const [timer, setTimer] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [defaultTimer, setDefaultTimer] = useState(0);

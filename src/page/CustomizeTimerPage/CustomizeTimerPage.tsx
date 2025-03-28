@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import Timer from './components/Timer';
+import TimeBasedTimer from './components/TimeBasedTimer';
 import { useParams } from 'react-router-dom';
 import FirstUseToolTip from './components/FirstUseToolTip';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
@@ -11,7 +11,7 @@ import { useCustomTimer } from './hooks/useCustomTimer';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import { FaArrowLeft, FaArrowRight, FaExchangeAlt } from 'react-icons/fa';
 import NomalTimer from './components/NomalTimer';
-import { useTimer } from './hooks/useTimer';
+import { useNomalTimer } from './hooks/useNomalTimer';
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 
 const bgColorMap: Record<TimerState, string> = {
@@ -56,7 +56,7 @@ export default function TimerPage() {
   // Prepare for timer hook
   const timer1 = useCustomTimer({});
   const timer2 = useCustomTimer({});
-  const nomalTimer = useTimer();
+  const nomalTimer = useNomalTimer();
   const [prosConsSelected, setProsConsSelected] = useState<'pros' | 'cons'>(
     'pros',
   );
@@ -500,7 +500,7 @@ export default function TimerPage() {
             {data.table[index].boxType === 'TIME_BASED' && (
               <div className="flex flex-row items-center justify-center space-x-[-30px]">
                 {/* 왼쪽 타이머 */}
-                <Timer
+                <TimeBasedTimer
                   onStart={() => timer1.startTimer()}
                   onPause={() => timer1.pauseTimer()}
                   onReset={() => timer1.resetTimer()}
@@ -554,7 +554,7 @@ export default function TimerPage() {
                 </button>
 
                 {/* 오른쪽 타이머 */}
-                <Timer
+                <TimeBasedTimer
                   onStart={() => timer2.startTimer()}
                   onPause={() => timer2.pauseTimer()}
                   onReset={() => timer2.resetTimer()}

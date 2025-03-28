@@ -3,7 +3,7 @@ import { CustomizeTimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 
-interface TimerProps {
+interface TimeBasedTimerProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
@@ -25,7 +25,7 @@ interface TimerProps {
   teamName: string;
 }
 
-export default function Timer({
+export default function TimeBasedTimer({
   onStart,
   onPause,
   onReset,
@@ -38,7 +38,7 @@ export default function Timer({
   onActivate,
   prosCons,
   teamName,
-}: TimerProps) {
+}: TimeBasedTimerProps) {
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(timer ?? 0) / 60),
   );

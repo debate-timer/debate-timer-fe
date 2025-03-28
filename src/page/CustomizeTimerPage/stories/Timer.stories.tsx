@@ -1,15 +1,15 @@
 import { Meta, StoryObj } from '@storybook/react';
-import Timer from '../components/Timer';
+import TimeBasedTimer from '../components/TimeBasedTimer';
 
-const meta: Meta<typeof Timer> = {
+const meta: Meta<typeof TimeBasedTimer> = {
   title: 'page/CustomizeTimerPage/Components/Timer',
-  component: Timer,
+  component: TimeBasedTimer,
   tags: ['autodocs'],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof Timer>;
+type Story = StoryObj<typeof TimeBasedTimer>;
 
 export const OnPros: Story = {
   args: {
