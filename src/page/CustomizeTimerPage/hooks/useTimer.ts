@@ -10,9 +10,7 @@ export function useTimer() {
   const startTimer = useCallback(() => {
     if (intervalRef.current === null) {
       intervalRef.current = setInterval(() => {
-        setTimer((prev) =>
-          prev === null ? null : prev - 1 >= 0 ? prev - 1 : 0,
-        );
+        setTimer((prev) => (prev === null ? null : prev - 1));
       }, 1000);
       setIsRunning(true);
     }
