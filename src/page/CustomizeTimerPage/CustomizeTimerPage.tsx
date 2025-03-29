@@ -433,7 +433,7 @@ export default function TimerPage() {
                   ? '테이블 이름 없음'
                   : data.info.name
               }
-              type={'PARLIAMENTARY'}
+              type={'CUSTOMIZE'}
             />
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
