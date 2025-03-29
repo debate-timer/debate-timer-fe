@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { AxiosResponse, AxiosError } from 'axios';
-import { ErrorResponseType } from './responseTypes';
+import { ErrorResponseType } from './responses/global';
 import axiosInstance from './axiosInstance';
 
 // HTTP request methods
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // Low-level http request function
 export async function request<T>(

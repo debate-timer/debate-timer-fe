@@ -1,10 +1,13 @@
 import { RiSpeakFill } from 'react-icons/ri';
-import { DebateTypeToString, TimeBoxInfo } from '../../../type/type';
+import {
+  ParliamentarySpeechTypeToString,
+  ParliamentaryTimeBoxInfo,
+} from '../../../type/type';
 import { Formatting } from '../../../util/formatting';
 
 interface TimeTableItem {
   isCurrent: boolean;
-  item: TimeBoxInfo;
+  item: ParliamentaryTimeBoxInfo;
 }
 
 export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
@@ -34,7 +37,7 @@ export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
       className={`flex h-max ${width} flex-row items-center justify-center space-x-2 ${pos} ${bgColorClass} ${roundedClass} p-[16px] text-[28px] font-bold ${textColorClass}`}
     >
       {/* Print what type is this sequence (e.g., opening, time-out, etc.) */}
-      <h1>{DebateTypeToString[item.type]}</h1>
+      <h1>{ParliamentarySpeechTypeToString[item.type]}</h1>
 
       {/* Print running time */}
       <p>| {timeText}</p>

@@ -1,12 +1,12 @@
 import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
-import { TimeBoxInfo } from '../../../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
 
 interface EditDeleteButtonsPros {
-  info: TimeBoxInfo;
-  onSubmitEdit: (updatedInfo: TimeBoxInfo) => void;
+  info: ParliamentaryTimeBoxInfo;
+  onSubmitEdit: (updatedInfo: ParliamentaryTimeBoxInfo) => void;
   onSubmitDelete: () => void;
 }
 

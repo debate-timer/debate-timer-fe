@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import TableOverview from './TableOverview';
-import { TimeBoxInfo } from '../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../type/type';
 
 // 1) 메타 설정
 const meta: Meta<typeof TableOverview> = {
@@ -29,6 +29,6 @@ export const Default: Story = {
         time: 180,
         speakerNumber: 2,
       },
-    ] as TimeBoxInfo[],
+    ] as ParliamentaryTimeBoxInfo[],
   },
 };

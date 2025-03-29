@@ -1,11 +1,11 @@
 import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
-import { TimeBoxInfo } from '../../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
 
 interface TimeTableProps {
   goToOtherItem: (isPrev: boolean) => void;
   currIndex: number;
-  items: TimeBoxInfo[];
+  items: ParliamentaryTimeBoxInfo[];
   titles?: {
     pros: string;
     cons: string;

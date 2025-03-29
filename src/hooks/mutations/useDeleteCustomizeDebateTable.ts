@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteParliamentaryDebateTable } from '../../apis/apis/parliamentary';
+import { deleteCustomizeTableData } from '../../apis/apis/customize';
 
-interface DeleteParliamentaryTableParams {
+interface DeleteCustomizeTableParams {
   tableId: number;
 }
 
-export function useDeleteParliamentaryDebateTable() {
+export function useDeleteCustomizeDebateTable() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async ({ tableId }: DeleteParliamentaryTableParams) =>
-      await deleteParliamentaryDebateTable(tableId),
+    mutationFn: async ({ tableId }: DeleteCustomizeTableParams) =>
+      await deleteCustomizeTableData(tableId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['DebateTableList'] });
 
@@ -18,7 +19,7 @@ export function useDeleteParliamentaryDebateTable() {
       }, 300);
     },
     onError: (error) => {
-      console.error('Error deleting parliamentary table:', error);
+      console.error('Error deleting customize table:', error);
     },
   });
 }

@@ -1,10 +1,10 @@
 import React from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
-import { Type } from '../../../../type/type';
+import { DebateType } from '../../../../type/type';
 interface EditButtonProps {
   tableId: number;
-  type?: Type;
+  type?: DebateType;
 }
 export default function EditButton({ tableId, type }: EditButtonProps) {
   const navigate = useNavigate();

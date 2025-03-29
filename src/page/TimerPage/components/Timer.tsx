@@ -1,8 +1,8 @@
 import { RiSpeakFill } from 'react-icons/ri';
 import {
-  DebateTypeToString,
+  ParliamentarySpeechTypeToString,
   StanceToString,
-  TimeBoxInfo,
+  ParliamentaryTimeBoxInfo,
 } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -22,7 +22,7 @@ interface TimerProps {
   isRunning: boolean;
   isLastItem: boolean;
   isFirstItem: boolean;
-  item: TimeBoxInfo;
+  item: ParliamentaryTimeBoxInfo;
 }
 
 export default function Timer({
@@ -55,7 +55,7 @@ export default function Timer({
         : StanceToString[item.stance] + ' 팀'
       : '';
   const titleText = isAdditionalTimerOn
-    ? DebateTypeToString['TIME_OUT']
+    ? ParliamentarySpeechTypeToString['TIME_OUT']
     : item.stance === 'NEUTRAL'
       ? DebateTypeToString[item.type]
       : DebateTypeToString[item.type];

@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { TimeBoxInfo, DebateType, Stance } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  ParliamentarySpeechType,
+  Stance,
+} from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
-  beforeData?: TimeBoxInfo;
-  initData?: TimeBoxInfo;
-  onSubmit: (data: TimeBoxInfo) => void;
+  beforeData?: ParliamentaryTimeBoxInfo;
+  initData?: ParliamentaryTimeBoxInfo;
+  onSubmit: (data: ParliamentaryTimeBoxInfo) => void;
   onClose: () => void;
 }
 
@@ -25,7 +29,7 @@ export default function TimerCreationContent({
       : (initData?.stance ?? 'PROS'),
   );
 
-  const [debateType, setDebateType] = useState<DebateType>(
+  const [debateType, setDebateType] = useState<ParliamentarySpeechType>(
     beforeData?.type
       ? beforeData?.type !== 'TIME_OUT'
         ? beforeData?.type
@@ -109,7 +113,7 @@ export default function TimerCreationContent({
               ) {
                 setStance('PROS');
               }
-              setDebateType(e.target.value as DebateType);
+              setDebateType(e.target.value as ParliamentarySpeechType);
             }}
           >
             <option value="OPENING">입론</option>
