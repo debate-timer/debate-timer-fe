@@ -21,7 +21,7 @@ export function usePutCustomizeDebateTable(onSuccess: () => void) {
       onSuccess();
     },
     onError: (error) => {
-      console.error('Error updating parliamentary table:', error);
+      console.error('Error updating customize table:', error);
     },
   });
 }
