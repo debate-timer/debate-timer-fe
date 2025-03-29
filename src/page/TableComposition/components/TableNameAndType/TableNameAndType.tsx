@@ -2,10 +2,10 @@ import ClearableInput from '../../../../components/ClearableInput/ClearableInput
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { DetailDebateInfo, DebateType } from '../../../../type/type';
+import { ParliamentaryDebateInfo, DebateType } from '../../../../type/type';
 import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
 
-type ExtendedDebateInfo = DetailDebateInfo & {
+type ExtendedDebateInfo = ParliamentaryDebateInfo & {
   type: DebateType;
 };
 interface TableNameAndTypeProps {

@@ -32,7 +32,7 @@ export const CustomizeTimeBoxTypeToString: Record<
   string
 > = {
   NORMAL: '일반 타이머',
-  TIME_BASED: '자요토론 타이머',
+  TIME_BASED: '자유토론 타이머',
 };
 
 export const DebateTypeToString: Record<DebateType, string> = {
@@ -63,9 +63,18 @@ export interface CustomizeTimeBoxInfo {
   speaker?: string;
 }
 
-export interface DetailDebateInfo {
+export interface ParliamentaryDebateInfo {
   name: string;
   agenda: string;
+  warningBell: boolean;
+  finishBell: boolean;
+}
+
+export interface CustomizeDebateInfo {
+  name: string;
+  agenda: string;
+  prosTeamName: string;
+  consTeamName: string;
   warningBell: boolean;
   finishBell: boolean;
 }

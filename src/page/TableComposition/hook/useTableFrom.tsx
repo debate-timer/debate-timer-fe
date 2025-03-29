@@ -3,7 +3,7 @@ import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import {
-  DetailDebateInfo,
+  ParliamentaryDebateInfo,
   ParliamentaryTimeBoxInfo,
   DebateType,
 } from '../../../type/type';
@@ -11,7 +11,7 @@ import useAddTable from '../../../hooks/mutations/useAddTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
 export interface TableFormData {
-  info: DetailDebateInfo & { type: DebateType };
+  info: ParliamentaryDebateInfo & { type: DebateType };
   table: ParliamentaryTimeBoxInfo[];
 }
 const useTableFrom = (
