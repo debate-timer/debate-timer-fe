@@ -1,15 +1,4 @@
-import { TimeBoxInfo, DebateTable, DetailDebateInfo } from '../type/type';
-
-// POST "/api/member"
-export interface PostUserResponseType {
-  id: number;
-  email: string;
-}
-
-// GET /api/table
-export interface GetDebateTableListResponseType {
-  tables: DebateTable[];
-}
+import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
 
 // GET /api/table/parliamentary/{tableId}
 export interface GetTableDataResponseType {
@@ -30,12 +19,4 @@ export interface PutDebateTableResponseType {
   id: number;
   info: DetailDebateInfo;
   table: TimeBoxInfo[];
-}
-
-// DELETE /api/table/parliamentary/{tableId}
-// This API only contains HTTP response code 204
-
-// Response types for error cases
-export interface ErrorResponseType {
-  message: string;
 }

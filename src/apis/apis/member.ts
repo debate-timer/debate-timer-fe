@@ -1,10 +1,8 @@
 import { setAccessToken } from '../../util/accessToken';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
-import {
-  GetDebateTableListResponseType,
-  PostUserResponseType,
-} from '../responseTypes';
+import { GetDebateTableListResponseType } from '../responses/member';
+import { PostUserResponseType } from '../responses/member';
 
 // Template
 /*

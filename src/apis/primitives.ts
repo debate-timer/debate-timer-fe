@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { AxiosResponse, AxiosError } from 'axios';
-import { ErrorResponseType } from './responseTypes';
+import { ErrorResponseType } from './responses/global';
 import axiosInstance from './axiosInstance';
 
 // HTTP request methods

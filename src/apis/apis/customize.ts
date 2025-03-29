@@ -14,3 +14,5 @@ export async function apiFunc(
     return response.data;
 }
 */
+
+// POST /api/table/customize

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../apis/endpoints';
-import { PostDebateTableResponseType } from '../apis/responseTypes';
+import { PostDebateTableResponseType } from '../apis/responses/parliamentary';
 
 export const handlers = [
   // POST "/api/member"

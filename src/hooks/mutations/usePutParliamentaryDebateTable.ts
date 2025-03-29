@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { putParliamentaryDebateTable } from '../../apis/apis/parliamentary';
-import { PutDebateTableResponseType } from '../../apis/responseTypes';
+import { PutDebateTableResponseType } from '../../apis/responses/parliamentary';
 import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
 
 interface PutParliamentaryTableParams {

@@ -1,11 +1,9 @@
 import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
-import {
-  GetTableDataResponseType,
-  PostDebateTableResponseType,
-  PutDebateTableResponseType,
-} from '../responseTypes';
+import { PutDebateTableResponseType } from '../responses/parliamentary';
+import { PostDebateTableResponseType } from '../responses/parliamentary';
+import { GetTableDataResponseType } from '../responses/parliamentary';
 
 // Template
 /*
