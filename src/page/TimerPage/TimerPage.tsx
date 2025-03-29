@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import Timer from './components/Timer';
-import TimeTable from './components/TimeTable';
 import { useTimer } from './hooks/useTimer';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
 import FirstUseToolTip from './components/FirstUseToolTip';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import IconButton from '../../components/IconButton/IconButton';
 import { IoHelpCircle } from 'react-icons/io5';
+import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 
 export default function TimerPage() {
   // ########## DECLARATION AREA ##########
@@ -34,6 +34,9 @@ export default function TimerPage() {
 
   // Prepare for changing background
   const [bg, setBg] = useState('');
+
+  // Prepare navigation
+  const navigate = useNavigate();
 
   // Prepare for additional timer
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
@@ -249,9 +252,9 @@ export default function TimerPage() {
             {/* Timer body */}
             <div
               data-testid="timer-page-body"
-              className="absolute inset-0 flex h-full w-full flex-row items-center justify-center space-x-[50px]"
+              className="absolute inset-0 flex h-full w-full flex-col items-center justify-center space-y-10"
             >
-              {/* Timer on the left side */}
+              {/* Timer on the top side */}
               <Timer
                 isAdditionalTimerOn={isAdditionalTimerOn}
                 onStart={() => startTimer()}
@@ -292,12 +295,35 @@ export default function TimerPage() {
                 }
               />
 
-              {/* Time table on the right side */}
-              <TimeTable
-                goToOtherItem={(isPrev: boolean) => goToOtherItem(isPrev)}
-                currIndex={index}
-                items={data !== undefined ? data.table : []}
-              />
+              {/* Round control buttons on the bottom side */}
+              {data && (
+                <div className="flex flex-row space-x-8">
+                  <div className="flex h-[70px] w-[200px] items-center justify-center">
+                    {index === 0 && <></>}
+                    {index !== 0 && (
+                      <RoundControlButton
+                        type="PREV"
+                        onClick={() => goToOtherItem(true)}
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex h-[70px] w-[200px] items-center justify-center">
+                    {index === data.table.length - 1 && (
+                      <RoundControlButton
+                        type="DONE"
+                        onClick={() => navigate('/')}
+                      />
+                    )}
+                    {index !== data.table.length - 1 && (
+                      <RoundControlButton
+                        type="NEXT"
+                        onClick={() => goToOtherItem(false)}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
