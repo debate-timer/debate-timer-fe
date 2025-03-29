@@ -303,7 +303,10 @@ export default function TimerPage() {
                     {index !== 0 && (
                       <RoundControlButton
                         type="PREV"
-                        onClick={() => goToOtherItem(true)}
+                        onClick={() => {
+                          setIsAdditionalTimerOn(false);
+                          goToOtherItem(true);
+                        }}
                       />
                     )}
                   </div>
@@ -318,7 +321,10 @@ export default function TimerPage() {
                     {index !== data.table.length - 1 && (
                       <RoundControlButton
                         type="NEXT"
-                        onClick={() => goToOtherItem(false)}
+                        onClick={() => {
+                          setIsAdditionalTimerOn(false);
+                          goToOtherItem(false);
+                        }}
                       />
                     )}
                   </div>

@@ -45,11 +45,21 @@ export default function Timer({
       : item.stance === 'PROS'
         ? 'bg-camp-blue'
         : 'bg-camp-red';
+
+  const speakerText =
+    item.stance !== 'NEUTRAL'
+      ? item.speakerNumber
+        ? StanceToString[item.stance] +
+          ' 팀 | ' +
+          item.speakerNumber +
+          '번 토론자'
+        : StanceToString[item.stance] + ' 팀'
+      : '';
   const titleText = isAdditionalTimerOn
     ? DebateTypeToString['TIME_OUT']
     : item.stance === 'NEUTRAL'
       ? DebateTypeToString[item.type]
-      : StanceToString[item.stance] + ' ' + DebateTypeToString[item.type];
+      : DebateTypeToString[item.type];
 
   return (
     <div
@@ -78,16 +88,12 @@ export default function Timer({
 
       {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
-        {item.stance !== 'NEUTRAL' &&
-          !isAdditionalTimerOn &&
-          item.speakerNumber && (
-            <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-              <RiSpeakFill className="size-[40px]" />
-              <h1 className="text-[28px] font-bold">
-                {item.speakerNumber}번 토론자
-              </h1>
-            </div>
-          )}
+        {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
+          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
+            <RiSpeakFill className="size-[40px]" />
+            <h1 className="text-[28px] font-bold">{speakerText}</h1>
+          </div>
+        )}
       </div>
 
       {/* Timer display */}
