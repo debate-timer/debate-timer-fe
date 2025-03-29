@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Type } from '../../../../type/type';
-import { typeMapping } from '../../../../constants/languageMapping';
+import { DebateType, DebateTypeToString } from '../../../../type/type';
 import { IoMdArrowDropdown } from 'react-icons/io';
 
 interface DropdownForDebateTypeProps {
-  type: Type;
-  onChange: (type: Type) => void;
+  type: DebateType;
+  onChange: (type: DebateType) => void;
 }
 
 export default function DropdownForDebateType(
@@ -14,16 +13,16 @@ export default function DropdownForDebateType(
   const { type, onChange } = props;
 
   const reverseTypeMapping: Record<string, string> = Object.fromEntries(
-    Object.entries(typeMapping).map(([key, value]) => [value, key]),
+    Object.entries(DebateTypeToString).map(([key, value]) => [value, key]),
   );
 
-  const koreanTypes = Object.values(typeMapping);
+  const koreanTypes = Object.values(DebateTypeToString);
 
   const [isToggleOpen, setIsToggleOpen] = useState(false);
 
   const handleTypeSelect = (selectedKoreanType: string) => {
     const selectedEnglishType = reverseTypeMapping[selectedKoreanType];
-    onChange(selectedEnglishType as Type);
+    onChange(selectedEnglishType as DebateType);
     setIsToggleOpen(false);
   };
 
@@ -37,7 +36,7 @@ export default function DropdownForDebateType(
         onClick={() => setIsToggleOpen(!isToggleOpen)}
         className="flex w-full items-center justify-between rounded-md border border-neutral-300 bg-white p-3 text-sm text-black focus:outline-none md:text-base"
       >
-        <span>{typeMapping[type]}</span>
+        <span>{DebateTypeToString[type]}</span>
         <IoMdArrowDropdown
           className={`ml-2 text-xl transition-transform ${
             isToggleOpen ? 'rotate-180' : ''

@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { DebateTable } from '../../../../type/type';
+import { DebateTable, DebateTypeToString } from '../../../../type/type';
 import EditButton from '../Modal/EditButton';
 import DeleteModalButton from '../Modal/DeleteModalButton';
-import { typeMapping } from '../../../../constants/languageMapping';
 
 interface DebateTableWithDelete extends DebateTable {
   onDelete: (name: string) => void;
@@ -33,7 +32,7 @@ export default function Table({
       <div className="flex h-full flex-col items-start justify-center">
         <h1 className="mb-[30px] text-[40px] font-bold">{name}</h1>
         <div className="flex max-w-full flex-col items-start justify-center text-[36px] font-bold">
-          <span>유형 | {typeMapping[type]}</span>
+          <span>유형 | {DebateTypeToString[type]}</span>
           <span
             className="w-full truncate"
             title={agenda && agenda?.length > 15 ? agenda : undefined}

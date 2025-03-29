@@ -1,11 +1,14 @@
 import { HTMLAttributes } from 'react';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
-import { TimeBoxInfo, DebateTypeToString } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  ParliamentarySpeechTypeToString,
+} from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
 interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
-  info: TimeBoxInfo;
-  onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
+  info: ParliamentaryTimeBoxInfo;
+  onSubmitEdit?: (updatedInfo: ParliamentaryTimeBoxInfo) => void;
   onSubmitDelete?: () => void;
 }
 
@@ -13,7 +16,7 @@ export default function DebatePanel(props: DebatePanelProps) {
   const { stance, type, time, speakerNumber } = props.info;
   const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
 
-  const debateTypeLabel = DebateTypeToString[type];
+  const debateTypeLabel = ParliamentarySpeechTypeToString[type];
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
   const timeStr = `${minutes}분 ${seconds}초`;
 
