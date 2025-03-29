@@ -47,10 +47,18 @@ export default function NomalTimer({
       ? DebateTypeToString['TIME_OUT']
       : item.speechType;
 
+  const boxShadow = isRunning
+    ? item.stance === 'NEUTRAL'
+      ? 'shadow-camp-neutral'
+      : item.stance === 'PROS'
+        ? 'shadow-camp-blue'
+        : 'shadow-camp-red'
+    : '';
+
   return (
     <div
       data-testid="timer"
-      className="flex min-h-[300px] w-[720px] flex-col items-center rounded-[45px] bg-neutral-200"
+      className={`flex min-h-[300px] w-[720px] flex-col items-center rounded-[45px] bg-neutral-200 duration-100 ${boxShadow}`}
     >
       {/* Title of timer */}
       <div

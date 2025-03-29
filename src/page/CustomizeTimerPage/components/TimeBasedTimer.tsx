@@ -54,12 +54,21 @@ export default function TimeBasedTimer({
     Math.abs((speakingTimer ?? 0) % 60),
   );
 
+  const boxShadow = isRunning
+    ? prosCons === 'pros'
+      ? 'shadow-camp-blue'
+      : 'shadow-camp-red'
+    : '';
+
   const bgColorClass = prosCons === 'pros' ? 'bg-camp-blue' : 'bg-camp-red';
 
   const titleText = item.speechType;
 
   return (
-    <div onClick={onActivate}>
+    <div
+      onClick={onActivate}
+      className={`rounded-[45px] duration-100 ${boxShadow}`}
+    >
       <div
         data-testid="timer"
         className={`flex min-h-[300px] w-[720px] flex-col items-center rounded-[45px] bg-neutral-200 transition-all duration-300 ${
