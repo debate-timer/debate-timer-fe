@@ -19,7 +19,7 @@
 }
 
 .button.enabled-hover-neutral {
-  @apply bg-background-default hover:bg-neutral-700 text-neutral-900;
+  @apply bg-background-default hover:bg-neutral-300 text-neutral-900;
 }
 
 .button.disabled {
