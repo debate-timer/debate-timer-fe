@@ -40,21 +40,6 @@ export async function getParliamentaryTableData(
   return response.data;
 }
 
-// GET /api/table/customize/{tableId}
-export async function getCustomizeTableData(
-  tableId: number,
-): Promise<GetCustomizeTableDataResponseType> {
-  const requestUrl: string = ApiUrl.customize;
-  const response = await request<GetCustomizeTableDataResponseType>(
-    'GET',
-    requestUrl + `/${tableId}`,
-    null,
-    null,
-  );
-
-  return response.data;
-}
-
 // POST /api/table/parliamentary
 export async function postParliamentaryDebateTable(
   info: ParliamentaryDebateInfo,

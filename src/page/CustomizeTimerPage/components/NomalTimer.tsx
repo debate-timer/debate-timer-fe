@@ -1,5 +1,8 @@
 import { RiSpeakFill } from 'react-icons/ri';
-import { CustomizeTimeBoxInfo, DebateTypeToString } from '../../../type/type';
+import {
+  CustomizeTimeBoxInfo,
+  ParliamentarySpeechTypeToString,
+} from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
@@ -42,9 +45,9 @@ export default function NomalTimer({
         ? 'bg-camp-blue'
         : 'bg-camp-red';
   const titleText = isAdditionalTimerOn
-    ? DebateTypeToString['TIME_OUT']
+    ? ParliamentarySpeechTypeToString['TIME_OUT']
     : item.stance === 'NEUTRAL'
-      ? DebateTypeToString['TIME_OUT']
+      ? ParliamentarySpeechTypeToString['TIME_OUT']
       : item.speechType;
 
   const boxShadow = isRunning

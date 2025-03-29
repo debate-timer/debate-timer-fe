@@ -132,7 +132,7 @@ export default function CustomizeTimerPage() {
         return 'default';
       };
 
-      if (boxType === 'PARLIAMENTARY') {
+      if (boxType === 'NORMAL') {
         if (!nomalTimer.isRunning) return 'default';
 
         if (nomalTimer.timer !== null) {
@@ -219,7 +219,7 @@ export default function CustomizeTimerPage() {
     setWarningBell(warningBell);
     setFinishBell(finishBell);
 
-    if (currentBox.boxType === 'PARLIAMENTARY') {
+    if (currentBox.boxType === 'NORMAL') {
       timer1.clearTimer();
       timer2.clearTimer();
 
@@ -469,7 +469,7 @@ export default function CustomizeTimerPage() {
               />
             )}
             {/* 타이머 두 개 + ENTER 버튼 */}
-            {data.table[index].boxType === 'PARLIAMENTARY' && (
+            {data.table[index].boxType === 'NORMAL' && (
               <NomalTimer
                 isAdditionalTimerOn={isAdditionalTimerOn}
                 onStart={() => nomalTimer.startTimer()}
