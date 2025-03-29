@@ -45,7 +45,6 @@ export default function Timer({
       : item.stance === 'PROS'
         ? 'bg-camp-blue'
         : 'bg-camp-red';
-
   const speakerText =
     item.stance !== 'NEUTRAL'
       ? item.speakerNumber
@@ -60,11 +59,18 @@ export default function Timer({
     : item.stance === 'NEUTRAL'
       ? DebateTypeToString[item.type]
       : DebateTypeToString[item.type];
+  const neonClass = isRunning
+    ? item.stance === 'NEUTRAL'
+      ? 'animate-neon-blink-neutral'
+      : item.stance === 'PROS'
+        ? 'animate-neon-blink-pros'
+        : 'animate-neon-blink-cons'
+    : '';
 
   return (
     <div
       data-testid="timer"
-      className="flex min-h-[300px] w-[736px] flex-col items-center rounded-[45px] bg-neutral-200"
+      className={`flex min-h-[300px] w-[736px] ${neonClass} flex-col items-center rounded-[45px] bg-neutral-200`}
     >
       {/* Title of timer */}
       <div
