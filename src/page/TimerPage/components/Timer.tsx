@@ -57,8 +57,8 @@ export default function Timer({
   const titleText = isAdditionalTimerOn
     ? ParliamentarySpeechTypeToString['TIME_OUT']
     : item.stance === 'NEUTRAL'
-      ? DebateTypeToString[item.type]
-      : DebateTypeToString[item.type];
+      ? ParliamentarySpeechTypeToString[item.type]
+      : ParliamentarySpeechTypeToString[item.type];
   const neonClass = isRunning
     ? item.stance === 'NEUTRAL'
       ? 'animate-neon-blink-neutral'
