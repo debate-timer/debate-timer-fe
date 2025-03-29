@@ -5,13 +5,13 @@ import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import {
   DetailDebateInfo,
   ParliamentaryTimeBoxInfo,
-  Type,
+  DebateType,
 } from '../../../type/type';
 import useAddTable from '../../../hooks/mutations/useAddTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
 export interface TableFormData {
-  info: DetailDebateInfo & { type: Type };
+  info: DetailDebateInfo & { type: DebateType };
   table: ParliamentaryTimeBoxInfo[];
 }
 const useTableFrom = (
@@ -62,7 +62,7 @@ const useTableFrom = (
     React.SetStateAction<{
       name: string;
       agenda: string;
-      type: Type;
+      type: DebateType;
       warningBell: boolean;
       finishBell: boolean;
     }>
@@ -71,7 +71,7 @@ const useTableFrom = (
       let newInfo: {
         name: string;
         agenda: string;
-        type: Type;
+        type: DebateType;
         warningBell: boolean;
         finishBell: boolean;
       };
