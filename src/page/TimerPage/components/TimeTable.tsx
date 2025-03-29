@@ -12,6 +12,10 @@ interface TimeTableProps {
   };
 }
 
+/**
+ *
+ * @deprecated 시간표 삭제로 인해 더 이상 사용하지 않음
+ */
 export default function TimeTable({
   goToOtherItem,
   currIndex,
