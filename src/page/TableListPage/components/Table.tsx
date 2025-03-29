@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { typeMapping } from '../../../constants/languageMapping';
-import { DebateTable } from '../../../type/type';
+import { DebateTable, DebateTypeToString } from '../../../type/type';
 import { IoArrowForward } from 'react-icons/io5';
 import { RiDeleteBinFill, RiEditFill } from 'react-icons/ri';
 import { useModal } from '../../../hooks/useModal';
@@ -24,8 +23,8 @@ export default function Table({
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
-  const bgColor = isHovered ? 'bg-brand-sub4' : 'bg-brand-main';
-  const squareColor = isHovered ? 'bg-neutral-0' : 'bg-brand-sub4';
+  const bgColor = isHovered ? 'bg-brand-sub1' : 'bg-brand-main';
+  const squareColor = isHovered ? 'bg-neutral-0' : 'bg-brand-sub1';
   const textBodyColor = isHovered ? 'text-neutral-0' : 'text-neutral-600';
   const textTitleColor = isHovered ? 'text-neutral-0' : 'text-neutral-1000';
   const psClass = isHovered ? 'ps-12' : 'ps-0';
@@ -90,7 +89,7 @@ export default function Table({
           <p
             className={`text-start text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
           >
-            유형 | {typeMapping[type]}
+            유형 | {DebateTypeToString[type]}
           </p>
           <h1
             className={`text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}

@@ -2,14 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDeleteParliamentaryDebateTable';
 import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { DebateTable, Type } from '../../type/type';
+import { DebateTable, DebateType } from '../../type/type';
 import Table from './components/Table';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
   const { mutate } = useDeleteParliamentaryDebateTable();
   const navigate = useNavigate();
-  const onEdit = (tableId: number, type: Type) => {
+  const onEdit = (tableId: number, type: DebateType) => {
     navigate(`/composition?mode=edit&tableId=${tableId}&type=${type}`);
   };
   const onClick = (tableId: number) => {
