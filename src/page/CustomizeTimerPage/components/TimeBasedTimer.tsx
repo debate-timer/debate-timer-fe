@@ -2,6 +2,8 @@ import { CustomizeTimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import { MdRecordVoiceOver } from 'react-icons/md';
+import KeyboardKeyA from '../../../assets/img/keyboard_key_A.png';
+import KeyboardKeyL from '../../../assets/img/keyboard_key_l.png';
 
 interface TimeBasedTimerProps {
   onStart: () => void;
@@ -68,8 +70,13 @@ export default function TimeBasedTimer({
         <div
           className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
         >
-          <h2 className="absolute left-1/2 w-max -translate-x-1/2 transform">
+          <h2 className="absolute left-1/2 flex w-max -translate-x-1/2 transform items-center justify-center gap-2">
             {titleText}
+            <img
+              src={prosCons === 'pros' ? KeyboardKeyA : KeyboardKeyL}
+              alt="A키"
+              className="h-[50px] w-[50px]"
+            />
           </h2>
         </div>
 

@@ -21,7 +21,7 @@ const bgColorMap: Record<TimerState, string> = {
   expired: 'bg-[#404040]', // 0초 이하
 };
 
-export default function TimerPage() {
+export default function CustomizeTimerPage() {
   // ########## DECLARATION AREA ##########
   // Load sounds and prepare for bell-related constants
   const warningBellRef = useRef<HTMLAudioElement>(null);
