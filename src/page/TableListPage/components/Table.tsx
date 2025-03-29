@@ -9,15 +9,16 @@ import DialogModal from '../../../components/DialogModal/DialogModal';
 interface TableProps extends DebateTable {
   onEdit: () => void;
   onDelete: () => void;
+  onClick: () => void;
 }
 
 export default function Table({
-  id,
   name,
   type,
   agenda,
   onDelete,
   onEdit,
+  onClick,
 }: TableProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { openModal, closeModal, ModalWrapper } = useModal({
@@ -27,25 +28,28 @@ export default function Table({
   const squareColor = isHovered ? 'bg-neutral-0' : 'bg-brand-sub4';
   const textBodyColor = isHovered ? 'text-neutral-0' : 'text-neutral-600';
   const textTitleColor = isHovered ? 'text-neutral-0' : 'text-neutral-1000';
+  const psClass = isHovered ? 'ps-12' : 'ps-0';
 
   return (
     <>
-      <div
-        className={`flex h-[220px] w-[340px] flex-row rounded-2xl ${bgColor} transition-all duration-300`}
+      <button
+        className={`m-5 flex h-[220px] w-[340px] items-center overflow-hidden rounded-[28px] ${bgColor} shadow-lg transition-all duration-300 hover:scale-105`}
+        onClick={() => onClick()}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Left component (fixed width) */}
+        {/* Left component (fixed width, slides in) */}
         <div
           className={`transform transition-all duration-300 ${
             isHovered
               ? 'w-24 translate-x-0 opacity-100'
               : 'w-0 -translate-x-10 opacity-0'
-          } flex h-full flex-col justify-between overflow-hidden rounded-lg py-4 ps-4`}
+          } flex h-full flex-col items-center justify-between overflow-hidden pb-12 pe-4 ps-8 pt-4`}
         >
           <div className="flex flex-row space-x-1">
             <button
-              onClick={() => {
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
                 onEdit();
               }}
               className="rounded-sm bg-neutral-0 p-[2px]"
@@ -54,7 +58,8 @@ export default function Table({
               <RiEditFill className="text-neutral-900" />
             </button>
             <button
-              onClick={() => {
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
                 openModal();
               }}
               className="rounded-sm bg-neutral-0 p-[2px]"
@@ -64,29 +69,35 @@ export default function Table({
             </button>
           </div>
 
-          <div className="my-8 flex size-[40px] items-center justify-center rounded-full bg-neutral-1000">
+          <div className="flex size-[40px] items-center justify-center rounded-full bg-neutral-1000">
             <IoArrowForward className="size-[24px] text-neutral-0" />
           </div>
         </div>
 
         {/* Right component (fills remaining space) */}
-        <div className="flex-grow self-center overflow-hidden truncate rounded-lg py-2 pe-8 ps-6">
+        <div
+          className={`flex flex-grow flex-col items-start overflow-hidden ${psClass} pe-8 duration-300`}
+        >
           <h1
-            className={`text-[28px] font-bold ${textTitleColor} duration-300`}
+            className={`text-[28px] font-bold ${textTitleColor} w-full truncate text-start duration-300`}
           >
             {name}
           </h1>
-          <div className={`my-3 size-[10px] duration-300 ${squareColor}`}></div>
-          <p className={`text-[16px] duration-300 ${textBodyColor}`}>
+          <div
+            className={`my-3 size-[10px] text-start duration-300 ${squareColor}`}
+          ></div>
+          <p
+            className={`text-start text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
+          >
             유형 | {typeMapping[type]}
           </p>
-          <p
-            className={`text-[16px] duration-300 ${textBodyColor} overflow-hidden text-ellipsis whitespace-nowrap`}
+          <h1
+            className={`text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
           >
             주제 | {agenda}
-          </p>
+          </h1>
         </div>
-      </div>
+      </button>
 
       <ModalWrapper>
         <DialogModal
