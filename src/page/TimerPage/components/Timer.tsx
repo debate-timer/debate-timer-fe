@@ -2,7 +2,7 @@ import { RiSpeakFill } from 'react-icons/ri';
 import {
   DebateTypeToString,
   StanceToString,
-  TimeBoxInfo,
+  ParliamentaryTimeBoxInfo,
 } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -22,7 +22,7 @@ interface TimerProps {
   isRunning: boolean;
   isLastItem: boolean;
   isFirstItem: boolean;
-  item: TimeBoxInfo;
+  item: ParliamentaryTimeBoxInfo;
 }
 
 export default function Timer({

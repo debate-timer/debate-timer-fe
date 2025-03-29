@@ -1,11 +1,11 @@
-import { TimeBoxInfo } from '../../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface TimeTableProps {
   goToOtherItem: (isPrev: boolean) => void;
   currIndex: number;
-  items: TimeBoxInfo[];
+  items: ParliamentaryTimeBoxInfo[];
   titles?: {
     pros: string;
     cons: string;

@@ -25,7 +25,7 @@ export interface User {
   name: string;
 }
 
-export interface TimeBoxInfo {
+export interface ParliamentaryTimeBoxInfo {
   stance: Stance;
   type: DebateType;
   time: number;

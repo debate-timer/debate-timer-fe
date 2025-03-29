@@ -2,7 +2,7 @@ import DebatePanel from '../DebatePanel/DebatePanel';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { useModal } from '../../../../hooks/useModal';
-import { TimeBoxInfo } from '../../../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
@@ -12,7 +12,9 @@ import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 
 interface TimeBoxStepProps {
   initData: TableFormData;
-  onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
+  onTimeBoxChange: React.Dispatch<
+    React.SetStateAction<ParliamentaryTimeBoxInfo[]>
+  >;
   onButtonClick: () => void;
   isEdit?: boolean;
 }
@@ -28,7 +30,10 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       throttleDelay: 50,
     });
 
-  const handleSubmitEdit = (indexToEdit: number, updatedInfo: TimeBoxInfo) => {
+  const handleSubmitEdit = (
+    indexToEdit: number,
+    updatedInfo: ParliamentaryTimeBoxInfo,
+  ) => {
     onTimeBoxChange((prevData) =>
       prevData.map((item, index) =>
         index === indexToEdit ? updatedInfo : item,

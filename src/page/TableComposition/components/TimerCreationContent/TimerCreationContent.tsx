@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { TimeBoxInfo, DebateType, Stance } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  DebateType,
+  Stance,
+} from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
-  beforeData?: TimeBoxInfo;
-  initData?: TimeBoxInfo;
-  onSubmit: (data: TimeBoxInfo) => void;
+  beforeData?: ParliamentaryTimeBoxInfo;
+  initData?: ParliamentaryTimeBoxInfo;
+  onSubmit: (data: ParliamentaryTimeBoxInfo) => void;
   onClose: () => void;
 }
 

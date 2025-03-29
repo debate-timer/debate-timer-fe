@@ -1,4 +1,4 @@
-import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
+import { DetailDebateInfo, ParliamentaryTimeBoxInfo } from '../../type/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
 import { PutDebateTableResponseType } from '../responses/parliamentary';
@@ -40,7 +40,7 @@ export async function getParliamentaryTableData(
 // POST /api/table/parliamentary
 export async function postParliamentaryDebateTable(
   info: DetailDebateInfo,
-  tables: TimeBoxInfo[],
+  tables: ParliamentaryTimeBoxInfo[],
 ): Promise<PostDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<PostDebateTableResponseType>(
@@ -65,7 +65,7 @@ export async function postParliamentaryDebateTable(
 export async function putParliamentaryDebateTable(
   tableId: number,
   info: DetailDebateInfo,
-  tables: TimeBoxInfo[],
+  tables: ParliamentaryTimeBoxInfo[],
 ): Promise<PutDebateTableResponseType> {
   const requestUrl: string = ApiUrl.parliamentary;
   const response = await request<PutDebateTableResponseType>(

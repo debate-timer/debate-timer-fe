@@ -1,10 +1,13 @@
 import { RiSpeakFill } from 'react-icons/ri';
-import { DebateTypeToString, TimeBoxInfo } from '../../../type/type';
+import {
+  DebateTypeToString,
+  ParliamentaryTimeBoxInfo,
+} from '../../../type/type';
 import { Formatting } from '../../../util/formatting';
 
 interface TimeTableItem {
   isCurrent: boolean;
-  item: TimeBoxInfo;
+  item: ParliamentaryTimeBoxInfo;
 }
 
 export default function TimeTableItem({ isCurrent, item }: TimeTableItem) {
