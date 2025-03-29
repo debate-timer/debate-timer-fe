@@ -38,24 +38,28 @@ export default function TableOverview() {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-4 flex w-full max-w-4xl items-center justify-between gap-2">
+        <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
-            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-neutral-300 text-2xl font-semibold  transition-colors duration-300 hover:bg-neutral-500"
+            className="button enabled-hover-neutral h-16 w-full"
             onClick={() =>
               navigate(
                 `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
               )
             }
           >
-            <RiEditFill />
-            수정하기
+            <div className="flex items-center justify-center gap-2">
+              <RiEditFill />
+              수정하기
+            </div>
           </button>
           <button
-            className="flex h-16 w-full items-center justify-center gap-2 rounded-md bg-brand-main text-2xl font-semibold transition-colors duration-300 hover:bg-amber-600"
+            className="button enabled h-16 w-full"
             onClick={() => navigate(`/table/parliamentary/${tableId}`)}
           >
-            <RiSpeakFill />
-            토론하기
+            <div className="flex items-center justify-center gap-2">
+              <RiSpeakFill />
+              토론하기
+            </div>
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
