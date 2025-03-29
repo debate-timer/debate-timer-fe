@@ -2,13 +2,17 @@ import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { DetailDebateInfo, TimeBoxInfo, Type } from '../../../type/type';
-import useAddTable from '../../../hooks/mutations/useAddTable';
+import {
+  ParliamentaryDebateInfo,
+  ParliamentaryTimeBoxInfo,
+  DebateType,
+} from '../../../type/type';
+import useAddParliamentaryTable from '../../../hooks/mutations/useAddParliamentaryDebateTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
 export interface TableFormData {
-  info: DetailDebateInfo & { type: Type };
-  table: TimeBoxInfo[];
+  info: ParliamentaryDebateInfo & { type: DebateType };
+  table: ParliamentaryTimeBoxInfo[];
 }
 const useTableFrom = (
   currentStep: TableCompositionStep,
@@ -58,7 +62,7 @@ const useTableFrom = (
     React.SetStateAction<{
       name: string;
       agenda: string;
-      type: Type;
+      type: DebateType;
       warningBell: boolean;
       finishBell: boolean;
     }>
@@ -67,7 +71,7 @@ const useTableFrom = (
       let newInfo: {
         name: string;
         agenda: string;
-        type: Type;
+        type: DebateType;
         warningBell: boolean;
         finishBell: boolean;
       };
@@ -82,15 +86,17 @@ const useTableFrom = (
     });
   };
 
-  const updateTable: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>> = (
-    action,
-  ) => {
+  const updateTable: React.Dispatch<
+    React.SetStateAction<ParliamentaryTimeBoxInfo[]>
+  > = (action) => {
     setFormData((prev) => {
-      let newTable: TimeBoxInfo[];
+      let newTable: ParliamentaryTimeBoxInfo[];
       if (typeof action === 'function') {
-        newTable = (action as (arg: TimeBoxInfo[]) => TimeBoxInfo[])(
-          prev.table,
-        );
+        newTable = (
+          action as (
+            arg: ParliamentaryTimeBoxInfo[],
+          ) => ParliamentaryTimeBoxInfo[]
+        )(prev.table);
       } else {
         newTable = action;
       }
@@ -101,12 +107,11 @@ const useTableFrom = (
     });
   };
 
-  const { mutate: AddTable, isPending: isAddTablePending } = useAddTable(
-    (tableId: number) => {
+  const { mutate: AddTable, isPending: isAddTablePending } =
+    useAddParliamentaryTable((tableId: number) => {
       removeValue();
       navigate(`/overview/${tableId}`);
-    },
-  );
+    });
   const { mutate: EditTable, isPending: isEditTablePending } =
     usePutParliamentaryDebateTable((tableId: number) => {
       removeValue();

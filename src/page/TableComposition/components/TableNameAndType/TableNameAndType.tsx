@@ -2,11 +2,11 @@ import ClearableInput from '../../../../components/ClearableInput/ClearableInput
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { DetailDebateInfo, Type } from '../../../../type/type';
+import { ParliamentaryDebateInfo, DebateType } from '../../../../type/type';
 import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
 
-type ExtendedDebateInfo = DetailDebateInfo & {
-  type: Type;
+type ExtendedDebateInfo = ParliamentaryDebateInfo & {
+  type: DebateType;
 };
 interface TableNameAndTypeProps {
   info: ExtendedDebateInfo;
@@ -108,7 +108,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-4 w-full max-w-4xl">
+        <div className="mx-auto mb-8 w-full max-w-4xl">
           <button
             onClick={() => {
               if (info.name === '') {
@@ -119,7 +119,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               }
               onButtonClick();
             }}
-            className="h-16 w-full rounded-md bg-brand-main text-lg font-semibold transition-colors duration-300 hover:bg-amber-500 md:text-xl"
+            className="button enabled h-16 w-full"
           >
             다음
           </button>

@@ -43,7 +43,7 @@ export default function DialogModal({
           onClick={() => left.onClick()}
         >
           <p
-            className={`w-full ${left.isBold ? 'font-bold' : ''} text-brand-sub2`}
+            className={`w-full ${left.isBold ? 'font-bold' : ''} text-neutral-1000`}
           >
             {left.text}
           </p>
@@ -56,7 +56,7 @@ export default function DialogModal({
           onClick={() => right.onClick()}
         >
           <p
-            className={`w-full ${right.isBold ? 'font-bold' : ''} text-brand-sub2`}
+            className={`w-full ${right.isBold ? 'font-bold' : ''} text-neutral-1000`}
           >
             {right.text}
           </p>

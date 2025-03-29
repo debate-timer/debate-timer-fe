@@ -9,4 +9,5 @@ export const ApiUrl = {
   member: makeUrl('/member'),
   table: makeUrl('/table'),
   parliamentary: makeUrl('/table/parliamentary'),
+  customize: makeUrl('/table/customize'),
 };
