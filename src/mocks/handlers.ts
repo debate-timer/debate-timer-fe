@@ -68,13 +68,6 @@ export const handlers = [
           agenda: '매우 긴 토론 주제 미리보기를 여기서 작성하고 있는 중입니다.',
           duration: '1800',
         },
-        {
-          id: 8,
-          name: '테이블 2',
-          type: 'PARLIAMENTARY',
-          agenda: '매우 긴 토론 주제 미리보기를 여기서 작성하고 있는 중입니다.',
-          duration: '1750',
-        },
       ],
     });
   }),

@@ -77,7 +77,7 @@ export default function Table({
 
         {/* Right component (fills remaining space) */}
         <div
-          className={`flex flex-grow flex-col items-start overflow-hidden ${psClass} pe-8 duration-300`}
+          className={`flex flex-grow flex-col items-start overflow-hidden ${psClass} w-full pe-8 duration-300`}
         >
           <h1
             className={`text-[28px] font-bold ${textTitleColor} w-full truncate text-start duration-300`}

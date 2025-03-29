@@ -29,7 +29,7 @@ export default function TableListPage() {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <div className="flex max-w-[1200px] flex-wrap items-start justify-center">
+        <div className="flex max-w-[1140px] flex-wrap justify-start">
           {/** Button that adds new table */}
           <button
             onClick={() => navigate(`/composition?mode=add`)}
