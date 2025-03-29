@@ -305,6 +305,7 @@ export default function TimerPage() {
                         type="PREV"
                         onClick={() => {
                           setIsAdditionalTimerOn(false);
+                          resetTimer();
                           goToOtherItem(true);
                         }}
                       />
@@ -323,6 +324,7 @@ export default function TimerPage() {
                         type="NEXT"
                         onClick={() => {
                           setIsAdditionalTimerOn(false);
+                          resetTimer();
                           goToOtherItem(false);
                         }}
                       />
