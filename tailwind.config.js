@@ -74,6 +74,7 @@ export default {
           warning: '#FFBF40',
           success: '#4BD964',
           danger: '#FF3F2F',
+          error: '#FF8B87',
         },
         camp: {
           red: '#F64740',

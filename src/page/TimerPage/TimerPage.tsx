@@ -86,12 +86,12 @@ export default function TimerPage() {
   // Change background color
   useEffect(() => {
     if (isRunning) {
-      if (timer > 30) {
-        setBg('gradient-timer-running');
-      } else if (timer >= 0 && timer <= 30) {
-        setBg('gradient-timer-warning');
-      } else {
-        setBg('gradient-timer-timeout');
+      if (timer <= 30 && timer >= 10) {
+        setBg('bg-brand-main');
+      } else if (timer >= 0 && timer < 10) {
+        setBg('bg-system-error');
+      } else if (timer < 0) {
+        setBg('bg-neutral-800');
       }
     } else {
       setBg('');
@@ -237,7 +237,7 @@ export default function TimerPage() {
         </DefaultLayout.Header>
 
         {/* Containers */}
-        <DefaultLayout.ContentContainer>
+        <DefaultLayout.ContentContainer noPadding={true}>
           <div className="relative z-10 h-full w-full">
             {/* Tooltip */}
             {isFirst && (
@@ -252,7 +252,7 @@ export default function TimerPage() {
             {/* Timer body */}
             <div
               data-testid="timer-page-body"
-              className="absolute inset-0 flex h-full w-full flex-col items-center justify-center space-y-10"
+              className={`flex h-full w-full flex-col items-center justify-center space-y-10 ${bg}`}
             >
               {/* Timer on the top side */}
               <Timer
@@ -326,12 +326,6 @@ export default function TimerPage() {
               )}
             </div>
           </div>
-
-          {/* Gradient background */}
-          <div
-            data-testid="timer-page-background"
-            className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bg}`}
-          />
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
     </>
