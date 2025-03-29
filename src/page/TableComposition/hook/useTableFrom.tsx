@@ -7,7 +7,7 @@ import {
   ParliamentaryTimeBoxInfo,
   DebateType,
 } from '../../../type/type';
-import useAddTable from '../../../hooks/mutations/useAddTable';
+import useAddParliamentaryTable from '../../../hooks/mutations/useAddParliamentaryDebateTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
 
 export interface TableFormData {
@@ -107,12 +107,11 @@ const useTableFrom = (
     });
   };
 
-  const { mutate: AddTable, isPending: isAddTablePending } = useAddTable(
-    (tableId: number) => {
+  const { mutate: AddTable, isPending: isAddTablePending } =
+    useAddParliamentaryTable((tableId: number) => {
       removeValue();
       navigate(`/overview/${tableId}`);
-    },
-  );
+    });
   const { mutate: EditTable, isPending: isEditTablePending } =
     usePutParliamentaryDebateTable((tableId: number) => {
       removeValue();

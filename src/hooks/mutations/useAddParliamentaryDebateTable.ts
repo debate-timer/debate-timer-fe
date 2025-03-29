@@ -6,14 +6,16 @@ import {
 } from '../../type/type';
 import { PostDebateTableResponseType } from '../../apis/responses/parliamentary';
 
-interface UseAddTableParams {
+interface UseAddParliamentaryTableParams {
   info: ParliamentaryDebateInfo;
   table: ParliamentaryTimeBoxInfo[];
 }
 
-export default function useAddTable(onSuccess: (id: number) => void) {
+export default function useAddParliamentaryTable(
+  onSuccess: (id: number) => void,
+) {
   return useMutation({
-    mutationFn: async (params: UseAddTableParams) => {
+    mutationFn: async (params: UseAddParliamentaryTableParams) => {
       const response = await postParliamentaryDebateTable(
         {
           name: params.info.name,
