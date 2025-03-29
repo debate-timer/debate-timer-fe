@@ -62,6 +62,7 @@ export default function TimerPage() {
     'pros',
   );
 
+  // 이전 또는 다음 차례로 이동하는 함수
   const goToOtherItem = useCallback(
     (isPrev: boolean) => {
       if (isPrev) {
@@ -76,6 +77,8 @@ export default function TimerPage() {
     },
     [index, data],
   );
+
+  // 발언 진영(pros/cons) 전환 함수 (ENTER 버튼 등에서 사용)
   const switchCamp = useCallback(() => {
     if (prosConsSelected === 'pros') {
       if (timer2.isDone) return;
@@ -101,7 +104,7 @@ export default function TimerPage() {
     }
   }, [prosConsSelected, timer1, timer2]);
   // ########### useEffect AREA ###########
-  // Open tooltip when value of 'isFirst' is true
+  // 로컬스토리지에 저장된 "최초 사용 여부" 확인 → 툴팁 띄울지 결정
   useEffect(() => {
     const storedIsFirst = localStorage.getItem(IS_FIRST);
 
@@ -112,7 +115,7 @@ export default function TimerPage() {
     }
   }, []);
 
-  // Change background color
+  // 타이머 상태에 따라 배경색(bg) 상태 설정
   useEffect(() => {
     const getBgStatus = () => {
       const boxType = data?.table[index].boxType;
@@ -166,7 +169,7 @@ export default function TimerPage() {
     data,
   ]);
 
-  // Play bells
+  // 벨 소리 재생
   useEffect(() => {
     if (
       warningBellRef.current &&
@@ -206,7 +209,7 @@ export default function TimerPage() {
     nomalTimer.timer,
   ]);
 
-  // Initiate timer
+  // 새로운 index(차례)로 이동했을 때 → 타이머 초기화 및 세팅
   useEffect(() => {
     if (!data) return;
 
@@ -246,7 +249,7 @@ export default function TimerPage() {
     timer2.setTimers,
   ]);
 
-  // Add keyboard event listener
+  // 키보드 단축키 제어
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const keysToDisable = [
@@ -324,7 +327,7 @@ export default function TimerPage() {
     switchCamp,
   ]);
 
-  // Calculate whether timer should show additional timer button
+  // 테이블에 TIME_OUT 발언이 있는 경우 작전시간 타이머 변경 비활성화
   useEffect(() => {
     if (data) {
       data.table.forEach((value) => {
@@ -335,7 +338,7 @@ export default function TimerPage() {
     }
   });
 
-  // Stop timer on 0 sec when additional timer is enabled
+  // 작전시간 타이머가 켜져 있고, 시간이 0이 되었을 때 → 저장된 시간으로 되돌림
   useEffect(() => {
     if (isAdditionalTimerOn && nomalTimer.timer === 0 && nomalTimer.isRunning) {
       nomalTimer.pauseTimer();
@@ -353,6 +356,7 @@ export default function TimerPage() {
     nomalTimer.isRunning,
   ]);
 
+  //진영(pros/cons)이 바뀌면 → 상대 타이머 초기화
   useEffect(() => {
     if (prosConsSelected === 'cons') {
       if (timer1.speakingTimer === null) return;
@@ -364,6 +368,7 @@ export default function TimerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prosConsSelected]);
 
+  //타이머가 0초가 되면 자동으로 일시정지
   useEffect(() => {
     if (timer1.speakingTimer === 0 || timer1.totalTimer === 0) {
       timer1.pauseTimer();
@@ -378,6 +383,7 @@ export default function TimerPage() {
     timer2.totalTimer,
   ]);
 
+  //speakingTimer or totalTimer가 0초면 → 타이머 종료 처리 (isDone = true)
   useEffect(() => {
     if (prosConsSelected === 'pros') {
       if (timer1.speakingTimer === null) {
