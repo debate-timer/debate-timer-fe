@@ -1,82 +1,12 @@
 import { http, HttpResponse } from 'msw';
-import { ApiUrl } from '../apis/endpoints';
-import { PostDebateTableResponseType } from '../apis/responses/parliamentary';
+import { ApiUrl } from '../../apis/endpoints';
+import { PostDebateTableResponseType } from '../../apis/responses/parliamentary';
 
-export const handlers = [
-  // POST "/api/member"
-  http.post(ApiUrl.member, async () => {
-    return HttpResponse.json({
-      id: 1,
-      nickname: '홍길동',
-    });
-  }),
-
-  // GET /api/table?memberId={memberId}
-  http.get(ApiUrl.table, ({ request }) => {
-    const url = new URL(request.url);
-    const memberId = url.searchParams.get('memberId');
-    console.log(`# memberId = ${memberId}`);
-
-    return HttpResponse.json({
-      tables: [
-        {
-          id: 1,
-          name: '테이블 1',
-          type: 'PARLIAMENTARY',
-          duration: '1800',
-        },
-        {
-          id: 2,
-          name: '테이블 2',
-          type: 'PARLIAMENTARY',
-          duration: '1750',
-        },
-        {
-          id: 3,
-          name: '테이블 1',
-          type: 'PARLIAMENTARY',
-          duration: '1800',
-        },
-        {
-          id: 4,
-          name: '테이블 2',
-          type: 'PARLIAMENTARY',
-          duration: '1750',
-        },
-        {
-          id: 5,
-          name: '테이블 1',
-          type: 'PARLIAMENTARY',
-          duration: '1800',
-        },
-        {
-          id: 6,
-          name: '테이블 2',
-          type: 'PARLIAMENTARY',
-          duration: '1750',
-        },
-        {
-          id: 7,
-          name: '테이블 1',
-          type: 'PARLIAMENTARY',
-          duration: '1800',
-        },
-        {
-          id: 8,
-          name: '테이블 2',
-          type: 'PARLIAMENTARY',
-          duration: '1750',
-        },
-      ],
-    });
-  }),
-
-  // GET /api/table/parliamentary/{tableId}?memberId={memberId}
-  http.get(ApiUrl.parliamentary + '/:tableId', ({ request, params }) => {
-    const url = new URL(request.url);
-    const memberId = url.searchParams.get('memberId');
+export const parliamentaryHandlers = [
+  // GET /api/table/parliamentary/{tableId}
+  http.get(ApiUrl.parliamentary + '/:tableId', ({ params }) => {
     const { tableId } = params;
-    console.log(`# memberId = ${memberId}, tableId  = ${tableId}`);
+    console.log(`# tableId  = ${tableId}`);
 
     return HttpResponse.json({
       id: 1,
@@ -115,14 +45,12 @@ export const handlers = [
     });
   }),
 
-  // POST /api/table/parliamentary?memberId={memberId}
+  // POST /api/table/parliamentary
   http.post(ApiUrl.parliamentary, async ({ request }) => {
-    const url = new URL(request.url);
-    const memberId = url.searchParams.get('memberId');
     const result = (await request.json()) as PostDebateTableResponseType;
     // This console log calling shows error(ts(2339)) but will be executed with any problems.
     console.log(
-      `# memberId = ${memberId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
+      `# tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
     );
 
     return HttpResponse.json({
@@ -220,15 +148,16 @@ export const handlers = [
     });
   }),
 
-  // DELETE /api/table/parliamentary/{tableId}?memberId={memberId}
-  http.delete(ApiUrl.parliamentary + '/:tableId', ({ request, params }) => {
-    const url = new URL(request.url);
-    const memberId = url.searchParams.get('memberId');
+  // DELETE /api/table/parliamentary/{tableId}
+  http.delete(ApiUrl.parliamentary + '/:tableId', ({ params }) => {
     const { tableId } = params;
-    console.log(`# memberId = ${memberId}, tableId  = ${tableId}`);
+    console.log(`# tableId  = ${tableId}`);
 
     return new HttpResponse(null, {
       status: 204,
     });
   }),
+
+  // PATCH /api/table/parliamentary/{tableId}
+  // TODO
 ];

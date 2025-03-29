@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import React from 'react';
 import { initialize, mswLoader } from 'msw-storybook-addon';
-import { handlers } from '../src/mocks/handlers';
+import { allHandlers } from '../src/mocks/handlers/global';
 
 initialize();
 
@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 const preview: Preview = {
   parameters: {
     msw: {
-      handlers: { ...handlers },
+      handlers: { ...allHandlers },
     },
     controls: {
       matchers: {
