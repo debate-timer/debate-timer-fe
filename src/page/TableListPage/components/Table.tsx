@@ -37,6 +37,7 @@ export default function Table({
         onClick={() => onClick()}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        data-testid="table"
       >
         {/* Left component (fixed width, slides in) */}
         <div
