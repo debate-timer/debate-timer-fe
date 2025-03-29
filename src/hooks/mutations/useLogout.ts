@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { logout } from '../../apis/apis';
+import { logout } from '../../apis/apis/member';
 import { removeAccessToken } from '../../util/accessToken';
 
 export default function useLogout(onSuccess: () => void) {

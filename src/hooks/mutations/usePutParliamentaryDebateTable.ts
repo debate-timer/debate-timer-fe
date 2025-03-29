@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { putParliamentaryDebateTable } from '../../apis/apis';
+import { putParliamentaryDebateTable } from '../../apis/apis/parliamentary';
 import { PutDebateTableResponseType } from '../../apis/responseTypes';
 import { DetailDebateInfo, TimeBoxInfo } from '../../type/type';
 
