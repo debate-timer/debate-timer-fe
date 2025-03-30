@@ -20,11 +20,32 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
         <div className="flex flex-col text-neutral-50">
           <div className="mb-2 flex flex-row items-center space-x-4">
             <MdOutlineTimer size={18} />
-            <h1 className="text-xl font-bold">타이머 조작</h1>
+            <h2 className="text-xl font-bold">자유 토론 타이머 조작</h2>
           </div>
 
           <div className="text-m flex flex-col space-y-1 md:text-lg">
-            <ListItem>초록색 시작 버튼을 눌러 타이머를 시작</ListItem>
+            <ListItem>재생 버튼을 눌러 타이머를 시작</ListItem>
+            <ListItem>
+              타이머가 동작 중일 때, 일시정지 버튼을 눌러 타이머를 일시정지
+            </ListItem>
+            <ListItem>
+              초기화 버튼을 눌러 타이머를 원래 시간으로 초기화
+            </ListItem>
+            <ListItem>마우스를 사용하여 타이머를 클릭 시, 진영 변경</ListItem>
+            <ListItem>
+              타이머 작동 중, 진영 변경 시, 상대 진영 자동 재생
+            </ListItem>
+          </div>
+        </div>
+
+        <div className="flex flex-col text-neutral-50">
+          <div className="mb-2 flex flex-row items-center space-x-4">
+            <MdOutlineTimer size={18} />
+            <h2 className="text-xl font-bold">일반 토론 타이머 조작</h2>
+          </div>
+
+          <div className="text-m flex flex-col space-y-1 md:text-lg">
+            <ListItem>재생 버튼을 눌러 타이머를 시작</ListItem>
             <ListItem>
               타이머가 동작 중일 때, 일시정지 버튼을 눌러 타이머를 일시정지
             </ListItem>
@@ -47,13 +68,17 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
             <ListItem>스페이스 바로 타이머를 시작 및 일시정지</ListItem>
             <ListItem>R 키로 타이머 초기화</ListItem>
             <ListItem>좌우 방향키로 이전/다음 차례로 이동</ListItem>
+            <ListItem>A/L 키로 토론 진영 변경</ListItem>
+            <ListItem>Enter 키로 상대 진영으로 변경</ListItem>
           </div>
         </div>
 
         <div className="flex flex-col space-y-1 text-slate-50">
           <div className="mb-2 flex flex-row items-center space-x-4">
             <IoHourglassOutline size={18} />
-            <h1 className="text-xl font-bold">작전 시간 총량이 정해진 경우</h1>
+            <h2 className="text-xl font-bold">
+              작전 시간을 사전에 설정하지 않는 경우
+            </h2>
           </div>
 
           <div className="text-m flex flex-col space-y-1 md:text-lg">
