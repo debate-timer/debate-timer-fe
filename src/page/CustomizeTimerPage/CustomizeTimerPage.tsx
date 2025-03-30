@@ -17,8 +17,8 @@ type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
   default: '',
   warning: 'bg-brand-main', // 30초 ~ 11초
-  danger: 'bg-[#FF8B87]', // 10초 이하
-  expired: 'bg-[#404040]', // 0초 이하
+  danger: 'bg-brand-sub3', // 10초 이하
+  expired: 'bg-neutral-700', // 0초 이하
 };
 
 export default function CustomizeTimerPage() {
@@ -138,7 +138,8 @@ export default function CustomizeTimerPage() {
         if (nomalTimer.timer !== null) {
           if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) return 'warning';
           if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) return 'danger';
-          return 'expired';
+          if (nomalTimer.timer < 0) return 'expired';
+          return 'default';
         }
       }
 

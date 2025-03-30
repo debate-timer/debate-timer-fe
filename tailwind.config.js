@@ -70,6 +70,8 @@ export default {
 
           sub1: '#FF5622',
           sub2: '#028391',
+          sub3 :'#FF8B87'
+          
         },
         neutral: {
           1000: '#000000',
