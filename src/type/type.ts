@@ -85,3 +85,11 @@ export interface DebateTable {
   type: DebateType;
   agenda: string;
 }
+
+// type 필드 포함한 인터페이스: 테이블 추가/수정 시 사용
+export interface ParliamentaryInfo extends ParliamentaryDebateInfo {
+  type: 'PARLIAMENTARY';
+}
+export interface CustomizeInfo extends CustomizeDebateInfo {
+  type: 'CUSTOMIZE';
+}
