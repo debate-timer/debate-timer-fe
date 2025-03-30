@@ -108,7 +108,7 @@ export default function TimeBasedTimer({
                 className={`relative flex h-[80px] w-[600px] items-center justify-center text-[80px] font-bold text-neutral-900`}
               >
                 <div className="absolute left-3 top-2 text-sm font-semibold">
-                  전체시간
+                  전체 시간
                 </div>
                 {minute} : {second}
               </div>
@@ -118,7 +118,7 @@ export default function TimeBasedTimer({
                 className={`relative flex h-[120px] w-[600px] items-center justify-center bg-white text-[100px] font-bold text-neutral-900 shadow-inner`}
               >
                 <div className="absolute left-3 top-2 text-sm font-semibold">
-                  현재시간
+                  현재 시간
                 </div>
                 {speakingMinute} : {speakingSecond}
               </div>
