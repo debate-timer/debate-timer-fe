@@ -458,8 +458,10 @@ export default function CustomizeTimerPage() {
         </DefaultLayout.Header>
 
         {/* Containers */}
-        <DefaultLayout.ContentContainer>
-          <div className="relative z-10 flex h-full w-full flex-col items-center justify-center space-y-[40px]">
+        <DefaultLayout.ContentContainer noPadding={true}>
+          <div
+            className={`relative z-10 flex h-full w-full flex-col items-center justify-center space-y-[40px] ${bgColorMap[bg]}`}
+          >
             {/* Tooltip */}
             {isFirst && (
               <FirstUseToolTip
