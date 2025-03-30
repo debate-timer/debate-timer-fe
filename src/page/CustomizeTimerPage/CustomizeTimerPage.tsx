@@ -642,11 +642,6 @@ export default function CustomizeTimerPage() {
               </button>
             </div>
           </div>
-          {/* Gradient background */}
-          <div
-            data-testid="timer-page-background"
-            className={`absolute inset-0 z-0 animate-gradient opacity-80 ${bgColorMap[bg]}`}
-          />
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
     </>
