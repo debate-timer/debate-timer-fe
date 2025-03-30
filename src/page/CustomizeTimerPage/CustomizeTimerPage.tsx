@@ -10,7 +10,7 @@ import { IoHelpCircle } from 'react-icons/io5';
 import { useCustomTimer } from './hooks/useCustomTimer';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import { FaArrowLeft, FaArrowRight, FaExchangeAlt } from 'react-icons/fa';
-import NomalTimer from './components/NomalTimer';
+import NormalTimer from './components/NormalTimer';
 import { useNomalTimer } from './hooks/useNomalTimer';
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 
@@ -470,7 +470,7 @@ export default function CustomizeTimerPage() {
             )}
             {/* 타이머 두 개 + ENTER 버튼 */}
             {data.table[index].boxType === 'NORMAL' && (
-              <NomalTimer
+              <NormalTimer
                 isAdditionalTimerOn={isAdditionalTimerOn}
                 onStart={() => nomalTimer.startTimer()}
                 onPause={() => nomalTimer.pauseTimer()}

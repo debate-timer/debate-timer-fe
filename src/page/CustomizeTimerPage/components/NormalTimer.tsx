@@ -8,7 +8,7 @@ import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
 import { IoCloseOutline } from 'react-icons/io5';
 
-interface TimerProps {
+interface NormalTimerProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
@@ -24,7 +24,7 @@ interface TimerProps {
   item: CustomizeTimeBoxInfo;
 }
 
-export default function NomalTimer({
+export default function NormalTimer({
   onStart,
   onPause,
   onReset,
@@ -35,7 +35,7 @@ export default function NomalTimer({
   isTimerChangeable,
   isRunning,
   item,
-}: TimerProps) {
+}: NormalTimerProps) {
   const minute = Formatting.formatTwoDigits(Math.floor(Math.abs(timer) / 60));
   const second = Formatting.formatTwoDigits(Math.abs(timer % 60));
   const bgColorClass =
