@@ -9,9 +9,10 @@ import IconButton from '../../components/IconButton/IconButton';
 import { IoHelpCircle } from 'react-icons/io5';
 import { useCustomTimer } from './hooks/useCustomTimer';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
-import { FaArrowLeft, FaArrowRight, FaExchangeAlt } from 'react-icons/fa';
+import { FaExchangeAlt } from 'react-icons/fa';
 import NormalTimer from './components/NormalTimer';
 import { useNomalTimer } from './hooks/useNomalTimer';
+import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 
 const bgColorMap: Record<TimerState, string> = {
@@ -607,40 +608,41 @@ export default function CustomizeTimerPage() {
                 />
               </div>
             )}
-            {/* 하단의 이전차례/다음차례 버튼 */}
-            <div className="flex flex-row items-center justify-center space-x-[30px]">
-              {/* 이전 차례 버튼 */}
-              <button
-                className={`flex min-w-60 flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main
-      ${index === 0 ? 'invisible' : ''}`}
-                onClick={() => goToOtherItem(true)}
-              >
-                <FaArrowLeft className="size-[36px]" />
-                <h1 className="text-[28px] font-semibold">이전 차례</h1>
-              </button>
+            {/* Round control buttons on the bottom side */}
+            {data && (
+              <div className="flex flex-row space-x-8">
+                <div className="flex h-[70px] w-[200px] items-center justify-center">
+                  {index === 0 && <></>}
+                  {index !== 0 && (
+                    <RoundControlButton
+                      type="PREV"
+                      onClick={() => {
+                        setIsAdditionalTimerOn(false);
+                        goToOtherItem(true);
+                      }}
+                    />
+                  )}
+                </div>
 
-              {/* 다음 차례 / 토론 종료하기 버튼 */}
-              <button
-                className="flex min-w-60 flex-row items-center justify-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] transition hover:bg-brand-main"
-                onClick={() => {
-                  if (index === data.table.length - 1) {
-                    navigate(`/overview/${tableId}`);
-                  } else {
-                    goToOtherItem(false); // 다음 차례
-                  }
-                }}
-              >
-                {index !== data.table.length - 1 && (
-                  <>
-                    <h1 className="text-[28px] font-semibold">다음 차례</h1>
-                    <FaArrowRight className="size-[36px]" />
-                  </>
-                )}
-                {index === data.table.length - 1 && (
-                  <h1 className="text-[28px] font-semibold">토론 종료</h1>
-                )}
-              </button>
-            </div>
+                <div className="flex h-[70px] w-[200px] items-center justify-center">
+                  {index === data.table.length - 1 && (
+                    <RoundControlButton
+                      type="DONE"
+                      onClick={() => navigate('/')}
+                    />
+                  )}
+                  {index !== data.table.length - 1 && (
+                    <RoundControlButton
+                      type="NEXT"
+                      onClick={() => {
+                        setIsAdditionalTimerOn(false);
+                        goToOtherItem(false);
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
