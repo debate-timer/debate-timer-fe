@@ -6,15 +6,14 @@ import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
-import { TableFormData } from '../../hook/useTableFrom';
+import { TableFormData, TimeBoxInfo } from '../../hook/useTableFrom';
 import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
+import { CustomizeTimeBoxInfo } from '../../../../type/type';
 
 interface TimeBoxStepProps {
   initData: TableFormData;
-  onTimeBoxChange: React.Dispatch<
-    React.SetStateAction<ParliamentaryTimeBoxInfo[]>
-  >;
+  onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
   onButtonClick: () => void;
   isEdit?: boolean;
 }
@@ -48,12 +47,21 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
   };
 
   const isAbledSummitButton = initTimeBox.length !== 0;
+  // customize 타입가드
+  function isCustomize(
+    info: TableFormData['info'],
+  ): info is Extract<TableFormData, { info: { type: 'CUSTOMIZE' } }>['info'] {
+    return info.type === 'CUSTOMIZE';
+  }
 
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={initData.info.name} type={'PARLIAMENTARY'} />
+          <HeaderTableInfo
+            name={initData.info.name}
+            type={initData.info.type}
+          />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <HeaderTitle title={initData.info.agenda} />
@@ -63,7 +71,15 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
       <DefaultLayout.ContentContainer>
         <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
-          <PropsAndConsTitle />
+          {isCustomize(initData.info) ? (
+            <PropsAndConsTitle
+              prosTeamName={initData.info.prosTeamName}
+              consTeamName={initData.info.consTeamName}
+            />
+          ) : (
+            <PropsAndConsTitle />
+          )}
+
           <DragAndDropWrapper>
             {initTimeBox.map((info, index) => (
               <div key={index + info.stance} style={getDraggingStyles(index)}>
