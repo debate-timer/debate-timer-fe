@@ -91,14 +91,12 @@ export default function TimeBasedTimer({
 
         {/* Team name */}
         <div className="my-[20px] h-[40px]">
-          {item.stance !== 'NEUTRAL' && (
-            <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-              <MdRecordVoiceOver className="size-[40px]" />
-              <h3 className="text-[28px] font-bold">
-                {teamName} 팀 | {item.speaker} 토론자
-              </h3>
-            </div>
-          )}
+          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
+            <MdRecordVoiceOver className="size-[40px]" />
+            <h3 className="text-[28px] font-bold">
+              {teamName} 팀 {item.speaker && '| ' + item.speaker + ' 토론자'}
+            </h3>
+          </div>
         </div>
 
         {/* 🚩 Timer 영역 */}
