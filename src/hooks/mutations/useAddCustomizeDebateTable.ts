@@ -1,13 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { CustomizeDebateInfo, CustomizeTimeBoxInfo } from '../../type/type';
 import { postCustomizeTableData } from '../../apis/apis/customize';
+import { PostCustomizeTableResponseType } from '../../apis/responses/customize';
 
 interface UseAddCustomizeTableParams {
   info: CustomizeDebateInfo;
   table: CustomizeTimeBoxInfo[];
 }
 
-export default function useAddCustomizeTable(onSuccess: () => void) {
+export default function useAddCustomizeTable(onSuccess: (id: number) => void) {
   return useMutation({
     mutationFn: async (params: UseAddCustomizeTableParams) => {
       const response = await postCustomizeTableData(
@@ -23,8 +24,8 @@ export default function useAddCustomizeTable(onSuccess: () => void) {
       );
       return response;
     },
-    onSuccess: () => {
-      onSuccess();
+    onSuccess: (response: PostCustomizeTableResponseType) => {
+      onSuccess(response.id);
     },
   });
 }

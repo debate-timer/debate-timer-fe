@@ -2,12 +2,14 @@ import { CustomizeDebateInfo, CustomizeTimeBoxInfo } from '../../type/type';
 
 // POST /api/table/customize
 export interface PostCustomizeTableResponseType {
+  id: number;
   info: CustomizeDebateInfo;
   table: CustomizeTimeBoxInfo[];
 }
 
 // PUT /api/table/customize/{tableId}
 export interface PutCustomizeTableResponseType {
+  id: number;
   info: CustomizeDebateInfo;
   table: CustomizeTimeBoxInfo[];
 }

@@ -9,7 +9,9 @@ interface PutCustomizeTableParams {
   table: CustomizeTimeBoxInfo[];
 }
 
-export function usePutCustomizeDebateTable(onSuccess: () => void) {
+export function usePutCustomizeDebateTable(
+  onSuccess: (tableId: number) => void,
+) {
   return useMutation<
     PutCustomizeTableResponseType,
     Error,
@@ -17,8 +19,8 @@ export function usePutCustomizeDebateTable(onSuccess: () => void) {
   >({
     mutationFn: ({ tableId, info, table }) =>
       putCustomizeTableData(tableId, info, table),
-    onSuccess: () => {
-      onSuccess();
+    onSuccess: (response: PutCustomizeTableResponseType) => {
+      onSuccess(response.id);
     },
     onError: (error) => {
       console.error('Error updating customize table:', error);
