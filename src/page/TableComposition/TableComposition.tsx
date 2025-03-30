@@ -4,9 +4,16 @@ import useFunnel from '../../hooks/useFunnel';
 import useTableFrom from './hook/useTableFrom';
 import TimeBoxStep from './components/TimeBoxStep/TimeBoxStep';
 import { useGetParliamentaryTableData } from '../../hooks/query/useGetParliamentaryTableData';
+import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
-import { DebateType } from '../../type/type';
+import {
+  CustomizeDebateInfo,
+  CustomizeTimeBoxInfo,
+  DebateType,
+  ParliamentaryDebateInfo,
+  ParliamentaryTimeBoxInfo,
+} from '../../type/type';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
@@ -22,22 +29,38 @@ export default function TableComposition() {
   const tableId = Number(searchParams.get('tableId') || 0);
 
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
-  const { data: fetchedTableData } = useGetParliamentaryTableData(
+  const { data: parliamentaryData } = useGetParliamentaryTableData(
     tableId,
-    mode === 'edit',
+    mode === 'edit' && type === 'PARLIAMENTARY',
   );
+  const { data: customizeData } = useGetCustomizeTableData(
+    tableId,
+    mode === 'edit' && type === 'CUSTOMIZE',
+  );
+  const fetchedTableData =
+    type === 'CUSTOMIZE' ? customizeData : parliamentaryData;
+
   const initData = useMemo(() => {
     if (mode === 'edit' && fetchedTableData) {
-      return {
-        info: {
-          name: fetchedTableData.info.name,
-          agenda: fetchedTableData.info.agenda,
-          type: type,
-          warningBell: fetchedTableData.info.warningBell,
-          finishBell: fetchedTableData.info.finishBell,
-        },
-        table: fetchedTableData.table,
-      };
+      if (type === 'CUSTOMIZE') {
+        const info = fetchedTableData.info as CustomizeDebateInfo;
+        return {
+          info: {
+            ...info,
+            type: 'CUSTOMIZE' as const,
+          },
+          table: fetchedTableData.table as CustomizeTimeBoxInfo[],
+        };
+      } else {
+        const info = fetchedTableData.info as ParliamentaryDebateInfo;
+        return {
+          info: {
+            ...info,
+            type: 'PARLIAMENTARY' as const,
+          },
+          table: fetchedTableData.table as ParliamentaryTimeBoxInfo[],
+        };
+      }
     }
     return undefined;
   }, [mode, fetchedTableData, type]);
@@ -46,27 +69,26 @@ export default function TableComposition() {
     useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
-    if (mode === 'edit') {
-      EditTable({
-        tableId: tableId, // etc
-        info: {
-          name: formData.info.name ?? '템플릿 1',
-          agenda: formData.info.agenda,
-          warningBell: formData.info.warningBell,
-          finishBell: formData.info.finishBell,
-        },
-        table: formData.table,
-      });
+    if (formData.info.type === 'CUSTOMIZE') {
+      const patchedInfo = {
+        ...formData.info,
+        name: formData.info.name ?? '템플릿 1',
+        prosTeamName: formData.info.prosTeamName ?? '찬성',
+        consTeamName: formData.info.consTeamName ?? '반대',
+      };
+      updateInfo(patchedInfo);
     } else {
-      AddTable({
-        info: {
-          name: formData.info.name ?? '템플릿 1',
-          agenda: formData.info.agenda,
-          warningBell: formData.info.warningBell,
-          finishBell: formData.info.finishBell,
-        },
-        table: formData.table,
-      });
+      const patchedInfo = {
+        ...formData.info,
+        name: formData.info.name ?? '템플릿 1',
+      };
+      updateInfo(patchedInfo);
+    }
+
+    if (mode === 'edit') {
+      EditTable(tableId);
+    } else {
+      AddTable();
     }
   };
 
