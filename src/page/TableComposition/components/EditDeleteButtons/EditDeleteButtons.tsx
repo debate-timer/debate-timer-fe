@@ -1,16 +1,24 @@
 import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
-import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  CustomizeTimeBoxInfo,
+} from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
+import CustomizeTimerCreationContent from '../TimerCreationContent/CustomizeTimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
 
-interface EditDeleteButtonsPros {
-  info: ParliamentaryTimeBoxInfo;
-  onSubmitEdit: (updatedInfo: ParliamentaryTimeBoxInfo) => void;
+interface EditDeleteButtonsPros<
+  T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+> {
+  info: T;
+  onSubmitEdit: (updatedInfo: T) => void;
   onSubmitDelete: () => void;
 }
 
-export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
+export default function EditDeleteButtons<
+  T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+>(props: EditDeleteButtonsPros<T>) {
   const {
     openModal: openEditModal,
     closeModal: closeEditModal,
@@ -22,6 +30,11 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
     ModalWrapper: DeleteModalWrapper,
   } = useModal({ isCloseButtonExist: false });
   const { info, onSubmitEdit, onSubmitDelete } = props;
+  function isCustomize(
+    info: ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+  ): info is CustomizeTimeBoxInfo {
+    return (info as CustomizeTimeBoxInfo).stance !== undefined;
+  }
 
   return (
     <>
@@ -42,13 +55,23 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
         </button>
       </div>
       <EditModalWrapper>
-        <TimerCreationContent
-          initData={info}
-          onSubmit={(newInfo) => {
-            onSubmitEdit(newInfo);
-          }}
-          onClose={closeEditModal}
-        />
+        {isCustomize(info) ? (
+          <CustomizeTimerCreationContent
+            initData={info}
+            onSubmit={(newInfo) => {
+              onSubmitEdit(newInfo as T);
+            }}
+            onClose={closeEditModal}
+          />
+        ) : (
+          <TimerCreationContent
+            initData={info}
+            onSubmit={(newInfo) => {
+              onSubmitEdit(newInfo as T);
+            }}
+            onClose={closeEditModal}
+          />
+        )}
       </EditModalWrapper>
       <DeleteModalWrapper>
         <DialogModal
