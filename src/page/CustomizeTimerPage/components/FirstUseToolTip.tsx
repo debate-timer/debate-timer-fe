@@ -12,10 +12,10 @@ interface FirstUseToolTipProps {
 
 export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
   return (
-    <div className="relative z-30 flex justify-center">
+    <div className="fixed z-30 m-4 flex justify-center">
       <div
         data-testid="tooltip"
-        className="fixed flex w-max flex-col space-y-6 rounded-2xl bg-neutral-900 bg-opacity-80 p-6"
+        className="flex w-max flex-col space-y-6 rounded-2xl bg-neutral-900 bg-opacity-80 p-6"
       >
         <div className="flex flex-col text-neutral-50">
           <div className="mb-2 flex flex-row items-center space-x-4">

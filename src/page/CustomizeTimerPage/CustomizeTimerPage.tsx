@@ -220,11 +220,11 @@ export default function CustomizeTimerPage() {
 
     setWarningBell(warningBell);
     setFinishBell(finishBell);
+    timer1.clearTimer();
+    timer2.clearTimer();
+    nomalTimer.clearTimer();
 
     if (currentBox.boxType === 'NORMAL') {
-      timer1.clearTimer();
-      timer2.clearTimer();
-
       const defaultTime = currentBox.time ?? 0;
       nomalTimer.setDefaultTimer(defaultTime);
       nomalTimer.setTimer(defaultTime);
@@ -241,7 +241,6 @@ export default function CustomizeTimerPage() {
         timer.setIsDone(false);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     data,
     index,
@@ -249,6 +248,8 @@ export default function CustomizeTimerPage() {
     timer1.setTimers,
     timer2.setDefaultTime,
     timer2.setTimers,
+    nomalTimer.setDefaultTimer,
+    nomalTimer.setTimer,
   ]);
 
   // 키보드 단축키 제어
@@ -460,18 +461,18 @@ export default function CustomizeTimerPage() {
 
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
+          {/* Tooltip */}
+          {isFirst && (
+            <FirstUseToolTip
+              onClose={() => {
+                setIsFirst(false);
+                localStorage.setItem(IS_FIRST, FALSE);
+              }}
+            />
+          )}
           <div
             className={`relative z-10 flex h-full w-full flex-col items-center justify-center space-y-[40px] ${bgColorMap[bg]}`}
           >
-            {/* Tooltip */}
-            {isFirst && (
-              <FirstUseToolTip
-                onClose={() => {
-                  setIsFirst(false);
-                  localStorage.setItem(IS_FIRST, FALSE);
-                }}
-              />
-            )}
             {/* 타이머 두 개 + ENTER 버튼 */}
             {data.table[index].boxType === 'NORMAL' && (
               <NormalTimer
