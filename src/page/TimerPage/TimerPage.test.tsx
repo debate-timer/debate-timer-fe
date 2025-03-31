@@ -39,7 +39,25 @@ describe('TimerPage', () => {
       expect(screen.getByTestId('timer-controller')).toBeInTheDocument(),
     );
 
+    // 다음 차례 버튼이 표시되는지 확인
+    await waitFor(() => {
+      expect(screen.getByText('다음 차례')).toBeInTheDocument();
+      expect(screen.queryByText('이전 차례')).not.toBeInTheDocument();
+    });
+
+    // 이전 차례 버튼이 표시되는지 확인
+    await waitFor(async () => {
+      // 추가 작전 시간 버튼 클릭
+      const nextButton = screen.getByText('다음 차례');
+      await userEvent.click(nextButton);
+
+      // 이전 차례 버튼이 표시되는지 확인인
+      expect(screen.getByText('이전 차례')).toBeInTheDocument();
+    });
+
+    // Deprecated due to deletion of TimeTable on TimerPage
     // 시간표가 표시되는지 확인
+    /**
     await waitFor(() =>
       expect(screen.getByTestId('time-table')).toBeInTheDocument(),
     );
@@ -50,6 +68,7 @@ describe('TimerPage', () => {
         0,
       ),
     );
+    */
   });
 
   it('작전 시간 타이머 동작 검증', async () => {
