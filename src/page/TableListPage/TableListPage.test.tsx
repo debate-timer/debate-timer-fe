@@ -52,12 +52,14 @@ describe('TableListPage', () => {
 
       // 삭제 버튼 클릭 시 모달 열리는지 확인
       await userEvent.click(deleteButton!);
-      expect(screen.getByText('테이블을 삭제할까요?')).toBeInTheDocument();
+      expect(
+        screen.getByText('테이블을 삭제하시겠습니까?'),
+      ).toBeInTheDocument();
 
       // 취소 버튼 클릭 시 모달 닫히는지 확인
       await userEvent.click(screen.getByText('취소'));
       expect(
-        screen.queryByText('테이블을 삭제할까요?'),
+        screen.queryByText('테이블을 삭제하시겠습니까?'),
       ).not.toBeInTheDocument();
     });
   });
