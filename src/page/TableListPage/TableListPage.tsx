@@ -1,13 +1,20 @@
-import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { DebateTable } from '../../type/type';
-import AddTable from './components/Table/AddTable';
-import Table from './components/Table/Table';
-import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
+import { useNavigate } from 'react-router-dom';
 import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDeleteParliamentaryDebateTable';
+import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
+import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import { DebateTable, DebateType } from '../../type/type';
+import Table from './components/Table';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
   const { mutate } = useDeleteParliamentaryDebateTable();
+  const navigate = useNavigate();
+  const onEdit = (tableId: number, type: DebateType) => {
+    navigate(`/composition?mode=edit&tableId=${tableId}&type=${type}`);
+  };
+  const onClick = (tableId: number) => {
+    navigate(`/overview/${tableId}`);
+  };
 
   return (
     <DefaultLayout>
@@ -15,14 +22,23 @@ export default function TableListPage() {
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
-            <h1>토론 시간표를 선택해주세요.</h1>
+            <h1>토론 시간표를 선택해주세요</h1>
           </div>
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <div className="flex flex-wrap px-20 py-6">
+        <div className="flex max-w-[1140px] flex-wrap justify-start">
+          {/** Button that adds new table */}
+          <button
+            onClick={() => navigate(`/composition?mode=add`)}
+            className="m-5 h-[220px] w-[340px] rounded-[28px] bg-neutral-200 shadow-lg duration-200 hover:scale-105"
+          >
+            <h1 className="text-[100px] font-light text-neutral-500">+</h1>
+          </button>
+
+          {/** All tables */}
           {data &&
             data.tables.map((table: DebateTable, idx: number) => (
               <Table
@@ -32,9 +48,10 @@ export default function TableListPage() {
                 type={table.type}
                 agenda={table.agenda}
                 onDelete={() => mutate({ tableId: table.id })}
+                onEdit={() => onEdit(table.id, table.type)}
+                onClick={() => onClick(table.id)}
               />
             ))}
-          <AddTable />
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>
