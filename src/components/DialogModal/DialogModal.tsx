@@ -39,7 +39,7 @@ export default function DialogModal({
         {/** Left button */}
         <button
           data-testid="button-left"
-          className="w-1/2"
+          className="w-1/2 hover:bg-neutral-300"
           onClick={() => left.onClick()}
         >
           <p
@@ -52,7 +52,7 @@ export default function DialogModal({
         {/** Right button */}
         <button
           data-testid="button-right"
-          className="w-1/2"
+          className="w-1/2 hover:bg-brand-main"
           onClick={() => right.onClick()}
         >
           <p
