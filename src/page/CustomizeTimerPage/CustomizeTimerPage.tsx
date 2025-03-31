@@ -507,6 +507,13 @@ export default function CustomizeTimerPage() {
                   setIsAdditionalTimerOn(!isAdditionalTimerOn);
                 }}
                 item={data.table[index]}
+                teamName={
+                  data.table[index].stance === 'NEUTRAL'
+                    ? null
+                    : data.table[index].stance === 'PROS'
+                      ? data.info.prosTeamName
+                      : data.info.consTeamName
+                }
               />
             )}
             {data.table[index].boxType === 'TIME_BASED' && (

@@ -1,4 +1,3 @@
-import { RiSpeakFill } from 'react-icons/ri';
 import {
   CustomizeTimeBoxInfo,
   ParliamentarySpeechTypeToString,
@@ -7,6 +6,7 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
 import { IoCloseOutline } from 'react-icons/io5';
+import { MdRecordVoiceOver } from 'react-icons/md';
 
 interface NormalTimerProps {
   onStart: () => void;
@@ -22,6 +22,7 @@ interface NormalTimerProps {
   isLastItem: boolean;
   isFirstItem: boolean;
   item: CustomizeTimeBoxInfo;
+  teamName: string | null;
 }
 
 export default function NormalTimer({
@@ -35,6 +36,7 @@ export default function NormalTimer({
   isTimerChangeable,
   isRunning,
   item,
+  teamName,
 }: NormalTimerProps) {
   const minute = Formatting.formatTwoDigits(Math.floor(Math.abs(timer) / 60));
   const second = Formatting.formatTwoDigits(Math.abs(timer % 60));
@@ -85,12 +87,13 @@ export default function NormalTimer({
 
       {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
-        {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
-          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-            <RiSpeakFill className="size-[40px]" />
-            <h1 className="text-[28px] font-bold">1번 토론자</h1>
-          </div>
-        )}
+        <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
+          <MdRecordVoiceOver className="size-[40px]" />
+          <h3 className="text-[28px] font-bold">
+            {teamName && teamName + '  팀 '}
+            {item.speaker && '| ' + item.speaker + ' 토론자'}
+          </h3>
+        </div>
       </div>
 
       {/* Timer display */}

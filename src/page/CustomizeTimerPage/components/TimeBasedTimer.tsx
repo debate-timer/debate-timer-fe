@@ -83,8 +83,8 @@ export default function TimeBasedTimer({
             {titleText}
             <img
               src={prosCons === 'pros' ? KeyboardKeyA : KeyboardKeyL}
-              alt="A키"
-              className="h-[50px] w-[50px]"
+              alt={prosCons === 'pros' ? 'A키' : 'ㅣ키'}
+              className="h-[56px] w-[56px]"
             />
           </h2>
         </div>
