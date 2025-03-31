@@ -22,7 +22,7 @@ export default function TableListPage() {
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
-            <h1>시간표 목록</h1>
+            <h1>토론 시간표를 선택해주세요</h1>
           </div>
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />

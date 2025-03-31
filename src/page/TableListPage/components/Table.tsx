@@ -78,11 +78,11 @@ export default function Table({
         <div
           className={`flex flex-grow flex-col items-start overflow-hidden ${psClass} w-full pe-8 duration-300`}
         >
-          <h1
+          <p
             className={`text-[28px] font-bold ${textTitleColor} w-full truncate text-start duration-300`}
           >
             {name}
-          </h1>
+          </p>
           <div
             className={`my-3 size-[10px] text-start duration-300 ${squareColor}`}
           ></div>
@@ -91,11 +91,11 @@ export default function Table({
           >
             유형 | {DebateTypeToString[type]}
           </p>
-          <h1
+          <p
             className={`text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
           >
             주제 | {agenda}
-          </h1>
+          </p>
         </div>
       </button>
 
@@ -112,8 +112,8 @@ export default function Table({
           }}
         >
           <div className="flex flex-col items-center justify-center space-y-2 px-16 py-8">
-            <h1 className="text-xl font-bold">테이블을 삭제할까요?</h1>
-            <h1 className="text-sm">{name}</h1>
+            <p className="text-xl font-bold">테이블을 삭제하시겠습니까?</p>
+            <p className="text-sm">{name}</p>
           </div>
         </DialogModal>
       </ModalWrapper>
