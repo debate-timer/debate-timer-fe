@@ -35,11 +35,11 @@ export default function DialogModal({
 
       {/** Buttons */}
       <div className="w-full border-t border-neutral-300" />
-      <div className="flex w-full flex-row items-center justify-center py-4">
+      <div className="flex w-full flex-row items-center justify-center">
         {/** Left button */}
         <button
           data-testid="button-left"
-          className="w-1/2 hover:bg-neutral-300"
+          className="w-1/2 py-4 hover:bg-neutral-300"
           onClick={() => left.onClick()}
         >
           <p
@@ -52,7 +52,7 @@ export default function DialogModal({
         {/** Right button */}
         <button
           data-testid="button-right"
-          className="w-1/2 hover:bg-brand-main"
+          className="w-1/2 py-4 hover:bg-brand-main"
           onClick={() => right.onClick()}
         >
           <p
