@@ -95,14 +95,15 @@ export function useCustomTimer({
     [pauseTimer],
   );
   const clearTimer = useCallback(() => {
+    pauseTimer();
     setDefaultTime({ defaultTotalTimer: 0, defaultSpeakingTimer: null });
     setTotalTimer(null);
     setIsSpeakingTimer(initIsSpeakingTimer);
     setSpeakingTimer(null);
-    setIsRunning(false);
     setIsDone(false);
     intervalRef.current = null;
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pauseTimer]);
 
   // Cleanup
   useEffect(() => () => pauseTimer(), [pauseTimer]);

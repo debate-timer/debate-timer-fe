@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useNomalTimer() {
   const [timer, setTimer] = useState<number | null>(null);
@@ -8,12 +8,11 @@ export function useNomalTimer() {
   const [isRunning, setIsRunning] = useState(false);
 
   const startTimer = useCallback(() => {
-    if (intervalRef.current === null) {
-      intervalRef.current = setInterval(() => {
-        setTimer((prev) => (prev === null ? null : prev - 1));
-      }, 1000);
-      setIsRunning(true);
-    }
+    if (intervalRef.current !== null) return;
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => (prev === null ? null : prev - 1));
+    }, 1000);
+    setIsRunning(true);
   }, []);
 
   const pauseTimer = useCallback(() => {
@@ -46,11 +45,14 @@ export function useNomalTimer() {
   );
 
   const clearTimer = useCallback(() => {
+    pauseTimer();
     setTimer(null);
     setDefaultTimer(0);
-    setIsRunning(false);
     intervalRef.current = null;
   }, []);
+
+  // Cleanup
+  useEffect(() => () => pauseTimer(), [pauseTimer]);
 
   return {
     timer,
