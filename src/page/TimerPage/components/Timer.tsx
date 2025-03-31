@@ -70,21 +70,21 @@ export default function Timer({
   return (
     <div
       data-testid="timer"
-      className={`flex min-h-[300px] w-[736px] ${neonClass} flex-col items-center rounded-[45px] bg-neutral-200`}
+      className={`flex w-[736px] ${neonClass} flex-col items-center rounded-[45px] bg-neutral-200`}
     >
       {/* Title of timer */}
       <div
-        className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
+        className={`flex h-[139px] w-full rounded-t-[45px] ${bgColorClass} relative py-4 text-neutral-50`}
       >
-        {/* Title text  */}
-        <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
+        {/* Title text <p className="absolute left-1/2 w-max -translate-x-1/2 transform"> */}
+        <p className="w-full items-center text-center text-[75px] font-bold">
           {titleText}
-        </h1>
+        </p>
 
         {/* Close button, if additional timer is enabled */}
         {isAdditionalTimerOn && (
           <button
-            className="ml-auto px-[30px]"
+            className="absolute right-10 top-1/2 -translate-y-1/2"
             onClick={() => onChangingTimer()}
           >
             <IoCloseOutline className="size-[40px] hover:text-neutral-300" />
@@ -97,7 +97,7 @@ export default function Timer({
         {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
           <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
             <RiSpeakFill className="size-[40px]" />
-            <h1 className="text-[28px] font-bold">{speakerText}</h1>
+            <p className="text-[28px] font-bold">{speakerText}</p>
           </div>
         )}
       </div>
@@ -116,7 +116,7 @@ export default function Timer({
       </div>
 
       {/* Timer controller and additional timer controller */}
-      <div className="my-[30px]">
+      <div className="my-[30px] flex w-full items-center justify-center">
         {!isAdditionalTimerOn && (
           <TimerController
             isRunning={isRunning}

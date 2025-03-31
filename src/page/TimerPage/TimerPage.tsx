@@ -238,7 +238,7 @@ export default function TimerPage() {
 
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
-          <div className="relative z-10 h-full w-full">
+          <div className="relative z-0 my-24 flex h-screen w-full items-center justify-center">
             {/* Tooltip */}
             {isFirst && (
               <FirstUseToolTip
@@ -252,7 +252,7 @@ export default function TimerPage() {
             {/* Timer body */}
             <div
               data-testid="timer-page-body"
-              className={`flex h-full w-full flex-col items-center justify-center space-y-10 ${bg}`}
+              className={`absolute inset-0 flex h-full w-full flex-col items-center justify-center space-y-10 py-8 ${bg}`}
             >
               {/* Timer on the top side */}
               <Timer
