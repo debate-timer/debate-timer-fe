@@ -11,17 +11,6 @@ interface CustomizeDebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   onSubmitEdit?: (updatedInfo: CustomizeTimeBoxInfo) => void;
   onSubmitDelete?: () => void;
 }
-{
-  /**
-  stance: 'PROS',
-  speechType: '입론',
-  boxType: 'NORMAL',
-  time: 120,
-  timePerTeam: null,
-  timePerSpeaking: null,
-  speaker: '발언자 1',
-  */
-}
 
 export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
   console.log('CustomizeDebatePanel', props);
