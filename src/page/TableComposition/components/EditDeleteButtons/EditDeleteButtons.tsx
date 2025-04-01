@@ -91,7 +91,7 @@ export default function EditDeleteButtons<
           }}
         >
           <h1 className="px-20 py-10 text-xl font-bold">
-            이 순서를 삭제하시겠습니까?
+            이 타이머를 삭제하시겠습니까?
           </h1>
         </DialogModal>
       </DeleteModalWrapper>

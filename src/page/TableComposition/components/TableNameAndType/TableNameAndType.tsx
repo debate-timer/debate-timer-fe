@@ -67,7 +67,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             value={info.name}
             onChange={(e) => handleFieldChange('name', e.target.value)}
             onClear={() => clearField('name')}
-            placeholder="테이블 1"
+            placeholder="시간표 1"
           />
 
           <label className="flex items-center text-base font-semibold md:text-2xl">
@@ -154,13 +154,13 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               const updatedInfo = isCustomize(info)
                 ? {
                     ...info,
-                    name: info.name || '템플릿 1',
+                    name: info.name || '시간표 1',
                     prosTeamName: info.prosTeamName || '찬성',
                     consTeamName: info.consTeamName || '반대',
                   }
                 : {
                     ...info,
-                    name: info.name || '템플릿 1',
+                    name: info.name || '시간표 1',
                   };
 
               onInfoChange(updatedInfo);

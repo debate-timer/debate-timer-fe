@@ -73,7 +73,7 @@ export default function TableComposition() {
     if (formData.info.type === 'CUSTOMIZE') {
       const patchedInfo = {
         ...formData.info,
-        name: formData.info.name ?? '템플릿 1',
+        name: formData.info.name ?? '시간표 1',
         prosTeamName: formData.info.prosTeamName ?? '찬성',
         consTeamName: formData.info.consTeamName ?? '반대',
       };
@@ -81,7 +81,7 @@ export default function TableComposition() {
     } else {
       const patchedInfo = {
         ...formData.info,
-        name: formData.info.name ?? '템플릿 1',
+        name: formData.info.name ?? '시간표 1',
       };
       updateInfo(patchedInfo);
     }
