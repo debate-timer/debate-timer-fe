@@ -31,7 +31,7 @@ export default function CustomizeTimerCreationContent({
   const [stance, setStance] = useState<Stance>(
     beforeData?.stance
       ? beforeData?.stance === 'NEUTRAL'
-        ? 'PROS'
+        ? 'NEUTRAL'
         : beforeData?.stance === 'CONS'
           ? 'PROS'
           : 'CONS'
@@ -43,7 +43,8 @@ export default function CustomizeTimerCreationContent({
 
   const predefinedSpeechOptions = ['입론', '반론', '최종발언', '작전시간'];
 
-  const initSpeechType = beforeData?.speechType ?? initData?.speechType ?? '';
+  const initSpeechType =
+    beforeData?.speechType ?? initData?.speechType ?? '입론';
   const [speechType, setSpeechType] = useState<string>(initSpeechType);
   const [isCustomSpeech, setIsCustomSpeech] = useState(
     !predefinedSpeechOptions.includes(initSpeechType),
@@ -83,6 +84,32 @@ export default function CustomizeTimerCreationContent({
     const totalTime = minutes * 60 + seconds;
     const totalTimePerTeam = teamMinutes * 60 + teamSeconds;
     const totalTimePerSpeaking = speakerMinutes * 60 + speakerSeconds;
+
+    const errors: string[] = [];
+    // 텍스트 길이 유효성 검사
+    if (speechType.length > 10) {
+      errors.push('발언유형은 최대 10자까지 입력할 수 있습니다.');
+    }
+    if (speaker.length > 5) {
+      errors.push('발언자는 최대 5자까지 입력할 수 있습니다.');
+    }
+    // 발언시간 유효성 검사
+    if (
+      boxType === 'TIME_BASED' &&
+      useSpeakerTime &&
+      totalTimePerSpeaking > totalTimePerTeam
+    ) {
+      errors.push('1회당 발언시간은 팀당 총 발언시간보다 클 수 없습니다.');
+    }
+    // 커스텀 타이머 발언유형 유효성 검사
+    if (boxType === 'NORMAL' && speechType.trim() === '') {
+      errors.push('발언유형을 입력해주세요.');
+    }
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+      return;
+    }
+
     if (boxType === 'NORMAL') {
       onSubmit({
         stance,
@@ -97,7 +124,7 @@ export default function CustomizeTimerCreationContent({
       // TIME_BASED
       onSubmit({
         stance: 'NEUTRAL',
-        speechType,
+        speechType: speechType.trim() === '' ? '자유토론' : speechType,
         boxType,
         time: null,
         timePerTeam: totalTimePerTeam,
@@ -160,7 +187,7 @@ export default function CustomizeTimerCreationContent({
                 종류
               </label>
               <div className="flex w-full justify-between space-x-2">
-                <label className="flex items-center gap-2">
+                <label className="flex cursor-pointer items-center gap-2">
                   <input
                     type="radio"
                     name="boxType"
@@ -172,7 +199,7 @@ export default function CustomizeTimerCreationContent({
                   />
                   일반 타이머
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex cursor-pointer items-center gap-2">
                   <input
                     type="radio"
                     name="boxType"
@@ -194,25 +221,16 @@ export default function CustomizeTimerCreationContent({
               >
                 발언유형
               </label>
-              <input
-                id="speech-type-input"
-                type="text"
-                className="flex w-full rounded border p-1"
-                value={speechType}
-                onChange={(e) => {
-                  // "직접입력"일 때만 사용자 입력 허용
-                  if (isCustomSpeech) {
-                    setSpeechType(e.target.value);
-                  }
-                }}
-                placeholder={isNormalTimer ? '예) 보충질의' : '직접 입력하세요'}
-                disabled={!isCustomSpeech && isNormalTimer}
-              />
+
               {isNormalTimer && (
                 <select
                   id="speech-type-select"
-                  className="flex rounded border p-1"
-                  value={speechType}
+                  className="flex flex-grow rounded border p-1"
+                  value={
+                    predefinedSpeechOptions.includes(speechType)
+                      ? speechType
+                      : '직접입력'
+                  }
                   onChange={(e) => {
                     const selectedValue = e.target.value;
                     if (selectedValue === '작전시간') {
@@ -223,22 +241,33 @@ export default function CustomizeTimerCreationContent({
                     ) {
                       setStance('PROS');
                     }
-                    // "직접입력"이 아닌 경우 텍스트 필드에 선택된 값을 설정
-                    if (selectedValue !== '직접입력') {
+                    if (selectedValue === '직접입력') {
+                      setIsCustomSpeech(true);
+                      setSpeechType('');
+                    } else {
                       setIsCustomSpeech(false);
                       setSpeechType(selectedValue);
-                    } else {
-                      setIsCustomSpeech(true);
-                      setSpeechType(''); // 직접 입력을 위해 초기화
                     }
                   }}
                 >
-                  <option value="직접입력">직접입력</option>
                   <option value="입론">입론</option>
                   <option value="반론">반론</option>
                   <option value="최종발언">최종발언</option>
                   <option value="작전시간">작전시간</option>
+                  <option value="직접입력">직접입력</option>
                 </select>
+              )}
+              {isCustomSpeech && (
+                <input
+                  id="speech-type-input"
+                  type="text"
+                  className="flex w-full rounded border p-1"
+                  value={speechType}
+                  onChange={(e) => {
+                    setSpeechType(e.target.value);
+                  }}
+                  placeholder={isNormalTimer ? '예) 보충질의' : '자유토론'}
+                />
               )}
             </div>
             {/** 팀 */}
@@ -253,15 +282,19 @@ export default function CustomizeTimerCreationContent({
                 <select
                   id="stance-select"
                   className={`flex-1 rounded border p-1 ${
-                    stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-100' : ''
+                    speechType === '작전시간'
+                      ? 'cursor-not-allowed bg-gray-100'
+                      : ''
                   }`}
                   value={stance}
                   onChange={(e) => setStance(e.target.value as Stance)}
-                  disabled={stance === 'NEUTRAL'}
+                  disabled={speechType === '작전시간'}
                 >
-                  {stance === 'NEUTRAL' && <option value="NEUTRAL" />}
                   <option value="PROS">{prosTeamName}</option>
                   <option value="CONS">{consTeamName}</option>
+                  {stance === 'NEUTRAL' || isCustomSpeech ? (
+                    <option value="NEUTRAL">공통</option>
+                  ) : null}
                 </select>
               </div>
             )}
@@ -345,23 +378,6 @@ export default function CustomizeTimerCreationContent({
                 </div>
                 {/** 1회당 발언시간 */}
                 <div className="flex w-full items-center space-x-2">
-                  {/* <label
-                    htmlFor="speaker-toggle"
-                    className={`flex w-24 flex-shrink-0 cursor-pointer items-center space-x-2 font-semibold ${
-                      useSpeakerTime ? '' : 'text-gray-400'
-                    }`}
-                  >
-                    <input
-                      id="speaker-toggle"
-                      type="checkbox"
-                      checked={useSpeakerTime}
-                      onChange={() => setUseSpeakerTime((prev) => !prev)}
-                      className="mr-1 h-4 w-4 cursor-pointer"
-                    />
-                    <span>
-                      1회당 <br /> 발언시간
-                    </span>
-                  </label> */}
                   <div className="w-24 flex-shrink-0">
                     <LabeledCheckbox
                       id="speaker-toggle"
@@ -425,7 +441,7 @@ export default function CustomizeTimerCreationContent({
                 <input
                   id="speaker-input"
                   type="text"
-                  className={`flex w-full rounded border p-1 ${
+                  className={`flex flex-grow rounded border p-1 ${
                     stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-100' : ''
                   }`}
                   value={speaker}
@@ -436,9 +452,10 @@ export default function CustomizeTimerCreationContent({
                       setSpeaker(e.target.value);
                     }
                   }}
-                  placeholder="예) 1번"
+                  placeholder="1번"
                   disabled={stance === 'NEUTRAL'}
                 />
+                <span>토론자</span>
               </div>
             )}
           </div>

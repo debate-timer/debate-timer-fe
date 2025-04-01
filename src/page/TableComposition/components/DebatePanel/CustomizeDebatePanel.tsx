@@ -115,7 +115,9 @@ export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
           )}
         </>
       )}
-      <div className="font-semibold">{`${speechType} | ${speaker} 토론자`}</div>
+      <div className="font-semibold">
+        {speechType} {speaker && `| ${speaker} 토론자`}
+      </div>
       <div className="text-2xl font-semibold">{timeStr}</div>
     </div>
   );
