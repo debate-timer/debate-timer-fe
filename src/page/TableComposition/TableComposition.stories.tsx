@@ -8,7 +8,7 @@ const meta: Meta<typeof TableComposition> = {
   decorators: [
     (Story) => {
       // 세션 초기화
-      window.sessionStorage.removeItem('moimCreationInfo');
+      window.sessionStorage.removeItem('creationInfo');
       return <Story />;
     },
   ],

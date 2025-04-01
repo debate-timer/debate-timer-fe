@@ -34,7 +34,7 @@ const useTableFrom = (
 
   const [formData, setFormData, removeValue] = useBrowserStorage<TableFormData>(
     {
-      key: 'moimCreationInfo',
+      key: 'creationInfo',
       initialState: {
         info: {
           name: '',
