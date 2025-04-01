@@ -212,7 +212,7 @@ describe('TableComposition', () => {
     await userEvent.click(confirmButton);
 
     const submitButton = screen.getByRole('button', {
-      name: '시간표 추가 완료',
+      name: '시간표 추가하기',
     });
     await waitFor(() => {
       expect(submitButton).toBeEnabled();

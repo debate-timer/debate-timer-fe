@@ -168,7 +168,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             }}
             className="button enabled h-16 w-full"
           >
-            테이블 추가하기
+            다음
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
