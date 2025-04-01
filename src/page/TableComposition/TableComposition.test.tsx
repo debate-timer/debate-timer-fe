@@ -208,7 +208,7 @@ describe('TableComposition', () => {
     const addButton = await screen.findAllByText('+');
     await userEvent.click(addButton[0]);
 
-    const confirmButton = screen.getByRole('button', { name: '시간표 설정' });
+    const confirmButton = screen.getByRole('button', { name: '설정 완료' });
     await userEvent.click(confirmButton);
 
     const submitButton = screen.getByRole('button', {
