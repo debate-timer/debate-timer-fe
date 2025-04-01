@@ -25,6 +25,11 @@ function isCustomize(
 ): info is Extract<TableFormData, { info: { type: 'CUSTOMIZE' } }>['info'] {
   return info.type === 'CUSTOMIZE';
 }
+// const isCustomizeInfo = (
+//   info: TimeBoxInfo,
+// ): info is CustomizeTimeBoxInfo => {
+//   return 'boxType' in info;
+// };
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initData, onTimeBoxChange, onButtonClick, isEdit = false } = props;
@@ -62,6 +67,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           key={index}
           info={info as CustomizeTimeBoxInfo}
           onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
+          prosTeamName={initData.info.prosTeamName}
+          consTeamName={initData.info.consTeamName}
           onSubmitDelete={() => handleSubmitDelete(index)}
           onMouseDown={() => handleMouseDown(index)}
         />
@@ -150,6 +157,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             beforeData={
               initTimeBox[initTimeBox.length - 1] as CustomizeTimeBoxInfo
             }
+            prosTeamName={initData.info.prosTeamName}
+            consTeamName={initData.info.consTeamName}
             onSubmit={(data) => {
               onTimeBoxChange((prev) => [...prev, data]);
             }}

@@ -6,6 +6,8 @@ import { LuArrowUpDown } from 'react-icons/lu';
 
 interface CustomizeDebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   info: CustomizeTimeBoxInfo;
+  prosTeamName: string;
+  consTeamName: string;
   onSubmitEdit?: (updatedInfo: CustomizeTimeBoxInfo) => void;
   onSubmitDelete?: () => void;
 }
@@ -21,7 +23,8 @@ interface CustomizeDebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   */
 }
 
-export default function DebatePanel(props: CustomizeDebatePanelProps) {
+export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
+  console.log('CustomizeDebatePanel', props);
   const {
     stance,
     speechType,
@@ -88,6 +91,8 @@ export default function DebatePanel(props: CustomizeDebatePanelProps) {
               <div className="absolute left-2 top-2">
                 <EditDeleteButtons
                   info={props.info}
+                  prosTeamName={props.prosTeamName}
+                  consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
                 />
@@ -100,6 +105,8 @@ export default function DebatePanel(props: CustomizeDebatePanelProps) {
               <div className="absolute right-2 top-2">
                 <EditDeleteButtons
                   info={props.info}
+                  prosTeamName={props.prosTeamName}
+                  consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
                 />

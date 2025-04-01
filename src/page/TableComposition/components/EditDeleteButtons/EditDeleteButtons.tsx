@@ -12,6 +12,8 @@ interface EditDeleteButtonsPros<
   T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
 > {
   info: T;
+  prosTeamName?: string;
+  consTeamName?: string;
   onSubmitEdit: (updatedInfo: T) => void;
   onSubmitDelete: () => void;
 }
@@ -33,7 +35,7 @@ export default function EditDeleteButtons<
   function isCustomize(
     info: ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
   ): info is CustomizeTimeBoxInfo {
-    return (info as CustomizeTimeBoxInfo).stance !== undefined;
+    return 'boxType' in info;
   }
 
   return (
@@ -58,6 +60,8 @@ export default function EditDeleteButtons<
         {isCustomize(info) ? (
           <CustomizeTimerCreationContent
             initData={info}
+            prosTeamName={props.prosTeamName}
+            consTeamName={props.consTeamName}
             onSubmit={(newInfo) => {
               onSubmitEdit(newInfo as T);
             }}
@@ -73,6 +77,7 @@ export default function EditDeleteButtons<
           />
         )}
       </EditModalWrapper>
+
       <DeleteModalWrapper>
         <DialogModal
           left={{ text: '취소', onClick: () => closeDeleteModal() }}
