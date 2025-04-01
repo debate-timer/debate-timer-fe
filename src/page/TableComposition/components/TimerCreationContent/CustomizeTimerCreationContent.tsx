@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
   CustomizeTimeBoxInfo,
-  // ParliamentarySpeechTypeToString,
-  // CustomizeTimeBoxTypeToString,
   Stance,
   CustomizeTimeBoxType,
 } from '../../../../type/type';
@@ -10,6 +8,7 @@ import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../../public/timer/normal_timer.png';
 import timeBasedTimer from '../../../../../public/timer/timebased_timer.png';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
+import timeBasedPerSpeakingTimer from '../../../../../public/timer/timebased_perSpeaking_timer.png';
 
 interface CustomizeTimerCreationContentProps {
   beforeData?: CustomizeTimeBoxInfo;
@@ -166,6 +165,12 @@ export default function CustomizeTimerCreationContent({
               <img
                 src={normalTimer}
                 alt="normal-timer"
+                className="h-full object-contain"
+              />
+            ) : useSpeakerTime ? (
+              <img
+                src={timeBasedPerSpeakingTimer}
+                alt="timebased-per-speaking-timer"
                 className="h-full object-contain"
               />
             ) : (
