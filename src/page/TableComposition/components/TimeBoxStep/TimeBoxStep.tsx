@@ -144,8 +144,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         </div>
       </DefaultLayout.StickyFooterWrapper>
 
-      <ModalWrapper>
-        {isCustomize(initData.info) ? (
+      {isCustomize(initData.info) ? (
+        <ModalWrapper closeButtonColor="text-neutral-1000">
           <CustomizeTimerCreationContent
             beforeData={
               initTimeBox[initTimeBox.length - 1] as CustomizeTimeBoxInfo
@@ -155,7 +155,9 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             }}
             onClose={closeModal}
           />
-        ) : (
+        </ModalWrapper>
+      ) : (
+        <ModalWrapper>
           <TimerCreationContent
             beforeData={
               initTimeBox[initTimeBox.length - 1] as ParliamentaryTimeBoxInfo
@@ -165,8 +167,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             }}
             onClose={closeModal}
           />
-        )}
-      </ModalWrapper>
+        </ModalWrapper>
+      )}
     </DefaultLayout>
   );
 }
