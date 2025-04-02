@@ -108,14 +108,14 @@ export async function deleteCustomizeTableData(
   return response.status === 204 ? true : false;
 }
 
-// PATCH /api/table/customize/{tableId}
+// PATCH /api/table/customize/{tableId}/debate
 export async function patchCustomizeTableData(
   tableId: number,
 ): Promise<PatchCustomizeTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PatchCustomizeTableResponseType>(
     'PATCH',
-    requestUrl + `/${tableId}`,
+    requestUrl + `/${tableId}/debate`,
     null,
     null,
   );
