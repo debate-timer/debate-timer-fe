@@ -44,11 +44,10 @@ export function useModal(options: UseModalOptions = {}) {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (e.target === e.currentTarget && closeOnOverlayClick) {
-        onClose();
         closeModal();
       }
     },
-    [closeModal, closeOnOverlayClick, onClose],
+    [closeModal, closeOnOverlayClick],
   );
 
   const ModalWrapper = ({ children }: { children: ReactNode }) => {
