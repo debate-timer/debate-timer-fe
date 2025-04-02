@@ -13,8 +13,8 @@ export default function TableListPage() {
   const onEdit = (tableId: number, type: DebateType) => {
     navigate(`/composition?mode=edit&tableId=${tableId}&type=${type}`);
   };
-  const onClick = (tableId: number) => {
-    navigate(`/overview/${tableId}`);
+  const onClick = (tableId: number, type: DebateType) => {
+    navigate(`/overview/${type.toLowerCase()}/${tableId}`);
   };
 
   return (
@@ -50,7 +50,7 @@ export default function TableListPage() {
                 agenda={table.agenda}
                 onDelete={() => mutate({ tableId: table.id })}
                 onEdit={() => onEdit(table.id, table.type)}
-                onClick={() => onClick(table.id)}
+                onClick={() => onClick(table.id, table.type)}
               />
             ))}
         </div>
