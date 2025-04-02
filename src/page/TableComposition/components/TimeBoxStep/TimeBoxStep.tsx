@@ -25,11 +25,6 @@ function isCustomize(
 ): info is Extract<TableFormData, { info: { type: 'CUSTOMIZE' } }>['info'] {
   return info.type === 'CUSTOMIZE';
 }
-// const isCustomizeInfo = (
-//   info: TimeBoxInfo,
-// ): info is CustomizeTimeBoxInfo => {
-//   return 'boxType' in info;
-// };
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initData, onTimeBoxChange, onButtonClick, isEdit = false } = props;

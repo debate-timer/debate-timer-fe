@@ -49,10 +49,10 @@ const useTableFrom = (
     },
   );
 
-  const isNewMoimCreation =
+  const isNewCreation =
     currentStep === 'NameAndType' && navigationType === 'PUSH';
 
-  if (isNewMoimCreation) {
+  if (isNewCreation) {
     removeValue();
   }
 
@@ -128,24 +128,24 @@ const useTableFrom = (
 
   const { mutate: addParliamentary } = useAddParliamentaryTable((tableId) => {
     removeValue();
-    navigate(`/overview/${tableId}`);
+    navigate(`/overview/parliamentary/${tableId}`);
   });
 
   const { mutate: addCustomize } = useAddCustomizeTable((tableId) => {
     removeValue();
-    navigate(`/overview/${tableId}`);
+    navigate(`/overview/customize/${tableId}`);
   });
 
   const { mutate: editParliamentary } = usePutParliamentaryDebateTable(
     (tableId) => {
       removeValue();
-      navigate(`/overview/${tableId}`);
+      navigate(`/overview/parliamentary/${tableId}`);
     },
   );
 
   const { mutate: editCustomize } = usePutCustomizeDebateTable((tableId) => {
     removeValue();
-    navigate(`/overview/${tableId}`);
+    navigate(`/overview/customize/${tableId}`);
   });
 
   // customize 타입 가드
@@ -154,6 +154,11 @@ const useTableFrom = (
   }
 
   const AddTable = () => {
+    console.log('[디버깅] 전송 데이터', formData);
+    console.log(
+      '[디버깅] 전송 JSON',
+      JSON.stringify({ info: formData.info, table: formData.table }, null, 2),
+    );
     if (isCustomizeInfo(formData.info)) {
       addCustomize({
         info: formData.info,
@@ -168,6 +173,8 @@ const useTableFrom = (
   };
 
   const EditTable = (tableId: number) => {
+    console.log('[디버깅] 전송 데이터', formData);
+
     if (isCustomizeInfo(formData.info)) {
       editCustomize({
         tableId,
