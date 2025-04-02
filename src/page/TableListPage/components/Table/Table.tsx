@@ -16,7 +16,7 @@ export default function Table({
 }: DebateTableWithDelete) {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate(`/overview/${id}`);
+    navigate(`/overview/${type.toLowerCase()}/${id}`);
   };
 
   return (
