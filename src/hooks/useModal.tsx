@@ -5,6 +5,7 @@ import { IoMdClose } from 'react-icons/io';
 interface UseModalOptions {
   closeOnOverlayClick?: boolean;
   isCloseButtonExist?: boolean;
+  onClose?: () => void;
 }
 
 /**
@@ -13,7 +14,11 @@ interface UseModalOptions {
  */
 export function useModal(options: UseModalOptions = {}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { closeOnOverlayClick = true, isCloseButtonExist = true } = options;
+  const {
+    closeOnOverlayClick = true,
+    isCloseButtonExist = true,
+    onClose = () => {},
+  } = options;
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -38,10 +43,11 @@ export function useModal(options: UseModalOptions = {}) {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (e.target === e.currentTarget && closeOnOverlayClick) {
+        onClose();
         closeModal();
       }
     },
-    [closeModal, closeOnOverlayClick],
+    [closeModal, closeOnOverlayClick, onClose],
   );
 
   const ModalWrapper = ({ children }: { children: ReactNode }) => {
