@@ -4,9 +4,12 @@ import {
 } from '../../type/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
-import { PutDebateTableResponseType } from '../responses/parliamentary';
-import { PostDebateTableResponseType } from '../responses/parliamentary';
-import { GetTableDataResponseType } from '../responses/parliamentary';
+import {
+  PutDebateTableResponseType,
+  PostDebateTableResponseType,
+  GetTableDataResponseType,
+  PatchDebateTableResponseType,
+} from '../responses/parliamentary';
 
 // Template
 /*
@@ -102,4 +105,19 @@ export async function deleteParliamentaryDebateTable(
   );
 
   return response.status === 204 ? true : false;
+}
+
+// PATCH /api/table/parliamentary/{tableId}/debate
+export async function patchParliamentaryDebateTable(
+  tableId: number,
+): Promise<PatchDebateTableResponseType> {
+  const requestUrl: string = ApiUrl.parliamentary;
+  const response = await request<PatchDebateTableResponseType>(
+    'PATCH',
+    requestUrl + `/${tableId}/debate`,
+    null,
+    null,
+  );
+
+  return response.data;
 }

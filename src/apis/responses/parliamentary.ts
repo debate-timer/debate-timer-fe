@@ -23,3 +23,10 @@ export interface PutDebateTableResponseType {
   info: ParliamentaryDebateInfo;
   table: ParliamentaryTimeBoxInfo[];
 }
+
+// PATCH /api/table/parliamentary/{tableId}/debate
+export interface PatchDebateTableResponseType {
+  id: number;
+  info: ParliamentaryDebateInfo;
+  table: ParliamentaryTimeBoxInfo[];
+}
