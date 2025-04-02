@@ -147,7 +147,7 @@ function TestWrapper({
           <Routes>
             <Route path="/composition" element={children} />
             <Route
-              path="/overview/1"
+              path="/overview/:type/:id"
               element={<h1 data-testid="overview-page">Overview Page</h1>}
             />
           </Routes>
