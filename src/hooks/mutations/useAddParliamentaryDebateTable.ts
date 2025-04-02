@@ -25,6 +25,11 @@ export default function useAddParliamentaryTable(
         },
         params.table,
       );
+      console.log(
+        'parliamentary 응답메세지:',
+        JSON.stringify(response, null, 2),
+      );
+
       return response;
     },
     onSuccess: (response: PostDebateTableResponseType) => {

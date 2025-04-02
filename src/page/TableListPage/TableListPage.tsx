@@ -7,6 +7,7 @@ import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDele
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
+  console.log(data);
   const { mutate } = useDeleteParliamentaryDebateTable();
 
   return (
