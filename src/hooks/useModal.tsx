@@ -25,8 +25,9 @@ export function useModal(options: UseModalOptions = {}) {
   }, []);
 
   const closeModal = useCallback(() => {
+    onClose();
     setIsOpen(false);
-  }, []);
+  }, [onClose]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
