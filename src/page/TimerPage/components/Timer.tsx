@@ -61,10 +61,10 @@ export default function Timer({
       : ParliamentarySpeechTypeToString[item.type];
   const neonClass = isRunning
     ? item.stance === 'NEUTRAL'
-      ? 'animate-neon-blink-neutral'
+      ? 'shadow-camp-neutral'
       : item.stance === 'PROS'
-        ? 'animate-neon-blink-pros'
-        : 'animate-neon-blink-cons'
+        ? 'shadow-camp-blue'
+        : 'shadow-camp-red'
     : '';
 
   return (

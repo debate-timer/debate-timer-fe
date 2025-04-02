@@ -4,30 +4,6 @@ export default {
   theme: {
     extend: {
       keyframes: {
-        'neon-pros': {
-          '0%, 100%': {
-            boxShadow: '0 0 12px #2B74E1, 0 0 24px #2B74E1, 0 0 36px #2B74E1',
-          },
-          '50%': {
-            boxShadow: '0 0 4px #2B74E1, 0 0 16px #2B74E1, 0 0 24px #2B74E1',
-          },
-        },
-        'neon-cons': {
-          '0%, 100%': {
-            boxShadow: '0 0 12px #F64740, 0 0 24px #F64740, 0 0 36px #F64740',
-          },
-          '50%': {
-            boxShadow: '0 0 4px #F64740, 0 0 16px #F64740, 0 0 24px #F64740',
-          },
-        },
-        'neon-neutral': {
-          '0%, 100%': {
-            boxShadow: '0 0 12px #737373, 0 0 24px #737373, 0 0 36px #737373',
-          },
-          '50%': {
-            boxShadow: '0 0 4px #737373, 0 0 16px #737373, 0 0 24px #737373',
-          },
-        },
         rotate: {
           '0%': { transform: 'rotate(0deg) scale(10)' },
           '100%': { transform: 'rotate(-360deg) scale(10)' },
@@ -59,9 +35,6 @@ export default {
         rotate: 'rotate 5s linear infinite',
         gradient: 'gradient 10s ease infinite',
         'color-transition': 'colorTransition 5s ease-in-out infinite',
-        'neon-blink-pros': 'neon-pros 3s infinite alternate',
-        'neon-blink-cons': 'neon-cons 3s infinite alternate',
-        'neon-blink-neutral': 'neon-neutral 3s infinite alternate',
       },
       fontFamily: {
         pretendard: [
@@ -81,6 +54,11 @@ export default {
           '"Segoe UI Symbol"',
           'sans-serif',
         ],
+      },
+      boxShadow: {
+        'camp-blue': `0 0 30px #FF3B2F`,
+        'camp-red': `0 0 30px #007AFF`,
+        'camp-neutral': `0 0 30px #737373`,
       },
       colors: {
         brand: {
