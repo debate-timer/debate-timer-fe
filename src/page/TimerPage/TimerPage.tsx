@@ -256,22 +256,13 @@ export default function TimerPage() {
 
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
-          <div className="relative z-0 my-24 flex h-screen w-full items-center justify-center">
-            {/** Tooltip
-            {isFirst && (
-              <FirstUseToolTip
-                onClose={() => {
-                  setIsFirst(false);
-                  localStorage.setItem(IS_FIRST, FALSE);
-                }}
-              />
-            )}
-               */}
-
+          <div
+            className={`flex h-screen w-full items-center justify-center ${bg} py-4`}
+          >
             {/* Timer body */}
             <div
               data-testid="timer-page-body"
-              className={`absolute inset-0 flex h-full w-full flex-col items-center justify-center space-y-10 py-8 ${bg}`}
+              className={`flex h-full w-full flex-col items-center justify-center space-y-10 py-8`}
             >
               {/* Timer on the top side */}
               <Timer
@@ -356,6 +347,7 @@ export default function TimerPage() {
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
 
+      {/** Tooltip */}
       <ModalWrapper>
         <FirstUseToolTip
           onClose={() => {
