@@ -7,11 +7,6 @@ import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
-// import {
-//   CustomizeDebateInfo,
-//   CustomizeTimeBoxInfo,
-//   ParliamentaryTimeBoxInfo,
-// } from '../../type/type';
 import CustomizeDebatePanel from '../TableComposition/components/DebatePanel/CustomizeDebatePanel';
 
 export default function TableOverview() {

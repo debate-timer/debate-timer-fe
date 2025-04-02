@@ -107,20 +107,6 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           )}
 
           <DragAndDropWrapper>
-            {/* {initTimeBox.map((info, index) => (
-              <div key={index + info.stance} style={getDraggingStyles(index)}>
-                <DebatePanel
-                  key={index + info.stance}
-                  info={info}
-                  onSubmitEdit={(updatedInfo) =>
-                    handleSubmitEdit(index, updatedInfo)
-                  }
-                  onSubmitDelete={() => handleSubmitDelete(index)}
-                  onMouseDown={() => handleMouseDown(index)}
-                />
-              </div>
-            ))}
-             */}
             {initTimeBox.map((info, index) => (
               <div key={index + info.stance} style={getDraggingStyles(index)}>
                 {renderTimeBoxItem(info, index)}
