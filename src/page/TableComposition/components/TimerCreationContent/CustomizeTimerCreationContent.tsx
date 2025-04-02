@@ -134,11 +134,8 @@ export default function CustomizeTimerCreationContent({
     onClose();
   };
 
-  const validateTime = (value: string) => {
-    if (value === '') return 0; // 빈 값 허용
-    const num = Math.max(0, Math.min(59, Number(value))); // 0~59 범위 유지
-    return num;
-  };
+  const validateTime = (value: string) =>
+    value === '' ? 0 : Math.max(0, Math.min(59, Number(value)));
 
   const isNormalTimer = boxType === 'NORMAL';
   // 자유토론 타이머로 전환되면 speechType 초기화
@@ -303,7 +300,7 @@ export default function CustomizeTimerCreationContent({
                 </select>
               </div>
             )}
-            {/** 시간 */}
+            {/* 시간 */}
             {isNormalTimer && (
               <div className="flex w-full items-center space-x-2">
                 <label
@@ -434,6 +431,7 @@ export default function CustomizeTimerCreationContent({
                 </div>
               </>
             )}
+
             {/** 발언자 */}
             {isNormalTimer && (
               <div className="flex min-w-0 items-center space-x-2">
