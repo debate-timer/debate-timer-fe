@@ -1,7 +1,6 @@
 import { CustomizeTimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
-import { MdRecordVoiceOver } from 'react-icons/md';
 import KeyboardKeyA from '../../../assets/img/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/img/keyboard_key_l.png';
 
@@ -35,7 +34,6 @@ export default function TimeBasedTimer({
   timer,
   speakingTimer,
   isRunning,
-  item,
   isSelected,
   onActivate,
   prosCons,
@@ -62,8 +60,6 @@ export default function TimeBasedTimer({
 
   const bgColorClass = prosCons === 'pros' ? 'bg-camp-blue' : 'bg-camp-red';
 
-  const titleText = item.speechType;
-
   return (
     <div
       onClick={onActivate}
@@ -80,7 +76,7 @@ export default function TimeBasedTimer({
           className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
         >
           <h2 className="absolute left-1/2 flex w-max -translate-x-1/2 transform items-center justify-center gap-2">
-            {titleText}
+            {teamName}
             <img
               src={prosCons === 'pros' ? KeyboardKeyA : KeyboardKeyL}
               alt={prosCons === 'pros' ? 'A키' : 'ㅣ키'}
@@ -88,17 +84,11 @@ export default function TimeBasedTimer({
             />
           </h2>
         </div>
-
-        {/* Team name */}
-        <div className="my-[20px] h-[40px]">
-          <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-            <MdRecordVoiceOver className="size-[40px]" />
-            <h3 className="text-[28px] font-bold">
-              {teamName} 팀 {item.speaker && '| ' + item.speaker + ' 토론자'}
-            </h3>
-          </div>
-        </div>
-
+        {speakingTimer !== null ? (
+          <div className="h-10" />
+        ) : (
+          <div className="h-20" />
+        )}
         {/* 🚩 Timer 영역 */}
         <div className="flex flex-col items-center space-y-[20px]">
           {speakingTimer !== null ? (
@@ -115,7 +105,7 @@ export default function TimeBasedTimer({
 
               {/* 현재시간 타이머 (크게 표시) */}
               <div
-                className={`relative flex h-[120px] w-[600px] items-center justify-center bg-white text-[100px] font-bold text-neutral-900 shadow-inner`}
+                className={`relative flex h-[160px] w-[600px] items-center justify-center bg-white text-[100px] font-bold text-neutral-900 shadow-inner`}
               >
                 <div className="absolute left-3 top-2 text-sm font-semibold">
                   현재 시간
