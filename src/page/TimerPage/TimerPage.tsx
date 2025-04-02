@@ -38,6 +38,7 @@ export default function TimerPage() {
       localStorage.setItem(IS_FIRST, FALSE);
       // console.log('# onClose called.');
     },
+    isCloseButtonExist: false,
   });
 
   // Prepare for changing background
