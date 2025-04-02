@@ -13,7 +13,6 @@ interface CustomizeDebatePanelProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
-  console.log('CustomizeDebatePanel', props);
   const {
     stance,
     speechType,
@@ -29,11 +28,13 @@ export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
   let timeStr = '';
   let timePerSpeakingStr = '';
 
-  if (time !== null) {
-    const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
+  if (boxType === 'NORMAL') {
+    const { minutes, seconds } = Formatting.formatSecondsToMinutes(time!);
     timeStr = `${minutes}분 ${seconds}초`;
-  } else if (timePerTeam !== null) {
-    const { minutes, seconds } = Formatting.formatSecondsToMinutes(timePerTeam);
+  } else if (boxType === 'TIME_BASED') {
+    const { minutes, seconds } = Formatting.formatSecondsToMinutes(
+      timePerTeam!,
+    );
     timeStr = `팀당 ${minutes}분 ${seconds}초`;
   }
 
