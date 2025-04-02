@@ -51,8 +51,10 @@ export async function postCustomizeTableData(
     requestUrl,
     {
       info: {
-        name: info.name === '' ? '테이블 1' : info.name,
+        name: info.name === '' ? '시간표 1' : info.name,
         agenda: info.agenda,
+        prosTeamName: info.prosTeamName,
+        consTeamName: info.consTeamName,
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
@@ -60,7 +62,7 @@ export async function postCustomizeTableData(
     },
     null,
   );
-
+  console.log('customize 메세지:', JSON.stringify(response.data, null, 2));
   return response.data;
 }
 
@@ -72,12 +74,14 @@ export async function putCustomizeTableData(
 ): Promise<PutCustomizeTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PutCustomizeTableResponseType>(
-    'POST',
+    'PUT',
     requestUrl + `/${tableId}`,
     {
       info: {
         name: info.name,
         agenda: info.agenda,
+        prosTeamName: info.prosTeamName,
+        consTeamName: info.consTeamName,
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
