@@ -6,8 +6,8 @@ import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel'
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
-import { usePatchParliamentaryTable } from '../../hooks/mutations/usePatchParliamentaryDebateTable';
-
+import usePatchParliamentaryTable from '../../hooks/mutations/usePatchParliamentaryDebateTable';
+import usePatchCustomizeTable from '../../hooks/mutations/usePatchCustomizeDebateTable';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import CustomizeDebatePanel from '../TableComposition/components/DebatePanel/CustomizeDebatePanel';
 
@@ -32,8 +32,13 @@ export default function TableOverview() {
   const navigate = useNavigate();
 
   // 토론하기 클릭 시 patch 요청 후 이동
-  const patchTableMutation = usePatchParliamentaryTable((tableId) => {
-    navigate(`/table/parliamentary/${tableId}`);
+  const patchParliamentaryTableMutation = usePatchParliamentaryTable(
+    (tableId) => {
+      navigate(`/table/parliamentary/${tableId}`);
+    },
+  );
+  const patchCustomizeTableMutation = usePatchCustomizeTable((tableId) => {
+    navigate(`/table/customize/${tableId}`);
   });
 
   return (
@@ -96,7 +101,11 @@ export default function TableOverview() {
           </button>
           <button
             className="button enabled h-16 w-full"
-            onClick={() => patchTableMutation.mutate({ tableId })}
+            onClick={() =>
+              isCustomize
+                ? patchCustomizeTableMutation.mutate({ tableId })
+                : patchParliamentaryTableMutation.mutate({ tableId })
+            }
           >
             <div className="flex items-center justify-center gap-2">
               <RiSpeakFill />

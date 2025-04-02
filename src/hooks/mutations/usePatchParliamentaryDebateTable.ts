@@ -6,7 +6,7 @@ interface UsePatchParliamentaryTableParams {
   tableId: number;
 }
 
-export function usePatchParliamentaryTable(
+export default function usePatchParliamentaryTable(
   onSuccess: (tableId: number) => void,
 ) {
   return useMutation<
