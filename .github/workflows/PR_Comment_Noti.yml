@@ -3,6 +3,16 @@ name: Discord Notification on PR Comment
 on:
   issue_comment:
     types: [created, edited]
+  workflow_dispatch:
+    inputs:
+      comment_body:
+        description: 'Title of the issue'
+        required: true
+        default: 'Test Issue'
+      issue_url:
+        description: 'Issue URL'
+        required: true
+        default: 'https://github.com/debate-timer/debate-timer-fe/pull/216#discussion_r2024354733'
 
 jobs:
   notify-discord-comment:
@@ -14,6 +24,7 @@ jobs:
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
           echo "USERNAME=망곰" >> $GITHUB_ENV
+          echo "CONTENT=새로운 PR 댓글이 달렸어요!" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
 
       - name: Notify Discord
@@ -25,9 +36,13 @@ jobs:
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
+          CONTENT: ${{ env.CONTENT }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           if [ -n "$WEB_HOOK" ]; then
             JSON_PAYLOAD=$(jq -n \
+              --arg content "$CONTENT" \
+              --arg comment_body "$COMMENT_BODY" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
               --arg pr_title "$PR_TITLE" \
@@ -39,6 +54,7 @@ jobs:
               '{
                 username: $username,
                 avatar_url: $avatar_url,
+                content: $content,
                 embeds: [{
                   title: $pr_title,
                   url: $pr_url,
@@ -46,6 +62,7 @@ jobs:
                     name: $author_name,
                     icon_url: $author_url
                   },
+                  description: $description,
                   color: ($color | tonumber),
                   timestamp: $timestamp
                 }]

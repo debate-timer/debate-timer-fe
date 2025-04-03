@@ -3,6 +3,26 @@ name: Discord notification on new issues
 on:
   issues:
     types: [opened, reopened]
+  workflow_dispatch:
+    inputs:
+      issue_title:
+        description: '이슈의 제목'
+        required: true
+        default: '[TEST] GitHub Actions 테스트용 가짜 이슈'
+      issue_body:
+        description: '이슈의 내용'
+        required: false
+        default: |
+          # 이슈 내용
+          - 가짜 이슈 1 해결
+          - 가짜 이슈 2 해결
+
+          # 마감 기간
+          - 오늘
+      issue_url:
+        description: 'Issue URL'
+        required: true
+        default: 'https://github.com/debate-timer/debate-timer/fe/issues/1'
 
 jobs:
   notify-discord-issue:
@@ -15,6 +35,7 @@ jobs:
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
           echo "USERNAME=망곰" >> $GITHUB_ENV
+          echo "CONTENT=새 이슈가 생겼어요!" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
 
       - name: Notify Discord
@@ -26,9 +47,12 @@ jobs:
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
+          CONTENT: ${{ env.CONTENT }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           if [ -n "$WEB_HOOK" ]; then
             JSON_PAYLOAD=$(jq -n \
+              --arg content "$CONTENT" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
               --arg issue_title "$ISSUE_TITLE" \
@@ -40,6 +64,7 @@ jobs:
               '{
                 username: $username,
                 avatar_url: $avatar_url,
+                content: $content,
                 embeds: [{
                   title: $issue_title,
                   url: $issue_url,
