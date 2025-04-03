@@ -3,18 +3,23 @@ name: Discord notification on new issues
 on:
   issues:
     types: [opened, reopened]
+  workflow_dispatch:
 
 jobs:
   notify-discord-issue:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug All Event Data
+        run: echo '${{ toJson(github.event) }}'
+
       - name: Set Environment Variables
         env:
           TITLE: ${{ github.event.issue.title }}
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
           echo "USERNAME=망곰" >> $GITHUB_ENV
+          echo "CONTENT=새 이슈가 생겼어요!" >> $GITHUB_ENV
           echo "WEB_HOOK=${{ secrets.DISCORD_WEB_HOOK }}" >> $GITHUB_ENV
 
       - name: Notify Discord
@@ -26,9 +31,11 @@ jobs:
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
+          CONTENT: ${{ env.CONTENT }}
         run: |
           if [ -n "$WEB_HOOK" ]; then
             JSON_PAYLOAD=$(jq -n \
+              --arg content "$CONTENT" \
               --arg username "$USERNAME" \
               --arg avatar_url "$AVATAR_URL" \
               --arg issue_title "$ISSUE_TITLE" \
@@ -40,6 +47,7 @@ jobs:
               '{
                 username: $username,
                 avatar_url: $avatar_url,
+                content: $content,
                 embeds: [{
                   title: $issue_title,
                   url: $issue_url,
