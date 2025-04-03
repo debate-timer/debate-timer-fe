@@ -71,7 +71,7 @@ describe('TableComposition', () => {
         name: '토론 정보를 수정해주세요',
       }),
     );
-    const nameInput = await screen.findByPlaceholderText('테이블 1');
+    const nameInput = await screen.findByPlaceholderText('시간표 1');
 
     expect((nameInput as HTMLInputElement).value).toBe('');
   });
@@ -112,7 +112,7 @@ describe('TableComposition', () => {
     const addButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
     await userEvent.click(addButton);
 
-    const confirmButton = screen.getByRole('button', { name: '타이머 설정' });
+    const confirmButton = screen.getByRole('button', { name: '설정 완료' });
     await userEvent.click(confirmButton);
 
     await userEvent.click(submitButton);
@@ -122,106 +122,3 @@ describe('TableComposition', () => {
     });
   });
 });
-
-// import { describe, it, expect, beforeEach } from 'vitest';
-// import { render, screen, waitFor } from '@testing-library/react';
-// import userEvent from '@testing-library/user-event';
-// import { MemoryRouter, Route, Routes } from 'react-router-dom';
-// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { GlobalPortal } from '../../util/GlobalPortal';
-// import TableComposition from './TableComposition';
-
-// // Test Wrapper
-// function TestWrapper({
-//   children,
-//   initialEntries = ['/composition?mode=add&type=CUSTOMIZE'],
-// }: {
-//   children: React.ReactNode;
-//   initialEntries?: string[];
-// }) {
-//   const queryClient = new QueryClient();
-//   return (
-//     <QueryClientProvider client={queryClient}>
-//       <GlobalPortal.Provider>
-//         <MemoryRouter initialEntries={initialEntries}>
-//           <Routes>
-//             <Route path="/composition" element={children} />
-//             <Route
-//               path="/overview/:type/:id"
-//               element={<h1 data-testid="overview-page">Overview Page</h1>}
-//             />
-//           </Routes>
-//         </MemoryRouter>
-//       </GlobalPortal.Provider>
-//     </QueryClientProvider>
-//   );
-// }
-
-// describe('TableComposition', () => {
-//   beforeEach(() => {
-//     sessionStorage.clear();
-//   });
-
-//   it('초기에는 TableNameAndType 단계가 렌더링된다', async () => {
-//     render(
-//       <TestWrapper initialEntries={['/composition?mode=add&type=CUSTOMIZE']}>
-//         <TableComposition />
-//       </TestWrapper>,
-//     );
-
-//     const heading = await screen.findByRole('heading', {
-//       name: /토론 정보를 설정해주세요/,
-//     });
-//     expect(heading).toBeInTheDocument();
-
-//     expect(screen.getByText('토론 유형')).toBeInTheDocument();
-//     expect(screen.getByRole('button', { name: '다음' })).toBeInTheDocument();
-//   });
-
-//   it('다음 버튼 클릭 시 TimeBoxStep 단계로 이동한다', async () => {
-//     render(
-//       <TestWrapper initialEntries={['/composition?mode=add&type=CUSTOMIZE']}>
-//         <TableComposition />
-//       </TestWrapper>,
-//     );
-
-//     const nextButton = await screen.findByRole('button', { name: '다음' });
-//     await userEvent.click(nextButton);
-
-//     await waitFor(() => {
-//       expect(screen.getByText('주제 없음')).toBeInTheDocument();
-//     });
-//   });
-
-//   it('시간표 설정 후 제출하면 overview로 이동한다', async () => {
-//     render(
-//       <TestWrapper initialEntries={['/composition?mode=add&type=CUSTOMIZE']}>
-//         <TableComposition />
-//       </TestWrapper>,
-//     );
-
-//     // 1단계
-//     const nextButton = await screen.findByRole('button', { name: '다음' });
-//     await userEvent.click(nextButton);
-
-//     // 2단계
-//     const addButton = await screen.findAllByText('+');
-//     await userEvent.click(addButton[0]);
-
-//     const confirmButton = screen.getByRole('button', { name: '설정 완료' });
-//     await userEvent.click(confirmButton);
-
-//     const submitButton = screen.getByRole('button', {
-//       name: '시간표 추가 완료',
-//     });
-//     await waitFor(() => {
-//       expect(submitButton).toBeEnabled();
-//     });
-
-//     await userEvent.click(submitButton);
-
-//     await waitFor(() => {
-//       expect(screen.getByTestId('overview-page')).toBeInTheDocument();
-//     });
-//   });
-// });
