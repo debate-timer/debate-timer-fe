@@ -113,7 +113,7 @@ export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
   );
 
   const renderNeutralTimeoutPanel = () => (
-    <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-500 p-2 font-medium ">
+    <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-400 p-2 font-medium ">
       {onSubmitEdit && onSubmitDelete && (
         <>
           {renderDragHandle()}
