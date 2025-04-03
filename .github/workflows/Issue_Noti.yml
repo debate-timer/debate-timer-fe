@@ -51,15 +51,20 @@ jobs:
 
       - name: Notify Discord
         env:
-          AUTHOR_NAME: ${{ github.event.issue.user.login }}
-          ISSUE_URL: ${{ github.event.issue.html_url }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          AUTHOR_URL: ${{ github.event.issue.user.avatar_url }}
+          # AUTHOR_NAME: ${{ github.event.issue.user.login }}
+          # ISSUE_URL: ${{ github.event.issue.html_url }}
+          # ISSUE_TITLE: ${{ github.event.issue.title }}
+          # AUTHOR_URL: ${{ github.event.issue.user.avatar_url }}
+          # ISSUE_BODY: ${{ github.event.issue.body }}
+          AUTHOR_NAME: ${{ github.action.inputs.author_name }}
+          ISSUE_URL: ${{ github.action.inputs.issue_url }}
+          ISSUE_TITLE: ${{ github.action.inputs.issue_title }}
+          AUTHOR_URL: ${{ github.action.inputs.author_url }}
+          ISSUE_BODY: ${{ github.action.inputs.issue_body }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
           CONTENT: ${{ env.CONTENT }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           if [ -n "$WEB_HOOK" ]; then
             JSON_PAYLOAD=$(jq -n \

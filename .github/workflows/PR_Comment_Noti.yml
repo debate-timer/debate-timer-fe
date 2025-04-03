@@ -48,11 +48,11 @@ jobs:
           PR_URL: ${{ github.event.issue.pull_request.html_url }}
           PR_TITLE: ${{ github.event.issue.title }}
           AUTHOR_URL: ${{ github.event.comment.user.avatar_url }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
           CONTENT: ${{ env.CONTENT }}
-          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           if [ -n "$WEB_HOOK" ]; then
             JSON_PAYLOAD=$(jq -n \
