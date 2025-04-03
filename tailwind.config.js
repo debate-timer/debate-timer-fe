@@ -82,6 +82,11 @@ export default {
           'sans-serif',
         ],
       },
+      boxShadow: {
+        'camp-blue': `0 0 30px #FF3B2F`,
+        'camp-red': `0 0 30px #007AFF`,
+        'camp-neutral': `0 0 30px #737373`
+      },
       colors: {
         brand: {
           main: '#FECD4C',
@@ -92,6 +97,8 @@ export default {
 
           sub1: '#FF5622',
           sub2: '#028391',
+          sub3 :'#FF8B87'
+          
         },
         neutral: {
           1000: '#000000',

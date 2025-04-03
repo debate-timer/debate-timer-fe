@@ -24,6 +24,24 @@ export const customizeHandlers = [
       },
       table: [
         {
+          stance: 'NEUTRAL',
+          speechType: '자유토론',
+          boxType: 'TIME_BASED',
+          time: null,
+          timePerTeam: 60,
+          timePerSpeaking: 20,
+          speaker: null,
+        },
+        {
+          stance: 'NEUTRAL',
+          speechType: '자유토론',
+          boxType: 'TIME_BASED',
+          time: null,
+          timePerTeam: 60,
+          timePerSpeaking: null,
+          speaker: null,
+        },
+        {
           stance: 'PROS',
           speechType: '입론',
           boxType: 'NORMAL',
@@ -48,15 +66,6 @@ export const customizeHandlers = [
           time: 60,
           timePerTeam: null,
           timePerSpeaking: null,
-          speaker: null,
-        },
-        {
-          stance: 'NEUTRAL',
-          speechType: '자유토론',
-          boxType: 'TIME_BASED',
-          time: null,
-          timePerTeam: 120,
-          timePerSpeaking: 40,
           speaker: null,
         },
         {
