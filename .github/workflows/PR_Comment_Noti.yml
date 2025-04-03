@@ -28,7 +28,7 @@ on:
 
 jobs:
   notify-discord-comment:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/noti') }}
+    # Have to insert codes that checks whether this is PR comment
     runs-on: ubuntu-latest
 
     steps:
@@ -44,11 +44,15 @@ jobs:
 
       - name: Notify Discord
         env:
-          AUTHOR_NAME: ${{ github.event.comment.user.login }}
-          PR_URL: ${{ github.event.issue.pull_request.html_url }}
-          PR_TITLE: ${{ github.event.issue.title }}
+          # AUTHOR_NAME: ${{ github.event.comment.user.login }}
+          # PR_URL: ${{ github.event.issue.pull_request.html_url }}
+          # PR_TITLE: ${{ github.event.issue.title }}
+          # COMMENT_BODY: ${{ github.event.comment.body }}
+          AUTHOR_NAME: ${{ github.event.inputs.author_name }}
+          PR_URL: ${{ github.event.inputs.pr_url }}
+          PR_TITLE: ${{ github.event.inputs.pr_title }}
           AUTHOR_URL: ${{ github.event.comment.user.avatar_url }}
-          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_BODY: ${{ github.event.inputs.comment_body }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
