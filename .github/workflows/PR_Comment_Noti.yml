@@ -81,7 +81,7 @@ jobs:
                     name: $author_name,
                     icon_url: $author_url
                   },
-                  description: $description,
+                  description: $comment_body,
                   color: ($color | tonumber),
                   timestamp: $timestamp
                 }]
