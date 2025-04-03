@@ -4,33 +4,6 @@ on:
   issues:
     types: [opened, reopened]
   workflow_dispatch:
-    inputs:
-      issue_title:
-        description: '이슈의 제목'
-        required: true
-        default: '[TEST] GitHub Actions 테스트용 가짜 이슈'
-      issue_body:
-        description: '이슈의 내용'
-        required: true
-        default: |
-          # 이슈 내용
-          - 가짜 이슈 1 해결
-          - 가짜 이슈 2 해결
-
-          # 마감 기간
-          - 오늘
-      issue_url:
-        description: 'Issue URL'
-        required: true
-        default: 'https://github.com/debate-timer/debate-timer/fe/issues/1'
-      author_name:
-        description: '작성자 이름'
-        required: true
-        default: '테스트 작성자'
-      author_url:
-        description: '작성자 링크'
-        required: true
-        default: 'http://www.naver.com'
 
 jobs:
   notify-discord-issue:
@@ -51,16 +24,10 @@ jobs:
 
       - name: Notify Discord
         env:
-          # AUTHOR_NAME: ${{ github.event.issue.user.login }}
-          # ISSUE_URL: ${{ github.event.issue.html_url }}
-          # ISSUE_TITLE: ${{ github.event.issue.title }}
-          # AUTHOR_URL: ${{ github.event.issue.user.avatar_url }}
-          # ISSUE_BODY: ${{ github.event.issue.body }}
-          AUTHOR_NAME: ${{ github.event.inputs.author_name }}
-          ISSUE_URL: ${{ github.event.inputs.issue_url }}
-          ISSUE_TITLE: ${{ github.event.inputs.issue_title }}
-          AUTHOR_URL: ${{ github.event.inputs.author_url }}
-          ISSUE_BODY: ${{ github.event.inputs.issue_body }}
+          AUTHOR_NAME: ${{ github.event.issue.user.login }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          AUTHOR_URL: ${{ github.event.issue.user.avatar_url }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
