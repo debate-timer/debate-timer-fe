@@ -56,11 +56,11 @@ jobs:
           # ISSUE_TITLE: ${{ github.event.issue.title }}
           # AUTHOR_URL: ${{ github.event.issue.user.avatar_url }}
           # ISSUE_BODY: ${{ github.event.issue.body }}
-          AUTHOR_NAME: ${{ github.action.inputs.author_name }}
-          ISSUE_URL: ${{ github.action.inputs.issue_url }}
-          ISSUE_TITLE: ${{ github.action.inputs.issue_title }}
-          AUTHOR_URL: ${{ github.action.inputs.author_url }}
-          ISSUE_BODY: ${{ github.action.inputs.issue_body }}
+          AUTHOR_NAME: ${{ github.event.inputs.author_name }}
+          ISSUE_URL: ${{ github.event.inputs.issue_url }}
+          ISSUE_TITLE: ${{ github.event.inputs.issue_title }}
+          AUTHOR_URL: ${{ github.event.inputs.author_url }}
+          ISSUE_BODY: ${{ github.event.inputs.issue_body }}
           AVATAR_URL: ${{ env.AVATAR_URL }}
           USERNAME: ${{ env.USERNAME }}
           WEB_HOOK: ${{ env.WEB_HOOK }}
