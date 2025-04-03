@@ -7,6 +7,7 @@ import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
+import CustomizeTimerPage from '../page/CustomizeTimerPage/CustomizeTimerPage';
 import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
@@ -35,6 +36,11 @@ const routesConfig = [
   {
     path: '/table/parliamentary/:id',
     element: <TimerPage />,
+    requiresAuth: true,
+  },
+  {
+    path: '/table/customize/:id',
+    element: <CustomizeTimerPage />,
     requiresAuth: true,
   },
   {
