@@ -127,7 +127,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             }`}
             disabled={!isAbledSummitButton}
           >
-            {isEdit ? '시간표 수정 완료' : '시간표 추가하기'}
+            {isEdit ? '시간표 수정 완료' : '시간표 추가 완료'}
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
