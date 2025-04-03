@@ -10,6 +10,7 @@ import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import IconButton from '../../components/IconButton/IconButton';
 import { IoHelpCircle } from 'react-icons/io5';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
+import { useModal } from '../../hooks/useModal';
 
 export default function TimerPage() {
   // ########## DECLARATION AREA ##########
@@ -31,6 +32,14 @@ export default function TimerPage() {
   const IS_FIRST = 'isFirst';
   const TRUE = 'true';
   const FALSE = 'false';
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    onClose: () => {
+      setIsFirst(false);
+      localStorage.setItem(IS_FIRST, FALSE);
+      // console.log('# onClose called.');
+    },
+    isCloseButtonExist: false,
+  });
 
   // Prepare for changing background
   const [bg, setBg] = useState('');
@@ -81,7 +90,11 @@ export default function TimerPage() {
     } else {
       setIsFirst(storedIsFirst.trim() === TRUE ? true : false);
     }
-  }, []);
+
+    if (isFirst) {
+      openModal();
+    }
+  }, [isFirst, openModal]);
 
   // Change background color
   useEffect(() => {
@@ -229,8 +242,13 @@ export default function TimerPage() {
             <IconButton
               icon={<IoHelpCircle size={24} />}
               onClick={() => {
-                setIsFirst(true);
-                localStorage.setItem(IS_FIRST, TRUE);
+                if (isFirst) {
+                  setIsFirst(false);
+                  localStorage.setItem(IS_FIRST, FALSE);
+                } else {
+                  setIsFirst(true);
+                  localStorage.setItem(IS_FIRST, TRUE);
+                }
               }}
             />
           </DefaultLayout.Header.Right>
@@ -238,21 +256,13 @@ export default function TimerPage() {
 
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
-          <div className="relative z-10 h-full w-full">
-            {/* Tooltip */}
-            {isFirst && (
-              <FirstUseToolTip
-                onClose={() => {
-                  setIsFirst(false);
-                  localStorage.setItem(IS_FIRST, FALSE);
-                }}
-              />
-            )}
-
+          <div
+            className={`flex h-screen w-full items-center justify-center ${bg} py-4`}
+          >
             {/* Timer body */}
             <div
               data-testid="timer-page-body"
-              className={`flex h-full w-full flex-col items-center justify-center space-y-10 ${bg}`}
+              className={`flex h-full w-full flex-col items-center justify-center space-y-10 py-8`}
             >
               {/* Timer on the top side */}
               <Timer
@@ -336,6 +346,17 @@ export default function TimerPage() {
           </div>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
+
+      {/** Tooltip */}
+      <ModalWrapper>
+        <FirstUseToolTip
+          onClose={() => {
+            closeModal();
+            setIsFirst(false);
+            localStorage.setItem(IS_FIRST, FALSE);
+          }}
+        />
+      </ModalWrapper>
     </>
   );
 }

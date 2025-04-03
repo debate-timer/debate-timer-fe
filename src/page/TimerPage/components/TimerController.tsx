@@ -22,10 +22,9 @@ export default function TimerController({
   return (
     <div
       data-testid="timer-controller"
-      className="relative h-[180px] w-[730px]"
+      className="flex h-[180px] w-[730px] flex-row"
     >
-      {/* Left-sided element */}
-      <div className="absolute right-1/2 top-1/2 mr-[72px] -translate-x-1/2 -translate-y-1/2 transform">
+      <div className="flex size-full flex-1 items-center justify-end ">
         <button
           className="size-[82px] rounded-full bg-neutral-900 p-[18px] hover:bg-brand-main"
           onClick={() => onReset()}
@@ -33,9 +32,7 @@ export default function TimerController({
           <FiRefreshCcw className="size-full justify-center text-slate-50" />
         </button>
       </div>
-
-      {/* Center-sided element */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+      <div className="flex size-full flex-1 items-center justify-center ">
         <button
           className="size-[152px] rounded-full bg-neutral-900 p-[45px] hover:bg-brand-main"
           onClick={() => {
@@ -54,9 +51,7 @@ export default function TimerController({
           )}
         </button>
       </div>
-
-      {/* Right-sided element */}
-      <div className="absolute left-1/2 top-1/2 ml-[192px] -translate-x-1/2 -translate-y-1/2 transform">
+      <div className="flex size-full flex-1 items-center justify-start ">
         {isTimerChangeable && (
           <button
             data-testid="additional-timer-button"
