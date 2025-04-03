@@ -6,13 +6,25 @@ on:
   workflow_dispatch:
     inputs:
       comment_body:
-        description: 'Title of the issue'
+        description: 'PR 코멘트의 내용'
         required: true
-        default: 'Test Issue'
-      issue_url:
-        description: 'Issue URL'
+        default: '테스트를 위한 PR 코멘트 내용의 예시입니다.'
+      pr_url:
+        description: 'PR URL'
         required: true
         default: 'https://github.com/debate-timer/debate-timer-fe/pull/216#discussion_r2024354733'
+      author_name:
+        description: '작성자 이름'
+        required: true
+        default: '테스트 작성자'
+      author_url:
+        description: '작성자 링크'
+        required: true
+        default: 'http://www.naver.com'
+      pr_title:
+        description: 'PR 제목'
+        required: true
+        default: '[TEST] 테스트용 가짜 PR'
 
 jobs:
   notify-discord-comment:
@@ -20,6 +32,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug All Event Data
+        run: echo '${{ toJson(github.event) }}'
+
       - name: Set Environment Variables
         run: |
           echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV

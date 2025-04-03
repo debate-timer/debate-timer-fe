@@ -11,7 +11,7 @@ on:
         default: '[TEST] GitHub Actions 테스트용 가짜 이슈'
       issue_body:
         description: '이슈의 내용'
-        required: false
+        required: true
         default: |
           # 이슈 내용
           - 가짜 이슈 1 해결
@@ -23,12 +23,23 @@ on:
         description: 'Issue URL'
         required: true
         default: 'https://github.com/debate-timer/debate-timer/fe/issues/1'
+      author_name:
+        description: '작성자 이름'
+        required: true
+        default: '테스트 작성자'
+      author_url:
+        description: '작성자 링크'
+        required: true
+        default: 'http://www.naver.com'
 
 jobs:
   notify-discord-issue:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug All Event Data
+        run: echo '${{ toJson(github.event) }}'
+
       - name: Set Environment Variables
         env:
           TITLE: ${{ github.event.issue.title }}
