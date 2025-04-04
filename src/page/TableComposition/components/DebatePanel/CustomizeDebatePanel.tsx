@@ -31,7 +31,7 @@ export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
   if (boxType === 'NORMAL') {
     const { minutes, seconds } = Formatting.formatSecondsToMinutes(time!);
     timeStr = `${minutes}분 ${seconds}초`;
-  } else if (boxType === 'TIME_BASED') {
+  } else {
     const { minutes, seconds } = Formatting.formatSecondsToMinutes(
       timePerTeam!,
     );

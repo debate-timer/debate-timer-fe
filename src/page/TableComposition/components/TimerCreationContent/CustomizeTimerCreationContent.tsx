@@ -125,7 +125,7 @@ export default function CustomizeTimerCreationContent({
         stance: 'NEUTRAL',
         speechType: speechType.trim() === '' ? '자유토론' : speechType,
         boxType,
-        time: 2 * totalTimePerTeam,
+        time: null,
         timePerTeam: totalTimePerTeam,
         timePerSpeaking: useSpeakerTime ? totalTimePerSpeaking : null,
         speaker: null,
