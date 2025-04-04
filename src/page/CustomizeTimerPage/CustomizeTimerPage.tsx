@@ -636,7 +636,7 @@ export default function CustomizeTimerPage() {
                   {index === data.table.length - 1 && (
                     <RoundControlButton
                       type="DONE"
-                      onClick={() => navigate('/')}
+                      onClick={() => navigate(`/overview/customize/${tableId}`)}
                     />
                   )}
                   {index !== data.table.length - 1 && (
