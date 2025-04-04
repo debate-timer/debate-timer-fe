@@ -326,7 +326,9 @@ export default function TimerPage() {
                     {index === data.table.length - 1 && (
                       <RoundControlButton
                         type="DONE"
-                        onClick={() => navigate('/')}
+                        onClick={() =>
+                          navigate(`/overview/parliamentary/${tableId}`)
+                        }
                       />
                     )}
                     {index !== data.table.length - 1 && (
