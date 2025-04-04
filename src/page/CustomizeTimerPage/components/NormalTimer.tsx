@@ -88,7 +88,9 @@ export default function NormalTimer({
       {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
         <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-          <MdRecordVoiceOver className="size-[40px]" />
+          {item.stance !== 'NEUTRAL' && (
+            <MdRecordVoiceOver className="size-[40px]" />
+          )}
           <h3 className="text-[28px] font-bold">
             {teamName && teamName + '  팀 '}
             {item.speaker && '| ' + item.speaker + ' 토론자'}
