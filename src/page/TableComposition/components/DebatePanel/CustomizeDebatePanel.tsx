@@ -120,6 +120,8 @@ export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
           <div className="absolute right-2 top-2">
             <EditDeleteButtons
               info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
             />
@@ -139,6 +141,8 @@ export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
           <div className="absolute right-2 top-2">
             <EditDeleteButtons
               info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
             />

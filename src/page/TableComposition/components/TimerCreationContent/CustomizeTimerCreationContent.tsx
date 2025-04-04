@@ -13,8 +13,8 @@ import timeBasedPerSpeakingTimer from '../../../../../public/timer/timebased_per
 interface CustomizeTimerCreationContentProps {
   beforeData?: CustomizeTimeBoxInfo;
   initData?: CustomizeTimeBoxInfo;
-  prosTeamName?: string;
-  consTeamName?: string;
+  prosTeamName: string;
+  consTeamName: string;
   onSubmit: (data: CustomizeTimeBoxInfo) => void;
   onClose: () => void;
 }
@@ -141,11 +141,14 @@ export default function CustomizeTimerCreationContent({
   // 자유토론 타이머로 전환되면 speechType 초기화
   useEffect(() => {
     if (!isNormalTimer) {
-      // 이전 데이터가 없을 때만 초기화
+      // 자유토론 타이머로 전환 시
       if (!initData?.speechType) {
         setSpeechType('');
       }
       setIsCustomSpeech(true);
+    } else {
+      // 일반 타이머로 전환 시, speechType이 predefined에 있으면 custom 아님
+      setIsCustomSpeech(!predefinedSpeechOptions.includes(speechType));
     }
     if (stance === 'NEUTRAL') {
       setSpeaker('');
@@ -294,9 +297,9 @@ export default function CustomizeTimerCreationContent({
                 >
                   <option value="PROS">{prosTeamName}</option>
                   <option value="CONS">{consTeamName}</option>
-                  {stance === 'NEUTRAL' || isCustomSpeech ? (
+                  {(stance === 'NEUTRAL' || isCustomSpeech) && (
                     <option value="NEUTRAL">공통</option>
-                  ) : null}
+                  )}
                 </select>
               </div>
             )}

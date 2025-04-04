@@ -60,8 +60,8 @@ export default function EditDeleteButtons<
         {isCustomize(info) ? (
           <CustomizeTimerCreationContent
             initData={info}
-            prosTeamName={props.prosTeamName}
-            consTeamName={props.consTeamName}
+            prosTeamName={props.prosTeamName as string}
+            consTeamName={props.consTeamName as string}
             onSubmit={(newInfo) => {
               onSubmitEdit(newInfo as T);
             }}
