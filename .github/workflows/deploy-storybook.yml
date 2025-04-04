@@ -2,9 +2,8 @@ name: Deploy-storybook
 
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches: ['develop']
-    types: ['closed']
 
 jobs:
   deploy:
