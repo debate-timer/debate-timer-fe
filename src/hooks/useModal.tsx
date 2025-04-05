@@ -56,7 +56,7 @@ export function useModal(options: UseModalOptions = {}) {
     return (
       <GlobalPortal.Consumer>
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-50"
           onClick={handleOverlayClick}
         >
           <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
