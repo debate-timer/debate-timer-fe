@@ -545,7 +545,7 @@ export default function CustomizeTimerPage() {
               />
             )}
             {data.table[index].boxType === 'TIME_BASED' && (
-              <div className="flex flex-row items-center justify-center space-x-[-30px]">
+              <div className="relative flex flex-row items-center justify-center space-x-[30px]">
                 {/* 왼쪽 타이머 */}
                 <TimeBasedTimer
                   onStart={() => timer1.startTimer()}
@@ -589,17 +589,6 @@ export default function CustomizeTimerPage() {
                   teamName={data.info.prosTeamName}
                 />
 
-                {/* ENTER 버튼 */}
-                <button
-                  onClick={() => {
-                    switchCamp();
-                  }}
-                  className="z-10 flex h-[100px] w-[100px] flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
-                >
-                  <FaExchangeAlt className="text-[36px]" />
-                  <span className="text-[18px] font-bold">ENTER</span>
-                </button>
-
                 {/* 오른쪽 타이머 */}
                 <TimeBasedTimer
                   onStart={() => timer2.startTimer()}
@@ -642,6 +631,17 @@ export default function CustomizeTimerPage() {
                   prosCons="cons"
                   teamName={data.info.consTeamName}
                 />
+
+                {/* ENTER 버튼 */}
+                <button
+                  onClick={() => {
+                    switchCamp();
+                  }}
+                  className="absolute left-1/2 top-1/2 flex h-[100px] w-[100px] -translate-x-20 -translate-y-8 flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
+                >
+                  <FaExchangeAlt className="text-[36px]" />
+                  <span className="text-[18px] font-bold">ENTER</span>
+                </button>
               </div>
             )}
             {/* Round control buttons on the bottom side */}
