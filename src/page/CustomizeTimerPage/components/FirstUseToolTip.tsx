@@ -29,7 +29,10 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           </ListItem>
           <ListItem>초기화 버튼을 눌러 타이머를 원래 시간으로 초기화</ListItem>
           <ListItem>마우스를 사용하여 타이머를 클릭 시, 진영 변경</ListItem>
-          <ListItem>타이머 작동 중, 진영 변경 시, 상대 진영 자동 재생</ListItem>
+          <ListItem>
+            타이머 동작 중 진영이 변경될 경우, 상대 진영의 타이머로 전환과
+            동시에 시작
+          </ListItem>
         </div>
       </div>
 
@@ -63,29 +66,6 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           <ListItem>좌우 방향키로 이전/다음 차례로 이동</ListItem>
           <ListItem>A/L 키로 토론 진영 변경</ListItem>
           <ListItem>Enter 키로 상대 진영으로 변경</ListItem>
-        </div>
-      </div>
-
-      <div className="flex flex-col space-y-1 text-slate-50">
-        <div className="mb-2 flex flex-row items-center space-x-4">
-          <IoHourglassOutline size={18} />
-          <h2 className="text-xl font-bold">
-            작전 시간을 사전에 설정하지 않는 경우
-          </h2>
-        </div>
-
-        <div className="text-m flex flex-col space-y-1 md:text-lg">
-          <ListItem>
-            타이머의 초기화 버튼 왼쪽의 &#39;작전 시간 사용&#39; 버튼을 눌러,
-            별도의 작전 시간 타이머를 열 수 있음
-          </ListItem>
-          <ListItem>
-            찬성 또는 반대 측에서 작전 시간을 요청할 경우 사용
-          </ListItem>
-          <ListItem>
-            각 팀에서 요청한 작전 시간 만큼 타이머를 설정할 수 있음 (±30초,
-            ±10초 단위)
-          </ListItem>
         </div>
       </div>
 
