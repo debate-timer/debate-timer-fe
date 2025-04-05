@@ -11,8 +11,9 @@ import { useCustomTimer } from './hooks/useCustomTimer';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import { FaExchangeAlt } from 'react-icons/fa';
 import NormalTimer from './components/NormalTimer';
-import { useNomalTimer } from './hooks/useNomalTimer';
+import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
+import { useModal } from '../../hooks/useModal';
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 
 const bgColorMap: Record<TimerState, string> = {
@@ -43,6 +44,13 @@ export default function CustomizeTimerPage() {
   const IS_FIRST = 'isFirst';
   const TRUE = 'true';
   const FALSE = 'false';
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    onClose: () => {
+      setIsFirst(false);
+      localStorage.setItem(IS_FIRST, FALSE);
+    },
+    isCloseButtonExist: false,
+  });
 
   // Prepare for changing background
   const [bg, setBg] = useState<TimerState>('default');
@@ -58,7 +66,7 @@ export default function CustomizeTimerPage() {
   // Prepare for timer hook
   const timer1 = useCustomTimer({});
   const timer2 = useCustomTimer({});
-  const nomalTimer = useNomalTimer();
+  const normalTimer = useNormalTimer();
   const [prosConsSelected, setProsConsSelected] = useState<'pros' | 'cons'>(
     'pros',
   );
@@ -104,6 +112,7 @@ export default function CustomizeTimerPage() {
       }
     }
   }, [prosConsSelected, timer1, timer2]);
+
   // ########### useEffect AREA ###########
   // 로컬스토리지에 저장된 "최초 사용 여부" 확인 → 툴팁 띄울지 결정
   useEffect(() => {
@@ -114,7 +123,11 @@ export default function CustomizeTimerPage() {
     } else {
       setIsFirst(storedIsFirst.trim() === TRUE ? true : false);
     }
-  }, []);
+
+    if (isFirst) {
+      openModal();
+    }
+  }, [isFirst, openModal]);
 
   // 타이머 상태에 따라 배경색(bg) 상태 설정
   useEffect(() => {
@@ -134,12 +147,14 @@ export default function CustomizeTimerPage() {
       };
 
       if (boxType === 'NORMAL') {
-        if (!nomalTimer.isRunning) return 'default';
+        if (!normalTimer.isRunning) return 'default';
 
-        if (nomalTimer.timer !== null) {
-          if (nomalTimer.timer > 10 && nomalTimer.timer <= 30) return 'warning';
-          if (nomalTimer.timer >= 0 && nomalTimer.timer <= 10) return 'danger';
-          if (nomalTimer.timer < 0) return 'expired';
+        if (normalTimer.timer !== null) {
+          if (normalTimer.timer > 10 && normalTimer.timer <= 30)
+            return 'warning';
+          if (normalTimer.timer >= 0 && normalTimer.timer <= 10)
+            return 'danger';
+          if (normalTimer.timer < 0) return 'expired';
           return 'default';
         }
       }
@@ -158,8 +173,8 @@ export default function CustomizeTimerPage() {
 
     setBg(getBgStatus());
   }, [
-    nomalTimer.isRunning,
-    nomalTimer.timer,
+    normalTimer.isRunning,
+    normalTimer.timer,
     timer1.isRunning,
     timer1.totalTimer,
     timer1.speakingTimer,
@@ -175,26 +190,26 @@ export default function CustomizeTimerPage() {
   useEffect(() => {
     if (
       warningBellRef.current &&
-      (timer1.isRunning || timer2.isRunning || nomalTimer.isRunning) &&
+      (timer1.isRunning || timer2.isRunning || normalTimer.isRunning) &&
       isWarningBellOn &&
       (timer1.speakingTimer === 30 ||
         timer1.totalTimer === 30 ||
         timer2.speakingTimer === 30 ||
         timer2.totalTimer === 30 ||
-        nomalTimer.timer === 30)
+        normalTimer.timer === 30)
     ) {
       warningBellRef.current.play();
     }
 
     if (
       finishBellRef.current &&
-      (timer1.isRunning || timer2.isRunning || nomalTimer.isRunning) &&
+      (timer1.isRunning || timer2.isRunning || normalTimer.isRunning) &&
       isFinishBellOn &&
       (timer1.speakingTimer === 0 ||
         timer1.totalTimer === 0 ||
         timer2.speakingTimer === 0 ||
         timer2.totalTimer === 0 ||
-        nomalTimer.timer === 0)
+        normalTimer.timer === 0)
     ) {
       finishBellRef.current.play();
     }
@@ -203,12 +218,12 @@ export default function CustomizeTimerPage() {
     isWarningBellOn,
     timer1.isRunning,
     timer2.isRunning,
-    nomalTimer.isRunning,
+    normalTimer.isRunning,
     timer1.speakingTimer,
     timer1.totalTimer,
     timer2.speakingTimer,
     timer2.totalTimer,
-    nomalTimer.timer,
+    normalTimer.timer,
   ]);
 
   // 새로운 index(차례)로 이동했을 때 → 타이머 초기화 및 세팅
@@ -222,14 +237,14 @@ export default function CustomizeTimerPage() {
     setFinishBell(finishBell);
     timer1.clearTimer();
     timer2.clearTimer();
-    nomalTimer.clearTimer();
+    normalTimer.clearTimer();
 
     if (currentBox.boxType === 'NORMAL') {
       const defaultTime = currentBox.time ?? 0;
-      nomalTimer.setDefaultTimer(defaultTime);
-      nomalTimer.setTimer(defaultTime);
+      normalTimer.setDefaultTimer(defaultTime);
+      normalTimer.setTimer(defaultTime);
     } else if (currentBox.boxType === 'TIME_BASED') {
-      nomalTimer.clearTimer();
+      normalTimer.clearTimer();
 
       const defaultTotalTimer = currentBox.timePerTeam;
       const defaultSpeakingTimer = currentBox.timePerSpeaking;
@@ -248,12 +263,13 @@ export default function CustomizeTimerPage() {
     timer1.setTimers,
     timer2.setDefaultTime,
     timer2.setTimers,
-    nomalTimer.setDefaultTimer,
-    nomalTimer.setTimer,
+    normalTimer.setDefaultTimer,
+    normalTimer.setTimer,
   ]);
 
   // 키보드 단축키 제어
   useEffect(() => {
+    const boxType = data?.table[index].boxType;
     const handleKeyDown = (event: KeyboardEvent) => {
       const keysToDisable = [
         'Space',
@@ -282,10 +298,18 @@ export default function CustomizeTimerPage() {
 
       switch (event.code) {
         case 'Space':
-          if (prosConsSelected === 'pros') {
-            toggleTimer(timer1);
-          } else if (prosConsSelected === 'cons') {
-            toggleTimer(timer2);
+          if (boxType === 'NORMAL') {
+            if (normalTimer.isRunning) {
+              normalTimer.pauseTimer();
+            } else {
+              normalTimer.startTimer();
+            }
+          } else {
+            if (prosConsSelected === 'pros') {
+              toggleTimer(timer1);
+            } else if (prosConsSelected === 'cons') {
+              toggleTimer(timer2);
+            }
           }
           break;
         case 'ArrowLeft':
@@ -295,10 +319,14 @@ export default function CustomizeTimerPage() {
           goToOtherItem(false);
           break;
         case 'KeyR':
-          if (prosConsSelected === 'pros') {
-            timer1.resetTimer();
+          if (boxType === 'NORMAL') {
+            normalTimer.resetTimer();
           } else {
-            timer2.resetTimer();
+            if (prosConsSelected === 'pros') {
+              timer1.resetTimer();
+            } else {
+              timer2.resetTimer();
+            }
           }
           break;
         case 'KeyA':
@@ -343,20 +371,24 @@ export default function CustomizeTimerPage() {
 
   // 작전시간 타이머가 켜져 있고, 시간이 0이 되었을 때 → 저장된 시간으로 되돌림
   useEffect(() => {
-    if (isAdditionalTimerOn && nomalTimer.timer === 0 && nomalTimer.isRunning) {
-      nomalTimer.pauseTimer();
-      nomalTimer.setTimer(savedTimer);
+    if (
+      isAdditionalTimerOn &&
+      normalTimer.timer === 0 &&
+      normalTimer.isRunning
+    ) {
+      normalTimer.pauseTimer();
+      normalTimer.setTimer(savedTimer);
       setIsAdditionalTimerOn(!isAdditionalTimerOn);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAdditionalTimerOn,
-    nomalTimer.timer,
+    normalTimer.timer,
     savedTimer,
-    nomalTimer.pauseTimer,
+    normalTimer.pauseTimer,
     setIsAdditionalTimerOn,
-    nomalTimer.setTimer,
-    nomalTimer.isRunning,
+    normalTimer.setTimer,
+    normalTimer.isRunning,
   ]);
 
   //진영(pros/cons)이 바뀌면 → 상대 타이머 초기화
@@ -452,8 +484,13 @@ export default function CustomizeTimerPage() {
             <IconButton
               icon={<IoHelpCircle size={24} />}
               onClick={() => {
-                setIsFirst(true);
-                localStorage.setItem(IS_FIRST, TRUE);
+                if (isFirst) {
+                  setIsFirst(false);
+                  localStorage.setItem(IS_FIRST, FALSE);
+                } else {
+                  setIsFirst(true);
+                  localStorage.setItem(IS_FIRST, TRUE);
+                }
               }}
             />
           </DefaultLayout.Header.Right>
@@ -461,47 +498,38 @@ export default function CustomizeTimerPage() {
 
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
-          {/* Tooltip */}
-          {isFirst && (
-            <FirstUseToolTip
-              onClose={() => {
-                setIsFirst(false);
-                localStorage.setItem(IS_FIRST, FALSE);
-              }}
-            />
-          )}
           <div
-            className={`relative z-10 flex h-full w-full flex-col items-center justify-center space-y-[40px] ${bgColorMap[bg]}`}
+            className={`flex h-full w-full flex-col items-center justify-center space-y-[40px] ${bgColorMap[bg]}`}
           >
             {/* 타이머 두 개 + ENTER 버튼 */}
             {data.table[index].boxType === 'NORMAL' && (
               <NormalTimer
                 isAdditionalTimerOn={isAdditionalTimerOn}
-                onStart={() => nomalTimer.startTimer()}
-                onPause={() => nomalTimer.pauseTimer()}
-                onReset={() => nomalTimer.resetTimer()}
+                onStart={() => normalTimer.startTimer()}
+                onPause={() => normalTimer.pauseTimer()}
+                onReset={() => normalTimer.resetTimer()}
                 addOnTimer={(delta: number) =>
-                  nomalTimer.setTimer((nomalTimer.timer ?? 0) + delta)
+                  normalTimer.setTimer((normalTimer.timer ?? 0) + delta)
                 }
-                isRunning={nomalTimer.isRunning}
-                timer={nomalTimer.timer ?? 0}
+                isRunning={normalTimer.isRunning}
+                timer={normalTimer.timer ?? 0}
                 isLastItem={
                   data !== undefined && index === data.table.length - 1
                 }
                 isFirstItem={index === 0}
                 goToOtherItem={(isPrev: boolean) => {
                   goToOtherItem(isPrev);
-                  nomalTimer.resetTimer();
+                  normalTimer.resetTimer();
                 }}
                 isTimerChangeable={isTimerChangeable}
                 onChangingTimer={() => {
-                  nomalTimer.pauseTimer();
+                  normalTimer.pauseTimer();
 
                   if (!isAdditionalTimerOn) {
-                    saveTimer(nomalTimer.timer ?? 0);
-                    nomalTimer.setTimer(0);
+                    saveTimer(normalTimer.timer ?? 0);
+                    normalTimer.setTimer(0);
                   } else {
-                    nomalTimer.setTimer(savedTimer);
+                    normalTimer.setTimer(savedTimer);
                   }
 
                   setIsAdditionalTimerOn(!isAdditionalTimerOn);
@@ -566,7 +594,7 @@ export default function CustomizeTimerPage() {
                   onClick={() => {
                     switchCamp();
                   }}
-                  className="z-20 flex h-[100px] w-[100px] flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
+                  className="z-10 flex h-[100px] w-[100px] flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
                 >
                   <FaExchangeAlt className="text-[36px]" />
                   <span className="text-[18px] font-bold">ENTER</span>
@@ -654,6 +682,17 @@ export default function CustomizeTimerPage() {
           </div>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
+
+      {/** Tooltip */}
+      <ModalWrapper>
+        <FirstUseToolTip
+          onClose={() => {
+            closeModal();
+            setIsFirst(false);
+            localStorage.setItem(IS_FIRST, FALSE);
+          }}
+        />
+      </ModalWrapper>
     </>
   );
 }
