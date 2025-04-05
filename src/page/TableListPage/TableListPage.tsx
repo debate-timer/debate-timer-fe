@@ -8,7 +8,6 @@ import Table from './components/Table';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
-  console.log(data);
   const { mutate: deleteParliamentaryTable } =
     useDeleteParliamentaryDebateTable();
   const { mutate: deleteCustomizeTable } = useDeleteCustomizeDebateTable();

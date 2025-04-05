@@ -154,11 +154,6 @@ const useTableFrom = (
   }
 
   const AddTable = () => {
-    console.log('[디버깅] 전송 데이터', formData);
-    console.log(
-      '[디버깅] 전송 JSON',
-      JSON.stringify({ info: formData.info, table: formData.table }, null, 2),
-    );
     if (isCustomizeInfo(formData.info)) {
       addCustomize({
         info: formData.info,
@@ -173,8 +168,6 @@ const useTableFrom = (
   };
 
   const EditTable = (tableId: number) => {
-    console.log('[디버깅] 전송 데이터', formData);
-
     if (isCustomizeInfo(formData.info)) {
       editCustomize({
         tableId,
@@ -196,7 +189,6 @@ const useTableFrom = (
     updateTable,
     AddTable,
     EditTable,
-    // 미사용한 pending 삭제
   };
 };
 

@@ -62,7 +62,6 @@ export async function postCustomizeTableData(
     },
     null,
   );
-  console.log('customize 메세지:', JSON.stringify(response.data, null, 2));
   return response.data;
 }
 
