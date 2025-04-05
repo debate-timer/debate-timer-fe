@@ -330,11 +330,11 @@ export default function CustomizeTimerPage() {
     switchCamp,
   ]);
 
-  // 테이블에 TIME_OUT 발언이 있는 경우 작전시간 타이머 변경 비활성화
+  // 테이블에 작전시간 발언이 있는 경우 작전시간 타이머 변경 비활성화
   useEffect(() => {
     if (data) {
       data.table.forEach((value) => {
-        if (value.speechType === 'TIME_OUT') {
+        if (value.speechType === '작전시간') {
           setIsTimerChangeable(false);
         }
       });
