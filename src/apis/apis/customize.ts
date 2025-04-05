@@ -51,8 +51,10 @@ export async function postCustomizeTableData(
     requestUrl,
     {
       info: {
-        name: info.name === '' ? '테이블 1' : info.name,
+        name: info.name === '' ? '시간표 1' : info.name,
         agenda: info.agenda,
+        prosTeamName: info.prosTeamName,
+        consTeamName: info.consTeamName,
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
@@ -60,7 +62,6 @@ export async function postCustomizeTableData(
     },
     null,
   );
-
   return response.data;
 }
 
@@ -72,12 +73,14 @@ export async function putCustomizeTableData(
 ): Promise<PutCustomizeTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PutCustomizeTableResponseType>(
-    'POST',
+    'PUT',
     requestUrl + `/${tableId}`,
     {
       info: {
         name: info.name,
         agenda: info.agenda,
+        prosTeamName: info.prosTeamName,
+        consTeamName: info.consTeamName,
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
@@ -104,14 +107,14 @@ export async function deleteCustomizeTableData(
   return response.status === 204 ? true : false;
 }
 
-// PATCH /api/table/customize/{tableId}
+// PATCH /api/table/customize/{tableId}/debate
 export async function patchCustomizeTableData(
   tableId: number,
 ): Promise<PatchCustomizeTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PatchCustomizeTableResponseType>(
     'PATCH',
-    requestUrl + `/${tableId}`,
+    requestUrl + `/${tableId}/debate`,
     null,
     null,
   );

@@ -2,12 +2,11 @@ import ClearableInput from '../../../../components/ClearableInput/ClearableInput
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { ParliamentaryDebateInfo, DebateType } from '../../../../type/type';
+import { ParliamentaryInfo, CustomizeInfo } from '../../../../type/type';
 import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
 
-type ExtendedDebateInfo = ParliamentaryDebateInfo & {
-  type: DebateType;
-};
+type ExtendedDebateInfo = ParliamentaryInfo | CustomizeInfo;
+
 interface TableNameAndTypeProps {
   info: ExtendedDebateInfo;
   isEdit?: boolean;
@@ -15,23 +14,32 @@ interface TableNameAndTypeProps {
   onButtonClick: () => void;
 }
 
-type ExtendedDebateInfoField = keyof ExtendedDebateInfo;
-type ExtendedDebateInfoValue = ExtendedDebateInfo[ExtendedDebateInfoField];
+// customize 타입 가드
+function isCustomize(info: ExtendedDebateInfo): info is CustomizeInfo {
+  return info.type === 'CUSTOMIZE';
+}
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
   const { info, isEdit = false, onInfoChange, onButtonClick } = props;
 
-  const handleFieldChange = (
-    field: ExtendedDebateInfoField,
-    value: ExtendedDebateInfoValue,
+  const handleFieldChange = <K extends keyof ExtendedDebateInfo>(
+    field: K,
+    value: ExtendedDebateInfo[K],
   ) => {
     onInfoChange({
       ...info,
       [field]: value,
-    });
+    } as ExtendedDebateInfo);
   };
 
   const clearField = (field: 'name' | 'agenda') => {
+    onInfoChange({
+      ...info,
+      [field]: '',
+    });
+  };
+
+  const clearCustomizeField = (field: 'prosTeamName' | 'consTeamName') => {
     onInfoChange({
       ...info,
       [field]: '',
@@ -59,7 +67,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             value={info.name}
             onChange={(e) => handleFieldChange('name', e.target.value)}
             onClear={() => clearField('name')}
-            placeholder="테이블 1"
+            placeholder="시간표 1"
           />
 
           <label className="flex items-center text-base font-semibold md:text-2xl">
@@ -82,6 +90,38 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                   handleFieldChange('type', selectedType)
                 }
               />
+            </>
+          )}
+          {isCustomize(info) && (
+            <>
+              <label className="flex items-center text-base font-semibold md:text-2xl">
+                팀명
+              </label>
+              <div className="flex items-center gap-8">
+                <ClearableInput
+                  value={info.prosTeamName || ''}
+                  onChange={(e) =>
+                    onInfoChange({
+                      ...info,
+                      prosTeamName: e.target.value,
+                    })
+                  }
+                  onClear={() => clearCustomizeField('prosTeamName')}
+                  placeholder="찬성"
+                />
+                <span>vs</span>
+                <ClearableInput
+                  value={info.consTeamName || ''}
+                  onChange={(e) =>
+                    onInfoChange({
+                      ...info,
+                      consTeamName: e.target.value,
+                    })
+                  }
+                  onClear={() => clearCustomizeField('consTeamName')}
+                  placeholder="반대"
+                />
+              </div>
             </>
           )}
 
@@ -111,12 +151,30 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
         <div className="mx-auto mb-8 w-full max-w-4xl">
           <button
             onClick={() => {
-              if (info.name === '') {
-                onInfoChange({
-                  ...info,
-                  name: '템플릿 1',
-                });
+              if (isCustomize(info)) {
+                const pros = info.prosTeamName || '';
+                const cons = info.consTeamName || '';
+
+                const isTooLong = pros.length > 8 || cons.length > 8;
+
+                if (isTooLong) {
+                  alert('팀명은 최대 8자까지 입력할 수 있습니다.');
+                  return;
+                }
               }
+              const updatedInfo = isCustomize(info)
+                ? {
+                    ...info,
+                    name: info.name || '시간표 1',
+                    prosTeamName: info.prosTeamName || '찬성',
+                    consTeamName: info.consTeamName || '반대',
+                  }
+                : {
+                    ...info,
+                    name: info.name || '시간표 1',
+                  };
+
+              onInfoChange(updatedInfo);
               onButtonClick();
             }}
             className="button enabled h-16 w-full"

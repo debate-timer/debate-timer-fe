@@ -29,7 +29,7 @@ const routesConfig = [
     requiresAuth: true,
   },
   {
-    path: '/overview/:id',
+    path: '/overview/:type/:id',
     element: <TableOverview />,
     requiresAuth: true,
   },

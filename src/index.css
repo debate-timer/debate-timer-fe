@@ -23,7 +23,7 @@
 }
 
 .button.disabled {
-  @apply bg-neutral-300 text-neutral-500;
+  @apply bg-neutral-300 text-neutral-500 border-none;
 }
 
 p {

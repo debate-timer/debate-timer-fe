@@ -54,7 +54,7 @@ export async function postParliamentaryDebateTable(
     requestUrl,
     {
       info: {
-        name: info.name === '' ? '테이블 1' : info.name,
+        name: info.name === '' ? '시간표 1' : info.name,
         agenda: info.agenda,
         warningBell: info.warningBell,
         finishBell: info.finishBell,

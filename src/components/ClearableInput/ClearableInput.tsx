@@ -12,7 +12,7 @@ export default function ClearableInput({
   ...rest
 }: ClearableInputProps) {
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <input
         {...rest}
         value={value}

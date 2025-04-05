@@ -3,7 +3,7 @@ import { patchCustomizeTableData } from '../../apis/apis/customize';
 import { PatchCustomizeTableResponseType } from '../../apis/responses/customize';
 
 interface UsePatchCustomizeTableParams {
-  id: number;
+  tableId: number;
 }
 
 export default function usePatchCustomizeTable(
@@ -14,7 +14,7 @@ export default function usePatchCustomizeTable(
     Error,
     UsePatchCustomizeTableParams
   >({
-    mutationFn: async ({ id }) => patchCustomizeTableData(id),
+    mutationFn: async ({ tableId }) => patchCustomizeTableData(tableId),
     onSuccess: (response: PatchCustomizeTableResponseType) => {
       onSuccess(response.id);
     },

@@ -6,25 +6,49 @@ import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel'
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
-import { usePatchParliamentaryTable } from '../../hooks/mutations/usePatchParliamentaryDebateTable';
+import usePatchParliamentaryTable from '../../hooks/mutations/usePatchParliamentaryDebateTable';
+import usePatchCustomizeTable from '../../hooks/mutations/usePatchCustomizeDebateTable';
+import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
+import CustomizeDebatePanel from '../TableComposition/components/DebatePanel/CustomizeDebatePanel';
 
 export default function TableOverview() {
-  const pathParams = useParams();
-  const tableId = Number(pathParams.id);
-  const { data } = useGetParliamentaryTableData(tableId);
+  const { type, id } = useParams();
+  const tableId = Number(id);
+
+  const isCustomize = type === 'customize';
+
+  const { data: customizeData } = useGetCustomizeTableData(
+    tableId,
+    isCustomize,
+  );
+  const { data: parliamentaryData } = useGetParliamentaryTableData(
+    tableId,
+    !isCustomize,
+  );
+
+  // 실제로 사용할 데이터
+  const data = isCustomize ? customizeData : parliamentaryData;
 
   const navigate = useNavigate();
 
   // 토론하기 클릭 시 patch 요청 후 이동
-  const patchTableMutation = usePatchParliamentaryTable((tableId) => {
-    navigate(`/table/parliamentary/${tableId}`);
+  const patchParliamentaryTableMutation = usePatchParliamentaryTable(
+    (tableId) => {
+      navigate(`/table/parliamentary/${tableId}`);
+    },
+  );
+  const patchCustomizeTableMutation = usePatchCustomizeTable((tableId) => {
+    navigate(`/table/customize/${tableId}`);
   });
 
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={data?.info.name} type={'PARLIAMENTARY'} />
+          <HeaderTableInfo
+            name={data?.info.name}
+            type={isCustomize ? 'CUSTOMIZE' : 'PARLIAMENTARY'}
+          />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <HeaderTitle title={data?.info.agenda} />
@@ -34,12 +58,28 @@ export default function TableOverview() {
 
       <DefaultLayout.ContentContainer>
         <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
-          <PropsAndConsTitle />
+          {isCustomize && customizeData ? (
+            <PropsAndConsTitle
+              prosTeamName={customizeData.info.prosTeamName}
+              consTeamName={customizeData.info.consTeamName}
+            />
+          ) : (
+            <PropsAndConsTitle />
+          )}
+
           <div className="flex w-full flex-col gap-2">
-            {data &&
-              data.table.map((info, index) => (
-                <DebatePanel key={index} info={info} />
-              ))}
+            {isCustomize && customizeData
+              ? customizeData.table.map((info, index) => (
+                  <CustomizeDebatePanel
+                    key={index}
+                    info={info}
+                    prosTeamName={customizeData.info.prosTeamName}
+                    consTeamName={customizeData.info.consTeamName}
+                  />
+                ))
+              : parliamentaryData?.table.map((info, index) => (
+                  <DebatePanel key={index} info={info} />
+                ))}
           </div>
         </section>
       </DefaultLayout.ContentContainer>
@@ -50,7 +90,7 @@ export default function TableOverview() {
             className="button enabled-hover-neutral h-16 w-full"
             onClick={() =>
               navigate(
-                `/composition?mode=edit&tableId=${tableId}&type=PARLIAMENTARY`,
+                `/composition?mode=edit&tableId=${tableId}&type=${type?.toUpperCase()}`,
               )
             }
           >
@@ -61,7 +101,11 @@ export default function TableOverview() {
           </button>
           <button
             className="button enabled h-16 w-full"
-            onClick={() => patchTableMutation.mutate({ tableId })}
+            onClick={() =>
+              isCustomize
+                ? patchCustomizeTableMutation.mutate({ tableId })
+                : patchParliamentaryTableMutation.mutate({ tableId })
+            }
           >
             <div className="flex items-center justify-center gap-2">
               <RiSpeakFill />

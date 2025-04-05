@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDeleteParliamentaryDebateTable';
+import { useDeleteCustomizeDebateTable } from '../../hooks/mutations/useDeleteCustomizeDebateTable';
 import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { DebateTable, DebateType } from '../../type/type';
@@ -7,13 +8,22 @@ import Table from './components/Table';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
-  const { mutate } = useDeleteParliamentaryDebateTable();
+  const { mutate: deleteParliamentaryTable } =
+    useDeleteParliamentaryDebateTable();
+  const { mutate: deleteCustomizeTable } = useDeleteCustomizeDebateTable();
   const navigate = useNavigate();
   const onEdit = (tableId: number, type: DebateType) => {
     navigate(`/composition?mode=edit&tableId=${tableId}&type=${type}`);
   };
-  const onClick = (tableId: number) => {
-    navigate(`/overview/${tableId}`);
+  const onClick = (tableId: number, type: DebateType) => {
+    navigate(`/overview/${type.toLowerCase()}/${tableId}`);
+  };
+  const onDelete = (tableId: number, type: DebateType) => {
+    if (type === 'PARLIAMENTARY') {
+      deleteParliamentaryTable({ tableId });
+    } else if (type === 'CUSTOMIZE') {
+      deleteCustomizeTable({ tableId });
+    }
   };
 
   return (
@@ -47,9 +57,9 @@ export default function TableListPage() {
                 name={table.name}
                 type={table.type}
                 agenda={table.agenda}
-                onDelete={() => mutate({ tableId: table.id })}
+                onDelete={() => onDelete(table.id, table.type)}
                 onEdit={() => onEdit(table.id, table.type)}
-                onClick={() => onClick(table.id)}
+                onClick={() => onClick(table.id, table.type)}
               />
             ))}
         </div>

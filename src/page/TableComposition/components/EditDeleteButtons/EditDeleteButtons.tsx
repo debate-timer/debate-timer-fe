@@ -1,16 +1,26 @@
 import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
-import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  CustomizeTimeBoxInfo,
+} from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
+import CustomizeTimerCreationContent from '../TimerCreationContent/CustomizeTimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
 
-interface EditDeleteButtonsPros {
-  info: ParliamentaryTimeBoxInfo;
-  onSubmitEdit: (updatedInfo: ParliamentaryTimeBoxInfo) => void;
+interface EditDeleteButtonsPros<
+  T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+> {
+  info: T;
+  prosTeamName?: string;
+  consTeamName?: string;
+  onSubmitEdit: (updatedInfo: T) => void;
   onSubmitDelete: () => void;
 }
 
-export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
+export default function EditDeleteButtons<
+  T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+>(props: EditDeleteButtonsPros<T>) {
   const {
     openModal: openEditModal,
     closeModal: closeEditModal,
@@ -22,6 +32,11 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
     ModalWrapper: DeleteModalWrapper,
   } = useModal({ isCloseButtonExist: false });
   const { info, onSubmitEdit, onSubmitDelete } = props;
+  function isCustomize(
+    info: ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+  ): info is CustomizeTimeBoxInfo {
+    return 'boxType' in info;
+  }
 
   return (
     <>
@@ -42,14 +57,27 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
         </button>
       </div>
       <EditModalWrapper>
-        <TimerCreationContent
-          initData={info}
-          onSubmit={(newInfo) => {
-            onSubmitEdit(newInfo);
-          }}
-          onClose={closeEditModal}
-        />
+        {isCustomize(info) ? (
+          <CustomizeTimerCreationContent
+            initData={info}
+            prosTeamName={props.prosTeamName as string}
+            consTeamName={props.consTeamName as string}
+            onSubmit={(newInfo) => {
+              onSubmitEdit(newInfo as T);
+            }}
+            onClose={closeEditModal}
+          />
+        ) : (
+          <TimerCreationContent
+            initData={info}
+            onSubmit={(newInfo) => {
+              onSubmitEdit(newInfo as T);
+            }}
+            onClose={closeEditModal}
+          />
+        )}
       </EditModalWrapper>
+
       <DeleteModalWrapper>
         <DialogModal
           left={{ text: '취소', onClick: () => closeDeleteModal() }}
@@ -63,7 +91,7 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
           }}
         >
           <h1 className="px-20 py-10 text-xl font-bold">
-            이 순서를 삭제하시겠습니까?
+            이 타이머를 삭제하시겠습니까?
           </h1>
         </DialogModal>
       </DeleteModalWrapper>

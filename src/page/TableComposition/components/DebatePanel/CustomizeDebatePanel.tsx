@@ -1,28 +1,56 @@
 import { HTMLAttributes } from 'react';
 import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
-import {
-  ParliamentaryTimeBoxInfo,
-  ParliamentarySpeechTypeToString,
-} from '../../../../type/type';
+import { CustomizeTimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
-interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
-  info: ParliamentaryTimeBoxInfo;
-  onSubmitEdit?: (updatedInfo: ParliamentaryTimeBoxInfo) => void;
+
+interface CustomizeDebatePanelProps extends HTMLAttributes<HTMLDivElement> {
+  info: CustomizeTimeBoxInfo;
+  prosTeamName: string;
+  consTeamName: string;
+  onSubmitEdit?: (updatedInfo: CustomizeTimeBoxInfo) => void;
   onSubmitDelete?: () => void;
 }
 
-export default function DebatePanel(props: DebatePanelProps) {
-  const { stance, type, time, speakerNumber } = props.info;
+export default function CustomizeDebatePanel(props: CustomizeDebatePanelProps) {
+  const {
+    stance,
+    speechType,
+    boxType,
+    time,
+    timePerTeam,
+    timePerSpeaking,
+    speaker,
+  } = props.info;
   const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
 
-  const debateTypeLabel = ParliamentarySpeechTypeToString[type];
-  const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
-  const timeStr = `${minutes}분 ${seconds}초`;
+  // 타이머 시간 문자열 처리
+  let timeStr = '';
+  let timePerSpeakingStr = '';
+
+  if (boxType === 'NORMAL') {
+    const { minutes, seconds } = Formatting.formatSecondsToMinutes(time!);
+    timeStr = `${minutes}분 ${seconds}초`;
+  } else {
+    const { minutes, seconds } = Formatting.formatSecondsToMinutes(
+      timePerTeam!,
+    );
+    timeStr = `팀당 ${minutes}분 ${seconds}초`;
+  }
+
+  if (timePerSpeaking !== null) {
+    const { minutes, seconds } =
+      Formatting.formatSecondsToMinutes(timePerSpeaking);
+    timePerSpeakingStr = `발언당 ${minutes}분 ${seconds}초`;
+  }
+  const fullTimeStr = timePerSpeakingStr
+    ? `${timeStr} | ${timePerSpeakingStr}`
+    : timeStr;
 
   const isPros = stance === 'PROS';
   const isCons = stance === 'CONS';
-  const isNeutralTimeout = type === 'TIME_OUT' && stance === 'NEUTRAL';
+  const isNeutralTimeout = boxType === 'NORMAL' && stance === 'NEUTRAL'; // 작전시간
+  const isNeutralCustom = boxType === 'TIME_BASED' && stance === 'NEUTRAL'; // 자유토론타이머
 
   const containerClass = isPros
     ? 'justify-start'
@@ -53,6 +81,8 @@ export default function DebatePanel(props: DebatePanelProps) {
               <div className="absolute left-2 top-2">
                 <EditDeleteButtons
                   info={props.info}
+                  prosTeamName={props.prosTeamName}
+                  consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
                 />
@@ -65,6 +95,8 @@ export default function DebatePanel(props: DebatePanelProps) {
               <div className="absolute right-2 top-2">
                 <EditDeleteButtons
                   info={props.info}
+                  prosTeamName={props.prosTeamName}
+                  consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
                 />
@@ -74,7 +106,7 @@ export default function DebatePanel(props: DebatePanelProps) {
         </>
       )}
       <div className="font-semibold">
-        {debateTypeLabel} {speakerNumber && `| ${speakerNumber}번 토론자`}
+        {speechType} {speaker && `| ${speaker} 토론자`}
       </div>
       <div className="text-2xl font-semibold">{timeStr}</div>
     </div>
@@ -88,14 +120,37 @@ export default function DebatePanel(props: DebatePanelProps) {
           <div className="absolute right-2 top-2">
             <EditDeleteButtons
               info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
             />
           </div>
         </>
       )}
-      <span className="font-semibold">{debateTypeLabel}</span>
+      <span className="font-semibold">{speechType}</span>
       <span className="text-2xl font-semibold">{timeStr}</span>
+    </div>
+  );
+
+  const renderNeutralCustomPanel = () => (
+    <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
+      {onSubmitEdit && onSubmitDelete && (
+        <>
+          {renderDragHandle()}
+          <div className="absolute right-2 top-2">
+            <EditDeleteButtons
+              info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
+              onSubmitEdit={onSubmitEdit}
+              onSubmitDelete={onSubmitDelete}
+            />
+          </div>
+        </>
+      )}
+      <span className="font-semibold">{speechType}</span>
+      <span className="text-2xl font-semibold">{fullTimeStr}</span>
     </div>
   );
 
@@ -104,6 +159,7 @@ export default function DebatePanel(props: DebatePanelProps) {
       {(isPros || isCons) && renderProsConsPanel()}
 
       {isNeutralTimeout && renderNeutralTimeoutPanel()}
+      {isNeutralCustom && renderNeutralCustomPanel()}
     </div>
   );
 }
