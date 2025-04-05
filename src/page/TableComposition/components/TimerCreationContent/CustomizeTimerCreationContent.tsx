@@ -461,7 +461,7 @@ export default function CustomizeTimerCreationContent({
                   placeholder="1번"
                   disabled={stance === 'NEUTRAL'}
                 />
-                <span>토론자</span>
+                <span className="whitespace-nowrap">토론자</span>
               </div>
             )}
           </div>
