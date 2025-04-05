@@ -155,14 +155,10 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 const pros = info.prosTeamName || '';
                 const cons = info.consTeamName || '';
 
-                const isEmpty =
-                  pros.trim().length === 0 || cons.trim().length === 0;
                 const isTooLong = pros.length > 8 || cons.length > 8;
 
-                if (isEmpty || isTooLong) {
-                  alert(
-                    '팀명은 공백일 수 없으며, 최대 8자까지 입력할 수 있습니다.',
-                  );
+                if (isTooLong) {
+                  alert('팀명은 최대 8자까지 입력할 수 있습니다.');
                   return;
                 }
               }
