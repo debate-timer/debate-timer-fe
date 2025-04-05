@@ -1,5 +1,4 @@
 import { PropsWithChildren } from 'react';
-import { IoHourglassOutline } from 'react-icons/io5';
 import { LuKeyboard } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
 
