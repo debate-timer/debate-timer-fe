@@ -69,15 +69,18 @@ export default function NormalTimer({
       <div
         className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
       >
-        {/* Title text  */}
+        {/* Title text  
         <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
           {titleText}
-        </h1>
+        </h1> */}
+        <p className="w-full items-center text-center text-[75px] font-bold">
+          {titleText}
+        </p>
 
         {/* Close button, if additional timer is enabled */}
         {isAdditionalTimerOn && (
           <button
-            className="ml-auto px-[30px]"
+            className="absolute right-10 top-1/2 -translate-y-1/2"
             onClick={() => onChangingTimer()}
           >
             <IoCloseOutline className="size-[40px] hover:text-neutral-300" />
@@ -107,7 +110,7 @@ export default function NormalTimer({
       </div>
 
       {/* Timer controller and additional timer controller */}
-      <div className="my-[30px]">
+      <div className="my-[30px] flex w-full items-center justify-center">
         {!isAdditionalTimerOn && (
           <TimerController
             isRunning={isRunning}
