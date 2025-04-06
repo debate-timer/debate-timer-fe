@@ -19,15 +19,26 @@ export function useCustomTimer({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isDone, setIsDone] = useState(false);
 
+  const [savedTime, setSavedTime] = useState<{
+    savedTotalTimer: number | null;
+    savedSpeakingTimer: number | null;
+  }>({ savedTotalTimer: 0, savedSpeakingTimer: null });
+
   // 타이머 시작
   const startTimer = useCallback(() => {
     if (intervalRef.current !== null) return;
     if (!isDone) {
       intervalRef.current = setInterval(() => {
+        setSavedTime((prev) => {
+          return { ...prev, savedTotalTimer: totalTimer };
+        });
         setTotalTimer((prev) =>
           prev === null ? null : prev - 1 >= 0 ? prev - 1 : 0,
         );
         if (isSpeakingTimer) {
+          setSavedTime((prev) => {
+            return { ...prev, savedSpeakingTimer: speakingTimer };
+          });
           setSpeakingTimer((prev) =>
             prev === null ? null : prev - 1 >= 0 ? prev - 1 : 0,
           );
@@ -35,7 +46,7 @@ export function useCustomTimer({
       }, 1000);
       setIsRunning(true);
     }
-  }, [isDone, isSpeakingTimer]);
+  }, [isDone, isSpeakingTimer, totalTimer, speakingTimer]);
 
   // 타이머 일시정지
   const pauseTimer = useCallback(() => {
@@ -46,8 +57,29 @@ export function useCustomTimer({
     setIsRunning(false);
   }, []);
 
-  // 타이머 리셋
-  const resetTimer = useCallback(() => {
+  // 가장 최근의 시간정보로 타이머 리셋
+  const resetCurrentTimer = useCallback(() => {
+    pauseTimer();
+    setIsDone(false);
+    setTotalTimer(savedTime.savedTotalTimer);
+    if (
+      isSpeakingTimer &&
+      defaultTime.defaultSpeakingTimer !== null &&
+      totalTimer !== null
+    ) {
+      setSpeakingTimer(savedTime.savedSpeakingTimer);
+    }
+  }, [
+    isSpeakingTimer,
+    defaultTime.defaultSpeakingTimer,
+    savedTime.savedTotalTimer,
+    savedTime.savedSpeakingTimer,
+    totalTimer,
+    pauseTimer,
+  ]);
+
+  // 타이머 전환 간에 타이머를 초기화하는 함수
+  const resetTimerForNextPhase = useCallback(() => {
     pauseTimer();
     if (
       isSpeakingTimer &&
@@ -115,7 +147,8 @@ export function useCustomTimer({
     isDone,
     startTimer,
     pauseTimer,
-    resetTimer,
+    resetTimerForNextPhase,
+    resetCurrentTimer,
     actOnTime,
     setTimers,
     setDefaultTime,
