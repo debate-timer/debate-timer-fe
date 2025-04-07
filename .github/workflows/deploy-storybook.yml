@@ -35,7 +35,7 @@ jobs:
         run: |
           OUTPUT=$(npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --sha=${{ github.sha }} --exit-zero-on-changes 2>&1 | tee chromatic_output.log)
 
-          STORYBOOK_URL=$(echo "$OUTPUT" | grep -oE 'https://[a-zA-Z0-9.-]+\.chromatic\.com')
+          STORYBOOK_URL=$(echo "$OUTPUT" | grep -oE 'https://67691bb66b38f560017adb56-[a-zA-Z0-9]{10}\.chromatic\.com')
 
           if [ -z "$STORYBOOK_URL" ]; then
             echo "❌ Failed to find Storybook URL in Chromatic output"
