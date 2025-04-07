@@ -33,19 +33,15 @@ jobs:
       - name: Publish to Chromatic
         id: chromatic
         run: |
-          # Run Chromatic and save output to a file
-          OUTPUT=$(npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} 2>&1 | tee chromatic_output.log)
+          OUTPUT=$ npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --sha=${{ github.sha }} --exit-zero-on-changes 2>&1 | tee chromatic_output.log)
 
-          # Extract URL using grep
           STORYBOOK_URL=$(echo "$OUTPUT" | grep -oE 'https://[a-zA-Z0-9.-]+\.chromatic\.com')
 
-          # Fail if URL not found
           if [ -z "$STORYBOOK_URL" ]; then
             echo "❌ Failed to find Storybook URL in Chromatic output"
             exit 1
           fi
 
-          # Save URL as GitHub Actions output
           echo "storybook_url=$STORYBOOK_URL" >> $GITHUB_OUTPUT
 
       - name: Notify on Discord
