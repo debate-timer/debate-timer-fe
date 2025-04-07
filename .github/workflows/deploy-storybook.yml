@@ -33,7 +33,7 @@ jobs:
       - name: Publish to Chromatic
         id: chromatic
         run: |
-          OUTPUT=$ npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --sha=${{ github.sha }} --exit-zero-on-changes 2>&1 | tee chromatic_output.log)
+          OUTPUT=$(npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --sha=${{ github.sha }} --exit-zero-on-changes 2>&1 | tee chromatic_output.log)
 
           STORYBOOK_URL=$(echo "$OUTPUT" | grep -oE 'https://[a-zA-Z0-9.-]+\.chromatic\.com')
 
