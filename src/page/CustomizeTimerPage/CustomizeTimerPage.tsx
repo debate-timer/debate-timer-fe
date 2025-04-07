@@ -323,9 +323,9 @@ export default function CustomizeTimerPage() {
             normalTimer.resetTimer();
           } else {
             if (prosConsSelected === 'pros') {
-              timer1.resetTimer();
+              timer1.resetCurrentTimer();
             } else {
-              timer2.resetTimer();
+              timer2.resetCurrentTimer();
             }
           }
           break;
@@ -395,10 +395,10 @@ export default function CustomizeTimerPage() {
   useEffect(() => {
     if (prosConsSelected === 'cons') {
       if (timer1.speakingTimer === null) return;
-      timer1.resetTimer();
+      timer1.resetTimerForNextPhase();
     } else if (prosConsSelected === 'pros') {
       if (timer2.speakingTimer === null) return;
-      timer2.resetTimer();
+      timer2.resetTimerForNextPhase();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prosConsSelected]);
@@ -550,7 +550,7 @@ export default function CustomizeTimerPage() {
                 <TimeBasedTimer
                   onStart={() => timer1.startTimer()}
                   onPause={() => timer1.pauseTimer()}
-                  onReset={() => timer1.resetTimer()}
+                  onReset={() => timer1.resetCurrentTimer()}
                   addOnTimer={(delta: number) =>
                     timer1.setTimers(timer1.totalTimer ?? 0 + delta)
                   }
@@ -562,7 +562,7 @@ export default function CustomizeTimerPage() {
                   isFirstItem={index === 0}
                   goToOtherItem={(isPrev: boolean) => {
                     goToOtherItem(isPrev);
-                    timer1.resetTimer();
+                    timer1.resetTimerForNextPhase();
                   }}
                   isTimerChangeable={isTimerChangeable}
                   onChangingTimer={() => {
@@ -593,7 +593,7 @@ export default function CustomizeTimerPage() {
                 <TimeBasedTimer
                   onStart={() => timer2.startTimer()}
                   onPause={() => timer2.pauseTimer()}
-                  onReset={() => timer2.resetTimer()}
+                  onReset={() => timer2.resetCurrentTimer()}
                   addOnTimer={(delta: number) =>
                     timer2.setTimers(timer2.totalTimer ?? 0 + delta)
                   }
@@ -605,7 +605,7 @@ export default function CustomizeTimerPage() {
                   isFirstItem={index === 0}
                   goToOtherItem={(isPrev: boolean) => {
                     goToOtherItem(isPrev);
-                    timer2.resetTimer();
+                    timer2.resetTimerForNextPhase();
                   }}
                   isTimerChangeable={isTimerChangeable}
                   onChangingTimer={() => {
