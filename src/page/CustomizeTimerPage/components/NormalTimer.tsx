@@ -90,12 +90,14 @@ export default function NormalTimer({
       <div className="my-[20px] h-[40px]">
         <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
           {item.stance !== 'NEUTRAL' && (
-            <MdRecordVoiceOver className="size-[40px]" />
+            <>
+              <MdRecordVoiceOver className="size-[40px]" />
+              <h3 className="text-[28px] font-bold">
+                {teamName && teamName + '  팀 '}
+                {item.speaker && '| ' + item.speaker + ' 토론자'}
+              </h3>
+            </>
           )}
-          <h3 className="text-[28px] font-bold">
-            {teamName && teamName + '  팀 '}
-            {item.speaker && '| ' + item.speaker + ' 토론자'}
-          </h3>
         </div>
       </div>
 
