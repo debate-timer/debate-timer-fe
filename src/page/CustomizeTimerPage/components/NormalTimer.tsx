@@ -89,7 +89,7 @@ export default function NormalTimer({
       {/* Speaker's number, if necessary */}
       <div className="my-[20px] h-[40px]">
         <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
-          {item.stance !== 'NEUTRAL' && (
+          {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
             <>
               <MdRecordVoiceOver className="size-[40px]" />
               <h3 className="text-[28px] font-bold">
