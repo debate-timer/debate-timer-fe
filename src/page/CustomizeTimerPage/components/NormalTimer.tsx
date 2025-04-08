@@ -48,9 +48,7 @@ export default function NormalTimer({
         : 'bg-camp-red';
   const titleText = isAdditionalTimerOn
     ? ParliamentarySpeechTypeToString['TIME_OUT']
-    : item.stance === 'NEUTRAL'
-      ? ParliamentarySpeechTypeToString['TIME_OUT']
-      : item.speechType;
+    : item.speechType;
 
   const boxShadow = isRunning
     ? item.stance === 'NEUTRAL'
