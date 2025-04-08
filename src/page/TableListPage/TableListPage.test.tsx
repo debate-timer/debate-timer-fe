@@ -1,11 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import TableListPage from './TableListPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, useNavigate } from 'react-router-dom';
-import { waitFor } from '@testing-library/react';
 import { GlobalPortal } from '../../util/GlobalPortal';
+import { MemoryRouter } from 'react-router-dom';
+import { describe, expect } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import TableListPage from './TableListPage';
+import userEvent from '@testing-library/user-event';
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
@@ -18,54 +17,6 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-vi.mock('../../layout/defaultLayout/DefaultLayout', () => {
-  const HeaderLeft = ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="header-left">{children}</div>
-  );
-  const HeaderCenter = ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="header-center">{children}</div>
-  );
-  const HeaderRight = ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="header-right">{children}</div>
-  );
-  const Header = ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="header">{children}</div>
-  );
-
-  Header.Left = HeaderLeft;
-  Header.Center = HeaderCenter;
-  Header.Right = HeaderRight;
-
-  const ContentContainer = ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="content-container">{children}</div>
-  );
-  const DefaultLayout = ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="default-layout">{children}</div>
-  );
-  DefaultLayout.displayName = 'DefaultLayout';
-  DefaultLayout.Header = Header;
-  DefaultLayout.ContentContainer = ContentContainer;
-
-  return {
-    default: DefaultLayout,
-  };
-});
-
-vi.mock('./components/Table/AddTable', () => ({
-  default: function AddTable() {
-    return <div data-testid="add-table">테이블 추가</div>;
-  },
-}));
-
-// react-router-dom의 useNavigate 모의(Mock)
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: vi.fn(),
-  };
-});
-
 describe('TableListPage', () => {
   const renderTableListPage = () => {
     return render(
@@ -75,63 +26,41 @@ describe('TableListPage', () => {
     );
   };
 
-  it('DefaultLayout 렌더링 검증', async () => {
+  it('테이블 추가 버튼 렌더링 검증', async () => {
     renderTableListPage();
-    expect(screen.getByTestId('default-layout')).toBeInTheDocument();
+
+    // 테이블 추가 버튼 표시되는지 확인
+    await waitFor(() => expect(screen.getByText('+')).toBeInTheDocument());
   });
 
-  it('헤더 렌더링 검증', () => {
+  it('테이블 아이템 렌더링 검증', async () => {
     renderTableListPage();
-    const headerCenter = screen.getByTestId('header-center');
-    expect(headerCenter).toBeInTheDocument();
-    expect(headerCenter).toHaveTextContent('토론 시간표를 선택해주세요.');
-  });
 
-  it('Table 렌더링 검증', async () => {
-    renderTableListPage();
-    await waitFor(() => {
-      const tables = screen.getAllByRole('button', { name: /테이블 \d+/i });
-      expect(tables).toHaveLength(8);
+    await waitFor(async () => {
+      // 테이블 1개 이상 존재하는지 확인
+      const tableItem = screen.getAllByTestId('table');
+      expect(tableItem.length).toBeGreaterThan(0);
+
+      // 수정 버튼 및 삭제 버튼 존재하는지 확인
+      const deleteButton = tableItem[0].querySelector(
+        '[aria-label="삭제하기"]',
+      );
+      expect(deleteButton).toBeInTheDocument();
+      expect(
+        tableItem[0].querySelector('[aria-label="수정하기"]'),
+      ).toBeInTheDocument();
+
+      // 삭제 버튼 클릭 시 모달 열리는지 확인
+      await userEvent.click(deleteButton!);
+      expect(
+        screen.getByText('테이블을 삭제하시겠습니까?'),
+      ).toBeInTheDocument();
+
+      // 취소 버튼 클릭 시 모달 닫히는지 확인
+      await userEvent.click(screen.getByText('취소'));
+      expect(
+        screen.queryByText('테이블을 삭제하시겠습니까?'),
+      ).not.toBeInTheDocument();
     });
-  });
-
-  it('AddTable 렌더링 검증', () => {
-    renderTableListPage();
-    expect(screen.getByTestId('add-table')).toBeInTheDocument();
-  });
-
-  it('삭제 버튼 클릭 동작 검증', async () => {
-    renderTableListPage();
-    await waitFor(() => {
-      screen.getAllByRole('button', { name: /테이블 \d+/i });
-    });
-
-    const deleteButtons = screen.getAllByRole('button', { name: '삭제하기' });
-    expect(deleteButtons).toHaveLength(8);
-
-    await userEvent.click(deleteButtons[0]);
-    const modalHeader = await screen.findByRole('heading', {
-      name: '삭제하시겠습니까?',
-    });
-    expect(modalHeader).toBeInTheDocument();
-  });
-
-  it('수정 버튼 클릭 동작 검증', async () => {
-    const navigate = vi.fn();
-    (useNavigate as jest.Mock).mockReturnValue(navigate);
-
-    renderTableListPage();
-
-    await waitFor(() => {
-      screen.getAllByRole('button', { name: /테이블 \d+/i });
-    });
-
-    const editButtons = screen.getAllByRole('button', { name: '수정하기' });
-    expect(editButtons).toHaveLength(8);
-
-    await userEvent.click(editButtons[0]);
-    expect(navigate).toHaveBeenCalledWith(
-      '/composition?mode=edit&tableId=1&type=PARLIAMENTARY',
-    );
   });
 });

@@ -1,14 +1,17 @@
 import DebatePanel from '../DebatePanel/DebatePanel';
+import CustomizeDebatePanel from '../DebatePanel/CustomizeDebatePanel';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { useModal } from '../../../../hooks/useModal';
-import { TimeBoxInfo } from '../../../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
-import { TableFormData } from '../../hook/useTableFrom';
+import { TableFormData, TimeBoxInfo } from '../../hook/useTableFrom';
 import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
+import { CustomizeTimeBoxInfo } from '../../../../type/type';
+import CustomizeTimerCreationContent from '../TimerCreationContent/CustomizeTimerCreationContent';
 
 interface TimeBoxStepProps {
   initData: TableFormData;
@@ -16,6 +19,13 @@ interface TimeBoxStepProps {
   onButtonClick: () => void;
   isEdit?: boolean;
 }
+// customize 타입가드
+function isCustomize(
+  info: TableFormData['info'],
+): info is Extract<TableFormData, { info: { type: 'CUSTOMIZE' } }>['info'] {
+  return info.type === 'CUSTOMIZE';
+}
+
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const { initData, onTimeBoxChange, onButtonClick, isEdit = false } = props;
   const initTimeBox = initData.table;
@@ -44,11 +54,40 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
   const isAbledSummitButton = initTimeBox.length !== 0;
 
+  // 타임박스 렌더링 분기 처리
+  const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
+    if (isCustomize(initData.info)) {
+      return (
+        <CustomizeDebatePanel
+          key={index}
+          info={info as CustomizeTimeBoxInfo}
+          onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
+          prosTeamName={initData.info.prosTeamName}
+          consTeamName={initData.info.consTeamName}
+          onSubmitDelete={() => handleSubmitDelete(index)}
+          onMouseDown={() => handleMouseDown(index)}
+        />
+      );
+    }
+    return (
+      <DebatePanel
+        key={index}
+        info={info as ParliamentaryTimeBoxInfo}
+        onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
+        onSubmitDelete={() => handleSubmitDelete(index)}
+        onMouseDown={() => handleMouseDown(index)}
+      />
+    );
+  };
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={initData.info.name} type={'PARLIAMENTARY'} />
+          <HeaderTableInfo
+            name={initData.info.name}
+            type={initData.info.type}
+          />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <HeaderTitle title={initData.info.agenda} />
@@ -58,19 +97,19 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
       <DefaultLayout.ContentContainer>
         <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
-          <PropsAndConsTitle />
+          {isCustomize(initData.info) ? (
+            <PropsAndConsTitle
+              prosTeamName={initData.info.prosTeamName}
+              consTeamName={initData.info.consTeamName}
+            />
+          ) : (
+            <PropsAndConsTitle />
+          )}
+
           <DragAndDropWrapper>
             {initTimeBox.map((info, index) => (
               <div key={index + info.stance} style={getDraggingStyles(index)}>
-                <DebatePanel
-                  key={index + info.stance}
-                  info={info}
-                  onSubmitEdit={(updatedInfo) =>
-                    handleSubmitEdit(index, updatedInfo)
-                  }
-                  onSubmitDelete={() => handleSubmitDelete(index)}
-                  onMouseDown={() => handleMouseDown(index)}
-                />
+                {renderTimeBoxItem(info, index)}
               </div>
             ))}
           </DragAndDropWrapper>
@@ -80,13 +119,11 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-4 w-full max-w-4xl">
+        <div className="mx-auto mb-8 w-full max-w-4xl">
           <button
             onClick={onButtonClick}
-            className={`font-semibol h-16 w-full rounded-md text-lg font-semibold transition-colors duration-300 md:text-xl ${
-              isAbledSummitButton
-                ? 'bg-brand-main hover:bg-amber-600'
-                : 'cursor-not-allowed bg-neutral-500'
+            className={`h-16 w-full ${
+              isAbledSummitButton ? 'button enabled' : 'button disabled'
             }`}
             disabled={!isAbledSummitButton}
           >
@@ -95,15 +132,33 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         </div>
       </DefaultLayout.StickyFooterWrapper>
 
-      <ModalWrapper>
-        <TimerCreationContent
-          beforeData={initTimeBox[initTimeBox.length - 1]}
-          onSubmit={(data) => {
-            onTimeBoxChange((prev) => [...prev, data]);
-          }}
-          onClose={closeModal}
-        />
-      </ModalWrapper>
+      {isCustomize(initData.info) ? (
+        <ModalWrapper closeButtonColor="text-neutral-1000">
+          <CustomizeTimerCreationContent
+            beforeData={
+              initTimeBox[initTimeBox.length - 1] as CustomizeTimeBoxInfo
+            }
+            prosTeamName={initData.info.prosTeamName}
+            consTeamName={initData.info.consTeamName}
+            onSubmit={(data) => {
+              onTimeBoxChange((prev) => [...prev, data]);
+            }}
+            onClose={closeModal}
+          />
+        </ModalWrapper>
+      ) : (
+        <ModalWrapper>
+          <TimerCreationContent
+            beforeData={
+              initTimeBox[initTimeBox.length - 1] as ParliamentaryTimeBoxInfo
+            }
+            onSubmit={(data) => {
+              onTimeBoxChange((prev) => [...prev, data]);
+            }}
+            onClose={closeModal}
+          />
+        </ModalWrapper>
+      )}
     </DefaultLayout>
   );
 }

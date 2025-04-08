@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { TimeBoxInfo, DebateType, Stance } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  ParliamentarySpeechType,
+  Stance,
+} from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 
 interface TimerCreationContentProps {
-  beforeData?: TimeBoxInfo;
-  initData?: TimeBoxInfo;
-  onSubmit: (data: TimeBoxInfo) => void;
+  beforeData?: ParliamentaryTimeBoxInfo;
+  initData?: ParliamentaryTimeBoxInfo;
+  onSubmit: (data: ParliamentaryTimeBoxInfo) => void;
   onClose: () => void;
 }
 
@@ -25,7 +29,7 @@ export default function TimerCreationContent({
       : (initData?.stance ?? 'PROS'),
   );
 
-  const [debateType, setDebateType] = useState<DebateType>(
+  const [debateType, setDebateType] = useState<ParliamentarySpeechType>(
     beforeData?.type
       ? beforeData?.type !== 'TIME_OUT'
         ? beforeData?.type
@@ -82,11 +86,11 @@ export default function TimerCreationContent({
   };
 
   return (
-    <div className="relative aspect-square min-w-[400px]">
+    <div className="relative min-w-[400px]">
       <h2
         className={`mb-4 px-4 py-4 text-xl font-bold text-neutral-0 ${getStanceColor()}`}
       >
-        시간표 설정
+        타이머 설정
       </h2>
       <div className="flex flex-col gap-6 p-4">
         <div className="flex items-center space-x-2">
@@ -109,7 +113,7 @@ export default function TimerCreationContent({
               ) {
                 setStance('PROS');
               }
-              setDebateType(e.target.value as DebateType);
+              setDebateType(e.target.value as ParliamentarySpeechType);
             }}
           >
             <option value="OPENING">입론</option>
@@ -205,10 +209,10 @@ export default function TimerCreationContent({
         </div>
 
         <button
-          className="absolute bottom-4 left-4 right-4 mt-4 rounded bg-amber-300 p-2 font-semibold hover:bg-amber-500"
+          className="rounded-xl border-[1px] border-neutral-700 p-2 text-[18px] font-semibold hover:bg-brand-main" // "absolute bottom-4 left-4 right-4 mt-4 rounded bg-amber-300 p-2 font-semibold hover:bg-amber-500"
           onClick={handleSubmit}
         >
-          시간표 설정
+          설정 완료
         </button>
       </div>
     </div>

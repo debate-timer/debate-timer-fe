@@ -1,7 +1,7 @@
-import { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes, ReactNode } from 'react';
 
 interface LabeledCheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label: ReactNode;
   checked: boolean;
 }
 
@@ -15,7 +15,7 @@ export default function LabeledCheckbox({
 
   return (
     <label
-      className={`flex items-center gap-2 text-sm md:text-base ${labelColorClass}`}
+      className={`flex cursor-pointer items-center gap-2 text-sm md:text-base ${labelColorClass}`}
     >
       <input
         {...rest}
@@ -24,9 +24,10 @@ export default function LabeledCheckbox({
         className="
           relative
           h-5
-          w-5 appearance-none
-          rounded-sm
-          border border-neutral-300
+          w-5 cursor-pointer
+          appearance-none
+          rounded-sm border
+          border-neutral-300
           checked:border-transparent
           checked:bg-blue-500
           checked:before:absolute

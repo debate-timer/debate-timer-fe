@@ -55,13 +55,23 @@ export default {
           'sans-serif',
         ],
       },
+      boxShadow: {
+        'camp-blue': `0 0 30px #FF3B2F`,
+        'camp-red': `0 0 30px #007AFF`,
+        'camp-neutral': `0 0 30px #737373`
+      },
       colors: {
         brand: {
           main: '#FECD4C',
-          sub1: '#01204E',
+          main501: '#FFF2B3',
+          main502: '#FFD866',
+          main504: '#E6B843',
+          main505: '#C4A64C',
+
+          sub1: '#FF5622',
           sub2: '#028391',
-          sub3: '#37474F',
-          sub4: '#FF5622',
+          sub3 :'#FF8B87'
+          
         },
         neutral: {
           1000: '#000000',
@@ -71,10 +81,11 @@ export default {
           warning: '#FFBF40',
           success: '#4BD964',
           danger: '#FF3F2F',
+          error: '#FF8B87',
         },
         camp: {
-          red: '#FF3B2F',
-          blue: '#007AFF',
+          red: '#F64740',
+          blue: '#2B74E1',
         },
         background: {
           default: '#F6F5F4',

@@ -5,6 +5,13 @@ const meta: Meta<typeof TableComposition> = {
   title: 'page/TableCompositon',
   component: TableComposition,
   tags: ['autodocs'],
+  decorators: [
+    (Story) => {
+      // 세션 초기화
+      window.sessionStorage.removeItem('creationInfo');
+      return <Story />;
+    },
+  ],
 };
 
 export default meta;

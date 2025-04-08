@@ -1,6 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react';
 import TableOverview from './TableOverview';
-import { TimeBoxInfo } from '../../type/type';
+import {
+  // ParliamentaryTimeBoxInfo,
+  CustomizeTimeBoxInfo,
+} from '../../type/type';
 
 // 1) 메타 설정
 const meta: Meta<typeof TableOverview> = {
@@ -19,16 +22,31 @@ export const Default: Story = {
     routeState: [
       {
         stance: 'PROS',
-        type: 'OPENING',
-        time: 150,
-        speakerNumber: 1,
+        speechType: '입론',
+        boxType: 'NORMAL',
+        time: 120,
+        timePerTeam: null,
+        timePerSpeaking: null,
+        speaker: '발언자 1',
       },
       {
-        stance: 'CONS',
-        type: 'REBUTTAL',
-        time: 180,
-        speakerNumber: 2,
+        stance: 'PROS',
+        speechType: '입론',
+        boxType: 'NORMAL',
+        time: 120,
+        timePerTeam: null,
+        timePerSpeaking: null,
+        speaker: '발언자 1',
       },
-    ] as TimeBoxInfo[],
+      {
+        stance: 'NEUTRAL',
+        speechType: '작전 시간',
+        boxType: 'NORMAL',
+        time: 60,
+        timePerTeam: null,
+        timePerSpeaking: null,
+        speaker: null,
+      },
+    ] as CustomizeTimeBoxInfo[],
   },
 };

@@ -73,6 +73,26 @@ export const OnNeutral: Story = {
   },
 };
 
+export const OnSpeakerNull: Story = {
+  args: {
+    onChangingTimer: () => {},
+    onPause: () => {},
+    onReset: () => {},
+    onStart: () => {},
+    goToOtherItem: (isPrev: boolean) => {
+      console.log(isPrev);
+    },
+    timer: 150,
+    isTimerChangeable: false,
+    isRunning: false,
+    item: {
+      stance: 'PROS',
+      type: 'OPENING',
+      time: 60,
+    },
+  },
+};
+
 export const OnRunning: Story = {
   args: {
     onChangingTimer: () => {},

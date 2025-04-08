@@ -1,15 +1,26 @@
 import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
-import { TimeBoxInfo } from '../../../../type/type';
+import {
+  ParliamentaryTimeBoxInfo,
+  CustomizeTimeBoxInfo,
+} from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
+import CustomizeTimerCreationContent from '../TimerCreationContent/CustomizeTimerCreationContent';
+import DialogModal from '../../../../components/DialogModal/DialogModal';
 
-interface EditDeleteButtonsPros {
-  info: TimeBoxInfo;
-  onSubmitEdit: (updatedInfo: TimeBoxInfo) => void;
+interface EditDeleteButtonsPros<
+  T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+> {
+  info: T;
+  prosTeamName?: string;
+  consTeamName?: string;
+  onSubmitEdit: (updatedInfo: T) => void;
   onSubmitDelete: () => void;
 }
 
-export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
+export default function EditDeleteButtons<
+  T extends ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+>(props: EditDeleteButtonsPros<T>) {
   const {
     openModal: openEditModal,
     closeModal: closeEditModal,
@@ -21,6 +32,11 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
     ModalWrapper: DeleteModalWrapper,
   } = useModal({ isCloseButtonExist: false });
   const { info, onSubmitEdit, onSubmitDelete } = props;
+  function isCustomize(
+    info: ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo,
+  ): info is CustomizeTimeBoxInfo {
+    return 'boxType' in info;
+  }
 
   return (
     <>
@@ -41,36 +57,43 @@ export default function EditDeleteButtons(props: EditDeleteButtonsPros) {
         </button>
       </div>
       <EditModalWrapper>
-        <TimerCreationContent
-          initData={info}
-          onSubmit={(newInfo) => {
-            onSubmitEdit(newInfo);
-          }}
-          onClose={closeEditModal}
-        />
+        {isCustomize(info) ? (
+          <CustomizeTimerCreationContent
+            initData={info}
+            prosTeamName={props.prosTeamName as string}
+            consTeamName={props.consTeamName as string}
+            onSubmit={(newInfo) => {
+              onSubmitEdit(newInfo as T);
+            }}
+            onClose={closeEditModal}
+          />
+        ) : (
+          <TimerCreationContent
+            initData={info}
+            onSubmit={(newInfo) => {
+              onSubmitEdit(newInfo as T);
+            }}
+            onClose={closeEditModal}
+          />
+        )}
       </EditModalWrapper>
-      <DeleteModalWrapper>
-        <div className="flex flex-col items-center">
-          <h1 className="px-20 py-10 text-xl font-bold">
-            이 순서를 삭제하시겠습니까?
-          </h1>
 
-          <div className="w-full border-t border-neutral-300" />
-          <div className="flex w-full flex-row items-center justify-center py-4">
-            <button className="w-1/2" onClick={() => closeDeleteModal()}>
-              <p className="w-full text-brand-sub2">취소</p>
-            </button>
-            <button
-              className="w-1/2"
-              onClick={() => {
-                onSubmitDelete();
-                closeDeleteModal();
-              }}
-            >
-              <p className="w-full font-bold text-brand-sub2">삭제</p>
-            </button>
-          </div>
-        </div>
+      <DeleteModalWrapper>
+        <DialogModal
+          left={{ text: '취소', onClick: () => closeDeleteModal() }}
+          right={{
+            text: '삭제',
+            onClick: () => {
+              onSubmitDelete();
+              closeDeleteModal();
+            },
+            isBold: true,
+          }}
+        >
+          <h1 className="px-20 py-10 text-xl font-bold">
+            이 타이머를 삭제하시겠습니까?
+          </h1>
+        </DialogModal>
       </DeleteModalWrapper>
     </>
   );

@@ -2,14 +2,29 @@ import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { DetailDebateInfo, TimeBoxInfo, Type } from '../../../type/type';
-import useAddTable from '../../../hooks/mutations/useAddTable';
+import {
+  ParliamentaryTimeBoxInfo,
+  CustomizeTimeBoxInfo,
+  ParliamentaryInfo,
+  CustomizeInfo,
+} from '../../../type/type';
+import useAddParliamentaryTable from '../../../hooks/mutations/useAddParliamentaryDebateTable';
 import { usePutParliamentaryDebateTable } from '../../../hooks/mutations/usePutParliamentaryDebateTable';
+import useAddCustomizeTable from '../../../hooks/mutations/useAddCustomizeDebateTable';
+import { usePutCustomizeDebateTable } from '../../../hooks/mutations/usePutCustomizeDebateTable';
 
-export interface TableFormData {
-  info: DetailDebateInfo & { type: Type };
-  table: TimeBoxInfo[];
+// type 필드 포함한 인터페이스를 info로 사용. 의회식/사용자지정 구분
+interface ParliamentaryTableFormData {
+  info: ParliamentaryInfo;
+  table: ParliamentaryTimeBoxInfo[];
 }
+interface CustomizeTableFormData {
+  info: CustomizeInfo;
+  table: CustomizeTimeBoxInfo[];
+}
+export type TableFormData = ParliamentaryTableFormData | CustomizeTableFormData;
+export type TimeBoxInfo = ParliamentaryTimeBoxInfo | CustomizeTimeBoxInfo;
+
 const useTableFrom = (
   currentStep: TableCompositionStep,
   initData?: TableFormData,
@@ -19,7 +34,7 @@ const useTableFrom = (
 
   const [formData, setFormData, removeValue] = useBrowserStorage<TableFormData>(
     {
-      key: 'moimCreationInfo',
+      key: 'creationInfo',
       initialState: {
         info: {
           name: '',
@@ -34,10 +49,10 @@ const useTableFrom = (
     },
   );
 
-  const isNewMoimCreation =
+  const isNewCreation =
     currentStep === 'NameAndType' && navigationType === 'PUSH';
 
-  if (isNewMoimCreation) {
+  if (isNewCreation) {
     removeValue();
   }
 
@@ -55,63 +70,118 @@ const useTableFrom = (
   }, [currentStep, navigationType, navigate]);
 
   const updateInfo: React.Dispatch<
-    React.SetStateAction<{
-      name: string;
-      agenda: string;
-      type: Type;
-      warningBell: boolean;
-      finishBell: boolean;
-    }>
+    React.SetStateAction<TableFormData['info']>
   > = (action) => {
     setFormData((prev) => {
-      let newInfo: {
-        name: string;
-        agenda: string;
-        type: Type;
-        warningBell: boolean;
-        finishBell: boolean;
-      };
-      if (typeof action === 'function') {
-        newInfo = (action as (arg: typeof prev.info) => typeof prev.info)(
-          prev.info,
-        );
+      const newInfo = typeof action === 'function' ? action(prev.info) : action;
+
+      if (isCustomizeInfo(newInfo)) {
+        const customizeInfo: CustomizeInfo = {
+          name: newInfo.name,
+          agenda: newInfo.agenda,
+          type: 'CUSTOMIZE',
+          warningBell: newInfo.warningBell,
+          finishBell: newInfo.finishBell,
+          prosTeamName: newInfo.prosTeamName,
+          consTeamName: newInfo.consTeamName,
+        };
+        return {
+          info: customizeInfo,
+          table: prev.table as CustomizeTimeBoxInfo[],
+        };
       } else {
-        newInfo = action;
+        const parliamentaryInfo: ParliamentaryInfo = {
+          name: newInfo.name,
+          agenda: newInfo.agenda,
+          type: 'PARLIAMENTARY',
+          warningBell: newInfo.warningBell,
+          finishBell: newInfo.finishBell,
+        };
+        return {
+          info: parliamentaryInfo,
+          table: prev.table as ParliamentaryTimeBoxInfo[],
+        };
       }
-      return { ...prev, info: newInfo };
     });
   };
 
-  const updateTable: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>> = (
-    action,
+  const updateTable = (
+    action: TimeBoxInfo[] | ((prev: TimeBoxInfo[]) => TimeBoxInfo[]),
   ) => {
     setFormData((prev) => {
-      let newTable: TimeBoxInfo[];
-      if (typeof action === 'function') {
-        newTable = (action as (arg: TimeBoxInfo[]) => TimeBoxInfo[])(
-          prev.table,
-        );
+      const newTable =
+        typeof action === 'function' ? action(prev.table) : action;
+
+      if (isCustomizeInfo(prev.info)) {
+        return {
+          info: prev.info,
+          table: newTable,
+        } as CustomizeTableFormData;
       } else {
-        newTable = action;
+        return {
+          info: prev.info,
+          table: newTable,
+        } as ParliamentaryTableFormData;
       }
-      return {
-        ...prev,
-        table: newTable,
-      };
     });
   };
 
-  const { mutate: AddTable, isPending: isAddTablePending } = useAddTable(
-    (tableId: number) => {
+  const { mutate: addParliamentary } = useAddParliamentaryTable((tableId) => {
+    removeValue();
+    navigate(`/overview/parliamentary/${tableId}`);
+  });
+
+  const { mutate: addCustomize } = useAddCustomizeTable((tableId) => {
+    removeValue();
+    navigate(`/overview/customize/${tableId}`);
+  });
+
+  const { mutate: editParliamentary } = usePutParliamentaryDebateTable(
+    (tableId) => {
       removeValue();
-      navigate(`/overview/${tableId}`);
+      navigate(`/overview/parliamentary/${tableId}`);
     },
   );
-  const { mutate: EditTable, isPending: isEditTablePending } =
-    usePutParliamentaryDebateTable((tableId: number) => {
-      removeValue();
-      navigate(`/overview/${tableId}`);
-    });
+
+  const { mutate: editCustomize } = usePutCustomizeDebateTable((tableId) => {
+    removeValue();
+    navigate(`/overview/customize/${tableId}`);
+  });
+
+  // customize 타입 가드
+  function isCustomizeInfo(info: TableFormData['info']): info is CustomizeInfo {
+    return info.type === 'CUSTOMIZE';
+  }
+
+  const AddTable = () => {
+    if (isCustomizeInfo(formData.info)) {
+      addCustomize({
+        info: formData.info,
+        table: formData.table as CustomizeTimeBoxInfo[],
+      });
+    } else {
+      addParliamentary({
+        info: formData.info,
+        table: formData.table as ParliamentaryTimeBoxInfo[],
+      });
+    }
+  };
+
+  const EditTable = (tableId: number) => {
+    if (isCustomizeInfo(formData.info)) {
+      editCustomize({
+        tableId,
+        info: formData.info,
+        table: formData.table as CustomizeTimeBoxInfo[],
+      });
+    } else {
+      editParliamentary({
+        tableId,
+        info: formData.info,
+        table: formData.table as ParliamentaryTimeBoxInfo[],
+      });
+    }
+  };
 
   return {
     formData,
@@ -119,8 +189,6 @@ const useTableFrom = (
     updateTable,
     AddTable,
     EditTable,
-    isAddTablePending,
-    isEditTablePending,
   };
 };
 

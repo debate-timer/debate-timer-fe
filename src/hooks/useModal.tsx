@@ -5,6 +5,7 @@ import { IoMdClose } from 'react-icons/io';
 interface UseModalOptions {
   closeOnOverlayClick?: boolean;
   isCloseButtonExist?: boolean;
+  onClose?: () => void;
 }
 
 /**
@@ -13,15 +14,20 @@ interface UseModalOptions {
  */
 export function useModal(options: UseModalOptions = {}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { closeOnOverlayClick = true, isCloseButtonExist = true } = options;
+  const {
+    closeOnOverlayClick = true,
+    isCloseButtonExist = true,
+    onClose = () => {},
+  } = options;
 
   const openModal = useCallback(() => {
     setIsOpen(true);
   }, []);
 
   const closeModal = useCallback(() => {
+    onClose();
     setIsOpen(false);
-  }, []);
+  }, [onClose]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -44,7 +50,13 @@ export function useModal(options: UseModalOptions = {}) {
     [closeModal, closeOnOverlayClick],
   );
 
-  const ModalWrapper = ({ children }: { children: ReactNode }) => {
+  const ModalWrapper = ({
+    children,
+    closeButtonColor = 'text-neutral-0 hover:text-gray-300',
+  }: {
+    children: ReactNode;
+    closeButtonColor?: string;
+  }) => {
     if (!isOpen) return null;
 
     return (
@@ -59,7 +71,7 @@ export function useModal(options: UseModalOptions = {}) {
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute right-4 top-4 text-3xl text-neutral-0 hover:text-gray-300"
+                className={`absolute right-4 top-4 text-3xl ${closeButtonColor}`}
                 aria-label="모달 닫기"
               >
                 <IoMdClose />

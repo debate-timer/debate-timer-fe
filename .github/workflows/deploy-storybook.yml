@@ -2,12 +2,11 @@ name: Deploy-storybook
 
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches: ['develop']
-    types: ['closed']
 
 jobs:
-  deploy:
+  deploy-and-notify:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,13 +21,62 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .env
-        run: echo "${{secrets.DEVELOPMENT_ENV}}" > .env
+        run: |
+          echo "AVATAR_URL=${{ secrets.DISCORD_AVATAR_URL }}" >> $GITHUB_ENV
+          echo "USERNAME=망곰" >> $GITHUB_ENV
+          echo "CONTENT=Storybook이 새로이 갱신되었어요!" >> $GITHUB_ENV
+          echo "WEB_HOOK=${{ secrets.DISCORD_STORYBOOK_WEB_HOOK }}" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Publish to Chromatic
-        uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+        id: chromatic
+        run: |
+          OUTPUT=$(npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --sha=${{ github.sha }} --exit-zero-on-changes 2>&1 | tee chromatic_output.log)
+
+          STORYBOOK_URL=$(echo "$OUTPUT" | grep -oE 'https://67691bb66b38f560017adb56-[a-zA-Z0-9]{10}\.chromatic\.com')
+
+          if [ -z "$STORYBOOK_URL" ]; then
+            echo "❌ Failed to find Storybook URL in Chromatic output"
+            exit 1
+          fi
+
+          echo "storybook_url=$STORYBOOK_URL" >> $GITHUB_OUTPUT
+
+      - name: Compute shorten SHA
+        id: sha
+        run: echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Notify on Discord
+        env:
+          AVATAR_URL: ${{ env.AVATAR_URL }}
+          USERNAME: ${{ env.USERNAME }}
+          WEB_HOOK: ${{ env.WEB_HOOK }}
+          CONTENT: ${{ env.CONTENT }}
+          SHA: ${{ github.sha }}
+        run: |
+          SHORT_SHA="${SHA:0:7}"
+          if [ -n "$WEB_HOOK" ]; then
+            JSON_PAYLOAD=$(jq -n \
+              --arg content "$CONTENT" \
+              --arg username "$USERNAME" \
+              --arg avatar_url "$AVATAR_URL" \
+              --arg color "6421128" \
+              --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              '{
+                username: $username,
+                avatar_url: $avatar_url,
+                content: $content,
+                embeds: [{
+                  title: "📖 Storybook (commit #${{ steps.sha.outputs.short_sha }})",
+                  url: "${{ steps.chromatic.outputs.storybook_url }}",
+                  color: ($color | tonumber),
+                  timestamp: $timestamp
+                }]
+              }')
+
+            curl -X POST -H "Content-Type: application/json" -d "$JSON_PAYLOAD" "$WEB_HOOK"
+          else
+            echo "No matching title found. Skipping notification."
+          fi

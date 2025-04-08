@@ -1,17 +1,21 @@
-import { TimeBoxInfo } from '../../../type/type';
+import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
+import { ParliamentaryTimeBoxInfo } from '../../../type/type';
 import TimeTableItem from './TimeTableItem';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface TimeTableProps {
   goToOtherItem: (isPrev: boolean) => void;
   currIndex: number;
-  items: TimeBoxInfo[];
+  items: ParliamentaryTimeBoxInfo[];
   titles?: {
     pros: string;
     cons: string;
   };
 }
 
+/**
+ *
+ * @deprecated 시간표 삭제로 인해 더 이상 사용하지 않음
+ */
 export default function TimeTable({
   goToOtherItem,
   currIndex,
@@ -19,7 +23,7 @@ export default function TimeTable({
   titles,
 }: TimeTableProps) {
   return (
-    <div className="flex min-w-[720px] flex-col items-center justify-center">
+    <div className="flex min-w-[740px] flex-col items-center justify-center">
       <div
         data-testid="time-table"
         className="mb-[30px] flex w-full flex-col rounded-[23px] bg-neutral-100 pb-[20px]"
@@ -36,7 +40,7 @@ export default function TimeTable({
         </div>
 
         {/** Print time table items(timeboxes) */}
-        <div className="flex w-full flex-col space-y-[15px] px-[20px]">
+        <div className="flex w-full flex-col space-y-[15px] px-[10px]">
           {items.length > 0 && (
             <div className="flex w-full flex-col space-y-[15px]">
               <div className="h-[70px] w-full">
@@ -85,20 +89,8 @@ export default function TimeTable({
 
       {/** Prev/next buttons */}
       <div className="flex w-max flex-row items-center justify-center space-x-[20px]">
-        <button
-          className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
-          onClick={() => goToOtherItem(true)}
-        >
-          <FaArrowLeft className="size-[36px]" />
-          <h1 className="text-[28px] font-semibold">이전 차례</h1>
-        </button>
-        <button
-          className="flex flex-row items-center space-x-[20px] rounded-full border border-neutral-300 bg-neutral-200 px-[32px] py-[20px] hover:bg-brand-main"
-          onClick={() => goToOtherItem(false)}
-        >
-          <h1 className="text-[28px] font-semibold">다음 차례</h1>
-          <FaArrowRight className="size-[36px]" />
-        </button>
+        <RoundControlButton type="PREV" onClick={() => goToOtherItem(true)} />
+        <RoundControlButton type="NEXT" onClick={() => goToOtherItem(false)} />
       </div>
     </div>
   );

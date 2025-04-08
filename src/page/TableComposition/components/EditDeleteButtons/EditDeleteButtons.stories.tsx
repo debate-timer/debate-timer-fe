@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import EditDeleteButtons from './EditDeleteButtons';
-import { TimeBoxInfo } from '../../../../type/type';
+import { ParliamentaryTimeBoxInfo } from '../../../../type/type';
 
 const meta: Meta<typeof EditDeleteButtons> = {
   title: 'page/TableSetup/components/EditDeleteButtons',
@@ -12,7 +12,7 @@ export default meta;
 
 type Story = StoryObj<typeof EditDeleteButtons>;
 
-const mockInfo: TimeBoxInfo = {
+const mockInfo: ParliamentaryTimeBoxInfo = {
   stance: 'PROS',
   type: 'OPENING',
   time: 150,

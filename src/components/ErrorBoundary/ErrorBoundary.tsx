@@ -1,7 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import ErrorPage from './ErrorPage';
 import { AxiosError } from 'axios';
-import { ErrorResponseType } from '../../apis/responseTypes';
+import { ErrorResponseType } from '../../apis/responses/global';
 
 interface ErrorBoundaryProps {
   children: ReactNode;

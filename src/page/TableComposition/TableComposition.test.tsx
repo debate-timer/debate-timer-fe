@@ -27,7 +27,7 @@ function TestWrapper({
 
             {/* 실제로 이동하고 싶은 /overview 경로 - 테스트용 컴포넌트 */}
             <Route
-              path="/overview/1"
+              path="/overview/parliamentary/1"
               element={<h1 data-testid="overview-page">Overview Page</h1>}
             />
           </Routes>
@@ -71,7 +71,7 @@ describe('TableComposition', () => {
         name: '토론 정보를 수정해주세요',
       }),
     );
-    const nameInput = await screen.findByPlaceholderText('테이블 1');
+    const nameInput = await screen.findByPlaceholderText('시간표 1');
 
     expect((nameInput as HTMLInputElement).value).toBe('');
   });
@@ -112,7 +112,7 @@ describe('TableComposition', () => {
     const addButton = screen.getAllByText('+')[0]; // 첫 번째 "+" 버튼 (왼쪽 버튼)
     await userEvent.click(addButton);
 
-    const confirmButton = screen.getByRole('button', { name: '시간표 설정' });
+    const confirmButton = screen.getByRole('button', { name: '설정 완료' });
     await userEvent.click(confirmButton);
 
     await userEvent.click(submitButton);
