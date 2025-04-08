@@ -75,6 +75,7 @@ export default function NormalTimer({
           {titleText}
         </p>
 
+        {/* */}
         {/* Close button, if additional timer is enabled */}
         {isAdditionalTimerOn && (
           <button
