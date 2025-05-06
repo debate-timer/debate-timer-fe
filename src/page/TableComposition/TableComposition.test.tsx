@@ -27,7 +27,7 @@ function TestWrapper({
 
             {/* 실제로 이동하고 싶은 /overview 경로 - 테스트용 컴포넌트 */}
             <Route
-              path="/overview/parliamentary/1"
+              path="/overview/customize/1"
               element={<h1 data-testid="overview-page">Overview Page</h1>}
             />
           </Routes>
@@ -55,7 +55,6 @@ describe('TableComposition', () => {
         name: '토론 정보를 설정해주세요',
       }),
     );
-    expect(screen.getByText('토론 유형')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '다음' })).toBeInTheDocument();
   });
 
