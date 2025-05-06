@@ -3,7 +3,6 @@ import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { ParliamentaryInfo, CustomizeInfo } from '../../../../type/type';
-import DropdownForDebateType from '../DropdownForDebateType/DropdownForDebateType';
 
 type ExtendedDebateInfo = ParliamentaryInfo | CustomizeInfo;
 
@@ -79,6 +78,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             onClear={() => clearField('agenda')}
             placeholder="토론 주제를 입력해주세요"
           />
+          {/**
           {!isEdit && (
             <>
               <label className="flex items-center text-base font-semibold md:text-2xl">
@@ -91,7 +91,9 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 }
               />
             </>
-          )}
+          )
+          }
+          */}
           {isCustomize(info) && (
             <>
               <label className="flex items-center text-base font-semibold md:text-2xl">
