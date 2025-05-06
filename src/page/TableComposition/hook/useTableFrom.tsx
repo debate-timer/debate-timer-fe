@@ -39,7 +39,9 @@ const useTableFrom = (
         info: {
           name: '',
           agenda: '',
-          type: 'PARLIAMENTARY',
+          type: 'CUSTOMIZE',
+          prosTeamName: '찬성',
+          consTeamName: '반대',
           warningBell: true,
           finishBell: true,
         },
