@@ -98,6 +98,7 @@ export const customizeHandlers = [
     );
 
     return HttpResponse.json({
+      id: 1,
       info: {
         name: '나의 자유토론 테이블',
         type: 'CUSTOMIZE',
