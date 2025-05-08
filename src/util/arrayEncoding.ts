@@ -19,3 +19,14 @@ export function createEncodedURL<T>(base: string, data: T[]): string {
   const encoded = encodeArrayCompressed(data);
   return `${base}?data=${encoded}`;
 }
+
+export function extractDecodedArrayFromURL<T>(url: string): T[] | null {
+  try {
+    const parsed = new URL(url);
+    const encodedData = parsed.searchParams.get('data');
+    if (!encodedData) return null;
+    return decodeArrayCompressed<T>(encodedData);
+  } catch {
+    return null;
+  }
+}
