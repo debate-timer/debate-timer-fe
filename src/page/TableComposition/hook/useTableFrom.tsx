@@ -32,6 +32,7 @@ const useTableFrom = (
   const navigationType = useNavigationType();
   const navigate = useNavigate();
 
+  // Set default value as CUSTOMIZE to prevent users to make PARLIAMENTARY tables
   const [formData, setFormData, removeValue] = useBrowserStorage<TableFormData>(
     {
       key: 'creationInfo',
