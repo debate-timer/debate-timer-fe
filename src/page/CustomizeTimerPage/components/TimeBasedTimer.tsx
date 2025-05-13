@@ -104,9 +104,9 @@ export default function TimeBasedTimer({
                 {minute} : {second}
                 */}
                 <div className="flex flex-row items-center justify-center space-x-5 text-center">
-                  <p className="w-[160px]">{minute}</p>
-                  <p className="w-[30px]">:</p>
-                  <p className="w-[160px]">{second}</p>
+                  <p className="w-[140px]">{minute}</p>
+                  <p className="w-[20px]">:</p>
+                  <p className="w-[140px]">{second}</p>
                 </div>
               </div>
 
@@ -122,7 +122,7 @@ export default function TimeBasedTimer({
                 */}
                 <div className="flex flex-row items-center justify-center space-x-5  text-center">
                   <p className="w-[160px]">{speakingMinute}</p>
-                  <p className="w-[30px]">:</p>
+                  <p className="w-[20px]">:</p>
                   <p className="w-[160px]">{speakingSecond}</p>
                 </div>
               </div>
