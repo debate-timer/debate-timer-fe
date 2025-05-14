@@ -37,7 +37,7 @@ export default function ShareModal({
 
         {/* QR code is here. */}
         {/* If QR code is not prepared because response is not arrived, spinner will be shown. */}
-        <div className="m-[50px] size-full">
+        <div className="m-[50px] flex size-full items-center justify-center">
           {isUrlReady && (
             <QRCodeSVG
               value={shareUrl}
