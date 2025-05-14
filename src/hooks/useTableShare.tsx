@@ -30,6 +30,14 @@ export function useTableShare(tableId: number) {
     }
   }, [baseUrl, data]);
 
+  useEffect(() => {
+    if (copyState) {
+      setTimeout(() => {
+        setCopyState(false);
+      }, 3000);
+    }
+  });
+
   const TableShareModal = () =>
     isOpen ? (
       <ModalWrapper>

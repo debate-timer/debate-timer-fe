@@ -1,5 +1,5 @@
 import { QRCodeSVG } from 'qrcode.react';
-import { IoLinkOutline } from 'react-icons/io5';
+import { IoLinkOutline, IoShareOutline } from 'react-icons/io5';
 
 interface ShareModalProps {
   shareUrl: string;
@@ -17,20 +17,32 @@ export default function ShareModal({
   return (
     <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
       <div
-        className="size-[290px] rounded-2xl p-[50px]"
+        className="relative size-[290px] rounded-2xl"
         style={{ boxShadow: 'inset 0 4px 16px rgba(0, 0, 0, 0.10)' }}
       >
-        {isUrlReady && (
-          <>
-            <QRCodeSVG value={shareUrl} className="size-full" />
-            {copyState && <></>}
-          </>
+        {copyState && (
+          <div className="absolute flex size-full rounded-2xl">
+            <div className="absolute z-10 size-full rounded-2xl bg-neutral-900 opacity-80" />
+            <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4  p-[30px] text-neutral-50">
+              <IoShareOutline className="size-[120px]" />
+              <p className="whitespace-nowrap text-center text-[20px] font-bold">
+                링크가 클립보드에 복사됨
+              </p>
+            </div>
+          </div>
         )}
-        {!isUrlReady && (
-          <>
-            <img src="/spinner.gif" alt="Loading" />
-          </>
-        )}
+        <div className="m-[50px]">
+          {isUrlReady && (
+            <>
+              <QRCodeSVG value={shareUrl} className="size-full" />
+            </>
+          )}
+          {!isUrlReady && (
+            <>
+              <img src="/spinner.gif" alt="Loading" />
+            </>
+          )}
+        </div>
       </div>
       <button
         className="button enabled relative flex h-[64px] w-[360px] items-center px-5"
