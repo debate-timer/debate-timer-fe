@@ -195,21 +195,25 @@ export default function CustomizeTimerPage() {
         return false;
 
       const isTimer1WarningTime =
-        (timer1.speakingTimer === 30 &&
+        (timer1.isRunning &&
+          timer1.speakingTimer === 30 &&
           timer1.defaultTime.defaultSpeakingTimer !== 30) ||
         (timer1.defaultTime.defaultSpeakingTimer === null &&
           timer1.totalTimer === 30 &&
           timer1.defaultTime.defaultTotalTimer !== 30);
 
       const isTimer2WarningTime =
-        (timer2.speakingTimer === 30 &&
+        (timer2.isRunning &&
+          timer2.speakingTimer === 30 &&
           timer2.defaultTime.defaultSpeakingTimer !== 30) ||
         (timer2.defaultTime.defaultSpeakingTimer === null &&
           timer2.totalTimer === 30 &&
           timer2.defaultTime.defaultTotalTimer !== 30);
 
       const isNormalTimerWarningTime =
-        normalTimer.timer === 30 && normalTimer.defaultTimer !== 30;
+        normalTimer.isRunning &&
+        normalTimer.timer === 30 &&
+        normalTimer.defaultTimer !== 30;
 
       return (
         isTimer1WarningTime || isTimer2WarningTime || isNormalTimerWarningTime
@@ -223,12 +227,15 @@ export default function CustomizeTimerPage() {
 
     const shouldPlayFinishBell = () => {
       const isTimer1Finished =
-        timer1.speakingTimer === 0 || timer1.totalTimer === 0;
+        timer1.isRunning &&
+        (timer1.speakingTimer === 0 || timer1.totalTimer === 0);
 
       const isTimer2Finished =
-        timer2.speakingTimer === 0 || timer2.totalTimer === 0;
+        timer2.isRunning &&
+        (timer2.speakingTimer === 0 || timer2.totalTimer === 0);
 
-      const isNormalTimerFinished = normalTimer.timer === 0;
+      const isNormalTimerFinished =
+        normalTimer.isRunning && normalTimer.timer === 0;
 
       const isAnyTimerRunning =
         timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
