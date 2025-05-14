@@ -21,6 +21,8 @@ export default function ShareModal({
         className="relative flex size-[290px] items-center justify-center rounded-2xl"
         style={{ boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.10)' }}
       >
+        {/* This component appears to tell the user that URL is succefully copied to clipboard. */}
+        {/* It will disappear after 3 seconds. */}
         {copyState && (
           <div className="absolute flex size-full rounded-2xl">
             <div className="absolute z-10 size-full rounded-2xl bg-neutral-900 opacity-80" />
@@ -32,6 +34,9 @@ export default function ShareModal({
             </div>
           </div>
         )}
+
+        {/* QR code is here. */}
+        {/* If QR code is not prepared because response is not arrived, spinner will be shown. */}
         <div className="m-[50px] size-full">
           {isUrlReady && (
             <QRCodeSVG
@@ -49,6 +54,8 @@ export default function ShareModal({
           )}
         </div>
       </div>
+
+      {/* Button that copies URL to the user's clipboard. */}
       <button
         className="button enabled relative flex h-[64px] w-[360px] items-center px-5"
         onClick={() => {

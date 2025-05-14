@@ -11,6 +11,7 @@ export default meta;
 
 type Story = StoryObj<typeof ShareModal>;
 
+// When QR code is ready
 export const OnQRCodeReady: Story = {
   args: {
     shareUrl: 'https://www.naver.com',
@@ -20,6 +21,7 @@ export const OnQRCodeReady: Story = {
   },
 };
 
+// When QR code is not ready
 export const OnLoadingData: Story = {
   args: {
     shareUrl: '',
