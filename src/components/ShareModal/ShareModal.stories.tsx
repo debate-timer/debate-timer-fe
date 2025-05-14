@@ -11,8 +11,20 @@ export default meta;
 
 type Story = StoryObj<typeof ShareModal>;
 
-export const Default: Story = {
+export const OnQRCodeReady: Story = {
   args: {
     shareUrl: 'https://www.naver.com',
+    copyState: false,
+    isUrlReady: true,
+    onClick: () => {},
+  },
+};
+
+export const OnLoadingData: Story = {
+  args: {
+    shareUrl: '',
+    copyState: false,
+    isUrlReady: false,
+    onClick: () => {},
   },
 };
