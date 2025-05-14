@@ -25,7 +25,7 @@ export default function ShareModal({
             <div className="absolute z-10 size-full rounded-2xl bg-neutral-900 opacity-80" />
             <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4  p-[30px] text-neutral-50">
               <IoShareOutline className="size-[120px]" />
-              <p className="whitespace-nowrap text-center text-[20px] font-bold">
+              <p className="whitespace-nowrap text-center text-[20px]">
                 링크가 클립보드에 복사됨
               </p>
             </div>
