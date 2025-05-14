@@ -1,5 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { IoLinkOutline, IoShareOutline } from 'react-icons/io5';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface ShareModalProps {
   shareUrl: string;
@@ -17,8 +18,8 @@ export default function ShareModal({
   return (
     <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
       <div
-        className="relative size-[290px] rounded-2xl"
-        style={{ boxShadow: 'inset 0 4px 16px rgba(0, 0, 0, 0.10)' }}
+        className="relative flex size-[290px] items-center justify-center rounded-2xl"
+        style={{ boxShadow: 'inset 0 4px 8px rgba(0, 0, 0, 0.10)' }}
       >
         {copyState && (
           <div className="absolute flex size-full rounded-2xl">
@@ -31,16 +32,20 @@ export default function ShareModal({
             </div>
           </div>
         )}
-        <div className="m-[50px]">
+        <div className="m-[50px] size-full">
           {isUrlReady && (
-            <>
-              <QRCodeSVG value={shareUrl} className="size-full" />
-            </>
+            <QRCodeSVG
+              value={shareUrl}
+              bgColor="#f6f5f4"
+              className="size-full"
+            />
           )}
           {!isUrlReady && (
-            <>
-              <img src="/spinner.gif" alt="Loading" />
-            </>
+            <LoadingSpinner
+              strokeWidth={3}
+              size={'size-24'}
+              color={'text-neutral-300'}
+            />
           )}
         </div>
       </div>
