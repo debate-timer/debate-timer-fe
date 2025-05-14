@@ -121,7 +121,7 @@ export default function TableOverview() {
               </button>
 
               <button
-                className="button enabled flex size-16 items-center justify-center"
+                className="button enabled-hover-neutral flex size-16 items-center justify-center"
                 onClick={() => {
                   openShareModal();
                 }}
