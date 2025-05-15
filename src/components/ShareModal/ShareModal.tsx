@@ -63,7 +63,7 @@ export default function ShareModal({
         }}
       >
         <p className="absolute left-1/2 -translate-x-1/2 transform text-[28px] font-bold">
-          초대 링크 복사
+          공유 링크 복사
         </p>
         <IoLinkOutline className="ml-auto size-8" />
       </button>
