@@ -10,8 +10,8 @@ import usePatchParliamentaryTable from '../../hooks/mutations/usePatchParliament
 import usePatchCustomizeTable from '../../hooks/mutations/usePatchCustomizeDebateTable';
 import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
 import CustomizeDebatePanel from '../TableComposition/components/DebatePanel/CustomizeDebatePanel';
-import { IoShareOutline } from 'react-icons/io5';
 import { useTableShare } from '../../hooks/useTableShare';
+import { MdOutlineIosShare } from 'react-icons/md';
 
 export default function TableOverview() {
   const { type, id } = useParams();
@@ -126,7 +126,7 @@ export default function TableOverview() {
                   openShareModal();
                 }}
               >
-                <IoShareOutline />
+                <MdOutlineIosShare className="m-4 size-full" />
               </button>
             </div>
           </div>
