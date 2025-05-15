@@ -29,7 +29,7 @@ export const customizeHandlers = [
           boxType: 'TIME_BASED',
           time: null,
           timePerTeam: 60,
-          timePerSpeaking: 20,
+          timePerSpeaking: 30,
           speaker: null,
         },
         {

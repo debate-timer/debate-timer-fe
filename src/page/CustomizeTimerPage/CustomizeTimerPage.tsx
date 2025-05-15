@@ -188,31 +188,69 @@ export default function CustomizeTimerPage() {
 
   // 벨 소리 재생
   useEffect(() => {
-    if (
-      warningBellRef.current &&
-      (timer1.isRunning || timer2.isRunning || normalTimer.isRunning) &&
-      isWarningBellOn &&
-      (timer1.speakingTimer === 30 ||
-        timer1.totalTimer === 30 ||
-        timer2.speakingTimer === 30 ||
-        timer2.totalTimer === 30 ||
-        normalTimer.timer === 30)
-    ) {
+    const shouldPlayWarningBell = () => {
+      const isAnyTimerRunning =
+        timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
+      if (!warningBellRef.current || !isAnyTimerRunning || !isWarningBellOn)
+        return false;
+
+      const isTimer1WarningTime =
+        (timer1.isRunning &&
+          timer1.speakingTimer === 30 &&
+          timer1.defaultTime.defaultSpeakingTimer !== 30) ||
+        (timer1.defaultTime.defaultSpeakingTimer === null &&
+          timer1.totalTimer === 30 &&
+          timer1.defaultTime.defaultTotalTimer !== 30);
+
+      const isTimer2WarningTime =
+        (timer2.isRunning &&
+          timer2.speakingTimer === 30 &&
+          timer2.defaultTime.defaultSpeakingTimer !== 30) ||
+        (timer2.defaultTime.defaultSpeakingTimer === null &&
+          timer2.totalTimer === 30 &&
+          timer2.defaultTime.defaultTotalTimer !== 30);
+
+      const isNormalTimerWarningTime =
+        normalTimer.isRunning &&
+        normalTimer.timer === 30 &&
+        normalTimer.defaultTimer !== 30;
+
+      return (
+        isTimer1WarningTime || isTimer2WarningTime || isNormalTimerWarningTime
+      );
+    };
+
+    // 사용
+    if (warningBellRef.current && shouldPlayWarningBell()) {
       warningBellRef.current.play();
     }
 
-    if (
-      finishBellRef.current &&
-      (timer1.isRunning || timer2.isRunning || normalTimer.isRunning) &&
-      isFinishBellOn &&
-      (timer1.speakingTimer === 0 ||
-        timer1.totalTimer === 0 ||
-        timer2.speakingTimer === 0 ||
-        timer2.totalTimer === 0 ||
-        normalTimer.timer === 0)
-    ) {
+    const shouldPlayFinishBell = () => {
+      const isTimer1Finished =
+        timer1.isRunning &&
+        (timer1.speakingTimer === 0 || timer1.totalTimer === 0);
+
+      const isTimer2Finished =
+        timer2.isRunning &&
+        (timer2.speakingTimer === 0 || timer2.totalTimer === 0);
+
+      const isNormalTimerFinished =
+        normalTimer.isRunning && normalTimer.timer === 0;
+
+      const isAnyTimerRunning =
+        timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
+      return (
+        isAnyTimerRunning &&
+        isFinishBellOn &&
+        (isTimer1Finished || isTimer2Finished || isNormalTimerFinished)
+      );
+    };
+
+    // 사용
+    if (finishBellRef.current && shouldPlayFinishBell()) {
       finishBellRef.current.play();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isFinishBellOn,
     isWarningBellOn,
@@ -221,9 +259,14 @@ export default function CustomizeTimerPage() {
     normalTimer.isRunning,
     timer1.speakingTimer,
     timer1.totalTimer,
+    timer1.defaultTime.defaultTotalTimer,
+    timer1.defaultTime.defaultSpeakingTimer,
     timer2.speakingTimer,
     timer2.totalTimer,
+    timer1.defaultTime.defaultTotalTimer,
+    timer2.defaultTime.defaultSpeakingTimer,
     normalTimer.timer,
+    normalTimer.defaultTimer,
   ]);
 
   // 새로운 index(차례)로 이동했을 때 → 타이머 초기화 및 세팅
