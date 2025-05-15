@@ -212,29 +212,29 @@ export default function CustomizeTimerPage() {
         timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
       if (!warningBellRef.current || !isAnyTimerRunning || !isWarningBellOn)
         return false;
-
-      const timerJustReached30 = (
+      const waringTime = 30;
+      const timerJustReached = (
         prevTime: number | null,
         currentTime: number | null,
         defaultTime: number | null,
       ) => {
         return (
           prevTime !== null &&
-          prevTime > 30 &&
-          currentTime === 30 &&
-          defaultTime !== 30
+          prevTime > waringTime &&
+          currentTime === waringTime &&
+          defaultTime !== waringTime
         );
       };
 
       const isTimer1WarningTime =
         timer1.isRunning &&
-        (timerJustReached30(
+        (timerJustReached(
           prevTimer1Ref.current.speakingTimer,
           timer1.speakingTimer,
           timer1.defaultTime.defaultSpeakingTimer,
         ) ||
           (timer1.speakingTimer === null &&
-            timerJustReached30(
+            timerJustReached(
               prevTimer1Ref.current.totalTimer,
               timer1.totalTimer,
               timer1.defaultTime.defaultTotalTimer,
@@ -242,13 +242,13 @@ export default function CustomizeTimerPage() {
 
       const isTimer2WarningTime =
         timer2.isRunning &&
-        (timerJustReached30(
+        (timerJustReached(
           prevTimer2Ref.current.speakingTimer,
           timer2.speakingTimer,
           timer2.defaultTime.defaultSpeakingTimer,
         ) ||
           (timer2.speakingTimer === null &&
-            timerJustReached30(
+            timerJustReached(
               prevTimer2Ref.current.totalTimer,
               timer2.totalTimer,
               timer2.defaultTime.defaultTotalTimer,
@@ -257,9 +257,9 @@ export default function CustomizeTimerPage() {
       const isNormalTimerWarningTime =
         normalTimer.isRunning &&
         prevNormalTimerRef.current !== null &&
-        prevNormalTimerRef.current > 30 &&
-        normalTimer.timer === 30 &&
-        normalTimer.defaultTimer !== 30;
+        prevNormalTimerRef.current > waringTime &&
+        normalTimer.timer === waringTime &&
+        normalTimer.defaultTimer !== waringTime;
 
       return (
         isTimer1WarningTime || isTimer2WarningTime || isNormalTimerWarningTime
