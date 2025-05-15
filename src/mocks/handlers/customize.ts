@@ -29,7 +29,7 @@ export const customizeHandlers = [
           boxType: 'TIME_BASED',
           time: null,
           timePerTeam: 60,
-          timePerSpeaking: 30,
+          timePerSpeaking: 33,
           speaker: null,
         },
         {
@@ -37,7 +37,7 @@ export const customizeHandlers = [
           speechType: '자유토론',
           boxType: 'TIME_BASED',
           time: null,
-          timePerTeam: 60,
+          timePerTeam: 35,
           timePerSpeaking: null,
           speaker: null,
         },
