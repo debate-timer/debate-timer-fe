@@ -40,7 +40,7 @@ export function useTableShare(tableId: number) {
 
   const TableShareModal = () =>
     isOpen ? (
-      <ModalWrapper>
+      <ModalWrapper closeButtonColor="text-neutral-900">
         <ShareModal
           shareUrl={shareUrl}
           copyState={copyState}
