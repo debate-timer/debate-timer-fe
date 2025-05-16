@@ -71,6 +71,25 @@ export default function CustomizeTimerPage() {
     'pros',
   );
 
+  // 타이머의 이전상태를 저장(타종 31->30초인 상황에서만 타종하기위한 로직)
+  const prevTimer1Ref = useRef<{
+    speakingTimer: number | null;
+    totalTimer: number | null;
+  }>({
+    speakingTimer: null,
+    totalTimer: null,
+  });
+
+  const prevTimer2Ref = useRef<{
+    speakingTimer: number | null;
+    totalTimer: number | null;
+  }>({
+    speakingTimer: null,
+    totalTimer: null,
+  });
+
+  const prevNormalTimerRef = useRef<number | null>(null);
+
   // 이전 또는 다음 차례로 이동하는 함수
   const goToOtherItem = useCallback(
     (isPrev: boolean) => {
@@ -188,31 +207,105 @@ export default function CustomizeTimerPage() {
 
   // 벨 소리 재생
   useEffect(() => {
-    if (
-      warningBellRef.current &&
-      (timer1.isRunning || timer2.isRunning || normalTimer.isRunning) &&
-      isWarningBellOn &&
-      (timer1.speakingTimer === 30 ||
-        timer1.totalTimer === 30 ||
-        timer2.speakingTimer === 30 ||
-        timer2.totalTimer === 30 ||
-        normalTimer.timer === 30)
-    ) {
+    const shouldPlayWarningBell = () => {
+      const isAnyTimerRunning =
+        timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
+      if (!warningBellRef.current || !isAnyTimerRunning || !isWarningBellOn)
+        return false;
+      const waringTime = 30;
+      const timerJustReached = (
+        prevTime: number | null,
+        currentTime: number | null,
+        defaultTime: number | null,
+      ) => {
+        return (
+          prevTime !== null &&
+          prevTime > waringTime &&
+          currentTime === waringTime &&
+          defaultTime !== waringTime
+        );
+      };
+
+      const isTimer1WarningTime =
+        timer1.isRunning &&
+        (timerJustReached(
+          prevTimer1Ref.current.speakingTimer,
+          timer1.speakingTimer,
+          timer1.defaultTime.defaultSpeakingTimer,
+        ) ||
+          (timer1.speakingTimer === null &&
+            timerJustReached(
+              prevTimer1Ref.current.totalTimer,
+              timer1.totalTimer,
+              timer1.defaultTime.defaultTotalTimer,
+            )));
+
+      const isTimer2WarningTime =
+        timer2.isRunning &&
+        (timerJustReached(
+          prevTimer2Ref.current.speakingTimer,
+          timer2.speakingTimer,
+          timer2.defaultTime.defaultSpeakingTimer,
+        ) ||
+          (timer2.speakingTimer === null &&
+            timerJustReached(
+              prevTimer2Ref.current.totalTimer,
+              timer2.totalTimer,
+              timer2.defaultTime.defaultTotalTimer,
+            )));
+
+      const isNormalTimerWarningTime =
+        normalTimer.isRunning &&
+        prevNormalTimerRef.current !== null &&
+        prevNormalTimerRef.current > waringTime &&
+        normalTimer.timer === waringTime &&
+        normalTimer.defaultTimer !== waringTime;
+
+      return (
+        isTimer1WarningTime || isTimer2WarningTime || isNormalTimerWarningTime
+      );
+    };
+
+    // 사용
+    if (warningBellRef.current && shouldPlayWarningBell()) {
       warningBellRef.current.play();
     }
 
-    if (
-      finishBellRef.current &&
-      (timer1.isRunning || timer2.isRunning || normalTimer.isRunning) &&
-      isFinishBellOn &&
-      (timer1.speakingTimer === 0 ||
-        timer1.totalTimer === 0 ||
-        timer2.speakingTimer === 0 ||
-        timer2.totalTimer === 0 ||
-        normalTimer.timer === 0)
-    ) {
+    const shouldPlayFinishBell = () => {
+      const isTimer1Finished =
+        timer1.isRunning &&
+        (timer1.speakingTimer === 0 || timer1.totalTimer === 0);
+
+      const isTimer2Finished =
+        timer2.isRunning &&
+        (timer2.speakingTimer === 0 || timer2.totalTimer === 0);
+
+      const isNormalTimerFinished =
+        normalTimer.isRunning && normalTimer.timer === 0;
+
+      const isAnyTimerRunning =
+        timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
+      return (
+        isAnyTimerRunning &&
+        isFinishBellOn &&
+        (isTimer1Finished || isTimer2Finished || isNormalTimerFinished)
+      );
+    };
+
+    // 사용
+    if (finishBellRef.current && shouldPlayFinishBell()) {
       finishBellRef.current.play();
     }
+
+    prevTimer1Ref.current = {
+      speakingTimer: timer1.speakingTimer,
+      totalTimer: timer1.totalTimer,
+    };
+    prevTimer2Ref.current = {
+      speakingTimer: timer2.speakingTimer,
+      totalTimer: timer2.totalTimer,
+    };
+    prevNormalTimerRef.current = normalTimer.timer;
   }, [
     isFinishBellOn,
     isWarningBellOn,
@@ -221,9 +314,14 @@ export default function CustomizeTimerPage() {
     normalTimer.isRunning,
     timer1.speakingTimer,
     timer1.totalTimer,
+    timer1.defaultTime.defaultTotalTimer,
+    timer1.defaultTime.defaultSpeakingTimer,
     timer2.speakingTimer,
     timer2.totalTimer,
+    timer2.defaultTime.defaultSpeakingTimer,
     normalTimer.timer,
+    normalTimer.defaultTimer,
+    timer2.defaultTime.defaultTotalTimer,
   ]);
 
   // 새로운 index(차례)로 이동했을 때 → 타이머 초기화 및 세팅

@@ -57,6 +57,7 @@ export function useNormalTimer() {
   return {
     timer,
     isRunning,
+    defaultTimer,
     setTimer,
     startTimer,
     pauseTimer,

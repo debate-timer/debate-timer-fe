@@ -100,7 +100,14 @@ export default function TimeBasedTimer({
                 <div className="absolute left-3 top-2 text-sm font-semibold">
                   전체 시간
                 </div>
+                {/*
                 {minute} : {second}
+                */}
+                <div className="flex flex-row items-center justify-center space-x-5 text-center">
+                  <p className="w-[140px]">{minute}</p>
+                  <p className="w-[20px]">:</p>
+                  <p className="w-[140px]">{second}</p>
+                </div>
               </div>
 
               {/* 현재시간 타이머 (크게 표시) */}
@@ -110,7 +117,14 @@ export default function TimeBasedTimer({
                 <div className="absolute left-3 top-2 text-sm font-semibold">
                   현재 시간
                 </div>
+                {/*
                 {speakingMinute} : {speakingSecond}
+                */}
+                <div className="flex flex-row items-center justify-center space-x-5  text-center">
+                  <p className="w-[160px]">{speakingMinute}</p>
+                  <p className="w-[20px]">:</p>
+                  <p className="w-[160px]">{speakingSecond}</p>
+                </div>
               </div>
             </>
           ) : (

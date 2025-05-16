@@ -145,6 +145,8 @@ export function useCustomTimer({
     speakingTimer,
     isRunning,
     isDone,
+    defaultTime,
+    isSpeakingTimer,
     startTimer,
     pauseTimer,
     resetTimerForNextPhase,
