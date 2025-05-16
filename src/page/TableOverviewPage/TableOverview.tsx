@@ -16,7 +16,7 @@ import { MdOutlineIosShare } from 'react-icons/md';
 export default function TableOverview() {
   const { type, id } = useParams();
   const tableId = Number(id);
-
+  const isShareEnabled = import.meta.env.VITE_ENABLE_SHARE_URL === 'true';
   const isCustomize = type === 'customize';
 
   const { data: customizeData } = useGetCustomizeTableData(
@@ -120,14 +120,16 @@ export default function TableOverview() {
                 </div>
               </button>
 
-              <button
-                className="button enabled-hover-neutral flex size-16 items-center justify-center"
-                onClick={() => {
-                  openShareModal();
-                }}
-              >
-                <MdOutlineIosShare className="m-4 size-full" />
-              </button>
+              {isShareEnabled && (
+                <button
+                  className="button enabled-hover-neutral flex size-16 items-center justify-center"
+                  onClick={() => {
+                    openShareModal();
+                  }}
+                >
+                  <MdOutlineIosShare className="m-4 size-full" />
+                </button>
+              )}
             </div>
           </div>
         </DefaultLayout.StickyFooterWrapper>
