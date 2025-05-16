@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { DebateTable, DebateTypeToString } from '../../../type/type';
-import { IoArrowForward } from 'react-icons/io5';
+import { IoArrowForward, IoShareOutline } from 'react-icons/io5';
 import { RiDeleteBinFill, RiEditFill } from 'react-icons/ri';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
+import { useTableShare } from '../../../hooks/useTableShare';
 
 interface TableProps extends DebateTable {
   onEdit: () => void;
@@ -12,6 +13,7 @@ interface TableProps extends DebateTable {
 }
 
 export default function Table({
+  id,
   name,
   type,
   agenda,
@@ -20,9 +22,11 @@ export default function Table({
   onClick,
 }: TableProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { openShareModal, TableShareModal } = useTableShare(id);
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
+  const isShareEnabled = import.meta.env.VITE_ENABLE_SHARE_URL === 'true';
   const bgColor = isHovered ? 'bg-brand-sub1' : 'bg-brand-main';
   const squareColor = isHovered ? 'bg-neutral-0' : 'bg-brand-sub1';
   const textBodyColor = isHovered ? 'text-neutral-0' : 'text-neutral-600';
@@ -42,7 +46,9 @@ export default function Table({
         <div
           className={`transform transition-all duration-300 ${
             isHovered
-              ? 'w-24 translate-x-0 opacity-100'
+              ? isShareEnabled
+                ? 'w-28 translate-x-0 opacity-100'
+                : 'w-16 translate-x-0 opacity-100'
               : 'w-0 -translate-x-10 opacity-0'
           } flex h-full flex-col items-center justify-between overflow-hidden pb-12 pe-4 ps-8 pt-4`}
         >
@@ -67,6 +73,18 @@ export default function Table({
             >
               <RiDeleteBinFill className="text-neutral-900" />
             </button>
+            {isShareEnabled && (
+              <button
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  openShareModal();
+                }}
+                className="rounded-sm bg-neutral-0 p-[2px]"
+                aria-label="공유하기"
+              >
+                <IoShareOutline className="text-neutral-900" />
+              </button>
+            )}
           </div>
 
           <div className="flex size-[40px] items-center justify-center rounded-full bg-neutral-1000">
@@ -117,6 +135,8 @@ export default function Table({
           </div>
         </DialogModal>
       </ModalWrapper>
+
+      <TableShareModal />
     </>
   );
 }
