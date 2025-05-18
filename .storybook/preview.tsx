@@ -43,6 +43,14 @@ const preview: Preview = {
           },
           type: 'desktop',
         },
+        laptopMac13: {
+          name: 'MacBook 13-inch',
+          styles: {
+            width: '1280px',
+            height: '800px',
+          },
+          type: 'desktop',
+        },
       },
       defaultViewport: 'responsive',
     },
