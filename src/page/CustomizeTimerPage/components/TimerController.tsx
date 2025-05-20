@@ -22,11 +22,11 @@ export default function TimerController({
   return (
     <div
       data-testid="timer-controller"
-      className="flex h-[180px] w-[730px] flex-row"
+      className="flex h-[140px] w-[730px] flex-row xl:h-[180px]"
     >
       <div className="flex size-full flex-1 items-center justify-end ">
         <button
-          className="size-[82px] rounded-full bg-neutral-900 p-[18px] hover:bg-brand-main"
+          className="size-[70px] rounded-full bg-neutral-900 p-[18px] hover:bg-brand-main xl:size-[82px]"
           onClick={() => onReset()}
         >
           <FiRefreshCcw className="size-full justify-center text-slate-50" />
@@ -34,7 +34,7 @@ export default function TimerController({
       </div>
       <div className="flex size-full flex-1 items-center justify-center ">
         <button
-          className="size-[140px] rounded-full bg-neutral-900 p-[45px] hover:bg-brand-main"
+          className="size-[130px] rounded-full bg-neutral-900 p-[40px] hover:bg-brand-main xl:size-[140px] xl:p-[45px]"
           onClick={() => {
             if (isRunning) {
               onPause();
@@ -55,7 +55,7 @@ export default function TimerController({
         {isTimerChangeable && (
           <button
             data-testid="additional-timer-button"
-            className="h-[133px] w-[165px] flex-col items-center space-y-2 rounded-[23px] border-[3px] border-neutral-900 bg-neutral-50 text-[30px] font-bold leading-[37px] hover:bg-neutral-200"
+            className="h-[120px] w-[150px] flex-col items-center space-y-1 rounded-[23px] border-[3px] border-neutral-900 bg-neutral-50 text-[27px] font-bold leading-[37px] hover:bg-neutral-200 xl:h-[133px] xl:w-[165px] xl:space-y-2 xl:text-[30px]"
             onClick={() => onChangingTimer()}
           >
             <p>작전 시간</p>
