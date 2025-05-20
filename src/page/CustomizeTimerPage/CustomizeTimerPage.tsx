@@ -499,7 +499,7 @@ export default function CustomizeTimerPage() {
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
           <div
-            className={`flex h-full w-full flex-col items-center justify-center space-y-[40px] ${bgColorMap[bg]}`}
+            className={`flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
           >
             {/* 타이머 두 개 + ENTER 버튼 */}
             {data.table[index].boxType === 'NORMAL' && (
@@ -646,7 +646,7 @@ export default function CustomizeTimerPage() {
             )}
             {/* Round control buttons on the bottom side */}
             {data && (
-              <div className="flex flex-row space-x-8">
+              <div className="flex flex-row space-x-1 xl:space-x-8">
                 <div className="flex h-[70px] w-[200px] items-center justify-center">
                   {index === 0 && <></>}
                   {index !== 0 && (

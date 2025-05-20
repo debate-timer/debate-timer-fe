@@ -31,7 +31,7 @@ export default function NormalTimerTestPage() {
 
       {/* Content */}
       <DefaultLayout.ContentContainer noPadding>
-        <div className="flex flex-1 flex-col items-center justify-center gap-8 bg-neutral-100">
+        <div className="flex flex-1 flex-col items-center justify-center space-y-[25px] bg-neutral-100 xl:space-y-[40px]">
           <NormalTimer
             timer={item.time ?? 0}
             isRunning={false}
@@ -50,7 +50,7 @@ export default function NormalTimerTestPage() {
           />
 
           {/* NEXT 버튼만 하단에 표시 */}
-          <div className="flex flex-row space-x-4 xl:space-x-8">
+          <div className="flex flex-row space-x-1 xl:space-x-8">
             <div className="flex h-[70px] w-[200px] items-center justify-center">
               <RoundControlButton type="PREV" onClick={() => alert('이전')} />
             </div>
