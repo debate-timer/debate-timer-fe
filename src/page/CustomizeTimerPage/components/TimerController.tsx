@@ -22,7 +22,7 @@ export default function TimerController({
   return (
     <div
       data-testid="timer-controller"
-      className="flex h-[140px] w-[730px] flex-row xl:h-[180px]"
+      className="flex h-[140px] w-[620px] flex-row xl:h-[180px] xl:w-[730px]"
     >
       <div className="flex size-full flex-1 items-center justify-end ">
         <button
@@ -34,7 +34,7 @@ export default function TimerController({
       </div>
       <div className="flex size-full flex-1 items-center justify-center ">
         <button
-          className="size-[130px] rounded-full bg-neutral-900 p-[40px] hover:bg-brand-main xl:size-[140px] xl:p-[45px]"
+          className="size-[130px] rounded-full bg-neutral-900 p-[40px] hover:bg-brand-main xl:size-[152px] xl:p-[45px]"
           onClick={() => {
             if (isRunning) {
               onPause();
