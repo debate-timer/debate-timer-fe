@@ -50,7 +50,6 @@ export default function TableListPage() {
                 key={idx}
                 id={table.id}
                 name={table.name}
-                type={table.type}
                 agenda={table.agenda}
                 onDelete={() => onDelete(table.id)}
                 onEdit={() => onEdit(table.id)}
