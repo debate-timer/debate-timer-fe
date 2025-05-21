@@ -22,7 +22,7 @@ export default function TableComposition() {
 
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
   // 테이블 데이터 패칭 분기
-  const { data } = useGetCustomizeTableData(tableId);
+  const { data } = useGetCustomizeTableData(tableId, mode === 'edit');
 
   const initData = useMemo(() => {
     if (mode === 'edit' && data) {
