@@ -26,7 +26,6 @@ const preview: Preview = {
     },
     viewport: {
       viewports: {
-        ...INITIAL_VIEWPORTS,
         laptop1024: {
           name: 'Laptop 1024',
           styles: {
@@ -48,6 +47,14 @@ const preview: Preview = {
           styles: {
             width: '1280px',
             height: '800px',
+          },
+          type: 'desktop',
+        },
+        laptopMac16: {
+          name: 'MacBook Pro 16-inch',
+          styles: {
+            width: '1536px',
+            height: '960px',
           },
           type: 'desktop',
         },
