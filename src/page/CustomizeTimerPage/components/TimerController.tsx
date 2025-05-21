@@ -55,7 +55,7 @@ export default function TimerController({
         {isTimerChangeable && (
           <button
             data-testid="additional-timer-button"
-            className="h-[120px] w-[150px] flex-col items-center space-y-1 rounded-[23px] border-[3px] border-neutral-900 bg-neutral-50 text-[27px] font-bold leading-[37px] hover:bg-neutral-200 xl:h-[133px] xl:w-[165px] xl:space-y-2 xl:text-[30px]"
+            className="h-[90px] w-[110px] flex-col items-center space-y-1 rounded-[18px] border-[3px] border-neutral-900 bg-neutral-50 text-[20px] font-bold leading-[27px] hover:bg-neutral-200 lg:h-[120px] lg:w-[150px] lg:rounded-[23px] lg:text-[27px] lg:leading-[37px] xl:h-[133px] xl:w-[165px] xl:space-y-2 xl:text-[30px]"
             onClick={() => onChangingTimer()}
           >
             <p>작전 시간</p>

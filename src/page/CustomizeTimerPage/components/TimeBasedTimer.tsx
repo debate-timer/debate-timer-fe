@@ -117,7 +117,7 @@ export default function TimeBasedTimer({
             <>
               {/* 타이머가 하나일 때 (크게 표시) */}
               <div
-                className={`flex h-[160px] w-[400px] items-center justify-center bg-white text-[75px] font-semibold text-neutral-900 shadow-inner lg:h-[200px] lg:w-[520px] lg:text-[100px] lg:font-bold xl:h-[220px] xl:w-[600px] xl:text-[120px]`}
+                className={`flex h-[160px] w-[400px] items-center justify-center bg-white text-[75px] font-semibold text-neutral-900 shadow-inner lg:h-[199px] lg:w-[520px] lg:text-[100px] lg:font-bold xl:h-[220px] xl:w-[600px] xl:text-[120px]`}
               >
                 {minute} : {second}
               </div>

@@ -51,10 +51,10 @@ export default function NormalTimerTestPage() {
 
           {/* NEXT 버튼만 하단에 표시 */}
           <div className="flex flex-row space-x-1 xl:space-x-8">
-            <div className="flex h-[70px] w-[200px] items-center justify-center">
+            <div className="flex h-[70px] w-[175px] items-center justify-center lg:w-[200px]">
               <RoundControlButton type="PREV" onClick={() => alert('이전')} />
             </div>
-            <div className="flex h-[70px] w-[200px] items-center justify-center">
+            <div className="flex h-[70px] w-[175px] items-center justify-center lg:w-[200px]">
               <RoundControlButton type="NEXT" onClick={() => alert('다음')} />
             </div>
           </div>

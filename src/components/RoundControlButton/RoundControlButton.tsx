@@ -19,21 +19,21 @@ export default function RoundControlButton({
       {type === 'PREV' && (
         <>
           <FaArrowLeft className="size-[25px] lg:size-[31px] xl:size-[36px]" />
-          <h1 className="text-[22px] font-semibold lg:text-[24px] xl:text-[28px]">
+          <h1 className="text-[21px] font-semibold lg:text-[24px] xl:text-[28px]">
             이전 차례
           </h1>
         </>
       )}
       {type === 'NEXT' && (
         <>
-          <h1 className="text-[22px] font-semibold lg:text-[24px] xl:text-[28px]">
+          <h1 className="text-[21px] font-semibold lg:text-[24px] xl:text-[28px]">
             다음 차례
           </h1>
           <FaArrowRight className="size-[25px] lg:size-[31px] xl:size-[36px]" />
         </>
       )}
       {type === 'DONE' && (
-        <h1 className="text-[22px] font-semibold lg:text-[24px] xl:text-[28px]">
+        <h1 className="text-[21px] font-semibold lg:text-[24px] xl:text-[28px]">
           토론 종료
         </h1>
       )}
