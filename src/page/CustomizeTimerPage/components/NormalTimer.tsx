@@ -61,7 +61,7 @@ export default function NormalTimer({
   return (
     <div
       data-testid="timer"
-      className={`flex w-[600px] flex-col items-center rounded-[45px] bg-neutral-200 duration-100 ${boxShadow} xl:w-[720px]`}
+      className={`flex min-h-[300px] w-[600px] flex-col items-center rounded-[45px] bg-neutral-200 duration-100 ${boxShadow} xl:w-[720px]`}
     >
       {/* Title of timer */}
       <div

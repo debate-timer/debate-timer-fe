@@ -67,37 +67,37 @@ export default function TimeBasedTimer({
     >
       <div
         data-testid="timer"
-        className={`flex min-h-[300px] w-[720px] flex-col items-center rounded-[45px] bg-neutral-200 transition-all duration-300 ${
+        className={`flex min-h-[300px] w-[460px] flex-col items-center rounded-[45px] bg-neutral-200 transition-all duration-300 lg:w-[600px] xl:w-[720px] ${
           isSelected ? '' : 'pointer-events-none opacity-50 grayscale'
         }`}
       >
         {/* Timer Header */}
         <div
-          className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
+          className={`flex h-[80px] w-full items-center justify-between rounded-t-[45px] lg:h-[105px] xl:h-[139px] ${bgColorClass} relative text-[45px] font-semibold  text-neutral-50 lg:text-[60px] lg:font-bold xl:text-[75px]`}
         >
           <h2 className="absolute left-1/2 flex w-max -translate-x-1/2 transform items-center justify-center gap-2">
             {teamName}
             <img
               src={prosCons === 'pros' ? KeyboardKeyA : KeyboardKeyL}
               alt={prosCons === 'pros' ? 'A키' : 'ㅣ키'}
-              className="h-[56px] w-[56px]"
+              className="h-[35px] w-[35px] lg:h-[50px] lg:w-[50px] xl:h-[56px] xl:w-[56px]"
             />
           </h2>
         </div>
         {speakingTimer !== null ? (
-          <div className="h-10" />
+          <div className="h-7 lg:h-10" />
         ) : (
-          <div className="h-20" />
+          <div className="h-12 lg:h-14 xl:h-20" />
         )}
         {/* 🚩 Timer 영역 */}
-        <div className="flex flex-col items-center space-y-[20px]">
+        <div className="flex flex-col items-center space-y-[10px] lg:space-y-[15px] xl:space-y-[20px]">
           {speakingTimer !== null ? (
             <>
               {/* 전체시간 타이머 (상단 작게 표시) */}
               <div
-                className={`relative flex h-[80px] w-[600px] items-center justify-center text-[80px] font-bold text-neutral-900`}
+                className={`relative flex h-[60px] w-[400px] items-center justify-center  text-[58px] font-semibold text-neutral-900 lg:h-[70px] lg:w-[520px] lg:text-[68px] lg:font-bold xl:h-[80px] xl:w-[600px] xl:text-[80px]`}
               >
-                <div className="absolute left-3 top-2 text-sm font-semibold">
+                <div className="absolute left-3 top-2 text-xs font-normal lg:text-sm lg:font-semibold">
                   전체 시간
                 </div>
                 {minute} : {second}
@@ -105,9 +105,9 @@ export default function TimeBasedTimer({
 
               {/* 현재시간 타이머 (크게 표시) */}
               <div
-                className={`relative flex h-[160px] w-[600px] items-center justify-center bg-white text-[100px] font-bold text-neutral-900 shadow-inner`}
+                className={`relative flex h-[110px] w-[400px] items-center justify-center bg-white text-[75px] font-semibold lg:h-[130px] lg:w-[520px] lg:text-[90px] lg:font-bold xl:h-[160px] xl:w-[600px] xl:text-[100px]`}
               >
-                <div className="absolute left-3 top-2 text-sm font-semibold">
+                <div className="absolute left-3 top-2 text-xs font-normal lg:text-sm lg:font-semibold">
                   현재 시간
                 </div>
                 {speakingMinute} : {speakingSecond}
@@ -117,7 +117,7 @@ export default function TimeBasedTimer({
             <>
               {/* 타이머가 하나일 때 (크게 표시) */}
               <div
-                className={`flex h-[220px] w-[600px] items-center justify-center bg-white text-[120px] font-bold text-neutral-900 shadow-inner`}
+                className={`flex h-[160px] w-[400px] items-center justify-center bg-white text-[75px] font-semibold text-neutral-900 shadow-inner lg:h-[200px] lg:w-[520px] lg:text-[100px] lg:font-bold xl:h-[220px] xl:w-[600px] xl:text-[120px]`}
               >
                 {minute} : {second}
               </div>
@@ -126,7 +126,7 @@ export default function TimeBasedTimer({
         </div>
 
         {/* Timer controller 유지 */}
-        <div className="my-[30px]">
+        <div className="my-[15px] lg:my-[25px] xl:my-[30px]">
           <TimerController
             isRunning={isRunning}
             isTimerChangeable={false}

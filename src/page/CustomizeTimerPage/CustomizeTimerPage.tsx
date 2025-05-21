@@ -637,17 +637,19 @@ export default function CustomizeTimerPage() {
                   onClick={() => {
                     switchCamp();
                   }}
-                  className="absolute left-1/2 top-1/2 flex h-[100px] w-[100px] -translate-x-20 -translate-y-8 flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500"
+                  className="absolute left-1/2 top-1/2 flex h-[78px] w-[78px] -translate-x-[70px] -translate-y-6 flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500 lg:h-[100px] lg:w-[100px] lg:-translate-x-20 lg:-translate-y-8"
                 >
-                  <FaExchangeAlt className="text-[36px]" />
-                  <span className="text-[18px] font-bold">ENTER</span>
+                  <FaExchangeAlt className="text-[28px] lg:text-[36px]" />
+                  <span className="text-[12px] font-semibold lg:text-[18px] lg:font-bold">
+                    ENTER
+                  </span>
                 </button>
               </div>
             )}
             {/* Round control buttons on the bottom side */}
             {data && (
               <div className="flex flex-row space-x-1 xl:space-x-8">
-                <div className="flex h-[70px] w-[200px] items-center justify-center">
+                <div className="flex h-[70px] w-[175px] items-center justify-center lg:w-[200px]">
                   {index === 0 && <></>}
                   {index !== 0 && (
                     <RoundControlButton
@@ -660,7 +662,7 @@ export default function CustomizeTimerPage() {
                   )}
                 </div>
 
-                <div className="flex h-[70px] w-[200px] items-center justify-center">
+                <div className="flex h-[70px] w-[175px] items-center justify-center lg:w-[200px]">
                   {index === data.table.length - 1 && (
                     <RoundControlButton
                       type="DONE"

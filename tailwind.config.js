@@ -93,8 +93,8 @@ export default {
       },
     },
     screens: {
-      lg: '1100px',
-      xl: '1400px',
+      lg: '1280px',
+      xl: '1450px',
     },
   },
 };
