@@ -1,4 +1,4 @@
-import { CustomizeDebateInfo, CustomizeTimeBoxInfo } from '../../type/type';
+import { DebateInfo, TimeBoxInfo } from '../../type/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
 import {
@@ -42,8 +42,8 @@ export async function getCustomizeTableData(
 
 // POST /api/table/customize
 export async function postCustomizeTableData(
-  info: CustomizeDebateInfo,
-  tables: CustomizeTimeBoxInfo[],
+  info: DebateInfo,
+  tables: TimeBoxInfo[],
 ): Promise<PostCustomizeTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PostCustomizeTableResponseType>(
@@ -68,8 +68,8 @@ export async function postCustomizeTableData(
 // PUT /api/table/customize/{tableId}
 export async function putCustomizeTableData(
   tableId: number,
-  info: CustomizeDebateInfo,
-  tables: CustomizeTimeBoxInfo[],
+  info: DebateInfo,
+  tables: TimeBoxInfo[],
 ): Promise<PutCustomizeTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PutCustomizeTableResponseType>(
