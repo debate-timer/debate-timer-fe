@@ -208,7 +208,10 @@ export default function TimerCreationContent({
                     name="boxType"
                     value="NORMAL"
                     checked={boxType === 'NORMAL'}
-                    onChange={(e) => setBoxType(e.target.value as TimeBoxType)}
+                    onChange={(e) => {
+                      setBoxType(e.target.value as TimeBoxType);
+                      setSpeechType('');
+                    }}
                   />
                   일반 타이머
                 </label>
@@ -218,7 +221,10 @@ export default function TimerCreationContent({
                     name="boxType"
                     value="TIME_BASED"
                     checked={boxType === 'TIME_BASED'}
-                    onChange={(e) => setBoxType(e.target.value as TimeBoxType)}
+                    onChange={(e) => {
+                      setBoxType(e.target.value as TimeBoxType);
+                      setSpeechType('');
+                    }}
                   />
                   자유 토론 타이머
                 </label>
