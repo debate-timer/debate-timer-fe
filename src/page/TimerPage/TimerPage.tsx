@@ -460,7 +460,7 @@ export default function TimerPage() {
   useEffect(() => {
     if (data) {
       data.table.forEach((value) => {
-        if (value.speechType === '작전시간') {
+        if (value.speechType === '작전 시간') {
           setIsTimerChangeable(false);
         }
       });
