@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
-import { CustomizeDebateInfo, CustomizeTimeBoxInfo } from '../../type/type';
+import { DebateInfo, TimeBoxInfo } from '../../type/type';
 import { PutCustomizeTableResponseType } from '../../apis/responses/customize';
 import { putCustomizeTableData } from '../../apis/apis/customize';
 
 interface PutCustomizeTableParams {
   tableId: number;
-  info: CustomizeDebateInfo;
-  table: CustomizeTimeBoxInfo[];
+  info: DebateInfo;
+  table: TimeBoxInfo[];
 }
 
 export function usePutCustomizeDebateTable(
