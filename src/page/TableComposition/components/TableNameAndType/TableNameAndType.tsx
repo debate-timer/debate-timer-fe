@@ -2,33 +2,26 @@ import ClearableInput from '../../../../components/ClearableInput/ClearableInput
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { ParliamentaryInfo, CustomizeInfo } from '../../../../type/type';
-
-type ExtendedDebateInfo = ParliamentaryInfo | CustomizeInfo;
+import { DebateInfo, StanceToString } from '../../../../type/type';
 
 interface TableNameAndTypeProps {
-  info: ExtendedDebateInfo;
+  info: DebateInfo;
   isEdit?: boolean;
-  onInfoChange: (newInfo: ExtendedDebateInfo) => void;
+  onInfoChange: (newInfo: DebateInfo) => void;
   onButtonClick: () => void;
-}
-
-// customize 타입 가드
-function isCustomize(info: ExtendedDebateInfo): info is CustomizeInfo {
-  return info.type === 'CUSTOMIZE';
 }
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
   const { info, isEdit = false, onInfoChange, onButtonClick } = props;
 
-  const handleFieldChange = <K extends keyof ExtendedDebateInfo>(
+  const handleFieldChange = <K extends keyof DebateInfo>(
     field: K,
-    value: ExtendedDebateInfo[K],
+    value: DebateInfo[K],
   ) => {
     onInfoChange({
       ...info,
       [field]: value,
-    } as ExtendedDebateInfo);
+    } as DebateInfo);
   };
 
   const clearField = (field: 'name' | 'agenda') => {
@@ -38,7 +31,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
     });
   };
 
-  const clearCustomizeField = (field: 'prosTeamName' | 'consTeamName') => {
+  const clearTeamNameField = (field: 'prosTeamName' | 'consTeamName') => {
     onInfoChange({
       ...info,
       [field]: '',
@@ -78,54 +71,36 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             onClear={() => clearField('agenda')}
             placeholder="토론 주제를 입력해주세요"
           />
-          {/**
-          {!isEdit && (
-            <>
-              <label className="flex items-center text-base font-semibold md:text-2xl">
-                토론 유형
-              </label>
-              <DropdownForDebateType
-                type={info.type}
-                onChange={(selectedType) =>
-                  handleFieldChange('type', selectedType)
+          <>
+            <label className="flex items-center text-base font-semibold md:text-2xl">
+              팀명
+            </label>
+            <div className="flex items-center gap-8">
+              <ClearableInput
+                value={info.prosTeamName || ''}
+                onChange={(e) =>
+                  onInfoChange({
+                    ...info,
+                    prosTeamName: e.target.value,
+                  })
                 }
+                onClear={() => clearTeamNameField('prosTeamName')}
+                placeholder={StanceToString['PROS']}
               />
-            </>
-          )
-          }
-          */}
-          {isCustomize(info) && (
-            <>
-              <label className="flex items-center text-base font-semibold md:text-2xl">
-                팀명
-              </label>
-              <div className="flex items-center gap-8">
-                <ClearableInput
-                  value={info.prosTeamName || ''}
-                  onChange={(e) =>
-                    onInfoChange({
-                      ...info,
-                      prosTeamName: e.target.value,
-                    })
-                  }
-                  onClear={() => clearCustomizeField('prosTeamName')}
-                  placeholder="찬성"
-                />
-                <span>vs</span>
-                <ClearableInput
-                  value={info.consTeamName || ''}
-                  onChange={(e) =>
-                    onInfoChange({
-                      ...info,
-                      consTeamName: e.target.value,
-                    })
-                  }
-                  onClear={() => clearCustomizeField('consTeamName')}
-                  placeholder="반대"
-                />
-              </div>
-            </>
-          )}
+              <span>vs.</span>
+              <ClearableInput
+                value={info.consTeamName || ''}
+                onChange={(e) =>
+                  onInfoChange({
+                    ...info,
+                    consTeamName: e.target.value,
+                  })
+                }
+                onClear={() => clearTeamNameField('consTeamName')}
+                placeholder={StanceToString['CONS']}
+              />
+            </div>
+          </>
 
           <label className="text-base font-semibold md:text-2xl">
             종소리 설정
@@ -153,28 +128,22 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
         <div className="mx-auto mb-8 w-full max-w-4xl">
           <button
             onClick={() => {
-              if (isCustomize(info)) {
-                const pros = info.prosTeamName || '';
-                const cons = info.consTeamName || '';
+              const pros = info.prosTeamName || '';
+              const cons = info.consTeamName || '';
 
-                const isTooLong = pros.length > 8 || cons.length > 8;
+              const isTooLong = pros.length > 8 || cons.length > 8;
 
-                if (isTooLong) {
-                  alert('팀명은 최대 8자까지 입력할 수 있습니다.');
-                  return;
-                }
+              if (isTooLong) {
+                alert('팀명은 최대 8자까지 입력할 수 있습니다.');
+                return;
               }
-              const updatedInfo = isCustomize(info)
-                ? {
-                    ...info,
-                    name: info.name || '시간표 1',
-                    prosTeamName: info.prosTeamName || '찬성',
-                    consTeamName: info.consTeamName || '반대',
-                  }
-                : {
-                    ...info,
-                    name: info.name || '시간표 1',
-                  };
+
+              const updatedInfo = {
+                ...info,
+                name: info.name || '시간표 1',
+                prosTeamName: info.prosTeamName || '찬성',
+                consTeamName: info.consTeamName || '반대',
+              };
 
               onInfoChange(updatedInfo);
               onButtonClick();
