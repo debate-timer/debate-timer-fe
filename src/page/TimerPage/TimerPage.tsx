@@ -8,7 +8,7 @@ import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import IconButton from '../../components/IconButton/IconButton';
 import { IoHelpCircle } from 'react-icons/io5';
 import { useCustomTimer } from './hooks/useCustomTimer';
-import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
+import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import { FaExchangeAlt } from 'react-icons/fa';
 import NormalTimer from './components/NormalTimer';
 import { useNormalTimer } from './hooks/useNormalTimer';
@@ -37,7 +37,7 @@ export default function TimerPage() {
   const navigate = useNavigate();
 
   // Get query
-  const { data } = useGetCustomizeTableData(tableId);
+  const { data } = useGetDebateTableData(tableId);
 
   // Prepare for tooltip-related constants
   const [isFirst, setIsFirst] = useState(false);

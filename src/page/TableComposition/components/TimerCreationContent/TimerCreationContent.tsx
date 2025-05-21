@@ -139,13 +139,16 @@ export default function TimerCreationContent({
     value === '' ? 0 : Math.max(0, Math.min(59, Number(value)));
 
   const isNormalTimer = boxType === 'NORMAL';
+
   // 자유토론 타이머로 전환되면 speechType 초기화
   useEffect(() => {
     if (!isNormalTimer) {
       // 자유토론 타이머로 전환 시
+      /*
       if (!initData?.speechType) {
         setSpeechType('');
       }
+        */
       setIsCustomSpeech(true);
     } else {
       // 일반 타이머로 전환 시, speechType이 predefined에 있으면 custom 아님
@@ -227,7 +230,7 @@ export default function TimerCreationContent({
                 htmlFor="debate-type-select"
                 className="w-16 flex-shrink-0 font-semibold"
               >
-                발언유형
+                발언 유형
               </label>
 
               {isNormalTimer && (

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useDeleteCustomizeDebateTable } from '../../hooks/mutations/useDeleteCustomizeDebateTable';
+import { useDeleteDebateTable } from '../../hooks/mutations/useDeleteDebateTable';
 import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { DebateTable } from '../../type/type';
@@ -7,7 +7,7 @@ import Table from './components/Table';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
-  const { mutate: deleteCustomizeTable } = useDeleteCustomizeDebateTable();
+  const { mutate: deleteCustomizeTable } = useDeleteDebateTable();
   const navigate = useNavigate();
   // TODO: have to delete the query param 'type'
   const onEdit = (tableId: number) => {

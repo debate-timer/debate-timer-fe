@@ -3,8 +3,8 @@ import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import { DebateInfo, TableFormData, TimeBoxInfo } from '../../../type/type';
-import useAddCustomizeTable from '../../../hooks/mutations/useAddCustomizeDebateTable';
-import { usePutCustomizeDebateTable } from '../../../hooks/mutations/usePutCustomizeDebateTable';
+import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
+import { usePutDebateTable } from '../../../hooks/mutations/usePutDebateTable';
 
 const useTableFrom = (
   currentStep: TableCompositionStep,
@@ -86,12 +86,12 @@ const useTableFrom = (
     });
   };
 
-  const { mutate: onAddTable } = useAddCustomizeTable((tableId) => {
+  const { mutate: onAddTable } = useAddDebateTable((tableId) => {
     removeValue();
     navigate(`/overview/customize/${tableId}`);
   });
 
-  const { mutate: onModifyTable } = usePutCustomizeDebateTable((tableId) => {
+  const { mutate: onModifyTable } = usePutDebateTable((tableId) => {
     removeValue();
     navigate(`/overview/customize/${tableId}`);
   });

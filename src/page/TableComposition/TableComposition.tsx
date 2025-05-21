@@ -3,7 +3,7 @@ import TableNameAndType from './components/TableNameAndType/TableNameAndType';
 import useFunnel from '../../hooks/useFunnel';
 import useTableFrom from './hook/useTableFrom';
 import TimeBoxStep from './components/TimeBoxStep/TimeBoxStep';
-import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
+import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
@@ -22,7 +22,7 @@ export default function TableComposition() {
 
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
   // 테이블 데이터 패칭 분기
-  const { data } = useGetCustomizeTableData(tableId, mode === 'edit');
+  const { data } = useGetDebateTableData(tableId, mode === 'edit');
 
   const initData = useMemo(() => {
     if (mode === 'edit' && data) {

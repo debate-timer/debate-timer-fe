@@ -4,8 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
-import usePatchCustomizeTable from '../../hooks/mutations/usePatchCustomizeDebateTable';
-import { useGetCustomizeTableData } from '../../hooks/query/useGetCustomizeTableData';
+import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
+import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
 import { useTableShare } from '../../hooks/useTableShare';
 import { MdOutlineIosShare } from 'react-icons/md';
@@ -18,8 +18,8 @@ export default function TableOverview() {
   const navigate = useNavigate();
 
   // Only uses hooks related with customize due to the removal of parliamentary
-  const { data } = useGetCustomizeTableData(tableId);
-  const onModifyCustomizeTableData = usePatchCustomizeTable((tableId) => {
+  const { data } = useGetDebateTableData(tableId);
+  const onModifyCustomizeTableData = usePatchDebateTable((tableId) => {
     navigate(`/table/customize/${tableId}`);
   });
 

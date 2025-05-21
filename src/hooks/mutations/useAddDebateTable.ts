@@ -1,17 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
-import { postCustomizeTableData } from '../../apis/apis/customize';
-import { PostCustomizeTableResponseType } from '../../apis/responses/customize';
+import { postDebateTableData } from '../../apis/apis/customize';
+import { PostDebateTableResponseType } from '../../apis/responses/customize';
 
-interface UseAddCustomizeTableParams {
+interface AddDebateTableParams {
   info: DebateInfo;
   table: TimeBoxInfo[];
 }
 
-export default function useAddCustomizeTable(onSuccess: (id: number) => void) {
+export default function useAddDebateTable(onSuccess: (id: number) => void) {
   return useMutation({
-    mutationFn: async (params: UseAddCustomizeTableParams) => {
-      const response = await postCustomizeTableData(
+    mutationFn: async (params: AddDebateTableParams) => {
+      const response = await postDebateTableData(
         {
           name: params.info.name,
           agenda: params.info.agenda,
@@ -24,7 +24,7 @@ export default function useAddCustomizeTable(onSuccess: (id: number) => void) {
       );
       return response;
     },
-    onSuccess: (response: PostCustomizeTableResponseType) => {
+    onSuccess: (response: PostDebateTableResponseType) => {
       onSuccess(response.id);
     },
   });
