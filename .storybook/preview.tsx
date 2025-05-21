@@ -7,7 +7,6 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import React from 'react';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { allHandlers } from '../src/mocks/handlers/global';
-import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 
 initialize();
 
