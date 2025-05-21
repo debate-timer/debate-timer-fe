@@ -7,7 +7,6 @@ export type ParliamentarySpeechType =
   | 'CLOSING'
   | 'TIME_OUT';
 export type CustomizeTimeBoxType = 'NORMAL' | 'TIME_BASED';
-export type DebateType = 'PARLIAMENTARY' | 'CUSTOMIZE';
 
 // Type converters
 export const StanceToString: Record<Stance, string> = {
@@ -33,11 +32,6 @@ export const CustomizeTimeBoxTypeToString: Record<
 > = {
   NORMAL: '일반 타이머',
   TIME_BASED: '자유토론 타이머',
-};
-
-export const DebateTypeToString: Record<DebateType, string> = {
-  PARLIAMENTARY: '의회식 토론',
-  CUSTOMIZE: '사용자 지정 토론',
 };
 
 // Interfaces
@@ -82,7 +76,6 @@ export interface CustomizeDebateInfo {
 export interface DebateTable {
   id: number;
   name: string;
-  type: DebateType;
   agenda: string;
 }
 
