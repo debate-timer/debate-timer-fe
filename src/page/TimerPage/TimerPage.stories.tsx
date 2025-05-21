@@ -1,9 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react';
-import CustomizeTimerPage from './CustomizeTimerPage';
+import TimerPage from './TimerPage';
 
-const meta: Meta<typeof CustomizeTimerPage> = {
-  title: 'page/CustomizeTimerPage',
-  component: CustomizeTimerPage,
+const meta: Meta<typeof TimerPage> = {
+  title: 'page/TimerPage',
+  component: TimerPage,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen', // Storybook에서 전체 화면으로 표시
@@ -12,12 +12,12 @@ const meta: Meta<typeof CustomizeTimerPage> = {
 
 export default meta;
 
-type Story = StoryObj<typeof CustomizeTimerPage>;
+type Story = StoryObj<typeof TimerPage>;
 
 export const Default: Story = {
   render: () => (
     <div style={{ height: '100vh', width: '100vw', overflow: 'hidden' }}>
-      <CustomizeTimerPage />
+      <TimerPage />
     </div>
   ),
 };

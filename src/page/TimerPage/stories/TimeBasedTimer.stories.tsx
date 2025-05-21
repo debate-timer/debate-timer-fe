@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import TimeBasedTimer from '../components/TimeBasedTimer';
 
 const meta: Meta<typeof TimeBasedTimer> = {
-  title: 'page/CustomizeTimerPage/Components/TimeBasedTimer',
+  title: 'page/TimerPage/Components/TimeBasedTimer',
   component: TimeBasedTimer,
   tags: ['autodocs'],
 };

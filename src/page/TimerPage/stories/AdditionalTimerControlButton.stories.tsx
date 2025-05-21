@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import AdditionalTimerControlButton from '../components/AdditionalTimerControlButton';
 
 const meta: Meta<typeof AdditionalTimerControlButton> = {
-  title: 'page/CustomizeTimerPage/Components/AdditionalTimerControlButton',
+  title: 'page/TimerPage/Components/AdditionalTimerControlButton',
   component: AdditionalTimerControlButton,
   tags: ['autodocs'],
 };

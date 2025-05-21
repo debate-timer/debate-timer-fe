@@ -14,8 +14,8 @@ import NormalTimer from './components/NormalTimer';
 import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
-type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 
+type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
   default: '',
   warning: 'bg-brand-main', // 30초 ~ 11초
@@ -23,7 +23,7 @@ const bgColorMap: Record<TimerState, string> = {
   expired: 'bg-neutral-700', // 0초 이하
 };
 
-export default function CustomizeTimerPage() {
+export default function TimerPage() {
   // ########## DECLARATION AREA ##########
   // Load sounds and prepare for bell-related constants
   const warningBellRef = useRef<HTMLAudioElement>(null);
@@ -566,7 +566,6 @@ export default function CustomizeTimerPage() {
                   ? '테이블 이름 없음'
                   : data.info.name
               }
-              type={'CUSTOMIZE'}
             />
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
