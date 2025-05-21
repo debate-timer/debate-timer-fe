@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TimeBoxInfo, Stance, TimeBoxType } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../../public/timer/normal_timer.png';
@@ -36,7 +36,10 @@ export default function TimerCreationContent({
     beforeData?.boxType ?? initData?.boxType ?? 'NORMAL',
   );
 
-  const predefinedSpeechOptions = ['입론', '반론', '최종 발언', '작전 시간'];
+  const predefinedSpeechOptions = useMemo(
+    () => ['입론', '반론', '최종 발언', '작전 시간'],
+    [],
+  );
 
   const initSpeechType =
     beforeData?.speechType ?? initData?.speechType ?? '입론';

@@ -15,7 +15,6 @@ export const Parliamentary: Story = {
   args: {
     agenda: '인간을 위한 동물 실험은 금지되어야 한다.',
     name: '테이블 30',
-    type: 'PARLIAMENTARY',
     onDelete: () => {},
     onEdit: () => {},
   },
@@ -25,7 +24,6 @@ export const Customize: Story = {
   args: {
     agenda: '인간을 위한 동물 실험은 금지되어야 한다.',
     name: '테이블 30',
-    type: 'PARLIAMENTARY',
     onDelete: () => {},
     onEdit: () => {},
   },

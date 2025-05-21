@@ -49,7 +49,7 @@ export default function EditDeleteButtons(props: EditDeleteButtonsProps) {
           prosTeamName={props.prosTeamName as string}
           consTeamName={props.consTeamName as string}
           onSubmit={(newInfo) => {
-            onSubmitEdit(newInfo as T);
+            onSubmitEdit(newInfo);
           }}
           onClose={closeEditModal}
         />
