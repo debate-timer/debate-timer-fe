@@ -124,7 +124,7 @@ export default function TimerCreationContent({
       // TIME_BASED
       onSubmit({
         stance: 'NEUTRAL',
-        speechType: speechType.trim() === '' ? '자유 토론' : speechType,
+        speechType: speechType.trim() === '' ? '자유토론' : speechType,
         boxType,
         time: null,
         timePerTeam: totalTimePerTeam,
@@ -226,7 +226,7 @@ export default function TimerCreationContent({
                       setSpeechType('');
                     }}
                   />
-                  자유 토론 타이머
+                  자유토론 타이머
                 </label>
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function TimerCreationContent({
                   onChange={(e) => {
                     setSpeechType(e.target.value);
                   }}
-                  placeholder={isNormalTimer ? '예) 보충 질의' : '자유 토론'}
+                  placeholder={isNormalTimer ? '예) 보충 질의' : '자유토론'}
                 />
               )}
             </div>

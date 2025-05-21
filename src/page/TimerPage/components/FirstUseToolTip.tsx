@@ -18,7 +18,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
       <div className="flex flex-col text-neutral-50">
         <div className="mb-2 flex flex-row items-center space-x-4">
           <MdOutlineTimer size={18} />
-          <h2 className="text-xl font-bold">자유 토론 타이머 조작</h2>
+          <h2 className="text-xl font-bold">자유토론 타이머 조작</h2>
         </div>
 
         <div className="text-m flex flex-col space-y-1 md:text-lg">
