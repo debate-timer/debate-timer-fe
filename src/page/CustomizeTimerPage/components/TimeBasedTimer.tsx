@@ -95,35 +95,35 @@ export default function TimeBasedTimer({
             <>
               {/* 전체시간 타이머 (상단 작게 표시) */}
               <div
-                className={`relative flex h-[60px] w-[400px] items-center justify-center  text-[58px] font-semibold text-neutral-900 lg:h-[70px] lg:w-[520px] lg:text-[68px] lg:font-bold xl:h-[80px] xl:w-[600px] xl:text-[80px]`}
+                className={`relative flex h-[60px] w-[400px] items-center justify-center  text-[54px] font-semibold text-neutral-900 lg:h-[70px] lg:w-[520px] lg:text-[68px] lg:font-bold xl:h-[80px] xl:w-[600px] xl:text-[80px]`}
               >
-                <div className="absolute left-3 top-2 text-xs font-normal lg:text-sm lg:font-semibold">
+                <div className="absolute left-3 top-2 text-xs font-semibold lg:text-sm">
                   전체 시간
                 </div>
-                {/*
-                {minute} : {second}
-                */}
-                <div className="flex flex-row items-center justify-center space-x-5 text-center">
-                  <p className="w-[140px]">{minute}</p>
-                  <p className="w-[20px]">:</p>
-                  <p className="w-[140px]">{second}</p>
+                <div className="flex flex-row items-center justify-center text-center xl:space-x-3">
+                  <p className="w-[95px] lg:w-[120px]">{minute}</p>
+                  <p className="w-[20px] -translate-y-[4px] lg:w-[20px]">:</p>
+                  <p className="w-[95px] lg:w-[120px]">{second}</p>
                 </div>
               </div>
 
               {/* 현재시간 타이머 (크게 표시) */}
               <div
-                className={`relative flex h-[110px] w-[400px] items-center justify-center bg-white text-[75px] font-semibold lg:h-[130px] lg:w-[520px] lg:text-[90px] lg:font-bold xl:h-[160px] xl:w-[600px] xl:text-[100px]`}
+                className={`relative flex h-[110px] w-[400px] items-center justify-center bg-white text-[70px] font-semibold lg:h-[130px] lg:w-[520px] lg:text-[90px] lg:font-bold xl:h-[160px] xl:w-[600px] xl:text-[110px]`}
               >
-                <div className="absolute left-3 top-2 text-xs font-normal lg:text-sm lg:font-semibold">
+                <div className="absolute left-3 top-2 text-xs font-semibold lg:text-sm">
                   현재 시간
                 </div>
-                {/*
-                {speakingMinute} : {speakingSecond}
-                */}
-                <div className="flex flex-row items-center justify-center space-x-5  text-center">
-                  <p className="w-[160px]">{speakingMinute}</p>
-                  <p className="w-[20px]">:</p>
-                  <p className="w-[160px]">{speakingSecond}</p>
+                <div className="flex flex-row items-center justify-center text-center xl:space-x-3">
+                  <p className="w-[110px] lg:w-[150px] xl:w-[170px]">
+                    {speakingMinute}
+                  </p>
+                  <p className="w-[40px] -translate-y-[6px] xl:w-[40px] xl:-translate-y-[10px]">
+                    :
+                  </p>
+                  <p className="w-[110px] lg:w-[150px] xl:w-[170px]">
+                    {speakingSecond}
+                  </p>
                 </div>
               </div>
             </>
