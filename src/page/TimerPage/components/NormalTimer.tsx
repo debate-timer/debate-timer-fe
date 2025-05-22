@@ -56,17 +56,17 @@ export default function NormalTimer({
   return (
     <div
       data-testid="timer"
-      className={`flex min-h-[300px] w-[720px] flex-col items-center rounded-[45px] bg-neutral-200 duration-100 ${boxShadow}`}
+      className={`flex min-h-[300px] w-[460px] flex-col items-center rounded-[45px] bg-neutral-200 duration-100 lg:w-[600px] ${boxShadow} xl:w-[720px]`}
     >
       {/* Title of timer */}
       <div
-        className={`flex h-[139px] w-full items-center justify-between rounded-t-[45px] ${bgColorClass} relative text-[75px] font-bold text-neutral-50`}
+        className={`flex h-[80px] w-full items-center justify-center rounded-t-[45px] lg:h-[105px] xl:h-[139px] ${bgColorClass} relative font-bold text-neutral-50`}
       >
         {/* Title text  
         <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
           {titleText}
         </h1> */}
-        <p className="w-full items-center text-center text-[75px] font-bold">
+        <p className="w-full items-center text-center text-[45px] font-semibold lg:text-[60px] lg:font-bold xl:text-[75px]">
           {titleText}
         </p>
 
@@ -77,18 +77,18 @@ export default function NormalTimer({
             className="absolute right-10 top-1/2 -translate-y-1/2"
             onClick={() => onChangingTimer()}
           >
-            <IoCloseOutline className="size-[40px] hover:text-neutral-300" />
+            <IoCloseOutline className="size-[30px] hover:text-neutral-300 lg:size-[35px] xl:size-[40px]" />
           </button>
         )}
       </div>
 
       {/* Speaker's number, if necessary */}
-      <div className="my-[20px] h-[40px]">
-        <div className="flex w-full flex-row items-center space-x-2 text-neutral-900">
+      <div className="my-[12px] h-[25px] lg:my-[17px] lg:h-[30px] xl:my-[20px] xl:h-[40px]">
+        <div className="flex w-full flex-row items-center justify-center space-x-2 text-neutral-900">
           {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
             <>
-              <MdRecordVoiceOver className="size-[40px]" />
-              <h3 className="text-[28px] font-bold">
+              <MdRecordVoiceOver className="size-[30px] lg:size-[35px] xl:size-[40px]" />
+              <h3 className="text-[18px] font-semibold lg:text-[24px] xl:text-[28px]">
                 {teamName && teamName + '  팀 '}
                 {item.speaker && '| ' + item.speaker + ' 토론자'}
               </h3>
@@ -98,25 +98,17 @@ export default function NormalTimer({
       </div>
 
       {/* Timer display */}
-      {/*
       <div
-        className={`flex h-[220px] w-[600px] items-center justify-center bg-white text-[120px] font-bold text-neutral-900 shadow-inner`}
+        className={`flex h-[140px] w-[400px] flex-row items-center justify-center bg-slate-50 text-center text-[90px] font-bold text-neutral-900 lg:h-[190px] lg:w-[520px] lg:text-[120px] xl:h-[230px] xl:w-[600px] xl:space-x-5 xl:text-[150px]`}
       >
-        {timer < 0 && '-'}
-        {minute} : {second}
-      </div>
-      */}
-      <div
-        className={`flex h-[230px] w-[600px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[150px] font-bold text-neutral-900`}
-      >
-        {timer < 0 && <p className="w-[70px]">-</p>}
-        <p className="w-[200px]">{minute}</p>
-        <p className="w-[50px]">:</p>
-        <p className="w-[200px]">{second}</p>
+        {timer < 0 && <p className="w-[30px] lg:w-[70px]">-</p>}
+        <p className="w-[130px] lg:w-[200px]">{minute}</p>
+        <p className="w-[50px] -translate-y-[7px] lg:-translate-y-[10px]">:</p>
+        <p className="w-[130px] lg:w-[200px]">{second}</p>
       </div>
 
       {/* Timer controller and additional timer controller */}
-      <div className="my-[30px] flex w-full items-center justify-center">
+      <div className="my-[20px] flex w-full items-center justify-center lg:my-[25px] xl:my-[30px]">
         {!isAdditionalTimerOn && (
           <TimerController
             isRunning={isRunning}
