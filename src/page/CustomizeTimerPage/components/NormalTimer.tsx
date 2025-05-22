@@ -103,21 +103,13 @@ export default function NormalTimer({
       </div>
 
       {/* Timer display */}
-      {/*
       <div
-        className={`flex h-[140px] w-[400px] items-center justify-center bg-white text-[80px] font-bold text-neutral-900 shadow-inner lg:h-[190px] lg:w-[520px] lg:text-[110px] xl:h-[220px] xl:w-[600px] xl:text-[120px]`}
+        className={`flex h-[140px] w-[400px] flex-row items-center justify-center bg-slate-50 text-center text-[90px] font-bold text-neutral-900 lg:h-[190px] lg:w-[520px] lg:text-[120px] xl:h-[230px] xl:w-[600px] xl:space-x-5 xl:text-[150px]`}
       >
-        {timer < 0 && '-'}
-        {minute} : {second}
-      </div>
-      */}
-      <div
-        className={`flex h-[230px] w-[600px] flex-row items-center justify-center space-x-5 bg-slate-50 text-center text-[150px] font-bold text-neutral-900`}
-      >
-        {timer < 0 && <p className="w-[70px]">-</p>}
-        <p className="w-[200px]">{minute}</p>
+        {timer < 0 && <p className="w-[30px] lg:w-[70px]">-</p>}
+        <p className="w-[130px] lg:w-[200px]">{minute}</p>
         <p className="w-[50px]">:</p>
-        <p className="w-[200px]">{second}</p>
+        <p className="w-[130px] lg:w-[200px]">{second}</p>
       </div>
 
       {/* Timer controller and additional timer controller */}
