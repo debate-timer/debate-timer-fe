@@ -97,7 +97,7 @@ export default function TimeBasedTimer({
               <div
                 className={`relative flex h-[60px] w-[400px] items-center justify-center  text-[54px] font-semibold text-neutral-900 lg:h-[70px] lg:w-[520px] lg:text-[68px] lg:font-bold xl:h-[80px] xl:w-[600px] xl:text-[80px]`}
               >
-                <div className="absolute left-3 top-2 text-xs font-normal lg:text-sm lg:font-semibold">
+                <div className="absolute left-3 top-2 text-xs font-semibold lg:text-sm">
                   전체 시간
                 </div>
                 <div className="flex flex-row items-center justify-center text-center xl:space-x-3">
@@ -111,7 +111,7 @@ export default function TimeBasedTimer({
               <div
                 className={`relative flex h-[110px] w-[400px] items-center justify-center bg-white text-[70px] font-semibold lg:h-[130px] lg:w-[520px] lg:text-[90px] lg:font-bold xl:h-[160px] xl:w-[600px] xl:text-[110px]`}
               >
-                <div className="absolute left-3 top-2 text-xs font-normal lg:text-sm lg:font-semibold">
+                <div className="absolute left-3 top-2 text-xs font-semibold lg:text-sm">
                   현재 시간
                 </div>
                 <div className="flex flex-row items-center justify-center text-center xl:space-x-3">
