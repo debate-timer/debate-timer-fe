@@ -23,6 +23,43 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    viewport: {
+      viewports: {
+        laptop1024: {
+          name: 'Laptop 1024',
+          styles: {
+            width: '1024px',
+            height: '768px',
+          },
+          type: 'desktop',
+        },
+        desktop1440: {
+          name: 'Desktop 1440',
+          styles: {
+            width: '1440px',
+            height: '900px',
+          },
+          type: 'desktop',
+        },
+        laptopMac13: {
+          name: 'MacBook 13-inch',
+          styles: {
+            width: '1280px',
+            height: '800px',
+          },
+          type: 'desktop',
+        },
+        laptopMac16: {
+          name: 'MacBook Pro 16-inch',
+          styles: {
+            width: '1536px',
+            height: '960px',
+          },
+          type: 'desktop',
+        },
+      },
+      defaultViewport: 'responsive',
+    },
   },
   loaders: [mswLoader],
   decorators: [
