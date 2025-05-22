@@ -108,7 +108,7 @@ export default function NormalTimer({
       >
         {timer < 0 && <p className="w-[30px] lg:w-[70px]">-</p>}
         <p className="w-[130px] lg:w-[200px]">{minute}</p>
-        <p className="w-[50px]">:</p>
+        <p className="w-[50px] -translate-y-[7px] lg:-translate-y-[10px]">:</p>
         <p className="w-[130px] lg:w-[200px]">{second}</p>
       </div>
 

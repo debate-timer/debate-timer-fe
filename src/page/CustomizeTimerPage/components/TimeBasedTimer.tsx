@@ -118,7 +118,9 @@ export default function TimeBasedTimer({
                   <p className="w-[110px] lg:w-[150px] xl:w-[170px]">
                     {speakingMinute}
                   </p>
-                  <p className="w-[40px] -translate-y-[7px] xl:w-[40px]">:</p>
+                  <p className="w-[40px] -translate-y-[6px] xl:w-[40px] xl:-translate-y-[10px]">
+                    :
+                  </p>
                   <p className="w-[110px] lg:w-[150px] xl:w-[170px]">
                     {speakingSecond}
                   </p>
