@@ -17,7 +17,7 @@ export default function AdditionalTimerController({
   return (
     <div
       data-testid="additional-timer-controller"
-      className="flex h-[180px] w-[730px] flex-row items-center justify-center"
+      className="flex h-[140px] w-[520px] flex-row items-center justify-center xl:h-[180px] xl:w-[730px]"
     >
       {/* Buttons that subtracts times */}
       <AdditionalTimerControlButton
@@ -33,7 +33,7 @@ export default function AdditionalTimerController({
       {/* Start and pause buttons */}
       {isRunning && (
         <button
-          className="mx-[25px] size-[152px] rounded-full bg-neutral-900 p-[45px] hover:bg-[#000000]"
+          className="mx-[25px] size-[130px] rounded-full bg-neutral-900 p-[40px] hover:bg-[#000000] xl:size-[152px] xl:p-[45px]"
           onClick={() => onPause()}
         >
           <FaStop className="size-full justify-center text-neutral-50" />
@@ -41,7 +41,7 @@ export default function AdditionalTimerController({
       )}
       {!isRunning && (
         <button
-          className="mx-[25px] size-[152px] rounded-full bg-neutral-900 p-[45px] hover:bg-[#000000]"
+          className="mx-[25px] size-[130px] rounded-full bg-neutral-900 p-[40px] hover:bg-[#000000] xl:size-[152px] xl:p-[45px]"
           onClick={() => onStart()}
         >
           <FaPlay className="size-full justify-center text-neutral-50" />

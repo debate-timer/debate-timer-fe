@@ -1,12 +1,12 @@
-import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import NormalTimer from './components/NormalTimer';
-import { CustomizeTimeBoxInfo } from '../../type/type';
-import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
-import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
-import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
+import DefaultLayout from '../../../layout/defaultLayout/DefaultLayout';
+import NormalTimer from './NormalTimer';
+import { TimeBoxInfo } from '../../../type/type';
+import HeaderTableInfo from '../../../components/HeaderTableInfo/HeaderTableInfo';
+import HeaderTitle from '../../../components/HeaderTitle/HeaderTitle';
+import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
 
 export default function NormalTimerTestPage() {
-  const item: CustomizeTimeBoxInfo = {
+  const item: TimeBoxInfo = {
     boxType: 'NORMAL',
     speechType: '입론',
     stance: 'PROS',
@@ -21,7 +21,7 @@ export default function NormalTimerTestPage() {
       {/* Header */}
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name="테스트 시간표" type="CUSTOMIZE" />
+          <HeaderTableInfo name="테스트 시간표" />
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
           <HeaderTitle title="일반타이머 테스트입니다" />

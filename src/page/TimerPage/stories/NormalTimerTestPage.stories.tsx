@@ -1,6 +1,6 @@
 // NormalTimerTestPage.stories.tsx
 import { Meta, StoryObj } from '@storybook/react';
-import NormalTimerTestPage from './NormalTimerTestPage';
+import NormalTimerTestPage from '../components/NormalTimerTestPage';
 
 const meta: Meta<typeof NormalTimerTestPage> = {
   title: 'page/CustomizeTimerPage/NormalTimerTestPage',

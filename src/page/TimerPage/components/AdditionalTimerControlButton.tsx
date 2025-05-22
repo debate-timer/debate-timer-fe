@@ -9,10 +9,12 @@ export default function AdditionalTimerControlButton({
 }: AdditionalTimerControlButtonProps) {
   return (
     <button
-      className="flex h-[50px] w-[100px] items-center justify-center rounded-[13px] bg-neutral-300 shadow-lg"
+      className="flex h-[45px] w-[80px] items-center justify-center rounded-[13px] bg-neutral-300 shadow-lg xl:h-[50px] xl:w-[100px]"
       onClick={() => addOnTimer()}
     >
-      <p className="text-center text-[25px] font-semibold">{text}</p>
+      <p className="text-center text-[20px] font-semibold xl:text-[25px]">
+        {text}
+      </p>
     </button>
   );
 }
