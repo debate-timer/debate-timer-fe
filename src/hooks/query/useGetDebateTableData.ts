@@ -1,10 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDebateTableData } from '../../apis/apis/customize';
+import { getRepository } from '../../repositories/DebateTableRepository';
+import { GetDebateTableResponseType } from '../../apis/responses/customize';
 
 export function useGetDebateTableData(tableId: number, enabled?: boolean) {
-  return useQuery({
+  return useQuery<GetDebateTableResponseType>({
     queryKey: ['DebateTableData', tableId],
-    queryFn: () => getDebateTableData(tableId),
+    queryFn: async () => {
+      const repo = getRepository();
+      return repo.getTable(tableId);
+    },
     enabled,
   });
 }
