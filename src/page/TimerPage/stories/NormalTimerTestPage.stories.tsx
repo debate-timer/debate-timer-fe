@@ -3,7 +3,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import NormalTimerTestPage from '../components/NormalTimerTestPage';
 
 const meta: Meta<typeof NormalTimerTestPage> = {
-  title: 'page/CustomizeTimerPage/NormalTimerTestPage',
+  title: 'page/TimerPage/NormalTimerTestPage',
   component: NormalTimerTestPage,
   parameters: {
     layout: 'fullscreen',
