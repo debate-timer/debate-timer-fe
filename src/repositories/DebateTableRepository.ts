@@ -1,8 +1,9 @@
+import { PutDebateTableRequestType } from '../apis/requests/debateTable';
 import {
   GetDebateTableResponseType,
   PostDebateTableResponseType,
   PutDebateTableResponseType,
-} from '../apis/responses/customize';
+} from '../apis/responses/debateTable';
 import { DebateTableData } from '../type/type';
 import { isGuestFlow } from '../util/sessionStorage';
 import { ApiDebateTableRepository } from './ApiDebateTableRepository';
@@ -11,7 +12,7 @@ export interface DebateTableRepository {
   getTable(tableId?: number): Promise<GetDebateTableResponseType>;
   saveTable(data: DebateTableData): Promise<PostDebateTableResponseType>;
   editTable(
-    data: PutDebateTableResponseType,
+    data: PutDebateTableRequestType,
   ): Promise<PutDebateTableResponseType>;
 }
 

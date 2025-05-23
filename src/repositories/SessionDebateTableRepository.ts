@@ -4,7 +4,7 @@ import {
   GetDebateTableResponseType,
   PostDebateTableResponseType,
   PutDebateTableResponseType,
-} from '../apis/responses/customize';
+} from '../apis/responses/debateTable';
 import { DebateTableData } from '../type/type';
 import {
   getSessionCustomizeTableData,

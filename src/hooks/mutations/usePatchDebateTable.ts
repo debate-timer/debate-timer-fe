@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { patchDebateTableData } from '../../apis/apis/customize';
-import { PatchDebateTableResponseType } from '../../apis/responses/customize';
+import { patchDebateTableData } from '../../apis/apis/debateTable';
+import { PatchDebateTableResponseType } from '../../apis/responses/debateTable';
 
 interface PatchDebateTableParams {
   tableId: number;

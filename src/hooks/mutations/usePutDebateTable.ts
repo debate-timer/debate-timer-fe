@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { DebateTableData } from '../../type/type';
-import { PutDebateTableResponseType } from '../../apis/responses/customize';
+import { PutDebateTableResponseType } from '../../apis/responses/debateTable';
 import { getRepository } from '../../repositories/DebateTableRepository';
 
 interface PutDebateTableParams extends DebateTableData {

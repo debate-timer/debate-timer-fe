@@ -1,7 +1,7 @@
 import {
   GetDebateTableResponseType,
   PostDebateTableResponseType,
-} from '../apis/responses/customize';
+} from '../apis/responses/debateTable';
 import { DebateTableData } from '../type/type';
 
 const STORAGE_KEY_PREFIX = 'DebateTableData';

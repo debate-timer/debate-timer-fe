@@ -2,26 +2,28 @@ import {
   getDebateTableData,
   postDebateTableData,
   putDebateTableData,
-} from '../apis/apis/customize';
+} from '../apis/apis/debateTable';
+import { PutDebateTableRequestType } from '../apis/requests/debateTable';
 import {
   GetDebateTableResponseType,
   PostDebateTableResponseType,
   PutDebateTableResponseType,
-} from '../apis/responses/customize';
+} from '../apis/responses/debateTable';
+import { DebateTableData } from '../type/type';
 import { DebateTableRepository } from './DebateTableRepository';
 
 export class ApiDebateTableRepository implements DebateTableRepository {
   async getTable(tableId: number): Promise<GetDebateTableResponseType> {
     return await getDebateTableData(tableId);
   }
-  async saveTable(
-    data: GetDebateTableResponseType,
-  ): Promise<PostDebateTableResponseType> {
-    return await postDebateTableData(data.info, data.table);
+  async saveTable(data: DebateTableData): Promise<PostDebateTableResponseType> {
+    const { info, table } = data;
+    return await postDebateTableData({ info, table });
   }
   async editTable(
-    data: PutDebateTableResponseType,
+    data: PutDebateTableRequestType,
   ): Promise<PutDebateTableResponseType> {
-    return await putDebateTableData(data.id, data.info, data.table);
+    const { id, info, table } = data;
+    return await putDebateTableData({ id, info, table });
   }
 }
