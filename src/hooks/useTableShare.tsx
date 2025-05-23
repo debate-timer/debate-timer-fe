@@ -1,7 +1,7 @@
 import { createEncodedURL } from '../util/arrayEncoding';
 import { useModal } from './useModal';
 import ShareModal from '../components/ShareModal/ShareModal';
-import { useGetCustomizeTableData } from './query/useGetCustomizeTableData';
+import { useGetDebateTableData } from './query/useGetDebateTableData';
 import { useEffect, useState } from 'react';
 
 export function useTableShare(tableId: number) {
@@ -21,7 +21,7 @@ export function useTableShare(tableId: number) {
       console.error('Failed to copy: ', err);
     }
   };
-  const data = useGetCustomizeTableData(tableId, isOpen);
+  const data = useGetDebateTableData(tableId, isOpen);
 
   useEffect(() => {
     if (data.data) {

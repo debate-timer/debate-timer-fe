@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import TableOverview from './TableOverview';
 import {
   // ParliamentaryTimeBoxInfo,
-  CustomizeTimeBoxInfo,
+  TimeBoxInfo,
 } from '../../type/type';
 
 // 1) 메타 설정
@@ -47,6 +47,6 @@ export const Default: Story = {
         timePerSpeaking: null,
         speaker: null,
       },
-    ] as CustomizeTimeBoxInfo[],
+    ] as TimeBoxInfo[],
   },
 };

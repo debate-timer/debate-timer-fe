@@ -8,9 +8,12 @@ const meta: Meta<typeof DebatePanel> = {
   args: {
     info: {
       stance: 'PROS',
-      type: 'OPENING',
-      time: 150,
-      speakerNumber: 1,
+      speechType: '입론',
+      boxType: 'NORMAL',
+      time: 120,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: '1번',
     },
   },
 };
@@ -23,9 +26,12 @@ export const ProsOpening: Story = {
   args: {
     info: {
       stance: 'PROS',
-      type: 'OPENING',
-      time: 150,
-      speakerNumber: 1,
+      speechType: '입론',
+      boxType: 'NORMAL',
+      time: 120,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: '1번',
     },
   },
 };
@@ -35,9 +41,12 @@ export const ConsRebuttal: Story = {
   args: {
     info: {
       stance: 'CONS',
-      type: 'REBUTTAL',
+      speechType: '반론',
+      boxType: 'NORMAL',
       time: 120,
-      speakerNumber: 2,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: '1번',
     },
   },
 };
@@ -47,9 +56,27 @@ export const NeutralTimeout: Story = {
   args: {
     info: {
       stance: 'NEUTRAL',
-      type: 'TIME_OUT',
-      time: 60,
-      speakerNumber: 0,
+      speechType: '작전시간',
+      boxType: 'NORMAL',
+      time: 120,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: '1번',
+    },
+  },
+};
+
+// 자유토론
+export const NeutralCustom: Story = {
+  args: {
+    info: {
+      stance: 'NEUTRAL',
+      speechType: '자유토론',
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 120,
+      timePerSpeaking: 60,
+      speaker: null,
     },
   },
 };

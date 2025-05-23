@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DebateTable, DebateTypeToString } from '../../../type/type';
+import { DebateTable } from '../../../type/type';
 import { IoArrowForward, IoShareOutline } from 'react-icons/io5';
 import { RiDeleteBinFill, RiEditFill } from 'react-icons/ri';
 import { useModal } from '../../../hooks/useModal';
@@ -15,7 +15,6 @@ interface TableProps extends DebateTable {
 export default function Table({
   id,
   name,
-  type,
   agenda,
   onDelete,
   onEdit,
@@ -104,11 +103,6 @@ export default function Table({
           <div
             className={`my-3 size-[10px] text-start duration-300 ${squareColor}`}
           ></div>
-          <p
-            className={`text-start text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
-          >
-            유형 | {DebateTypeToString[type]}
-          </p>
           <p
             className={`text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
           >

@@ -1,4 +1,4 @@
-import { CustomizeTimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/img/keyboard_key_A.png';
@@ -16,7 +16,7 @@ interface TimeBasedTimerProps {
   isRunning: boolean;
   isLastItem: boolean;
   isFirstItem: boolean;
-  item: CustomizeTimeBoxInfo;
+  item: TimeBoxInfo;
 
   /** 🚩 추가된 Props */
   speakingTimer: number | null; // 발언시간용 타이머 추가

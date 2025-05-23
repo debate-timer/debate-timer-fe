@@ -1,29 +1,29 @@
-import { CustomizeDebateInfo, CustomizeTimeBoxInfo } from '../../type/type';
+import { DebateInfo, TimeBoxInfo } from '../../type/type';
 
 // POST /api/table/customize
-export interface PostCustomizeTableResponseType {
+export interface PostDebateTableResponseType {
   id: number;
-  info: CustomizeDebateInfo;
-  table: CustomizeTimeBoxInfo[];
+  info: DebateInfo;
+  table: TimeBoxInfo[];
 }
 
 // PUT /api/table/customize/{tableId}
-export interface PutCustomizeTableResponseType {
+export interface PutDebateTableResponseType {
   id: number;
-  info: CustomizeDebateInfo;
-  table: CustomizeTimeBoxInfo[];
+  info: DebateInfo;
+  table: TimeBoxInfo[];
 }
 
 // GET /api/table/customize/{tableId}
-export interface GetCustomizeTableResponseType {
+export interface GetDebateTableResponseType {
   id: number;
-  info: CustomizeDebateInfo;
-  table: CustomizeTimeBoxInfo[];
+  info: DebateInfo;
+  table: TimeBoxInfo[];
 }
 
 // PATCH /api/table/customize/{tableId}
-export interface PatchCustomizeTableResponseType {
+export interface PatchDebateTableResponseType {
   id: number;
-  info: CustomizeDebateInfo;
-  table: CustomizeTimeBoxInfo[];
+  info: DebateInfo;
+  table: TimeBoxInfo[];
 }

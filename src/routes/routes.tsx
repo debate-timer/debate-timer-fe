@@ -2,15 +2,14 @@ import { createBrowserRouter } from 'react-router-dom';
 import LoginPage from '../page/LoginPage/LoginPage';
 import TableListPage from '../page/TableListPage/TableListPage';
 import TableOverview from '../page/TableOverviewPage/TableOverview';
-import TimerPage from '../page/TimerPage/TimerPage';
 import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/LoginPage/OAuth';
-import CustomizeTimerPage from '../page/CustomizeTimerPage/CustomizeTimerPage';
 import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
+import TimerPage from '../page/TimerPage/TimerPage';
 
 const routesConfig = [
   {
@@ -34,13 +33,8 @@ const routesConfig = [
     requiresAuth: true,
   },
   {
-    path: '/table/parliamentary/:id',
-    element: <TimerPage />,
-    requiresAuth: true,
-  },
-  {
     path: '/table/customize/:id',
-    element: <CustomizeTimerPage />,
+    element: <TimerPage />,
     requiresAuth: true,
   },
   {

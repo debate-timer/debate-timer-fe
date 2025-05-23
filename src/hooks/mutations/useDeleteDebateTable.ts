@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteCustomizeTableData } from '../../apis/apis/customize';
+import { deleteDebateTableData } from '../../apis/apis/customize';
 
-interface DeleteCustomizeTableParams {
+interface DeleteDebateTableParams {
   tableId: number;
 }
 
-export function useDeleteCustomizeDebateTable() {
+export function useDeleteDebateTable() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ tableId }: DeleteCustomizeTableParams) =>
-      await deleteCustomizeTableData(tableId),
+    mutationFn: async ({ tableId }: DeleteDebateTableParams) =>
+      await deleteDebateTableData(tableId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['DebateTableList'] });
 

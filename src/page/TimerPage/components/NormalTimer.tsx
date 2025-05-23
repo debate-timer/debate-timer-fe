@@ -1,7 +1,4 @@
-import {
-  CustomizeTimeBoxInfo,
-  ParliamentarySpeechTypeToString,
-} from '../../../type/type';
+import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
@@ -21,7 +18,7 @@ interface NormalTimerProps {
   isRunning: boolean;
   isLastItem: boolean;
   isFirstItem: boolean;
-  item: CustomizeTimeBoxInfo;
+  item: TimeBoxInfo;
   teamName: string | null;
 }
 
@@ -46,9 +43,7 @@ export default function NormalTimer({
       : item.stance === 'PROS'
         ? 'bg-camp-blue'
         : 'bg-camp-red';
-  const titleText = isAdditionalTimerOn
-    ? ParliamentarySpeechTypeToString['TIME_OUT']
-    : item.speechType;
+  const titleText = isAdditionalTimerOn ? '작전 시간' : item.speechType;
 
   const boxShadow = isRunning
     ? item.stance === 'NEUTRAL'
