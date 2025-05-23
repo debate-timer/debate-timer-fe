@@ -7,7 +7,7 @@ export default function useAddDebateTable(onSuccess: (id: number) => void) {
   return useMutation({
     mutationFn: async (params: DebateTableData) => {
       const repo = getRepository();
-      return repo.saveTable(params);
+      return repo.addTable(params);
     },
     onSuccess: (response: PostDebateTableResponseType) => {
       onSuccess(response.id);

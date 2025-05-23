@@ -10,7 +10,7 @@ import { ApiDebateTableRepository } from './ApiDebateTableRepository';
 import { SessionDebateTableRepository } from './SessionDebateTableRepository';
 export interface DebateTableRepository {
   getTable(tableId?: number): Promise<GetDebateTableResponseType>;
-  saveTable(data: DebateTableData): Promise<PostDebateTableResponseType>;
+  addTable(data: DebateTableData): Promise<PostDebateTableResponseType>;
   editTable(
     data: PutDebateTableRequestType,
   ): Promise<PutDebateTableResponseType>;

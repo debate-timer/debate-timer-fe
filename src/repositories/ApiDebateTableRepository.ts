@@ -16,7 +16,7 @@ export class ApiDebateTableRepository implements DebateTableRepository {
   async getTable(tableId: number): Promise<GetDebateTableResponseType> {
     return await getDebateTableData(tableId);
   }
-  async saveTable(data: DebateTableData): Promise<PostDebateTableResponseType> {
+  async addTable(data: DebateTableData): Promise<PostDebateTableResponseType> {
     const { info, table } = data;
     return await postDebateTableData({ info, table });
   }

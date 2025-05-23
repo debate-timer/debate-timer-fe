@@ -16,7 +16,7 @@ export class SessionDebateTableRepository implements DebateTableRepository {
   async getTable(): Promise<GetDebateTableResponseType> {
     return getSessionCustomizeTableData();
   }
-  async saveTable(data: DebateTableData): Promise<PostDebateTableResponseType> {
+  async addTable(data: DebateTableData): Promise<PostDebateTableResponseType> {
     return setSessionCustomizeTableData(data);
   }
   async editTable(
