@@ -4,7 +4,7 @@ import {
 } from '../apis/responses/customize';
 import { DebateTableData } from '../type/type';
 
-const STORAGE_KEY_PREFIX = 'customizeTable';
+const STORAGE_KEY_PREFIX = 'DebateTableData';
 
 export const getSessionCustomizeTableData = () => {
   const data = sessionStorage.getItem(STORAGE_KEY_PREFIX);
