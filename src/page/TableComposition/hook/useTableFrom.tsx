@@ -2,20 +2,20 @@ import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableComposition';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { DebateInfo, TableFormData, TimeBoxInfo } from '../../../type/type';
+import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
 import { usePutDebateTable } from '../../../hooks/mutations/usePutDebateTable';
 
 const useTableFrom = (
   currentStep: TableCompositionStep,
-  initData?: TableFormData,
+  initData?: DebateTableData,
 ) => {
   const navigationType = useNavigationType();
   const navigate = useNavigate();
 
   // Set default value as CUSTOMIZE to prevent users to make PARLIAMENTARY tables
-  const [formData, setFormData, removeValue] = useBrowserStorage<TableFormData>(
-    {
+  const [formData, setFormData, removeValue] =
+    useBrowserStorage<DebateTableData>({
       key: 'creationInfo',
       initialState: {
         info: {
@@ -29,8 +29,7 @@ const useTableFrom = (
         table: [],
       },
       storage: 'sessionStorage',
-    },
-  );
+    });
 
   const isNewCreation =
     currentStep === 'NameAndType' && navigationType === 'PUSH';
@@ -53,7 +52,7 @@ const useTableFrom = (
   }, [currentStep, navigationType, navigate]);
 
   const updateInfo: React.Dispatch<
-    React.SetStateAction<TableFormData['info']>
+    React.SetStateAction<DebateTableData['info']>
   > = (action) => {
     setFormData((prev) => {
       const newInfo = typeof action === 'function' ? action(prev.info) : action;
@@ -82,7 +81,7 @@ const useTableFrom = (
       return {
         info: prev.info,
         table: newTable,
-      } as TableFormData;
+      } as DebateTableData;
     });
   };
 

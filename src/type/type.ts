@@ -45,7 +45,7 @@ export interface DebateTable {
   agenda: string;
 }
 
-export interface TableFormData {
+export interface DebateTableData {
   info: DebateInfo;
   table: TimeBoxInfo[];
 }

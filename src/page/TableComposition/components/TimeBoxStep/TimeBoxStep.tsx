@@ -7,10 +7,10 @@ import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndC
 import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
-import { TableFormData, TimeBoxInfo } from '../../../../type/type';
+import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
 
 interface TimeBoxStepProps {
-  initData: TableFormData;
+  initData: DebateTableData;
   onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
   onButtonClick: () => void;
   isEdit?: boolean;
