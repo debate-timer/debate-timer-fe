@@ -3,7 +3,7 @@ import { ApiUrl } from '../../apis/endpoints';
 import {
   PostDebateTableResponseType,
   PutDebateTableResponseType,
-} from '../../apis/responses/customize';
+} from '../../apis/responses/debateTable';
 
 export const customizeHandlers = [
   // GET /api/table/customize/{tableId}

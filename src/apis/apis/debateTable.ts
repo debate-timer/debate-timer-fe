@@ -1,12 +1,13 @@
-import { DebateInfo, TimeBoxInfo } from '../../type/type';
+import { DebateTableData } from '../../type/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
+import { PutDebateTableRequestType } from '../requests/debateTable';
 import {
   GetDebateTableResponseType,
   PatchDebateTableResponseType,
   PostDebateTableResponseType,
   PutDebateTableResponseType,
-} from '../responses/customize';
+} from '../responses/debateTable';
 
 // Template
 /*
@@ -41,10 +42,10 @@ export async function getDebateTableData(
 }
 
 // POST /api/table/customize
-export async function postDebateTableData(
-  info: DebateInfo,
-  tables: TimeBoxInfo[],
-): Promise<PostDebateTableResponseType> {
+export async function postDebateTableData({
+  info,
+  table,
+}: DebateTableData): Promise<PostDebateTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PostDebateTableResponseType>(
     'POST',
@@ -58,7 +59,7 @@ export async function postDebateTableData(
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
-      table: tables,
+      table,
     },
     null,
   );
@@ -66,15 +67,15 @@ export async function postDebateTableData(
 }
 
 // PUT /api/table/customize/{tableId}
-export async function putDebateTableData(
-  tableId: number,
-  info: DebateInfo,
-  tables: TimeBoxInfo[],
-): Promise<PutDebateTableResponseType> {
+export async function putDebateTableData({
+  id,
+  info,
+  table,
+}: PutDebateTableRequestType): Promise<PutDebateTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request<PutDebateTableResponseType>(
     'PUT',
-    requestUrl + `/${tableId}`,
+    requestUrl + `/${id}`,
     {
       info: {
         name: info.name,
@@ -84,7 +85,7 @@ export async function putDebateTableData(
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
-      table: tables,
+      table,
     },
     null,
   );

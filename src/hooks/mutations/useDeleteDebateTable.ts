@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteDebateTableData } from '../../apis/apis/customize';
+import { deleteDebateTableData } from '../../apis/apis/debateTable';
 
 interface DeleteDebateTableParams {
   tableId: number;
