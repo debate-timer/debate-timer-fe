@@ -75,7 +75,8 @@ export default function TableComposition() {
               initData={formData}
               isEdit={mode === 'edit'}
               onTimeBoxChange={updateTable}
-              onButtonClick={handleButtonClick}
+              onFinishButtonClick={handleButtonClick}
+              onEditTableInfoButtonClick={() => goNextStep('NameAndType')}
             />
           ),
         }}
