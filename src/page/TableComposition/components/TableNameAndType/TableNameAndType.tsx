@@ -51,8 +51,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
-          <label className="flex items-center text-base font-semibold md:text-2xl">
+        <section className="md:p-8 mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6">
+          <label className="md:text-2xl flex items-center text-base font-semibold">
             토론 시간표 이름
           </label>
           <ClearableInput
@@ -62,7 +62,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             placeholder="시간표 1"
           />
 
-          <label className="flex items-center text-base font-semibold md:text-2xl">
+          <label className="md:text-2xl flex items-center text-base font-semibold">
             토론 주제
           </label>
           <ClearableInput
@@ -72,7 +72,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             placeholder="토론 주제를 입력해주세요"
           />
           <>
-            <label className="flex items-center text-base font-semibold md:text-2xl">
+            <label className="md:text-2xl flex items-center text-base font-semibold">
               팀명
             </label>
             <div className="flex items-center gap-8">
@@ -102,7 +102,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             </div>
           </>
 
-          <label className="text-base font-semibold md:text-2xl">
+          <label className="md:text-2xl text-base font-semibold">
             종소리 설정
           </label>
           <div className="flex flex-col gap-3">

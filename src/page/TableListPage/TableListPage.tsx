@@ -26,7 +26,7 @@ export default function TableListPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
+          <div className="md:text-3xl flex flex-wrap items-center justify-center px-2 text-2xl font-bold">
             <h1>토론 시간표를 선택해주세요</h1>
           </div>
         </DefaultLayout.Header.Center>

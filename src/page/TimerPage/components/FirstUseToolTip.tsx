@@ -21,7 +21,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           <h2 className="text-xl font-bold">자유토론 타이머 조작</h2>
         </div>
 
-        <div className="text-m flex flex-col space-y-1 md:text-lg">
+        <div className="text-m md:text-lg flex flex-col space-y-1">
           <ListItem>재생 버튼을 눌러 타이머를 시작</ListItem>
           <ListItem>
             타이머가 동작 중일 때, 일시정지 버튼을 눌러 타이머를 일시정지
@@ -41,7 +41,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           <h2 className="text-xl font-bold">일반 토론 타이머 조작</h2>
         </div>
 
-        <div className="text-m flex flex-col space-y-1 md:text-lg">
+        <div className="text-m md:text-lg flex flex-col space-y-1">
           <ListItem>재생 버튼을 눌러 타이머를 시작</ListItem>
           <ListItem>
             타이머가 동작 중일 때, 일시정지 버튼을 눌러 타이머를 일시정지
@@ -59,7 +59,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           <h1 className="text-xl font-bold">키보드 조작</h1>
         </div>
 
-        <div className="text-m flex flex-col space-y-1 md:text-lg">
+        <div className="text-m md:text-lg flex flex-col space-y-1">
           <ListItem>스페이스 바로 타이머를 시작 및 일시정지</ListItem>
           <ListItem>R 키로 타이머 초기화</ListItem>
           <ListItem>좌우 방향키로 이전/다음 차례로 이동</ListItem>

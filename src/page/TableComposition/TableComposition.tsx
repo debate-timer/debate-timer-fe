@@ -7,7 +7,6 @@ import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
-import LoadingSpinner from '../../components/LoadingSpinner';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
