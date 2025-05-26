@@ -12,13 +12,16 @@ export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
 
 export default function TableComposition() {
-  const { Funnel, currentStep, goNextStep } =
-    useFunnel<TableCompositionStep>('NameAndType');
-
-  // 1) URL 등으로부터 "editMode"와 "tableId"를 추출
+  // URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode') as Mode;
   const tableId = Number(searchParams.get('tableId') || 0);
+
+  // Print different funnel page by mode (edit a existing table or add a new table)
+  const initialMode: TableCompositionStep =
+    mode !== 'edit' ? 'NameAndType' : 'TimeBox';
+  const { Funnel, currentStep, goNextStep } =
+    useFunnel<TableCompositionStep>(initialMode);
 
   // (2) edit 모드일 때만 서버에서 initData를 가져옴
   // 테이블 데이터 패칭 분기
