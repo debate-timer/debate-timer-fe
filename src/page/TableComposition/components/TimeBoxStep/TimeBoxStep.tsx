@@ -90,7 +90,12 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-8 w-full max-w-4xl">
+        <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
+          {/* TODO: Need to add a function here */}
+          <button onClick={() => {}} className="button enabled h-16 w-full">
+            토론 정보 수정하기
+          </button>
+
           <button
             onClick={onButtonClick}
             className={`h-16 w-full ${
@@ -98,7 +103,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             }`}
             disabled={!isAbledSummitButton}
           >
-            {isEdit ? '시간표 수정 완료' : '시간표 추가 완료'}
+            {isEdit ? '수정 완료' : '추가하기'}
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
