@@ -16,10 +16,12 @@ export class ApiDebateTableRepository implements DebateTableRepository {
   async getTable(tableId: number): Promise<GetDebateTableResponseType> {
     return await getDebateTableData(tableId);
   }
+
   async addTable(data: DebateTableData): Promise<PostDebateTableResponseType> {
     const { info, table } = data;
     return await postDebateTableData({ info, table });
   }
+
   async editTable(
     data: PutDebateTableRequestType,
   ): Promise<PutDebateTableResponseType> {
