@@ -7,6 +7,7 @@ import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
@@ -20,10 +21,10 @@ export default function TableComposition() {
   // Print different funnel page by mode (edit a existing table or add a new table)
   const initialMode: TableCompositionStep =
     mode !== 'edit' ? 'NameAndType' : 'TimeBox';
-  const { Funnel, currentStep, goNextStep } =
+  const { Funnel, currentStep, goToStep } =
     useFunnel<TableCompositionStep>(initialMode);
 
-  // (2) edit 모드일 때만 서버에서 initData를 가져옴
+  // edit 모드일 때만 서버에서 initData를 가져옴
   // 테이블 데이터 패칭 분기
   const { data } = useGetDebateTableData(tableId, mode === 'edit');
 
@@ -67,7 +68,7 @@ export default function TableComposition() {
               info={formData.info}
               isEdit={mode === 'edit'}
               onInfoChange={updateInfo}
-              onButtonClick={() => goNextStep('TimeBox')}
+              onButtonClick={() => goToStep('TimeBox')}
             />
           ),
           TimeBox: (
@@ -76,7 +77,7 @@ export default function TableComposition() {
               isEdit={mode === 'edit'}
               onTimeBoxChange={updateTable}
               onFinishButtonClick={handleButtonClick}
-              onEditTableInfoButtonClick={() => goNextStep('NameAndType')}
+              onEditTableInfoButtonClick={() => goToStep('NameAndType')}
             />
           ),
         }}

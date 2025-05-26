@@ -31,5 +31,5 @@ export default function useFunnel<Step extends string | number | symbol>(
     [currentStep],
   );
 
-  return { currentStep, goBack, goNextStep: goToStep, Funnel };
+  return { currentStep, goBack, goToStep, Funnel };
 }
