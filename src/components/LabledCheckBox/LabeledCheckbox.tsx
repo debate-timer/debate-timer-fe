@@ -15,7 +15,7 @@ export default function LabeledCheckbox({
 
   return (
     <label
-      className={`flex cursor-pointer items-center gap-2 text-sm md:text-base ${labelColorClass}`}
+      className={`md:text-base flex cursor-pointer items-center gap-2 text-sm ${labelColorClass}`}
     >
       <input
         {...rest}

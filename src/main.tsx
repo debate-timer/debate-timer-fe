@@ -8,6 +8,13 @@ import './index.css';
 import { setupGoogleAnalytics } from './util/setupGoogleAnalytics.tsx';
 
 // console.log(`# URL = ${import.meta.env.VITE_API_BASE_URL}`);
+if (import.meta.env.DEV && !localStorage.getItem('accessToken')) {
+  localStorage.setItem('accessToken', 'mock-token');
+  console.log(
+    '# Fake access token has set to %{}',
+    localStorage.getItem('accessToken'),
+  );
+}
 
 // Functions that calls msw mocking worker
 if (import.meta.env.VITE_MOCK_API === 'true') {

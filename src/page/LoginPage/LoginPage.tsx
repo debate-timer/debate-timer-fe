@@ -26,7 +26,7 @@ export default function LoginPage() {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <div className="flex flex-wrap items-center text-2xl font-bold md:text-3xl">
+          <div className="md:text-3xl flex flex-wrap items-center text-2xl font-bold">
             <h1 className="mr-2">로그인 페이지</h1>
           </div>
         </DefaultLayout.Header.Left>

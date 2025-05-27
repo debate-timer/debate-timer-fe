@@ -12,15 +12,18 @@ export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
 
 export default function TableComposition() {
-  const { Funnel, currentStep, goNextStep } =
-    useFunnel<TableCompositionStep>('NameAndType');
-
-  // 1) URL 등으로부터 "editMode"와 "tableId"를 추출
+  // URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode') as Mode;
   const tableId = Number(searchParams.get('tableId') || 0);
 
-  // (2) edit 모드일 때만 서버에서 initData를 가져옴
+  // Print different funnel page by mode (edit a existing table or add a new table)
+  const initialMode: TableCompositionStep =
+    mode !== 'edit' ? 'NameAndType' : 'TimeBox';
+  const { Funnel, currentStep, goToStep } =
+    useFunnel<TableCompositionStep>(initialMode);
+
+  // edit 모드일 때만 서버에서 initData를 가져옴
   // 테이블 데이터 패칭 분기
   const { data } = useGetDebateTableData(tableId, mode === 'edit');
 
@@ -64,7 +67,7 @@ export default function TableComposition() {
               info={formData.info}
               isEdit={mode === 'edit'}
               onInfoChange={updateInfo}
-              onButtonClick={() => goNextStep('TimeBox')}
+              onButtonClick={() => goToStep('TimeBox')}
             />
           ),
           TimeBox: (
@@ -72,7 +75,8 @@ export default function TableComposition() {
               initData={formData}
               isEdit={mode === 'edit'}
               onTimeBoxChange={updateTable}
-              onButtonClick={handleButtonClick}
+              onFinishButtonClick={handleButtonClick}
+              onEditTableInfoButtonClick={() => goToStep('NameAndType')}
             />
           ),
         }}

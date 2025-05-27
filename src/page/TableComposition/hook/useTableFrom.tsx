@@ -45,12 +45,6 @@ const useTableFrom = (
     // Originaly here was exhaustive-deps
   }, [initData, setFormData]);
 
-  useEffect(() => {
-    if (currentStep === 'TimeBox' && navigationType === 'POP') {
-      navigate('/');
-    }
-  }, [currentStep, navigationType, navigate]);
-
   const updateInfo: React.Dispatch<
     React.SetStateAction<DebateTableData['info']>
   > = (action) => {

@@ -12,12 +12,19 @@ import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
 interface TimeBoxStepProps {
   initData: DebateTableData;
   onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
-  onButtonClick: () => void;
+  onFinishButtonClick: () => void;
+  onEditTableInfoButtonClick: () => void;
   isEdit?: boolean;
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
-  const { initData, onTimeBoxChange, onButtonClick, isEdit = false } = props;
+  const {
+    initData,
+    onTimeBoxChange,
+    onFinishButtonClick,
+    onEditTableInfoButtonClick,
+    isEdit = false,
+  } = props;
   const initTimeBox = initData.table;
   const { openModal, closeModal, ModalWrapper } = useModal();
 
@@ -90,15 +97,23 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-8 w-full max-w-4xl">
+        <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
+          {/* TODO: Need to add a function here */}
           <button
-            onClick={onButtonClick}
+            onClick={onEditTableInfoButtonClick}
+            className="button enabled h-16 w-full"
+          >
+            토론 정보 수정하기
+          </button>
+
+          <button
+            onClick={onFinishButtonClick}
             className={`h-16 w-full ${
               isAbledSummitButton ? 'button enabled' : 'button disabled'
             }`}
             disabled={!isAbledSummitButton}
           >
-            {isEdit ? '시간표 수정 완료' : '시간표 추가 완료'}
+            {isEdit ? '수정 완료' : '추가하기'}
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
