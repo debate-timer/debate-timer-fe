@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { TimeBoxInfo, Stance, TimeBoxType } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-import normalTimer from '../../../../../public/timer/normal_timer.png';
-import timeBasedTimer from '../../../../../public/timer/timebased_timer.png';
+import normalTimer from '../../../../assets/timer/normal_timer.png';
+import timeBasedTimer from '../../../../assets/timer/timebased_timer.png';
 import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
-import timeBasedPerSpeakingTimer from '../../../../../public/timer/timebased_perSpeaking_timer.png';
+import timeBasedPerSpeakingTimer from '../../../../assets/timer/timebased_perSpeaking_timer.png';
 
 interface TimerCreationContentProps {
   beforeData?: TimeBoxInfo;

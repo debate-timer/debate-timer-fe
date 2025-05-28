@@ -1,8 +1,8 @@
 import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
-import KeyboardKeyA from '../../../assets/img/keyboard_key_A.png';
-import KeyboardKeyL from '../../../assets/img/keyboard_key_l.png';
+import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
+import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
 
 interface TimeBasedTimerProps {
   onStart: () => void;

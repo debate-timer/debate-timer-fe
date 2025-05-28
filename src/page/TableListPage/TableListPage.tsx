@@ -4,6 +4,7 @@ import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { DebateTable } from '../../type/type';
 import Table from './components/Table';
+import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
@@ -26,9 +27,7 @@ export default function TableListPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <div className="md:text-3xl flex flex-wrap items-center justify-center px-2 text-2xl font-bold">
-            <h1>토론 시간표를 선택해주세요</h1>
-          </div>
+          <HeaderTitle title="토론 시간표를 선택해주세요" />
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
