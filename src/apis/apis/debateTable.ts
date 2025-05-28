@@ -1,12 +1,13 @@
-import { CustomizeDebateInfo, CustomizeTimeBoxInfo } from '../../type/type';
+import { DebateTableData } from '../../type/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
+import { PutDebateTableRequestType } from '../requests/debateTable';
 import {
-  GetCustomizeTableResponseType,
-  PatchCustomizeTableResponseType,
-  PostCustomizeTableResponseType,
-  PutCustomizeTableResponseType,
-} from '../responses/customize';
+  GetDebateTableResponseType,
+  PatchDebateTableResponseType,
+  PostDebateTableResponseType,
+  PutDebateTableResponseType,
+} from '../responses/debateTable';
 
 // Template
 /*
@@ -26,11 +27,11 @@ export async function apiFunc(
 */
 
 // GET /api/table/customize/{tableId}
-export async function getCustomizeTableData(
+export async function getDebateTableData(
   tableId: number,
-): Promise<GetCustomizeTableResponseType> {
+): Promise<GetDebateTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
-  const response = await request<GetCustomizeTableResponseType>(
+  const response = await request<GetDebateTableResponseType>(
     'GET',
     requestUrl + `/${tableId}`,
     null,
@@ -41,12 +42,12 @@ export async function getCustomizeTableData(
 }
 
 // POST /api/table/customize
-export async function postCustomizeTableData(
-  info: CustomizeDebateInfo,
-  tables: CustomizeTimeBoxInfo[],
-): Promise<PostCustomizeTableResponseType> {
+export async function postDebateTableData({
+  info,
+  table,
+}: DebateTableData): Promise<PostDebateTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
-  const response = await request<PostCustomizeTableResponseType>(
+  const response = await request<PostDebateTableResponseType>(
     'POST',
     requestUrl,
     {
@@ -58,7 +59,7 @@ export async function postCustomizeTableData(
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
-      table: tables,
+      table,
     },
     null,
   );
@@ -66,15 +67,15 @@ export async function postCustomizeTableData(
 }
 
 // PUT /api/table/customize/{tableId}
-export async function putCustomizeTableData(
-  tableId: number,
-  info: CustomizeDebateInfo,
-  tables: CustomizeTimeBoxInfo[],
-): Promise<PutCustomizeTableResponseType> {
+export async function putDebateTableData({
+  id,
+  info,
+  table,
+}: PutDebateTableRequestType): Promise<PutDebateTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
-  const response = await request<PutCustomizeTableResponseType>(
+  const response = await request<PutDebateTableResponseType>(
     'PUT',
-    requestUrl + `/${tableId}`,
+    requestUrl + `/${id}`,
     {
       info: {
         name: info.name,
@@ -84,7 +85,7 @@ export async function putCustomizeTableData(
         warningBell: info.warningBell,
         finishBell: info.finishBell,
       },
-      table: tables,
+      table,
     },
     null,
   );
@@ -93,9 +94,7 @@ export async function putCustomizeTableData(
 }
 
 // DELETE /api/table/customize/{tableId}
-export async function deleteCustomizeTableData(
-  tableId: number,
-): Promise<boolean> {
+export async function deleteDebateTableData(tableId: number): Promise<boolean> {
   const requestUrl: string = ApiUrl.customize;
   const response = await request(
     'DELETE',
@@ -108,11 +107,11 @@ export async function deleteCustomizeTableData(
 }
 
 // PATCH /api/table/customize/{tableId}/debate
-export async function patchCustomizeTableData(
+export async function patchDebateTableData(
   tableId: number,
-): Promise<PatchCustomizeTableResponseType> {
+): Promise<PatchDebateTableResponseType> {
   const requestUrl: string = ApiUrl.customize;
-  const response = await request<PatchCustomizeTableResponseType>(
+  const response = await request<PatchDebateTableResponseType>(
     'PATCH',
     requestUrl + `/${tableId}/debate`,
     null,

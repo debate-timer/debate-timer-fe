@@ -58,7 +58,7 @@ export default {
       boxShadow: {
         'camp-blue': `0 0 30px #FF3B2F`,
         'camp-red': `0 0 30px #007AFF`,
-        'camp-neutral': `0 0 30px #737373`
+        'camp-neutral': `0 0 30px #737373`,
       },
       colors: {
         brand: {
@@ -70,8 +70,7 @@ export default {
 
           sub1: '#FF5622',
           sub2: '#028391',
-          sub3 :'#FF8B87'
-          
+          sub3: '#FF8B87',
         },
         neutral: {
           1000: '#000000',
@@ -93,6 +92,9 @@ export default {
         },
       },
     },
+    screens: {
+      lg: '1280px',
+      xl: '1450px',
+    },
   },
-  plugins: [],
 };

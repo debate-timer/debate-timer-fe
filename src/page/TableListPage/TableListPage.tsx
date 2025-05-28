@@ -1,29 +1,25 @@
 import { useNavigate } from 'react-router-dom';
-import { useDeleteParliamentaryDebateTable } from '../../hooks/mutations/useDeleteParliamentaryDebateTable';
-import { useDeleteCustomizeDebateTable } from '../../hooks/mutations/useDeleteCustomizeDebateTable';
+import { useDeleteDebateTable } from '../../hooks/mutations/useDeleteDebateTable';
 import { useGetDebateTableList } from '../../hooks/query/useGetDebateTableList';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { DebateTable, DebateType } from '../../type/type';
+import { DebateTable } from '../../type/type';
 import Table from './components/Table';
+import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();
-  const { mutate: deleteParliamentaryTable } =
-    useDeleteParliamentaryDebateTable();
-  const { mutate: deleteCustomizeTable } = useDeleteCustomizeDebateTable();
+  const { mutate: deleteCustomizeTable } = useDeleteDebateTable();
   const navigate = useNavigate();
-  const onEdit = (tableId: number, type: DebateType) => {
-    navigate(`/composition?mode=edit&tableId=${tableId}&type=${type}`);
+  // TODO: have to delete the query param 'type'
+  const onEdit = (tableId: number) => {
+    navigate(`/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`);
   };
-  const onClick = (tableId: number, type: DebateType) => {
-    navigate(`/overview/${type.toLowerCase()}/${tableId}`);
+  // TODO: have to delete the string 'customize' from the URL
+  const onClick = (tableId: number) => {
+    navigate(`/overview/customize/${tableId}`);
   };
-  const onDelete = (tableId: number, type: DebateType) => {
-    if (type === 'PARLIAMENTARY') {
-      deleteParliamentaryTable({ tableId });
-    } else if (type === 'CUSTOMIZE') {
-      deleteCustomizeTable({ tableId });
-    }
+  const onDelete = (tableId: number) => {
+    deleteCustomizeTable({ tableId });
   };
 
   return (
@@ -31,9 +27,7 @@ export default function TableListPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <div className="flex flex-wrap items-center justify-center px-2 text-2xl font-bold md:text-3xl">
-            <h1>토론 시간표를 선택해주세요</h1>
-          </div>
+          <HeaderTitle title="토론 시간표를 선택해주세요" />
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
       </DefaultLayout.Header>
@@ -55,11 +49,10 @@ export default function TableListPage() {
                 key={idx}
                 id={table.id}
                 name={table.name}
-                type={table.type}
                 agenda={table.agenda}
-                onDelete={() => onDelete(table.id, table.type)}
-                onEdit={() => onEdit(table.id, table.type)}
-                onClick={() => onClick(table.id, table.type)}
+                onDelete={() => onDelete(table.id)}
+                onEdit={() => onEdit(table.id)}
+                onClick={() => onClick(table.id)}
               />
             ))}
         </div>

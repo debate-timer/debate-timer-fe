@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import NormalTimer from '../components/NormalTimer';
 
 const meta: Meta<typeof NormalTimer> = {
-  title: 'page/CustomizeTimerPage/Components/NormalTimer',
+  title: 'page/TimerPage/Components/NormalTimer',
   component: NormalTimer,
   tags: ['autodocs'],
 };

@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../../apis/endpoints';
 import {
-  PostCustomizeTableResponseType,
-  PutCustomizeTableResponseType,
-} from '../../apis/responses/customize';
+  PostDebateTableResponseType,
+  PutDebateTableResponseType,
+} from '../../apis/responses/debateTable';
 
 export const customizeHandlers = [
   // GET /api/table/customize/{tableId}
@@ -92,7 +92,7 @@ export const customizeHandlers = [
 
   // POST /api/table/customize
   http.post(ApiUrl.customize, async ({ request }) => {
-    const result = (await request.json()) as PostCustomizeTableResponseType;
+    const result = (await request.json()) as PostDebateTableResponseType;
     console.log(
       `# tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
     );
@@ -170,7 +170,7 @@ export const customizeHandlers = [
   // PUT /api/table/customize/{tableId}
   http.put(ApiUrl.customize + '/:tableId', async ({ request, params }) => {
     const { tableId } = params;
-    const result = (await request.json()) as PutCustomizeTableResponseType;
+    const result = (await request.json()) as PutDebateTableResponseType;
     console.log(
       `# tableId = ${tableId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
     );
@@ -257,7 +257,7 @@ export const customizeHandlers = [
   // PATCH /api/table/customize/{tableId}
   http.patch(ApiUrl.customize + '/:tableId', async ({ request, params }) => {
     const { tableId } = params;
-    const result = (await request.json()) as PutCustomizeTableResponseType;
+    const result = (await request.json()) as PutDebateTableResponseType;
     console.log(
       `# tableId = ${tableId}, tableAgenda = ${result?.info.agenda}, tableName = ${result?.info.name}`,
     );
