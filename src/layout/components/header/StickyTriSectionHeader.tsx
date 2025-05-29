@@ -5,6 +5,7 @@ import useLogout from '../../../hooks/mutations/useLogout';
 import { IoLogIn, IoLogOut } from 'react-icons/io5';
 import IconButton from '../../../components/IconButton/IconButton';
 import { isGuestFlow } from '../../../util/sessionStorage';
+import { AuthLogin } from '../../../util/googleAuth';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
@@ -64,7 +65,7 @@ StickyTriSectionHeader.Right = function Right({
                 <div key={`${iconName}-${index}`}>
                   <IconButton
                     icon={<IoLogIn size={24} />}
-                    onClick={() => {}}
+                    onClick={AuthLogin}
                     title="로그인 하기"
                   />
                 </div>
