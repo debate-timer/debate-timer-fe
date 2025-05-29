@@ -2,8 +2,9 @@ import { PropsWithChildren } from 'react';
 import { IoMdHome } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
-import { IoLogOut } from 'react-icons/io5';
+import { IoLogIn, IoLogOut } from 'react-icons/io5';
 import IconButton from '../../../components/IconButton/IconButton';
+import { isGuestFlow } from '../../../util/sessionStorage';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
@@ -28,7 +29,7 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
 };
 
 interface RightProps extends PropsWithChildren {
-  defaultIcons?: ('home' | 'logout')[];
+  defaultIcons?: ('home' | 'auth')[];
 }
 
 StickyTriSectionHeader.Right = function Right({
@@ -37,7 +38,6 @@ StickyTriSectionHeader.Right = function Right({
 }: RightProps) {
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
-
   return (
     <div className="flex flex-1  items-stretch justify-end gap-2 text-right">
       {children && (
@@ -58,15 +58,28 @@ StickyTriSectionHeader.Right = function Right({
                 />
               </div>
             );
-          case 'logout':
-            return (
-              <div key={`${iconName}-${index}`}>
-                <IconButton
-                  icon={<IoLogOut size={24} />}
-                  onClick={() => logoutMutate()}
-                />
-              </div>
-            );
+          case 'auth':
+            if (isGuestFlow()) {
+              return (
+                <div key={`${iconName}-${index}`}>
+                  <IconButton
+                    icon={<IoLogIn size={24} />}
+                    onClick={() => {}}
+                    title="로그인 하기"
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div key={`${iconName}-${index}`}>
+                  <IconButton
+                    icon={<IoLogOut size={24} />}
+                    onClick={() => logoutMutate()}
+                    title="로그아웃 하기"
+                  />
+                </div>
+              );
+            }
           default:
             return null;
         }

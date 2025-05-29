@@ -74,7 +74,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         <DefaultLayout.Header.Center>
           <HeaderTitle title={initData.info.agenda} />
         </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+        <DefaultLayout.Header.Right defaultIcons={['home', 'auth']} />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>

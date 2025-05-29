@@ -29,7 +29,7 @@ export default function TableListPage() {
         <DefaultLayout.Header.Center>
           <HeaderTitle title="토론 시간표를 선택해주세요" />
         </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+        <DefaultLayout.Header.Right defaultIcons={['home', 'auth']} />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>

@@ -47,7 +47,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             title={`토론 정보를 ${isEdit ? '수정' : '설정'}해주세요`}
           />
         </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+        <DefaultLayout.Header.Right defaultIcons={['home', 'auth']} />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>

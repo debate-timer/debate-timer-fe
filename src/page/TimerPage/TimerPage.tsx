@@ -577,7 +577,7 @@ export default function TimerPage() {
               }
             />
           </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right defaultIcons={['home', 'logout']}>
+          <DefaultLayout.Header.Right defaultIcons={['home', 'auth']}>
             <IconButton
               icon={<IoHelpCircle size={24} />}
               onClick={() => {
