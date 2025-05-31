@@ -14,8 +14,12 @@ import NormalTimer from './components/NormalTimer';
 import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
-import { isGuestFlow } from '../../util/sessionStorage';
+import {
+  deleteSessionCustomizeTableData,
+  isGuestFlow,
+} from '../../util/sessionStorage';
 import LoginAndStoreDBModal from '../../components/LoginAndStoreDBModal/LoginAndStoreDBModal';
+import { AuthLogin } from '../../util/googleAuth';
 
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
@@ -814,11 +818,14 @@ export default function TimerPage() {
       {/** Login And DataStore*/}
       <LoginAndStoreModalWrapper closeButtonColor="text-neutral-1000">
         <LoginAndStoreDBModal
-          onConfirm={() => {
+          onSaveAndLogin={() => {
             closeLoginAndStoreModal();
+            AuthLogin();
           }}
-          onDecline={() => {
+          onOnlyLogin={() => {
+            deleteSessionCustomizeTableData();
             closeLoginAndStoreModal();
+            AuthLogin();
           }}
         >
           <>

@@ -1,13 +1,13 @@
 interface LoginAndStoreDBModalProps {
   children: React.ReactNode;
-  onConfirm: () => void;
-  onDecline: () => void;
+  onSaveAndLogin: () => void;
+  onOnlyLogin: () => void;
 }
 
 export default function LoginAndStoreDBModal({
   children,
-  onConfirm,
-  onDecline,
+  onSaveAndLogin,
+  onOnlyLogin,
 }: LoginAndStoreDBModalProps) {
   return (
     <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
@@ -18,10 +18,10 @@ export default function LoginAndStoreDBModal({
       </div>
 
       <div className="flex w-full flex-col space-y-4">
-        <button className="button enabled" onClick={onConfirm}>
+        <button className="button enabled" onClick={onSaveAndLogin}>
           네, 로그인하고 저장할게요.
         </button>
-        <button className="button enabled" onClick={onDecline}>
+        <button className="button enabled" onClick={onOnlyLogin}>
           아니요, 로그인만 할게요
         </button>
       </div>

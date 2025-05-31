@@ -95,19 +95,19 @@ StickyTriSectionHeader.Right = function Right({
       </div>
       <ModalWrapper closeButtonColor="text-neutral-1000">
         <LoginAndStoreDBModal
-          onConfirm={() => {
+          onSaveAndLogin={() => {
             closeModal();
             AuthLogin();
           }}
-          onDecline={() => {
+          onOnlyLogin={() => {
             deleteSessionCustomizeTableData();
             closeModal();
             AuthLogin();
           }}
         >
           <>
-            작성하신 내용이 저장되지 않을 수 있습니다. <br />
-            그래도 로그인을 진행하시겠습니까?
+            비회원으로 사용하던 데이터가 있습니다. <br />
+            로그인 후에도 이 데이터를 계속 사용하시겠습니까?
           </>
         </LoginAndStoreDBModal>
       </ModalWrapper>
