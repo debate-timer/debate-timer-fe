@@ -14,6 +14,8 @@ import NormalTimer from './components/NormalTimer';
 import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
+import { isGuestFlow } from '../../util/sessionStorage';
+import LoginAndStoreDBModal from '../../components/LoginAndStoreDBModal/LoginAndStoreDBModal';
 
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
@@ -44,13 +46,22 @@ export default function TimerPage() {
   const IS_FIRST = 'isFirst';
   const TRUE = 'true';
   const FALSE = 'false';
-  const { openModal, closeModal, ModalWrapper } = useModal({
+  const {
+    openModal: openUseTooltipModal,
+    closeModal: closeUseTooltipModal,
+    ModalWrapper: UseToolTipWrapper,
+  } = useModal({
     onClose: () => {
       setIsFirst(false);
       localStorage.setItem(IS_FIRST, FALSE);
     },
     isCloseButtonExist: false,
   });
+  const {
+    openModal: openLoginAndStoreModal,
+    closeModal: closeLoginAndStoreModal,
+    ModalWrapper: LoginAndStoreModalWrapper,
+  } = useModal();
 
   // Prepare for changing background
   const [bg, setBg] = useState<TimerState>('default');
@@ -144,9 +155,9 @@ export default function TimerPage() {
     }
 
     if (isFirst) {
-      openModal();
+      openUseTooltipModal();
     }
-  }, [isFirst, openModal]);
+  }, [isFirst, openUseTooltipModal]);
 
   // 타이머 상태에 따라 배경색(bg) 상태 설정
   useEffect(() => {
@@ -354,6 +365,7 @@ export default function TimerPage() {
         timer.setIsDone(false);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     data,
     index,
@@ -447,6 +459,7 @@ export default function TimerPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     goToOtherItem,
     prosConsSelected,
@@ -763,7 +776,13 @@ export default function TimerPage() {
                   {index === data.table.length - 1 && (
                     <RoundControlButton
                       type="DONE"
-                      onClick={() => navigate(`/overview/customize/${tableId}`)}
+                      onClick={() => {
+                        if (isGuestFlow()) {
+                          openLoginAndStoreModal();
+                        } else {
+                          navigate(`/overview/customize/${tableId}`);
+                        }
+                      }}
                     />
                   )}
                   {index !== data.table.length - 1 && (
@@ -783,15 +802,31 @@ export default function TimerPage() {
       </DefaultLayout>
 
       {/** Tooltip */}
-      <ModalWrapper>
+      <UseToolTipWrapper>
         <FirstUseToolTip
           onClose={() => {
-            closeModal();
+            closeUseTooltipModal();
             setIsFirst(false);
             localStorage.setItem(IS_FIRST, FALSE);
           }}
         />
-      </ModalWrapper>
+      </UseToolTipWrapper>
+      {/** Login And DataStore*/}
+      <LoginAndStoreModalWrapper closeButtonColor="text-neutral-1000">
+        <LoginAndStoreDBModal
+          onConfirm={() => {
+            closeLoginAndStoreModal();
+          }}
+          onDecline={() => {
+            closeLoginAndStoreModal();
+          }}
+        >
+          <>
+            토론을 끝내셨군요! <br />
+            지금까지의 토론을 저장할까요?
+          </>
+        </LoginAndStoreDBModal>
+      </LoginAndStoreModalWrapper>
     </>
   );
 }
