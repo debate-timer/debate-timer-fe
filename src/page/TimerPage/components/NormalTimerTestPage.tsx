@@ -26,7 +26,7 @@ export default function NormalTimerTestPage() {
         <DefaultLayout.Header.Center>
           <HeaderTitle title="일반타이머 테스트입니다" />
         </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+        <DefaultLayout.Header.Right defaultIcons={['home', 'auth']} />
       </DefaultLayout.Header>
 
       {/* Content */}
