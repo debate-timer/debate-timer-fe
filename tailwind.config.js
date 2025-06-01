@@ -89,6 +89,7 @@ export default {
         background: {
           default: '#F6F5F4',
           secondary: '#FFF3DD',
+          dark: '#E8E8E8',
         },
       },
     },
