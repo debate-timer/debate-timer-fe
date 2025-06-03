@@ -10,6 +10,7 @@ import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel'
 import { useTableShare } from '../../hooks/useTableShare';
 import { MdOutlineIosShare } from 'react-icons/md';
 import { StanceToString } from '../../type/type';
+import { isGuestFlow } from '../../util/sessionStorage';
 
 export default function TableOverview() {
   const { id } = useParams();
@@ -71,12 +72,15 @@ export default function TableOverview() {
           <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
               className="button enabled-hover-neutral h-16 w-full"
-              onClick={() =>
-                // TODO: have to remove the quert param 'type'
-                navigate(
-                  `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
-                )
-              }
+              onClick={() => {
+                if (isGuestFlow()) {
+                  navigate(`/composition?mode=edit&type=CUSTOMIZE`);
+                } else {
+                  navigate(
+                    `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+                  );
+                }
+              }}
             >
               <div className="flex items-center justify-center gap-2">
                 <RiEditFill />
@@ -86,7 +90,13 @@ export default function TableOverview() {
             <div className="flex h-16 w-full space-x-2">
               <button
                 className="button enabled flex-1"
-                onClick={() => onModifyCustomizeTableData.mutate({ tableId })}
+                onClick={() => {
+                  if (isGuestFlow()) {
+                    navigate('/table/customize/guest');
+                  } else {
+                    onModifyCustomizeTableData.mutate({ tableId });
+                  }
+                }}
               >
                 <div className="flex items-center justify-center gap-2">
                   <RiSpeakFill />

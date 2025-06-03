@@ -14,6 +14,7 @@ import NormalTimer from './components/NormalTimer';
 import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
+import { isGuestFlow } from '../../util/sessionStorage';
 
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
@@ -763,7 +764,14 @@ export default function TimerPage() {
                   {index === data.table.length - 1 && (
                     <RoundControlButton
                       type="DONE"
-                      onClick={() => navigate(`/overview/customize/${tableId}`)}
+                      onClick={() => {
+                        if (isGuestFlow()) {
+                          // TODO: have to add modal here
+                          navigate(`/overview/customize/guest`);
+                        } else {
+                          navigate(`/overview/customize/${tableId}`);
+                        }
+                      }}
                     />
                   )}
                   {index !== data.table.length - 1 && (

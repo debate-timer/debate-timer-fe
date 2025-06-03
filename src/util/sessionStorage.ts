@@ -33,7 +33,7 @@ export const deleteSessionCustomizeTableData = () => {
 // For isGuestFlow
 export const isGuestFlow = () => {
   const value = sessionStorage.getItem(IS_GUEST_FLOW_PREFIX);
-  if (!value) throw new Error('No table data in sessionStorage');
+  if (!value) return false;
   return value === TRUE;
 };
 

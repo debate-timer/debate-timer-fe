@@ -9,7 +9,6 @@ import { getRepository } from '../../repositories/DebateTableRepository';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';
-import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
 import { setIsGuestFlow } from '../../util/sessionStorage';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
@@ -47,16 +46,16 @@ export default function TableSharingPage() {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      setIsGuestFlow(true);
       openModal();
     } else {
       // On this case, getRepository() will automatically decide what data source to use
+      setIsGuestFlow(true);
       getRepository()
         .addTable(decodedData)
         .then(
-          (value: PostDebateTableResponseType) => {
-            // And if POST request is succesful, directly navigate to overview page
-            navigate(`/overview/customize/${value.id}`);
+          () => {
+            // On success
+            navigate(`/overview/customize/guest`);
           },
           () => {
             // Handling error
@@ -99,6 +98,7 @@ export default function TableSharingPage() {
               // On fulfilled
               () => {
                 closeModal();
+                setIsGuestFlow(true);
                 navigate('/overview/customize/guest');
               },
               // On failed
