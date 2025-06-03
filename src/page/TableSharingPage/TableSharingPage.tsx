@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { isGuestFlow } from '../../util/sessionStorage';
 import { useModal } from '../../hooks/useModal';
 import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
 import { decodeDebateTableData } from '../../util/arrayEncoding';
@@ -9,6 +8,7 @@ import { DebateTableData } from '../../type/type';
 import { getRepository } from '../../repositories/DebateTableRepository';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
+import { isLoggedIn } from '../../util/accessToken';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
   if (!encodedData) {
@@ -44,12 +44,12 @@ export default function TableSharingPage() {
   const decodedData = getDecodedDataOrThrow(encodedData);
 
   useEffect(() => {
-    if (isGuestFlow()) {
+    if (isLoggedIn()) {
+      openModal();
+    } else {
       // On this case, getRepository() will automatically decide what data source to use
       getRepository().addTable(decodedData);
       navigate('/overview/customize/guest');
-    } else {
-      openModal();
     }
   }, [decodedData, navigate, openModal]);
 
