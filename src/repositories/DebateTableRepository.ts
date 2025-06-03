@@ -6,6 +6,7 @@ import {
 } from '../apis/responses/debateTable';
 import { DebateTableData } from '../type/type';
 import { isLoggedIn } from '../util/accessToken';
+import { isGuestFlow } from '../util/sessionStorage';
 import apiDebateTableRepository from './ApiDebateTableRepository';
 import sessionDebateTableRepository from './SessionDebateTableRepository';
 
@@ -20,6 +21,6 @@ export interface DebateTableRepository {
 export function getRepository(): DebateTableRepository {
   console.log('# isLoggedIn? ' + isLoggedIn());
 
-  if (isLoggedIn()) return apiDebateTableRepository;
-  return sessionDebateTableRepository;
+  if (isGuestFlow()) return sessionDebateTableRepository;
+  return apiDebateTableRepository;
 }
