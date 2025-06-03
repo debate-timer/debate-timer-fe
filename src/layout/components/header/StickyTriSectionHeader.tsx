@@ -5,7 +5,7 @@ import useLogout from '../../../hooks/mutations/useLogout';
 import { IoLogIn, IoLogOut } from 'react-icons/io5';
 import IconButton from '../../../components/IconButton/IconButton';
 import { isLoggedIn } from '../../../util/accessToken';
-import { isGuestFlow } from '../../../util/sessionStorage';
+import { isGuestFlow, setIsGuestFlow } from '../../../util/sessionStorage';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
@@ -71,7 +71,12 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
               <div key={`${iconName}-${index}`}>
                 <IconButton
                   icon={<IoMdHome size={24} />}
-                  onClick={() => navigate('/')}
+                  onClick={() => {
+                    if (isGuestFlow()) {
+                      setIsGuestFlow(false);
+                    }
+                    navigate('/');
+                  }}
                 />
               </div>
             );
