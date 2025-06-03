@@ -9,6 +9,7 @@ import { getRepository } from '../../repositories/DebateTableRepository';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';
+import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
   if (!encodedData) {
@@ -48,8 +49,18 @@ export default function TableSharingPage() {
       openModal();
     } else {
       // On this case, getRepository() will automatically decide what data source to use
-      getRepository().addTable(decodedData);
-      navigate('/overview/customize/guest');
+      getRepository()
+        .addTable(decodedData)
+        .then(
+          (value: PostDebateTableResponseType) => {
+            // And if POST request is succesful, directly navigate to overview page
+            navigate(`/overview/customize/${value.id}`);
+          },
+          () => {
+            // Handling error
+            throw new Error('공유된 토론 테이블을 DB에 저장하지 못했어요.');
+          },
+        );
     }
   }, [decodedData, navigate, openModal]);
 
