@@ -28,7 +28,7 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
 };
 
 interface RightProps extends PropsWithChildren {
-  defaultIcons?: ('home' | 'logout')[];
+  defaultIcons?: ('home' | 'logout' | 'guest')[];
 }
 
 StickyTriSectionHeader.Right = function Right({
@@ -39,7 +39,7 @@ StickyTriSectionHeader.Right = function Right({
   const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
 
   return (
-    <div className="flex flex-1  items-stretch justify-end gap-2 text-right">
+    <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
       {children && (
         <>
           {children}
@@ -49,6 +49,14 @@ StickyTriSectionHeader.Right = function Right({
 
       {defaultIcons?.map((iconName, index) => {
         switch (iconName) {
+          case 'guest':
+            return (
+              <div key={`${iconName}-${index}`}>
+                <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+                  비회원 모드
+                </div>
+              </div>
+            );
           case 'home':
             return (
               <div key={`${iconName}-${index}`}>
