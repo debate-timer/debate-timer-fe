@@ -25,7 +25,3 @@ export const setSessionCustomizeTableData = (
 export const deleteSessionCustomizeTableData = () => {
   sessionStorage.removeItem(STORAGE_KEY_PREFIX);
 };
-
-export function isGuestFlow(): boolean {
-  return !!sessionStorage.getItem(STORAGE_KEY_PREFIX);
-}
