@@ -10,6 +10,7 @@ import apiDebateTableRepository from '../../repositories/ApiDebateTableRepositor
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';
 import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
+import { setIsGuestFlow } from '../../util/sessionStorage';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
   if (!encodedData) {
@@ -46,6 +47,7 @@ export default function TableSharingPage() {
 
   useEffect(() => {
     if (isLoggedIn()) {
+      setIsGuestFlow(true);
       openModal();
     } else {
       // On this case, getRepository() will automatically decide what data source to use
