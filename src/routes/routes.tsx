@@ -25,17 +25,17 @@ const routesConfig = [
   {
     path: '/composition',
     element: <TableComposition />,
-    requiresAuth: true,
+    requiresAuth: false,
   },
   {
     path: '/overview/:type/:id',
     element: <TableOverview />,
-    requiresAuth: true,
+    requiresAuth: false,
   },
   {
     path: '/table/customize/:id',
     element: <TimerPage />,
-    requiresAuth: true,
+    requiresAuth: false,
   },
   {
     path: '/oauth',
