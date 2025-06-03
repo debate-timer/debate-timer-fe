@@ -10,6 +10,7 @@ import apiDebateTableRepository from '../../repositories/ApiDebateTableRepositor
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';
 import { setIsGuestFlow } from '../../util/sessionStorage';
+import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
   if (!encodedData) {
@@ -80,11 +81,13 @@ export default function TableSharingPage() {
         {/* On this case, we have to specify the data source */}
         <LoggedInStoreDBModal
           onSave={() => {
+            decodedData.info.name = '(공유됨) ' + decodedData.info.name;
             apiDebateTableRepository.addTable(decodedData).then(
               // On fulfilled
-              () => {
+              (value: PostDebateTableResponseType) => {
                 closeModal();
-                navigate('/');
+                setIsGuestFlow(false);
+                navigate(`/overview/customize/${value.id}`);
               },
               // On failed
               () => {
