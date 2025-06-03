@@ -12,7 +12,7 @@ import {
 } from '../util/sessionStorage';
 import { DebateTableRepository } from './DebateTableRepository';
 
-export class SessionDebateTableRepository implements DebateTableRepository {
+class SessionDebateTableRepository implements DebateTableRepository {
   async getTable(): Promise<GetDebateTableResponseType> {
     return getSessionCustomizeTableData();
   }
@@ -25,3 +25,7 @@ export class SessionDebateTableRepository implements DebateTableRepository {
     return setSessionCustomizeTableData(data);
   }
 }
+
+// Singleton
+const sessionDebateTableRepository = new SessionDebateTableRepository();
+export default sessionDebateTableRepository;

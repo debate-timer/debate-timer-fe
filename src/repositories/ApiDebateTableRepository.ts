@@ -12,7 +12,7 @@ import {
 import { DebateTableData } from '../type/type';
 import { DebateTableRepository } from './DebateTableRepository';
 
-export class ApiDebateTableRepository implements DebateTableRepository {
+class ApiDebateTableRepository implements DebateTableRepository {
   async getTable(tableId: number): Promise<GetDebateTableResponseType> {
     return await getDebateTableData(tableId);
   }
@@ -29,3 +29,7 @@ export class ApiDebateTableRepository implements DebateTableRepository {
     return await putDebateTableData({ id, info, table });
   }
 }
+
+// Singleton
+const apiDebateTableRepository = new ApiDebateTableRepository();
+export default apiDebateTableRepository;

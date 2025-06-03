@@ -6,8 +6,8 @@ import {
 } from '../apis/responses/debateTable';
 import { DebateTableData } from '../type/type';
 import { isGuestFlow } from '../util/sessionStorage';
-import { ApiDebateTableRepository } from './ApiDebateTableRepository';
-import { SessionDebateTableRepository } from './SessionDebateTableRepository';
+import apiDebateTableRepository from './ApiDebateTableRepository';
+import sessionDebateTableRepository from './SessionDebateTableRepository';
 
 export interface DebateTableRepository {
   getTable(tableId?: number): Promise<GetDebateTableResponseType>;
@@ -20,6 +20,6 @@ export interface DebateTableRepository {
 export function getRepository(): DebateTableRepository {
   console.log(isGuestFlow());
 
-  if (isGuestFlow()) return new SessionDebateTableRepository();
-  return new ApiDebateTableRepository();
+  if (isGuestFlow()) return sessionDebateTableRepository;
+  return apiDebateTableRepository;
 }
