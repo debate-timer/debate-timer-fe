@@ -2,8 +2,10 @@ import { PropsWithChildren } from 'react';
 import { IoMdHome } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
-import { IoLogOut } from 'react-icons/io5';
+import { IoLogIn, IoLogOut } from 'react-icons/io5';
 import IconButton from '../../../components/IconButton/IconButton';
+import { isLoggedIn } from '../../../util/accessToken';
+import { isGuestFlow } from '../../../util/sessionStorage';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
@@ -27,16 +29,23 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
   return <div className="flex-1 items-center text-center">{children}</div>;
 };
 
-interface RightProps extends PropsWithChildren {
-  defaultIcons?: ('home' | 'logout' | 'guest')[];
-}
+type HeaderIcons = 'home' | 'logout' | 'guest' | 'login';
 
-StickyTriSectionHeader.Right = function Right({
-  children,
-  defaultIcons,
-}: RightProps) {
+StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
+  const { children } = props;
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
+  const defaultIcons: HeaderIcons[] = [];
+
+  if (isGuestFlow()) {
+    defaultIcons.push('guest');
+  }
+
+  if (isLoggedIn()) {
+    defaultIcons.push('home', 'logout');
+  } else {
+    defaultIcons.push('login');
+  }
 
   return (
     <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
@@ -47,7 +56,7 @@ StickyTriSectionHeader.Right = function Right({
         </>
       )}
 
-      {defaultIcons?.map((iconName, index) => {
+      {defaultIcons.map((iconName, index) => {
         switch (iconName) {
           case 'guest':
             return (
@@ -72,6 +81,15 @@ StickyTriSectionHeader.Right = function Right({
                 <IconButton
                   icon={<IoLogOut size={24} />}
                   onClick={() => logoutMutate()}
+                />
+              </div>
+            );
+          case 'login':
+            return (
+              <div key={`${iconName}-${index}`}>
+                <IconButton
+                  icon={<IoLogIn size={24} />}
+                  onClick={() => navigate('/login')}
                 />
               </div>
             );

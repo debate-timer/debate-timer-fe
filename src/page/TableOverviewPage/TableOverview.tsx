@@ -37,7 +37,7 @@ export default function TableOverview() {
           <DefaultLayout.Header.Center>
             <HeaderTitle title={data?.info.agenda} />
           </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+          <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
 
         <DefaultLayout.ContentContainer>
