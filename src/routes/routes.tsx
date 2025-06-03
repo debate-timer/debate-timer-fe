@@ -10,6 +10,7 @@ import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
+import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 
 const routesConfig = [
   {
@@ -40,6 +41,11 @@ const routesConfig = [
   {
     path: '/oauth',
     element: <OAuth />,
+    requiresAuth: false,
+  },
+  {
+    path: '/share',
+    element: <TableSharingPage />,
     requiresAuth: false,
   },
   {
