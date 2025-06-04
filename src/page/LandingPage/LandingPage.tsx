@@ -28,7 +28,8 @@ export default function LandingPage() {
   };
 
   const handleStartWithoutLogin = () => {
-    alert('비회원으로 시작하기');
+    window.location.href =
+      'https://www.debate-timer.com/share?data=eJzFkkFPwjAYhv8K%2Bc47MNTE7Aa4A4lsZBsXjTFlFFgc3bJB1BASY8CY6EEuhsM0U68epomJB3%2BRK%2F%2FB1ukEQyIX8NY%2B7ff26df2wKqDJIobAlik4YDUA4LaGCSIT8f0ZpyhF8F7NJiMAhCgc%2BzylWJVN9RyaUdmCDUxqaOf7ZOzML4LM%2FThjYa8xPUc38CorSShNHqkgyfGTYdM8zgax5cnjB8ij1ikWcC2DVID2T4WoGERy28lqON1cZ%2BZoJrN6nZ74HcQMXlERVN1FuC7GJstIzGlt0Nmw2jNOfpCiqqV89v8MhY%2FWdzMJsMK9rgPSKRr2ynSXYwOmM839vkceyxHjJ%2FPoS9MCRRV5X8F5nWAN3ZJArmFOrBSAUWuGtpn9K9XuKJBmHzNGROjVJb3C3ld3kptZs5OdNZz2Tk2IqepDC%2F78zHoS0Dvh5k4Cuj161JasrbYr1yRx17%2FAxahlXY%3D';
   };
 
   return (

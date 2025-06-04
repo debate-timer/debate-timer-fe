@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import reviewIcon from '../../../../public/landing/review-icon.svg';
+import reviewIcon from '../../../assets/landing/review-icon.svg';
 
 interface ReviewCardProps {
   quote: string;

@@ -1,5 +1,5 @@
-import section101 from '../../../../public/landing/section1-1.png';
-import section102 from '../../../../public/landing/section1-2.png';
+import section101 from '../../../assets/landing/section1-1.png';
+import section102 from '../../../assets/landing/section1-2.png';
 
 export default function TimeTableSection() {
   return (

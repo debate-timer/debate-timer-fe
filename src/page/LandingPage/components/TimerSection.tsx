@@ -1,6 +1,6 @@
-import section201 from '../../../../public/landing/section2-1.png';
-import section202 from '../../../../public/landing/section2-2.png';
-import section203 from '../../../../public/landing/section2-3.png';
+import section201 from '../../../assets/landing/section2-1.png';
+import section202 from '../../../assets/landing/section2-2.png';
+import section203 from '../../../assets/landing/section2-3.png';
 
 export default function TimerSection() {
   return (

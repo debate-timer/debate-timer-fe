@@ -1,5 +1,5 @@
-import section301 from '../../../../public/landing/section3-1.png';
-import section302 from '../../../../public/landing/section3-2.png';
+import section301 from '../../../assets/landing/section3-1.png';
+import section302 from '../../../assets/landing/section3-2.png';
 
 interface TableSectionProps {
   onLogin: () => void;

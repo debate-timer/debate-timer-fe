@@ -1,4 +1,4 @@
-import section501 from '../../../../public/landing/section5-1.png';
+import section501 from '../../../assets/landing/section5-1.png';
 
 export default function ReportSection() {
   return (
