@@ -13,14 +13,14 @@ export default function TableSection({ onLogin }: TableSectionProps) {
           <span className="relative z-10">홈 | 설정</span>
           <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand-main/70"></span>
         </div>
-        <h3 className="mt-4 text-left text-[2.75vw] font-bold">
+        <h2 className="mt-4 text-left text-[2.75vw] font-bold">
           토론 정보 관리 및 기록
-        </h3>
+        </h2>
       </div>
       <div className="flex flex-row items-center justify-center gap-8 px-4">
         <img src={section301} alt="section301" className="flex w-1/2" />
         <div className="flex w-1/2 flex-col items-center gap-4">
-          <h1 className="text-[1.75vw] font-semibold">종소리 설정</h1>
+          <h3 className="text-[1.75vw] font-semibold">종소리 설정</h3>
           <p className="text-[1.5vw] font-medium text-neutral-600">
             원하는 종소리만 골라서 설정할 수 있어요.
           </p>
