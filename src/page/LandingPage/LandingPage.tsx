@@ -5,31 +5,42 @@ import TimerSection from './components/TimerSection';
 import TableSection from './components/TableSection';
 import ReviewSection from './components/ReviewSection';
 import ReportSection from './components/ReportSection';
+import { LANDING_URLS } from '../../constants/urls';
 
 export default function LandingPage() {
   const AuthLogin = () => {
-    if (
-      !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID ||
-      !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI
-    ) {
-      throw new Error('OAuth 정보가 없습니다.');
+    try {
+      if (
+        !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID ||
+        !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID.trim() ||
+        !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI ||
+        !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI.trim() ||
+        !import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL ||
+        !import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL.trim()
+      ) {
+        console.error('OAuth configuration is missing');
+        alert('로그인 설정에 문제가 있습니다. 관리자에게 문의해주세요.');
+        return;
+      }
+
+      const params = {
+        client_id: import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID,
+        redirect_uri: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI,
+        response_type: 'code',
+        scope: 'openid profile email',
+      };
+      const queryString = new URLSearchParams(params).toString();
+      const googleOAuthUrl = `${import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL}?${queryString}`;
+
+      window.location.href = googleOAuthUrl;
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
-
-    const params = {
-      client_id: import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID,
-      redirect_uri: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI,
-      response_type: 'code',
-      scope: 'openid profile email',
-    };
-    const queryString = new URLSearchParams(params).toString();
-    const googleOAuthUrl = `${import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL}?${queryString}`;
-
-    window.location.href = googleOAuthUrl;
   };
 
   const handleStartWithoutLogin = () => {
-    window.location.href =
-      'https://www.debate-timer.com/share?data=eJzFkkFPwjAYhv8K%2Bc47MNTE7Aa4A4lsZBsXjTFlFFgc3bJB1BASY8CY6EEuhsM0U68epomJB3%2BRK%2F%2FB1ukEQyIX8NY%2B7ff26df2wKqDJIobAlik4YDUA4LaGCSIT8f0ZpyhF8F7NJiMAhCgc%2BzylWJVN9RyaUdmCDUxqaOf7ZOzML4LM%2FThjYa8xPUc38CorSShNHqkgyfGTYdM8zgax5cnjB8ij1ikWcC2DVID2T4WoGERy28lqON1cZ%2BZoJrN6nZ74HcQMXlERVN1FuC7GJstIzGlt0Nmw2jNOfpCiqqV89v8MhY%2FWdzMJsMK9rgPSKRr2ynSXYwOmM839vkceyxHjJ%2FPoS9MCRRV5X8F5nWAN3ZJArmFOrBSAUWuGtpn9K9XuKJBmHzNGROjVJb3C3ld3kptZs5OdNZz2Tk2IqepDC%2F78zHoS0Dvh5k4Cuj161JasrbYr1yRx17%2FAxahlXY%3D';
+    window.location.href = LANDING_URLS.START_WITHOUT_LOGIN_URL;
   };
 
   return (

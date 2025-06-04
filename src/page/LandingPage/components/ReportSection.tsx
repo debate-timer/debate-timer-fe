@@ -1,4 +1,5 @@
 import section501 from '../../../assets/landing/section5-1.png';
+import { LANDING_URLS } from '../../../constants/urls';
 
 export default function ReportSection() {
   return (
@@ -11,7 +12,11 @@ export default function ReportSection() {
           </p>
           <button
             onClick={() =>
-              window.open('https://forms.gle/r9idqUGsoD2jJMZ29', '_blank')
+              window.open(
+                LANDING_URLS.REPORT_FORM_URL,
+                '_blank',
+                'noopener,noreferrer',
+              )
             }
             className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-main"
           >
@@ -26,8 +31,9 @@ export default function ReportSection() {
           <button
             onClick={() =>
               window.open(
-                'https://bustling-bathtub-b3a.notion.site/2071550c60cf80f18395e03440fba80a?source=copy_link',
+                LANDING_URLS.PRIVACY_POLICY_URL,
                 '_blank',
+                'noopener,noreferrer',
               )
             }
             className="text-[1vw] text-neutral-500 transition-colors hover:text-neutral-700"
@@ -38,8 +44,9 @@ export default function ReportSection() {
           <button
             onClick={() =>
               window.open(
-                'https://bustling-bathtub-b3a.notion.site/1b01550c60cf8020b34adff2d40cf605?source=copy_link',
+                LANDING_URLS.TERMS_OF_SERVICE_URL,
                 '_blank',
+                'noopener,noreferrer',
               )
             }
             className="text-[1vw] text-neutral-500 transition-colors hover:text-neutral-700"
