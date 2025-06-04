@@ -9,7 +9,12 @@ export default function ReportSection() {
           <p className="text-[1.25vw] text-neutral-400">
             디베이트 타이머 사용 중 불편함을 느끼셨나요?
           </p>
-          <button className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-main">
+          <button
+            onClick={() =>
+              window.open('https://forms.gle/r9idqUGsoD2jJMZ29', '_blank')
+            }
+            className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-main"
+          >
             접수하기
           </button>
         </div>
@@ -18,11 +23,27 @@ export default function ReportSection() {
       <div className="flex flex-col items-start justify-center gap-4">
         <p className="text-[1.25vw] font-medium">디베이트 타이머</p>
         <div className="flex items-center gap-1">
-          <button className="text-[1vw] text-neutral-500 transition-colors hover:text-neutral-700">
+          <button
+            onClick={() =>
+              window.open(
+                'https://bustling-bathtub-b3a.notion.site/2071550c60cf80f18395e03440fba80a?source=copy_link',
+                '_blank',
+              )
+            }
+            className="text-[1vw] text-neutral-500 transition-colors hover:text-neutral-700"
+          >
             개인정보처리방침
           </button>
           <span className="text-[1vw] text-neutral-500">|</span>
-          <button className="text-[1vw] text-neutral-500 transition-colors hover:text-neutral-700">
+          <button
+            onClick={() =>
+              window.open(
+                'https://bustling-bathtub-b3a.notion.site/1b01550c60cf8020b34adff2d40cf605?source=copy_link',
+                '_blank',
+              )
+            }
+            className="text-[1vw] text-neutral-500 transition-colors hover:text-neutral-700"
+          >
             서비스 이용약관
           </button>
         </div>
