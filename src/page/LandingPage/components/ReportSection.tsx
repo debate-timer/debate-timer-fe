@@ -9,7 +9,7 @@ export default function ReportSection() {
           <p className="text-[1.25vw] text-neutral-400">
             디베이트 타이머 사용 중 불편함을 느끼셨나요?
           </p>
-          <button className="rounded-full bg-neutral-200 px-9 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-main">
+          <button className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-main">
             접수하기
           </button>
         </div>

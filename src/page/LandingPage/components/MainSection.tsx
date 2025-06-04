@@ -15,7 +15,7 @@ export default function MainSection({ onStartWithoutLogin }: MainSectionProps) {
       <h1 className="text-[3.5vw] font-bold">토론 진행을 더 쉽고 빠르게</h1>
       <button
         onClick={onStartWithoutLogin}
-        className="rounded-full bg-brand-main px-5 py-2 text-[1.25vw] font-medium text-black shadow-md transition-all duration-100 hover:bg-brand-sub1 hover:text-neutral-0"
+        className="rounded-full border border-neutral-300 bg-brand-main px-5 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-sub1 hover:text-neutral-0"
       >
         비회원으로 시작하기
       </button>

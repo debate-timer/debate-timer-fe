@@ -40,7 +40,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
         <h1>시간표를 저장하려면,</h1>
         <h1>디베이트 타이머에 로그인해보세요!</h1>
         <button
-          className="mt-14 rounded-full bg-brand-main px-5 py-2 text-[1.25vw] font-medium text-black shadow-md transition-all duration-100 hover:bg-brand-sub1 hover:text-neutral-0"
+          className="mt-14 rounded-full border border-neutral-300 bg-brand-main px-5 py-2 text-[1.25vw] font-medium text-black transition-all duration-100 hover:bg-brand-sub1 hover:text-neutral-0"
           onClick={onLogin}
         >
           3초 로그인 하기
