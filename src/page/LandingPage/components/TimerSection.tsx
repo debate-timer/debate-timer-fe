@@ -24,10 +24,10 @@ export default function TimerSection() {
 
       <div className="flex flex-col items-center gap-1 font-medium text-neutral-600">
         <p className="text-center text-[1.5vw]">
-          토론자들이 손을 들고 작전시간을 요청하면
+          토론자들이 손을 들고 작전 시간을 요청하면
         </p>
         <p className="text-center text-[1.5vw]">
-          버튼을 통해 작전시간을 세팅할 수 있어요.
+          버튼을 통해 작전 시간을 세팅할 수 있어요.
         </p>
       </div>
 

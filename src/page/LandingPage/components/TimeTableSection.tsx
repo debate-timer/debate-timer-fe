@@ -6,7 +6,7 @@ export default function TimeTableSection() {
     <section id="section1" className="flex flex-col gap-24">
       <div>
         <div className="relative inline-block text-[1.5vw] font-semibold">
-          <span className="relative z-10">시간표 설정화면</span>
+          <span className="relative z-10">시간표 설정 화면</span>
           <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand-main/70"></span>
         </div>
         <h1 className="mt-4 text-left text-[2.75vw] font-bold">
@@ -19,7 +19,7 @@ export default function TimeTableSection() {
       <img src={section102} alt="section102" className="mt-5 w-full" />
       <div className="flex flex-col items-center gap-1">
         <p className="mb-2 text-center text-[1.75vw] font-semibold">
-          두가지 타이머
+          두 가지 타이머
         </p>
         <p className="text-center text-[1.5vw] font-medium text-neutral-600">
           일반형과 자유토론형 타이머로,
