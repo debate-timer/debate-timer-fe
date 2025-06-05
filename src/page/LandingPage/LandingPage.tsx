@@ -50,7 +50,7 @@ export default function LandingPage() {
 
       <main className="flex w-full flex-col items-center">
         {/* 흰색 배경 */}
-        <div className="flex w-[64%] max-w-[1226px] flex-col gap-96 pb-48 pt-20">
+        <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 pb-48 pt-20 md:w-[64%]">
           {/* 메인 화면 */}
           <MainSection onStartWithoutLogin={handleStartWithoutLogin} />
           {/* 시간표 설정화면 */}
@@ -64,7 +64,7 @@ export default function LandingPage() {
         </div>
 
         {/* 흰색 배경 */}
-        <div className="flex w-[64%] max-w-[1226px] flex-col gap-96 py-48">
+        <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
           {/* 홈 설정 */}
           <TableSection onLogin={AuthLogin} />
           {/* 리뷰 */}

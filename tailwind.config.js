@@ -94,6 +94,7 @@ export default {
       },
     },
     screens: {
+      md: '768px',
       lg: '1280px',
       xl: '1450px',
     },

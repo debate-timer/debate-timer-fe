@@ -22,11 +22,14 @@ export default function Header({ onLogin }: HeaderProps) {
         isScrolled ? 'shadow-md' : ''
       }`}
     >
-      <div className="flex w-[70%] items-center justify-between">
-        <div className="flex items-center text-[2vw] font-semibold">
+      <div className="flex w-[90%] max-w-[1226px] items-center justify-between md:w-[70%]">
+        <div className="flex items-center text-[min(max(1.25rem,2vw),2rem)] font-semibold">
           Debate Timer
         </div>
-        <button className="text-[1.25vw]" onClick={onLogin}>
+        <button
+          className="text-[min(max(0.875rem,1.25vw),1.2rem)]"
+          onClick={onLogin}
+        >
           3초 로그인
         </button>
       </div>
