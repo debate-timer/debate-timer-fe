@@ -14,12 +14,9 @@ import NormalTimer from './components/NormalTimer';
 import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
-import {
-  deleteSessionCustomizeTableData,
-  isGuestFlow,
-} from '../../util/sessionStorage';
-import LoginAndStoreDBModal from '../../components/LoginAndStoreDBModal/LoginAndStoreDBModal';
+import { isGuestFlow } from '../../util/sessionStorage';
 import { AuthLogin } from '../../util/googleAuth';
+import DialogModal from '../../components/DialogModal/DialogModal';
 
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
@@ -817,22 +814,27 @@ export default function TimerPage() {
       </UseToolTipWrapper>
       {/** Login And DataStore*/}
       <LoginAndStoreModalWrapper closeButtonColor="text-neutral-1000">
-        <LoginAndStoreDBModal
-          onSaveAndLogin={() => {
-            closeLoginAndStoreModal();
-            AuthLogin();
+        <DialogModal
+          left={{
+            text: '아니오',
+            onClick: () => {
+              closeLoginAndStoreModal();
+            },
           }}
-          onOnlyLogin={() => {
-            deleteSessionCustomizeTableData();
-            closeLoginAndStoreModal();
-            AuthLogin();
+          right={{
+            text: '네',
+            onClick: () => {
+              closeLoginAndStoreModal();
+              AuthLogin();
+            },
+            isBold: true,
           }}
         >
-          <>
+          <div className="px-20 py-10 text-xl font-bold">
             토론을 끝내셨군요! <br />
-            지금까지의 토론을 저장할까요?
-          </>
-        </LoginAndStoreDBModal>
+            지금까지의 시간표를 로그인하고 저장할까요?
+          </div>
+        </DialogModal>
       </LoginAndStoreModalWrapper>
     </>
   );

@@ -10,7 +10,7 @@ import {
 } from '../../../util/sessionStorage';
 import { AuthLogin } from '../../../util/googleAuth';
 import { useModal } from '../../../hooks/useModal';
-import LoginAndStoreDBModal from '../../../components/LoginAndStoreDBModal/LoginAndStoreDBModal';
+import DialogModal from '../../../components/DialogModal/DialogModal';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
@@ -94,22 +94,29 @@ StickyTriSectionHeader.Right = function Right({
         })}
       </div>
       <ModalWrapper closeButtonColor="text-neutral-1000">
-        <LoginAndStoreDBModal
-          onSaveAndLogin={() => {
-            closeModal();
-            AuthLogin();
+        <DialogModal
+          left={{
+            text: '아니오',
+            onClick: () => {
+              deleteSessionCustomizeTableData();
+              closeModal();
+              AuthLogin();
+            },
           }}
-          onOnlyLogin={() => {
-            deleteSessionCustomizeTableData();
-            closeModal();
-            AuthLogin();
+          right={{
+            text: '네',
+            onClick: () => {
+              closeModal();
+              AuthLogin();
+            },
+            isBold: true,
           }}
         >
-          <>
-            비회원으로 사용하던 데이터가 있습니다. <br />
-            로그인 후에도 이 데이터를 계속 사용하시겠습니까?
-          </>
-        </LoginAndStoreDBModal>
+          <div className="px-20 py-10 text-xl font-bold">
+            비회원으로 사용하던 시간표가 있습니다. <br />
+            로그인 후에도 이 시간표를 계속 사용하시겠습니까?
+          </div>
+        </DialogModal>
       </ModalWrapper>
     </>
   );
