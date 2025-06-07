@@ -5,10 +5,9 @@ import useLogout from '../../../hooks/mutations/useLogout';
 import { IoLogIn, IoLogOut } from 'react-icons/io5';
 import IconButton from '../../../components/IconButton/IconButton';
 import { isLoggedIn } from '../../../util/accessToken';
-import { isGuestFlow, setIsGuestFlow } from '../../../util/sessionStorage';
 import {
-  deleteSessionCustomizeTableData,
   isGuestFlow,
+  deleteSessionCustomizeTableData,
 } from '../../../util/sessionStorage';
 import { AuthLogin } from '../../../util/googleAuth';
 import { useModal } from '../../../hooks/useModal';
@@ -36,12 +35,13 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
   return <div className="flex-1 items-center text-center">{children}</div>;
 };
 
-type HeaderIcons = 'home' | 'logout' | 'guest' | 'login';
+type HeaderIcons = 'home' | 'logout' | 'guest' | 'auth';
 
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const { children } = props;
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
+  const { openModal, closeModal, ModalWrapper } = useModal({});
   const defaultIcons: HeaderIcons[] = [];
 
   if (isGuestFlow()) {
@@ -49,67 +49,99 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   }
 
   if (isLoggedIn()) {
-    defaultIcons.push('home', 'logout');
+    defaultIcons.push('home', 'auth');
   } else {
-    defaultIcons.push('login');
+    defaultIcons.push('auth');
   }
 
   return (
-    <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
-      {children && (
-        <>
-          {children}
-          <div className="w-[1px] self-stretch bg-neutral-500" />
-        </>
-      )}
+    <>
+      <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
+        {children && (
+          <>
+            {children}
+            <div className="w-[1px] self-stretch bg-neutral-500" />
+          </>
+        )}
 
-      {defaultIcons.map((iconName, index) => {
-        switch (iconName) {
-          case 'guest':
-            return (
-              <div key={`${iconName}-${index}`}>
-                <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
-                  비회원 모드
+        {defaultIcons.map((iconName, index) => {
+          switch (iconName) {
+            case 'guest':
+              return (
+                <div key={`${iconName}-${index}`}>
+                  <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+                    비회원 모드
+                  </div>
                 </div>
-              </div>
-            );
-          case 'home':
-            return (
-              <div key={`${iconName}-${index}`}>
-                <IconButton
-                  icon={<IoMdHome size={24} />}
-                  onClick={() => {
-                    if (isGuestFlow()) {
-                      setIsGuestFlow(false);
-                    }
-                    navigate('/');
-                  }}
-                />
-              </div>
-            );
-          case 'logout':
-            return (
-              <div key={`${iconName}-${index}`}>
-                <IconButton
-                  icon={<IoLogOut size={24} />}
-                  onClick={() => logoutMutate()}
-                />
-              </div>
-            );
-          case 'login':
-            return (
-              <div key={`${iconName}-${index}`}>
-                <IconButton
-                  icon={<IoLogIn size={24} />}
-                  onClick={() => navigate('/login')}
-                />
-              </div>
-            );
-          default:
-            return null;
-        }
-      })}
-    </div>
+              );
+            case 'home':
+              return (
+                <div key={`${iconName}-${index}`}>
+                  <IconButton
+                    icon={<IoMdHome size={24} />}
+                    onClick={() => {
+                      if (isGuestFlow()) {
+                        deleteSessionCustomizeTableData();
+                      }
+                      navigate('/');
+                    }}
+                  />
+                </div>
+              );
+            case 'auth':
+              if (isLoggedIn()) {
+                return (
+                  <div key={`${iconName}-${index}`}>
+                    <IconButton
+                      icon={<IoLogOut size={24} />}
+                      onClick={() => logoutMutate()}
+                      title="로그아웃"
+                    />
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={`${iconName}-${index}`}>
+                    <IconButton
+                      icon={<IoLogIn size={24} />}
+                      onClick={() => openModal()}
+                      title="로그인"
+                    />
+                  </div>
+                );
+              }
+            default:
+              return null;
+          }
+        })}
+      </div>
+
+      <ModalWrapper closeButtonColor="text-neutral-1000">
+        <DialogModal
+          left={{
+            text: '아니오',
+            onClick: () => {
+              deleteSessionCustomizeTableData();
+              closeModal();
+              AuthLogin();
+            },
+          }}
+          right={{
+            text: '네',
+            onClick: () => {
+              closeModal();
+              AuthLogin();
+            },
+            isBold: true,
+          }}
+        >
+          <div className="px-20 py-10 text-xl font-bold">
+            비회원으로 사용하던 시간표가 있습니다. <br />
+            로그인 후에도 이 시간표를 계속 사용하시겠습니까?
+          </div>
+        </DialogModal>
+      </ModalWrapper>
+    </>
   );
 };
 

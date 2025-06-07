@@ -10,7 +10,7 @@ export default function NotFoundPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left />
         <DefaultLayout.Header.Center />
-        <DefaultLayout.Header.Right defaultIcons={['home', 'auth']} />
+        <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
