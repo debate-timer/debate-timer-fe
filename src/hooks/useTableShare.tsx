@@ -1,8 +1,8 @@
-import { createEncodedURL } from '../util/arrayEncoding';
 import { useModal } from './useModal';
 import ShareModal from '../components/ShareModal/ShareModal';
 import { useGetDebateTableData } from './query/useGetDebateTableData';
 import { useEffect, useState } from 'react';
+import { createTableShareUrl } from '../util/arrayEncoding';
 
 export function useTableShare(tableId: number) {
   const { isOpen, openModal, closeModal, ModalWrapper } = useModal();
@@ -25,7 +25,7 @@ export function useTableShare(tableId: number) {
 
   useEffect(() => {
     if (data.data) {
-      setShareUrl(createEncodedURL(baseUrl, data.data.table));
+      setShareUrl(createTableShareUrl(baseUrl, data.data));
       setIsUrlReady(true);
     }
   }, [baseUrl, data]);

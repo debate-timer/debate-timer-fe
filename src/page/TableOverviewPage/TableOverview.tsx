@@ -10,11 +10,11 @@ import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel'
 import { useTableShare } from '../../hooks/useTableShare';
 import { MdOutlineIosShare } from 'react-icons/md';
 import { StanceToString } from '../../type/type';
+import { isGuestFlow } from '../../util/sessionStorage';
 
 export default function TableOverview() {
   const { id } = useParams();
   const tableId = Number(id);
-  const isShareEnabled = import.meta.env.VITE_ENABLE_SHARE_URL === 'true';
   const navigate = useNavigate();
 
   // Only uses hooks related with customize due to the removal of parliamentary
@@ -36,7 +36,7 @@ export default function TableOverview() {
           <DefaultLayout.Header.Center>
             <HeaderTitle title={data?.info.agenda} />
           </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+          <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
 
         <DefaultLayout.ContentContainer>
@@ -71,12 +71,15 @@ export default function TableOverview() {
           <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
               className="button enabled-hover-neutral h-16 w-full"
-              onClick={() =>
-                // TODO: have to remove the quert param 'type'
-                navigate(
-                  `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
-                )
-              }
+              onClick={() => {
+                if (isGuestFlow()) {
+                  navigate(`/composition?mode=edit&type=CUSTOMIZE`);
+                } else {
+                  navigate(
+                    `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+                  );
+                }
+              }}
             >
               <div className="flex items-center justify-center gap-2">
                 <RiEditFill />
@@ -86,7 +89,13 @@ export default function TableOverview() {
             <div className="flex h-16 w-full space-x-2">
               <button
                 className="button enabled flex-1"
-                onClick={() => onModifyCustomizeTableData.mutate({ tableId })}
+                onClick={() => {
+                  if (isGuestFlow()) {
+                    navigate('/table/customize/guest');
+                  } else {
+                    onModifyCustomizeTableData.mutate({ tableId });
+                  }
+                }}
               >
                 <div className="flex items-center justify-center gap-2">
                   <RiSpeakFill />
@@ -94,16 +103,14 @@ export default function TableOverview() {
                 </div>
               </button>
 
-              {isShareEnabled && (
-                <button
-                  className="button enabled-hover-neutral flex size-16 items-center justify-center"
-                  onClick={() => {
-                    openShareModal();
-                  }}
-                >
-                  <MdOutlineIosShare className="m-4 size-full" />
-                </button>
-              )}
+              <button
+                className="button enabled-hover-neutral flex size-16 items-center justify-center"
+                onClick={() => {
+                  openShareModal();
+                }}
+              >
+                <MdOutlineIosShare className="m-4 size-full" />
+              </button>
             </div>
           </div>
         </DefaultLayout.StickyFooterWrapper>

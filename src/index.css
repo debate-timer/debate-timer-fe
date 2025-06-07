@@ -26,6 +26,23 @@
   @apply bg-neutral-300 text-neutral-500 border-none;
 }
 
+/* For small buttons */
+.small-button {
+  @apply rounded-[24px] border-[2px] border-neutral-700 text-[20px] font-bold transition-colors duration-200;
+}
+
+.small-button.enabled {
+  @apply bg-background-default hover:bg-brand-main text-neutral-900;
+}
+
+.small-button.enabled-hover-neutral {
+  @apply bg-background-default hover:bg-neutral-300 text-neutral-900;
+}
+
+.small-button.disabled {
+  @apply bg-neutral-300 text-neutral-500 border-none;
+}
+
 p {
   white-space: pre-wrap;
 }

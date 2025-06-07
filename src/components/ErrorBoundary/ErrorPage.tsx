@@ -17,9 +17,9 @@ export default function ErrorPage({ message, stack, onReset }: ErrorPageProps) {
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center></DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+        <DefaultLayout.Header.Left />
+        <DefaultLayout.Header.Center />
+        <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>

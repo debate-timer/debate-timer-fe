@@ -5,6 +5,7 @@ import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
 import { usePutDebateTable } from '../../../hooks/mutations/usePutDebateTable';
+import { isGuestFlow } from '../../../util/sessionStorage';
 
 const useTableFrom = (
   currentStep: TableCompositionStep,
@@ -86,7 +87,11 @@ const useTableFrom = (
 
   const { mutate: onModifyTable } = usePutDebateTable((tableId) => {
     removeValue();
-    navigate(`/overview/customize/${tableId}`);
+    if (isGuestFlow()) {
+      navigate(`/overview/customize/guest`);
+    } else {
+      navigate(`/overview/customize/${tableId}`);
+    }
   });
 
   const AddTable = () => {

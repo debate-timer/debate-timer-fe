@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import ShareModal from './ShareModal';
+import { createTableShareUrl } from '../../util/arrayEncoding';
 
 const meta: Meta<typeof ShareModal> = {
   title: 'components/ShareModal',
@@ -11,13 +12,55 @@ export default meta;
 
 type Story = StoryObj<typeof ShareModal>;
 
+const shareUrl = createTableShareUrl('https://localhost:6006', {
+  info: {
+    agenda: '토론 주제',
+    prosTeamName: '짜장',
+    consTeamName: '짬뽕',
+    finishBell: true,
+    warningBell: false,
+    name: '테이블 이름',
+  },
+  table: [
+    {
+      stance: 'PROS',
+      boxType: 'NORMAL',
+      speechType: '입론',
+      speaker: '발언자',
+      time: 60,
+      timePerSpeaking: null,
+      timePerTeam: null,
+    },
+    {
+      stance: 'CONS',
+      boxType: 'NORMAL',
+      speechType: '입론',
+      speaker: '발언자',
+      time: 60,
+      timePerSpeaking: null,
+      timePerTeam: null,
+    },
+    {
+      stance: 'NEUTRAL',
+      boxType: 'TIME_BASED',
+      speechType: '자유토론',
+      speaker: null,
+      time: null,
+      timePerSpeaking: 60,
+      timePerTeam: 120,
+    },
+  ],
+});
+
 // When QR code is ready
 export const OnQRCodeReady: Story = {
   args: {
-    shareUrl: 'https://www.naver.com',
+    shareUrl: shareUrl,
     copyState: false,
     isUrlReady: true,
-    onClick: () => {},
+    onClick: () => {
+      navigator.clipboard.writeText(shareUrl);
+    },
   },
 };
 

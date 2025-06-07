@@ -1,4 +1,5 @@
 import {
+  deleteDebateTableData,
   getDebateTableData,
   postDebateTableData,
   putDebateTableData,
@@ -12,7 +13,7 @@ import {
 import { DebateTableData } from '../type/type';
 import { DebateTableRepository } from './DebateTableRepository';
 
-export class ApiDebateTableRepository implements DebateTableRepository {
+class ApiDebateTableRepository implements DebateTableRepository {
   async getTable(tableId: number): Promise<GetDebateTableResponseType> {
     return await getDebateTableData(tableId);
   }
@@ -28,4 +29,12 @@ export class ApiDebateTableRepository implements DebateTableRepository {
     const { id, info, table } = data;
     return await putDebateTableData({ id, info, table });
   }
+
+  async deleteTable(tableId: number): Promise<boolean> {
+    return await deleteDebateTableData(tableId);
+  }
 }
+
+// Singleton
+const apiDebateTableRepository = new ApiDebateTableRepository();
+export default apiDebateTableRepository;
