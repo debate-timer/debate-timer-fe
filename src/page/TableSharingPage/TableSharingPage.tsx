@@ -14,8 +14,10 @@ import {
 } from '../../apis/responses/debateTable';
 import { isGuestFlow } from '../../util/sessionStorage';
 
-function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
-  let decodedData: DebateTableData;
+function getDecodedDataOrThrowOrNull(
+  encodedData: string | null,
+): DebateTableData | null {
+  let decodedData: DebateTableData | null = null;
 
   if (encodedData !== null) {
     try {
@@ -23,8 +25,6 @@ function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
     } catch {
       throw new Error('공유받은 데이터에 문제가 있어요.');
     }
-  } else {
-    throw new Error('데이터가 비어 있어요.');
   }
 
   return decodedData;
@@ -50,7 +50,7 @@ export default function TableSharingPage() {
   });
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
-  const decodedData = getDecodedDataOrThrow(encodedData);
+  const decodedData = getDecodedDataOrThrowOrNull(encodedData);
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -89,6 +89,10 @@ export default function TableSharingPage() {
       }
     } else {
       // On this case, getRepository() will automatically decide what data source to use
+      if (!decodedData) {
+        throw new Error('공유된 데이터가 비어 있어요.');
+      }
+
       sessionDebateTableRepository.deleteTable();
       sessionDebateTableRepository.addTable(decodedData).then(
         () => {
@@ -116,38 +120,36 @@ export default function TableSharingPage() {
 
       <ModalWrapper>
         {/* On this case, we have to specify the data source */}
-        <LoggedInStoreDBModal
-          onSave={() => {
-            decodedData.info.name = '(공유됨) ' + decodedData.info.name;
-            apiDebateTableRepository.addTable(decodedData).then(
-              // On fulfilled
-              (value: PostDebateTableResponseType) => {
-                closeModal();
-                sessionDebateTableRepository.deleteTable();
-                navigate(`/overview/customize/${value.id}`);
-              },
-              // On failed
-              () => {
-                closeModal();
-                throw new Error('공유받은 테이블을 저장하지 못했어요.');
-              },
-            );
-          }}
-          onContinue={() => {
-            sessionDebateTableRepository.addTable(decodedData).then(
-              // On fulfilled
-              () => {
-                closeModal();
-                navigate('/overview/customize/guest');
-              },
-              // On failed
-              () => {
-                closeModal();
-                throw new Error('공유받은 데이터 처리에 실패했어요.');
-              },
-            );
-          }}
-        />
+        {decodedData && (
+          <LoggedInStoreDBModal
+            onSave={() => {
+              decodedData.info.name = '(공유됨) ' + decodedData.info.name;
+              apiDebateTableRepository.addTable(decodedData).then(
+                (value) => {
+                  closeModal();
+                  sessionDebateTableRepository.deleteTable();
+                  navigate(`/overview/customize/${value.id}`);
+                },
+                () => {
+                  closeModal();
+                  throw new Error('공유받은 테이블을 저장하지 못했어요.');
+                },
+              );
+            }}
+            onContinue={() => {
+              sessionDebateTableRepository.addTable(decodedData).then(
+                () => {
+                  closeModal();
+                  navigate('/overview/customize/guest');
+                },
+                () => {
+                  closeModal();
+                  throw new Error('공유받은 데이터 처리에 실패했어요.');
+                },
+              );
+            }}
+          />
+        )}
       </ModalWrapper>
     </>
   );
