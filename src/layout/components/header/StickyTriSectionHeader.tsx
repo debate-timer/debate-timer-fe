@@ -40,7 +40,7 @@ type HeaderIcons = 'home' | 'logout' | 'guest' | 'auth';
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const { children } = props;
   const navigate = useNavigate();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
+  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
   const { openModal, closeModal, ModalWrapper } = useModal({});
   const defaultIcons: HeaderIcons[] = [];
 
@@ -53,7 +53,6 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   } else {
     defaultIcons.push('auth');
   }
-  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
 
   return (
     <>
