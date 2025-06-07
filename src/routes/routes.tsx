@@ -10,11 +10,16 @@ import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
-
+import LandingPage from '../page/LandingPage/LandingPage';
 const routesConfig = [
   {
     path: '/login',
     element: <LoginPage />,
+    requiresAuth: false,
+  },
+  {
+    path: '/home',
+    element: <LandingPage />,
     requiresAuth: false,
   },
   {

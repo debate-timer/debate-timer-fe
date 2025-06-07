@@ -36,7 +36,7 @@ StickyTriSectionHeader.Right = function Right({
   defaultIcons,
 }: RightProps) {
   const navigate = useNavigate();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/login'));
+  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
 
   return (
     <div className="flex flex-1  items-stretch justify-end gap-2 text-right">

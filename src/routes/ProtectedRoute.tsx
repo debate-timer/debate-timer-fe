@@ -12,6 +12,6 @@ export default function ProtectedRoute(props: PropsWithChildren) {
   return isAuthenticated ? (
     children
   ) : (
-    <Navigate to={'/login'} state={{ from: location }} replace />
+    <Navigate to={'/home'} state={{ from: location }} replace />
   );
 }
