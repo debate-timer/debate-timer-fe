@@ -1,4 +1,5 @@
 import {
+  deleteDebateTableData,
   getDebateTableData,
   postDebateTableData,
   putDebateTableData,
@@ -27,6 +28,10 @@ class ApiDebateTableRepository implements DebateTableRepository {
   ): Promise<PutDebateTableResponseType> {
     const { id, info, table } = data;
     return await putDebateTableData({ id, info, table });
+  }
+
+  async deleteTable(tableId: number): Promise<boolean> {
+    return await deleteDebateTableData(tableId);
   }
 }
 

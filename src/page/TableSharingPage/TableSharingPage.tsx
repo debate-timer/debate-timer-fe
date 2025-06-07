@@ -5,11 +5,9 @@ import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
 import { decodeDebateTableData } from '../../util/arrayEncoding';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { DebateTableData } from '../../type/type';
-import { getRepository } from '../../repositories/DebateTableRepository';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';
-import { setIsGuestFlow } from '../../util/sessionStorage';
 import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
@@ -52,19 +50,17 @@ export default function TableSharingPage() {
       openModal();
     } else {
       // On this case, getRepository() will automatically decide what data source to use
-      setIsGuestFlow(true);
-      getRepository()
-        .addTable(decodedData)
-        .then(
-          () => {
-            // On success
-            navigate(`/overview/customize/guest`);
-          },
-          () => {
-            // Handling error
-            throw new Error('공유된 토론 테이블을 DB에 저장하지 못했어요.');
-          },
-        );
+      sessionDebateTableRepository.deleteTable();
+      sessionDebateTableRepository.addTable(decodedData).then(
+        () => {
+          // On success
+          navigate(`/overview/customize/guest`);
+        },
+        () => {
+          // Handling error
+          throw new Error('공유된 토론 테이블을 DB에 저장하지 못했어요.');
+        },
+      );
     }
   }, [decodedData, navigate, openModal]);
 
@@ -88,7 +84,7 @@ export default function TableSharingPage() {
               // On fulfilled
               (value: PostDebateTableResponseType) => {
                 closeModal();
-                setIsGuestFlow(false);
+                sessionDebateTableRepository.deleteTable();
                 navigate(`/overview/customize/${value.id}`);
               },
               // On failed
@@ -103,7 +99,6 @@ export default function TableSharingPage() {
               // On fulfilled
               () => {
                 closeModal();
-                setIsGuestFlow(true);
                 navigate('/overview/customize/guest');
               },
               // On failed
