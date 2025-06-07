@@ -53,6 +53,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   } else {
     defaultIcons.push('auth');
   }
+  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
 
   return (
     <>
