@@ -17,7 +17,11 @@ export default function LoginPage() {
           <h1 className="text-6xl font-semibold">Debate Timer</h1>
         </div>
         <section className="flex w-72 flex-col gap-8 text-lg font-semibold">
-          <GoogleButton onClick={AuthLogin} />
+          <GoogleButton
+            onClick={() => {
+              AuthLogin();
+            }}
+          />
         </section>
       </div>
     </DefaultLayout>
