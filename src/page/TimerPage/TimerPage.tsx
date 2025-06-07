@@ -15,6 +15,8 @@ import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
 import { isGuestFlow } from '../../util/sessionStorage';
+import { AuthLogin } from '../../util/googleAuth';
+import DialogModal from '../../components/DialogModal/DialogModal';
 
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
 const bgColorMap: Record<TimerState, string> = {
@@ -45,13 +47,22 @@ export default function TimerPage() {
   const IS_FIRST = 'isFirst';
   const TRUE = 'true';
   const FALSE = 'false';
-  const { openModal, closeModal, ModalWrapper } = useModal({
+  const {
+    openModal: openUseTooltipModal,
+    closeModal: closeUseTooltipModal,
+    ModalWrapper: UseToolTipWrapper,
+  } = useModal({
     onClose: () => {
       setIsFirst(false);
       localStorage.setItem(IS_FIRST, FALSE);
     },
     isCloseButtonExist: false,
   });
+  const {
+    openModal: openLoginAndStoreModal,
+    closeModal: closeLoginAndStoreModal,
+    ModalWrapper: LoginAndStoreModalWrapper,
+  } = useModal();
 
   // Prepare for changing background
   const [bg, setBg] = useState<TimerState>('default');
@@ -145,9 +156,9 @@ export default function TimerPage() {
     }
 
     if (isFirst) {
-      openModal();
+      openUseTooltipModal();
     }
-  }, [isFirst, openModal]);
+  }, [isFirst, openUseTooltipModal]);
 
   // 타이머 상태에 따라 배경색(bg) 상태 설정
   useEffect(() => {
@@ -355,6 +366,7 @@ export default function TimerPage() {
         timer.setIsDone(false);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     data,
     index,
@@ -448,6 +460,7 @@ export default function TimerPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     goToOtherItem,
     prosConsSelected,
@@ -766,8 +779,7 @@ export default function TimerPage() {
                       type="DONE"
                       onClick={() => {
                         if (isGuestFlow()) {
-                          // TODO: have to add modal here
-                          navigate(`/overview/customize/guest`);
+                          openLoginAndStoreModal();
                         } else {
                           navigate(`/overview/customize/${tableId}`);
                         }
@@ -791,15 +803,39 @@ export default function TimerPage() {
       </DefaultLayout>
 
       {/** Tooltip */}
-      <ModalWrapper>
+      <UseToolTipWrapper>
         <FirstUseToolTip
           onClose={() => {
-            closeModal();
+            closeUseTooltipModal();
             setIsFirst(false);
             localStorage.setItem(IS_FIRST, FALSE);
           }}
         />
-      </ModalWrapper>
+      </UseToolTipWrapper>
+      {/** Login And DataStore*/}
+      <LoginAndStoreModalWrapper closeButtonColor="text-neutral-1000">
+        <DialogModal
+          left={{
+            text: '아니오',
+            onClick: () => {
+              closeLoginAndStoreModal();
+            },
+          }}
+          right={{
+            text: '네',
+            onClick: () => {
+              closeLoginAndStoreModal();
+              AuthLogin();
+            },
+            isBold: true,
+          }}
+        >
+          <div className="px-20 py-10 text-xl font-bold">
+            토론을 끝내셨군요! <br />
+            지금까지의 시간표를 로그인하고 저장할까요?
+          </div>
+        </DialogModal>
+      </LoginAndStoreModalWrapper>
     </>
   );
 }

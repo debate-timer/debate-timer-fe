@@ -19,7 +19,7 @@ export default function ErrorPage({ message, stack, onReset }: ErrorPageProps) {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center></DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right></DefaultLayout.Header.Right>
+        <DefaultLayout.Header.Right defaultIcons={['home', 'auth']} />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>

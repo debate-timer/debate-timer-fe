@@ -6,6 +6,13 @@ import { IoLogIn, IoLogOut } from 'react-icons/io5';
 import IconButton from '../../../components/IconButton/IconButton';
 import { isLoggedIn } from '../../../util/accessToken';
 import { isGuestFlow, setIsGuestFlow } from '../../../util/sessionStorage';
+import {
+  deleteSessionCustomizeTableData,
+  isGuestFlow,
+} from '../../../util/sessionStorage';
+import { AuthLogin } from '../../../util/googleAuth';
+import { useModal } from '../../../hooks/useModal';
+import DialogModal from '../../../components/DialogModal/DialogModal';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
