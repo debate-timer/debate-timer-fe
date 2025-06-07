@@ -1,3 +1,5 @@
+import DialogModal from '../../../components/DialogModal/DialogModal';
+
 /**
  * Props for LoggedInStoreDBModal
  */
@@ -19,21 +21,19 @@ export default function LoggedInStoreDBModal({
   onContinue,
 }: LoggedInStoreDBModalProps) {
   return (
-    <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
-      <div className="relative flex flex-col items-center justify-center space-y-6 rounded-2xl p-10">
-        <p className="break-keep text-center text-[20px] text-neutral-800">
-          공유된 토론 테이블을 내 테이블 목록에 저장하시겠어요?
-        </p>
-      </div>
-
-      <div className="flex w-full flex-col space-y-4">
-        <button className="small-button enabled py-2" onClick={onSave}>
-          네, 내 테이블 목록에 저장할게요.
-        </button>
-        <button className="small-button enabled py-2" onClick={onContinue}>
-          아니요, 저장하지 않고 진행할게요.
-        </button>
-      </div>
-    </div>
+    <DialogModal
+      left={{ text: '아니오', onClick: () => onContinue() }}
+      right={{
+        text: '네',
+        onClick: () => {
+          onSave();
+        },
+        isBold: true,
+      }}
+    >
+      <h1 className="break-keep px-20 py-10 text-xl font-bold">
+        공유받은 토론 테이블을 내 테이블 목록에 저장하시겠어요?
+      </h1>
+    </DialogModal>
   );
 }
