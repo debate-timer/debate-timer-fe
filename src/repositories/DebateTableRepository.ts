@@ -19,14 +19,9 @@ export interface DebateTableRepository {
 }
 
 export function getRepository(): DebateTableRepository {
-  // console.log('# isLoggedIn? ' + isLoggedIn());
-  // console.log('# isGuestFlow? ' + isGuestFlow());
-
   if (isGuestFlow()) {
-    // console.log('# Session repo called');
     return sessionDebateTableRepository;
   } else {
-    // console.log('# API repo called');
     return apiDebateTableRepository;
   }
 }

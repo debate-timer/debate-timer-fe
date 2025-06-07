@@ -29,8 +29,12 @@ class SessionDebateTableRepository implements DebateTableRepository {
   }
 
   async deleteTable(): Promise<boolean> {
-    deleteSessionCustomizeTableData();
-    return true;
+    try {
+      deleteSessionCustomizeTableData();
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

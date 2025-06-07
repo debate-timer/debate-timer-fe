@@ -15,31 +15,20 @@ import {
 import { isGuestFlow } from '../../util/sessionStorage';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
-  if (!encodedData) {
-    throw new Error('공유받은 데이터가 비어 있어요.');
-  }
-  const decodedData = decodeDebateTableData(encodedData);
-  if (!decodedData) {
-    throw new Error('공유받은 데이터에 문제가 있어요.');
+  let decodedData: DebateTableData;
+
+  if (encodedData !== null) {
+    try {
+      decodedData = decodeDebateTableData(encodedData);
+    } catch {
+      throw new Error('공유받은 데이터에 문제가 있어요.');
+    }
+  } else {
+    throw new Error('데이터가 비어 있어요.');
   }
 
   return decodedData;
 }
-/*
-function getDecodedDataOrNull(
-  encodedData: string | null,
-): DebateTableData | null {
-  if (!encodedData) {
-    return null;
-  }
-  const decodedData = decodeDebateTableData(encodedData);
-  if (!decodedData) {
-    return null;
-  }
-
-  return decodedData;
-}
-*/
 
 /**
  * ### Component TableSharingPage
@@ -61,7 +50,6 @@ export default function TableSharingPage() {
   });
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
-  console.log('# DATA = ' + encodedData);
   const decodedData = getDecodedDataOrThrow(encodedData);
 
   useEffect(() => {
@@ -113,7 +101,7 @@ export default function TableSharingPage() {
         },
       );
     }
-  }, [decodedData, navigate, openModal, closeModal]);
+  }, [decodedData, navigate, openModal, closeModal, encodedData]);
 
   return (
     <>
