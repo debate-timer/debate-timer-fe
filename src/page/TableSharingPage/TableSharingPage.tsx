@@ -39,7 +39,9 @@ function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
  */
 export default function TableSharingPage() {
   const navigate = useNavigate();
-  const { openModal, closeModal, ModalWrapper } = useModal();
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
+  });
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
   console.log('# DATA = ' + encodedData);
