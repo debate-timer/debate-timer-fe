@@ -830,7 +830,7 @@ export default function TimerPage() {
             isBold: true,
           }}
         >
-          <div className="px-20 py-10 text-xl font-bold">
+          <div className="break-keep px-20 py-10 text-xl font-bold">
             토론을 끝내셨군요! <br />
             지금까지의 시간표를 로그인하고 저장할까요?
           </div>
