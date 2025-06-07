@@ -15,7 +15,6 @@ import { isGuestFlow } from '../../util/sessionStorage';
 export default function TableOverview() {
   const { id } = useParams();
   const tableId = Number(id);
-  const isShareEnabled = import.meta.env.VITE_ENABLE_SHARE_URL === 'true';
   const navigate = useNavigate();
 
   // Only uses hooks related with customize due to the removal of parliamentary
@@ -104,16 +103,14 @@ export default function TableOverview() {
                 </div>
               </button>
 
-              {isShareEnabled && (
-                <button
-                  className="button enabled-hover-neutral flex size-16 items-center justify-center"
-                  onClick={() => {
-                    openShareModal();
-                  }}
-                >
-                  <MdOutlineIosShare className="m-4 size-full" />
-                </button>
-              )}
+              <button
+                className="button enabled-hover-neutral flex size-16 items-center justify-center"
+                onClick={() => {
+                  openShareModal();
+                }}
+              >
+                <MdOutlineIosShare className="m-4 size-full" />
+              </button>
             </div>
           </div>
         </DefaultLayout.StickyFooterWrapper>
