@@ -8,7 +8,11 @@ import { DebateTableData } from '../../type/type';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';
-import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
+import {
+  GetDebateTableResponseType,
+  PostDebateTableResponseType,
+} from '../../apis/responses/debateTable';
+import { isGuestFlow } from '../../util/sessionStorage';
 
 function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
   if (!encodedData) {
@@ -21,6 +25,21 @@ function getDecodedDataOrThrow(encodedData: string | null): DebateTableData {
 
   return decodedData;
 }
+/*
+function getDecodedDataOrNull(
+  encodedData: string | null,
+): DebateTableData | null {
+  if (!encodedData) {
+    return null;
+  }
+  const decodedData = decodeDebateTableData(encodedData);
+  if (!decodedData) {
+    return null;
+  }
+
+  return decodedData;
+}
+*/
 
 /**
  * ### Component TableSharingPage
@@ -47,7 +66,39 @@ export default function TableSharingPage() {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      openModal();
+      if (isGuestFlow() && encodedData === null) {
+        // URL == /BASE_URL/share일 때, 즉 data 쿼리 파라미터가 없을 때
+        // OAuth 리다이렉트 후 세션 저장소에 있는 테이블 바로 저장
+        sessionDebateTableRepository.getTable().then(
+          (value: GetDebateTableResponseType) => {
+            apiDebateTableRepository
+              .addTable(value as PostDebateTableResponseType)
+              .then(
+                // 저장 성공 시
+                (value: PostDebateTableResponseType) => {
+                  closeModal();
+                  sessionDebateTableRepository.deleteTable();
+                  navigate(`/overview/customize/${value.id}`);
+                },
+                // 저장 실패 시
+                () => {
+                  closeModal();
+                  throw new Error('공유받은 테이블을 저장하지 못했어요.');
+                },
+              );
+          },
+          () => {
+            // 세션 저장소에서 테이블을 불러오지 못할 때
+            closeModal();
+            throw new Error('테이블 데이터를 확인할 수 없어요.');
+          },
+        );
+      } else {
+        // URL == /BASE_URL/share?data=something일 때,
+        // 즉 data 쿼리 파라미터가 없을 때
+        // 로그인 사용자가 공유 URL로 접속할 때를 의미
+        openModal();
+      }
     } else {
       // On this case, getRepository() will automatically decide what data source to use
       sessionDebateTableRepository.deleteTable();
@@ -62,7 +113,7 @@ export default function TableSharingPage() {
         },
       );
     }
-  }, [decodedData, navigate, openModal]);
+  }, [decodedData, navigate, openModal, closeModal]);
 
   return (
     <>
