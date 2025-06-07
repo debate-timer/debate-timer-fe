@@ -825,7 +825,7 @@ export default function TimerPage() {
             text: '네',
             onClick: () => {
               closeLoginAndStoreModal();
-              AuthLogin('share');
+              AuthLogin();
             },
             isBold: true,
           }}

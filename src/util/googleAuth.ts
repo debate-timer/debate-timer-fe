@@ -1,18 +1,14 @@
-export const AuthLogin = (redirect?: 'share' | 'default') => {
-  const redirectUriMap: Record<string, string | undefined> = {
-    default: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI,
-    share: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URL_SHARE,
-  };
-
-  const redirectUri = redirectUriMap[redirect ?? 'default'];
-
-  if (!import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID || !redirectUri) {
+export const AuthLogin = () => {
+  if (
+    !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID ||
+    !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI
+  ) {
     throw new Error('OAuth 정보가 없습니다.');
   }
 
   const params = {
     client_id: import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID,
-    redirect_uri: redirectUri,
+    redirect_uri: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI,
     response_type: 'code',
     scope: 'openid profile email',
   };

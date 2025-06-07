@@ -123,14 +123,14 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             onClick: () => {
               deleteSessionCustomizeTableData();
               closeModal();
-              AuthLogin('share');
+              AuthLogin();
             },
           }}
           right={{
             text: '네',
             onClick: () => {
               closeModal();
-              AuthLogin('share');
+              AuthLogin();
             },
             isBold: true,
           }}
