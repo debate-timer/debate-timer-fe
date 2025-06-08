@@ -11,6 +11,8 @@ import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
+import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
+
 const routesConfig = [
   {
     path: '/login',
@@ -30,21 +32,26 @@ const routesConfig = [
   {
     path: '/composition',
     element: <TableComposition />,
-    requiresAuth: true,
+    requiresAuth: false,
   },
   {
     path: '/overview/:type/:id',
     element: <TableOverview />,
-    requiresAuth: true,
+    requiresAuth: false,
   },
   {
     path: '/table/customize/:id',
     element: <TimerPage />,
-    requiresAuth: true,
+    requiresAuth: false,
   },
   {
     path: '/oauth',
     element: <OAuth />,
+    requiresAuth: false,
+  },
+  {
+    path: '/share',
+    element: <TableSharingPage />,
     requiresAuth: false,
   },
   {

@@ -9,3 +9,7 @@ export const getAccessToken = () => {
 export const removeAccessToken = (): void => {
   localStorage.removeItem('accessToken');
 };
+
+export const isLoggedIn = (): boolean => {
+  return !!getAccessToken();
+};
