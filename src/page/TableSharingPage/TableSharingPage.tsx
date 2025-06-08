@@ -14,7 +14,7 @@ import {
 } from '../../apis/responses/debateTable';
 import { isGuestFlow } from '../../util/sessionStorage';
 
-function getDecodedDataOrThrowOrNull(
+function getDecodedDataOrNull(
   encodedData: string | null,
 ): DebateTableData | null {
   let decodedData: DebateTableData | null = null;
@@ -23,7 +23,7 @@ function getDecodedDataOrThrowOrNull(
     try {
       decodedData = decodeDebateTableData(encodedData);
     } catch {
-      throw new Error('공유받은 데이터에 문제가 있어요.');
+      return null;
     }
   }
 
@@ -50,7 +50,7 @@ export default function TableSharingPage() {
   });
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
-  const decodedData = getDecodedDataOrThrowOrNull(encodedData);
+  const decodedData = getDecodedDataOrNull(encodedData);
 
   useEffect(() => {
     if (isLoggedIn()) {
