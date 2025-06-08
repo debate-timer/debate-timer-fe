@@ -135,7 +135,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             isBold: true,
           }}
         >
-          <div className="break-keep px-20 py-10 text-xl font-bold">
+          <div className="break-keep px-20 py-10 text-center text-xl font-bold">
             비회원으로 사용하던 시간표가 있습니다. <br />
             로그인 후에도 이 시간표를 계속 사용하시겠습니까?
           </div>
