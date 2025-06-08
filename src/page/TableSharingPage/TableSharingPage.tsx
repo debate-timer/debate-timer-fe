@@ -59,6 +59,7 @@ export default function TableSharingPage() {
         // OAuth 리다이렉트 후 세션 저장소에 있는 테이블 바로 저장
         sessionDebateTableRepository.getTable().then(
           (value: GetDebateTableResponseType) => {
+            value.info.name = '(공유됨) ' + value.info.name;
             apiDebateTableRepository
               .addTable(value as PostDebateTableResponseType)
               .then(
