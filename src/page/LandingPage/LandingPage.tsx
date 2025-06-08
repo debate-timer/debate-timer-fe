@@ -6,39 +6,9 @@ import TableSection from './components/TableSection';
 import ReviewSection from './components/ReviewSection';
 import ReportSection from './components/ReportSection';
 import { LANDING_URLS } from '../../constants/urls';
+import { oAuthLogin } from '../../util/googleAuth';
 
 export default function LandingPage() {
-  const AuthLogin = () => {
-    try {
-      if (
-        !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID ||
-        !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID.trim() ||
-        !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI ||
-        !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI.trim() ||
-        !import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL ||
-        !import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL.trim()
-      ) {
-        console.error('OAuth configuration is missing');
-        alert('로그인 설정에 문제가 있습니다. 관리자에게 문의해주세요.');
-        return;
-      }
-
-      const params = {
-        client_id: import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID,
-        redirect_uri: import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI,
-        response_type: 'code',
-        scope: 'openid profile email',
-      };
-      const queryString = new URLSearchParams(params).toString();
-      const googleOAuthUrl = `${import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL}?${queryString}`;
-
-      window.location.href = googleOAuthUrl;
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
-  };
-
   const handleStartWithoutLogin = () => {
     window.location.href = LANDING_URLS.START_WITHOUT_LOGIN_URL;
   };
@@ -46,7 +16,7 @@ export default function LandingPage() {
   return (
     <div className="flex h-full w-full items-center justify-center bg-neutral-0">
       {/* 헤더 */}
-      <Header onLogin={AuthLogin} />
+      <Header onLogin={() => oAuthLogin()} />
 
       <main className="flex w-full flex-col items-center">
         {/* 흰색 배경 */}
@@ -66,7 +36,7 @@ export default function LandingPage() {
         {/* 흰색 배경 */}
         <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
           {/* 홈 설정 */}
-          <TableSection onLogin={AuthLogin} />
+          <TableSection onLogin={() => oAuthLogin()} />
           {/* 리뷰 */}
           <ReviewSection onStartWithoutLogin={handleStartWithoutLogin} />
           {/* 버그 및 불편사항 제보 */}

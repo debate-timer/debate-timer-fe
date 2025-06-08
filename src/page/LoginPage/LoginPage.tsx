@@ -1,6 +1,6 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import GoogleButton from '../../components/GoogleButton';
-import { AuthLogin } from '../../util/googleAuth';
+import { oAuthLogin } from '../../util/googleAuth';
 
 export default function LoginPage() {
   return (
@@ -19,7 +19,7 @@ export default function LoginPage() {
         <section className="flex w-72 flex-col gap-8 text-lg font-semibold">
           <GoogleButton
             onClick={() => {
-              AuthLogin();
+              oAuthLogin();
             }}
           />
         </section>

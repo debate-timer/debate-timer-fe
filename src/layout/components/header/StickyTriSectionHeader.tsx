@@ -9,7 +9,7 @@ import {
   isGuestFlow,
   deleteSessionCustomizeTableData,
 } from '../../../util/sessionStorage';
-import { AuthLogin } from '../../../util/googleAuth';
+import { oAuthLogin } from '../../../util/googleAuth';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 
@@ -123,14 +123,14 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             onClick: () => {
               deleteSessionCustomizeTableData();
               closeModal();
-              AuthLogin();
+              oAuthLogin();
             },
           }}
           right={{
             text: '네',
             onClick: () => {
               closeModal();
-              AuthLogin();
+              oAuthLogin();
             },
             isBold: true,
           }}

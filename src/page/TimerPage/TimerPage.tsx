@@ -15,7 +15,7 @@ import { useNormalTimer } from './hooks/useNormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
 import { useModal } from '../../hooks/useModal';
 import { isGuestFlow } from '../../util/sessionStorage';
-import { AuthLogin } from '../../util/googleAuth';
+import { oAuthLogin } from '../../util/googleAuth';
 import DialogModal from '../../components/DialogModal/DialogModal';
 
 type TimerState = 'default' | 'warning' | 'danger' | 'expired';
@@ -825,7 +825,7 @@ export default function TimerPage() {
             text: '네',
             onClick: () => {
               closeLoginAndStoreModal();
-              AuthLogin();
+              oAuthLogin();
             },
             isBold: true,
           }}
