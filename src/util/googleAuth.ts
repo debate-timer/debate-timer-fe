@@ -1,7 +1,8 @@
 export const AuthLogin = () => {
   if (
     !import.meta.env.VITE_GOOGLE_O_AUTH_CLIENT_ID ||
-    !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI
+    !import.meta.env.VITE_GOOGLE_O_AUTH_REDIRECT_URI ||
+    !import.meta.env.VITE_GOOGLE_O_AUTH_REQUEST_URL
   ) {
     throw new Error('OAuth 정보가 없습니다.');
   }
