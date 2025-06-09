@@ -5,12 +5,17 @@ import TimerSection from './components/TimerSection';
 import TableSection from './components/TableSection';
 import ReviewSection from './components/ReviewSection';
 import ReportSection from './components/ReportSection';
-import { LANDING_URLS } from '../../constants/urls';
 import { oAuthLogin } from '../../util/googleAuth';
+import { createTableShareUrl } from '../../util/arrayEncoding';
+import { SAMPLE_TABLE_DATA } from '../../constants/sample_table';
 
 export default function LandingPage() {
   const handleStartWithoutLogin = () => {
-    window.location.href = LANDING_URLS.START_WITHOUT_LOGIN_URL;
+    // window.location.href = LANDING_URLS.START_WITHOUT_LOGIN_URL;
+    window.location.href = createTableShareUrl(
+      import.meta.env.VITE_SHARE_BASE_URL,
+      SAMPLE_TABLE_DATA,
+    );
   };
 
   return (
