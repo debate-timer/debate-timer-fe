@@ -9,6 +9,11 @@ import { oAuthLogin } from '../../util/googleAuth';
 import { createTableShareUrl } from '../../util/arrayEncoding';
 import { SAMPLE_TABLE_DATA } from '../../constants/sample_table';
 
+/**
+ * Renders the landing page layout with sections for login, timetable, timer, table, reviews, and reports.
+ *
+ * Provides handlers for user login via OAuth and for starting the app without login by redirecting to a generated shareable URL based on sample data.
+ */
 export default function LandingPage() {
   const handleStartWithoutLogin = () => {
     // window.location.href = LANDING_URLS.START_WITHOUT_LOGIN_URL;

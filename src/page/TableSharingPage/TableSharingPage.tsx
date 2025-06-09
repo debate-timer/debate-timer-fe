@@ -31,17 +31,11 @@ function getDecodedDataOrNull(
 }
 
 /**
- * ### Component TableSharingPage
- * 공유된 테이블 데이터를 처리하는 페이지. 다음 절차에 따라 플로우가 진행됨:
- * 1. 쿼리 파라미터로 인코딩 데이터가 잘 들어왔는지 확인
- * - 잘 들어왔을 경우, 계속 진행
- * - null일 경우, 오류 반환
- * 2. 인코딩 데이터를 디코딩하여, 올바른 데이터를 담고 있는지 확인
- * - 올바른 데이터를 담고 있을 경우, 계속 진행
- * - 디코딩 과정에서 오류 발생 시, 오류 반환
- * 3. 로그인 상태인지 확인
- * - 로그인 상태일 경우, 모달을 열어 저장 여부를 물어봄
- * - 로그인 상태가 아닐 경우, 비회원 플로우 실행
+ * Handles the flow for processing and importing shared debate table data from a URL.
+ *
+ * Determines user flow based on login status and the presence of shared data in the URL. Decodes and validates shared data, manages saving to the appropriate repository, and navigates the user to the correct customization page. Presents a modal for logged-in users to choose between saving the shared table or continuing as a guest.
+ *
+ * @remark Throws an error if shared data is missing, invalid, or if saving fails at any step.
  */
 export default function TableSharingPage() {
   const navigate = useNavigate();
