@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(
         // Refresh Token은 HttpOnly 쿠키에 있다고 가정 (JS 접근 X)
         // => withCredentials로 자동 전송되거나, 백엔드가 쿠키로 다룸
         const refreshResponse = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}api/member/reissue`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/member/reissue`,
           null,
         );
 

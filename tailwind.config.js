@@ -89,10 +89,12 @@ export default {
         background: {
           default: '#F6F5F4',
           secondary: '#FFF3DD',
+          dark: '#E8E8E8',
         },
       },
     },
     screens: {
+      md: '768px',
       lg: '1280px',
       xl: '1450px',
     },

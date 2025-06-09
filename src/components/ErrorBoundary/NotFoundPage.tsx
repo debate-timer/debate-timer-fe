@@ -8,16 +8,16 @@ export default function NotFoundPage() {
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
-        <DefaultLayout.Header.Left></DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center></DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right defaultIcons={['home', 'logout']} />
+        <DefaultLayout.Header.Left />
+        <DefaultLayout.Header.Center />
+        <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
         <div className="flex w-full flex-col items-start justify-start px-8 py-10">
           <div className="mb-20 flex flex-col font-bold">
             <h1 className="mb-5 text-[120px]">🤔</h1>
-            <h1 className="md:text-5xl text-4xl">페이지를 찾을 수 없어요...</h1>
+            <h1 className="text-4xl md:text-5xl">페이지를 찾을 수 없어요...</h1>
           </div>
 
           <div className="mb-10 flex flex-col space-y-2">
