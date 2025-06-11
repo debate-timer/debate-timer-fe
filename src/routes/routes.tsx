@@ -1,11 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
-import LoginPage from '../page/LoginPage/LoginPage';
 import TableListPage from '../page/TableListPage/TableListPage';
 import TableOverview from '../page/TableOverviewPage/TableOverview';
 import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
-import OAuth from '../page/LoginPage/OAuth';
+import OAuth from '../page/OAuthPage/OAuth';
 import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
@@ -14,11 +13,6 @@ import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 
 const routesConfig = [
-  {
-    path: '/login',
-    element: <LoginPage />,
-    requiresAuth: false,
-  },
   {
     path: '/home',
     element: <LandingPage />,
