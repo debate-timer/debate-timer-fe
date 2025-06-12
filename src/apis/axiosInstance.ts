@@ -56,7 +56,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.error('Refresh Token is invalid or expired', refreshError);
         // 재발급도 실패하면 -> 로그인 페이지 이동
-        window.location.href = '/login';
+        window.location.href = '/home';
         return Promise.reject(refreshError);
       }
     }
