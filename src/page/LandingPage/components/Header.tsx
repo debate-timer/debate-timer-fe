@@ -29,7 +29,7 @@ export default function Header({ onLoginButtonClicked }: HeaderProps) {
         </div>
         <button
           className="text-[min(max(0.875rem,1.25vw),1.2rem)]"
-          onClick={() => onLoginButtonClicked()}
+          onClick={onLoginButtonClicked}
         >
           {!isLoggedIn() ? '3초 로그인' : '로그아웃'}
         </button>

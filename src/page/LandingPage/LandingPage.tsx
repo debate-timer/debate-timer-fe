@@ -25,18 +25,25 @@ export default function LandingPage() {
   const handleDashboardButtonClick = () => {
     navigate('/');
   };
-  const onLoginButtonClick = () => {
+  const onHeaderLoginClicked = () => {
     if (!isLoggedIn()) {
       oAuthLogin();
     } else {
       logoutMutate();
     }
   };
+  const onTableSectionLoginClicked = () => {
+    if (!isLoggedIn()) {
+      oAuthLogin();
+    } else {
+      handleDashboardButtonClick();
+    }
+  };
 
   return (
     <div className="flex h-full w-full items-center justify-center bg-neutral-0">
       {/* 헤더 */}
-      <Header onLoginButtonClicked={() => onLoginButtonClick()} />
+      <Header onLoginButtonClicked={onHeaderLoginClicked} />
 
       <main className="flex w-full flex-col items-center">
         {/* 흰색 배경 */}
@@ -59,7 +66,7 @@ export default function LandingPage() {
         {/* 흰색 배경 */}
         <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
           {/* 홈 설정 */}
-          <TableSection onLogin={() => onLoginButtonClick()} />
+          <TableSection onLogin={onTableSectionLoginClicked} />
           {/* 리뷰 */}
           <ReviewSection onStartWithoutLogin={handleStartWithoutLogin} />
           {/* 버그 및 불편사항 제보 */}
