@@ -12,6 +12,9 @@ import { oAuthLogin } from '../../../util/googleAuth';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 
+// The type of header icons will be declared here.
+type HeaderIcons = 'home';
+
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
@@ -24,24 +27,37 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   );
 }
 
+/**
+ * Header의 좌측 부 제목 영역
+ * @param props 부 제목에 해당하는 JSX 컴포넌트
+ * @returns JSX.Element
+ */
 StickyTriSectionHeader.Left = function Left(props: PropsWithChildren) {
   const { children } = props;
   return <div className="flex-1 items-start text-start">{children}</div>;
 };
 
+/**
+ * Header의 중앙 주 제목 영역
+ * @param props 주 제목에 해당하는 JSX 컴포넌트
+ * @returns JSX.Element
+ */
 StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
   const { children } = props;
   return <div className="flex-1 items-center text-center">{children}</div>;
 };
 
-type HeaderIcons = 'home';
-
+/**
+ * Header의 우측 버튼 영역
+ * @param props Header에 추가할 기본 아이콘 외의 커스텀 아이콘
+ * @returns JSX.Element
+ */
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const { children } = props;
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
   const { openModal, closeModal, ModalWrapper } = useModal({});
-  const defaultIcons: HeaderIcons[] = ['home'];
+  const defaultIcons: HeaderIcons[] = ['home']; // Icons that will be displayed on all pages are added here
 
   return (
     <>
@@ -49,7 +65,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         {/* Auth related header items */}
         <>
           {/* Guest mode indicator */}
-          {!isGuestFlow() && (
+          {isGuestFlow() && (
             <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
               비회원 모드
             </div>
@@ -58,7 +74,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
           {/* Login and logout button */}
           {isLoggedIn() && (
             <button
-              className="rounded-full px-4 py-2 text-[20px] font-bold hover:bg-neutral-400"
+              className="rounded-full px-4 py-2 font-bold hover:bg-neutral-300"
               onClick={() => logoutMutate()}
             >
               로그아웃
@@ -66,7 +82,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
           )}
           {!isLoggedIn() && (
             <button
-              className="rounded-full px-4 py-2 font-bold hover:bg-neutral-400"
+              className="rounded-full px-4 py-2 font-bold hover:bg-neutral-300"
               onClick={() => openModal()}
             >
               로그인
