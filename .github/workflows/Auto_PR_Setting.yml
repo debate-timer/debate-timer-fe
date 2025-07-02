@@ -45,7 +45,8 @@ jobs:
           LABELS=$(echo "${ISSUE_DATA}" | jq -r '.labels | join(",")')
 
           # 팀 멤버 목록을 정의하고, 할당되지 않은 멤버를 리뷰어로 추가.
-          TEAM_MEMBERS=("jaeml06" "i-meant-to-be" "eunwoo-levi" "katie424")
+          # 단, 현재 활동하지 않는 멤버는 제외. (현재 비활성 멤버 = 엘, 케이티)
+          TEAM_MEMBERS=("jaeml06" "i-meant-to-be" "useon")
           IFS=', ' read -r -a ASSIGNEE_ARRAY <<< "${ASSIGNEES}"
           REVIEWERS=()
           for MEMBER in "${TEAM_MEMBERS[@]}"; do
