@@ -159,3 +159,5 @@ export function useCustomTimer({
     clearTimer,
   };
 }
+
+export type UseCustomTimerReturnType = ReturnType<typeof useCustomTimer>;

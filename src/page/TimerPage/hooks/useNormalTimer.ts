@@ -67,3 +67,5 @@ export function useNormalTimer() {
     clearTimer,
   };
 }
+
+export type UseNormalTimerReturnType = ReturnType<typeof useNormalTimer>;
