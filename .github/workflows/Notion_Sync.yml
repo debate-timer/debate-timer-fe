@@ -30,4 +30,4 @@ jobs:
           NOTION_USER_UUID_MAP: ${{ secrets.NOTION_USER_UUID_MAP }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
-        run: python src/notion_sync.py
+        run: python notion_sync.py
