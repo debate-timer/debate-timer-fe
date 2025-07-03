@@ -5,14 +5,13 @@ import datetime
 import requests
 import pytz
 
-# De
-
 # Import envs
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 NOTION_DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
 NOTION_USER_UUID_MAP_STR = os.getenv("NOTION_USER_UUID_MAP")
 NOTION_API_URL = "https://api.notion.com/v1"
 
+# Parse GitHub ID-Notion UUID map
 if NOTION_USER_UUID_MAP_STR:
     NOTION_USER_UUID_MAP = json.loads(NOTION_USER_UUID_MAP_STR)
 else:
