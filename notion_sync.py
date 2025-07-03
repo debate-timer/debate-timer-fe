@@ -31,8 +31,12 @@ def get_github_event_payload():
     if not event_path:
         print("GITHUB_EVENT_PATH is not valid.")
         return None
-    with open(event_path, "r") as f:
-        return json.load(f)
+    try:
+        with open(event_path, "r") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Failed to read event payload: {e}")
+        return None
 
 # Find Notion DB item by GitHub issue id
 def find_notion_page_by_github_id(github_id):
