@@ -6,16 +6,26 @@ interface UseBellSoundProps {
   timer1: UseCustomTimerReturnType;
   timer2: UseCustomTimerReturnType;
   normalTimer: UseNormalTimerReturnType;
+  isWarningBell?: boolean;
+  isFinishBell?: boolean;
 }
 
+/**
+ * 토론 타이머에서 경고/종료 벨 사운드를 자동 재생해주는 커스텀 훅
+ * - 타이머 상태 변화(30초, 0초 등)에 따라 지정된 벨 사운드가 한 번씩 재생됨
+ */
 export function useBellSound({
   timer1,
   timer2,
   normalTimer,
+  isWarningBell = false,
+  isFinishBell = false,
 }: UseBellSoundProps) {
+  // 오디오 태그를 참조하기 위한 ref (컴포넌트에서 <audio ref={...} />로 연결)
   const warningBellRef = useRef<HTMLAudioElement>(null);
   const finishBellRef = useRef<HTMLAudioElement>(null);
 
+  // 이전 타이머 상태를 기억하여 변화 시점을 감지하기 위한 ref
   const prevTimer1Ref = useRef<{
     speakingTimer: number | null;
     totalTimer: number | null;
@@ -32,14 +42,21 @@ export function useBellSound({
   });
   const prevNormalTimerRef = useRef<number | null>(null);
 
+  // 벨 On/Off 여부 상태
   const [isWarningBellOn, setWarningBell] = useState(false);
   const [isFinishBellOn, setFinishBell] = useState(false);
+
   useEffect(() => {
     const waringTime = 30;
 
+    // 하나라도 타이머가 동작 중인지 체크
     const isAnyTimerRunning =
       timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
 
+    /**
+     * 30초 경고음 재생 조건을 만족하는지 판단하는 함수
+     * - "30초"로 처음 진입할 때만 true 반환
+     */
     const timerJustReached = (
       prevTime: number | null,
       currentTime: number | null,
@@ -49,10 +66,11 @@ export function useBellSound({
         prevTime !== null &&
         prevTime > waringTime &&
         currentTime === waringTime &&
-        defaultTime !== waringTime
+        defaultTime !== waringTime // (처음부터 30초면 울리지 않게)
       );
     };
 
+    // 각각의 타이머가 "경고음 조건"에 진입했는지 계산
     const isTimer1WarningTime =
       timer1.isRunning &&
       (timerJustReached(
@@ -88,6 +106,7 @@ export function useBellSound({
       normalTimer.timer === waringTime &&
       normalTimer.defaultTimer !== waringTime;
 
+    // ------ 경고음(warningBell) 재생 ------
     if (
       warningBellRef.current &&
       isAnyTimerRunning &&
@@ -97,7 +116,8 @@ export function useBellSound({
       warningBellRef.current.play();
     }
 
-    // --- Finish Bell ---
+    // ------ 종료음(finishBell) 재생 ------
+    // (각 타이머별 0초에 도달했는지 체크)
     const isTimer1Finished =
       timer1.isRunning &&
       (timer1.speakingTimer === 0 || timer1.totalTimer === 0);
@@ -121,6 +141,7 @@ export function useBellSound({
       finishBellRef.current.play();
     }
 
+    // --- 이전값(ref) 최신화 ---
     prevTimer1Ref.current = {
       speakingTimer: timer1.speakingTimer,
       totalTimer: timer1.totalTimer,
@@ -155,6 +176,12 @@ export function useBellSound({
     prevTimer2Ref.current.totalTimer,
     prevNormalTimerRef.current,
   ]);
+
+  // 외부 상태/props에서 벨 활성화 여부를 받아옴 (처음 or 값 변경 시 반영)
+  useEffect(() => {
+    setWarningBell(isWarningBell);
+    setFinishBell(isFinishBell);
+  }, [isWarningBell, isFinishBell]);
 
   return {
     warningBellRef,
