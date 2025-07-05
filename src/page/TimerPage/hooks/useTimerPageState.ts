@@ -1,10 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableData';
-import { useModal } from '../../../hooks/useModal';
 import { useCustomTimer } from './useCustomTimer';
 import { useNormalTimer } from './useNormalTimer';
-import { oAuthLogin } from '../../../util/googleAuth';
 import { isGuestFlow } from '../../../util/sessionStorage';
 import { useBellSound } from './useBellSound';
 
@@ -18,34 +15,21 @@ export const bgColorMap: Record<TimerState, string> = {
 };
 
 export function useTimerPageState(tableId: number) {
-  const navigate = useNavigate();
   const { data } = useGetDebateTableData(tableId);
 
-  const [isFirst, setIsFirst] = useState(false);
-  const IS_FIRST = 'isFirst';
-  const TRUE = 'true';
-  const FALSE = 'false';
-  const {
-    openModal: openUseTooltipModal,
-    closeModal: closeUseTooltipModal,
-    ModalWrapper: UseToolTipWrapper,
-  } = useModal({
-    onClose: () => {
-      setIsFirst(false);
-      localStorage.setItem(IS_FIRST, FALSE);
-    },
-    isCloseButtonExist: false,
-  });
-  const {
-    openModal: openLoginAndStoreModal,
-    closeModal: closeLoginAndStoreModal,
-    ModalWrapper: LoginAndStoreModalWrapper,
-  } = useModal();
-
   const [bg, setBg] = useState<TimerState>('default');
-  const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
-  const [savedTimer, saveTimer] = useState(0);
-  const [isTimerChangeable, setIsTimerChangeable] = useState(true);
+
+  const isAdditionalTimerAvailable = useMemo(() => {
+    if (data) {
+      return data.table.every((value) => {
+        if (value.speechType !== '작전 시간') {
+          return true;
+        }
+        return false;
+      });
+    }
+    return true;
+  }, [data]);
   const [index, setIndex] = useState(0);
 
   const timer1 = useCustomTimer({});
@@ -56,12 +40,13 @@ export function useTimerPageState(tableId: number) {
   );
 
   // ✅ 벨 사운드 훅 사용
-  const { warningBellRef, finishBellRef, setWarningBell, setFinishBell } =
-    useBellSound({
-      timer1,
-      timer2,
-      normalTimer,
-    });
+  const { warningBellRef, finishBellRef } = useBellSound({
+    timer1,
+    timer2,
+    normalTimer,
+    isWarningBell: data?.info.warningBell,
+    isFinishBell: data?.info.finishBell,
+  });
 
   const goToOtherItem = useCallback(
     (isPrev: boolean) => {
@@ -104,19 +89,6 @@ export function useTimerPageState(tableId: number) {
   }, [prosConsSelected, timer1, timer2]);
 
   // --- useEffect 모음 ---
-
-  useEffect(() => {
-    const storedIsFirst = localStorage.getItem(IS_FIRST);
-    if (storedIsFirst === null) {
-      setIsFirst(true);
-    } else {
-      setIsFirst(storedIsFirst.trim() === TRUE ? true : false);
-    }
-    if (isFirst) {
-      openUseTooltipModal();
-    }
-  }, [isFirst, openUseTooltipModal]);
-
   useEffect(() => {
     const getBgStatus = () => {
       const boxType = data?.table[index].boxType;
@@ -171,9 +143,6 @@ export function useTimerPageState(tableId: number) {
   useEffect(() => {
     if (!data) return;
     const currentBox = data.table[index];
-    const { warningBell, finishBell } = data.info;
-    setWarningBell(warningBell);
-    setFinishBell(finishBell);
     timer1.clearTimer();
     timer2.clearTimer();
     normalTimer.clearTimer();
@@ -202,37 +171,6 @@ export function useTimerPageState(tableId: number) {
     timer2.setTimers,
     normalTimer.setDefaultTimer,
     normalTimer.setTimer,
-  ]);
-
-  useEffect(() => {
-    if (data) {
-      data.table.forEach((value) => {
-        if (value.speechType === '작전 시간') {
-          setIsTimerChangeable(false);
-        }
-      });
-    }
-  });
-
-  useEffect(() => {
-    if (
-      isAdditionalTimerOn &&
-      normalTimer.timer === 0 &&
-      normalTimer.isRunning
-    ) {
-      normalTimer.pauseTimer();
-      normalTimer.setTimer(savedTimer);
-      setIsAdditionalTimerOn(!isAdditionalTimerOn);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isAdditionalTimerOn,
-    normalTimer.timer,
-    savedTimer,
-    normalTimer.pauseTimer,
-    setIsAdditionalTimerOn,
-    normalTimer.setTimer,
-    normalTimer.isRunning,
   ]);
 
   useEffect(() => {
@@ -294,29 +232,10 @@ export function useTimerPageState(tableId: number) {
   return {
     warningBellRef,
     finishBellRef,
-    setWarningBell,
-    setFinishBell,
-    navigate,
     data,
-    isFirst,
-    setIsFirst,
-    IS_FIRST,
-    TRUE,
-    FALSE,
-    openUseTooltipModal,
-    closeUseTooltipModal,
-    UseToolTipWrapper,
-    openLoginAndStoreModal,
-    closeLoginAndStoreModal,
-    LoginAndStoreModalWrapper,
     bg,
     setBg,
-    isAdditionalTimerOn,
-    setIsAdditionalTimerOn,
-    savedTimer,
-    saveTimer,
-    isTimerChangeable,
-    setIsTimerChangeable,
+    isAdditionalTimerAvailable,
     index,
     setIndex,
     timer1,
@@ -326,7 +245,6 @@ export function useTimerPageState(tableId: number) {
     setProsConsSelected,
     goToOtherItem,
     switchCamp,
-    oAuthLogin,
     isGuestFlow,
     tableId,
   };
