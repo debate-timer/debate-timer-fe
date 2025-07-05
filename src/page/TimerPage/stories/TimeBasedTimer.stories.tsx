@@ -13,96 +13,47 @@ type Story = StoryObj<typeof TimeBasedTimer>;
 
 export const OnPros: Story = {
   args: {
-    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
     timer: 150,
-    isTimerChangeable: false,
     isRunning: false,
-    item: {
-      stance: 'PROS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: 10,
-      speaker: '나',
-    },
+    isSelected: true,
+    prosCons: 'pros',
   },
 };
 
 export const OnCons: Story = {
   args: {
-    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
     timer: 150,
-    isTimerChangeable: false,
     isRunning: false,
-    item: {
-      stance: 'CONS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: 10,
-      speaker: '나',
-    },
+    isSelected: true,
+    prosCons: 'cons',
   },
 };
 
 export const OnRunning: Story = {
   args: {
-    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
     timer: 150,
-    isTimerChangeable: false,
+    isSelected: true,
     isRunning: true,
-    item: {
-      stance: 'PROS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: 10,
-      speaker: '나',
-    },
   },
 };
 
 export const WhenOnlyTeamPerTime: Story = {
   args: {
-    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
-    },
     timer: 150,
-    isTimerChangeable: true,
     isRunning: false,
-    item: {
-      stance: 'PROS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: null,
-      speaker: '나',
-    },
+    isSelected: true,
+    speakingTimer: null,
   },
 };

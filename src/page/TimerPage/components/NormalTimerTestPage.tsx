@@ -35,18 +35,13 @@ export default function NormalTimerTestPage() {
           <NormalTimer
             timer={item.time ?? 0}
             isRunning={false}
-            isAdditionalTimerOn={false}
-            isTimerChangeable={true}
-            onChangingTimer={() => {}}
             onStart={() => {}}
             onPause={() => {}}
             onReset={() => {}}
-            goToOtherItem={() => {}}
-            addOnTimer={() => {}}
-            isFirstItem={true}
-            isLastItem={false}
             item={item}
             teamName="찬성"
+            onSet={() => {}}
+            isAdditionalTimerAvailable={false}
           />
 
           {/* NEXT 버튼만 하단에 표시 */}

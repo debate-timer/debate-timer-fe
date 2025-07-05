@@ -17,7 +17,6 @@ export const OnStopped: Story = {
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    isTimerChangeable: false,
     isRunning: false,
   },
 };
@@ -28,7 +27,6 @@ export const OnRunning: Story = {
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    isTimerChangeable: false,
     isRunning: true,
   },
 };
@@ -39,7 +37,6 @@ export const WhenAdditionalTimerAvailable: Story = {
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
-    isTimerChangeable: true,
     isRunning: false,
   },
 };
