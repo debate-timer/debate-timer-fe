@@ -1,0 +1,32 @@
+name: Notion Sync
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened, reopened, closed]
+  pull_request_target: # For accessing secrets from forked repos
+    types: [opened, reopened, closed]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests pytz
+
+      - name: Run Notion Sync Script
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_USER_UUID_MAP: ${{ secrets.NOTION_USER_UUID_MAP }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: python ./notion_sync.py
