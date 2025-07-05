@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimeBasedTimer from './components/TimeBasedTimer';
 import FirstUseToolTip from './components/FirstUseToolTip';
@@ -12,17 +12,14 @@ import RoundControlButton from '../../components/RoundControlButton/RoundControl
 import DialogModal from '../../components/DialogModal/DialogModal';
 import { bgColorMap, useTimerPageState } from './hooks/useTimerPageState';
 import { useTimerHotkey } from './hooks/useTimerHotkey';
+import useTimerPageModal from './hooks/useTimerPageModal';
+import { oAuthLogin } from '../../util/googleAuth';
 
 export default function TimerPage() {
   const pathParams = useParams();
+  const navigate = useNavigate();
   const tableId = Number(pathParams.id);
-  const state = useTimerPageState(tableId);
-  useTimerHotkey(state);
   const {
-    warningBellRef,
-    finishBellRef,
-    navigate,
-    data,
     isFirst,
     setIsFirst,
     IS_FIRST,
@@ -33,12 +30,17 @@ export default function TimerPage() {
     openLoginAndStoreModal,
     closeLoginAndStoreModal,
     LoginAndStoreModalWrapper,
+  } = useTimerPageModal();
+
+  const state = useTimerPageState(tableId);
+
+  useTimerHotkey(state);
+  const {
+    warningBellRef,
+    finishBellRef,
+    data,
     bg,
-    isAdditionalTimerOn,
-    setIsAdditionalTimerOn,
-    savedTimer,
-    saveTimer,
-    isTimerChangeable,
+    isAdditionalTimerAvailable,
     index,
     timer1,
     timer2,
@@ -47,7 +49,6 @@ export default function TimerPage() {
     setProsConsSelected,
     goToOtherItem,
     switchCamp,
-    oAuthLogin,
     isGuestFlow,
   } = state;
 
@@ -105,36 +106,13 @@ export default function TimerPage() {
             {/* 타이머 두 개 + ENTER 버튼 */}
             {data.table[index].boxType === 'NORMAL' && (
               <NormalTimer
-                isAdditionalTimerOn={isAdditionalTimerOn}
                 onStart={() => normalTimer.startTimer()}
                 onPause={() => normalTimer.pauseTimer()}
                 onReset={() => normalTimer.resetTimer()}
-                addOnTimer={(delta: number) =>
-                  normalTimer.setTimer((normalTimer.timer ?? 0) + delta)
-                }
+                onSet={(second: number) => normalTimer.setTimer(second)}
                 isRunning={normalTimer.isRunning}
                 timer={normalTimer.timer ?? 0}
-                isLastItem={
-                  data !== undefined && index === data.table.length - 1
-                }
-                isFirstItem={index === 0}
-                goToOtherItem={(isPrev: boolean) => {
-                  goToOtherItem(isPrev);
-                  normalTimer.resetTimer();
-                }}
-                isTimerChangeable={isTimerChangeable}
-                onChangingTimer={() => {
-                  normalTimer.pauseTimer();
-
-                  if (!isAdditionalTimerOn) {
-                    saveTimer(normalTimer.timer ?? 0);
-                    normalTimer.setTimer(0);
-                  } else {
-                    normalTimer.setTimer(savedTimer);
-                  }
-
-                  setIsAdditionalTimerOn(!isAdditionalTimerOn);
-                }}
+                isAdditionalTimerAvailable={isAdditionalTimerAvailable}
                 item={data.table[index]}
                 teamName={
                   data.table[index].stance === 'NEUTRAL'
@@ -152,25 +130,8 @@ export default function TimerPage() {
                   onStart={() => timer1.startTimer()}
                   onPause={() => timer1.pauseTimer()}
                   onReset={() => timer1.resetCurrentTimer()}
-                  addOnTimer={(delta: number) =>
-                    timer1.setTimers(timer1.totalTimer ?? 0 + delta)
-                  }
                   isRunning={timer1.isRunning}
                   timer={timer1.totalTimer ?? 0}
-                  isLastItem={
-                    data !== undefined && index === data.table.length - 1
-                  }
-                  isFirstItem={index === 0}
-                  goToOtherItem={(isPrev: boolean) => {
-                    goToOtherItem(isPrev);
-                    timer1.resetTimerForNextPhase();
-                  }}
-                  isTimerChangeable={isTimerChangeable}
-                  onChangingTimer={() => {
-                    timer1.pauseTimer();
-                    setIsAdditionalTimerOn(!isAdditionalTimerOn);
-                  }}
-                  item={data.table[index]}
                   speakingTimer={timer1.speakingTimer}
                   isSelected={prosConsSelected === 'pros'}
                   onActivate={() => {
@@ -195,25 +156,8 @@ export default function TimerPage() {
                   onStart={() => timer2.startTimer()}
                   onPause={() => timer2.pauseTimer()}
                   onReset={() => timer2.resetCurrentTimer()}
-                  addOnTimer={(delta: number) =>
-                    timer2.setTimers(timer2.totalTimer ?? 0 + delta)
-                  }
                   isRunning={timer2.isRunning}
                   timer={timer2.totalTimer ?? 0}
-                  isLastItem={
-                    data !== undefined && index === data.table.length - 1
-                  }
-                  isFirstItem={index === 0}
-                  goToOtherItem={(isPrev: boolean) => {
-                    goToOtherItem(isPrev);
-                    timer2.resetTimerForNextPhase();
-                  }}
-                  isTimerChangeable={isTimerChangeable}
-                  onChangingTimer={() => {
-                    timer2.pauseTimer();
-                    setIsAdditionalTimerOn(!isAdditionalTimerOn);
-                  }}
-                  item={data.table[index]}
                   speakingTimer={timer2.speakingTimer}
                   isSelected={prosConsSelected === 'cons'}
                   onActivate={() => {
@@ -256,7 +200,6 @@ export default function TimerPage() {
                     <RoundControlButton
                       type="PREV"
                       onClick={() => {
-                        setIsAdditionalTimerOn(false);
                         goToOtherItem(true);
                       }}
                     />
@@ -280,7 +223,6 @@ export default function TimerPage() {
                     <RoundControlButton
                       type="NEXT"
                       onClick={() => {
-                        setIsAdditionalTimerOn(false);
                         goToOtherItem(false);
                       }}
                     />

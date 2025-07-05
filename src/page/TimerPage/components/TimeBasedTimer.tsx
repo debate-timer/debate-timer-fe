@@ -1,4 +1,3 @@
-import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
@@ -8,15 +7,8 @@ interface TimeBasedTimerProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
-  addOnTimer: (delta: number) => void;
-  onChangingTimer: () => void;
-  goToOtherItem: (isPrev: boolean) => void;
   timer: number;
-  isTimerChangeable: boolean;
   isRunning: boolean;
-  isLastItem: boolean;
-  isFirstItem: boolean;
-  item: TimeBoxInfo;
 
   /** 🚩 추가된 Props */
   speakingTimer: number | null; // 발언시간용 타이머 추가
@@ -30,7 +22,6 @@ export default function TimeBasedTimer({
   onStart,
   onPause,
   onReset,
-  onChangingTimer,
   timer,
   speakingTimer,
   isRunning,
@@ -143,8 +134,6 @@ export default function TimeBasedTimer({
         <div className="my-[15px] lg:my-[25px] xl:my-[30px]">
           <TimerController
             isRunning={isRunning}
-            isTimerChangeable={false}
-            onChangingTimer={onChangingTimer}
             onStart={onStart}
             onPause={onPause}
             onReset={onReset}

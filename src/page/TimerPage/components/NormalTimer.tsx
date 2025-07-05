@@ -4,20 +4,16 @@ import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
 import { IoCloseOutline } from 'react-icons/io5';
 import { MdRecordVoiceOver } from 'react-icons/md';
+import { useCallback, useEffect, useState } from 'react';
 
 interface NormalTimerProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
-  addOnTimer: (delta: number) => void;
-  onChangingTimer: () => void;
-  goToOtherItem: (isPrev: boolean) => void;
+  onSet: (second: number) => void;
   timer: number;
-  isAdditionalTimerOn: boolean;
-  isTimerChangeable: boolean;
+  isAdditionalTimerAvailable: boolean;
   isRunning: boolean;
-  isLastItem: boolean;
-  isFirstItem: boolean;
   item: TimeBoxInfo;
   teamName: string | null;
 }
@@ -26,15 +22,16 @@ export default function NormalTimer({
   onStart,
   onPause,
   onReset,
-  addOnTimer,
-  onChangingTimer,
+  onSet,
   timer,
-  isAdditionalTimerOn,
-  isTimerChangeable,
+  isAdditionalTimerAvailable,
   isRunning,
   item,
   teamName,
 }: NormalTimerProps) {
+  const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
+  const [savedTimer, setSavedTimer] = useState(0);
+
   const minute = Formatting.formatTwoDigits(Math.floor(Math.abs(timer) / 60));
   const second = Formatting.formatTwoDigits(Math.abs(timer % 60));
   const bgColorClass =
@@ -52,6 +49,33 @@ export default function NormalTimer({
         ? 'shadow-camp-blue'
         : 'shadow-camp-red'
     : '';
+
+  const handleChangeAdditionalTimer = useCallback(() => {
+    onPause();
+    if (!isAdditionalTimerOn) {
+      setSavedTimer(timer ?? 0);
+      onSet(0);
+    } else {
+      onSet(savedTimer);
+    }
+    setIsAdditionalTimerOn(!isAdditionalTimerOn);
+  }, [isAdditionalTimerOn, onPause, onSet, savedTimer, timer]);
+
+  useEffect(() => {
+    if (isAdditionalTimerOn && timer === 0 && isRunning) {
+      onPause();
+      onSet(savedTimer);
+      setIsAdditionalTimerOn(!isAdditionalTimerOn);
+    }
+  }, [
+    isAdditionalTimerOn,
+    timer,
+    savedTimer,
+    onPause,
+    setIsAdditionalTimerOn,
+    onSet,
+    isRunning,
+  ]);
 
   return (
     <div
@@ -75,7 +99,7 @@ export default function NormalTimer({
         {isAdditionalTimerOn && (
           <button
             className="absolute right-10 top-1/2 -translate-y-1/2"
-            onClick={() => onChangingTimer()}
+            onClick={handleChangeAdditionalTimer}
           >
             <IoCloseOutline className="size-[30px] hover:text-neutral-300 lg:size-[35px] xl:size-[40px]" />
           </button>
@@ -112,8 +136,8 @@ export default function NormalTimer({
         {!isAdditionalTimerOn && (
           <TimerController
             isRunning={isRunning}
-            isTimerChangeable={isTimerChangeable}
-            onChangingTimer={() => onChangingTimer()}
+            isAdditionalTimerAvailable={isAdditionalTimerAvailable}
+            onChangingTimer={handleChangeAdditionalTimer}
             onStart={() => onStart()}
             onPause={() => onPause()}
             onReset={() => onReset()}
@@ -125,7 +149,7 @@ export default function NormalTimer({
             isRunning={isRunning}
             onStart={() => onStart()}
             onPause={() => onPause()}
-            addOnTimer={(delta: number) => addOnTimer(delta)}
+            addOnTimer={(delta: number) => onSet(timer + delta)}
           />
         )}
       </div>
