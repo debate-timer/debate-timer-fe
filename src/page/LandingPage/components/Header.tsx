@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { isLoggedIn } from '../../../util/accessToken';
 
 interface HeaderProps {
-  onLogin: () => void;
+  onLoginButtonClicked: () => void;
 }
 
-export default function Header({ onLogin }: HeaderProps) {
+export default function Header({ onLoginButtonClicked }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -28,9 +29,9 @@ export default function Header({ onLogin }: HeaderProps) {
         </div>
         <button
           className="text-[min(max(0.875rem,1.25vw),1.2rem)]"
-          onClick={onLogin}
+          onClick={onLoginButtonClicked}
         >
-          3초 로그인
+          {!isLoggedIn() ? '3초 로그인' : '로그아웃'}
         </button>
       </div>
     </header>

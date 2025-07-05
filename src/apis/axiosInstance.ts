@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { getAccessToken, setAccessToken } from '../util/accessToken';
+import {
+  getAccessToken,
+  removeAccessToken,
+  setAccessToken,
+} from '../util/accessToken';
 
 axios.defaults.withCredentials = true;
 export const axiosInstance = axios.create({
@@ -57,6 +61,7 @@ axiosInstance.interceptors.response.use(
         console.error('Refresh Token is invalid or expired', refreshError);
         // 재발급도 실패하면 -> 로그인 페이지 이동
         window.location.href = '/home';
+        removeAccessToken();
         return Promise.reject(refreshError);
       }
     }
