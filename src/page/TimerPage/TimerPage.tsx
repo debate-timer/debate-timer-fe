@@ -112,6 +112,10 @@ export default function TimerPage() {
                 onSet={(second: number) => normalTimer.setTimer(second)}
                 isRunning={normalTimer.isRunning}
                 timer={normalTimer.timer ?? 0}
+                onChangeAdditionalTimer={
+                  normalTimer.handleChangeAdditionalTimer
+                }
+                isAdditionalTimerOn={normalTimer.isAdditionalTimerOn}
                 isAdditionalTimerAvailable={isAdditionalTimerAvailable}
                 item={data.table[index]}
                 teamName={

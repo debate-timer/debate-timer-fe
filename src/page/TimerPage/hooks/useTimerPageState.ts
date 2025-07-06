@@ -170,6 +170,7 @@ export function useTimerPageState(tableId: number) {
     timer1.clearTimer();
     timer2.clearTimer();
     normalTimer.clearTimer();
+    normalTimer.handleCloseAdditionalTimer();
 
     // 일반 타이머(중립 발언 등)
     if (currentBox.boxType === 'NORMAL') {

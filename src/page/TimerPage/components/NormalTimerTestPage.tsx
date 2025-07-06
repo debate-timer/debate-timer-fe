@@ -42,6 +42,8 @@ export default function NormalTimerTestPage() {
             teamName="찬성"
             onSet={() => {}}
             isAdditionalTimerAvailable={false}
+            isAdditionalTimerOn={false}
+            onChangeAdditionalTimer={() => {}}
           />
 
           {/* NEXT 버튼만 하단에 표시 */}
