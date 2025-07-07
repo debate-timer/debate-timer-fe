@@ -5,40 +5,15 @@ import TimerSection from './components/TimerSection';
 import TableSection from './components/TableSection';
 import ReviewSection from './components/ReviewSection';
 import ReportSection from './components/ReportSection';
-import { oAuthLogin } from '../../util/googleAuth';
-import { createTableShareUrl } from '../../util/arrayEncoding';
-import { SAMPLE_TABLE_DATA } from '../../constants/sample_table';
-import { isLoggedIn } from '../../util/accessToken';
-import { useNavigate } from 'react-router-dom';
-import useLogout from '../../hooks/mutations/useLogout';
+import useLandingPageLogics from './hooks/useLandingPageLogics';
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
-  const handleStartWithoutLogin = () => {
-    // window.location.href = LANDING_URLS.START_WITHOUT_LOGIN_URL;
-    window.location.href = createTableShareUrl(
-      import.meta.env.VITE_SHARE_BASE_URL,
-      SAMPLE_TABLE_DATA,
-    );
-  };
-  const handleDashboardButtonClick = () => {
-    navigate('/');
-  };
-  const onHeaderLoginClicked = () => {
-    if (!isLoggedIn()) {
-      oAuthLogin();
-    } else {
-      logoutMutate();
-    }
-  };
-  const onTableSectionLoginClicked = () => {
-    if (!isLoggedIn()) {
-      oAuthLogin();
-    } else {
-      handleDashboardButtonClick();
-    }
-  };
+  const [
+    handleStartWithoutLogin,
+    onTableSectionLoginClicked,
+    onDashboardButtonClicked,
+    onHeaderLoginClicked,
+  ] = useLandingPageLogics();
 
   return (
     <div className="flex h-full w-full items-center justify-center bg-neutral-0">
@@ -51,7 +26,7 @@ export default function LandingPage() {
           {/* 메인 화면 */}
           <MainSection
             onStartWithoutLogin={handleStartWithoutLogin}
-            onDashboardButtonClicked={handleDashboardButtonClick}
+            onDashboardButtonClicked={onDashboardButtonClicked}
           />
           {/* 시간표 설정화면 */}
           <TimeTableSection />
