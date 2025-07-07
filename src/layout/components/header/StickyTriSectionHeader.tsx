@@ -27,33 +27,18 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   );
 }
 
-/**
- * Header의 좌측 부 제목 영역
- * @param props 부 제목에 해당하는 JSX 컴포넌트
- * @returns JSX.Element
- */
 StickyTriSectionHeader.Left = function Left(props: PropsWithChildren) {
   const { children } = props;
   return <div className="flex-1 items-start text-start">{children}</div>;
 };
 
-/**
- * Header의 중앙 주 제목 영역
- * @param props 주 제목에 해당하는 JSX 컴포넌트
- * @returns JSX.Element
- */
 StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
   const { children } = props;
   return <div className="flex-1 items-center text-center">{children}</div>;
 };
 
-/**
- * Header의 우측 버튼 영역
- * @param props Header에 추가할 기본 아이콘 외의 커스텀 아이콘
- * @returns JSX.Element
- */
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
-  const { children } = props;
+  const { children: buttons } = props;
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
   const { openModal, closeModal, ModalWrapper } = useModal({});
@@ -93,7 +78,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         </>
 
         {/* Buttons given as an argument */}
-        {children}
+        {buttons}
 
         {/* Normal buttons */}
         {defaultIcons.map((iconName, index) => {
