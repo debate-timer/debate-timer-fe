@@ -6,7 +6,7 @@ import { createTableShareUrl } from '../../../util/arrayEncoding';
 import { SAMPLE_TABLE_DATA } from '../../../constants/sample_table';
 import { useCallback } from 'react';
 
-const useLandingPageLogics = () => {
+const useLandingPageHandlers = () => {
   // Prepare dependencies
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
@@ -19,17 +19,17 @@ const useLandingPageLogics = () => {
       SAMPLE_TABLE_DATA,
     );
   }, []);
-  const onTableSectionLoginButtonClicked = useCallback(() => {
+  const handleTableSectionLoginButtonClick = useCallback(() => {
     if (!isLoggedIn()) {
       oAuthLogin();
     } else {
       navigate('/');
     }
   }, [navigate]);
-  const onDashboardButtonClicked = useCallback(() => {
+  const handleDashboardButtonClick = useCallback(() => {
     navigate('/');
   }, [navigate]);
-  const onHeaderLoginButtonClicked = useCallback(() => {
+  const handleHeaderLoginButtonClick = useCallback(() => {
     if (!isLoggedIn()) {
       oAuthLogin();
     } else {
@@ -37,12 +37,12 @@ const useLandingPageLogics = () => {
     }
   }, [logoutMutate]);
 
-  return [
+  return {
     handleStartWithoutLogin,
-    onTableSectionLoginButtonClicked,
-    onDashboardButtonClicked,
-    onHeaderLoginButtonClicked,
-  ];
+    handleTableSectionLoginButtonClick,
+    handleDashboardButtonClick,
+    handleHeaderLoginButtonClick,
+  };
 };
 
-export default useLandingPageLogics;
+export default useLandingPageHandlers;
