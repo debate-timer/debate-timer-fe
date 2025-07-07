@@ -25,123 +25,82 @@ export function useBellSound({
   const warningBellRef = useRef<HTMLAudioElement>(null);
   const finishBellRef = useRef<HTMLAudioElement>(null);
 
-  // 이전 타이머 상태를 기억하여 변화 시점을 감지하기 위한 ref
-  const prevTimer1Ref = useRef<{
-    speakingTimer: number | null;
-    totalTimer: number | null;
-  }>({
-    speakingTimer: null,
-    totalTimer: null,
+  // 이전 타이머 상태를 기억하여 변화 시점을 감지하기 위한 ref(30초로 변경되는 시점 종소리를 위한)
+  const prevTimer1Ref = useRef({
+    speakingTimer: null as number | null,
+    totalTimer: null as number | null,
   });
-  const prevTimer2Ref = useRef<{
-    speakingTimer: number | null;
-    totalTimer: number | null;
-  }>({
-    speakingTimer: null,
-    totalTimer: null,
+  const prevTimer2Ref = useRef({
+    speakingTimer: null as number | null,
+    totalTimer: null as number | null,
   });
   const prevNormalTimerRef = useRef<number | null>(null);
 
-  // 벨 On/Off 여부 상태
-  const [isWarningBellOn, setWarningBell] = useState(false);
-  const [isFinishBellOn, setFinishBell] = useState(false);
+  const [isWarningBellOn, setWarningBell] = useState(isWarningBell);
+  const [isFinishBellOn, setFinishBell] = useState(isFinishBell);
+  const waringTime = 30;
 
-  useEffect(() => {
-    const waringTime = 30;
+  // 30초 경고음 진입 조건 함수
+  function timerJustReached(
+    prevTime: number | null,
+    currentTime: number | null,
+    defaultTime: number | null,
+  ) {
+    return (
+      prevTime !== null &&
+      prevTime > waringTime &&
+      currentTime === waringTime &&
+      defaultTime !== waringTime
+    );
+  }
 
-    // 하나라도 타이머가 동작 중인지 체크
-    const isAnyTimerRunning =
-      timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
-
-    /**
-     * 30초 경고음 재생 조건을 만족하는지 판단하는 함수
-     * - "30초"로 처음 진입할 때만 true 반환
-     */
-    const timerJustReached = (
-      prevTime: number | null,
-      currentTime: number | null,
-      defaultTime: number | null,
-    ) => {
-      return (
-        prevTime !== null &&
-        prevTime > waringTime &&
-        currentTime === waringTime &&
-        defaultTime !== waringTime // (처음부터 30초면 울리지 않게)
-      );
-    };
-
-    // 각각의 타이머가 "경고음 조건"에 진입했는지 계산
-    const isTimer1WarningTime =
-      timer1.isRunning &&
+  // 자유토론(TimeBased) 타이머 경고음 조건 체크
+  function isTimerWarningTime(
+    timer: UseCustomTimerReturnType,
+    prevTimer: { speakingTimer: number | null; totalTimer: number | null },
+  ) {
+    return (
+      timer.isRunning &&
       (timerJustReached(
-        prevTimer1Ref.current.speakingTimer,
-        timer1.speakingTimer,
-        timer1.defaultTime.defaultSpeakingTimer,
+        prevTimer.speakingTimer,
+        timer.speakingTimer,
+        timer.defaultTime.defaultSpeakingTimer,
       ) ||
-        (timer1.speakingTimer === null &&
+        (timer.speakingTimer === null &&
           timerJustReached(
-            prevTimer1Ref.current.totalTimer,
-            timer1.totalTimer,
-            timer1.defaultTime.defaultTotalTimer,
-          )));
+            prevTimer.totalTimer,
+            timer.totalTimer,
+            timer.defaultTime.defaultTotalTimer,
+          )))
+    );
+  }
 
-    const isTimer2WarningTime =
-      timer2.isRunning &&
-      (timerJustReached(
-        prevTimer2Ref.current.speakingTimer,
-        timer2.speakingTimer,
-        timer2.defaultTime.defaultSpeakingTimer,
-      ) ||
-        (timer2.speakingTimer === null &&
-          timerJustReached(
-            prevTimer2Ref.current.totalTimer,
-            timer2.totalTimer,
-            timer2.defaultTime.defaultTotalTimer,
-          )));
+  // 일반타이머 경고음 조건 체크
+  function isNormalTimerWarningTime(
+    timer: UseNormalTimerReturnType,
+    prevNormalTimer: number | null,
+  ) {
+    return (
+      timer.isRunning &&
+      prevNormalTimer !== null &&
+      prevNormalTimer > waringTime &&
+      timer.timer === waringTime &&
+      timer.defaultTimer !== waringTime
+    );
+  }
 
-    const isNormalTimerWarningTime =
-      normalTimer.isRunning &&
-      prevNormalTimerRef.current !== null &&
-      prevNormalTimerRef.current > waringTime &&
-      normalTimer.timer === waringTime &&
-      normalTimer.defaultTimer !== waringTime;
+  // 종료음 조건 체크
+  function isTimerFinished(timer: UseCustomTimerReturnType) {
+    return (
+      timer.isRunning && (timer.speakingTimer === 0 || timer.totalTimer === 0)
+    );
+  }
+  function isNormalTimerFinished(timer: UseNormalTimerReturnType) {
+    return timer.isRunning && timer.timer === 0;
+  }
 
-    // ------ 경고음(warningBell) 재생 ------
-    if (
-      warningBellRef.current &&
-      isAnyTimerRunning &&
-      isWarningBellOn &&
-      (isTimer1WarningTime || isTimer2WarningTime || isNormalTimerWarningTime)
-    ) {
-      warningBellRef.current.play();
-    }
-
-    // ------ 종료음(finishBell) 재생 ------
-    // (각 타이머별 0초에 도달했는지 체크)
-    const isTimer1Finished =
-      timer1.isRunning &&
-      (timer1.speakingTimer === 0 || timer1.totalTimer === 0);
-
-    const isTimer2Finished =
-      timer2.isRunning &&
-      (timer2.speakingTimer === 0 || timer2.totalTimer === 0);
-
-    const isNormalTimerFinished =
-      normalTimer.isRunning && normalTimer.timer === 0;
-
-    const isAnyTimerFinished =
-      isTimer1Finished || isTimer2Finished || isNormalTimerFinished;
-
-    if (
-      finishBellRef.current &&
-      isAnyTimerRunning &&
-      isFinishBellOn &&
-      isAnyTimerFinished
-    ) {
-      finishBellRef.current.play();
-    }
-
-    // --- 이전값(ref) 최신화 ---
+  // 이전값(ref) 최신화 함수
+  function updatePrevTimers() {
     prevTimer1Ref.current = {
       speakingTimer: timer1.speakingTimer,
       totalTimer: timer1.totalTimer,
@@ -151,10 +110,57 @@ export function useBellSound({
       totalTimer: timer2.totalTimer,
     };
     prevNormalTimerRef.current = normalTimer.timer;
+  }
+
+  // 벨 재생 함수
+  function playWarningBell() {
+    if (warningBellRef.current) warningBellRef.current.play();
+  }
+  function playFinishBell() {
+    if (finishBellRef.current) finishBellRef.current.play();
+  }
+
+  // ===== useEffect 메인 =====
+  useEffect(() => {
+    const isAnyTimerRunning =
+      timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
+
+    const isTimer1WarningTime = isTimerWarningTime(
+      timer1,
+      prevTimer1Ref.current,
+    );
+    const isTimer2WarningTime = isTimerWarningTime(
+      timer2,
+      prevTimer2Ref.current,
+    );
+    const isNormalWarningTime = isNormalTimerWarningTime(
+      normalTimer,
+      prevNormalTimerRef.current,
+    );
+
+    // ------ 경고음(warningBell) ------
+    if (
+      isAnyTimerRunning &&
+      isWarningBellOn &&
+      (isTimer1WarningTime || isTimer2WarningTime || isNormalWarningTime)
+    ) {
+      playWarningBell();
+    }
+
+    // ------ 종료음(finishBell) ------
+    const isTimer1Finished = isTimerFinished(timer1);
+    const isTimer2Finished = isTimerFinished(timer2);
+    const isNormalTimerFin = isNormalTimerFinished(normalTimer);
+    const isAnyTimerFinished =
+      isTimer1Finished || isTimer2Finished || isNormalTimerFin;
+
+    if (isAnyTimerRunning && isFinishBellOn && isAnyTimerFinished) {
+      playFinishBell();
+    }
+
+    updatePrevTimers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    warningBellRef,
-    finishBellRef,
     isWarningBellOn,
     isFinishBellOn,
     timer1.isRunning,
