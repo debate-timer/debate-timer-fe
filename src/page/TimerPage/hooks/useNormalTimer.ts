@@ -94,7 +94,7 @@ export function useNormalTimer() {
     if (isAdditionalTimerOn && timer === 0 && isRunning) {
       pauseTimer();
       setTimer(savedTimer);
-      setIsAdditionalTimerOn(!isAdditionalTimerOn);
+      setIsAdditionalTimerOn(false);
     }
   }, [
     isAdditionalTimerOn,
