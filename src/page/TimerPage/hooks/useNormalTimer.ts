@@ -123,4 +123,4 @@ export function useNormalTimer() {
   };
 }
 
-export type UseNormalTimerReturnType = ReturnType<typeof useNormalTimer>;
+export type NormalTimerLogics = ReturnType<typeof useNormalTimer>;

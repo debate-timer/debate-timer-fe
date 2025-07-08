@@ -264,4 +264,4 @@ export function useTimerPageState(tableId: number) {
   };
 }
 
-export type TimerPageState = ReturnType<typeof useTimerPageState>;
+export type TimerPageLogics = ReturnType<typeof useTimerPageState>;

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { TimerPageState } from './useTimerPageState';
+import { TimerPageLogics } from './useTimerPageState';
 
 /**
  * 타이머 페이지에서 키보드 단축키(핫키) 기능을 제공하는 커스텀 훅입니다.
@@ -9,7 +9,7 @@ import { TimerPageState } from './useTimerPageState';
  * - KeyA/KeyL: 각각 찬/반 진영 타이머 활성화
  * - Enter: 진영 전환
  */
-export function useTimerHotkey(state: TimerPageState) {
+export function useTimerHotkey(state: TimerPageLogics) {
   const {
     data,
     index,

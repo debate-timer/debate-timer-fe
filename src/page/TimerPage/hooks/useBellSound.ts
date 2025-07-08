@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { UseCustomTimerReturnType } from './useCustomTimer';
-import { UseNormalTimerReturnType } from './useNormalTimer';
+import { CustomTimerLogics } from './useCustomTimer';
+import { NormalTimerLogics } from './useNormalTimer';
 
 interface UseBellSoundProps {
-  timer1: UseCustomTimerReturnType;
-  timer2: UseCustomTimerReturnType;
-  normalTimer: UseNormalTimerReturnType;
+  timer1: CustomTimerLogics;
+  timer2: CustomTimerLogics;
+  normalTimer: NormalTimerLogics;
   isWarningBell?: boolean;
   isFinishBell?: boolean;
 }
@@ -56,7 +56,7 @@ export function useBellSound({
 
   // 자유토론(TimeBased) 타이머 경고음 조건 체크
   function isTimerWarningTime(
-    timer: UseCustomTimerReturnType,
+    timer: CustomTimerLogics,
     prevTimer: { speakingTimer: number | null; totalTimer: number | null },
   ) {
     return (
@@ -77,7 +77,7 @@ export function useBellSound({
 
   // 일반타이머 경고음 조건 체크
   function isNormalTimerWarningTime(
-    timer: UseNormalTimerReturnType,
+    timer: NormalTimerLogics,
     prevNormalTimer: number | null,
   ) {
     return (
@@ -90,12 +90,12 @@ export function useBellSound({
   }
 
   // 종료음 조건 체크
-  function isTimerFinished(timer: UseCustomTimerReturnType) {
+  function isTimerFinished(timer: CustomTimerLogics) {
     return (
       timer.isRunning && (timer.speakingTimer === 0 || timer.totalTimer === 0)
     );
   }
-  function isNormalTimerFinished(timer: UseNormalTimerReturnType) {
+  function isNormalTimerFinished(timer: NormalTimerLogics) {
     return timer.isRunning && timer.timer === 0;
   }
 

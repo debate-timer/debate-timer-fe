@@ -183,4 +183,4 @@ export function useCustomTimer({
   };
 }
 
-export type UseCustomTimerReturnType = ReturnType<typeof useCustomTimer>;
+export type CustomTimerLogics = ReturnType<typeof useCustomTimer>;
