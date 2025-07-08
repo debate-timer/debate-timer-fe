@@ -38,7 +38,7 @@ export function useBellSound({
 
   const [isWarningBellOn, setWarningBell] = useState(isWarningBell);
   const [isFinishBellOn, setFinishBell] = useState(isFinishBell);
-  const waringTime = 30;
+  const warningTime = 30;
 
   // 30초 경고음 진입 조건 함수
   function timerJustReached(
@@ -48,9 +48,9 @@ export function useBellSound({
   ) {
     return (
       prevTime !== null &&
-      prevTime > waringTime &&
-      currentTime === waringTime &&
-      defaultTime !== waringTime
+      prevTime > warningTime &&
+      currentTime === warningTime &&
+      defaultTime !== warningTime
     );
   }
 
@@ -83,9 +83,9 @@ export function useBellSound({
     return (
       timer.isRunning &&
       prevNormalTimer !== null &&
-      prevNormalTimer > waringTime &&
-      timer.timer === waringTime &&
-      timer.defaultTimer !== waringTime
+      prevNormalTimer > warningTime &&
+      timer.timer === warningTime &&
+      timer.defaultTimer !== warningTime
     );
   }
 
