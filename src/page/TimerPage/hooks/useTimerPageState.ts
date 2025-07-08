@@ -93,7 +93,6 @@ export function useTimerPageState(tableId: number) {
     } else if (prosConsSelected === 'cons') {
       if (timer1.isDone) return;
       if (timer2.isRunning) {
-        if (timer1.isDone) return;
         timer2.pauseTimer();
         timer1.startTimer();
         setProsConsSelected('pros');
