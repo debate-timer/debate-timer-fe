@@ -176,11 +176,6 @@ export function useBellSound({
     timer2.defaultTime.defaultSpeakingTimer,
     normalTimer.timer,
     normalTimer.defaultTimer,
-    prevTimer1Ref.current.speakingTimer,
-    prevTimer1Ref.current.totalTimer,
-    prevTimer2Ref.current.speakingTimer,
-    prevTimer2Ref.current.totalTimer,
-    prevNormalTimerRef.current,
   ]);
 
   // 외부 상태/props에서 벨 활성화 여부를 받아옴 (처음 or 값 변경 시 반영)
