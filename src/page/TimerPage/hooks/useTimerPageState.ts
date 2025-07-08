@@ -223,24 +223,25 @@ export function useTimerPageState(tableId: number) {
   /**
    * 각 진영의 타이머가 완전히 끝난 경우(isDone 처리)
    */
-useEffect(() => {
-  const selectedTimer = prosConsSelected === 'pros' ? timer1 : timer2;
+  useEffect(() => {
+    const selectedTimer = prosConsSelected === 'pros' ? timer1 : timer2;
 
-  const isDone =
-    selectedTimer.speakingTimer === null
-      ? selectedTimer.totalTimer === 0
-      : selectedTimer.speakingTimer === 0;
+    const isDone =
+      selectedTimer.speakingTimer === null
+        ? selectedTimer.totalTimer === 0
+        : selectedTimer.speakingTimer === 0;
 
-  if (isDone) {
-    selectedTimer.setIsDone(true);
-  }
-}, [
-  prosConsSelected,
-  timer1.totalTimer,
-  timer1.speakingTimer,
-  timer2.totalTimer,
-  timer2.speakingTimer,
-]);
+    if (isDone) {
+      selectedTimer.setIsDone(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    prosConsSelected,
+    timer1.totalTimer,
+    timer1.speakingTimer,
+    timer2.totalTimer,
+    timer2.speakingTimer,
+  ]);
 
   return {
     warningBellRef,
