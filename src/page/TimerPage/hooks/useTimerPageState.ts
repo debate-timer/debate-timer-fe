@@ -80,27 +80,15 @@ export function useTimerPageState(tableId: number) {
    * - pros → cons, cons → pros로 타이머/상태 전환
    */
   const switchCamp = useCallback(() => {
-    if (prosConsSelected === 'pros') {
-      if (timer2.isDone) return; // 상대 팀 발언 종료시 전환 불가
-      if (timer1.isRunning) {
-        timer1.pauseTimer();
-        timer2.startTimer();
-        setProsConsSelected('cons');
-      } else {
-        timer1.pauseTimer();
-        setProsConsSelected('cons');
-      }
-    } else if (prosConsSelected === 'cons') {
-      if (timer1.isDone) return;
-      if (timer2.isRunning) {
-        timer2.pauseTimer();
-        timer1.startTimer();
-        setProsConsSelected('pros');
-      } else {
-        timer2.pauseTimer();
-        setProsConsSelected('pros');
-      }
+    const currentTimer = prosConsSelected === 'pros' ? timer1 : timer2;
+    const nextTimer = prosConsSelected === 'pros' ? timer2 : timer1;
+    const nextTeam = prosConsSelected === 'pros' ? 'cons' : 'pros';
+    if (nextTimer.isDone) return;
+    currentTimer.pauseTimer();
+    if (!nextTimer.isDone && currentTimer.isRunning) {
+      nextTimer.startTimer();
     }
+    setProsConsSelected(nextTeam);
   }, [prosConsSelected, timer1, timer2]);
 
   /**
