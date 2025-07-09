@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableData';
 import { useCustomTimer } from './useCustomTimer';
 import { useNormalTimer } from './useNormalTimer';
-import { isGuestFlow } from '../../../util/sessionStorage';
 import { useBellSound } from './useBellSound';
 
 // ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
@@ -73,6 +72,33 @@ export function useTimerPageState(tableId: number) {
       }
     },
     [index, data],
+  );
+
+  /**
+   * 특정 진영(팀)을 활성화하는 함수
+   * - 사용자가 좌/우 타이머 영역을 직접 클릭할 때 사용
+   * - 현재 진영이 아닌 타이머를 클릭한 경우에만 동작
+   */
+  const handleActivateTeam = useCallback(
+    (team: 'pros' | 'cons') => {
+      const isPros = team === 'pros';
+      const currentTimer = isPros ? timer1 : timer2;
+      const otherTimer = isPros ? timer2 : timer1;
+      if (currentTimer.isDone) return;
+
+      // 반대편에서 클릭했을 때만
+      if (prosConsSelected !== team) {
+        if (otherTimer.isRunning) {
+          otherTimer.pauseTimer();
+          currentTimer.startTimer();
+          setProsConsSelected(team);
+        } else {
+          otherTimer.pauseTimer();
+          setProsConsSelected(team);
+        }
+      }
+    },
+    [prosConsSelected, timer1, timer2],
   );
 
   /**
@@ -259,7 +285,7 @@ export function useTimerPageState(tableId: number) {
     setProsConsSelected,
     goToOtherItem,
     switchCamp,
-    isGuestFlow,
+    handleActivateTeam,
     tableId,
   };
 }

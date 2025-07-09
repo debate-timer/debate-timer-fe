@@ -36,10 +36,9 @@ export default function TimerPage() {
     timer2,
     normalTimer,
     prosConsSelected,
-    setProsConsSelected,
     goToOtherItem,
     switchCamp,
-    isGuestFlow,
+    handleActivateTeam,
   } = state;
 
   if (!data) {
@@ -52,7 +51,6 @@ export default function TimerPage() {
       <audio ref={finishBellRef} src="/sounds/bell-finish.mp3" />
 
       <DefaultLayout>
-        {/* Headers */}
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
             <HeaderTableInfo
@@ -120,19 +118,7 @@ export default function TimerPage() {
                   timer={timer1.totalTimer ?? 0}
                   speakingTimer={timer1.speakingTimer}
                   isSelected={prosConsSelected === 'pros'}
-                  onActivate={() => {
-                    if (timer1.isDone) return;
-                    if (prosConsSelected === 'cons') {
-                      if (timer2.isRunning) {
-                        timer2.pauseTimer();
-                        timer1.startTimer();
-                        setProsConsSelected('pros');
-                      } else {
-                        timer2.pauseTimer();
-                        setProsConsSelected('pros');
-                      }
-                    }
-                  }}
+                  onActivate={() => handleActivateTeam('pros')}
                   prosCons="pros"
                   teamName={data.info.prosTeamName}
                 />
@@ -146,19 +132,7 @@ export default function TimerPage() {
                   timer={timer2.totalTimer ?? 0}
                   speakingTimer={timer2.speakingTimer}
                   isSelected={prosConsSelected === 'cons'}
-                  onActivate={() => {
-                    if (timer2.isDone) return;
-                    if (prosConsSelected === 'pros') {
-                      if (timer1.isRunning) {
-                        timer1.pauseTimer();
-                        timer2.startTimer();
-                        setProsConsSelected('cons');
-                      } else {
-                        timer1.pauseTimer();
-                        setProsConsSelected('cons');
-                      }
-                    }
-                  }}
+                  onActivate={() => handleActivateTeam('cons')}
                   prosCons="cons"
                   teamName={data.info.consTeamName}
                 />
