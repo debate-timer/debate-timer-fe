@@ -13,11 +13,20 @@ type Story = StoryObj<typeof NormalTimer>;
 
 export const OnPros: Story = {
   args: {
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    timer: 150,
-    isRunning: false,
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      defaultTimer: 150,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      setDefaultTimer: () => {},
+      clearTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
     item: {
       stance: 'PROS',
       speechType: '입론1',
@@ -32,11 +41,20 @@ export const OnPros: Story = {
 
 export const OnCons: Story = {
   args: {
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    timer: 150,
-    isRunning: false,
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      defaultTimer: 150,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      setDefaultTimer: () => {},
+      clearTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
     item: {
       stance: 'CONS',
       speechType: '입론1',
@@ -51,11 +69,20 @@ export const OnCons: Story = {
 
 export const OnNeutral: Story = {
   args: {
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    timer: 150,
-    isRunning: false,
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      defaultTimer: 150,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      setDefaultTimer: () => {},
+      clearTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
     item: {
       stance: 'NEUTRAL',
       speechType: '작전 시간',
@@ -70,11 +97,20 @@ export const OnNeutral: Story = {
 
 export const OnRunning: Story = {
   args: {
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    timer: 150,
-    isRunning: true,
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      defaultTimer: 150,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      setDefaultTimer: () => {},
+      clearTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
     item: {
       stance: 'PROS',
       speechType: '입론 1',
@@ -89,12 +125,20 @@ export const OnRunning: Story = {
 
 export const WhenAdditionalTimerAvailable: Story = {
   args: {
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    timer: 150,
-    isRunning: true,
-    isAdditionalTimerAvailable: true,
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      defaultTimer: 150,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      setDefaultTimer: () => {},
+      clearTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
     item: {
       stance: 'PROS',
       speechType: '입론 1',
@@ -109,12 +153,20 @@ export const WhenAdditionalTimerAvailable: Story = {
 
 export const OnAdditionalTimerEnabled: Story = {
   args: {
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    isAdditionalTimerAvailable: true,
-    timer: 150,
-    isRunning: false,
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      defaultTimer: 150,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      setDefaultTimer: () => {},
+      clearTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
     item: {
       stance: 'PROS',
       speechType: '입론1',

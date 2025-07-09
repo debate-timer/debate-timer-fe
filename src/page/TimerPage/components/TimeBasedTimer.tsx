@@ -2,16 +2,10 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
+import { CustomTimerLogics } from '../hooks/useCustomTimer';
 
 interface TimeBasedTimerProps {
-  onStart: () => void;
-  onPause: () => void;
-  onReset: () => void;
-  timer: number;
-  isRunning: boolean;
-
-  /** 🚩 추가된 Props */
-  speakingTimer: number | null; // 발언시간용 타이머 추가
+  timeBasedTimerInstance: CustomTimerLogics;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: 'pros' | 'cons';
@@ -19,23 +13,25 @@ interface TimeBasedTimerProps {
 }
 
 export default function TimeBasedTimer({
-  onStart,
-  onPause,
-  onReset,
-  timer,
-  speakingTimer,
-  isRunning,
+  timeBasedTimerInstance,
   isSelected,
   onActivate,
   prosCons,
   teamName,
 }: TimeBasedTimerProps) {
+  const {
+    totalTimer,
+    speakingTimer,
+    isRunning,
+    startTimer,
+    pauseTimer,
+    resetCurrentTimer,
+  } = timeBasedTimerInstance;
   const minute = Formatting.formatTwoDigits(
-    Math.floor(Math.abs(timer ?? 0) / 60),
+    Math.floor(Math.abs(totalTimer ?? 0) / 60),
   );
-  const second = Formatting.formatTwoDigits(Math.abs((timer ?? 0) % 60));
+  const second = Formatting.formatTwoDigits(Math.abs((totalTimer ?? 0) % 60));
 
-  /** 🚩 추가된 코드: 발언시간 표시 처리 */
   const speakingMinute = Formatting.formatTwoDigits(
     Math.floor(Math.abs((speakingTimer ?? 0) / 60)),
   );
@@ -134,12 +130,28 @@ export default function TimeBasedTimer({
         <div className="my-[15px] lg:my-[25px] xl:my-[30px]">
           <TimerController
             isRunning={isRunning}
-            onStart={onStart}
-            onPause={onPause}
-            onReset={onReset}
+            onStart={startTimer}
+            onPause={pauseTimer}
+            onReset={resetCurrentTimer}
           />
         </div>
       </div>
     </div>
   );
 }
+
+// type TimeBasedTimerInstance = {
+//   totalTimer: number;
+//   speakingTimer: number;
+//   isRunning: boolean;
+//   startTimer: () => void;
+//   pauseTimer: () => void;
+//   resetCurrentTimer: () => void;
+// };
+// interface TimeBasedTimerProps {
+//   timeBasedTimerInstance: TimeBasedTimerInstance;
+//   isSelected: boolean;
+//   onActivate?: () => void;
+//   prosCons: 'pros' | 'cons';
+//   teamName: string;
+// }

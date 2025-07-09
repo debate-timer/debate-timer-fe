@@ -4,36 +4,36 @@ import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
 import { IoCloseOutline } from 'react-icons/io5';
 import { MdRecordVoiceOver } from 'react-icons/md';
+import { NormalTimerLogics } from '../hooks/useNormalTimer';
 
 interface NormalTimerProps {
-  onStart: () => void;
-  onPause: () => void;
-  onReset: () => void;
-  onSet: (second: number) => void;
-  timer: number;
-  isAdditionalTimerOn: boolean;
-  onChangeAdditionalTimer: () => void;
+  normalTimerInstance: NormalTimerLogics;
   isAdditionalTimerAvailable: boolean;
-  isRunning: boolean;
   item: TimeBoxInfo;
   teamName: string | null;
 }
 
 export default function NormalTimer({
-  onStart,
-  onPause,
-  onReset,
-  onSet,
-  timer,
-  isAdditionalTimerOn,
-  onChangeAdditionalTimer,
+  normalTimerInstance,
   isAdditionalTimerAvailable,
-  isRunning,
   item,
   teamName,
 }: NormalTimerProps) {
-  const minute = Formatting.formatTwoDigits(Math.floor(Math.abs(timer) / 60));
-  const second = Formatting.formatTwoDigits(Math.abs(timer % 60));
+  const {
+    timer,
+    isAdditionalTimerOn,
+    isRunning,
+    handleChangeAdditionalTimer,
+    startTimer,
+    pauseTimer,
+    resetTimer,
+    setTimer,
+  } = normalTimerInstance;
+  const totalTime = timer ?? 0;
+  const minute = Formatting.formatTwoDigits(
+    Math.floor(Math.abs(totalTime) / 60),
+  );
+  const second = Formatting.formatTwoDigits(Math.abs(totalTime % 60));
   const bgColorClass =
     item.stance === 'NEUTRAL' || isAdditionalTimerOn
       ? 'bg-neutral-500'
@@ -72,7 +72,7 @@ export default function NormalTimer({
         {isAdditionalTimerOn && (
           <button
             className="absolute right-10 top-1/2 -translate-y-1/2"
-            onClick={onChangeAdditionalTimer}
+            onClick={handleChangeAdditionalTimer}
           >
             <IoCloseOutline className="size-[30px] hover:text-neutral-300 lg:size-[35px] xl:size-[40px]" />
           </button>
@@ -82,7 +82,7 @@ export default function NormalTimer({
       {/* Speaker's number, if necessary */}
       <div className="my-[12px] h-[25px] lg:my-[17px] lg:h-[30px] xl:my-[20px] xl:h-[40px]">
         <div className="flex w-full flex-row items-center justify-center space-x-2 text-neutral-900">
-          {item.stance !== 'NEUTRAL' && !isAdditionalTimerOn && (
+          {item.stance !== 'NEUTRAL' && isAdditionalTimerOn && (
             <>
               <MdRecordVoiceOver className="size-[30px] lg:size-[35px] xl:size-[40px]" />
               <h3 className="text-[18px] font-semibold lg:text-[24px] xl:text-[28px]">
@@ -98,7 +98,7 @@ export default function NormalTimer({
       <div
         className={`flex h-[140px] w-[400px] flex-row items-center justify-center bg-slate-50 text-center text-[90px] font-bold text-neutral-900 lg:h-[190px] lg:w-[520px] lg:text-[120px] xl:h-[230px] xl:w-[600px] xl:space-x-5 xl:text-[150px]`}
       >
-        {timer < 0 && <p className="w-[30px] lg:w-[70px]">-</p>}
+        {totalTime < 0 && <p className="w-[30px] lg:w-[70px]">-</p>}
         <p className="w-[130px] lg:w-[200px]">{minute}</p>
         <p className="w-[50px] -translate-y-[7px] lg:-translate-y-[10px]">:</p>
         <p className="w-[130px] lg:w-[200px]">{second}</p>
@@ -110,19 +110,19 @@ export default function NormalTimer({
           <TimerController
             isRunning={isRunning}
             isAdditionalTimerAvailable={isAdditionalTimerAvailable}
-            onChangingTimer={onChangeAdditionalTimer}
-            onStart={() => onStart()}
-            onPause={() => onPause()}
-            onReset={() => onReset()}
+            onChangingTimer={handleChangeAdditionalTimer}
+            onStart={startTimer}
+            onPause={pauseTimer}
+            onReset={resetTimer}
           />
         )}
 
         {isAdditionalTimerOn && (
           <AdditionalTimerController
             isRunning={isRunning}
-            onStart={() => onStart()}
-            onPause={() => onPause()}
-            addOnTimer={(delta: number) => onSet(timer + delta)}
+            onStart={startTimer}
+            onPause={pauseTimer}
+            addOnTimer={(delta: number) => setTimer(totalTime + delta)}
           />
         )}
       </div>

@@ -34,17 +34,23 @@ function NormalTimerTestPage() {
       <DefaultLayout.ContentContainer noPadding>
         <div className="flex flex-1 flex-col items-center justify-center space-y-[25px] bg-neutral-100 xl:space-y-[40px]">
           <NormalTimer
-            timer={item.time ?? 0}
-            isRunning={false}
-            onStart={() => {}}
-            onPause={() => {}}
-            onReset={() => {}}
+            normalTimerInstance={{
+              timer: 150,
+              isRunning: false,
+              defaultTimer: 150,
+              isAdditionalTimerOn: false,
+              setTimer: () => {},
+              startTimer: () => {},
+              pauseTimer: () => {},
+              resetTimer: () => {},
+              setDefaultTimer: () => {},
+              clearTimer: () => {},
+              handleChangeAdditionalTimer: () => {},
+              handleCloseAdditionalTimer: () => {},
+            }}
             item={item}
             teamName="찬성"
-            onSet={() => {}}
             isAdditionalTimerAvailable={false}
-            isAdditionalTimerOn={false}
-            onChangeAdditionalTimer={() => {}}
           />
 
           {/* NEXT 버튼만 하단에 표시 */}
