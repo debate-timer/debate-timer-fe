@@ -54,12 +54,12 @@ export async function postItem(
 // DELETE
 export async function deleteItem(
   dbPath: string,
-  item: DebateTableData,
+  id: UUID,
 ): Promise<DebateTableData[]> {
   return await dbMutex.runExclusive(async () => {
     const db = await readDb(dbPath);
     const updatedDb = db.filter(
-      (record: DebateTableData) => record.info.id !== item.info.id,
+      (record: DebateTableData) => record.info.id !== id,
     );
     await fs.writeFile(dbPath, JSON.stringify(updatedDb, null, 2));
     return updatedDb;

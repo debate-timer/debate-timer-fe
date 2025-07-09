@@ -61,9 +61,7 @@ ipcMain.handle('db-post', async (_event, item: DebateTableData) =>
 );
 
 // DELETE
-ipcMain.handle('db-delete', async (_event, item: DebateTableData) =>
-  deleteItem(dbPath, item),
-);
+ipcMain.handle('db-delete', async (_event, id: UUID) => deleteItem(dbPath, id));
 
 // PATCH
 ipcMain.handle('db-patch', async (_event, item: DebateTableData) =>
