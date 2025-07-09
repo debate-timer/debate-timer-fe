@@ -1,8 +1,9 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { randomUUID, UUID } from 'crypto';
+import { UUID } from 'crypto';
 import path from 'path';
 import fs from 'fs/promises';
 import { DebateTableData } from './type';
+import { getItem, getAllItems, deleteItem, patchItem, postItem } from './api';
 
 // Vite 개발 서버 URL. process.env.VITE_DEV_SERVER_URL는 vite-plugin-electron이 자동으로 설정해줍니다.
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
@@ -44,55 +45,30 @@ async function initDb() {
   }
 }
 
-// Read database (helper function used on API requests)
-async function readDb() {
-  const data = await fs.readFile(dbPath, 'utf-8');
-  const parsedData = JSON.parse(data);
-  return Array.isArray(parsedData) ? parsedData : [];
-}
-
+// IPC Handlers
 // GET
-ipcMain.handle('db-get', async (_event, id: UUID): Promise<DebateTableData> => {
-  const db = await readDb();
-  const target = db.find((record: DebateTableData) => record.info.id === id);
-  if (target) {
-    return target;
-  } else {
-    throw new Error('Failed to find item.');
-  }
-});
+ipcMain.handle(
+  'db-get',
+  async (_event, id: UUID): Promise<DebateTableData> => getItem(dbPath, id),
+);
 
 // GET ALL
-ipcMain.handle('db-get-all', async () => readDb());
+ipcMain.handle('db-get-all', async () => getAllItems(dbPath));
 
 // POST
-ipcMain.handle('db-post', async (_event, item: DebateTableData) => {
-  const db = await readDb();
-  item.info.id = randomUUID();
-  db.push(item);
-  await fs.writeFile(dbPath, JSON.stringify(db, null, 2));
-  return item;
-});
+ipcMain.handle('db-post', async (_event, item: DebateTableData) =>
+  postItem(dbPath, item),
+);
 
 // DELETE
-ipcMain.handle('db-delete', async (_event, id: UUID) => {
-  const db = await readDb();
-  const updatedDb = db.filter(
-    (record: DebateTableData) => record.info.id !== id,
-  );
-  await fs.writeFile(dbPath, JSON.stringify(updatedDb, null, 2));
-  return updatedDb;
-});
+ipcMain.handle('db-delete', async (_event, item: DebateTableData) =>
+  deleteItem(dbPath, item),
+);
 
 // PATCH
-ipcMain.handle('db-patch', async (_event, item: DebateTableData) => {
-  const db = await readDb();
-  const updatedDb = db.map((record: DebateTableData) =>
-    record.info.id === item.info.id ? item : record,
-  );
-  await fs.writeFile(dbPath, JSON.stringify(updatedDb, null, 2));
-  return item;
-});
+ipcMain.handle('db-patch', async (_event, item: DebateTableData) =>
+  patchItem(dbPath, item),
+);
 
 // Launch app
 app.whenReady().then(() => {
