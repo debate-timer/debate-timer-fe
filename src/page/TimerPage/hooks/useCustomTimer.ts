@@ -176,6 +176,7 @@ export function useCustomTimer({
     resetTimerForNextPhase,
     resetCurrentTimer,
     setTimers,
+    setSavedTime,
     setDefaultTime,
     setIsSpeakingTimer,
     setIsDone,

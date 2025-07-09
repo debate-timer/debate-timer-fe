@@ -198,6 +198,10 @@ export function useTimerPageState(tableId: number) {
       const defaultSpeakingTimer = currentBox.timePerSpeaking;
       [timer1, timer2].forEach((timer) => {
         timer.setDefaultTime({ defaultTotalTimer, defaultSpeakingTimer });
+        timer.setSavedTime({
+          savedTotalTimer: defaultTotalTimer,
+          savedSpeakingTimer: defaultSpeakingTimer,
+        });
         timer.setTimers(defaultTotalTimer, defaultSpeakingTimer);
         timer.setIsSpeakingTimer(true);
         timer.setIsDone(false);
