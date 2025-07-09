@@ -139,19 +139,3 @@ export default function TimeBasedTimer({
     </div>
   );
 }
-
-// type TimeBasedTimerInstance = {
-//   totalTimer: number;
-//   speakingTimer: number;
-//   isRunning: boolean;
-//   startTimer: () => void;
-//   pauseTimer: () => void;
-//   resetCurrentTimer: () => void;
-// };
-// interface TimeBasedTimerProps {
-//   timeBasedTimerInstance: TimeBasedTimerInstance;
-//   isSelected: boolean;
-//   onActivate?: () => void;
-//   prosCons: 'pros' | 'cons';
-//   teamName: string;
-// }
