@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { DebateTableData } from './type';
 import { UUID } from 'crypto';
 
+// Only expose under items to the renderer
 interface DB_API {
   get: (id: UUID) => Promise<DebateTableData>;
   getAll: () => Promise<DebateTableData[]>;
