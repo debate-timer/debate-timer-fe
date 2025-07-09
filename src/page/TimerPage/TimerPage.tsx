@@ -1,7 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TimeBasedTimer from './components/TimeBasedTimer';
-import FirstUseToolTip from './components/FirstUseToolTip';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import IconButton from '../../components/IconButton/IconButton';
@@ -9,28 +8,19 @@ import { IoHelpCircle } from 'react-icons/io5';
 import { FaExchangeAlt } from 'react-icons/fa';
 import NormalTimer from './components/NormalTimer';
 import RoundControlButton from '../../components/RoundControlButton/RoundControlButton';
-import DialogModal from '../../components/DialogModal/DialogModal';
 import { bgColorMap, useTimerPageState } from './hooks/useTimerPageState';
 import { useTimerHotkey } from './hooks/useTimerHotkey';
 import useTimerPageModal from './hooks/useTimerPageModal';
-import { oAuthLogin } from '../../util/googleAuth';
 
 export default function TimerPage() {
   const pathParams = useParams();
-  const navigate = useNavigate();
   const tableId = Number(pathParams.id);
   const {
-    isFirst,
-    setIsFirst,
-    IS_FIRST,
-    TRUE,
-    FALSE,
-    closeUseTooltipModal,
-    UseToolTipWrapper,
-    openLoginAndStoreModal,
-    closeLoginAndStoreModal,
-    LoginAndStoreModalWrapper,
-  } = useTimerPageModal();
+    openUseTooltipModal,
+    FirstUseToolTipModal,
+    LoginAndStoreModal,
+    openLoginAndStoreModalOrGoToOverviewPage,
+  } = useTimerPageModal(tableId);
 
   const state = useTimerPageState(tableId);
 
@@ -85,15 +75,7 @@ export default function TimerPage() {
           <DefaultLayout.Header.Right>
             <IconButton
               icon={<IoHelpCircle size={24} />}
-              onClick={() => {
-                if (isFirst) {
-                  setIsFirst(false);
-                  localStorage.setItem(IS_FIRST, FALSE);
-                } else {
-                  setIsFirst(true);
-                  localStorage.setItem(IS_FIRST, TRUE);
-                }
-              }}
+              onClick={openUseTooltipModal}
             />
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
@@ -199,7 +181,7 @@ export default function TimerPage() {
             {data && (
               <div className="flex flex-row space-x-1 xl:space-x-8">
                 <div className="flex h-[70px] w-[175px] items-center justify-center lg:w-[200px]">
-                  {index === 0 && <></>}
+                  {index === 0 && null}
                   {index !== 0 && (
                     <RoundControlButton
                       type="PREV"
@@ -214,13 +196,7 @@ export default function TimerPage() {
                   {index === data.table.length - 1 && (
                     <RoundControlButton
                       type="DONE"
-                      onClick={() => {
-                        if (isGuestFlow()) {
-                          openLoginAndStoreModal();
-                        } else {
-                          navigate(`/overview/customize/${tableId}`);
-                        }
-                      }}
+                      onClick={openLoginAndStoreModalOrGoToOverviewPage}
                     />
                   )}
                   {index !== data.table.length - 1 && (
@@ -237,41 +213,8 @@ export default function TimerPage() {
           </div>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
-
-      {/** Tooltip */}
-      <UseToolTipWrapper>
-        <FirstUseToolTip
-          onClose={() => {
-            closeUseTooltipModal();
-            setIsFirst(false);
-            localStorage.setItem(IS_FIRST, FALSE);
-          }}
-        />
-      </UseToolTipWrapper>
-      {/** Login And DataStore*/}
-      <LoginAndStoreModalWrapper closeButtonColor="text-neutral-1000">
-        <DialogModal
-          left={{
-            text: '아니오',
-            onClick: () => {
-              closeLoginAndStoreModal();
-            },
-          }}
-          right={{
-            text: '네',
-            onClick: () => {
-              closeLoginAndStoreModal();
-              oAuthLogin();
-            },
-            isBold: true,
-          }}
-        >
-          <div className="break-keep px-20 py-10 text-center text-xl font-bold">
-            토론을 끝내셨군요! <br />
-            지금까지의 시간표를 로그인하고 저장할까요?
-          </div>
-        </DialogModal>
-      </LoginAndStoreModalWrapper>
+      <FirstUseToolTipModal />
+      <LoginAndStoreModal />
     </>
   );
 }
