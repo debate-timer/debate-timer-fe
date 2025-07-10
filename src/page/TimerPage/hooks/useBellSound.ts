@@ -55,7 +55,7 @@ export function useBellSound({
   }
 
   // 자유토론(TimeBased) 타이머 경고음 조건 체크
-  function isTimerWarningTime(
+  function checkTimerWarningTime(
     timer: TimeBasedTimerLogics,
     prevTimer: { speakingTimer: number | null; totalTimer: number | null },
   ) {
@@ -76,7 +76,7 @@ export function useBellSound({
   }
 
   // 일반타이머 경고음 조건 체크
-  function isNormalTimerWarningTime(
+  function checkNormalTimerWarningTime(
     timer: NormalTimerLogics,
     prevNormalTimer: number | null,
   ) {
@@ -90,12 +90,12 @@ export function useBellSound({
   }
 
   // 종료음 조건 체크
-  function isTimerFinished(timer: TimeBasedTimerLogics) {
+  function checkTimerFinished(timer: TimeBasedTimerLogics) {
     return (
       timer.isRunning && (timer.speakingTimer === 0 || timer.totalTimer === 0)
     );
   }
-  function isNormalTimerFinished(timer: NormalTimerLogics) {
+  function checkNormalTimerFinished(timer: NormalTimerLogics) {
     return timer.isRunning && timer.timer === 0;
   }
 
@@ -125,15 +125,15 @@ export function useBellSound({
     const isAnyTimerRunning =
       timer1.isRunning || timer2.isRunning || normalTimer.isRunning;
 
-    const isTimer1WarningTime = isTimerWarningTime(
+    const isTimer1WarningTime = checkTimerWarningTime(
       timer1,
       prevTimer1Ref.current,
     );
-    const isTimer2WarningTime = isTimerWarningTime(
+    const isTimer2WarningTime = checkTimerWarningTime(
       timer2,
       prevTimer2Ref.current,
     );
-    const isNormalWarningTime = isNormalTimerWarningTime(
+    const isNormalWarningTime = checkNormalTimerWarningTime(
       normalTimer,
       prevNormalTimerRef.current,
     );
@@ -148,11 +148,11 @@ export function useBellSound({
     }
 
     // ------ 종료음(finishBell) ------
-    const isTimer1Finished = isTimerFinished(timer1);
-    const isTimer2Finished = isTimerFinished(timer2);
-    const isNormalTimerFin = isNormalTimerFinished(normalTimer);
+    const isTimer1Finished = checkTimerFinished(timer1);
+    const isTimer2Finished = checkTimerFinished(timer2);
+    const isNormalTimerFinhed = checkNormalTimerFinished(normalTimer);
     const isAnyTimerFinished =
-      isTimer1Finished || isTimer2Finished || isNormalTimerFin;
+      isTimer1Finished || isTimer2Finished || isNormalTimerFinhed;
 
     if (isAnyTimerRunning && isFinishBellOn && isAnyTimerFinished) {
       playFinishBell();
