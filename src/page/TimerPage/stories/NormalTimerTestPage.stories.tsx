@@ -37,16 +37,12 @@ function NormalTimerTestPage() {
             normalTimerInstance={{
               timer: 150,
               isRunning: false,
-              defaultTimer: 150,
               isAdditionalTimerOn: false,
               setTimer: () => {},
               startTimer: () => {},
               pauseTimer: () => {},
               resetTimer: () => {},
-              setDefaultTimer: () => {},
-              clearTimer: () => {},
               handleChangeAdditionalTimer: () => {},
-              handleCloseAdditionalTimer: () => {},
             }}
             item={item}
             teamName="찬성"

@@ -4,10 +4,18 @@ import { Formatting } from '../../../util/formatting';
 import AdditionalTimerController from './AdditionalTimerController';
 import { IoCloseOutline } from 'react-icons/io5';
 import { MdRecordVoiceOver } from 'react-icons/md';
-import { NormalTimerLogics } from '../hooks/useNormalTimer';
-
+type NormalTimerInstance = {
+  timer: number | null;
+  isAdditionalTimerOn: boolean;
+  isRunning: boolean;
+  handleChangeAdditionalTimer: () => void;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetTimer: () => void;
+  setTimer: (val: number) => void;
+};
 interface NormalTimerProps {
-  normalTimerInstance: NormalTimerLogics;
+  normalTimerInstance: NormalTimerInstance;
   isAdditionalTimerAvailable: boolean;
   item: TimeBoxInfo;
   teamName: string | null;

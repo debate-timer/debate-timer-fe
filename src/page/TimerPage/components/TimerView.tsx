@@ -19,7 +19,16 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
   if (data?.table[index].boxType === 'NORMAL') {
     return (
       <NormalTimer
-        normalTimerInstance={normalTimer}
+        normalTimerInstance={{
+          timer: normalTimer.timer,
+          isAdditionalTimerOn: normalTimer.isAdditionalTimerOn,
+          isRunning: normalTimer.isRunning,
+          handleChangeAdditionalTimer: normalTimer.handleChangeAdditionalTimer,
+          startTimer: normalTimer.startTimer,
+          pauseTimer: normalTimer.pauseTimer,
+          resetTimer: normalTimer.resetTimer,
+          setTimer: normalTimer.setTimer,
+        }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
         teamName={
@@ -37,7 +46,14 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
       <div className="relative flex flex-row items-center justify-center space-x-[30px]">
         {/* 왼쪽 타이머 */}
         <TimeBasedTimer
-          timeBasedTimerInstance={timer1}
+          timeBasedTimerInstance={{
+            totalTimer: timer1.totalTimer,
+            speakingTimer: timer1.speakingTimer,
+            isRunning: timer1.isRunning,
+            startTimer: timer1.startTimer,
+            pauseTimer: timer1.pauseTimer,
+            resetCurrentTimer: timer1.resetCurrentTimer,
+          }}
           isSelected={prosConsSelected === 'PROS'}
           onActivate={() => handleActivateTeam('PROS')}
           prosCons="PROS"
@@ -45,7 +61,14 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
         />
         {/* 오른쪽 타이머 */}
         <TimeBasedTimer
-          timeBasedTimerInstance={timer2}
+          timeBasedTimerInstance={{
+            totalTimer: timer2.totalTimer,
+            speakingTimer: timer2.speakingTimer,
+            isRunning: timer2.isRunning,
+            startTimer: timer2.startTimer,
+            pauseTimer: timer2.pauseTimer,
+            resetCurrentTimer: timer2.resetCurrentTimer,
+          }}
           isSelected={prosConsSelected === 'CONS'}
           onActivate={() => handleActivateTeam('CONS')}
           prosCons="CONS"

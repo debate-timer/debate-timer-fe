@@ -2,11 +2,18 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
-import { TimeBasedTimerLogics } from '../hooks/useTimeBasedTimer';
 import { TimeBasedStance } from '../../../type/type';
 
+type TimeBasedTimerInstance = {
+  totalTimer: number | null;
+  speakingTimer: number | null;
+  isRunning: boolean;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetCurrentTimer: () => void;
+};
 interface TimeBasedTimerProps {
-  timeBasedTimerInstance: TimeBasedTimerLogics;
+  timeBasedTimerInstance: TimeBasedTimerInstance;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: TimeBasedStance;
