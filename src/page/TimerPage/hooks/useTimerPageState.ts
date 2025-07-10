@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableData';
-import { useCustomTimer } from './useCustomTimer';
+import { useTimeBasedTimer } from './useTimeBasedTimer';
 import { useNormalTimer } from './useNormalTimer';
 import { useBellSound } from './useBellSound';
 import { TimeBasedStance } from '../../../type/type';
@@ -39,8 +39,8 @@ export function useTimerPageState(tableId: number) {
   const [index, setIndex] = useState(0);
 
   // 자유토론 타이머, 일반 타이머 상태 관리 커스텀 훅
-  const timer1 = useCustomTimer({});
-  const timer2 = useCustomTimer({});
+  const timer1 = useTimeBasedTimer({});
+  const timer2 = useTimeBasedTimer({});
   const normalTimer = useNormalTimer();
 
   // 현재 발언자('PROS'/'CONS')

@@ -2,11 +2,11 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
-import { CustomTimerLogics } from '../hooks/useCustomTimer';
+import { TimeBasedTimerLogics } from '../hooks/useTimeBasedTimer';
 import { TimeBasedStance } from '../../../type/type';
 
 interface TimeBasedTimerProps {
-  timeBasedTimerInstance: CustomTimerLogics;
+  timeBasedTimerInstance: TimeBasedTimerLogics;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: TimeBasedStance;

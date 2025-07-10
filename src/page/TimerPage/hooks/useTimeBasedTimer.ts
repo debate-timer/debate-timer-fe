@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 
-interface useCustomTimerProps {
+interface UseTimeBasedTimerProps {
   initIsSpeakingTimer?: boolean; // 처음에 발언 당 시간을 추가할지 여부
 }
 
@@ -8,9 +8,9 @@ interface useCustomTimerProps {
  * 토론에서 사용하는 커스텀 타이머 훅
  * - 전체시간, 전체시간 + 발언 당 시간(2가지) 모드 지원
  */
-export function useCustomTimer({
+export function useTimeBasedTimer({
   initIsSpeakingTimer = false,
-}: useCustomTimerProps) {
+}: UseTimeBasedTimerProps) {
   // 전체 남은 시간 (null이면 타이머 미사용)
   const [totalTimer, setTotalTimer] = useState<number | null>(null);
   // 발언당 시간 타이머(=각 phase별 제한시간, 모드 전환 가능)
@@ -184,4 +184,4 @@ export function useCustomTimer({
   };
 }
 
-export type CustomTimerLogics = ReturnType<typeof useCustomTimer>;
+export type TimeBasedTimerLogics = ReturnType<typeof useTimeBasedTimer>;

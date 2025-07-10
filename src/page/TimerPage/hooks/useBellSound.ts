@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { CustomTimerLogics } from './useCustomTimer';
+import { TimeBasedTimerLogics } from './useTimeBasedTimer';
 import { NormalTimerLogics } from './useNormalTimer';
 
 interface UseBellSoundProps {
-  timer1: CustomTimerLogics;
-  timer2: CustomTimerLogics;
+  timer1: TimeBasedTimerLogics;
+  timer2: TimeBasedTimerLogics;
   normalTimer: NormalTimerLogics;
   isWarningBell?: boolean;
   isFinishBell?: boolean;
@@ -56,7 +56,7 @@ export function useBellSound({
 
   // 자유토론(TimeBased) 타이머 경고음 조건 체크
   function isTimerWarningTime(
-    timer: CustomTimerLogics,
+    timer: TimeBasedTimerLogics,
     prevTimer: { speakingTimer: number | null; totalTimer: number | null },
   ) {
     return (
@@ -90,7 +90,7 @@ export function useBellSound({
   }
 
   // 종료음 조건 체크
-  function isTimerFinished(timer: CustomTimerLogics) {
+  function isTimerFinished(timer: TimeBasedTimerLogics) {
     return (
       timer.isRunning && (timer.speakingTimer === 0 || timer.totalTimer === 0)
     );
