@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 /**
  * "일반 타이머" 기능을 제공하는 커스텀 훅
@@ -123,4 +130,17 @@ export function useNormalTimer() {
   };
 }
 
-export type NormalTimerLogics = ReturnType<typeof useNormalTimer>;
+export interface NormalTimerLogics {
+  timer: number | null;
+  isRunning: boolean;
+  defaultTimer: number;
+  isAdditionalTimerOn: boolean;
+  setTimer: Dispatch<SetStateAction<number | null>>;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetTimer: (value?: number) => void;
+  setDefaultTimer: Dispatch<SetStateAction<number>>;
+  clearTimer: () => void;
+  handleChangeAdditionalTimer: () => void;
+  handleCloseAdditionalTimer: () => void;
+}

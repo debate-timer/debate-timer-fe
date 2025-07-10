@@ -1,9 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableData';
-import { useTimeBasedTimer } from './useTimeBasedTimer';
-import { useNormalTimer } from './useNormalTimer';
+import { TimeBasedTimerLogics, useTimeBasedTimer } from './useTimeBasedTimer';
+import { NormalTimerLogics, useNormalTimer } from './useNormalTimer';
 import { useBellSound } from './useBellSound';
-import { TimeBasedStance } from '../../../type/type';
+import { DebateTableData, TimeBasedStance } from '../../../type/type';
 
 // ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
 export type TimerState = 'default' | 'warning' | 'danger' | 'expired';
@@ -294,4 +302,22 @@ export function useTimerPageState(tableId: number) {
   };
 }
 
-export type TimerPageLogics = ReturnType<typeof useTimerPageState>;
+export interface TimerPageLogics {
+  warningBellRef: RefObject<HTMLAudioElement>;
+  finishBellRef: RefObject<HTMLAudioElement>;
+  data: DebateTableData | undefined;
+  bg: TimerState;
+  setBg: Dispatch<SetStateAction<TimerState>>;
+  isAdditionalTimerAvailable: boolean;
+  index: number;
+  setIndex: Dispatch<SetStateAction<number>>;
+  timer1: TimeBasedTimerLogics;
+  timer2: TimeBasedTimerLogics;
+  normalTimer: NormalTimerLogics;
+  prosConsSelected: TimeBasedStance;
+  setProsConsSelected: Dispatch<SetStateAction<TimeBasedStance>>;
+  goToOtherItem: (isPrev: boolean) => void;
+  switchCamp: () => void;
+  handleActivateTeam: (team: TimeBasedStance) => void;
+  tableId: number;
+}

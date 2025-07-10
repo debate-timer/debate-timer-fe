@@ -1,4 +1,11 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import {
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 
 interface UseTimeBasedTimerProps {
   initIsSpeakingTimer?: boolean; // 처음에 발언 당 시간을 추가할지 여부
@@ -184,4 +191,34 @@ export function useTimeBasedTimer({
   };
 }
 
-export type TimeBasedTimerLogics = ReturnType<typeof useTimeBasedTimer>;
+export interface TimeBasedTimerLogics {
+  totalTimer: number | null;
+  speakingTimer: number | null;
+  isRunning: boolean;
+  isDone: boolean;
+  defaultTime: {
+    defaultTotalTimer: number | null;
+    defaultSpeakingTimer: number | null;
+  };
+  isSpeakingTimer: boolean;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetTimerForNextPhase: () => void;
+  resetCurrentTimer: () => void;
+  setTimers: (total: number | null, speaking?: number | null) => void;
+  setSavedTime: Dispatch<
+    SetStateAction<{
+      savedTotalTimer: number | null;
+      savedSpeakingTimer: number | null;
+    }>
+  >;
+  setDefaultTime: Dispatch<
+    SetStateAction<{
+      defaultTotalTimer: number | null;
+      defaultSpeakingTimer: number | null;
+    }>
+  >;
+  setIsSpeakingTimer: Dispatch<SetStateAction<boolean>>;
+  setIsDone: Dispatch<SetStateAction<boolean>>;
+  clearTimer: () => void;
+}
