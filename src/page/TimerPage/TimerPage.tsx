@@ -6,17 +6,21 @@ import IconButton from '../../components/IconButton/IconButton';
 import { IoHelpCircle } from 'react-icons/io5';
 import { bgColorMap, useTimerPageState } from './hooks/useTimerPageState';
 import { useTimerHotkey } from './hooks/useTimerHotkey';
-import useTimerPageModal from './hooks/useTimerPageModal';
 import RoundControlRow from './components/RoundControlRow';
 import TimerView from './components/TimerView';
+import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
+import { LoginAndStoreModal } from './components/LoginAndStoreModal';
+import { useTimerPageModal } from './hooks/useTimerPageModal';
 
 export default function TimerPage() {
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
   const {
     openUseTooltipModal,
-    FirstUseToolTipModal,
-    LoginAndStoreModal,
+    UseToolTipWrapper,
+    closeUseTooltipModal,
+    LoginAndStoreModalWrapper,
+    closeLoginAndStoreModal,
     openLoginAndStoreModalOrGoToOverviewPage,
   } = useTimerPageModal(tableId);
 
@@ -82,8 +86,14 @@ export default function TimerPage() {
           </div>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
-      <FirstUseToolTipModal />
-      <LoginAndStoreModal />
+      <FirstUseToolTipModal
+        Wrapper={UseToolTipWrapper}
+        onClose={closeUseTooltipModal}
+      />
+      <LoginAndStoreModal
+        Wrapper={LoginAndStoreModalWrapper}
+        onClose={closeLoginAndStoreModal}
+      />
     </>
   );
 }
