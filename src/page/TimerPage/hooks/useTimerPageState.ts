@@ -3,6 +3,7 @@ import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableDat
 import { useCustomTimer } from './useCustomTimer';
 import { useNormalTimer } from './useNormalTimer';
 import { useBellSound } from './useBellSound';
+import { TimeBasedStance } from '../../../type/type';
 
 // ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
 export type TimerState = 'default' | 'warning' | 'danger' | 'expired';
@@ -42,10 +43,9 @@ export function useTimerPageState(tableId: number) {
   const timer2 = useCustomTimer({});
   const normalTimer = useNormalTimer();
 
-  // 현재 발언자('pros'/'cons')
-  const [prosConsSelected, setProsConsSelected] = useState<'pros' | 'cons'>(
-    'pros',
-  );
+  // 현재 발언자('PROS'/'CONS')
+  const [prosConsSelected, setProsConsSelected] =
+    useState<TimeBasedStance>('PROS');
 
   // 벨 사운드 관련 훅 (벨 ref 제공)
   const { warningBellRef, finishBellRef } = useBellSound({
@@ -80,8 +80,8 @@ export function useTimerPageState(tableId: number) {
    * - 현재 진영이 아닌 타이머를 클릭한 경우에만 동작
    */
   const handleActivateTeam = useCallback(
-    (team: 'pros' | 'cons') => {
-      const isPros = team === 'pros';
+    (team: TimeBasedStance) => {
+      const isPros = team === 'PROS';
       const currentTimer = isPros ? timer1 : timer2;
       const otherTimer = isPros ? timer2 : timer1;
       if (currentTimer.isDone) return;
@@ -106,9 +106,9 @@ export function useTimerPageState(tableId: number) {
    * - pros → cons, cons → pros로 타이머/상태 전환
    */
   const switchCamp = useCallback(() => {
-    const currentTimer = prosConsSelected === 'pros' ? timer1 : timer2;
-    const nextTimer = prosConsSelected === 'pros' ? timer2 : timer1;
-    const nextTeam = prosConsSelected === 'pros' ? 'cons' : 'pros';
+    const currentTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
+    const nextTimer = prosConsSelected === 'PROS' ? timer2 : timer1;
+    const nextTeam = prosConsSelected === 'PROS' ? 'CONS' : 'PROS';
     if (nextTimer.isDone) return;
     currentTimer.pauseTimer();
     if (!nextTimer.isDone && currentTimer.isRunning) {
@@ -150,10 +150,10 @@ export function useTimerPageState(tableId: number) {
         }
       }
       if (boxType === 'TIME_BASED') {
-        if (prosConsSelected === 'pros' && timer1.isRunning) {
+        if (prosConsSelected === 'PROS' && timer1.isRunning) {
           return getTimerStatus(timer1.speakingTimer, timer1.totalTimer);
         }
-        if (prosConsSelected === 'cons' && timer2.isRunning) {
+        if (prosConsSelected === 'CONS' && timer2.isRunning) {
           return getTimerStatus(timer2.speakingTimer, timer2.totalTimer);
         }
       }
@@ -223,10 +223,10 @@ export function useTimerPageState(tableId: number) {
    * 진영 전환 시, 상대 타이머를 발언 구간에 맞게 초기화
    */
   useEffect(() => {
-    if (prosConsSelected === 'cons') {
+    if (prosConsSelected === 'CONS') {
       if (timer1.speakingTimer === null) return;
       timer1.resetTimerForNextPhase();
-    } else if (prosConsSelected === 'pros') {
+    } else if (prosConsSelected === 'PROS') {
       if (timer2.speakingTimer === null) return;
       timer2.resetTimerForNextPhase();
     }
@@ -254,7 +254,7 @@ export function useTimerPageState(tableId: number) {
    * 각 진영의 타이머가 완전히 끝난 경우(isDone 처리)
    */
   useEffect(() => {
-    const selectedTimer = prosConsSelected === 'pros' ? timer1 : timer2;
+    const selectedTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
 
     const isDone =
       selectedTimer.speakingTimer === null

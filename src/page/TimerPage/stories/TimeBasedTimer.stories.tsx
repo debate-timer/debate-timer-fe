@@ -37,7 +37,7 @@ export const OnPros: Story = {
     },
     isSelected: true,
     onActivate: () => {},
-    prosCons: 'pros',
+    prosCons: 'PROS',
     teamName: '찬성팀',
   },
 };
@@ -49,7 +49,7 @@ export const OnCons: Story = {
     },
     isSelected: true,
     onActivate: () => {},
-    prosCons: 'cons',
+    prosCons: 'CONS',
     teamName: '반대팀',
   },
 };
@@ -62,7 +62,7 @@ export const OnRunning: Story = {
     },
     isSelected: true,
     onActivate: () => {},
-    prosCons: 'pros',
+    prosCons: 'PROS',
     teamName: '찬성팀',
   },
 };
@@ -75,7 +75,7 @@ export const WhenOnlyTeamPerTime: Story = {
     },
     isSelected: true,
     onActivate: () => {},
-    prosCons: 'pros',
+    prosCons: 'PROS',
     teamName: '찬성팀',
   },
 };

@@ -3,12 +3,13 @@ import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
 import { CustomTimerLogics } from '../hooks/useCustomTimer';
+import { TimeBasedStance } from '../../../type/type';
 
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: CustomTimerLogics;
   isSelected: boolean;
   onActivate?: () => void;
-  prosCons: 'pros' | 'cons';
+  prosCons: TimeBasedStance;
   teamName: string;
 }
 
@@ -40,12 +41,12 @@ export default function TimeBasedTimer({
   );
 
   const boxShadow = isRunning
-    ? prosCons === 'pros'
+    ? prosCons === 'PROS'
       ? 'shadow-camp-blue'
       : 'shadow-camp-red'
     : '';
 
-  const bgColorClass = prosCons === 'pros' ? 'bg-camp-blue' : 'bg-camp-red';
+  const bgColorClass = prosCons === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
 
   return (
     <div
@@ -65,8 +66,8 @@ export default function TimeBasedTimer({
           <h2 className="absolute left-1/2 flex w-max -translate-x-1/2 transform items-center justify-center gap-2">
             {teamName}
             <img
-              src={prosCons === 'pros' ? KeyboardKeyA : KeyboardKeyL}
-              alt={prosCons === 'pros' ? 'A키' : 'ㅣ키'}
+              src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}
+              alt={prosCons === 'PROS' ? 'A키' : 'ㅣ키'}
               className="h-[35px] w-[35px] lg:h-[50px] lg:w-[50px] xl:h-[56px] xl:w-[56px]"
             />
           </h2>

@@ -38,17 +38,17 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
         {/* 왼쪽 타이머 */}
         <TimeBasedTimer
           timeBasedTimerInstance={timer1}
-          isSelected={prosConsSelected === 'pros'}
-          onActivate={() => handleActivateTeam('pros')}
-          prosCons="pros"
+          isSelected={prosConsSelected === 'PROS'}
+          onActivate={() => handleActivateTeam('PROS')}
+          prosCons="PROS"
           teamName={data.info.prosTeamName}
         />
         {/* 오른쪽 타이머 */}
         <TimeBasedTimer
           timeBasedTimerInstance={timer2}
-          isSelected={prosConsSelected === 'cons'}
-          onActivate={() => handleActivateTeam('cons')}
-          prosCons="cons"
+          isSelected={prosConsSelected === 'CONS'}
+          onActivate={() => handleActivateTeam('CONS')}
+          prosCons="CONS"
           teamName={data.info.consTeamName}
         />
         {/* ENTER 버튼 */}

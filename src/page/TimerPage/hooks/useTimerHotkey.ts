@@ -70,9 +70,9 @@ export function useTimerHotkey(state: TimerPageLogics) {
               normalTimer.startTimer();
             }
           } else {
-            if (prosConsSelected === 'pros') {
+            if (prosConsSelected === 'PROS') {
               toggleTimer(timer1);
-            } else if (prosConsSelected === 'cons') {
+            } else if (prosConsSelected === 'CONS') {
               toggleTimer(timer2);
             }
           }
@@ -90,7 +90,7 @@ export function useTimerHotkey(state: TimerPageLogics) {
           if (boxType === 'NORMAL') {
             normalTimer.resetTimer();
           } else {
-            if (prosConsSelected === 'pros') {
+            if (prosConsSelected === 'PROS') {
               timer1.resetCurrentTimer();
             } else {
               timer2.resetCurrentTimer();
@@ -100,14 +100,14 @@ export function useTimerHotkey(state: TimerPageLogics) {
         case 'KeyA':
           // 찬성 진영 선택 및 반대 타이머 정지
           if (!timer1.isDone) {
-            setProsConsSelected('pros');
+            setProsConsSelected('CONS');
             if (timer2.isRunning) timer2.pauseTimer();
           }
           break;
         case 'KeyL':
           // 반대 진영 선택 및 찬성 타이머 정지
           if (!timer2.isDone) {
-            setProsConsSelected('cons');
+            setProsConsSelected('CONS');
             if (timer1.isRunning) timer1.pauseTimer();
           }
           break;

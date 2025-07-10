@@ -1,5 +1,6 @@
 // Types
 export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
+export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
 export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
 
 // Type converters
