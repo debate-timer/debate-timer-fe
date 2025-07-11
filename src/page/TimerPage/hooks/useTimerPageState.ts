@@ -33,12 +33,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   // 추가 타이머가 가능한지 여부 (예: 사전에 설정한 "작전 시간"이 있으면 false)
   const isAdditionalTimerAvailable = useMemo(() => {
     if (data) {
-      return data.table.every((value) => {
-        if (value.speechType !== '작전 시간') {
-          return true;
-        }
-        return false;
-      });
+      return !data.table.some((value) => value.speechType === '작전 시간');
     }
     return true;
   }, [data]);
@@ -92,19 +87,13 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       const isPros = team === 'PROS';
       const currentTimer = isPros ? timer1 : timer2;
       const otherTimer = isPros ? timer2 : timer1;
-      if (currentTimer.isDone) return;
+      if (currentTimer.isDone || prosConsSelected === team) return;
 
-      // 반대편에서 클릭했을 때만
-      if (prosConsSelected !== team) {
-        if (otherTimer.isRunning) {
-          otherTimer.pauseTimer();
-          currentTimer.startTimer();
-          setProsConsSelected(team);
-        } else {
-          otherTimer.pauseTimer();
-          setProsConsSelected(team);
-        }
+      otherTimer.pauseTimer();
+      if (otherTimer.isRunning) {
+        currentTimer.startTimer();
       }
+      setProsConsSelected(team);
     },
     [prosConsSelected, timer1, timer2],
   );
