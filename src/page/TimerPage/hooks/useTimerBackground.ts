@@ -29,7 +29,7 @@ function getTimerStatusByTime(
   if (time < TIME_THRESHOLDS.DANGER_MIN) return 'expired';
   return 'default';
 }
-interface UseTimerBackgroundStateProps {
+interface UseTimerBackgroundProps {
   timer1: TimeBasedTimerLogics;
   timer2: TimeBasedTimerLogics;
   normalTimer: NormalTimerLogics;
@@ -38,14 +38,14 @@ interface UseTimerBackgroundStateProps {
   index: number;
 }
 
-export function useTimerBackgroundState({
+export function useTimerBackground({
   timer1,
   timer2,
   normalTimer,
   prosConsSelected,
   data,
   index,
-}: UseTimerBackgroundStateProps) {
+}: UseTimerBackgroundProps) {
   const [bg, setBg] = useState<TimerState>('default');
 
   useEffect(() => {

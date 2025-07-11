@@ -12,7 +12,7 @@ import { TimeBasedTimerLogics, useTimeBasedTimer } from './useTimeBasedTimer';
 import { NormalTimerLogics, useNormalTimer } from './useNormalTimer';
 import { useBellSound } from './useBellSound';
 import { DebateTableData, TimeBasedStance } from '../../../type/type';
-import { useTimerBackgroundState } from './useTimerBackgroundState';
+import { useTimerBackground } from './useTimerBackground';
 
 // ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
 export type TimerState = 'default' | 'warning' | 'danger' | 'expired';
@@ -58,7 +58,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     isFinishBell: data?.info.finishBell,
   });
 
-  const { bg, setBg } = useTimerBackgroundState({
+  const { bg, setBg } = useTimerBackground({
     timer1,
     timer2,
     normalTimer,
