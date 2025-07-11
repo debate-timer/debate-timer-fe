@@ -6,8 +6,8 @@ interface TimerControllerProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
-  onChangingTimer: () => void;
-  isTimerChangeable: boolean;
+  onChangingTimer?: () => void;
+  isAdditionalTimerAvailable?: boolean;
   isRunning: boolean;
 }
 
@@ -16,7 +16,7 @@ export default function TimerController({
   onPause,
   onReset,
   onChangingTimer,
-  isTimerChangeable,
+  isAdditionalTimerAvailable,
   isRunning,
 }: TimerControllerProps) {
   return (
@@ -52,7 +52,7 @@ export default function TimerController({
         </button>
       </div>
       <div className="flex size-full flex-1 items-center justify-start ">
-        {isTimerChangeable && (
+        {isAdditionalTimerAvailable && onChangingTimer && (
           <button
             data-testid="additional-timer-button"
             className="h-[90px] w-[110px] flex-col items-center space-y-1 rounded-[18px] border-[3px] border-neutral-900 bg-neutral-50 text-[20px] font-bold leading-[27px] hover:bg-neutral-200 lg:h-[120px] lg:w-[150px] lg:rounded-[23px] lg:text-[27px] lg:leading-[37px] xl:h-[133px] xl:w-[165px] xl:space-y-2 xl:text-[30px]"

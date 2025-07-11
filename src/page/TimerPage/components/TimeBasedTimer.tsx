@@ -1,50 +1,45 @@
-import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
+import { TimeBasedStance } from '../../../type/type';
 
-interface TimeBasedTimerProps {
-  onStart: () => void;
-  onPause: () => void;
-  onReset: () => void;
-  addOnTimer: (delta: number) => void;
-  onChangingTimer: () => void;
-  goToOtherItem: (isPrev: boolean) => void;
-  timer: number;
-  isTimerChangeable: boolean;
+type TimeBasedTimerInstance = {
+  totalTimer: number | null;
+  speakingTimer: number | null;
   isRunning: boolean;
-  isLastItem: boolean;
-  isFirstItem: boolean;
-  item: TimeBoxInfo;
-
-  /** 🚩 추가된 Props */
-  speakingTimer: number | null; // 발언시간용 타이머 추가
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetCurrentTimer: () => void;
+};
+interface TimeBasedTimerProps {
+  timeBasedTimerInstance: TimeBasedTimerInstance;
   isSelected: boolean;
   onActivate?: () => void;
-  prosCons: 'pros' | 'cons';
+  prosCons: TimeBasedStance;
   teamName: string;
 }
 
 export default function TimeBasedTimer({
-  onStart,
-  onPause,
-  onReset,
-  onChangingTimer,
-  timer,
-  speakingTimer,
-  isRunning,
+  timeBasedTimerInstance,
   isSelected,
   onActivate,
   prosCons,
   teamName,
 }: TimeBasedTimerProps) {
+  const {
+    totalTimer,
+    speakingTimer,
+    isRunning,
+    startTimer,
+    pauseTimer,
+    resetCurrentTimer,
+  } = timeBasedTimerInstance;
   const minute = Formatting.formatTwoDigits(
-    Math.floor(Math.abs(timer ?? 0) / 60),
+    Math.floor(Math.abs(totalTimer ?? 0) / 60),
   );
-  const second = Formatting.formatTwoDigits(Math.abs((timer ?? 0) % 60));
+  const second = Formatting.formatTwoDigits(Math.abs((totalTimer ?? 0) % 60));
 
-  /** 🚩 추가된 코드: 발언시간 표시 처리 */
   const speakingMinute = Formatting.formatTwoDigits(
     Math.floor(Math.abs((speakingTimer ?? 0) / 60)),
   );
@@ -53,12 +48,12 @@ export default function TimeBasedTimer({
   );
 
   const boxShadow = isRunning
-    ? prosCons === 'pros'
+    ? prosCons === 'PROS'
       ? 'shadow-camp-blue'
       : 'shadow-camp-red'
     : '';
 
-  const bgColorClass = prosCons === 'pros' ? 'bg-camp-blue' : 'bg-camp-red';
+  const bgColorClass = prosCons === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
 
   return (
     <div
@@ -78,8 +73,8 @@ export default function TimeBasedTimer({
           <h2 className="absolute left-1/2 flex w-max -translate-x-1/2 transform items-center justify-center gap-2">
             {teamName}
             <img
-              src={prosCons === 'pros' ? KeyboardKeyA : KeyboardKeyL}
-              alt={prosCons === 'pros' ? 'A키' : 'ㅣ키'}
+              src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}
+              alt={prosCons === 'PROS' ? 'A키' : 'ㅣ키'}
               className="h-[35px] w-[35px] lg:h-[50px] lg:w-[50px] xl:h-[56px] xl:w-[56px]"
             />
           </h2>
@@ -143,11 +138,9 @@ export default function TimeBasedTimer({
         <div className="my-[15px] lg:my-[25px] xl:my-[30px]">
           <TimerController
             isRunning={isRunning}
-            isTimerChangeable={false}
-            onChangingTimer={onChangingTimer}
-            onStart={onStart}
-            onPause={onPause}
-            onReset={onReset}
+            onStart={startTimer}
+            onPause={pauseTimer}
+            onReset={resetCurrentTimer}
           />
         </div>
       </div>

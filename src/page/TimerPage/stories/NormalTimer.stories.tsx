@@ -13,20 +13,16 @@ type Story = StoryObj<typeof NormalTimer>;
 
 export const OnPros: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
     },
-    addOnTimer: () => {},
-    timer: 150,
-    isAdditionalTimerOn: false,
-    isTimerChangeable: false,
-    isRunning: false,
-    isLastItem: false,
-    isFirstItem: false,
     item: {
       stance: 'PROS',
       speechType: '입론1',
@@ -41,20 +37,16 @@ export const OnPros: Story = {
 
 export const OnCons: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
     },
-    addOnTimer: () => {},
-    timer: 150,
-    isAdditionalTimerOn: false,
-    isTimerChangeable: false,
-    isRunning: false,
-    isLastItem: false,
-    isFirstItem: false,
     item: {
       stance: 'CONS',
       speechType: '입론1',
@@ -69,20 +61,16 @@ export const OnCons: Story = {
 
 export const OnNeutral: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
     },
-    addOnTimer: () => {},
-    timer: 150,
-    isAdditionalTimerOn: false,
-    isTimerChangeable: false,
-    isRunning: false,
-    isLastItem: false,
-    isFirstItem: false,
     item: {
       stance: 'NEUTRAL',
       speechType: '작전 시간',
@@ -97,20 +85,16 @@ export const OnNeutral: Story = {
 
 export const OnRunning: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
     },
-    addOnTimer: () => {},
-    timer: 150,
-    isAdditionalTimerOn: false,
-    isTimerChangeable: false,
-    isRunning: true,
-    isLastItem: false,
-    isFirstItem: false,
     item: {
       stance: 'PROS',
       speechType: '입론 1',
@@ -125,20 +109,16 @@ export const OnRunning: Story = {
 
 export const WhenAdditionalTimerAvailable: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
     },
-    addOnTimer: () => {},
-    timer: 150,
-    isAdditionalTimerOn: false,
-    isTimerChangeable: true,
-    isRunning: true,
-    isLastItem: false,
-    isFirstItem: false,
     item: {
       stance: 'PROS',
       speechType: '입론 1',
@@ -153,20 +133,16 @@ export const WhenAdditionalTimerAvailable: Story = {
 
 export const OnAdditionalTimerEnabled: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
     },
-    addOnTimer: () => {},
-    timer: 150,
-    isAdditionalTimerOn: true,
-    isTimerChangeable: false,
-    isRunning: false,
-    isLastItem: false,
-    isFirstItem: false,
     item: {
       stance: 'PROS',
       speechType: '입론1',
