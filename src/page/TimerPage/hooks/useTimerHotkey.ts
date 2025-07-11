@@ -100,7 +100,7 @@ export function useTimerHotkey(state: TimerPageLogics) {
         case 'KeyA':
           // 찬성 진영 선택 및 반대 타이머 정지
           if (!timer1.isDone) {
-            setProsConsSelected('CONS');
+            setProsConsSelected('PROS');
             if (timer2.isRunning) timer2.pauseTimer();
           }
           break;
