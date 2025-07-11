@@ -50,3 +50,12 @@ export interface DebateTableData {
   info: DebateInfo;
   table: TimeBoxInfo[];
 }
+
+// ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
+export type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
+export const bgColorMap: Record<TimerBGState, string> = {
+  default: '',
+  warning: 'bg-brand-main', // 30초~11초 구간
+  danger: 'bg-brand-sub3', // 10초 이하
+  expired: 'bg-neutral-700', // 0초 이하
+};

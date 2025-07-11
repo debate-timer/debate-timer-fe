@@ -11,17 +11,12 @@ import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableDat
 import { TimeBasedTimerLogics, useTimeBasedTimer } from './useTimeBasedTimer';
 import { NormalTimerLogics, useNormalTimer } from './useNormalTimer';
 import { useBellSound } from './useBellSound';
-import { DebateTableData, TimeBasedStance } from '../../../type/type';
+import {
+  DebateTableData,
+  TimeBasedStance,
+  TimerBGState,
+} from '../../../type/type';
 import { useTimerBackground } from './useTimerBackground';
-
-// ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
-export type TimerState = 'default' | 'warning' | 'danger' | 'expired';
-export const bgColorMap: Record<TimerState, string> = {
-  default: '',
-  warning: 'bg-brand-main', // 30초~11초 구간
-  danger: 'bg-brand-sub3', // 10초 이하
-  expired: 'bg-neutral-700', // 0초 이하
-};
 
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
@@ -246,8 +241,8 @@ export interface TimerPageLogics {
   warningBellRef: RefObject<HTMLAudioElement>;
   finishBellRef: RefObject<HTMLAudioElement>;
   data: DebateTableData | undefined;
-  bg: TimerState;
-  setBg: Dispatch<SetStateAction<TimerState>>;
+  bg: TimerBGState;
+  setBg: Dispatch<SetStateAction<TimerBGState>>;
   isAdditionalTimerAvailable: boolean;
   index: number;
   setIndex: Dispatch<SetStateAction<number>>;

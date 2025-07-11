@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react';
 import { TimeBasedTimerLogics } from './useTimeBasedTimer';
 import { NormalTimerLogics } from './useNormalTimer';
-import { DebateTableData, TimeBasedStance } from '../../../type/type';
-type TimerState = 'default' | 'warning' | 'danger' | 'expired';
+import {
+  DebateTableData,
+  TimeBasedStance,
+  TimerBGState,
+} from '../../../type/type';
 
 const TIME_THRESHOLDS = {
   WARNING_MAX: 30,
@@ -19,7 +22,7 @@ const TIME_THRESHOLDS = {
 function getTimerStatusByTime(
   time: number | null,
   isRunning: boolean,
-): TimerState {
+): TimerBGState {
   if (!isRunning) return 'default';
   if (typeof time !== 'number') return 'default';
   if (time > TIME_THRESHOLDS.DANGER_MAX && time <= TIME_THRESHOLDS.WARNING_MAX)
@@ -46,7 +49,7 @@ export function useTimerBackground({
   data,
   index,
 }: UseTimerBackgroundProps) {
-  const [bg, setBg] = useState<TimerState>('default');
+  const [bg, setBg] = useState<TimerBGState>('default');
 
   useEffect(() => {
     const boxType = data?.table[index].boxType;
