@@ -11,7 +11,7 @@ import {
  * "일반 타이머" 기능을 제공하는 커스텀 훅
  * - 한 명(한 팀)만 시간을 쓰는 단일 타이머 상황에서 사용
  */
-export function useNormalTimer() {
+export function useNormalTimer(): NormalTimerLogics {
   // 타이머에 표시할 '남은 시간'(초)
   const [timer, setTimer] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);

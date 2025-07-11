@@ -25,7 +25,7 @@ export const bgColorMap: Record<TimerState, string> = {
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
-export function useTimerPageState(tableId: number) {
+export function useTimerPageState(tableId: number): TimerPageLogics {
   const { data } = useGetDebateTableData(tableId);
 
   const [bg, setBg] = useState<TimerState>('default');

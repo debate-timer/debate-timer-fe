@@ -17,7 +17,7 @@ interface UseTimeBasedTimerProps {
  */
 export function useTimeBasedTimer({
   initIsSpeakingTimer = false,
-}: UseTimeBasedTimerProps) {
+}: UseTimeBasedTimerProps): TimeBasedTimerLogics {
   // 전체 남은 시간 (null이면 타이머 미사용)
   const [totalTimer, setTotalTimer] = useState<number | null>(null);
   // 발언당 시간 타이머(=각 phase별 제한시간, 모드 전환 가능)
