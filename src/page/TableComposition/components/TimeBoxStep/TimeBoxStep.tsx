@@ -1,4 +1,4 @@
-import DebatePanel from '../DebatePanel/DebatePanel';
+import TimeBox from '../TimeBox/TimeBox';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import { useModal } from '../../../../hooks/useModal';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
@@ -49,17 +49,27 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     );
   };
 
+  const handleCopy = (indexToCopy: number) => {
+    onTimeBoxChange((prevData) => {
+      const toCopy = prevData[indexToCopy];
+      if (!toCopy) return prevData;
+      const copyItem = { ...toCopy };
+      return [...prevData, copyItem];
+    });
+  };
+
   const isAbledSummitButton = initTimeBox.length !== 0;
 
   const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
     return (
-      <DebatePanel
+      <TimeBox
         key={index}
         info={info as TimeBoxInfo}
         onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
         prosTeamName={initData.info.prosTeamName}
         consTeamName={initData.info.consTeamName}
         onSubmitDelete={() => handleSubmitDelete(index)}
+        onSubmitCopy={() => handleCopy(index)}
         onMouseDown={() => handleMouseDown(index)}
       />
     );

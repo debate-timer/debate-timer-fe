@@ -1,18 +1,19 @@
 import { HTMLAttributes } from 'react';
-import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
+import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
 
-interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
+interface TimeBoxProps extends HTMLAttributes<HTMLDivElement> {
   info: TimeBoxInfo;
   prosTeamName: string;
   consTeamName: string;
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
   onSubmitDelete?: () => void;
+  onSubmitCopy?: () => void;
 }
 
-export default function DebatePanel(props: DebatePanelProps) {
+export default function TimeBox(props: TimeBoxProps) {
   const {
     stance,
     speechType,
@@ -22,7 +23,7 @@ export default function DebatePanel(props: DebatePanelProps) {
     timePerSpeaking,
     speaker,
   } = props.info;
-  const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
+  const { onSubmitEdit, onSubmitDelete, onSubmitCopy, onMouseDown } = props;
 
   // 타이머 시간 문자열 처리
   let timeStr = '';
@@ -74,17 +75,18 @@ export default function DebatePanel(props: DebatePanelProps) {
         isPros ? 'bg-camp-blue' : 'bg-camp-red'
       } h-20 select-none p-2 font-bold text-neutral-0`}
     >
-      {onSubmitEdit && onSubmitDelete && (
+      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
         <>
           {isPros ? (
             <>
               <div className="absolute left-2 top-2">
-                <EditDeleteButtons
+                <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
                   consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
+                  onSubmitCopy={onSubmitCopy}
                 />
               </div>
               {renderDragHandle()}
@@ -93,12 +95,13 @@ export default function DebatePanel(props: DebatePanelProps) {
             <>
               {renderDragHandle()}
               <div className="absolute right-2 top-2">
-                <EditDeleteButtons
+                <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
                   consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
+                  onSubmitCopy={onSubmitCopy}
                 />
               </div>
             </>
@@ -114,16 +117,17 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralTimeoutPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-400 p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && (
+      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
-            <EditDeleteButtons
+            <TimeBoxManageButtons
               info={props.info}
               prosTeamName={props.prosTeamName}
               consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
+              onSubmitCopy={onSubmitCopy}
             />
           </div>
         </>
@@ -135,16 +139,17 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralCustomPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && (
+      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
-            <EditDeleteButtons
+            <TimeBoxManageButtons
               info={props.info}
               prosTeamName={props.prosTeamName}
               consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
+              onSubmitCopy={onSubmitCopy}
             />
           </div>
         </>

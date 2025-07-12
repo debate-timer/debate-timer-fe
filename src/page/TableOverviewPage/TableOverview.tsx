@@ -6,7 +6,7 @@ import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
 import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
-import DebatePanel from '../TableComposition/components/DebatePanel/DebatePanel';
+import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
 import { MdOutlineIosShare } from 'react-icons/md';
 import { StanceToString } from '../../type/type';
@@ -56,7 +56,7 @@ export default function TableOverview() {
 
             <div className="flex w-full flex-col gap-2">
               {data?.table.map((info, index) => (
-                <DebatePanel
+                <TimeBox
                   key={index}
                   info={info}
                   prosTeamName={data.info.prosTeamName}

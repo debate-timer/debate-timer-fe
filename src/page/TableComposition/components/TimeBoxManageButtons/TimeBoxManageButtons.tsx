@@ -3,16 +3,18 @@ import { TimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
+import { FaPaste } from 'react-icons/fa';
 
-interface EditDeleteButtonsProps {
+interface TimeBoxManageButtonsProps {
   info: TimeBoxInfo;
   prosTeamName?: string;
   consTeamName?: string;
   onSubmitEdit: (updatedInfo: TimeBoxInfo) => void;
   onSubmitDelete: () => void;
+  onSubmitCopy: () => void;
 }
 
-export default function EditDeleteButtons(props: EditDeleteButtonsProps) {
+export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
   const {
     openModal: openEditModal,
     closeModal: closeEditModal,
@@ -23,11 +25,18 @@ export default function EditDeleteButtons(props: EditDeleteButtonsProps) {
     closeModal: closeDeleteModal,
     ModalWrapper: DeleteModalWrapper,
   } = useModal({ isCloseButtonExist: false });
-  const { info, onSubmitEdit, onSubmitDelete } = props;
+  const { info, onSubmitEdit, onSubmitDelete, onSubmitCopy } = props;
 
   return (
     <>
       <div className="flex justify-end gap-2">
+        <button
+          onClick={onSubmitCopy}
+          className="rounded-sm bg-neutral-0 p-[2px]"
+          aria-label="복사하기"
+        >
+          <FaPaste className="text-neutral-900" />
+        </button>
         <button
           onClick={openEditModal}
           className="rounded-sm bg-neutral-0 p-[2px]"
