@@ -1,4 +1,4 @@
-import DebatePanel from '../DebatePanel/DebatePanel';
+import TimeBox from '../TimeBox/TimeBox';
 import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import { useModal } from '../../../../hooks/useModal';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
@@ -62,7 +62,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
   const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
     return (
-      <DebatePanel
+      <TimeBox
         key={index}
         info={info as TimeBoxInfo}
         onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}

@@ -4,7 +4,7 @@ import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
 
-interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
+interface TimeBoxProps extends HTMLAttributes<HTMLDivElement> {
   info: TimeBoxInfo;
   prosTeamName: string;
   consTeamName: string;
@@ -13,7 +13,7 @@ interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   onSubmitCopy?: () => void;
 }
 
-export default function DebatePanel(props: DebatePanelProps) {
+export default function TimeBox(props: TimeBoxProps) {
   const {
     stance,
     speechType,
