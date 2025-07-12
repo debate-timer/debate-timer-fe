@@ -10,6 +10,7 @@ interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
   consTeamName: string;
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
   onSubmitDelete?: () => void;
+  onSubmitCopy?: () => void;
 }
 
 export default function DebatePanel(props: DebatePanelProps) {
@@ -22,7 +23,7 @@ export default function DebatePanel(props: DebatePanelProps) {
     timePerSpeaking,
     speaker,
   } = props.info;
-  const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
+  const { onSubmitEdit, onSubmitDelete, onSubmitCopy, onMouseDown } = props;
 
   // 타이머 시간 문자열 처리
   let timeStr = '';
@@ -74,7 +75,7 @@ export default function DebatePanel(props: DebatePanelProps) {
         isPros ? 'bg-camp-blue' : 'bg-camp-red'
       } h-20 select-none p-2 font-bold text-neutral-0`}
     >
-      {onSubmitEdit && onSubmitDelete && (
+      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
         <>
           {isPros ? (
             <>
@@ -85,6 +86,7 @@ export default function DebatePanel(props: DebatePanelProps) {
                   consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
+                  onSubmitCopy={onSubmitCopy}
                 />
               </div>
               {renderDragHandle()}
@@ -99,6 +101,7 @@ export default function DebatePanel(props: DebatePanelProps) {
                   consTeamName={props.consTeamName}
                   onSubmitEdit={onSubmitEdit}
                   onSubmitDelete={onSubmitDelete}
+                  onSubmitCopy={onSubmitCopy}
                 />
               </div>
             </>
@@ -114,7 +117,7 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralTimeoutPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-400 p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && (
+      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
@@ -124,6 +127,7 @@ export default function DebatePanel(props: DebatePanelProps) {
               consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
+              onSubmitCopy={onSubmitCopy}
             />
           </div>
         </>
@@ -135,7 +139,7 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralCustomPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && (
+      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
@@ -145,6 +149,7 @@ export default function DebatePanel(props: DebatePanelProps) {
               consTeamName={props.consTeamName}
               onSubmitEdit={onSubmitEdit}
               onSubmitDelete={onSubmitDelete}
+              onSubmitCopy={onSubmitCopy}
             />
           </div>
         </>

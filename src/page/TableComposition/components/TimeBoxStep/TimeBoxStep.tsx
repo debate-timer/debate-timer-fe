@@ -49,6 +49,15 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     );
   };
 
+  const handleCopy = (indexToCopy: number) => {
+    onTimeBoxChange((prevData) => {
+      const toCopy = prevData[indexToCopy];
+      if (!toCopy) return prevData;
+      const copyItem = { ...toCopy };
+      return [...prevData, copyItem];
+    });
+  };
+
   const isAbledSummitButton = initTimeBox.length !== 0;
 
   const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
@@ -60,6 +69,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         prosTeamName={initData.info.prosTeamName}
         consTeamName={initData.info.consTeamName}
         onSubmitDelete={() => handleSubmitDelete(index)}
+        onSubmitCopy={() => handleCopy(index)}
         onMouseDown={() => handleMouseDown(index)}
       />
     );
