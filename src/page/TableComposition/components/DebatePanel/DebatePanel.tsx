@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react';
-import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
+import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
@@ -80,7 +80,7 @@ export default function DebatePanel(props: DebatePanelProps) {
           {isPros ? (
             <>
               <div className="absolute left-2 top-2">
-                <EditDeleteButtons
+                <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
                   consTeamName={props.consTeamName}
@@ -95,7 +95,7 @@ export default function DebatePanel(props: DebatePanelProps) {
             <>
               {renderDragHandle()}
               <div className="absolute right-2 top-2">
-                <EditDeleteButtons
+                <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
                   consTeamName={props.consTeamName}
@@ -121,7 +121,7 @@ export default function DebatePanel(props: DebatePanelProps) {
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
-            <EditDeleteButtons
+            <TimeBoxManageButtons
               info={props.info}
               prosTeamName={props.prosTeamName}
               consTeamName={props.consTeamName}
@@ -143,7 +143,7 @@ export default function DebatePanel(props: DebatePanelProps) {
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
-            <EditDeleteButtons
+            <TimeBoxManageButtons
               info={props.info}
               prosTeamName={props.prosTeamName}
               consTeamName={props.consTeamName}

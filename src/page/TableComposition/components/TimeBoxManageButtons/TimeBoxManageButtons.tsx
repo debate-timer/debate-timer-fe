@@ -5,7 +5,7 @@ import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
 import { FaPaste } from 'react-icons/fa';
 
-interface EditDeleteButtonsProps {
+interface TimeBoxManageButtonsProps {
   info: TimeBoxInfo;
   prosTeamName?: string;
   consTeamName?: string;
@@ -14,7 +14,7 @@ interface EditDeleteButtonsProps {
   onSubmitCopy: () => void;
 }
 
-export default function EditDeleteButtons(props: EditDeleteButtonsProps) {
+export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
   const {
     openModal: openEditModal,
     closeModal: closeEditModal,
