@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useId } from 'react';
 
 interface TimeBasedTimerTitleProps extends PropsWithChildren {
   width?: number;
@@ -32,6 +32,7 @@ const SvgShape: React.FC<{ width: number; height: number }> = ({
   width,
   height,
 }) => {
+  const id = useId();
   const pathData = `
     M0 4.875
     C0 2.666, 1.791 0.875, 4 0.875 H${width - 4.131}
@@ -40,7 +41,7 @@ const SvgShape: React.FC<{ width: number; height: number }> = ({
     L${width - 0.962} 54.434 C${width + 1.064} 57.064, ${width - 0.811} 60.875, ${width - 4.131} 60.875
     H4 C1.791 60.875, 0 59.085, 0 56.875 V4.875 Z
   `;
-  const gradientId = `grad_${Math.random()}`;
+  const gradientId = `grad_${id}`;
 
   return (
     <svg
