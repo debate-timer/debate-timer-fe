@@ -75,37 +75,33 @@ export default function TimeBox(props: TimeBoxProps) {
         isPros ? 'bg-camp-blue' : 'bg-camp-red'
       } h-20 select-none p-2 font-bold text-neutral-0`}
     >
-      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
+      {isPros ? (
         <>
-          {isPros ? (
-            <>
-              <div className="absolute left-2 top-2">
-                <TimeBoxManageButtons
-                  info={props.info}
-                  prosTeamName={props.prosTeamName}
-                  consTeamName={props.consTeamName}
-                  onSubmitEdit={onSubmitEdit}
-                  onSubmitDelete={onSubmitDelete}
-                  onSubmitCopy={onSubmitCopy}
-                />
-              </div>
-              {renderDragHandle()}
-            </>
-          ) : (
-            <>
-              {renderDragHandle()}
-              <div className="absolute right-2 top-2">
-                <TimeBoxManageButtons
-                  info={props.info}
-                  prosTeamName={props.prosTeamName}
-                  consTeamName={props.consTeamName}
-                  onSubmitEdit={onSubmitEdit}
-                  onSubmitDelete={onSubmitDelete}
-                  onSubmitCopy={onSubmitCopy}
-                />
-              </div>
-            </>
-          )}
+          <div className="absolute left-2 top-2">
+            <TimeBoxManageButtons
+              info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
+              onSubmitEdit={onSubmitEdit}
+              onSubmitDelete={onSubmitDelete}
+              onSubmitCopy={onSubmitCopy}
+            />
+          </div>
+          {renderDragHandle()}
+        </>
+      ) : (
+        <>
+          {renderDragHandle()}
+          <div className="absolute right-2 top-2">
+            <TimeBoxManageButtons
+              info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
+              onSubmitEdit={onSubmitEdit}
+              onSubmitDelete={onSubmitDelete}
+              onSubmitCopy={onSubmitCopy}
+            />
+          </div>
         </>
       )}
       <div className="font-semibold">
@@ -117,21 +113,17 @@ export default function TimeBox(props: TimeBoxProps) {
 
   const renderNeutralTimeoutPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-400 p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
-        <>
-          {renderDragHandle()}
-          <div className="absolute right-2 top-2">
-            <TimeBoxManageButtons
-              info={props.info}
-              prosTeamName={props.prosTeamName}
-              consTeamName={props.consTeamName}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-              onSubmitCopy={onSubmitCopy}
-            />
-          </div>
-        </>
-      )}
+      {renderDragHandle()}
+      <div className="absolute right-2 top-2">
+        <TimeBoxManageButtons
+          info={props.info}
+          prosTeamName={props.prosTeamName}
+          consTeamName={props.consTeamName}
+          onSubmitEdit={onSubmitEdit}
+          onSubmitDelete={onSubmitDelete}
+          onSubmitCopy={onSubmitCopy}
+        />
+      </div>
       <span className="font-semibold">{speechType}</span>
       <span className="text-2xl font-semibold">{timeStr}</span>
     </div>
@@ -139,21 +131,17 @@ export default function TimeBox(props: TimeBoxProps) {
 
   const renderNeutralCustomPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && onSubmitCopy && (
-        <>
-          {renderDragHandle()}
-          <div className="absolute right-2 top-2">
-            <TimeBoxManageButtons
-              info={props.info}
-              prosTeamName={props.prosTeamName}
-              consTeamName={props.consTeamName}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-              onSubmitCopy={onSubmitCopy}
-            />
-          </div>
-        </>
-      )}
+      {renderDragHandle()}
+      <div className="absolute right-2 top-2">
+        <TimeBoxManageButtons
+          info={props.info}
+          prosTeamName={props.prosTeamName}
+          consTeamName={props.consTeamName}
+          onSubmitEdit={onSubmitEdit}
+          onSubmitDelete={onSubmitDelete}
+          onSubmitCopy={onSubmitCopy}
+        />
+      </div>
       <span className="font-semibold">{speechType}</span>
       <span className="text-2xl font-semibold">{fullTimeStr}</span>
     </div>
