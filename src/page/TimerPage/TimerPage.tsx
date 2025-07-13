@@ -71,7 +71,7 @@ export default function TimerPage() {
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
           <div
-            className={`flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
+            className={`my-4 flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
           >
             {/* 타이머 두 개 + ENTER 버튼 */}
             <TimerView state={state} />
