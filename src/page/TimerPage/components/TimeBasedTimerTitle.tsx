@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 
-interface TimeBasedTimerTitle extends PropsWithChildren {
+interface TimeBasedTimerTitleProps extends PropsWithChildren {
   width?: number;
   height?: number;
   className?: string;
@@ -11,7 +11,7 @@ export default function TimeBasedTimerTitle({
   width = 320,
   height = 60,
   className,
-}: TimeBasedTimerTitle) {
+}: TimeBasedTimerTitleProps) {
   return (
     <div
       className={`relative inline-block ${className || ''}`}
