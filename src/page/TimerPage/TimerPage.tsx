@@ -87,10 +87,14 @@ export default function TimerPage() {
           </div>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
+
+      {/* Modal for users who have not used this timer */}
       <FirstUseToolTipModal
         Wrapper={UseToolTipWrapper}
         onClose={closeUseTooltipModal}
       />
+
+      {/* Modal that asks users whether they want to store the timetable in their account */}
       <LoginAndStoreModal
         Wrapper={LoginAndStoreModalWrapper}
         onClose={closeLoginAndStoreModal}
