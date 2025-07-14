@@ -4,13 +4,17 @@ import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
 
+interface TimeBoxEventHandlers {
+  onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
+  onSubmitDelete?: () => void;
+  onSubmitCopy?: () => void;
+  onMouseDown?: () => void;
+}
 interface TimeBoxProps extends HTMLAttributes<HTMLDivElement> {
   info: TimeBoxInfo;
   prosTeamName: string;
   consTeamName: string;
-  onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
-  onSubmitDelete?: () => void;
-  onSubmitCopy?: () => void;
+  eventHandlers?: TimeBoxEventHandlers;
 }
 
 export default function TimeBox(props: TimeBoxProps) {
@@ -23,9 +27,12 @@ export default function TimeBox(props: TimeBoxProps) {
     timePerSpeaking,
     speaker,
   } = props.info;
-  const { onSubmitEdit, onSubmitDelete, onSubmitCopy, onMouseDown } = props;
-
-  // 타이머 시간 문자열 처리
+  const { eventHandlers } = props;
+  const onSubmitEdit = eventHandlers?.onSubmitEdit;
+  const onSubmitDelete = eventHandlers?.onSubmitDelete;
+  const onSubmitCopy = eventHandlers?.onSubmitCopy;
+  const onMouseDown = eventHandlers?.onMouseDown;
+  const isModifiable = !!eventHandlers;
   let timeStr = '';
   let timePerSpeakingStr = '';
 
@@ -75,35 +82,41 @@ export default function TimeBox(props: TimeBoxProps) {
         isPros ? 'bg-camp-blue' : 'bg-camp-red'
       } h-20 select-none p-2 font-bold text-neutral-0`}
     >
-      {isPros ? (
-        <>
-          <div className="absolute left-2 top-2">
-            <TimeBoxManageButtons
-              info={props.info}
-              prosTeamName={props.prosTeamName}
-              consTeamName={props.consTeamName}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-              onSubmitCopy={onSubmitCopy}
-            />
-          </div>
-          {renderDragHandle()}
-        </>
-      ) : (
-        <>
-          {renderDragHandle()}
-          <div className="absolute right-2 top-2">
-            <TimeBoxManageButtons
-              info={props.info}
-              prosTeamName={props.prosTeamName}
-              consTeamName={props.consTeamName}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-              onSubmitCopy={onSubmitCopy}
-            />
-          </div>
-        </>
-      )}
+      {isPros
+        ? isModifiable && (
+            <>
+              <div className="absolute left-2 top-2">
+                <TimeBoxManageButtons
+                  info={props.info}
+                  prosTeamName={props.prosTeamName}
+                  consTeamName={props.consTeamName}
+                  eventHandlers={{
+                    onSubmitEdit,
+                    onSubmitDelete,
+                    onSubmitCopy,
+                  }}
+                />
+              </div>
+              {renderDragHandle()}
+            </>
+          )
+        : isModifiable && (
+            <>
+              {renderDragHandle()}
+              <div className="absolute right-2 top-2">
+                <TimeBoxManageButtons
+                  info={props.info}
+                  prosTeamName={props.prosTeamName}
+                  consTeamName={props.consTeamName}
+                  eventHandlers={{
+                    onSubmitEdit,
+                    onSubmitDelete,
+                    onSubmitCopy,
+                  }}
+                />
+              </div>
+            </>
+          )}
       <div className="font-semibold">
         {speechType} {speaker && `| ${speaker} 토론자`}
       </div>
@@ -119,9 +132,11 @@ export default function TimeBox(props: TimeBoxProps) {
           info={props.info}
           prosTeamName={props.prosTeamName}
           consTeamName={props.consTeamName}
-          onSubmitEdit={onSubmitEdit}
-          onSubmitDelete={onSubmitDelete}
-          onSubmitCopy={onSubmitCopy}
+          eventHandlers={{
+            onSubmitEdit,
+            onSubmitDelete,
+            onSubmitCopy,
+          }}
         />
       </div>
       <span className="font-semibold">{speechType}</span>
@@ -131,17 +146,23 @@ export default function TimeBox(props: TimeBoxProps) {
 
   const renderNeutralCustomPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
-      {renderDragHandle()}
-      <div className="absolute right-2 top-2">
-        <TimeBoxManageButtons
-          info={props.info}
-          prosTeamName={props.prosTeamName}
-          consTeamName={props.consTeamName}
-          onSubmitEdit={onSubmitEdit}
-          onSubmitDelete={onSubmitDelete}
-          onSubmitCopy={onSubmitCopy}
-        />
-      </div>
+      {isModifiable && (
+        <>
+          {renderDragHandle()}
+          <div className="absolute right-2 top-2">
+            <TimeBoxManageButtons
+              info={props.info}
+              prosTeamName={props.prosTeamName}
+              consTeamName={props.consTeamName}
+              eventHandlers={{
+                onSubmitEdit,
+                onSubmitDelete,
+                onSubmitCopy,
+              }}
+            />
+          </div>
+        </>
+      )}
       <span className="font-semibold">{speechType}</span>
       <span className="text-2xl font-semibold">{fullTimeStr}</span>
     </div>

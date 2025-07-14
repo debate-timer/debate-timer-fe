@@ -25,9 +25,11 @@ const normalTimeBoxInfo: TimeBoxInfo = {
 export const NormalTimeBox: Story = {
   args: {
     info: normalTimeBoxInfo,
-    onSubmitEdit: () => {},
-    onSubmitDelete: () => {},
-    onSubmitCopy: () => {},
+    eventHandlers: {
+      onSubmitEdit: () => {},
+      onSubmitDelete: () => {},
+      onSubmitCopy: () => {},
+    },
   },
 };
 
@@ -44,7 +46,9 @@ const timeBasedTimeBoxInfo: TimeBoxInfo = {
 export const TimeBasedTimeBox: Story = {
   args: {
     info: timeBasedTimeBoxInfo,
-    onSubmitEdit: () => {},
-    onSubmitDelete: () => {},
+    eventHandlers: {
+      onSubmitEdit: () => {},
+      onSubmitDelete: () => {},
+    },
   },
 };

@@ -65,12 +65,15 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <TimeBox
         key={index}
         info={info as TimeBoxInfo}
-        onSubmitEdit={(updatedInfo) => handleSubmitEdit(index, updatedInfo)}
         prosTeamName={initData.info.prosTeamName}
         consTeamName={initData.info.consTeamName}
-        onSubmitDelete={() => handleSubmitDelete(index)}
-        onSubmitCopy={() => handleCopy(index)}
-        onMouseDown={() => handleMouseDown(index)}
+        eventHandlers={{
+          onSubmitEdit: (updatedInfo: TimeBoxInfo) =>
+            handleSubmitEdit(index, updatedInfo),
+          onSubmitDelete: () => handleSubmitDelete(index),
+          onSubmitCopy: () => handleCopy(index),
+          onMouseDown: () => handleMouseDown(index),
+        }}
       />
     );
   };

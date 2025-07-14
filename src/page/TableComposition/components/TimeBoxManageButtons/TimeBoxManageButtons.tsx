@@ -4,14 +4,16 @@ import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
 import { FaPaste } from 'react-icons/fa';
-
-interface TimeBoxManageButtonsProps {
-  info: TimeBoxInfo;
-  prosTeamName?: string;
-  consTeamName?: string;
+interface TimeBoxManageButtonsEventHandlers {
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
   onSubmitDelete?: () => void;
   onSubmitCopy?: () => void;
+}
+interface TimeBoxManageButtonsProps {
+  info: TimeBoxInfo;
+  prosTeamName: string;
+  consTeamName: string;
+  eventHandlers?: TimeBoxManageButtonsEventHandlers;
 }
 
 export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
@@ -25,7 +27,10 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
     closeModal: closeDeleteModal,
     ModalWrapper: DeleteModalWrapper,
   } = useModal({ isCloseButtonExist: false });
-  const { info, onSubmitEdit, onSubmitDelete, onSubmitCopy } = props;
+  const { info, eventHandlers } = props;
+  const onSubmitEdit = eventHandlers?.onSubmitEdit;
+  const onSubmitDelete = eventHandlers?.onSubmitDelete;
+  const onSubmitCopy = eventHandlers?.onSubmitCopy;
 
   return (
     <>
@@ -62,8 +67,8 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
         <EditModalWrapper>
           <TimerCreationContent
             initData={info}
-            prosTeamName={props.prosTeamName as string}
-            consTeamName={props.consTeamName as string}
+            prosTeamName={props.prosTeamName}
+            consTeamName={props.consTeamName}
             onSubmit={(newInfo) => {
               onSubmitEdit(newInfo);
             }}
