@@ -1,18 +1,23 @@
 import { HTMLAttributes } from 'react';
-import EditDeleteButtons from '../EditDeleteButtons/EditDeleteButtons';
+import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import { LuArrowUpDown } from 'react-icons/lu';
 
-interface DebatePanelProps extends HTMLAttributes<HTMLDivElement> {
+interface TimeBoxEventHandlers {
+  onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
+  onSubmitDelete?: () => void;
+  onSubmitCopy?: () => void;
+  onMouseDown?: () => void;
+}
+interface TimeBoxProps extends HTMLAttributes<HTMLDivElement> {
   info: TimeBoxInfo;
   prosTeamName: string;
   consTeamName: string;
-  onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
-  onSubmitDelete?: () => void;
+  eventHandlers?: TimeBoxEventHandlers;
 }
 
-export default function DebatePanel(props: DebatePanelProps) {
+export default function TimeBox(props: TimeBoxProps) {
   const {
     stance,
     speechType,
@@ -22,9 +27,12 @@ export default function DebatePanel(props: DebatePanelProps) {
     timePerSpeaking,
     speaker,
   } = props.info;
-  const { onSubmitEdit, onSubmitDelete, onMouseDown } = props;
-
-  // 타이머 시간 문자열 처리
+  const { eventHandlers } = props;
+  const onSubmitEdit = eventHandlers?.onSubmitEdit;
+  const onSubmitDelete = eventHandlers?.onSubmitDelete;
+  const onSubmitCopy = eventHandlers?.onSubmitCopy;
+  const onMouseDown = eventHandlers?.onMouseDown;
+  const isModifiable = !!eventHandlers;
   let timeStr = '';
   let timePerSpeakingStr = '';
 
@@ -74,37 +82,41 @@ export default function DebatePanel(props: DebatePanelProps) {
         isPros ? 'bg-camp-blue' : 'bg-camp-red'
       } h-20 select-none p-2 font-bold text-neutral-0`}
     >
-      {onSubmitEdit && onSubmitDelete && (
-        <>
-          {isPros ? (
+      {isPros
+        ? isModifiable && (
             <>
               <div className="absolute left-2 top-2">
-                <EditDeleteButtons
+                <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
                   consTeamName={props.consTeamName}
-                  onSubmitEdit={onSubmitEdit}
-                  onSubmitDelete={onSubmitDelete}
+                  eventHandlers={{
+                    onSubmitEdit,
+                    onSubmitDelete,
+                    onSubmitCopy,
+                  }}
                 />
               </div>
               {renderDragHandle()}
             </>
-          ) : (
+          )
+        : isModifiable && (
             <>
               {renderDragHandle()}
               <div className="absolute right-2 top-2">
-                <EditDeleteButtons
+                <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
                   consTeamName={props.consTeamName}
-                  onSubmitEdit={onSubmitEdit}
-                  onSubmitDelete={onSubmitDelete}
+                  eventHandlers={{
+                    onSubmitEdit,
+                    onSubmitDelete,
+                    onSubmitCopy,
+                  }}
                 />
               </div>
             </>
           )}
-        </>
-      )}
       <div className="font-semibold">
         {speechType} {speaker && `| ${speaker} 토론자`}
       </div>
@@ -114,20 +126,19 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralTimeoutPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-400 p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && (
-        <>
-          {renderDragHandle()}
-          <div className="absolute right-2 top-2">
-            <EditDeleteButtons
-              info={props.info}
-              prosTeamName={props.prosTeamName}
-              consTeamName={props.consTeamName}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
-            />
-          </div>
-        </>
-      )}
+      {renderDragHandle()}
+      <div className="absolute right-2 top-2">
+        <TimeBoxManageButtons
+          info={props.info}
+          prosTeamName={props.prosTeamName}
+          consTeamName={props.consTeamName}
+          eventHandlers={{
+            onSubmitEdit,
+            onSubmitDelete,
+            onSubmitCopy,
+          }}
+        />
+      </div>
       <span className="font-semibold">{speechType}</span>
       <span className="text-2xl font-semibold">{timeStr}</span>
     </div>
@@ -135,16 +146,19 @@ export default function DebatePanel(props: DebatePanelProps) {
 
   const renderNeutralCustomPanel = () => (
     <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
-      {onSubmitEdit && onSubmitDelete && (
+      {isModifiable && (
         <>
           {renderDragHandle()}
           <div className="absolute right-2 top-2">
-            <EditDeleteButtons
+            <TimeBoxManageButtons
               info={props.info}
               prosTeamName={props.prosTeamName}
               consTeamName={props.consTeamName}
-              onSubmitEdit={onSubmitEdit}
-              onSubmitDelete={onSubmitDelete}
+              eventHandlers={{
+                onSubmitEdit,
+                onSubmitDelete,
+                onSubmitCopy,
+              }}
             />
           </div>
         </>

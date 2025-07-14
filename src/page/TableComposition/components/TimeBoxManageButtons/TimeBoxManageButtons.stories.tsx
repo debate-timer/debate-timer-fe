@@ -1,16 +1,16 @@
 import { Meta, StoryObj } from '@storybook/react';
-import EditDeleteButtons from './EditDeleteButtons';
+import TimeBoxManageButtons from './TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
 
-const meta: Meta<typeof EditDeleteButtons> = {
-  title: 'page/TableSetup/components/EditDeleteButtons',
-  component: EditDeleteButtons,
+const meta: Meta<typeof TimeBoxManageButtons> = {
+  title: 'page/TableSetup/components/TimeBoxManageButtons',
+  component: TimeBoxManageButtons,
   tags: ['autodocs'],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof EditDeleteButtons>;
+type Story = StoryObj<typeof TimeBoxManageButtons>;
 
 const normalTimeBoxInfo: TimeBoxInfo = {
   stance: 'PROS',
@@ -25,8 +25,11 @@ const normalTimeBoxInfo: TimeBoxInfo = {
 export const NormalTimeBox: Story = {
   args: {
     info: normalTimeBoxInfo,
-    onSubmitEdit: () => {},
-    onSubmitDelete: () => {},
+    eventHandlers: {
+      onSubmitEdit: () => {},
+      onSubmitDelete: () => {},
+      onSubmitCopy: () => {},
+    },
   },
 };
 
@@ -43,7 +46,9 @@ const timeBasedTimeBoxInfo: TimeBoxInfo = {
 export const TimeBasedTimeBox: Story = {
   args: {
     info: timeBasedTimeBoxInfo,
-    onSubmitEdit: () => {},
-    onSubmitDelete: () => {},
+    eventHandlers: {
+      onSubmitEdit: () => {},
+      onSubmitDelete: () => {},
+    },
   },
 };

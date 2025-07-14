@@ -1,9 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react';
-import DebatePanel from './DebatePanel';
+import TimeBox from './TimeBox';
 
-const meta: Meta<typeof DebatePanel> = {
-  title: 'page/TableSetup/Components/DebatePanel',
-  component: DebatePanel,
+const meta: Meta<typeof TimeBox> = {
+  title: 'page/TableSetup/Components/TimeBox',
+  component: TimeBox,
   tags: ['autodocs'],
   args: {
     info: {
@@ -19,7 +19,7 @@ const meta: Meta<typeof DebatePanel> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof DebatePanel>;
+type Story = StoryObj<typeof TimeBox>;
 
 // 찬성 입론
 export const ProsOpening: Story = {
