@@ -2,6 +2,7 @@
 export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
 export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
+export type BellConfig = { time: number; count: number };
 
 // Type converters
 export const StanceToString: Record<Stance, string> = {
@@ -24,6 +25,7 @@ export interface User {
 export interface TimeBoxInfo {
   stance: Stance;
   speechType: string;
+  bell: BellConfig[] | null;
   boxType: TimeBoxType;
   time: number | null;
   timePerTeam: number | null;

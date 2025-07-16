@@ -28,8 +28,7 @@ export default function TimerPage() {
   const state = useTimerPageState(tableId);
 
   useTimerHotkey(state);
-  const { warningBellRef, finishBellRef, data, bg, index, goToOtherItem } =
-    state;
+  const { data, bg, index, goToOtherItem } = state;
 
   if (!data) {
     return null;
@@ -37,9 +36,6 @@ export default function TimerPage() {
 
   return (
     <>
-      <audio ref={warningBellRef} src="/sounds/bell-warning.mp3" />
-      <audio ref={finishBellRef} src="/sounds/bell-finish.mp3" />
-
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
