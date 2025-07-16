@@ -15,6 +15,12 @@ interface TimerCreationContentProps {
   onClose: () => void;
 }
 
+interface BellConfig {
+  min: number;
+  sec: number;
+  count: number;
+}
+
 export default function TimerCreationContent({
   beforeData,
   initData,
@@ -80,6 +86,63 @@ export default function TimerCreationContent({
     beforeData?.speaker ?? initData?.speaker ?? '',
   );
 
+  // 종소리 임시 입력값 상태
+  const [bellInput, setBellInput] = useState({
+    min: 0,
+    sec: 0,
+    count: 1,
+  });
+
+  const getInitialBells = () => {
+    // 1. beforeData에 bell이 있으면
+    if (beforeData?.bell && beforeData.bell.length > 0) {
+      return beforeData.bell.map(({ time, count }) => ({
+        min: Math.floor(time / 60),
+        sec: time % 60,
+        count,
+      }));
+    }
+    // 2. initData에 bell이 있으면
+    if (initData?.bell && initData.bell.length > 0) {
+      return initData.bell.map(({ time, count }) => ({
+        min: Math.floor(time / 60),
+        sec: time % 60,
+        count,
+      }));
+    }
+    Formatting.formatSecondsToMinutes(
+      beforeData?.time ?? initData?.time ?? 180,
+    );
+    return [
+      { min: 0, sec: 30, count: 1 },
+      { min: 0, sec: 0, count: 1 },
+    ];
+  };
+  // 종소리 설정: 일반 타이머에서만 사용
+  const [bells, setBells] = useState<BellConfig[]>(getInitialBells);
+  const isBellAddEnabled = bellInput.min > 0 || bellInput.sec > 0;
+
+  const handleAddBell = () => {
+    // 최대 3개 제한
+    if (bellInput.count > 3 || bellInput.count < 1) return;
+    // 분/초/횟수 0이 아닌지 체크
+    if (bellInput.min === 0 && bellInput.sec === 0) return;
+    if (bellInput.count <= 0) return;
+    setBells([
+      ...bells,
+      {
+        min: bellInput.min,
+        sec: bellInput.sec,
+        count: bellInput.count,
+      },
+    ]);
+    // 입력값 초기화
+    setBellInput({ min: 0, sec: 0, count: 1 });
+  };
+
+  const handleDeleteBell = (idx: number) => {
+    setBells(bells.filter((_, i) => i !== idx));
+  };
   const handleSubmit = () => {
     const totalTime = minutes * 60 + seconds;
     const totalTimePerTeam = teamMinutes * 60 + teamSeconds;
@@ -110,6 +173,14 @@ export default function TimerCreationContent({
       return;
     }
 
+    // 벨 데이터 가공
+    const bell = isNormalTimer
+      ? bells.map(({ min, sec, count }) => ({
+          time: min * 60 + sec,
+          count,
+        }))
+      : null;
+
     if (boxType === 'NORMAL') {
       onSubmit({
         stance,
@@ -119,6 +190,7 @@ export default function TimerCreationContent({
         timePerTeam: null,
         timePerSpeaking: null,
         speaker,
+        bell,
       });
     } else {
       // TIME_BASED
@@ -130,6 +202,7 @@ export default function TimerCreationContent({
         timePerTeam: totalTimePerTeam,
         timePerSpeaking: useSpeakerTime ? totalTimePerSpeaking : null,
         speaker: null,
+        bell: null,
       });
     }
     onClose();
@@ -168,8 +241,8 @@ export default function TimerCreationContent({
   return (
     <div className="relative p-6">
       <div className="flex flex-col gap-1">
-        <div className="flex h-[280px] flex-row items-center justify-center p-2">
-          <div className="flex h-[260px] w-[260px] justify-center">
+        <div className="flex  flex-row items-center justify-center p-2">
+          <div className="flex  w-[260px] justify-center">
             {/** 타이머 이미지 */}
             {isNormalTimer ? (
               <img
@@ -476,10 +549,100 @@ export default function TimerCreationContent({
                 <span className="whitespace-nowrap">토론자</span>
               </div>
             )}
+
+            {isNormalTimer && (
+              <div className="mt-3">
+                <label className="mb-1 block font-semibold">종소리 설정</label>
+                {/* 입력부 */}
+                <div className="mb-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    max={59}
+                    className="w-12 rounded border px-1"
+                    value={bellInput.min}
+                    onChange={(e) =>
+                      setBellInput((prev) => ({
+                        ...prev,
+                        min: Math.max(0, Math.min(59, Number(e.target.value))),
+                      }))
+                    }
+                    placeholder="분"
+                  />
+                  <span>분</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={59}
+                    className="w-12 rounded border px-1"
+                    value={bellInput.sec}
+                    onChange={(e) =>
+                      setBellInput((prev) => ({
+                        ...prev,
+                        sec: Math.max(0, Math.min(59, Number(e.target.value))),
+                      }))
+                    }
+                    placeholder="초"
+                  />
+                  <span>초</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={3}
+                    className="w-12 rounded border px-1"
+                    value={bellInput.count}
+                    onChange={(e) =>
+                      setBellInput((prev) => ({
+                        ...prev,
+                        count: Math.max(1, Math.min(3, Number(e.target.value))),
+                      }))
+                    }
+                    placeholder="횟수"
+                  />
+                  <span role="img" aria-label="bell">
+                    🔔
+                  </span>
+                  <span>x {bellInput.count}</span>
+                  <button
+                    type="button"
+                    className={`ml-2 rounded px-2 py-1 font-bold 
+    ${isBellAddEnabled ? 'bg-brand-main text-neutral-0' : 'cursor-not-allowed bg-neutral-300 text-neutral-0'}`}
+                    onClick={handleAddBell}
+                    disabled={!isBellAddEnabled}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="mb-2 flex h-[100px] flex-col items-center gap-2  overflow-y-auto">
+                  {bells.map((bell, idx) => (
+                    <div
+                      key={idx}
+                      className="scr flex w-full items-stretch justify-between rounded border border-yellow-200 bg-yellow-50 px-3 py-1"
+                    >
+                      <div className="flex gap-1">
+                        <span className="font-semibold">
+                          {bell.min}분 {bell.sec}초
+                        </span>
+                        <span className="ml-2" role="img" aria-label="bell">
+                          🔔
+                        </span>
+                        <span className="ml-1">x{bell.count}</span>
+                      </div>
+                      <button
+                        className="ml-2 font-bold text-neutral-500 hover:text-red-500"
+                        onClick={() => handleDeleteBell(idx)}
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <button
-          className="rounded-xl border-[1px] border-neutral-700 p-2 text-[18px] font-semibold hover:bg-brand-main"
+          className="w-full rounded-xl border-[1px] border-neutral-700 p-2 text-[18px] font-semibold hover:bg-brand-main"
           onClick={handleSubmit}
         >
           설정 완료
