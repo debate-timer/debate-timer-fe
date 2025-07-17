@@ -14,31 +14,34 @@ export function usePreventDuplicateMutation<
   options: UseMutationOptions<TData, TError, TVariables, TContext>,
 ): UseMutationResult<TData, TError, TVariables, TContext> {
   const isMutatingRef = useRef(false);
-  const mutation = useMutation(options);
 
-  const preventDuplicateMutation = useCallback(
+  const onSettled: UseMutationOptions<
+    TData,
+    TError,
+    TVariables,
+    TContext
+  >['onSettled'] = (data, error, variables, context) => {
+    isMutatingRef.current = false;
+    options.onSettled?.(data, error, variables, context);
+  };
+
+  const mutation = useMutation({ ...options, onSettled });
+
+  const preventDuplicateMutate = useCallback(
     (
       variables: TVariables,
       mutateOptions?: Parameters<typeof mutation.mutate>[1],
     ) => {
       if (isMutatingRef.current) {
-        console.warn('mutation 호출 중');
+        console.warn('이미 요청이 처리 중 입니다.');
         return;
       }
-
       isMutatingRef.current = true;
-
-      mutation
-        .mutateAsync(variables, mutateOptions)
-        .catch(() => {
-          // onError 콜백에서 오류를 처리해서 비워둠.
-        })
-        .finally(() => {
-          isMutatingRef.current = false;
-        });
+      mutation.mutate(variables, mutateOptions);
     },
+
     [mutation],
   );
 
-  return { ...mutation, mutate: preventDuplicateMutation };
+  return { ...mutation, mutate: preventDuplicateMutate };
 }
