@@ -94,14 +94,14 @@ const useTableFrom = (
     }
   });
 
-  const AddTable = () => {
+  const addTable = () => {
     onAddTable({
       info: formData.info,
       table: formData.table as TimeBoxInfo[],
     });
   };
 
-  const EditTable = (tableId: number) => {
+  const editTable = (tableId: number) => {
     onModifyTable({
       tableId,
       info: formData.info,
@@ -113,8 +113,8 @@ const useTableFrom = (
     formData,
     updateInfo,
     updateTable,
-    AddTable,
-    EditTable,
+    addTable,
+    editTable,
   };
 };
 

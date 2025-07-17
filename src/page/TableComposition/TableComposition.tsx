@@ -39,7 +39,7 @@ export default function TableComposition() {
     return undefined;
   }, [mode, data]);
 
-  const { formData, updateInfo, updateTable, AddTable, EditTable } =
+  const { formData, updateInfo, updateTable, addTable, editTable } =
     useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
@@ -52,9 +52,9 @@ export default function TableComposition() {
     updateInfo(patchedInfo);
 
     if (mode === 'edit') {
-      EditTable(tableId);
+      editTable(tableId);
     } else {
-      AddTable();
+      addTable();
     }
   };
 
