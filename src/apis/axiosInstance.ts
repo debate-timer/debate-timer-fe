@@ -7,10 +7,7 @@ import {
 
 axios.defaults.withCredentials = true;
 export const axiosInstance = axios.create({
-  baseURL:
-    import.meta.env.MODE !== 'production'
-      ? undefined
-      : import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
