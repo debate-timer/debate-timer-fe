@@ -39,8 +39,15 @@ export default function TableComposition() {
     return undefined;
   }, [mode, data]);
 
-  const { formData, updateInfo, updateTable, addTable, editTable } =
-    useTableFrom(currentStep, initData);
+  const {
+    formData,
+    updateInfo,
+    updateTable,
+    addTable,
+    editTable,
+    isAddingTable,
+    isModifyingTable,
+  } = useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
     const patchedInfo = {
@@ -77,6 +84,7 @@ export default function TableComposition() {
               onTimeBoxChange={updateTable}
               onFinishButtonClick={handleButtonClick}
               onEditTableInfoButtonClick={() => goToStep('NameAndType')}
+              isSubmitting={mode === 'edit' ? isModifyingTable : isAddingTable}
             />
           ),
         }}
