@@ -1,19 +1,29 @@
 import { IoHome } from 'react-icons/io5';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useNavigate } from 'react-router-dom';
+import { APIError } from '../../apis/primitives';
+import { ERROR_STATUS_TABLE } from '../../constants/errors';
 
 interface ErrorPageProps {
-  message: string;
+  error: Error;
   stack: string;
   onReset: () => void;
 }
 
-export default function ErrorPage({ message, stack, onReset }: ErrorPageProps) {
+export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
   const navigate = useNavigate();
   const goToHome = () => {
     onReset();
-    navigate('/', { replace: true }); // 현재 라우트가 "/"여도 강제 이동
+    navigate('/home', { replace: true });
   };
+
+  // If error is from API request, print status code
+  // to let user know exact reason of error.
+  const title =
+    error instanceof APIError
+      ? ERROR_STATUS_TABLE[error.status]
+      : '오류가 발생했어요...';
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -26,12 +36,12 @@ export default function ErrorPage({ message, stack, onReset }: ErrorPageProps) {
         <div className="flex w-full flex-col items-start justify-start px-8 py-10">
           <div className="mb-20 flex flex-col font-bold">
             <h1 className="mb-5 text-[120px]">😭</h1>
-            <h1 className="md:text-5xl text-4xl">오류가 발생했어요...</h1>
+            <h1 className="text-4xl md:text-5xl">{title}</h1>
           </div>
 
           <div className="mb-10 flex flex-col space-y-2">
             <h1 className="text-xl font-bold">오류 내용</h1>
-            <p className="text-lg">{message}</p>
+            <p className="text-lg">{error.message}</p>
           </div>
 
           <div className="mb-20 flex flex-col space-y-2">
