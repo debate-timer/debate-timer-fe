@@ -67,8 +67,10 @@ export default function TableCompositionPage() {
     formData,
     updateInfo,
     updateTable,
-    addTable: AddTable,
-    editTable: EditTable,
+    addTable,
+    editTable,
+    isAddingTable,
+    isModifyingTable,
   } = useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
@@ -81,9 +83,9 @@ export default function TableCompositionPage() {
     updateInfo(patchedInfo);
 
     if (mode === 'edit') {
-      EditTable(tableId);
+      editTable(tableId);
     } else {
-      AddTable();
+      addTable();
     }
   };
 
@@ -123,6 +125,7 @@ export default function TableCompositionPage() {
               onTimeBoxChange={updateTable}
               onFinishButtonClick={handleButtonClick}
               onEditTableInfoButtonClick={() => goToStep('NameAndType')}
+              isSubmitting={mode === 'edit' ? isModifyingTable : isAddingTable}
             />
           ),
         }}

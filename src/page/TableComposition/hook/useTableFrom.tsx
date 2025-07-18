@@ -80,19 +80,22 @@ const useTableFrom = (
     });
   };
 
-  const { mutate: onAddTable } = useAddDebateTable((tableId) => {
-    removeValue();
-    navigate(`/overview/customize/${tableId}`);
-  });
-
-  const { mutate: onModifyTable } = usePutDebateTable((tableId) => {
-    removeValue();
-    if (isGuestFlow()) {
-      navigate(`/overview/customize/guest`);
-    } else {
+  const { mutate: onAddTable, isPending: isAddingTable } = useAddDebateTable(
+    (tableId) => {
+      removeValue();
       navigate(`/overview/customize/${tableId}`);
-    }
-  });
+    },
+  );
+
+  const { mutate: onModifyTable, isPending: isModifyingTable } =
+    usePutDebateTable((tableId) => {
+      removeValue();
+      if (isGuestFlow()) {
+        navigate(`/overview/customize/guest`);
+      } else {
+        navigate(`/overview/customize/${tableId}`);
+      }
+    });
 
   const addTable = () => {
     onAddTable({
@@ -115,6 +118,8 @@ const useTableFrom = (
     updateTable,
     addTable,
     editTable,
+    isAddingTable,
+    isModifyingTable,
   };
 };
 

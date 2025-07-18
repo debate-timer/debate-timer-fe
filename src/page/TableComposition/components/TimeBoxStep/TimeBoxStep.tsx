@@ -17,6 +17,7 @@ interface TimeBoxStepProps {
   onFinishButtonClick: () => void;
   onEditTableInfoButtonClick: () => void;
   isEdit?: boolean;
+  isSubmitting?: boolean;
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
@@ -27,6 +28,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     onFinishButtonClick,
     onEditTableInfoButtonClick,
     isEdit = false,
+    isSubmitting = false,
   } = props;
   const initTimeBox = initData.table;
   const { openModal, closeModal, ModalWrapper } = useModal();
@@ -61,7 +63,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     });
   };
 
-  const isSubmitButtonDisabled = initTimeBox.length === 0 || isLoading;
+  const isSubmitButtonDisabled =
+    initTimeBox.length === 0 || isLoading || isSubmitting;
 
   const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
     return (
