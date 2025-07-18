@@ -22,7 +22,17 @@ import { useTimerBackground } from './useTimerBackground';
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
 export function useTimerPageState(tableId: number): TimerPageLogics {
-  const { data } = useGetDebateTableData(tableId);
+  // Get data with useQuery of TanStack Query
+  const {
+    data,
+    isLoading: isFetching,
+    isError: isFetchingError,
+    isRefetching,
+    isRefetchError,
+    refetch,
+  } = useGetDebateTableData(tableId);
+  const isLoading = isFetching || isRefetching;
+  const isError = isFetchingError || isRefetchError;
 
   // 추가 타이머가 가능한지 여부 (예: 사전에 설정한 "작전 시간"이 있으면 false)
   const isAdditionalTimerAvailable = useMemo(() => {
@@ -234,6 +244,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     switchCamp,
     handleActivateTeam,
     tableId,
+    isLoading,
+    isError,
+    refetch,
   };
 }
 
@@ -255,4 +268,7 @@ export interface TimerPageLogics {
   switchCamp: () => void;
   handleActivateTeam: (team: TimeBasedStance) => void;
   tableId: number;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => void;
 }
