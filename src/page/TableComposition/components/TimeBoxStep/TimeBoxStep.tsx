@@ -15,6 +15,7 @@ interface TimeBoxStepProps {
   onFinishButtonClick: () => void;
   onEditTableInfoButtonClick: () => void;
   isEdit?: boolean;
+  isSubmitting?: boolean;
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
@@ -24,6 +25,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     onFinishButtonClick,
     onEditTableInfoButtonClick,
     isEdit = false,
+    isSubmitting = false,
   } = props;
   const initTimeBox = initData.table;
   const { openModal, closeModal, ModalWrapper } = useModal();
@@ -124,7 +126,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             className={`h-16 w-full ${
               isAbledSummitButton ? 'button enabled' : 'button disabled'
             }`}
-            disabled={!isAbledSummitButton}
+            disabled={!isAbledSummitButton || isSubmitting}
           >
             {isEdit ? '수정 완료' : '추가하기'}
           </button>

@@ -1,14 +1,18 @@
-import { useMutation } from '@tanstack/react-query';
 import { DebateTableData } from '../../type/type';
 import { PutDebateTableResponseType } from '../../apis/responses/debateTable';
 import { getRepository } from '../../repositories/DebateTableRepository';
+import { usePreventDuplicateMutation } from './usePreventDuplicateMutation';
 
 interface PutDebateTableParams extends DebateTableData {
   tableId: number;
 }
 
 export function usePutDebateTable(onSuccess: (tableId: number) => void) {
-  return useMutation<PutDebateTableResponseType, Error, PutDebateTableParams>({
+  return usePreventDuplicateMutation<
+    PutDebateTableResponseType,
+    Error,
+    PutDebateTableParams
+  >({
     mutationFn: ({ tableId, info, table }) => {
       const repo = getRepository();
       return repo.editTable({ id: tableId, info, table });
