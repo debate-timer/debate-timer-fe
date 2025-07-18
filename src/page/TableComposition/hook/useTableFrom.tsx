@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
-import { TableCompositionStep } from '../TableComposition';
+import { TableCompositionStep } from '../TableCompositionPage';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
@@ -94,14 +94,14 @@ const useTableFrom = (
     }
   });
 
-  const AddTable = () => {
+  const addTable = () => {
     onAddTable({
       info: formData.info,
       table: formData.table as TimeBoxInfo[],
     });
   };
 
-  const EditTable = (tableId: number) => {
+  const editTable = (tableId: number) => {
     onModifyTable({
       tableId,
       info: formData.info,
@@ -113,8 +113,8 @@ const useTableFrom = (
     formData,
     updateInfo,
     updateTable,
-    AddTable,
-    EditTable,
+    addTable,
+    editTable,
   };
 };
 

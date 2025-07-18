@@ -3,19 +3,32 @@ import TableNameAndType from './components/TableNameAndType/TableNameAndType';
 import useFunnel from '../../hooks/useFunnel';
 import useTableFrom from './hook/useTableFrom';
 import TimeBoxStep from './components/TimeBoxStep/TimeBoxStep';
-import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
+import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
+import ErrorIndicator from '../../components/async/ErrorIndicator';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
 
-export default function TableComposition() {
+export default function TableCompositionPage() {
   // URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
-  const mode = searchParams.get('mode') as Mode;
-  const tableId = Number(searchParams.get('tableId') || 0);
+  const rawMode = searchParams.get('mode');
+  const rawTableId = searchParams.get('tableId');
+
+  // Verify mode param
+  if (rawMode !== 'edit' && rawMode !== 'add') {
+    throw new Error('테이블 모드가 올바르지 않습니다.');
+  }
+  const mode = rawMode as Mode;
+
+  // Verify table id param
+  if (isNaN(Number(rawTableId))) {
+    throw new Error('테이블 ID가 올바르지 않습니다.');
+  }
+  const tableId = Number(rawTableId);
 
   // Print different funnel page by mode (edit a existing table or add a new table)
   const initialMode: TableCompositionStep =
@@ -24,9 +37,16 @@ export default function TableComposition() {
     useFunnel<TableCompositionStep>(initialMode);
 
   // edit 모드일 때만 서버에서 initData를 가져옴
-  // 테이블 데이터 패칭 분기
-  const { data } = useGetDebateTableData(tableId, mode === 'edit');
+  const {
+    data,
+    isError: isFetchError,
+    isRefetchError,
+    isLoading: isFetching,
+    isRefetching,
+    refetch,
+  } = useGetDebateTableData(tableId, mode === 'edit');
 
+  // 테이블 데이터 패칭 분기
   const initData = useMemo(() => {
     if (mode === 'edit' && data) {
       const info = data.info as DebateInfo;
@@ -39,8 +59,17 @@ export default function TableComposition() {
     return undefined;
   }, [mode, data]);
 
-  const { formData, updateInfo, updateTable, AddTable, EditTable } =
-    useTableFrom(currentStep, initData);
+  // Declare constants to handle async request
+  const isError = mode === 'add' ? false : isFetchError || isRefetchError;
+  const isLoading = mode === 'add' ? false : isFetching || isRefetching;
+
+  const {
+    formData,
+    updateInfo,
+    updateTable,
+    addTable: AddTable,
+    editTable: EditTable,
+  } = useTableFrom(currentStep, initData);
 
   const handleButtonClick = () => {
     const patchedInfo = {
@@ -58,6 +87,21 @@ export default function TableComposition() {
     }
   };
 
+  // If error, print error message and let user be able to retry
+  if (isError) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator onClickRetry={() => refetch()}>
+            시간표 정보를 불러오지 못했어요...<br></br>다시 시도할까요?
+          </ErrorIndicator>
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
+  }
+
+  // If no error or on loading, print contents
+  // Only pass isLoading because isError is used right above this code line
   return (
     <DefaultLayout>
       <Funnel
@@ -65,6 +109,7 @@ export default function TableComposition() {
           NameAndType: (
             <TableNameAndType
               info={formData.info}
+              isLoading={isLoading}
               isEdit={mode === 'edit'}
               onInfoChange={updateInfo}
               onButtonClick={() => goToStep('TimeBox')}
@@ -73,6 +118,7 @@ export default function TableComposition() {
           TimeBox: (
             <TimeBoxStep
               initData={formData}
+              isLoading={isLoading}
               isEdit={mode === 'edit'}
               onTimeBoxChange={updateTable}
               onFinishButtonClick={handleButtonClick}
