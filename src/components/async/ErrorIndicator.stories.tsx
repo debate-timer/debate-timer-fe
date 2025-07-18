@@ -13,13 +13,13 @@ type Story = StoryObj<typeof ErrorIndicator>;
 
 export const Default: Story = {
   args: {
-    message: '오류가 발생했어요.',
+    children: '오류가 발생했어요.',
   },
 };
 
 export const OnRetryButtonEnabled: Story = {
   args: {
-    message: '오류가 발생했어요. 다시 시도하시겠어요?',
+    children: '오류가 발생했어요. 다시 시도하시겠어요?',
     onClickRetry: () => {},
   },
 };

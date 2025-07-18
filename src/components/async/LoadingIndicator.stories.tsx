@@ -13,6 +13,6 @@ type Story = StoryObj<typeof LoadingIndicator>;
 
 export const Default: Story = {
   args: {
-    message: '로딩 중...',
+    children: '로딩 중...',
   },
 };
