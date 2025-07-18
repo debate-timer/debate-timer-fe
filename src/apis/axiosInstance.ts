@@ -5,9 +5,12 @@ import {
   setAccessToken,
 } from '../util/accessToken';
 
+const currentMode = import.meta.env.MODE;
+
 // Axios instance
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL:
+    currentMode === 'test' ? undefined : import.meta.env.VITE_API_BASE_URL,
   timeout: 5000,
   timeoutErrorMessage:
     '시간 초과로 인해 요청을 처리하지 못했어요... 잠시 후 다시 시도해 주세요.',
