@@ -57,8 +57,10 @@ export const OnQRCodeReady: Story = {
   args: {
     shareUrl: shareUrl,
     copyState: false,
-    isUrlReady: true,
-    onClick: () => {
+    isLoading: false,
+    isError: false,
+    onRefetch: () => {},
+    onCopyClicked: () => {
       navigator.clipboard.writeText(shareUrl);
     },
   },
@@ -69,7 +71,21 @@ export const OnLoadingData: Story = {
   args: {
     shareUrl: '',
     copyState: false,
-    isUrlReady: false,
-    onClick: () => {},
+    isLoading: true,
+    isError: false,
+    onRefetch: () => {},
+    onCopyClicked: () => {},
+  },
+};
+
+// When failed to process share URL
+export const OnFailure: Story = {
+  args: {
+    shareUrl: '',
+    copyState: false,
+    isLoading: false,
+    isError: true,
+    onRefetch: () => {},
+    onCopyClicked: () => {},
   },
 };
