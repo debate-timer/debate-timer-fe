@@ -37,3 +37,12 @@ export const Unchecked: Story = {
     checked: false,
   },
 };
+
+// 비활성화 상태
+export const Disabled: Story = {
+  args: {
+    label: '체크박스 라벨 (Disabled)',
+    checked: false,
+    disabled: true,
+  },
+};

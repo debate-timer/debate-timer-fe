@@ -3,25 +3,31 @@ import { InputHTMLAttributes, ReactNode } from 'react';
 interface LabeledCheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   label: ReactNode;
   checked: boolean;
+  disabled?: boolean;
 }
 
 export default function LabeledCheckbox({
   label,
   checked,
+  disabled = false,
   ...rest
 }: LabeledCheckboxProps) {
-  // 체크 안 된 상태일 때 라벨 색을 회색으로
-  const labelColorClass = checked ? '' : 'text-neutral-400';
+  // Set label text color to...
+  // - Black when checkbox is enabled
+  // - Gray when checkbox is disabled
 
   return (
     <label
-      className={`md:text-base flex cursor-pointer items-center gap-2 text-sm ${labelColorClass}`}
+      className={`
+        flex cursor-pointer items-center gap-2 text-sm md:text-base
+        ${disabled ? 'text-neutral-400' : 'text-neutral-900'}
+        `}
     >
       <input
         {...rest}
         type="checkbox"
         checked={checked}
-        className="
+        className={`
           relative
           h-5
           w-5 cursor-pointer
@@ -31,7 +37,6 @@ export default function LabeledCheckbox({
           checked:border-transparent
           checked:bg-blue-500
           checked:before:absolute
-
           checked:before:left-1/2
           checked:before:top-[-4px]
           checked:before:-translate-x-1/2
@@ -40,7 +45,7 @@ export default function LabeledCheckbox({
           checked:before:text-background-default
           checked:before:content-['✓']
           focus:outline-none
-        "
+        `}
       />
       {label}
     </label>
