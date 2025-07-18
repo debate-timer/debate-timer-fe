@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import TableListPage from '../page/TableListPage/TableListPage';
-import TableOverview from '../page/TableOverviewPage/TableOverview';
+import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
 import TableComposition from '../page/TableComposition/TableComposition';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
@@ -30,7 +30,7 @@ const routesConfig = [
   },
   {
     path: '/overview/:type/:id',
-    element: <TableOverview />,
+    element: <TableOverviewPage />,
     requiresAuth: false,
   },
   {
