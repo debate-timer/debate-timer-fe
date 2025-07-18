@@ -10,7 +10,7 @@ export default function ErrorIndicator({
   onClickRetry,
 }: ErrorIndicatorProps) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4 p-16">
       <MdErrorOutline className="size-32 text-red-500" />
       <p className="text-xl">{message}</p>
 
