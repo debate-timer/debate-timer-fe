@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import { createTableShareUrl } from '../util/arrayEncoding';
 
 export function useTableShare(tableId: number) {
+  // Prepare variables, states and functions
   const { isOpen, openModal, closeModal, ModalWrapper } = useModal();
   const [copyState, setCopyState] = useState(false);
-  const [isUrlReady, setIsUrlReady] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const baseUrl =
     import.meta.env.MODE !== 'production'
@@ -21,22 +21,27 @@ export function useTableShare(tableId: number) {
       console.error('Failed to copy: ', err);
     }
   };
-  const data = useGetDebateTableData(tableId, isOpen);
 
+  // Fetch data
+  const { data, isLoading, isError, refetch, isRefetching, isRefetchError } =
+    useGetDebateTableData(tableId, isOpen);
+
+  // Process URL when data is successfully fetched
   useEffect(() => {
-    if (data.data) {
-      setShareUrl(createTableShareUrl(baseUrl, data.data));
-      setIsUrlReady(true);
+    if (data) {
+      setShareUrl(createTableShareUrl(baseUrl, data));
     }
   }, [baseUrl, data]);
 
+  // Close indicator after 3 seconds
+  // which tells user that URL is copied to clipboard
   useEffect(() => {
     if (copyState) {
       setTimeout(() => {
         setCopyState(false);
       }, 3000);
     }
-  });
+  }, [copyState]);
 
   const TableShareModal = () =>
     isOpen ? (
@@ -44,8 +49,10 @@ export function useTableShare(tableId: number) {
         <ShareModal
           shareUrl={shareUrl}
           copyState={copyState}
-          isUrlReady={isUrlReady}
-          onClick={() => handleCopy()}
+          isLoading={isLoading || isRefetching}
+          isError={isError || isRefetchError}
+          onRefetch={() => refetch()}
+          onCopyClicked={() => handleCopy()}
         />
       </ModalWrapper>
     ) : null;
