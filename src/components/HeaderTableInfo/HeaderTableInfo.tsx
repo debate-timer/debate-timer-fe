@@ -13,8 +13,8 @@ export default function HeaderTableInfo(props: HeaderTitleProps) {
     <>
       {isLoading && (
         <div className="flex flex-col space-y-[4px]">
-          <Skeleton width={120} height={16} />
-          <Skeleton width={360} height={24} />
+          <Skeleton width={80} height={16} />
+          <Skeleton width={240} height={24} />
         </div>
       )}
       {!isLoading && (

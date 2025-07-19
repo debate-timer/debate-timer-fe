@@ -18,12 +18,13 @@ export default function ClearableInput({
       <input
         {...rest}
         value={value}
+        disabled={disabled}
         className={`
           w-full rounded-md border border-neutral-300 p-3 pr-10 text-base text-neutral-900 placeholder-neutral-400 focus:outline-none
           ${disabled ? 'bg-neutral-400' : ''}
         `}
       />
-      {value && (
+      {value && !disabled && (
         <button
           type="button"
           onClick={onClear}
