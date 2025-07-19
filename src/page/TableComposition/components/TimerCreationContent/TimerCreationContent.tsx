@@ -1,5 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { TimeBoxInfo, Stance, TimeBoxType } from '../../../../type/type';
+import {
+  TimeBoxInfo,
+  Stance,
+  TimeBoxType,
+  BellType,
+} from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../assets/timer/normal_timer.png';
 import timeBasedTimer from '../../../../assets/timer/timebased_timer.png';
@@ -15,7 +20,8 @@ interface TimerCreationContentProps {
   onClose: () => void;
 }
 
-interface BellConfig {
+interface BellInputConfig {
+  type: BellType;
   min: number;
   sec: number;
   count: number;
@@ -87,57 +93,63 @@ export default function TimerCreationContent({
   );
 
   // 종소리 임시 입력값 상태
-  const [bellInput, setBellInput] = useState({
+  const [bellInput, setBellInput] = useState<BellInputConfig>({
+    type: 'BEFORE_END', // 기본값: 종료 전
     min: 0,
     sec: 0,
     count: 1,
   });
-
-  const getInitialBells = () => {
-    // 1. beforeData에 bell이 있으면
+  // bell의 time(초)은: before => 양수, after => 음수로 변환
+  const getInitialBells = (): BellInputConfig[] => {
     if (beforeData?.bell && beforeData.bell.length > 0) {
-      return beforeData.bell.map(({ time, count }) => ({
-        min: Math.floor(time / 60),
-        sec: time % 60,
-        count,
-      }));
+      return beforeData.bell.map(({ time, count, type }) => {
+        // direction이 없으면 종료 전(before)로 기본처리
+        return {
+          type,
+          min: Math.floor(Math.abs(time) / 60),
+          sec: Math.abs(time) % 60,
+          count,
+        };
+      });
     }
-    // 2. initData에 bell이 있으면
     if (initData?.bell && initData.bell.length > 0) {
-      return initData.bell.map(({ time, count }) => ({
-        min: Math.floor(time / 60),
-        sec: time % 60,
-        count,
-      }));
+      return initData.bell.map(({ time, count, type }) => {
+        return {
+          type,
+          min: Math.floor(Math.abs(time) / 60),
+          sec: Math.abs(time) % 60,
+          count,
+        };
+      });
     }
-    Formatting.formatSecondsToMinutes(
-      beforeData?.time ?? initData?.time ?? 180,
-    );
     return [
-      { min: 0, sec: 30, count: 1 },
-      { min: 0, sec: 0, count: 1 },
+      { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
+      { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
     ];
   };
-  // 종소리 설정: 일반 타이머에서만 사용
-  const [bells, setBells] = useState<BellConfig[]>(getInitialBells);
-  const isBellAddEnabled = bellInput.min > 0 || bellInput.sec > 0;
+  const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
+  const isBellAddEnabled =
+    (bellInput.min > 0 || bellInput.sec > 0) &&
+    bellInput.count >= 1 &&
+    bellInput.count <= 3;
 
   const handleAddBell = () => {
-    // 최대 3개 제한
-    if (bellInput.count > 3 || bellInput.count < 1) return;
-    // 분/초/횟수 0이 아닌지 체크
-    if (bellInput.min === 0 && bellInput.sec === 0) return;
-    if (bellInput.count <= 0) return;
+    if (!isBellAddEnabled) return;
     setBells([
       ...bells,
       {
+        type: bellInput.type,
         min: bellInput.min,
         sec: bellInput.sec,
         count: bellInput.count,
       },
     ]);
-    // 입력값 초기화
-    setBellInput({ min: 0, sec: 0, count: 1 });
+    setBellInput({
+      type: 'BEFORE_END',
+      min: 0,
+      sec: 0,
+      count: 1,
+    });
   };
 
   const handleDeleteBell = (idx: number) => {
@@ -173,14 +185,18 @@ export default function TimerCreationContent({
       return;
     }
 
-    // 벨 데이터 가공
     const bell = isNormalTimer
-      ? bells.map(({ min, sec, count }) => ({
-          time: min * 60 + sec,
-          count,
-        }))
+      ? bells.map(({ type, min, sec, count }) => {
+          let time = min * 60 + sec;
+          if (type === 'AFTER_END') time = -time;
+          // before, startAfter는 양수 (0포함)
+          return {
+            time,
+            count,
+            type,
+          };
+        })
       : null;
-
     if (boxType === 'NORMAL') {
       onSubmit({
         stance,
@@ -265,7 +281,7 @@ export default function TimerCreationContent({
             )}
           </div>
 
-          <div className="flex w-[350px] flex-col gap-6 p-5">
+          <div className="flex flex-col gap-6 p-5">
             {/** boxType 라디오버튼 */}
             <div className="flex items-center space-x-2">
               <label
@@ -555,6 +571,21 @@ export default function TimerCreationContent({
                 <label className="mb-1 block font-semibold">종소리 설정</label>
                 {/* 입력부 */}
                 <div className="mb-2 flex items-center gap-2">
+                  {/* direction 드롭다운 */}
+                  <select
+                    className="rounded border px-1"
+                    value={bellInput.type}
+                    onChange={(e) =>
+                      setBellInput((prev) => ({
+                        ...prev,
+                        type: e.target.value as BellType,
+                      }))
+                    }
+                  >
+                    <option value="BEFORE_END">종료 전</option>
+                    <option value="AFTER_END">종료 후</option>
+                    <option value="AFTER_START">시작 후</option>
+                  </select>
                   <input
                     type="number"
                     min={0}
@@ -602,25 +633,31 @@ export default function TimerCreationContent({
                   <span role="img" aria-label="bell">
                     🔔
                   </span>
-                  <span>x {bellInput.count}</span>
+                  <span className="whitespace-nowrap">x {bellInput.count}</span>
                   <button
                     type="button"
                     className={`ml-2 rounded px-2 py-1 font-bold 
-    ${isBellAddEnabled ? 'bg-brand-main text-neutral-0' : 'cursor-not-allowed bg-neutral-300 text-neutral-0'}`}
+      ${isBellAddEnabled ? 'bg-brand-main text-neutral-0' : 'cursor-not-allowed bg-neutral-300 text-neutral-0'}`}
                     onClick={handleAddBell}
                     disabled={!isBellAddEnabled}
                   >
                     +
                   </button>
                 </div>
+                {/* 벨 리스트 */}
                 <div className="mb-2 flex h-[100px] flex-col items-center gap-2  overflow-y-auto">
                   {bells.map((bell, idx) => (
                     <div
                       key={idx}
                       className="scr flex w-full items-stretch justify-between rounded border border-yellow-200 bg-yellow-50 px-3 py-1"
                     >
-                      <div className="flex gap-1">
+                      <div className="flex items-center gap-1">
                         <span className="font-semibold">
+                          {bell.type === 'BEFORE_END' && '종료 전'}
+                          {bell.type === 'AFTER_END' && '종료 후'}
+                          {bell.type === 'AFTER_START' && '시작 후'}
+                        </span>
+                        <span className="ml-1 font-semibold">
                           {bell.min}분 {bell.sec}초
                         </span>
                         <span className="ml-2" role="img" aria-label="bell">
