@@ -1,6 +1,5 @@
 import {
   Dispatch,
-  RefObject,
   SetStateAction,
   useCallback,
   useEffect,
@@ -45,12 +44,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     useState<TimeBasedStance>('PROS');
 
   // 벨 사운드 관련 훅 (벨 ref 제공)
-  const { warningBellRef, finishBellRef } = useBellSound({
-    timer1,
-    timer2,
+  useBellSound({
     normalTimer,
-    isWarningBell: data?.info.warningBell,
-    isFinishBell: data?.info.finishBell,
+    bells: data?.table[index].bell,
   });
 
   const { bg, setBg } = useTimerBackground({
@@ -217,8 +213,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   ]);
 
   return {
-    warningBellRef,
-    finishBellRef,
     data,
     bg,
     setBg,
@@ -238,8 +232,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
 }
 
 export interface TimerPageLogics {
-  warningBellRef: RefObject<HTMLAudioElement>;
-  finishBellRef: RefObject<HTMLAudioElement>;
   data: DebateTableData | undefined;
   bg: TimerBGState;
   setBg: Dispatch<SetStateAction<TimerBGState>>;
