@@ -3,7 +3,7 @@ import { TimeBoxInfo, Stance, TimeBoxType } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../assets/timer/normal_timer.png';
 import timeBasedTimer from '../../../../assets/timer/timebased_timer.png';
-import LabeledCheckBox from '../../../../components/LabledCheckBox/LabeledCheckBox';
+import LabeledCheckBox from '../../../../components/LabeledCheckBox/LabeledCheckBox';
 import timeBasedPerSpeakingTimer from '../../../../assets/timer/timebased_perSpeaking_timer.png';
 
 interface TimerCreationContentProps {
