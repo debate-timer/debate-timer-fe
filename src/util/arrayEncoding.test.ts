@@ -13,8 +13,6 @@ describe('토론 테이블 인코딩 유틸리티', () => {
       agenda: '토론 주제',
       prosTeamName: '찬성',
       consTeamName: '반대',
-      warningBell: true,
-      finishBell: true,
     },
     table: [
       {

@@ -44,8 +44,6 @@ export interface DebateInfo {
   agenda: string;
   prosTeamName: string;
   consTeamName: string;
-  warningBell: boolean;
-  finishBell: boolean;
 }
 
 export interface DebateTable {

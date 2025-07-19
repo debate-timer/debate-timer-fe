@@ -17,8 +17,6 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
     agenda: '토론 주제',
     prosTeamName: '짜장',
     consTeamName: '짬뽕',
-    finishBell: true,
-    warningBell: false,
     name: '테이블 이름',
   },
   table: [

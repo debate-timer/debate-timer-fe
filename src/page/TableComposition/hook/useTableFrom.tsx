@@ -24,8 +24,6 @@ const useTableFrom = (
           agenda: '',
           prosTeamName: '',
           consTeamName: '',
-          warningBell: true,
-          finishBell: true,
         },
         table: [],
       },
@@ -54,8 +52,6 @@ const useTableFrom = (
       const debateInfo: DebateInfo = {
         name: newInfo.name,
         agenda: newInfo.agenda,
-        warningBell: newInfo.warningBell,
-        finishBell: newInfo.finishBell,
         prosTeamName: newInfo.prosTeamName,
         consTeamName: newInfo.consTeamName,
       };

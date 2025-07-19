@@ -6,8 +6,6 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
     name: '나의 시간표',
     prosTeamName: '찬성',
     consTeamName: '반대',
-    finishBell: true,
-    warningBell: false,
   },
   table: [
     {

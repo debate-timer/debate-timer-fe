@@ -1,6 +1,5 @@
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
-import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { DebateInfo, StanceToString } from '../../../../type/type';
 
@@ -51,8 +50,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <section className="md:p-8 mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6">
-          <label className="md:text-2xl flex items-center text-base font-semibold">
+        <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
+          <label className="flex items-center text-base font-semibold md:text-2xl">
             토론 시간표 이름
           </label>
           <ClearableInput
@@ -62,7 +61,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             placeholder="시간표 1"
           />
 
-          <label className="md:text-2xl flex items-center text-base font-semibold">
+          <label className="flex items-center text-base font-semibold md:text-2xl">
             토론 주제
           </label>
           <ClearableInput
@@ -72,7 +71,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             placeholder="토론 주제를 입력해주세요"
           />
           <>
-            <label className="md:text-2xl flex items-center text-base font-semibold">
+            <label className="flex items-center text-base font-semibold md:text-2xl">
               팀명
             </label>
             <div className="flex items-center gap-8">
@@ -101,26 +100,6 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               />
             </div>
           </>
-
-          <label className="md:text-2xl text-base font-semibold">
-            종소리 설정
-          </label>
-          <div className="flex flex-col gap-3">
-            <LabeledCheckbox
-              label="발언 종료 30초 전 알림"
-              checked={info.warningBell}
-              onChange={(e) =>
-                handleFieldChange('warningBell', e.target.checked)
-              }
-            />
-            <LabeledCheckbox
-              label="발언 종료 알림"
-              checked={info.finishBell}
-              onChange={(e) =>
-                handleFieldChange('finishBell', e.target.checked)
-              }
-            />
-          </div>
         </section>
       </DefaultLayout.ContentContainer>
 
