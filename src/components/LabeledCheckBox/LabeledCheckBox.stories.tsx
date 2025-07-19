@@ -1,10 +1,10 @@
 // LabeledCheckbox.stories.tsx
 import { Meta, StoryObj } from '@storybook/react';
-import LabeledCheckbox from './LabeledCheckbox';
+import LabeledCheckBox from './LabeledCheckBox';
 
-const meta: Meta<typeof LabeledCheckbox> = {
-  title: 'Components/LabeledCheckbox',
-  component: LabeledCheckbox,
+const meta: Meta<typeof LabeledCheckBox> = {
+  title: 'Components/LabeledCheckBox',
+  component: LabeledCheckBox,
   tags: ['autodocs'],
   argTypes: {
     onChange: { action: 'changed' },
@@ -12,7 +12,7 @@ const meta: Meta<typeof LabeledCheckbox> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof LabeledCheckbox>;
+type Story = StoryObj<typeof LabeledCheckBox>;
 
 // 기본 스토리
 export const Default: Story = {
@@ -35,5 +35,14 @@ export const Unchecked: Story = {
   args: {
     label: '체크박스 라벨 (Unchecked)',
     checked: false,
+  },
+};
+
+// 비활성화 상태
+export const Disabled: Story = {
+  args: {
+    label: '체크박스 라벨 (Disabled)',
+    checked: false,
+    disabled: true,
   },
 };

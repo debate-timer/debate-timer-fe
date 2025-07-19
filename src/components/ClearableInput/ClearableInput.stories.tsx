@@ -19,3 +19,12 @@ export const Default: Story = {
     placeholder: 'Enter text...',
   },
 };
+
+export const Disabled: Story = {
+  args: {
+    value: 'Hello Storybook',
+    onClear: () => alert('Clear clicked'),
+    placeholder: 'Enter text...',
+    disabled: true,
+  },
+};
