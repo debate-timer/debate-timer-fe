@@ -2,7 +2,13 @@
 export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
 export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
-export type BellConfig = { time: number; count: number };
+
+export type BellType = 'BEFORE_END' | 'AFTER_END' | 'AFTER_START';
+export type BellConfig = {
+  type: BellType;
+  time: number;
+  count: number;
+};
 
 // Type converters
 export const StanceToString: Record<Stance, string> = {

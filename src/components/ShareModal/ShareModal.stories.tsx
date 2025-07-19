@@ -30,6 +30,7 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
       time: 60,
       timePerSpeaking: null,
       timePerTeam: null,
+      bell: null,
     },
     {
       stance: 'CONS',
@@ -39,6 +40,7 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
       time: 60,
       timePerSpeaking: null,
       timePerTeam: null,
+      bell: null,
     },
     {
       stance: 'NEUTRAL',
@@ -48,6 +50,7 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
       time: null,
       timePerSpeaking: 60,
       timePerTeam: 120,
+      bell: null,
     },
   ],
 });

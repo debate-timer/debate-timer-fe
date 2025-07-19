@@ -18,6 +18,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: null,
       timePerTeam: null,
       speaker: '1번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
     {
       boxType: 'NORMAL',
@@ -27,6 +28,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: null,
       timePerTeam: null,
       speaker: '1번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
     {
       boxType: 'NORMAL',
@@ -36,6 +38,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: null,
       timePerTeam: null,
       speaker: '2번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
     {
       boxType: 'NORMAL',
@@ -45,6 +48,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: null,
       timePerTeam: null,
       speaker: '2번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
     {
       boxType: 'TIME_BASED',
@@ -54,6 +58,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: 120,
       timePerTeam: 420,
       speaker: '2번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
     {
       boxType: 'NORMAL',
@@ -63,6 +68,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: null,
       timePerTeam: null,
       speaker: '3번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
     {
       boxType: 'NORMAL',
@@ -72,6 +78,7 @@ export const SAMPLE_TABLE_DATA: DebateTableData = {
       timePerSpeaking: null,
       timePerTeam: null,
       speaker: '3번',
+      bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
     },
   ],
 } as const;
