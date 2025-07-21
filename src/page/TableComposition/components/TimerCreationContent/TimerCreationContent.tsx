@@ -4,6 +4,7 @@ import {
   Stance,
   TimeBoxType,
   BellType,
+  BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../assets/timer/normal_timer.png';
@@ -53,6 +54,15 @@ export default function TimerCreationContent({
     [],
   );
 
+  const initBellInput: BellInputConfig = useMemo(() => {
+    return {
+      type: 'BEFORE_END', // 기본값: 종료 전
+      min: 0,
+      sec: 0,
+      count: 1,
+    };
+  }, []);
+
   const initSpeechType =
     beforeData?.speechType ?? initData?.speechType ?? '입론';
   const [speechType, setSpeechType] = useState<string>(initSpeechType);
@@ -93,12 +103,8 @@ export default function TimerCreationContent({
   );
 
   // 종소리 임시 입력값 상태
-  const [bellInput, setBellInput] = useState<BellInputConfig>({
-    type: 'BEFORE_END', // 기본값: 종료 전
-    min: 0,
-    sec: 0,
-    count: 1,
-  });
+  const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
+
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
     if (beforeData?.bell && beforeData.bell.length > 0) {
@@ -144,12 +150,7 @@ export default function TimerCreationContent({
         count: bellInput.count,
       },
     ]);
-    setBellInput({
-      type: 'BEFORE_END',
-      min: 0,
-      sec: 0,
-      count: 1,
-    });
+    setBellInput(initBellInput);
   };
 
   const handleDeleteBell = (idx: number) => {
