@@ -13,7 +13,9 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
     for (let i = 0; i < count; i++) {
       setTimeout(() => {
         const audio = new Audio('/sounds/bell-warning.mp3');
-        audio.play();
+        audio.play().catch((err) => {
+          console.warn('audio.play() 실패:', err);
+        });
       }, i * 500);
     }
   }
