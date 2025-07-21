@@ -45,7 +45,6 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
 
       if (trigger && !bellTriggeredRef.current[key]) {
         playBell(bell.count);
-        bellTriggeredRef.current[key] = true;
       }
     });
   }, [normalTimer.timer, bells, normalTimer.defaultTimer]);
