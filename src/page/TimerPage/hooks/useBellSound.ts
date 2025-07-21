@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { NormalTimerLogics } from './useNormalTimer';
 import { BellConfig } from '../../../type/type';
 
@@ -8,8 +8,6 @@ interface UseBellSoundProps {
 }
 
 export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
-  const bellTriggeredRef = useRef<Record<string, boolean>>({});
-
   // 종소리 여러 번 - 새로운 Audio로 재생
   function playBell(count: number) {
     for (let i = 0; i < count; i++) {
@@ -27,29 +25,21 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
 
     bells.forEach((bell) => {
       let trigger = false;
-      let key = '';
 
       if (bell.type === 'BEFORE_END') {
         // timerVal이 남은 시간 === bell.time일 때
         trigger = timerVal === bell.time;
-        key = `BEFORE_END-${bell.time}-${bell.count}`;
       } else if (bell.type === 'AFTER_END') {
         // timerVal이 0보다 작아진 후, timerVal === bell.time (bell.time < 0)
         trigger = timerVal === bell.time;
-        key = `AFTER_END-${bell.time}-${bell.count}`;
       } else if (bell.type === 'AFTER_START') {
         // 시작 후 N초: timerVal === defaultTime - bell.time
         trigger = timerVal === defaultTime - bell.time;
-        key = `START_AFTER-${bell.time}-${bell.count}`;
       }
 
-      if (trigger && !bellTriggeredRef.current[key]) {
+      if (trigger) {
         playBell(bell.count);
       }
     });
   }, [normalTimer.timer, bells, normalTimer.defaultTimer]);
-
-  useEffect(() => {
-    bellTriggeredRef.current = {};
-  }, [normalTimer.defaultTimer, bells]);
 }
