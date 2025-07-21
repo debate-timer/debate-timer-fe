@@ -129,7 +129,7 @@ export default function TimerCreationContent({
   };
   const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
   const isBellAddEnabled =
-    (bellInput.min > 0 || bellInput.sec > 0) &&
+    (bellInput.min >= 0 || bellInput.sec >= 0) &&
     bellInput.count >= 1 &&
     bellInput.count <= 3;
 
