@@ -108,25 +108,10 @@ export default function TimerCreationContent({
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
     if (beforeData?.bell && beforeData.bell.length > 0) {
-      return beforeData.bell.map(({ time, count, type }) => {
-        // direction이 없으면 종료 전(before)로 기본처리
-        return {
-          type,
-          min: Math.floor(Math.abs(time) / 60),
-          sec: Math.abs(time) % 60,
-          count,
-        };
-      });
+      return beforeData.bell.map(bellConfigToBellInputConfig);
     }
     if (initData?.bell && initData.bell.length > 0) {
-      return initData.bell.map(({ time, count, type }) => {
-        return {
-          type,
-          min: Math.floor(Math.abs(time) / 60),
-          sec: Math.abs(time) % 60,
-          count,
-        };
-      });
+      return initData.bell.map(bellConfigToBellInputConfig);
     }
     return [
       { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
@@ -186,18 +171,7 @@ export default function TimerCreationContent({
       return;
     }
 
-    const bell = isNormalTimer
-      ? bells.map(({ type, min, sec, count }) => {
-          let time = min * 60 + sec;
-          if (type === 'AFTER_END') time = -time;
-          // before, startAfter는 양수 (0포함)
-          return {
-            time,
-            count,
-            type,
-          };
-        })
-      : null;
+    const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
     if (boxType === 'NORMAL') {
       onSubmit({
         stance,
@@ -688,4 +662,21 @@ export default function TimerCreationContent({
       </div>
     </div>
   );
+}
+
+function bellInputConfigToBellConfig(input: BellInputConfig): BellConfig {
+  let time = input.min * 60 + input.sec;
+  if (input.type === 'AFTER_END') time = -time;
+  return {
+    time,
+    count: input.count,
+    type: input.type,
+  };
+}
+
+function bellConfigToBellInputConfig(data: BellConfig): BellInputConfig {
+  const { type, time, count } = data;
+  const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
+  const converted = { type, min: minutes, sec: seconds, count };
+  return converted;
 }
