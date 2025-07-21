@@ -5,6 +5,7 @@ import {
   TimeBoxType,
   BellType,
   BellConfig,
+  BellTypeToString,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../assets/timer/normal_timer.png';
@@ -557,9 +558,15 @@ export default function TimerCreationContent({
                       }))
                     }
                   >
-                    <option value="BEFORE_END">종료 전</option>
-                    <option value="AFTER_END">종료 후</option>
-                    <option value="AFTER_START">시작 후</option>
+                    <option value="BEFORE_END">
+                      {BellTypeToString['BEFORE_END']}
+                    </option>
+                    <option value="AFTER_END">
+                      {BellTypeToString['AFTER_END']}
+                    </option>
+                    <option value="AFTER_START">
+                      {BellTypeToString['AFTER_START']}
+                    </option>
                   </select>
                   <input
                     type="number"
@@ -628,9 +635,7 @@ export default function TimerCreationContent({
                     >
                       <div className="flex items-center gap-1">
                         <span className="font-semibold">
-                          {bell.type === 'BEFORE_END' && '종료 전'}
-                          {bell.type === 'AFTER_END' && '종료 후'}
-                          {bell.type === 'AFTER_START' && '시작 후'}
+                          {BellTypeToString[bell.type]}
                         </span>
                         <span className="ml-1 font-semibold">
                           {bell.min}분 {bell.sec}초

@@ -22,6 +22,12 @@ export const TimeBoxTypeToString: Record<TimeBoxType, string> = {
   TIME_BASED: '자유토론 타이머',
 };
 
+export const BellTypeToString: Record<BellType, string> = {
+  BEFORE_END: '종료 전',
+  AFTER_END: '종료 후',
+  AFTER_START: '시작 후',
+};
+
 // Interfaces
 export interface User {
   id: string;
