@@ -19,7 +19,7 @@ export default function LabeledCheckBox({
   return (
     <label
       className={`
-        flex cursor-pointer items-center gap-2 text-sm md:text-base
+        flex items-center gap-2 text-sm md:text-base
         ${disabled ? 'text-neutral-400' : 'cursor-pointer text-neutral-900'}
         `}
     >
