@@ -16,6 +16,7 @@ const viteConfig = defineViteConfig(({ mode }) => {
           ws: true,
         },
       },
+      port: 3000,
     },
   };
 });
