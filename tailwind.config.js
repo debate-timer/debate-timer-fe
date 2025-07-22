@@ -68,7 +68,7 @@ export default {
         'camp-neutral': `0 0 30px #737373`,
       },
       colors: {
-        team: {
+        camp: {
           red: '#F64740',
           blue: '#2B74E1',
         },
