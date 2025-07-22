@@ -88,6 +88,7 @@ export default {
         semantic: {
           warning: '#FF8B87',
           error: '#D70000',
+          table: '#FF5622',
         },
       },
     },
