@@ -5,25 +5,34 @@ import {
   setAccessToken,
 } from '../util/accessToken';
 
-axios.defaults.withCredentials = true;
+// Get current mode (DEV, PROD or TEST)
+const currentMode = import.meta.env.MODE;
+
+// Axios instance
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
+  baseURL:
+    currentMode === 'test' ? undefined : import.meta.env.VITE_API_BASE_URL,
+  timeout: 5000,
+  timeoutErrorMessage:
+    '시간 초과로 인해 요청을 처리하지 못했어요... 잠시 후 다시 시도해 주세요.',
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,
 });
 
-// 요청 인터셉터: Access Token을 헤더에 붙여 전송
+// Request interceptor
 axiosInstance.interceptors.request.use((config) => {
   const accessToken = getAccessToken();
+
+  // Access token을 헤더에 붙여 전송
   if (accessToken && config.headers) {
     config.headers.Authorization = `${accessToken}`;
   }
   return config;
 });
 
+// Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
