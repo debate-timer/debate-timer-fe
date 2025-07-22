@@ -103,7 +103,7 @@ export default function TimerCreationContent({
     beforeData?.speaker ?? initData?.speaker ?? '',
   );
 
-  // 종소리 임시 입력값 상태
+  // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
 
   // bell의 time(초)은: before => 양수, after => 음수로 변환

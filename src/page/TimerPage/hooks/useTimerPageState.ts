@@ -43,7 +43,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   const [prosConsSelected, setProsConsSelected] =
     useState<TimeBasedStance>('PROS');
 
-  // 벨 사운드 관련 훅 (벨 ref 제공)
+  // 벨 사운드 관련 훅
   useBellSound({
     normalTimer,
     bells: data?.table[index].bell,
