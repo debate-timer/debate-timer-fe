@@ -55,41 +55,39 @@ export default {
           'sans-serif',
         ],
       },
+      fontSize: {
+        'display-raw': ['72px', { lineHeight: '80px' }],
+        'title-raw': ['28px', { lineHeight: '28px' }],
+        'subtitle-raw': ['24px', { lineHeight: '36px' }],
+        'detail-raw': ['20px', { lineHeight: '20px' }],
+        'body-raw': ['16px', { lineHeight: '16px' }],
+      },
       boxShadow: {
         'camp-blue': `0 0 30px #FF3B2F`,
         'camp-red': `0 0 30px #007AFF`,
         'camp-neutral': `0 0 30px #737373`,
       },
       colors: {
-        brand: {
-          main: '#FECD4C',
-          main501: '#FFF2B3',
-          main502: '#FFD866',
-          main504: '#E6B843',
-          main505: '#C4A64C',
-
-          sub1: '#FF5622',
-          sub2: '#028391',
-          sub3: '#FF8B87',
-        },
-        neutral: {
-          1000: '#000000',
-          0: '#FFFFFF',
-        },
-        system: {
-          warning: '#FFBF40',
-          success: '#4BD964',
-          danger: '#FF3F2F',
-          error: '#FF8B87',
-        },
-        camp: {
+        team: {
           red: '#F64740',
           blue: '#2B74E1',
         },
-        background: {
-          default: '#F6F5F4',
-          secondary: '#FFF3DD',
-          dark: '#E8E8E8',
+        brand: {
+          DEFAULT: '#FECD4C',
+          hover: '#DBA822',
+        },
+        default: {
+          'disabled/hover': '#D6D7D9',
+          neutral: '#A3A3A3',
+          dim: '#222222',
+          border: '#79747E',
+          timeout: '#4F4F4F',
+          white: '#FFFFFF',
+          black: '#222222',
+        },
+        semantic: {
+          warning: '#FF8B87',
+          error: '#D70000',
         },
       },
     },
