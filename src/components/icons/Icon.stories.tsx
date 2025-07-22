@@ -8,6 +8,9 @@ import DTExpand from './Expand';
 import DTDebate from './Debate';
 import DTRightArrow from './RightArrow';
 import DTLeftArrow from './LeftArrow';
+import DTDrag from './Drag';
+import DTCopy from './Copy';
+import DTDelete from './Delete';
 
 const meta: Meta<typeof DTLogin> = {
   title: 'Design System/Icons',
@@ -149,6 +152,45 @@ export const OnLeftArrowIcon: Story = {
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
       <DTLeftArrow {...args} />
       <p className="mt-2 text-sm text-gray-600">좌측 화살표</p>
+    </div>
+  ),
+};
+
+export const OnDragIcon: Story = {
+  args: {
+    size: 72,
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTDrag {...args} />
+      <p className="mt-2 text-sm text-gray-600">드래그</p>
+    </div>
+  ),
+};
+
+export const OnCopyIcon: Story = {
+  args: {
+    size: 72,
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTCopy {...args} />
+      <p className="mt-2 text-sm text-gray-600">드래그</p>
+    </div>
+  ),
+};
+
+export const OnDeleteIcon: Story = {
+  args: {
+    size: 72,
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTDelete {...args} />
+      <p className="mt-2 text-sm text-gray-600">드래그</p>
     </div>
   ),
 };

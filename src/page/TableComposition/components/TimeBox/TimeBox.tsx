@@ -2,7 +2,8 @@ import { HTMLAttributes } from 'react';
 import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-import { LuArrowUpDown } from 'react-icons/lu';
+import DTDrag from '../../../../components/icons/Drag';
+import SmallIconContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
 
 interface TimeBoxEventHandlers {
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
@@ -68,24 +69,30 @@ export default function TimeBox(props: TimeBoxProps) {
 
   const renderDragHandle = () => (
     <div
-      className={`${isPros ? 'right-2' : 'left-2'} absolute top-4 flex h-2/3 w-4 flex-1 cursor-grab items-center 
-                justify-center rounded-md bg-neutral-0 hover:bg-neutral-300`}
+      className={`
+        absolute flex cursor-grab items-center justify-center
+        ${isPros ? 'right-[10px]' : 'left-[10px]'}
+      `}
       onMouseDown={onMouseDown}
       title="위아래로 드래그"
     >
-      <LuArrowUpDown className="text-neutral-900" />
+      <SmallIconContainer className="w-[28px] px-[4px] py-[8px]">
+        <DTDrag />
+      </SmallIconContainer>
     </div>
   );
+
   const renderProsConsPanel = () => (
     <div
-      className={`relative flex w-1/2 flex-col items-center justify-center rounded-md ${
-        isPros ? 'bg-camp-blue' : 'bg-camp-red'
-      } h-20 select-none p-2 font-bold text-neutral-0`}
+      className={`
+        timebox
+        ${isPros ? 'pros' : 'cons'}
+      `}
     >
       {isPros
         ? isModifiable && (
             <>
-              <div className="absolute left-2 top-2">
+              <div className="absolute left-[10px] top-[10px]">
                 <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
@@ -103,7 +110,7 @@ export default function TimeBox(props: TimeBoxProps) {
         : isModifiable && (
             <>
               {renderDragHandle()}
-              <div className="absolute right-2 top-2">
+              <div className="absolute right-[10px] top-[10px]">
                 <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
@@ -117,15 +124,15 @@ export default function TimeBox(props: TimeBoxProps) {
               </div>
             </>
           )}
-      <div className="font-semibold">
+      <p className="text-detail mb-2 text-default-white">
         {speechType} {speaker && `| ${speaker} 토론자`}
-      </div>
-      <div className="text-2xl font-semibold">{timeStr}</div>
+      </p>
+      <p className="text-title text-default-white">{timeStr}</p>
     </div>
   );
 
   const renderNeutralTimeoutPanel = () => (
-    <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-neutral-400 p-2 font-medium ">
+    <div className="timebox neutral">
       {renderDragHandle()}
       <div className="absolute right-2 top-2">
         <TimeBoxManageButtons
@@ -139,13 +146,13 @@ export default function TimeBox(props: TimeBoxProps) {
           }}
         />
       </div>
-      <span className="font-semibold">{speechType}</span>
-      <span className="text-2xl font-semibold">{timeStr}</span>
+      <p className="text-detail mb-2 text-default-white">{speechType}</p>
+      <p className="text-title text-default-white">{timeStr}</p>
     </div>
   );
 
   const renderNeutralCustomPanel = () => (
-    <div className="relative flex h-20 w-full flex-col items-center justify-center rounded-md bg-brand-main p-2 font-medium ">
+    <div className="timebox time-based">
       {isModifiable && (
         <>
           {renderDragHandle()}

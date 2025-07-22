@@ -1,9 +1,11 @@
-import { RiEditFill, RiDeleteBinFill } from 'react-icons/ri';
 import { TimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
-import { FaPaste } from 'react-icons/fa';
+import SmallIconContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
+import DTCopy from '../../../../components/icons/Copy';
+import DTEdit from '../../../../components/icons/Edit';
+import DTDelete from '../../../../components/icons/Delete';
 interface TimeBoxManageButtonsEventHandlers {
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
   onSubmitDelete?: () => void;
@@ -36,33 +38,28 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
     <>
       <div className="flex justify-end gap-2">
         {onSubmitCopy && (
-          <button
-            onClick={onSubmitCopy}
-            className="rounded-sm bg-neutral-0 p-[2px]"
-            aria-label="복사하기"
-          >
-            <FaPaste className="text-neutral-900" />
+          <button onClick={onSubmitCopy} aria-label="복사하기">
+            <SmallIconContainer className="size-[28px] p-[8px]">
+              <DTCopy />
+            </SmallIconContainer>
           </button>
         )}
         {onSubmitEdit && (
-          <button
-            onClick={openEditModal}
-            className="rounded-sm bg-neutral-0 p-[2px]"
-            aria-label="수정하기"
-          >
-            <RiEditFill className="text-neutral-900" />
+          <button onClick={openEditModal} aria-label="수정하기">
+            <SmallIconContainer className="size-[28px] p-[8px]">
+              <DTEdit />
+            </SmallIconContainer>{' '}
           </button>
         )}
         {onSubmitDelete && (
-          <button
-            onClick={openDeleteModal}
-            className="rounded-sm bg-neutral-0 p-[2px]"
-            aria-label="삭제하기"
-          >
-            <RiDeleteBinFill className="text-neutral-900" />
+          <button onClick={openDeleteModal} aria-label="삭제하기">
+            <SmallIconContainer className="size-[28px] p-[8px]">
+              <DTDelete />
+            </SmallIconContainer>{' '}
           </button>
         )}
       </div>
+
       {onSubmitEdit && (
         <EditModalWrapper>
           <TimerCreationContent

@@ -30,6 +30,25 @@
   @apply text-body-raw;
 }
 
+.timebox {
+  @apply relative flex h-[92px] select-none flex-col items-center justify-center rounded-[12px] p-[12px];
+}
+
+.timebox.pros {
+  @apply bg-camp-blue w-1/2;
+}
+
+.timebox.cons {
+  @apply bg-camp-red w-1/2;
+}
+
+.timebox.neutral {
+  @apply bg-default-neutral w-full;
+}
+
+.timebox.time-based {
+  @apply bg-brand w-full;
+}
 /*
 # Old styles
 .button {
