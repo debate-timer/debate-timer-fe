@@ -25,8 +25,8 @@ export default function ShareModal({
         {/* It will disappear after 3 seconds. */}
         {copyState && (
           <div className="absolute flex size-full rounded-2xl">
-            <div className="absolute z-10 size-full rounded-2xl bg-neutral-900 opacity-80" />
-            <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4  p-[30px] text-neutral-50">
+            <div className="absolute z-10 size-full rounded-2xl bg-default-black opacity-80" />
+            <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4  p-[30px] text-default-white">
               <IoShareOutline className="size-[120px]" />
               <p className="whitespace-nowrap text-center text-[20px]">
                 링크가 클립보드에 복사됨
@@ -49,7 +49,7 @@ export default function ShareModal({
             <LoadingSpinner
               strokeWidth={3}
               size={'size-24'}
-              color={'text-neutral-300'}
+              color={'text-default-disabled/hover'}
             />
           )}
         </div>
@@ -57,15 +57,13 @@ export default function ShareModal({
 
       {/* Button that copies URL to the user's clipboard. */}
       <button
-        className="button enabled relative flex h-[64px] w-[360px] items-center px-5"
+        className="button enabled brand flex w-[360px] items-center justify-center gap-[12px] rounded-full"
         onClick={() => {
           onClick();
         }}
       >
-        <p className="absolute left-1/2 -translate-x-1/2 transform text-[28px] font-bold">
-          공유 링크 복사
-        </p>
-        <IoLinkOutline className="ml-auto size-8" />
+        <IoLinkOutline className="size-[24px]" />
+        <p>공유 링크 복사</p>
       </button>
     </div>
   );

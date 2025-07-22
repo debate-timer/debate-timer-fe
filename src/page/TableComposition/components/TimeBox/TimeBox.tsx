@@ -74,7 +74,7 @@ export default function TimeBox(props: TimeBoxProps) {
         ${isPros ? 'right-[10px]' : 'left-[10px]'}
       `}
       onMouseDown={onMouseDown}
-      title="위아래로 드래그"
+      title="위/아래로 드래그"
     >
       <SmallIconContainer className="w-[28px] px-[4px] py-[8px]">
         <DTDrag />
@@ -83,12 +83,7 @@ export default function TimeBox(props: TimeBoxProps) {
   );
 
   const renderProsConsPanel = () => (
-    <div
-      className={`
-        timebox
-        ${isPros ? 'pros' : 'cons'}
-      `}
-    >
+    <div className={`timebox ${isPros ? 'pros' : 'cons'}`}>
       {isPros
         ? isModifiable && (
             <>

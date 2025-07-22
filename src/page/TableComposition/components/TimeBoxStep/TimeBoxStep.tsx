@@ -8,6 +8,8 @@ import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableI
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
+import DTEdit from '../../../../components/icons/Edit';
+import DTCheck from '../../../../components/icons/Check';
 
 interface TimeBoxStepProps {
   initData: DebateTableData;
@@ -114,18 +116,21 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           {/* TODO: Need to add a function here */}
           <button
             onClick={onEditTableInfoButtonClick}
-            className="button enabled h-16 w-full"
+            className="button enabled neutral flex w-full gap-[12px] rounded-full"
           >
+            <DTEdit />
             토론 정보 수정하기
           </button>
 
           <button
             onClick={onFinishButtonClick}
-            className={`h-16 w-full ${
-              isAbledSummitButton ? 'button enabled' : 'button disabled'
-            }`}
+            className={`
+              flex w-full gap-[12px] rounded-full
+              ${isAbledSummitButton ? 'button enabled brand' : 'button disabled'}
+            `}
             disabled={!isAbledSummitButton}
           >
+            <DTCheck />
             {isEdit ? '수정 완료' : '추가하기'}
           </button>
         </div>
