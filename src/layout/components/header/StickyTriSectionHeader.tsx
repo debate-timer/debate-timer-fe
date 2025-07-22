@@ -1,8 +1,6 @@
 import { PropsWithChildren } from 'react';
-import { IoMdHome } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
-import IconButton from '../../../components/IconButton/IconButton';
 import { isLoggedIn } from '../../../util/accessToken';
 import {
   isGuestFlow,
@@ -11,15 +9,17 @@ import {
 import { oAuthLogin } from '../../../util/googleAuth';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
+import DTHome from '../../../components/icons/Home';
+import DTLogin from '../../../components/icons/Login';
 
 // The type of header icons will be declared here.
-type HeaderIcons = 'home';
+type HeaderIcons = 'home' | 'auth';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
   return (
-    <header className="sticky top-0 min-h-20 border-b-[1px] border-neutral-900 px-6">
+    <header className="sticky top-0 h-[80px] border-b-[3px] border-default-disabled/hover p-[16px]">
       <div className="relative flex h-full items-center justify-between">
         {children}
       </div>
@@ -42,40 +42,22 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
   const { openModal, closeModal, ModalWrapper } = useModal({});
-  const defaultIcons: HeaderIcons[] = ['home']; // Icons that will be displayed on all pages are added here
+  const defaultIcons: HeaderIcons[] = ['home', 'auth']; // Icons that will be displayed on all pages are added here
 
   return (
     <>
       <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
-        {/* Auth related header items */}
-        <>
-          {/* Guest mode indicator */}
-          {isGuestFlow() && (
+        {isGuestFlow() && (
+          <>
+            {/* Guest mode indicator */}
             <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
               비회원 모드
             </div>
-          )}
 
-          {/* Login and logout button */}
-          {isLoggedIn() && (
-            <button
-              className="rounded-full px-4 py-2 font-bold hover:bg-neutral-300"
-              onClick={() => logoutMutate()}
-            >
-              로그아웃
-            </button>
-          )}
-          {!isLoggedIn() && (
-            <button
-              className="rounded-full px-4 py-2 font-bold hover:bg-neutral-300"
-              onClick={() => openModal()}
-            >
-              로그인
-            </button>
-          )}
-
-          <div className="w-[1px] self-stretch bg-neutral-500" />
-        </>
+            {/* Vertical divider */}
+            <div className="w-[1px] self-stretch bg-neutral-500" />
+          </>
+        )}
 
         {/* Buttons given as an argument */}
         {buttons}
@@ -85,17 +67,32 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
           switch (iconName) {
             case 'home':
               return (
-                <div key={`${iconName}-${index}`}>
-                  <IconButton
-                    icon={<IoMdHome size={24} />}
-                    onClick={() => {
-                      if (isGuestFlow()) {
-                        deleteSessionCustomizeTableData();
-                      }
-                      navigate('/home');
-                    }}
-                  />
-                </div>
+                <button
+                  key={`${iconName}-${index}`}
+                  onClick={() => {
+                    if (isGuestFlow()) {
+                      deleteSessionCustomizeTableData();
+                    }
+                    navigate('/home');
+                  }}
+                >
+                  <DTHome />
+                </button>
+              );
+            case 'auth':
+              return (
+                <button
+                  key={`${iconName}-${index}`}
+                  onClick={() => {
+                    if (isLoggedIn()) {
+                      logoutMutate();
+                    } else {
+                      openModal();
+                    }
+                  }}
+                >
+                  <DTLogin />
+                </button>
               );
             default:
               return null;
