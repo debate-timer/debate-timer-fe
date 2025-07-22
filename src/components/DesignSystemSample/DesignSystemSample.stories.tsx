@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import DesignSystemSample from './DesignSystemSample';
 
 const meta: Meta<typeof DesignSystemSample> = {
-  title: 'components/DesignSystemSample',
+  title: 'Design System/DesignSystemSample',
   component: DesignSystemSample,
   tags: ['autodocs'],
 };
