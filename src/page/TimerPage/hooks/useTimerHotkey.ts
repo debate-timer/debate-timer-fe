@@ -113,6 +113,7 @@ export function useTimerHotkey(state: TimerPageLogics) {
           }
           break;
         case 'Enter':
+        case 'NumpadEnter':
           // 진영 전환
           switchCamp();
           break;
