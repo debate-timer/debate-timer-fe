@@ -40,6 +40,7 @@ export function useTimerHotkey(state: TimerPageLogics) {
         'KeyA',
         'KeyL',
         'Enter',
+        'NumpadEnter',
       ];
 
       // 핫키 입력시, 기본 동작(스크롤, 폼 전송 등) 막음
