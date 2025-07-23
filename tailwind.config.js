@@ -89,6 +89,7 @@ export default {
           warning: '#FF8B87',
           error: '#D70000',
           table: '#FF5622',
+          material: '#6750A4',
         },
       },
     },

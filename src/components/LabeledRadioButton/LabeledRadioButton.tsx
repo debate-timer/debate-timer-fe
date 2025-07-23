@@ -19,7 +19,7 @@ export default function LabeledRadioButton({
 }: LabeledRadioButtonProps) {
   const radioSize = 'size-[20px]';
 
-  const checkedColorClass = 'bg-brand border-brand';
+  const checkedColorClass = 'bg-semantic-material border-semantic-material';
   const uncheckedColorClass =
     'bg-default-disabled/hover border-default-disabled/hover';
 
@@ -30,7 +30,7 @@ export default function LabeledRadioButton({
   const outerRingClasses = `
     relative flex items-center justify-center rounded-full transition-all duration-200 ease-in-out border-2
     ${radioSize}
-    ${checked ? 'border-brand' : 'border-default-disabled/hover'}
+    ${checked ? 'border-semantic-material' : 'border-default-disabled/hover'}
   `;
   const innerDotClasses = `
     rounded-full transition-all duration-200 ease-in-out w-2.5 h-2.5
