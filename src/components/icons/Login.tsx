@@ -1,18 +1,18 @@
 import { IconProps } from './IconProps';
 
 export default function DTLogin({
-  size = 24,
   color = 'currentColor',
   className = '',
   ...props
 }: IconProps) {
   return (
     <svg
-      width={size}
-      height={size}
       viewBox="0 0 45 44"
       fill="none"
-      className={className}
+      className={`
+        aspect-[45/44]
+        ${className}
+      `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

@@ -1,17 +1,18 @@
 import { IconProps } from './IconProps';
 
 export default function DTDrag({
-  size = 24,
   color = 'currentColor',
   className = '',
   ...props
 }: IconProps) {
   return (
     <svg
-      width={size}
       viewBox="0 0 32 40"
       fill="none"
-      className={`aspect-[32/40] ${className}`}
+      className={`
+        aspect-[32/40]
+        ${className}
+      `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

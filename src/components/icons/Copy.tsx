@@ -1,7 +1,6 @@
 import { IconProps } from './IconProps';
 
 export default function DTCopy({
-  size = 24,
   color = 'currentColor',
   className = '',
   ...props

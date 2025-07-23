@@ -1,18 +1,18 @@
 import { IconProps } from './IconProps';
 
 export default function DTDebate({
-  size = 24,
   color = 'currentColor',
   className = '',
   ...props
 }: IconProps) {
   return (
     <svg
-      width={size}
-      height={size}
       viewBox="0 0 19 18"
       fill="none"
-      className={className}
+      className={`
+        aspect-[19/18]
+        ${className}
+      `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
