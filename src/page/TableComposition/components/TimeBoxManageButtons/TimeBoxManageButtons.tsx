@@ -40,21 +40,21 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
         {onSubmitCopy && (
           <button onClick={onSubmitCopy} aria-label="복사하기">
             <SmallIconContainer className="size-[28px] p-[8px]">
-              <DTCopy />
+              <DTCopy className="h-full" />
             </SmallIconContainer>
           </button>
         )}
         {onSubmitEdit && (
           <button onClick={openEditModal} aria-label="수정하기">
             <SmallIconContainer className="size-[28px] p-[8px]">
-              <DTEdit />
+              <DTEdit className="h-full" />
             </SmallIconContainer>{' '}
           </button>
         )}
         {onSubmitDelete && (
           <button onClick={openDeleteModal} aria-label="삭제하기">
             <SmallIconContainer className="size-[28px] p-[8px]">
-              <DTDelete />
+              <DTDelete className="h-full" />
             </SmallIconContainer>{' '}
           </button>
         )}

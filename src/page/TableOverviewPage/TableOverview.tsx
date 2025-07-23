@@ -71,7 +71,7 @@ export default function TableOverview() {
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
-              className="button enabled neutral w-full rounded-full"
+              className="button enabled neutral flex w-full flex-row gap-[12px] rounded-full p-[24px]"
               onClick={() => {
                 if (isGuestFlow()) {
                   navigate(`/composition?mode=edit&type=CUSTOMIZE`);
@@ -82,14 +82,12 @@ export default function TableOverview() {
                 }
               }}
             >
-              <div className="flex items-center justify-center gap-[12px]">
-                <DTEdit />
-                수정하기
-              </div>
+              <DTEdit className="h-full" />
+              수정하기
             </button>
-            <div className="flex h-16 w-full space-x-2">
+            <div className="flex w-full space-x-2">
               <button
-                className="button enabled brand flex-1 rounded-full"
+                className="button enabled brand flex flex-1 flex-row gap-[12px] rounded-full p-[24px]"
                 onClick={() => {
                   if (isGuestFlow()) {
                     navigate('/table/customize/guest');
@@ -98,19 +96,16 @@ export default function TableOverview() {
                   }
                 }}
               >
-                <div className="flex items-center justify-center gap-[12px]">
-                  <DTDebate />
-                  토론하기
-                </div>
+                <DTDebate className="h-full" />
+                토론하기
               </button>
-
               <button
-                className="button enabled neutral flex aspect-square rounded-full"
+                className="button enabled neutral flex aspect-square rounded-full p-[20px]"
                 onClick={() => {
                   openShareModal();
                 }}
               >
-                <DTShare />
+                <DTShare className="h-full" />
               </button>
             </div>
           </div>

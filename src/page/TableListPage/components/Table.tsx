@@ -67,7 +67,7 @@ export default function Table({
               aria-label="수정하기"
             >
               <SmallIconContainer className="size-[28px] p-[8px]">
-                <DTEdit />
+                <DTEdit className="h-full" />
               </SmallIconContainer>
             </button>
             <button
@@ -78,7 +78,7 @@ export default function Table({
               aria-label="삭제하기"
             >
               <SmallIconContainer className="size-[28px] p-[8px]">
-                <DTDelete />
+                <DTDelete className="h-full" />
               </SmallIconContainer>
             </button>
             <button
@@ -89,7 +89,7 @@ export default function Table({
               aria-label="공유하기"
             >
               <SmallIconContainer className="size-[28px] p-[8px]">
-                <DTShare />
+                <DTShare className="h-full" />
               </SmallIconContainer>
             </button>
           </div>

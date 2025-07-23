@@ -1,14 +1,12 @@
 import { IconProps } from './IconProps';
 
 export default function DTLeftArrow({
-  size = 24,
   color = 'currentColor',
   className = '',
   ...props
 }: IconProps) {
   return (
     <svg
-      width={size}
       viewBox="0 0 34 30"
       fill="none"
       className={`

@@ -112,25 +112,24 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
-          {/* TODO: Need to add a function here */}
+        <div className="relative mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
             onClick={onEditTableInfoButtonClick}
-            className="button enabled neutral flex w-full gap-[12px] rounded-full"
+            className="button enabled neutral flex h-full w-full gap-[12px] rounded-full p-[24px]"
           >
-            <DTEdit />
+            <DTEdit className="h-full" />
             토론 정보 수정하기
           </button>
 
           <button
             onClick={onFinishButtonClick}
             className={`
-              flex w-full gap-[12px] rounded-full
+              flex h-full w-full gap-[12px] rounded-full p-[24px]
               ${isAbledSummitButton ? 'button enabled brand' : 'button disabled'}
             `}
             disabled={!isAbledSummitButton}
           >
-            <DTCheck />
+            <DTCheck className="h-full" />
             {isEdit ? '수정 완료' : '추가하기'}
           </button>
         </div>

@@ -2,8 +2,6 @@ import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
-import IconButton from '../../components/IconButton/IconButton';
-import { IoHelpCircle } from 'react-icons/io5';
 import { useTimerPageState } from './hooks/useTimerPageState';
 import { useTimerHotkey } from './hooks/useTimerHotkey';
 import RoundControlRow from './components/RoundControlRow';
@@ -12,6 +10,7 @@ import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
+import DTHelp from '../../components/icons/Help';
 
 export default function TimerPage() {
   const pathParams = useParams();
@@ -61,10 +60,12 @@ export default function TimerPage() {
             />
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
-            <IconButton
-              icon={<IoHelpCircle size={24} />}
+            <button
+              className="flex h-full items-center justify-center"
               onClick={openUseTooltipModal}
-            />
+            >
+              <DTHelp className="size-full" />
+            </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 

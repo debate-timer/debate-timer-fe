@@ -77,7 +77,7 @@ export default function TimeBox(props: TimeBoxProps) {
       title="위/아래로 드래그"
     >
       <SmallIconContainer className="w-[28px] px-[4px] py-[8px]">
-        <DTDrag />
+        <DTDrag className="h-full" />
       </SmallIconContainer>
     </div>
   );

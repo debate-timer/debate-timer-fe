@@ -14,6 +14,6 @@ type Story = StoryObj<typeof SmallIconContainer>;
 
 export const Default: Story = {
   args: {
-    children: <DTHome />,
+    children: <DTHome className="size-16" />,
   },
 };

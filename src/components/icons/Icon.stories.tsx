@@ -19,17 +19,13 @@ const meta: Meta<typeof DTLogin> = {
     layout: 'centered',
   },
   argTypes: {
-    size: {
-      control: 'number',
-      description: '아이콘의 크기 (px)',
-    },
     color: {
       control: 'color',
       description: '아이콘의 색상',
     },
     className: {
       control: 'text',
-      description: 'Tailwind CSS 클래스 추가',
+      description: 'Tailwind CSS 클래스 추가 (크기도 여기에서 관리)',
     },
   },
   tags: ['autodocs'],
@@ -41,12 +37,11 @@ type Story = StoryObj<typeof DTLogin>;
 
 export const OnLoginIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTLogin {...args} />
+      <DTLogin className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">로그인</p>
     </div>
   ),
@@ -54,12 +49,11 @@ export const OnLoginIcon: Story = {
 
 export const OnHomeIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTHome {...args} />
+      <DTHome className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">도움말</p>
     </div>
   ),
@@ -67,12 +61,11 @@ export const OnHomeIcon: Story = {
 
 export const OnHelpIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTHelp {...args} />
+      <DTHelp className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">도움말</p>
     </div>
   ),
@@ -80,12 +73,11 @@ export const OnHelpIcon: Story = {
 
 export const OnCloseIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTClose {...args} />
+      <DTClose className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">닫기</p>
     </div>
   ),
@@ -93,12 +85,11 @@ export const OnCloseIcon: Story = {
 
 export const OnCheckIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTCheck {...args} />
+      <DTCheck className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">확인</p>
     </div>
   ),
@@ -106,12 +97,11 @@ export const OnCheckIcon: Story = {
 
 export const OnExpandIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTExpand {...args} />
+      <DTExpand className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">확장 (더보기)</p>
     </div>
   ),
@@ -119,12 +109,11 @@ export const OnExpandIcon: Story = {
 
 export const OnDebateIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTDebate {...args} />
+      <DTDebate className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">토론</p>
     </div>
   ),
@@ -132,12 +121,11 @@ export const OnDebateIcon: Story = {
 
 export const OnRightArrowIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTRightArrow {...args} />
+      <DTRightArrow className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">우측 화살표</p>
     </div>
   ),
@@ -145,12 +133,11 @@ export const OnRightArrowIcon: Story = {
 
 export const OnLeftArrowIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTLeftArrow {...args} />
+      <DTLeftArrow className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">좌측 화살표</p>
     </div>
   ),
@@ -158,12 +145,11 @@ export const OnLeftArrowIcon: Story = {
 
 export const OnDragIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTDrag {...args} />
+      <DTDrag className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">드래그</p>
     </div>
   ),
@@ -171,26 +157,24 @@ export const OnDragIcon: Story = {
 
 export const OnCopyIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTCopy {...args} />
-      <p className="mt-2 text-sm text-gray-600">드래그</p>
+      <DTCopy className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">복사</p>
     </div>
   ),
 };
 
 export const OnDeleteIcon: Story = {
   args: {
-    size: 72,
     color: '#FECD4C',
   },
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
-      <DTDelete {...args} />
-      <p className="mt-2 text-sm text-gray-600">드래그</p>
+      <DTDelete className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">삭제</p>
     </div>
   ),
 };

@@ -29,12 +29,20 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
 
 StickyTriSectionHeader.Left = function Left(props: PropsWithChildren) {
   const { children } = props;
-  return <div className="flex-1 items-start text-start">{children}</div>;
+  return (
+    <div className="flex h-full flex-1 items-center justify-start text-start">
+      {children}
+    </div>
+  );
 };
 
 StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
   const { children } = props;
-  return <div className="flex-1 items-center text-center">{children}</div>;
+  return (
+    <div className="flex h-full flex-1 items-center justify-center text-center">
+      {children}
+    </div>
+  );
 };
 
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
@@ -46,7 +54,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
 
   return (
     <>
-      <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
+      <div className="flex h-full flex-1 items-center justify-end gap-[12px] text-right">
         {isGuestFlow() && (
           <>
             {/* Guest mode indicator */}
@@ -68,6 +76,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             case 'home':
               return (
                 <button
+                  className="flex h-full items-center justify-center"
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     if (isGuestFlow()) {
@@ -76,12 +85,13 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                     navigate('/home');
                   }}
                 >
-                  <DTHome />
+                  <DTHome className="h-full" />
                 </button>
               );
             case 'auth':
               return (
                 <button
+                  className="flex h-full items-center justify-center"
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     if (isLoggedIn()) {
@@ -91,7 +101,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                     }
                   }}
                 >
-                  <DTLogin />
+                  <DTLogin className="h-full" />
                 </button>
               );
             default:
