@@ -16,7 +16,7 @@ export default function ClearableInput({
       <input
         {...rest}
         value={value}
-        className="w-full rounded-md border border-neutral-300 p-3 pr-10 text-base text-black placeholder-neutral-400 focus:outline-none"
+        className="text-body w-full rounded-[4px] border border-default-border p-[12px] text-default-black placeholder-default-border focus:outline-none"
       />
       {value && (
         <button

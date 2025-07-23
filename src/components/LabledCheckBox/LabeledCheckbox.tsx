@@ -11,36 +11,37 @@ export default function LabeledCheckbox({
   ...rest
 }: LabeledCheckboxProps) {
   // 체크 안 된 상태일 때 라벨 색을 회색으로
-  const labelColorClass = checked ? '' : 'text-neutral-400';
+  const labelColorClass = checked ? '' : 'text-default-disabled/hover';
+  const checkedColorClass = `
+    checked:bg-brand checked:text-default-white checked:border-transparent 
+    checked:before:absolute
+    checked:before:left-1/2
+    checked:before:top-[-6px]
+    checked:before:-translate-x-1/2
+    checked:before:text-xl
+    checked:before:font-bold
+    checked:before:content-['✓']
+    checked:before:text-background-default
+  `;
+  const uncheckedColorClass = 'border-default-border border';
 
   return (
     <label
-      className={`md:text-base flex cursor-pointer items-center gap-2 text-sm ${labelColorClass}`}
+      className={`flex cursor-pointer items-center gap-2 text-sm md:text-base ${labelColorClass}`}
     >
       <input
         {...rest}
         type="checkbox"
         checked={checked}
-        className="
+        className={`
           relative
-          h-5
-          w-5 cursor-pointer
-          appearance-none
-          rounded-sm border
-          border-neutral-300
-          checked:border-transparent
-          checked:bg-blue-500
-          checked:before:absolute
-
-          checked:before:left-1/2
-          checked:before:top-[-4px]
-          checked:before:-translate-x-1/2
-          checked:before:text-xl
-          checked:before:font-bold
-          checked:before:text-background-default
-          checked:before:content-['✓']
+          size-[20px]
+          cursor-pointer appearance-none
+          rounded-sm
           focus:outline-none
-        "
+          ${checkedColorClass}
+          ${uncheckedColorClass}
+        `}
       />
       {label}
     </label>

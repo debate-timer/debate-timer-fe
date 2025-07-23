@@ -479,7 +479,7 @@ export default function TimerCreationContent({
           </div>
         </div>
         <button
-          className="rounded-xl border-[1px] border-neutral-700 p-2 text-[18px] font-semibold hover:bg-brand-main"
+          className="hover:bg-brand-main rounded-xl border-[1px] border-neutral-700 p-2 text-[18px] font-semibold"
           onClick={handleSubmit}
         >
           설정 완료
