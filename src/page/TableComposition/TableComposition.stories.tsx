@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import TableComposition from './TableComposition';
 
 const meta: Meta<typeof TableComposition> = {
-  title: 'page/TableCompositon',
+  title: 'page/TableComposition',
   component: TableComposition,
   tags: ['autodocs'],
   decorators: [
