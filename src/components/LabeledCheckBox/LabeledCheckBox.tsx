@@ -1,17 +1,17 @@
 import { InputHTMLAttributes, ReactNode } from 'react';
 
-interface LabeledCheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
+interface LabeledCheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
   label: ReactNode;
   checked: boolean;
   disabled?: boolean;
 }
 
-export default function LabeledCheckbox({
+export default function LabeledCheckBox({
   label,
   checked,
   disabled = false,
   ...rest
-}: LabeledCheckboxProps) {
+}: LabeledCheckBoxProps) {
   // Set label text color to...
   // - Black when checkbox is enabled
   // - Gray when checkbox is disabled
@@ -19,14 +19,15 @@ export default function LabeledCheckbox({
   return (
     <label
       className={`
-        flex cursor-pointer items-center gap-2 text-sm md:text-base
-        ${disabled ? 'text-neutral-400' : 'text-neutral-900'}
+        flex items-center gap-2 text-sm md:text-base
+        ${disabled ? 'text-neutral-400' : 'cursor-pointer text-neutral-900'}
         `}
     >
       <input
         {...rest}
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         className={`
           relative
           h-5

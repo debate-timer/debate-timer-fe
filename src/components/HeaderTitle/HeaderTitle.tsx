@@ -13,7 +13,7 @@ export default function HeaderTitle(props: HeaderTitleProps) {
     <>
       {isLoading && (
         <div className="flex items-center justify-center">
-          <Skeleton width={540} height={32} />
+          <Skeleton width={400} height={32} />
         </div>
       )}
       {!isLoading && (
