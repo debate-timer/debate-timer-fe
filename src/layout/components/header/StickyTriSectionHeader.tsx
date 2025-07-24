@@ -108,7 +108,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
           left={{
             text: '아니오',
             onClick: () => {
-              deleteSessionCustomizeTableData();
+              sessionStorage.setItem('keepGuestTable', 'false');
               closeModal();
               oAuthLogin();
             },
@@ -116,6 +116,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
           right={{
             text: '네',
             onClick: () => {
+              sessionStorage.setItem('keepGuestTable', 'true');
               closeModal();
               oAuthLogin();
             },
