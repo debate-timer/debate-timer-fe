@@ -44,6 +44,12 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const { openModal, closeModal, ModalWrapper } = useModal({});
   const defaultIcons: HeaderIcons[] = ['home']; // Icons that will be displayed on all pages are added here
 
+  const handleLoginStart = (keepData: boolean) => {
+    sessionStorage.setItem('keepGuestTable', String(keepData));
+    closeModal();
+    oAuthLogin();
+  };
+
   return (
     <>
       <div className="flex flex-1 items-stretch justify-end gap-2 text-right">
@@ -107,19 +113,11 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         <DialogModal
           left={{
             text: '아니오',
-            onClick: () => {
-              sessionStorage.setItem('keepGuestTable', 'false');
-              closeModal();
-              oAuthLogin();
-            },
+            onClick: () => handleLoginStart(false),
           }}
           right={{
             text: '네',
-            onClick: () => {
-              sessionStorage.setItem('keepGuestTable', 'true');
-              closeModal();
-              oAuthLogin();
-            },
+            onClick: () => handleLoginStart(true),
             isBold: true,
           }}
         >
