@@ -7,7 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
-import ErrorIndicator from '../../components/async/ErrorIndicator';
+import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';

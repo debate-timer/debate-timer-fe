@@ -11,8 +11,8 @@ import { useTableShare } from '../../hooks/useTableShare';
 import { MdOutlineIosShare } from 'react-icons/md';
 import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
-import ErrorIndicator from '../../components/async/ErrorIndicator';
-import LoadingIndicator from '../../components/async/LoadingIndicator';
+import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 
 export default function TableOverviewPage() {
   const { id } = useParams();

@@ -1,7 +1,7 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { IoLinkOutline, IoShareOutline } from 'react-icons/io5';
 import LoadingSpinner from '../LoadingSpinner';
-import ErrorIndicator from '../async/ErrorIndicator';
+import ErrorIndicator from '../ErrorIndicator/ErrorIndicator';
 
 interface ShareModalProps {
   shareUrl: string;

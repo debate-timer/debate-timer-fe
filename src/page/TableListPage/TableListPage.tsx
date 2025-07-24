@@ -6,7 +6,7 @@ import { DebateTable } from '../../type/type';
 import Table from './components/Table';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { Suspense } from 'react';
-import LoadingIndicator from '../../components/async/LoadingIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 
 export default function TableListPage() {
   const { data } = useGetDebateTableList();

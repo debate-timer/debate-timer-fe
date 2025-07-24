@@ -12,8 +12,8 @@ import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
-import ErrorIndicator from '../../components/async/ErrorIndicator';
-import LoadingIndicator from '../../components/async/LoadingIndicator';
+import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 
 export default function TimerPage() {
   const pathParams = useParams();

@@ -8,7 +8,7 @@ import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableI
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
-import LoadingIndicator from '../../../../components/async/LoadingIndicator';
+import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator';
 
 interface TimeBoxStepProps {
   initData: DebateTableData;
