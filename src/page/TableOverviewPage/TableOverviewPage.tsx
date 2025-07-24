@@ -56,11 +56,9 @@ export default function TableOverviewPage() {
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            {isLoading && <HeaderTableInfo skeletonEnabled={true} />}
             {!isLoading && <HeaderTableInfo name={data?.info.name} />}
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            {isLoading && <HeaderTitle skeletonEnabled={true} />}
             {!isLoading && <HeaderTitle title={data?.info.agenda} />}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right />

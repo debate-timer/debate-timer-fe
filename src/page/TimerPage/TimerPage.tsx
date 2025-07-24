@@ -64,7 +64,6 @@ export default function TimerPage() {
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            {isLoading && <HeaderTableInfo skeletonEnabled={true} />}
             {!isLoading && (
               <HeaderTableInfo
                 name={
@@ -76,7 +75,6 @@ export default function TimerPage() {
             )}
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            {isLoading && <HeaderTitle skeletonEnabled={true} />}
             {!isLoading && (
               <HeaderTitle
                 title={

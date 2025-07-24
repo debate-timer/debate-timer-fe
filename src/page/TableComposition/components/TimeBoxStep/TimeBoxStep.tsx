@@ -88,11 +88,9 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          {isLoading && <HeaderTableInfo skeletonEnabled={true} />}
           {!isLoading && <HeaderTableInfo name={initData.info.name} />}
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          {isLoading && <HeaderTitle skeletonEnabled={true} />}
           {!isLoading && <HeaderTitle title={initData.info.agenda} />}
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
