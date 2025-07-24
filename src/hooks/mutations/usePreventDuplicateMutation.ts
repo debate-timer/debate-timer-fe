@@ -1,5 +1,6 @@
 import { useRef, useCallback } from 'react';
 import {
+  type DefaultError,
   useMutation,
   type UseMutationOptions,
   type UseMutationResult,
@@ -7,14 +8,16 @@ import {
 
 export function usePreventDuplicateMutation<
   TData = unknown,
-  TError = Error,
+  TError = DefaultError,
   TVariables = void,
   TContext = unknown,
 >(
   options: UseMutationOptions<TData, TError, TVariables, TContext>,
 ): UseMutationResult<TData, TError, TVariables, TContext> {
+  // useRef를 통해 요청 여부를 저장
   const isMutatingRef = useRef(false);
 
+  // 요청이 끝난 후 실행
   const onSettled: UseMutationOptions<
     TData,
     TError,
@@ -27,6 +30,7 @@ export function usePreventDuplicateMutation<
 
   const mutation = useMutation({ ...options, onSettled });
 
+  // 중복 요청을 방지하는 mutation wrapper
   const preventDuplicateMutate = useCallback(
     (
       variables: TVariables,
@@ -43,5 +47,6 @@ export function usePreventDuplicateMutation<
     [mutation],
   );
 
+  // 중복 요청을 방지하는 커스텀 mutate를 반환
   return { ...mutation, mutate: preventDuplicateMutate };
 }

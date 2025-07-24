@@ -21,7 +21,7 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
   // to let user know exact reason of error.
   const title =
     error instanceof APIError
-      ? ERROR_STATUS_TABLE[error.status]
+      ? ERROR_STATUS_TABLE[error.status] || `${error.status} 오류`
       : '오류가 발생했어요...';
 
   return (

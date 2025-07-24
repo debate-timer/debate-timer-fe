@@ -30,10 +30,10 @@ export async function request<T>(
   try {
     // Get response
     const response: AxiosResponse<T> = await instance({
-      method: method,
+      method,
       url: endpoint,
-      data: data,
-      params: params,
+      data,
+      params,
     });
 
     // If successful, return it

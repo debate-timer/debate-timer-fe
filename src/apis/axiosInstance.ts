@@ -5,6 +5,7 @@ import {
   setAccessToken,
 } from '../util/accessToken';
 
+// Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
 
 // Axios instance
