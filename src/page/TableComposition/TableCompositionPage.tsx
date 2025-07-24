@@ -25,10 +25,10 @@ export default function TableCompositionPage() {
   const mode = rawMode as Mode;
 
   // Verify table id param
-  if (isNaN(Number(rawTableId))) {
+  if (mode === 'edit' && (rawTableId === null || isNaN(Number(rawTableId)))) {
     throw new Error('테이블 ID가 올바르지 않습니다.');
   }
-  const tableId = Number(rawTableId);
+  const tableId = rawTableId ? Number(rawTableId) : 0;
 
   // Print different funnel page by mode (edit a existing table or add a new table)
   const initialMode: TableCompositionStep =
