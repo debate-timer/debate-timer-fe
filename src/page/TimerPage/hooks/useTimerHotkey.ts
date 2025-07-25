@@ -34,8 +34,6 @@ export function useTimerHotkey(state: TimerPageLogics) {
       // 핫키로 쓸 키 목록
       const keysToDisable = new Set([
         'Space',
-        'ArrowLeft',
-        'ArrowRight',
         'KeyR',
         'KeyA',
         'KeyL',
@@ -77,14 +75,6 @@ export function useTimerHotkey(state: TimerPageLogics) {
               toggleTimer(timer2);
             }
           }
-          break;
-        case 'ArrowLeft':
-          // 이전 라운드 이동
-          goToOtherItem(true);
-          break;
-        case 'ArrowRight':
-          // 다음 라운드 이동
-          goToOtherItem(false);
           break;
         case 'KeyR':
           // 타이머 리셋
