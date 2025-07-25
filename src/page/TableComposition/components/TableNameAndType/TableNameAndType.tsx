@@ -1,5 +1,6 @@
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
+import LabeledCheckBox from '../../../../components/LabeledCheckBox/LabeledCheckBox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { DebateInfo, StanceToString } from '../../../../type/type';
 

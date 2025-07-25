@@ -10,7 +10,7 @@ import {
 import { Formatting } from '../../../../util/formatting';
 import normalTimer from '../../../../assets/timer/normal_timer.png';
 import timeBasedTimer from '../../../../assets/timer/timebased_timer.png';
-import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
+import LabeledCheckBox from '../../../../components/LabeledCheckBox/LabeledCheckBox';
 import timeBasedPerSpeakingTimer from '../../../../assets/timer/timebased_perSpeaking_timer.png';
 
 interface TimerCreationContentProps {
@@ -461,7 +461,7 @@ export default function TimerCreationContent({
                 {/** 1회당 발언시간 */}
                 <div className="flex w-full items-center space-x-2">
                   <div className="w-24 flex-shrink-0">
-                    <LabeledCheckbox
+                    <LabeledCheckBox
                       id="speaker-toggle"
                       label={
                         <span className="ml-1 font-semibold">
