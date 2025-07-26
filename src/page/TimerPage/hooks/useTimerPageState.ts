@@ -166,13 +166,11 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
    * 진영 전환 시, 상대 타이머를 발언 구간에 맞게 초기화
    */
   useEffect(() => {
-    if (prosConsSelected === 'CONS') {
-      if (timer1.speakingTimer === null) return;
-      timer1.resetTimerForNextPhase();
-    } else if (prosConsSelected === 'PROS') {
-      if (timer2.speakingTimer === null) return;
-      timer2.resetTimerForNextPhase();
-    }
+    const isPros = prosConsSelected === 'PROS';
+    const myTimer = isPros ? timer1 : timer2;
+    const opponentTimer = isPros ? timer2 : timer1;
+    if (myTimer.speakingTimer === null) return;
+    myTimer.resetTimerForNextPhase(opponentTimer.isDone);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prosConsSelected]);
 

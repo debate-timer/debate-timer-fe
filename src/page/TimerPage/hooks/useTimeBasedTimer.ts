@@ -113,33 +113,41 @@ export function useTimeBasedTimer({
    * 발언자 전환 시 타이머 리셋/초기화
    * - 발언 타이머 사용중이면 default값(또는 totalTimer 이하)로 재설정
    * - 전체 타이머는 초기값(defaultTotalTimer)로 리셋
+   * - 상대 진영 전체 시간 소진 시, 남은 전체 시간을 speakingTimer에 전부 반영
    */
-  const resetTimerForNextPhase = useCallback(() => {
-    pauseTimer();
-    if (
-      isSpeakingTimer &&
-      defaultTime.defaultSpeakingTimer !== null &&
-      totalTimer !== null
-    ) {
-      setSpeakingTimer(
-        defaultTime.defaultSpeakingTimer < totalTimer
-          ? defaultTime.defaultSpeakingTimer
-          : totalTimer,
-      );
-      if (totalTimer > 0) {
-        setIsDone(false);
+  const resetTimerForNextPhase = useCallback(
+    (isOpponentDone: boolean) => {
+      pauseTimer();
+      if (
+        isSpeakingTimer &&
+        totalTimer !== null &&
+        defaultTime.defaultSpeakingTimer !== null
+      ) {
+        if (isOpponentDone) {
+          setSpeakingTimer(totalTimer);
+        } else {
+          setSpeakingTimer(
+            defaultTime.defaultSpeakingTimer < totalTimer
+              ? defaultTime.defaultSpeakingTimer
+              : totalTimer,
+          );
+        }
+        if (totalTimer > 0) {
+          setIsDone(false);
+        }
+        return;
       }
-      return;
-    }
-    if (totalTimer === 0) return;
-    setTotalTimer(defaultTime.defaultTotalTimer);
-  }, [
-    defaultTime.defaultSpeakingTimer,
-    defaultTime.defaultTotalTimer,
-    isSpeakingTimer,
-    totalTimer,
-    pauseTimer,
-  ]);
+      if (totalTimer === 0) return;
+      setTotalTimer(defaultTime.defaultTotalTimer);
+    },
+    [
+      defaultTime.defaultSpeakingTimer,
+      defaultTime.defaultTotalTimer,
+      isSpeakingTimer,
+      totalTimer,
+      pauseTimer,
+    ],
+  );
 
   /**
    * 외부에서 전체/발언 타이머를 지정값으로 재설정
@@ -203,7 +211,7 @@ export interface TimeBasedTimerLogics {
   isSpeakingTimer: boolean;
   startTimer: () => void;
   pauseTimer: () => void;
-  resetTimerForNextPhase: () => void;
+  resetTimerForNextPhase: (isOpponentDone: boolean) => void;
   resetCurrentTimer: () => void;
   setTimers: (total: number | null, speaking?: number | null) => void;
   setSavedTime: Dispatch<
