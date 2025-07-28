@@ -32,9 +32,9 @@ export default function TableListPageContent() {
 
       {/** All tables */}
       {data &&
-        data.tables.map((table: DebateTable, idx: number) => (
+        data.tables.map((table: DebateTable) => (
           <Table
-            key={idx}
+            key={table.id}
             id={table.id}
             name={table.name}
             agenda={table.agenda}
