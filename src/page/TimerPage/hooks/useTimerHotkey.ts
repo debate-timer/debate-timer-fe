@@ -92,9 +92,9 @@ export function useTimerHotkey(state: TimerPageLogics) {
             normalTimer.resetTimer();
           } else {
             if (prosConsSelected === 'PROS') {
-              timer1.resetCurrentTimer();
+              timer1.resetCurrentTimer(timer2.isDone);
             } else {
-              timer2.resetCurrentTimer();
+              timer2.resetCurrentTimer(timer1.isDone);
             }
           }
           break;

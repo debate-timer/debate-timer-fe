@@ -89,25 +89,46 @@ export function useTimeBasedTimer({
   /**
    * 최근 저장된 시간(savedTime)으로 복원
    */
-  const resetCurrentTimer = useCallback(() => {
-    pauseTimer();
-    setIsDone(false);
-    setTotalTimer(savedTime.savedTotalTimer);
-    if (
-      isSpeakingTimer &&
-      defaultTime.defaultSpeakingTimer !== null &&
-      totalTimer !== null
-    ) {
-      setSpeakingTimer(savedTime.savedSpeakingTimer);
-    }
-  }, [
-    isSpeakingTimer,
-    defaultTime.defaultSpeakingTimer,
-    savedTime.savedTotalTimer,
-    savedTime.savedSpeakingTimer,
-    totalTimer,
-    pauseTimer,
-  ]);
+  const resetCurrentTimer = useCallback(
+    (isOpponentDone: boolean) => {
+      // 초기화를 위해 타이머 정지
+      pauseTimer();
+
+      // 타이머가 초기화되었으니 이제부터는 당연히 다시 동작 가능하기 때문에,
+      // isDone을 false로 설정
+      setIsDone(false);
+
+      // 전체 발언 시간 복원
+      setTotalTimer(savedTime.savedTotalTimer);
+
+      // 1회당 발언 시간 사용하는지 여부와 유효성 확인
+      if (
+        !isSpeakingTimer ||
+        defaultTime.defaultSpeakingTimer === null ||
+        totalTimer === null
+      ) {
+        return;
+      }
+
+      // 상대편 발언 종료 여부에 따라 1회당 발언 시간 다르게 계산
+      console.log('# 1회당 발언 시간 초기화 계산');
+      if (isOpponentDone) {
+        console.log('  - 상대방 완료');
+        setSpeakingTimer(savedTime.savedTotalTimer);
+      } else {
+        console.log('  - 상대방 미완료');
+        setSpeakingTimer(savedTime.savedSpeakingTimer);
+      }
+    },
+    [
+      isSpeakingTimer,
+      defaultTime.defaultSpeakingTimer,
+      savedTime.savedTotalTimer,
+      savedTime.savedSpeakingTimer,
+      totalTimer,
+      pauseTimer,
+    ],
+  );
 
   /**
    * 발언자 전환 시 타이머 리셋/초기화
@@ -202,7 +223,7 @@ export interface TimeBasedTimerLogics {
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimerForNextPhase: (isOpponentDone: boolean) => void;
-  resetCurrentTimer: () => void;
+  resetCurrentTimer: (isOpponentDone: boolean) => void;
   setTimers: (total: number | null, speaking?: number | null) => void;
   setSavedTime: Dispatch<
     SetStateAction<{
