@@ -170,7 +170,26 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     const myTimer = isPros ? timer1 : timer2;
     const opponentTimer = isPros ? timer2 : timer1;
     if (myTimer.speakingTimer === null) return;
-    myTimer.resetTimerForNextPhase(opponentTimer.isDone);
+    if (
+      opponentTimer.speakingTimer !== null &&
+      opponentTimer.totalTimer !== null &&
+      opponentTimer.totalTimer > 0
+    ) {
+      myTimer.resetTimerForNextPhase(false);
+    } else {
+      myTimer.resetTimerForNextPhase(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prosConsSelected]);
+  /**
+   * 진영 전환 시, 상대 타이머가 작동가능하면 isDone false로 변경
+   */
+  useEffect(() => {
+    const isPros = prosConsSelected === 'PROS';
+    const opponentTimer = isPros ? timer2 : timer1;
+    if (opponentTimer.totalTimer !== null && opponentTimer.totalTimer > 0) {
+      opponentTimer.setIsDone(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prosConsSelected]);
 
@@ -197,14 +216,16 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   useEffect(() => {
     const selectedTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
 
-    const isDone = selectedTimer.totalTimer === 0;
+    const isDone =
+      selectedTimer.speakingTimer === null
+        ? selectedTimer.totalTimer === 0
+        : selectedTimer.speakingTimer === 0;
 
     if (isDone) {
       selectedTimer.setIsDone(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    prosConsSelected,
     timer1.totalTimer,
     timer1.speakingTimer,
     timer2.totalTimer,
