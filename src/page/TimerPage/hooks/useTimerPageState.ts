@@ -106,15 +106,37 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
    * - pros → cons, cons → pros로 타이머/상태 전환
    */
   const switchCamp = useCallback(() => {
+    // 1. 현재 팀과 다음 팀의 정보 설정
     const currentTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
     const nextTimer = prosConsSelected === 'PROS' ? timer2 : timer1;
     const nextTeam = prosConsSelected === 'PROS' ? 'CONS' : 'PROS';
-    if (nextTimer.isDone) return;
+
+    // 2. 상대 팀이 시간을 모두 소진했을 경우, 차례를 넘기지 않고 종료
+    if (nextTimer.isDone) {
+      return;
+    }
+
+    // 3. 다음 팀의 발언 시간을 미리 계산
+    const isOpponentDone =
+      currentTimer.totalTimer !== null && currentTimer.totalTimer <= 0;
+    nextTimer.resetTimerForNextPhase(isOpponentDone);
+
+    // 4. 현재 타이머를 멈추기 전, 실행 중이었는지를 저장
+    const wasRunning = currentTimer.isRunning;
+
+    // 5. 이제 현재 타이머를 정지하고...
     currentTimer.pauseTimer();
-    if (!nextTimer.isDone && currentTimer.isRunning) {
+
+    // 6. 발언권을 다음 팀에게 넘김 (현재 발언권 가진 팀을 다음 팀으로 설정)
+    setProsConsSelected(nextTeam);
+
+    // 7. 타이머 자동 실행 조건 확인
+    // - 만약 원래 타이머가 동작 중이었다면, 상대 팀으로 발언권을 넘기면서 동시에 타이머 시작
+    // - 그렇지 않다면, 상대 팀으로 발언권을 넘기기만 함
+    if (wasRunning) {
+      console.log('# 다음 타이머 즉시 시작');
       nextTimer.startTimer();
     }
-    setProsConsSelected(nextTeam);
   }, [prosConsSelected, timer1, timer2]);
 
   /**
@@ -162,25 +184,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     normalTimer.setTimer,
   ]);
 
-  /**
-   * 진영 전환 시, 상대 타이머를 발언 구간에 맞게 초기화
-   */
-  useEffect(() => {
-    const isPros = prosConsSelected === 'PROS';
-    const myTimer = isPros ? timer1 : timer2;
-    const opponentTimer = isPros ? timer2 : timer1;
-    if (myTimer.speakingTimer === null) return;
-    if (
-      opponentTimer.speakingTimer !== null &&
-      opponentTimer.totalTimer !== null &&
-      opponentTimer.totalTimer > 0
-    ) {
-      myTimer.resetTimerForNextPhase(false);
-    } else {
-      myTimer.resetTimerForNextPhase(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prosConsSelected]);
   /**
    * 진영 전환 시, 상대 타이머가 작동가능하면 isDone false로 변경
    */

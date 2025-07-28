@@ -113,40 +113,30 @@ export function useTimeBasedTimer({
    * 발언자 전환 시 타이머 리셋/초기화
    * - 발언 타이머 사용중이면 default값(또는 totalTimer 이하)로 재설정
    * - 전체 타이머는 초기값(defaultTotalTimer)로 리셋
-   * - 상대 진영 전체 시간 소진 시, 남은 전체 시간을 speakingTimer에 전부 반영
    */
   const resetTimerForNextPhase = useCallback(
     (isOpponentDone: boolean) => {
-      pauseTimer();
+      // 타이머의 값들이 유효한지 검사
       if (
-        isSpeakingTimer &&
-        totalTimer !== null &&
-        defaultTime.defaultSpeakingTimer !== null
+        !isSpeakingTimer ||
+        totalTimer === null ||
+        defaultTime.defaultSpeakingTimer === null
       ) {
-        if (isOpponentDone) {
-          setSpeakingTimer(totalTimer);
-        } else {
-          setSpeakingTimer(
-            defaultTime.defaultSpeakingTimer < totalTimer
-              ? defaultTime.defaultSpeakingTimer
-              : totalTimer,
-          );
-        }
-        if (totalTimer > 0) {
-          setIsDone(false);
-        }
+        console.error('타이머 값이 유효하지 않거나 1회당 발언 시간 사용 안 함');
         return;
       }
-      if (totalTimer === 0) return;
-      setTotalTimer(defaultTime.defaultTotalTimer);
+
+      // 다음 발언 시간 계산
+      // - 상대방 시간 모두 소진 시, 남아있는 전체 발언 시간을 모두 1회당 발언 시간으로 사용
+      // - 상대방 시간이 남았을 때, 1회당 발언 시간과 남은 전체 발언 시간 중 더 작은 것을 사용
+      const nextSpeakingTime = isOpponentDone
+        ? totalTimer
+        : Math.min(totalTimer, defaultTime.defaultSpeakingTimer);
+
+      // 계산한 시간을 1회당 발언 시간으로 설정
+      setSpeakingTimer(nextSpeakingTime);
     },
-    [
-      defaultTime.defaultSpeakingTimer,
-      defaultTime.defaultTotalTimer,
-      isSpeakingTimer,
-      totalTimer,
-      pauseTimer,
-    ],
+    [defaultTime.defaultSpeakingTimer, isSpeakingTimer, totalTimer],
   );
 
   /**
