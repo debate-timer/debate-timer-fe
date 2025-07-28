@@ -6,7 +6,13 @@ interface ErrorIndicatorProps extends PropsWithChildren {
 }
 
 export default function ErrorIndicator({
-  children = '데이터를 불러오지 못했어요. 다시 시도할까요?',
+  children = (
+    <>
+      데이터를 불러오지 못했어요.
+      <br />
+      다시 시도할까요?
+    </>
+  ),
   onClickRetry,
 }: ErrorIndicatorProps) {
   return (

@@ -42,9 +42,7 @@ export default function TableOverviewPage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => refetch()}>
-            테이블 정보를 불러오지 못했어요...<br></br>다시 시도할까요?
-          </ErrorIndicator>
+          <ErrorIndicator onClickRetry={() => refetch()} />
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
     );

@@ -18,19 +18,16 @@ export default function TableCompositionPage() {
   const rawMode = searchParams.get('mode');
   const rawTableId = searchParams.get('tableId');
 
-  // Verify mode param
   if (rawMode !== 'edit' && rawMode !== 'add') {
     throw new Error('테이블 모드가 올바르지 않습니다.');
   }
   const mode = rawMode as Mode;
 
-  // Verify table id param
   if (mode === 'edit' && (rawTableId === null || isNaN(Number(rawTableId)))) {
     throw new Error('테이블 ID가 올바르지 않습니다.');
   }
   const tableId = rawTableId ? Number(rawTableId) : 0;
 
-  // Print different funnel page by mode (edit a existing table or add a new table)
   const initialMode: TableCompositionStep =
     mode !== 'edit' ? 'NameAndType' : 'TimeBox';
   const { Funnel, currentStep, goToStep } =

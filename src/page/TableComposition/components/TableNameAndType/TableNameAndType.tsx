@@ -13,7 +13,6 @@ interface TableNameAndTypeProps {
 }
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
-  // Deconstruct props
   const {
     info,
     isEdit = false,
@@ -22,7 +21,6 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
     onButtonClick,
   } = props;
 
-  // Prepare handlers
   const handleFieldChange = <K extends keyof DebateInfo>(
     field: K,
     value: DebateInfo[K],

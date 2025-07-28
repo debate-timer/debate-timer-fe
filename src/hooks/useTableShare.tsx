@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { createTableShareUrl } from '../util/arrayEncoding';
 
 export function useTableShare(tableId: number) {
-  // Prepare variables, states and functions
   const { isOpen, openModal, closeModal, ModalWrapper } = useModal();
   const [copyState, setCopyState] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
@@ -22,9 +21,16 @@ export function useTableShare(tableId: number) {
     }
   };
 
-  // Fetch data
-  const { data, isLoading, isError, refetch, isRefetching, isRefetchError } =
-    useGetDebateTableData(tableId, isOpen);
+  const {
+    data,
+    isLoading: isFetching,
+    isError: isFetchError,
+    refetch,
+    isRefetching,
+    isRefetchError,
+  } = useGetDebateTableData(tableId, isOpen);
+  const isLoading = isFetching || isRefetching;
+  const isError = isFetchError || isRefetchError;
 
   // Process URL when data is successfully fetched
   useEffect(() => {
@@ -49,8 +55,8 @@ export function useTableShare(tableId: number) {
         <ShareModal
           shareUrl={shareUrl}
           copyState={copyState}
-          isLoading={isLoading || isRefetching}
-          isError={isError || isRefetchError}
+          isLoading={isLoading}
+          isError={isError}
           onRefetch={() => refetch()}
           onCopyClicked={() => handleCopy()}
         />
