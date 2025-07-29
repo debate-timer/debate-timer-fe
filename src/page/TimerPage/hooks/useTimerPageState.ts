@@ -36,8 +36,8 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   const [index, setIndex] = useState(0);
 
   // 자유토론 타이머, 일반 타이머 상태 관리 커스텀 훅
-  const timer1 = useTimeBasedTimer({});
-  const timer2 = useTimeBasedTimer({});
+  const timer1 = useTimeBasedTimer();
+  const timer2 = useTimeBasedTimer();
   const normalTimer = useNormalTimer();
 
   // 현재 발언자('PROS'/'CONS')
@@ -166,7 +166,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
           savedSpeakingTimer: defaultSpeakingTimer,
         });
         timer.setTimers(defaultTotalTimer, defaultSpeakingTimer);
-        timer.setIsSpeakingTimer(true);
         timer.setIsDone(false);
       });
     }

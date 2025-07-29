@@ -7,22 +7,16 @@ import {
   SetStateAction,
 } from 'react';
 
-interface UseTimeBasedTimerProps {
-  initIsSpeakingTimer?: boolean; // 처음에 발언 당 시간을 추가할지 여부
-}
-
 /**
  * 토론에서 사용하는 커스텀 타이머 훅
  * - 전체시간, 전체시간 + 발언 당 시간(2가지) 모드 지원
  */
-export function useTimeBasedTimer({
-  initIsSpeakingTimer = false,
-}: UseTimeBasedTimerProps): TimeBasedTimerLogics {
+export function useTimeBasedTimer(): TimeBasedTimerLogics {
   // 전체 남은 시간 (null이면 타이머 미사용)
   const [totalTimer, setTotalTimer] = useState<number | null>(null);
   // 발언당 시간 타이머(=각 phase별 제한시간, 모드 전환 가능)
-  const [isSpeakingTimer, setIsSpeakingTimer] = useState(initIsSpeakingTimer);
   const [speakingTimer, setSpeakingTimer] = useState<number | null>(null);
+  const isSpeakingTimerAvailable = speakingTimer !== null;
   // 기본(초기) 시간값 (reset 등에서 참조)
   const [defaultTime, setDefaultTime] = useState<{
     defaultTotalTimer: number | null;
@@ -69,9 +63,12 @@ export function useTimeBasedTimer({
 
       // 계산한 남은 시간을 타이머에 반영
       setTotalTimer(remainingSeconds);
+      setSavedTime((prev) => {
+        return { ...prev, savedTotalTimer: totalTimer };
+      });
 
       // 1회당 발언 시간 타이머도 사용하고 있을 경우, 마찬가지로 남은 시간 계산
-      if (isSpeakingTimer) {
+      if (isSpeakingTimerAvailable) {
         if (speakingTargetTimeRef.current === null) {
           return;
         }
@@ -82,20 +79,12 @@ export function useTimeBasedTimer({
           Math.ceil(remainingSpeaking / 1000),
         );
         setSpeakingTimer(remainingSpeakingSeconds);
+        setSavedTime((prev) => {
+          return { ...prev, savedSpeakingTimer: speakingTimer };
+        });
       }
-
-      /*
-      // 만약 남은 시간이 0초 이하라면, 타이머 종료를 의미하므로,
-      // 인터벌을 제거하고 타이머를 종료함
-      if (remainingSeconds <= 0) {
-        clearInterval(intervalRef.current!);
-        intervalRef.current = null;
-        setIsDone(true);
-        setIsRunning(false);
-      }
-        */
     }, 200);
-  }, [isSpeakingTimer]);
+  }, [isSpeakingTimerAvailable, speakingTimer, totalTimer]);
 
   /**
    * 타이머 카운트다운 시작
@@ -114,13 +103,19 @@ export function useTimeBasedTimer({
     // 해당 시간을 목표 시간으로 두는 식임
     const startTime = Date.now();
     targetTimeRef.current = startTime + totalTimer * 1000;
-    if (isSpeakingTimer && speakingTimer !== null) {
+    if (isSpeakingTimerAvailable) {
       speakingTargetTimeRef.current = startTime + speakingTimer * 1000;
     }
 
     // 타이머 인터벌 시작
     setTimerInterval();
-  }, [isDone, isSpeakingTimer, setTimerInterval, speakingTimer, totalTimer]);
+  }, [
+    isDone,
+    isSpeakingTimerAvailable,
+    setTimerInterval,
+    speakingTimer,
+    totalTimer,
+  ]);
 
   /**
    * 타이머 일시정지
@@ -151,7 +146,7 @@ export function useTimeBasedTimer({
 
       // 1회당 발언 시간 사용하는지 여부와 유효성 확인
       if (
-        !isSpeakingTimer ||
+        !isSpeakingTimerAvailable ||
         defaultTime.defaultSpeakingTimer === null ||
         totalTimer === null
       ) {
@@ -166,7 +161,7 @@ export function useTimeBasedTimer({
       }
     },
     [
-      isSpeakingTimer,
+      isSpeakingTimerAvailable,
       savedTime.savedSpeakingTimer,
       savedTime.savedTotalTimer,
       defaultTime.defaultSpeakingTimer,
@@ -182,31 +177,34 @@ export function useTimeBasedTimer({
    */
   const resetTimerForNextPhase = useCallback(
     (isOpponentDone: boolean): number => {
-      console.log(`# resetTimerForNextPhase 호출`);
-      // console.log(`  - isOpponentDone = ${isOpponentDone}`);
-      // 타이머의 값들이 유효한지 검사
       if (
-        !isSpeakingTimer ||
-        totalTimer === null ||
-        defaultTime.defaultSpeakingTimer === null
+        isSpeakingTimerAvailable &&
+        defaultTime.defaultSpeakingTimer !== null &&
+        totalTimer !== null
       ) {
-        console.error('타이머 값이 유효하지 않거나 1회당 발언 시간 사용 안 함');
-        return 0;
+        // 1회당 발언 시간을 사용할 경우
+
+        // 다음 발언 시간 계산
+        // - 상대방 시간 모두 소진 시, 남아있는 전체 발언 시간을 모두 1회당 발언 시간으로 사용
+        // - 상대방 시간이 남았을 때, 1회당 발언 시간과 남은 전체 발언 시간 중 더 작은 것을 사용
+        const nextSpeakingTime = isOpponentDone
+          ? totalTimer
+          : Math.min(totalTimer, defaultTime.defaultSpeakingTimer);
+
+        // 계산한 시간을 1회당 발언 시간으로 설정
+        setSpeakingTimer(nextSpeakingTime);
+        return nextSpeakingTime;
+      } else {
+        // 1회당 발언 시간을 사용하지 않을 경우
+
+        // 전체 발언 시간 타이머는 초기값으로 리셋
+        if (totalTimer === 0 || totalTimer === null) {
+          return 0;
+        }
+        return totalTimer;
       }
-
-      // 다음 발언 시간 계산
-      // - 상대방 시간 모두 소진 시, 남아있는 전체 발언 시간을 모두 1회당 발언 시간으로 사용
-      // - 상대방 시간이 남았을 때, 1회당 발언 시간과 남은 전체 발언 시간 중 더 작은 것을 사용
-      const nextSpeakingTime = isOpponentDone
-        ? totalTimer
-        : Math.min(totalTimer, defaultTime.defaultSpeakingTimer);
-      // console.log(`  - nextSpeakingTime = ${nextSpeakingTime}`);
-
-      // 계산한 시간을 1회당 발언 시간으로 설정
-      setSpeakingTimer(nextSpeakingTime);
-      return nextSpeakingTime;
     },
-    [defaultTime.defaultSpeakingTimer, isSpeakingTimer, totalTimer],
+    [defaultTime.defaultSpeakingTimer, isSpeakingTimerAvailable, totalTimer],
   );
 
   /**
@@ -217,7 +215,7 @@ export function useTimeBasedTimer({
   const resetAndStartTimer = useCallback(
     (isOpponentDone: boolean) => {
       console.log(`# resetAndStartTimer 호출`);
-      const newSpeakingTime = resetTimerForNextPhase(isOpponentDone);
+      const newTime = resetTimerForNextPhase(isOpponentDone);
 
       if (intervalRef.current !== null || totalTimer === null || isDone) {
         return;
@@ -229,8 +227,8 @@ export function useTimeBasedTimer({
       // 해당 시간을 목표 시간으로 두는 식임
       const startTime = Date.now();
       targetTimeRef.current = startTime + totalTimer * 1000;
-      if (isSpeakingTimer) {
-        speakingTargetTimeRef.current = startTime + newSpeakingTime * 1000;
+      if (isSpeakingTimerAvailable) {
+        speakingTargetTimeRef.current = startTime + newTime * 1000;
       }
 
       // 타이머 인터벌 시작
@@ -240,7 +238,7 @@ export function useTimeBasedTimer({
       resetTimerForNextPhase,
       setTimerInterval,
       isDone,
-      isSpeakingTimer,
+      isSpeakingTimerAvailable,
       totalTimer,
     ],
   );
@@ -266,11 +264,9 @@ export function useTimeBasedTimer({
     pauseTimer();
     setDefaultTime({ defaultTotalTimer: 0, defaultSpeakingTimer: null });
     setTotalTimer(null);
-    setIsSpeakingTimer(initIsSpeakingTimer);
     setSpeakingTimer(null);
     setIsDone(false);
     intervalRef.current = null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pauseTimer]);
 
   useEffect(() => () => pauseTimer(), [pauseTimer]);
@@ -281,7 +277,7 @@ export function useTimeBasedTimer({
     isRunning,
     isDone,
     defaultTime,
-    isSpeakingTimer,
+    isSpeakingTimerAvailable,
     startTimer,
     pauseTimer,
     resetTimerForNextPhase,
@@ -290,7 +286,6 @@ export function useTimeBasedTimer({
     setTimers,
     setSavedTime,
     setDefaultTime,
-    setIsSpeakingTimer,
     setIsDone,
     clearTimer,
   };
@@ -305,7 +300,7 @@ export interface TimeBasedTimerLogics {
     defaultTotalTimer: number | null;
     defaultSpeakingTimer: number | null;
   };
-  isSpeakingTimer: boolean;
+  isSpeakingTimerAvailable: boolean;
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimerForNextPhase: (isOpponentDone: boolean) => number;
@@ -324,7 +319,6 @@ export interface TimeBasedTimerLogics {
       defaultSpeakingTimer: number | null;
     }>
   >;
-  setIsSpeakingTimer: Dispatch<SetStateAction<boolean>>;
   setIsDone: Dispatch<SetStateAction<boolean>>;
   clearTimer: () => void;
 }
