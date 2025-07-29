@@ -95,10 +95,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       return;
     }
 
-    // 3. 다음 팀의 발언 시간을 미리 계산
+    // 3. 현재 팀의 발언이 종료되었는지 확인
     const isOpponentDone =
       currentTimer.totalTimer !== null && currentTimer.totalTimer <= 0;
-    nextTimer.resetTimerForNextPhase(isOpponentDone);
 
     // 4. 현재 타이머를 멈추기 전, 실행 중이었는지를 저장
     const wasRunning = currentTimer.isRunning;
@@ -109,12 +108,12 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     // 6. 발언권을 다음 팀에게 넘김 (현재 발언권 가진 팀을 다음 팀으로 설정)
     setProsConsSelected(nextTeam);
 
-    // 7. 타이머 자동 실행 조건 확인
-    // - 만약 원래 타이머가 동작 중이었다면, 상대 팀으로 발언권을 넘기면서 동시에 타이머 시작
-    // - 그렇지 않다면, 상대 팀으로 발언권을 넘기기만 함
     if (wasRunning) {
-      console.log('# 다음 타이머 즉시 시작');
-      nextTimer.startTimer();
+      // 7-1. 만약 타이머가 실행 중이었다면, 다음 타이머 초기화 후 즉시 시작
+      nextTimer.resetAndStartTimer(isOpponentDone);
+    } else {
+      // 7-1. 만약 타이머가 멈춰 있었다면, 다음 타이머 초기화만 진행
+      nextTimer.resetTimerForNextPhase(isOpponentDone);
     }
   }, [prosConsSelected, timer1, timer2]);
 
