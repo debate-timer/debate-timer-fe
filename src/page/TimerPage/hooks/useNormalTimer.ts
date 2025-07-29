@@ -25,15 +25,44 @@ export function useNormalTimer(): NormalTimerLogics {
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
   const [savedTimer, setSavedTimer] = useState(0);
 
+  // 실제 시간 계산용 레퍼런스
+  const targetTimeRef = useRef<number | null>(null);
+
   /**
    * 타이머를 1초마다 1씩 감소시키며 시작
    * 이미 동작중이면 재시작하지 않음
    */
   const startTimer = useCallback(() => {
     if (intervalRef.current !== null) return;
+
+    // isRunning 상태를 true로 바꿔주고 인터벌 처리
+    setIsRunning(true);
+
+    // 목표 시각에 기반하여 타이머 계산
     intervalRef.current = setInterval(() => {
-      setTimer((prev) => (prev === null ? null : prev - 1));
-    }, 1000);
+      // 목표 시각 레퍼런스의 유효성 확인
+      if (targetTimeRef.current === null) {
+        return;
+      }
+
+      // 현재 시각 확인
+      const now = Date.now();
+
+      // 목표 시각까지 얼마나 더 필요한지, 남은 시간을 초 단위로 계산
+      const remainingTotal = targetTimeRef.current - now;
+      const remainingSeconds = Math.max(0, Math.ceil(remainingTotal / 1000));
+
+      // 계산한 남은 시간을 타이머에 반영
+      setTimer(remainingSeconds);
+
+      // 만약 남은 시간이 0초 이하라면, 타이머 종료를 의미하므로,
+      // 인터벌을 제거하고 타이머를 종료함
+      if (remainingSeconds <= 0) {
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
+        setIsRunning(false);
+      }
+    }, 200);
     setIsRunning(true);
   }, []);
 
