@@ -64,7 +64,7 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
       // 계산한 남은 시간을 타이머에 반영
       setTotalTimer(remainingSeconds);
       setSavedTime((prev) => {
-        return { ...prev, savedTotalTimer: totalTimer };
+        return { ...prev, savedTotalTimer: remainingSeconds };
       });
 
       // 1회당 발언 시간 타이머도 사용하고 있을 경우, 마찬가지로 남은 시간 계산
@@ -80,11 +80,11 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
         );
         setSpeakingTimer(remainingSpeakingSeconds);
         setSavedTime((prev) => {
-          return { ...prev, savedSpeakingTimer: speakingTimer };
+          return { ...prev, savedSpeakingTimer: remainingSpeakingSeconds };
         });
       }
     }, 200);
-  }, [isSpeakingTimerAvailable, speakingTimer, totalTimer]);
+  }, [isSpeakingTimerAvailable]);
 
   /**
    * 타이머 카운트다운 시작
@@ -182,7 +182,7 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
         defaultTime.defaultSpeakingTimer !== null &&
         totalTimer !== null
       ) {
-        // 1회당 발언 시간을 사용할 경우
+        // # 1회당 발언 시간을 사용할 경우
 
         // 다음 발언 시간 계산
         // - 상대방 시간 모두 소진 시, 남아있는 전체 발언 시간을 모두 1회당 발언 시간으로 사용
@@ -195,7 +195,7 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
         setSpeakingTimer(nextSpeakingTime);
         return nextSpeakingTime;
       } else {
-        // 1회당 발언 시간을 사용하지 않을 경우
+        // # 1회당 발언 시간을 사용하지 않을 경우
 
         // 전체 발언 시간 타이머는 초기값으로 리셋
         if (totalTimer === 0 || totalTimer === null) {
