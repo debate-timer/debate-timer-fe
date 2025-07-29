@@ -65,7 +65,7 @@ export function useModal(options: UseModalOptions = {}) {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           onClick={handleOverlayClick}
         >
-          <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
+          <div className="relative overflow-hidden rounded-[20px] bg-white shadow-lg">
             {children}
             {isCloseButtonExist && (
               <button

@@ -22,7 +22,9 @@ interface TimeBoxStepProps {
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
-  const { openModal, closeModal, ModalWrapper } = useModal();
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
+  });
   const {
     initData,
     onTimeBoxChange,
@@ -182,7 +184,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         </div>
       </DefaultLayout.StickyFooterWrapper>
 
-      <ModalWrapper closeButtonColor="text-neutral-1000">
+      <ModalWrapper>
         <TimerCreationContent
           beforeData={initTimeBox[initTimeBox.length - 1] as TimeBoxInfo}
           prosTeamName={initData.info.prosTeamName}
