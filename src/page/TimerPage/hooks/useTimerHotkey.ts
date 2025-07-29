@@ -100,16 +100,14 @@ export function useTimerHotkey(state: TimerPageLogics) {
           break;
         case 'KeyA':
           // 찬성 진영 선택 및 반대 타이머 정지
-          if (!timer1.isDone) {
-            setProsConsSelected('PROS');
-            if (timer2.isRunning) timer2.pauseTimer();
+          if (!timer1.isDone && prosConsSelected === 'CONS') {
+            switchCamp();
           }
           break;
         case 'KeyL':
           // 반대 진영 선택 및 찬성 타이머 정지
-          if (!timer2.isDone) {
-            setProsConsSelected('CONS');
-            if (timer1.isRunning) timer1.pauseTimer();
+          if (!timer2.isDone && prosConsSelected === 'PROS') {
+            switchCamp();
           }
           break;
         case 'Enter':
