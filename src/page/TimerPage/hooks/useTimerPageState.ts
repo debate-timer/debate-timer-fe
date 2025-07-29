@@ -81,27 +81,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   );
 
   /**
-   * 특정 진영(팀)을 활성화하는 함수
-   * - 사용자가 좌/우 타이머 영역을 직접 클릭할 때 사용
-   * - 현재 진영이 아닌 타이머를 클릭한 경우에만 동작
-   */
-  const handleActivateTeam = useCallback(
-    (team: TimeBasedStance) => {
-      const isPros = team === 'PROS';
-      const currentTimer = isPros ? timer1 : timer2;
-      const otherTimer = isPros ? timer2 : timer1;
-      if (currentTimer.isDone || prosConsSelected === team) return;
-
-      otherTimer.pauseTimer();
-      if (otherTimer.isRunning) {
-        currentTimer.startTimer();
-      }
-      setProsConsSelected(team);
-    },
-    [prosConsSelected, timer1, timer2],
-  );
-
-  /**
    * 발언 진영 전환(ENTER 키/버튼)
    * - pros → cons, cons → pros로 타이머/상태 전환
    */
@@ -111,7 +90,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     const nextTimer = prosConsSelected === 'PROS' ? timer2 : timer1;
     const nextTeam = prosConsSelected === 'PROS' ? 'CONS' : 'PROS';
 
-    // 2. 상대 팀이 시간을 모두 소진했을 경우, 차례를 넘기지 않고 종료
+    // 2. 상대 팀이 시간을 모두 소진했을 경우, 차례를 넘기지 않고 반환
     if (nextTimer.isDone) {
       return;
     }
@@ -138,6 +117,26 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       nextTimer.startTimer();
     }
   }, [prosConsSelected, timer1, timer2]);
+
+  /**
+   * 특정 진영(팀)을 활성화하는 함수
+   * - 사용자가 좌/우 타이머 영역을 직접 클릭할 때 사용
+   * - 현재 진영이 아닌 타이머를 클릭한 경우에만 동작
+   */
+  const handleActivateTeam = useCallback(
+    (team: TimeBasedStance) => {
+      // 클릭한 타이머 식별
+      const isPros = team === 'PROS';
+      const clickedTimer = isPros ? timer1 : timer2;
+
+      // 클릭한 타이머가 종료 상태거나 현재 타이머와 동일한 타이머라면, 바로 반환
+      if (clickedTimer.isDone || prosConsSelected === team) return;
+
+      // 아니라면 진영 전환
+      switchCamp();
+    },
+    [prosConsSelected, switchCamp, timer1, timer2],
+  );
 
   /**
    * 라운드 이동/초기 진입 시 타이머 상태 초기화 및 셋업
