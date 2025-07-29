@@ -15,6 +15,7 @@ export function useNormalTimer(): NormalTimerLogics {
   // 타이머에 표시할 '남은 시간'(초)
   const [timer, setTimer] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // 타이머가 초기화될 때 사용하는 '기본 시간값' (reset 시 사용)
   const [defaultTimer, setDefaultTimer] = useState(0);
 
@@ -33,7 +34,14 @@ export function useNormalTimer(): NormalTimerLogics {
    * 이미 동작중이면 재시작하지 않음
    */
   const startTimer = useCallback(() => {
-    if (intervalRef.current !== null) return;
+    if (intervalRef.current !== null || timer === null) return;
+
+    // 목표 시각을 실제 시각 기반으로 계산
+    // 예를 들어, 현재 시각이 오후 13시 00분 30초인데, 1회당 발언 시간이 30초라면,
+    // 1회당 발언 시간이 모두 끝나는 시간은 13시 01분 00초이므로,
+    // 해당 시간을 목표 시간으로 두는 식임
+    const startTime = Date.now();
+    targetTimeRef.current = startTime + timer * 1000;
 
     // isRunning 상태를 true로 바꿔주고 인터벌 처리
     setIsRunning(true);
@@ -63,8 +71,7 @@ export function useNormalTimer(): NormalTimerLogics {
         setIsRunning(false);
       }
     }, 200);
-    setIsRunning(true);
-  }, []);
+  }, [timer]);
 
   /**
    * 타이머 일시정지 (setInterval 해제)
