@@ -19,6 +19,7 @@ interface TimeBoxStepProps {
   onFinishButtonClick: () => void;
   onEditTableInfoButtonClick: () => void;
   isEdit?: boolean;
+  isSubmitting?: boolean;
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
@@ -31,6 +32,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     onFinishButtonClick,
     onEditTableInfoButtonClick,
     isEdit = false,
+    isSubmitting = false,
   } = props;
   const initTimeBox = initData.table;
   const isAbledSummitButton = initTimeBox.length !== 0;
@@ -172,11 +174,10 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
           <button
             onClick={onFinishButtonClick}
-            className={`
-              flex h-full w-full gap-[12px] rounded-full p-[24px]
-              ${isAbledSummitButton ? 'button enabled brand' : 'button disabled'}
-            `}
-            disabled={!isAbledSummitButton}
+            className={`h-16 w-full ${
+              isAbledSummitButton ? 'button enabled' : 'button disabled'
+            }`}
+            disabled={!isAbledSummitButton || isSubmitting}
           >
             <DTCheck className="h-full" />
             {isEdit ? '수정 완료' : '추가하기'}

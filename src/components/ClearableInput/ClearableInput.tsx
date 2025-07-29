@@ -3,12 +3,14 @@ import { IoMdCloseCircle } from 'react-icons/io';
 
 interface ClearableInputProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string;
+  disabled?: boolean;
   onClear: () => void;
 }
 
 export default function ClearableInput({
   value,
   onClear,
+  disabled = false,
   ...rest
 }: ClearableInputProps) {
   return (
@@ -16,9 +18,13 @@ export default function ClearableInput({
       <input
         {...rest}
         value={value}
-        className="text-body w-full rounded-[4px] border border-default-border p-[12px] text-default-black placeholder-default-border focus:outline-none"
+        disabled={disabled}
+        className={`
+          w-full rounded-md border border-neutral-300 p-3 pr-10 text-base text-neutral-900 placeholder-neutral-400 focus:outline-none
+          ${disabled ? 'bg-neutral-400' : ''}
+        `}
       />
-      {value && (
+      {value && !disabled && (
         <button
           type="button"
           onClick={onClear}

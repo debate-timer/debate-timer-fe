@@ -1,6 +1,6 @@
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
-import LabeledCheckbox from '../../../../components/LabledCheckBox/LabeledCheckbox';
+import LabeledCheckBox from '../../../../components/LabeledCheckBox/LabeledCheckBox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { DebateInfo, StanceToString } from '../../../../type/type';
 
@@ -106,14 +106,14 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             종소리 설정
           </label>
           <div className="flex flex-col gap-3">
-            <LabeledCheckbox
+            <LabeledCheckBox
               label="발언 종료 30초 전 알림"
               checked={info.warningBell}
               onChange={(e) =>
                 handleFieldChange('warningBell', e.target.checked)
               }
             />
-            <LabeledCheckbox
+            <LabeledCheckBox
               label="발언 종료 알림"
               checked={info.finishBell}
               onChange={(e) =>

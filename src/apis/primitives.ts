@@ -1,10 +1,22 @@
 import axios from 'axios';
-import { AxiosResponse, AxiosError } from 'axios';
-import { ErrorResponseType } from './responses/global';
+import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
 
 // HTTP request methods
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+// Define APIError; It only represents error that is returned from API response.
+export class APIError extends Error {
+  public readonly status: number;
+  public readonly data: unknown;
+
+  constructor(message: string, status: number, data: unknown) {
+    super(message);
+    this.status = status;
+    this.data = data;
+    this.name = 'APIError';
+  }
+}
 
 // Low-level http request function
 export async function request<T>(
@@ -20,22 +32,25 @@ export async function request<T>(
     const response: AxiosResponse<T> = await instance({
       method,
       url: endpoint,
-      data: data ? JSON.stringify(data) : null,
+      data,
       params,
     });
 
+    // If successful, return it
     return response;
   } catch (error) {
-    // Handle error
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<ErrorResponseType>;
-      console.error('Error message:', axiosError.message);
-      if (axiosError.response) {
-        console.error('Error response data:', axiosError.response.data.message);
-      }
-    } else {
-      console.error('Unexpected error:', error);
+      // If error is raised during API request,
+      // pass it as an APIError
+      const apiError = new APIError(
+        error.response?.data || error.message,
+        error.response?.status || 500,
+        error.response?.data,
+      );
+      throw apiError;
     }
+
+    // Else, just throw it
     throw error;
   }
 }

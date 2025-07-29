@@ -80,28 +80,31 @@ const useTableFrom = (
     });
   };
 
-  const { mutate: onAddTable } = useAddDebateTable((tableId) => {
-    removeValue();
-    navigate(`/overview/customize/${tableId}`);
-  });
-
-  const { mutate: onModifyTable } = usePutDebateTable((tableId) => {
-    removeValue();
-    if (isGuestFlow()) {
-      navigate(`/overview/customize/guest`);
-    } else {
+  const { mutate: onAddTable, isPending: isAddingTable } = useAddDebateTable(
+    (tableId) => {
+      removeValue();
       navigate(`/overview/customize/${tableId}`);
-    }
-  });
+    },
+  );
 
-  const AddTable = () => {
+  const { mutate: onModifyTable, isPending: isModifyingTable } =
+    usePutDebateTable((tableId) => {
+      removeValue();
+      if (isGuestFlow()) {
+        navigate(`/overview/customize/guest`);
+      } else {
+        navigate(`/overview/customize/${tableId}`);
+      }
+    });
+
+  const addTable = () => {
     onAddTable({
       info: formData.info,
       table: formData.table as TimeBoxInfo[],
     });
   };
 
-  const EditTable = (tableId: number) => {
+  const editTable = (tableId: number) => {
     onModifyTable({
       tableId,
       info: formData.info,
@@ -113,8 +116,10 @@ const useTableFrom = (
     formData,
     updateInfo,
     updateTable,
-    AddTable,
-    EditTable,
+    addTable,
+    editTable,
+    isAddingTable,
+    isModifyingTable,
   };
 };
 
