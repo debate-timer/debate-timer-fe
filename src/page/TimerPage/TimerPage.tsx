@@ -11,6 +11,7 @@ import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
 import DTHelp from '../../components/icons/Help';
+import clsx from 'clsx';
 
 export default function TimerPage() {
   const pathParams = useParams();
@@ -72,7 +73,10 @@ export default function TimerPage() {
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
           <div
-            className={`flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
+            className={clsx(
+              'flex h-full w-full flex-col items-center justify-center space-y-[100px]',
+              bgColorMap[bg],
+            )}
           >
             {/* 타이머 두 개 + ENTER 버튼 */}
             <TimerView state={state} />

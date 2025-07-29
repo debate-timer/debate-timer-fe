@@ -141,6 +141,7 @@ export default function TimeBasedTimer({
             onStart={startTimer}
             onPause={pauseTimer}
             onReset={resetCurrentTimer}
+            stance={prosCons}
           />
         </div>
       </div>

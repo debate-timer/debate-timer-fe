@@ -32,6 +32,7 @@ export const OnPros: Story = {
       timePerSpeaking: null,
       speaker: '발언자',
     },
+    teamName: '찬성',
   },
 };
 
@@ -56,6 +57,7 @@ export const OnCons: Story = {
       timePerSpeaking: null,
       speaker: '발언자',
     },
+    teamName: '찬성',
   },
 };
 
@@ -80,13 +82,14 @@ export const OnNeutral: Story = {
       timePerSpeaking: null,
       speaker: '홍길동',
     },
+    teamName: '찬성',
   },
 };
 
-export const OnRunning: Story = {
+export const OnMinus: Story = {
   args: {
     normalTimerInstance: {
-      timer: 150,
+      timer: -30,
       isRunning: false,
       isAdditionalTimerOn: true,
       setTimer: () => {},
@@ -96,38 +99,15 @@ export const OnRunning: Story = {
       handleChangeAdditionalTimer: () => {},
     },
     item: {
-      stance: 'PROS',
-      speechType: '입론 1',
+      stance: 'NEUTRAL',
+      speechType: '작전 시간',
       boxType: 'NORMAL',
       time: 30,
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '홍길동',
     },
-  },
-};
-
-export const WhenAdditionalTimerAvailable: Story = {
-  args: {
-    normalTimerInstance: {
-      timer: 150,
-      isRunning: false,
-      isAdditionalTimerOn: true,
-      setTimer: () => {},
-      startTimer: () => {},
-      pauseTimer: () => {},
-      resetTimer: () => {},
-      handleChangeAdditionalTimer: () => {},
-    },
-    item: {
-      stance: 'PROS',
-      speechType: '입론 1',
-      boxType: 'NORMAL',
-      time: 30,
-      timePerTeam: null,
-      timePerSpeaking: null,
-      speaker: '홍길동',
-    },
+    teamName: '찬성',
   },
 };
 
@@ -152,5 +132,6 @@ export const OnAdditionalTimerEnabled: Story = {
       timePerSpeaking: null,
       speaker: '발언자',
     },
+    teamName: '찬성',
   },
 };

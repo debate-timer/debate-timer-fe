@@ -16,7 +16,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
     handleActivateTeam,
     switchCamp,
   } = state;
-  if (data?.table[index].boxType === 'NORMAL') {
+  if (data && data.table[index].boxType === 'NORMAL') {
     return (
       <NormalTimer
         normalTimerInstance={{
@@ -41,7 +41,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
       />
     );
   }
-  if (data?.table[index].boxType === 'TIME_BASED') {
+  if (data && data.table[index].boxType === 'TIME_BASED') {
     return (
       <div className="relative flex flex-row items-center justify-center space-x-[30px]">
         {/* 왼쪽 타이머 */}

@@ -13,7 +13,6 @@ type Story = StoryObj<typeof TimerController>;
 
 export const OnStopped: Story = {
   args: {
-    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
@@ -23,20 +22,9 @@ export const OnStopped: Story = {
 
 export const OnRunning: Story = {
   args: {
-    onChangingTimer: () => {},
     onPause: () => {},
     onReset: () => {},
     onStart: () => {},
     isRunning: true,
-  },
-};
-
-export const WhenAdditionalTimerAvailable: Story = {
-  args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    isRunning: false,
   },
 };

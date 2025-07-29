@@ -1,9 +1,12 @@
 import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
-import AdditionalTimerController from './AdditionalTimerController';
-import { IoCloseOutline } from 'react-icons/io5';
-import { MdRecordVoiceOver } from 'react-icons/md';
+import CircularTimer from './CircularTimer';
+import clsx from 'clsx';
+import DTDebate from '../../../components/icons/Debate';
+import { animate, useMotionValue } from 'framer-motion';
+import { useEffect } from 'react';
+
 type NormalTimerInstance = {
   timer: number | null;
   isAdditionalTimerOn: boolean;
@@ -14,6 +17,7 @@ type NormalTimerInstance = {
   resetTimer: () => void;
   setTimer: (val: number) => void;
 };
+
 interface NormalTimerProps {
   normalTimerInstance: NormalTimerInstance;
   isAdditionalTimerAvailable: boolean;
@@ -23,7 +27,6 @@ interface NormalTimerProps {
 
 export default function NormalTimer({
   normalTimerInstance,
-  isAdditionalTimerAvailable,
   item,
   teamName,
 }: NormalTimerProps) {
@@ -31,109 +34,103 @@ export default function NormalTimer({
     timer,
     isAdditionalTimerOn,
     isRunning,
-    handleChangeAdditionalTimer,
     startTimer,
     pauseTimer,
     resetTimer,
-    setTimer,
   } = normalTimerInstance;
   const totalTime = timer ?? 0;
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(totalTime) / 60),
   );
   const second = Formatting.formatTwoDigits(Math.abs(totalTime % 60));
-  const bgColorClass =
-    item.stance === 'NEUTRAL' || isAdditionalTimerOn
-      ? 'bg-neutral-500'
-      : item.stance === 'PROS'
-        ? 'bg-camp-blue'
-        : 'bg-camp-red';
   const titleText = isAdditionalTimerOn ? '작전 시간' : item.speechType;
+  const rawProgress =
+    timer !== null && item.time ? ((item.time - timer) / item.time) * 100 : 0;
+  const progress = Math.min(100, rawProgress);
+  const progressMotionValue = useMotionValue(0);
 
-  const boxShadow = isRunning
-    ? item.stance === 'NEUTRAL'
-      ? 'shadow-camp-neutral'
-      : item.stance === 'PROS'
-        ? 'shadow-camp-blue'
-        : 'shadow-camp-red'
-    : '';
+  useEffect(() => {
+    animate(progressMotionValue, progress, {
+      duration: 0.7,
+      ease: 'easeOut',
+    });
+  }, [progress, progressMotionValue]);
 
   return (
-    <div
-      data-testid="timer"
-      className={`flex min-h-[300px] w-[460px] flex-col items-center rounded-[45px] bg-neutral-200 duration-100 lg:w-[600px] ${boxShadow} xl:w-[720px]`}
-    >
-      {/* Title of timer */}
-      <div
-        className={`flex h-[80px] w-full items-center justify-center rounded-t-[45px] lg:h-[105px] xl:h-[139px] ${bgColorClass} relative font-bold text-neutral-50`}
-      >
-        {/* Title text  
-        <h1 className="absolute left-1/2 w-max -translate-x-1/2 transform">
-          {titleText}
-        </h1> */}
-        <p className="w-full items-center text-center text-[45px] font-semibold lg:text-[60px] lg:font-bold xl:text-[75px]">
-          {titleText}
-        </p>
+    <div className="flex flex-row space-x-[80px]">
+      {/* 좌측 영역 */}
+      <span className="flex min-w-[360px] flex-col items-center justify-center space-y-[36px]">
+        {/* 제목 */}
+        <h1 className="text-[68px] font-bold">{titleText}</h1>
 
-        {/* */}
-        {/* Close button, if additional timer is enabled */}
-        {isAdditionalTimerOn && (
-          <button
-            className="absolute right-10 top-1/2 -translate-y-1/2"
-            onClick={handleChangeAdditionalTimer}
-          >
-            <IoCloseOutline className="size-[30px] hover:text-neutral-300 lg:size-[35px] xl:size-[40px]" />
-          </button>
+        {/* 발언자 및 팀 정보 */}
+        {(teamName || item.speaker) && (
+          <span className="flex flex-row items-center justify-center space-x-[16px]">
+            <DTDebate className="w-[36px]" />
+            <p className="text-[32px]">
+              {teamName && teamName + ' 팀'}
+              {teamName && item.speaker && ' | '}
+              {item.speaker && item.speaker + ' 토론자'}
+            </p>
+          </span>
         )}
-      </div>
 
-      {/* Speaker's number, if necessary */}
-      <div className="my-[12px] h-[25px] lg:my-[17px] lg:h-[30px] xl:my-[20px] xl:h-[40px]">
-        <div className="flex w-full flex-row items-center justify-center space-x-2 text-neutral-900">
-          {item.stance !== 'NEUTRAL' && isAdditionalTimerOn && (
-            <>
-              <MdRecordVoiceOver className="size-[30px] lg:size-[35px] xl:size-[40px]" />
-              <h3 className="text-[18px] font-semibold lg:text-[24px] xl:text-[28px]">
-                {teamName && teamName + '  팀 '}
-                {item.speaker && '| ' + item.speaker + ' 토론자'}
-              </h3>
-            </>
+        {/* 작전 시간 타이머 버튼 */}
+        <button
+          className={clsx(
+            'flex h-[68px] w-full items-center justify-center rounded-[20px] bg-default-white',
           )}
-        </div>
-      </div>
+        >
+          <span
+            className={clsx(
+              'flex h-[68px] w-full items-center justify-center rounded-[20px] text-[28px] font-semibold transition-all duration-200 ease-in-out',
+              { 'bg-camp-blue/50 hover:bg-camp-blue': item.stance === 'PROS' },
+              { 'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS' },
+              {
+                'bg-default-neutral/50 hover:bg-default-neutral':
+                  item.stance === 'NEUTRAL',
+              },
+            )}
+          >
+            작전 시간
+          </span>
+        </button>
+      </span>
 
-      {/* Timer display */}
-      <div
-        className={`flex h-[140px] w-[400px] flex-row items-center justify-center bg-slate-50 text-center text-[90px] font-bold text-neutral-900 lg:h-[190px] lg:w-[520px] lg:text-[120px] xl:h-[230px] xl:w-[600px] xl:space-x-5 xl:text-[150px]`}
-      >
-        {totalTime < 0 && <p className="w-[30px] lg:w-[70px]">-</p>}
-        <p className="w-[130px] lg:w-[200px]">{minute}</p>
-        <p className="w-[50px] -translate-y-[7px] lg:-translate-y-[10px]">:</p>
-        <p className="w-[130px] lg:w-[200px]">{second}</p>
-      </div>
+      {/* 우측 영역 */}
+      <span className="flex min-w-[480px] flex-col space-y-[16px]">
+        {/* 타이머 */}
+        <CircularTimer
+          progress={progressMotionValue}
+          stance={item.stance}
+          size={480}
+          strokeWidth={20}
+        >
+          <span
+            className={clsx(
+              'flex w-full flex-row items-center justify-center p-[16px] text-[110px] font-bold text-default-black',
+              { 'space-x-[8px]': totalTime < 0 },
+              { 'space-x-[16px]': totalTime >= 0 },
+            )}
+          >
+            {totalTime < 0 && (
+              <p className="flex items-center justify-center">-</p>
+            )}
+            <p className="flex flex-1 items-center justify-center">{minute}</p>
+            <p className="flex items-center justify-center">:</p>
+            <p className="flex flex-1 items-center justify-center">{second}</p>
+          </span>
+        </CircularTimer>
 
-      {/* Timer controller and additional timer controller */}
-      <div className="my-[20px] flex w-full items-center justify-center lg:my-[25px] xl:my-[30px]">
-        {!isAdditionalTimerOn && (
-          <TimerController
-            isRunning={isRunning}
-            isAdditionalTimerAvailable={isAdditionalTimerAvailable}
-            onChangingTimer={handleChangeAdditionalTimer}
-            onStart={startTimer}
-            onPause={pauseTimer}
-            onReset={resetTimer}
-          />
-        )}
-
-        {isAdditionalTimerOn && (
-          <AdditionalTimerController
-            isRunning={isRunning}
-            onStart={startTimer}
-            onPause={pauseTimer}
-            addOnTimer={(delta: number) => setTimer(totalTime + delta)}
-          />
-        )}
-      </div>
+        {/* 조작부 */}
+        <TimerController
+          isRunning={isRunning}
+          onStart={startTimer}
+          onPause={pauseTimer}
+          onReset={resetTimer}
+          stance={item.stance}
+        />
+      </span>
     </div>
   );
 }
