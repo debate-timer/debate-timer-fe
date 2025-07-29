@@ -84,6 +84,7 @@ export function useTimeBasedTimer({
         setSpeakingTimer(remainingSpeakingSeconds);
       }
 
+      /*
       // 만약 남은 시간이 0초 이하라면, 타이머 종료를 의미하므로,
       // 인터벌을 제거하고 타이머를 종료함
       if (remainingSeconds <= 0) {
@@ -92,6 +93,7 @@ export function useTimeBasedTimer({
         setIsDone(true);
         setIsRunning(false);
       }
+        */
     }, 200);
   }, [isSpeakingTimer]);
 
@@ -145,7 +147,7 @@ export function useTimeBasedTimer({
       setIsDone(false);
 
       // 전체 발언 시간 복원
-      setTotalTimer(savedTime.savedSpeakingTimer);
+      setTotalTimer(savedTime.savedTotalTimer);
 
       // 1회당 발언 시간 사용하는지 여부와 유효성 확인
       if (
