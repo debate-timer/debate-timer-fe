@@ -58,18 +58,10 @@ export function useNormalTimer(): NormalTimerLogics {
 
       // 목표 시각까지 얼마나 더 필요한지, 남은 시간을 초 단위로 계산
       const remainingTotal = targetTimeRef.current - now;
-      const remainingSeconds = Math.max(0, Math.ceil(remainingTotal / 1000));
+      const remainingSeconds = Math.ceil(remainingTotal / 1000);
 
       // 계산한 남은 시간을 타이머에 반영
       setTimer(remainingSeconds);
-
-      // 만약 남은 시간이 0초 이하라면, 타이머 종료를 의미하므로,
-      // 인터벌을 제거하고 타이머를 종료함
-      if (remainingSeconds <= 0) {
-        clearInterval(intervalRef.current!);
-        intervalRef.current = null;
-        setIsRunning(false);
-      }
     }, 200);
   }, [timer]);
 
@@ -132,6 +124,7 @@ export function useNormalTimer(): NormalTimerLogics {
   const handleCloseAdditionalTimer = useCallback(() => {
     setIsAdditionalTimerOn(false);
   }, []);
+
   //작전시간 종료 시, 자동으로 타이머 변경
   useEffect(() => {
     if (isAdditionalTimerOn && timer === 0 && isRunning) {
@@ -148,6 +141,7 @@ export function useNormalTimer(): NormalTimerLogics {
     setTimer,
     isRunning,
   ]);
+
   useEffect(() => () => pauseTimer(), [pauseTimer]);
 
   return {
