@@ -50,7 +50,8 @@ export function useBellSound({
       prevTime !== null &&
       prevTime > warningTime &&
       currentTime === warningTime &&
-      defaultTime !== warningTime
+      ((defaultTime !== null && prevTime > defaultTime) ||
+        defaultTime !== warningTime)
     );
   }
 
