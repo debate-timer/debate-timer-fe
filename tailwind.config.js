@@ -61,6 +61,7 @@ export default {
         'subtitle-raw': ['24px', { lineHeight: '36px' }],
         'detail-raw': ['20px', { lineHeight: '20px' }],
         'body-raw': ['16px', { lineHeight: '16px' }],
+        'timer-raw': ['110px'],
       },
       boxShadow: {
         'camp-blue': `0 0 30px #FF3B2F`,
@@ -69,8 +70,8 @@ export default {
       },
       colors: {
         camp: {
-          red: '#F64740',
-          blue: '#2B74E1',
+          red: '#E14666',
+          blue: '#1E91D6',
         },
         brand: {
           DEFAULT: '#FECD4C',
@@ -84,6 +85,7 @@ export default {
           timeout: '#4F4F4F',
           white: '#FFFFFF',
           black: '#222222',
+          black2: '#404040',
         },
         semantic: {
           warning: '#FF8B87',
