@@ -7,7 +7,7 @@ export default function TimeTableSection() {
       <div>
         <div className="relative inline-block text-[min(max(0.875rem,1.5vw),1.4rem)] font-semibold">
           <span className="relative z-10">시간표 설정 화면</span>
-          <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand-main/70"></span>
+          <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand/70"></span>
         </div>
         <h1 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
           드래그 앤 드롭으로
