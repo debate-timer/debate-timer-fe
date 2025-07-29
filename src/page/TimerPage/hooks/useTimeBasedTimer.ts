@@ -47,26 +47,9 @@ export function useTimeBasedTimer({
   const speakingTargetTimeRef = useRef<number | null>(null);
 
   /**
-   * 타이머 카운트다운 시작
-   * - 이미 실행 중이면 무시
-   * - isDone(완료) 상태일 땐 시작X
-   * - 1초마다 totalTimer, speakingTimer(필요시) 감소
+   * 타이머 시작을 위해 사용하는 저수준 함수
    */
-  const startTimer = useCallback(() => {
-    if (intervalRef.current !== null || totalTimer === null || isDone) {
-      return;
-    }
-
-    // 목표 시각을 실제 시각 기반으로 계산
-    // 예를 들어, 현재 시각이 오후 13시 00분 30초인데, 1회당 발언 시간이 30초라면,
-    // 1회당 발언 시간이 모두 끝나는 시간은 13시 01분 00초이므로,
-    // 해당 시간을 목표 시간으로 두는 식임
-    const startTime = Date.now();
-    targetTimeRef.current = startTime + totalTimer * 1000;
-    if (isSpeakingTimer && speakingTimer !== null) {
-      speakingTargetTimeRef.current = startTime + speakingTimer * 1000;
-    }
-
+  const setTimerInterval = useCallback(() => {
     // isRunning 상태를 true로 바꿔주고 인터벌 처리
     setIsRunning(true);
 
@@ -110,7 +93,32 @@ export function useTimeBasedTimer({
         setIsRunning(false);
       }
     }, 200);
-  }, [isDone, isSpeakingTimer, speakingTimer, totalTimer]);
+  }, [isSpeakingTimer]);
+
+  /**
+   * 타이머 카운트다운 시작
+   * - 이미 실행 중이면 무시
+   * - isDone(완료) 상태일 땐 시작X
+   * - 1초마다 totalTimer, speakingTimer(필요시) 감소
+   */
+  const startTimer = useCallback(() => {
+    if (intervalRef.current !== null || totalTimer === null || isDone) {
+      return;
+    }
+
+    // 목표 시각을 실제 시각 기반으로 계산
+    // 예를 들어, 현재 시각이 오후 13시 00분 30초인데, 1회당 발언 시간이 30초라면,
+    // 1회당 발언 시간이 모두 끝나는 시간은 13시 01분 00초이므로,
+    // 해당 시간을 목표 시간으로 두는 식임
+    const startTime = Date.now();
+    targetTimeRef.current = startTime + totalTimer * 1000;
+    if (isSpeakingTimer && speakingTimer !== null) {
+      speakingTargetTimeRef.current = startTime + speakingTimer * 1000;
+    }
+
+    // 타이머 인터벌 시작
+    setTimerInterval();
+  }, [isDone, isSpeakingTimer, setTimerInterval, speakingTimer, totalTimer]);
 
   /**
    * 타이머 일시정지
@@ -223,51 +231,16 @@ export function useTimeBasedTimer({
         speakingTargetTimeRef.current = startTime + newSpeakingTime * 1000;
       }
 
-      // isRunning 상태를 true로 바꿔주고 인터벌 처리
-      setIsRunning(true);
-
-      // 목표 시각에 기반하여 타이머 계산
-      intervalRef.current = setInterval(() => {
-        // 목표 시각 레퍼런스의 유효성 확인
-        if (targetTimeRef.current === null) {
-          return;
-        }
-
-        // 현재 시각 확인
-        const now = Date.now();
-
-        // 목표 시각까지 얼마나 더 필요한지, 남은 시간을 초 단위로 계산
-        const remainingTotal = targetTimeRef.current - now;
-        const remainingSeconds = Math.max(0, Math.ceil(remainingTotal / 1000));
-
-        // 계산한 남은 시간을 타이머에 반영
-        setTotalTimer(remainingSeconds);
-
-        // 1회당 발언 시간 타이머도 사용하고 있을 경우, 마찬가지로 남은 시간 계산
-        if (isSpeakingTimer) {
-          if (speakingTargetTimeRef.current === null) {
-            return;
-          }
-
-          const remainingSpeaking = speakingTargetTimeRef.current - now;
-          const remainingSpeakingSeconds = Math.max(
-            0,
-            Math.ceil(remainingSpeaking / 1000),
-          );
-          setSpeakingTimer(remainingSpeakingSeconds);
-        }
-
-        // 만약 남은 시간이 0초 이하라면, 타이머 종료를 의미하므로,
-        // 인터벌을 제거하고 타이머를 종료함
-        if (remainingSeconds <= 0) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-          setIsDone(true);
-          setIsRunning(false);
-        }
-      }, 200);
+      // 타이머 인터벌 시작
+      setTimerInterval();
     },
-    [resetTimerForNextPhase, isDone, isSpeakingTimer, totalTimer],
+    [
+      resetTimerForNextPhase,
+      setTimerInterval,
+      isDone,
+      isSpeakingTimer,
+      totalTimer,
+    ],
   );
 
   /**
