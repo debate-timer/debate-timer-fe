@@ -14,9 +14,11 @@ import {
 export function useTimeBasedTimer(): TimeBasedTimerLogics {
   // 전체 남은 시간 (null이면 타이머 미사용)
   const [totalTimer, setTotalTimer] = useState<number | null>(null);
+
   // 발언당 시간 타이머(=각 phase별 제한시간, 모드 전환 가능)
   const [speakingTimer, setSpeakingTimer] = useState<number | null>(null);
   const isSpeakingTimerAvailable = speakingTimer !== null;
+
   // 기본(초기) 시간값 (reset 등에서 참조)
   const [defaultTime, setDefaultTime] = useState<{
     defaultTotalTimer: number | null;
@@ -25,16 +27,12 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
 
   // 현재 타이머 동작중 여부
   const [isRunning, setIsRunning] = useState(false);
+
   // setInterval() 저장용 ref
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // 타이머가 0이 되면 true (완료 상태)
   const [isDone, setIsDone] = useState(false);
-
-  // 리셋/롤백용: 최근 사용된(변경 직전) 값 저장
-  const [savedTime, setSavedTime] = useState<{
-    savedTotalTimer: number | null;
-    savedSpeakingTimer: number | null;
-  }>({ savedTotalTimer: 0, savedSpeakingTimer: null });
 
   // 실제 시간 계산용 레퍼런스
   const targetTimeRef = useRef<number | null>(null);
@@ -63,9 +61,6 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
 
       // 계산한 남은 시간을 타이머에 반영
       setTotalTimer(remainingSeconds);
-      setSavedTime((prev) => {
-        return { ...prev, savedTotalTimer: remainingSeconds };
-      });
 
       // 1회당 발언 시간 타이머도 사용하고 있을 경우, 마찬가지로 남은 시간 계산
       if (isSpeakingTimerAvailable) {
@@ -79,9 +74,6 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
           Math.ceil(remainingSpeaking / 1000),
         );
         setSpeakingTimer(remainingSpeakingSeconds);
-        setSavedTime((prev) => {
-          return { ...prev, savedSpeakingTimer: remainingSpeakingSeconds };
-        });
       }
     }, 200);
   }, [isSpeakingTimerAvailable]);
@@ -142,7 +134,7 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
       setIsDone(false);
 
       // 전체 발언 시간 복원
-      setTotalTimer(savedTime.savedTotalTimer);
+      setTotalTimer(defaultTime.defaultTotalTimer);
 
       // 1회당 발언 시간 사용하는지 여부와 유효성 확인
       if (
@@ -155,16 +147,15 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
 
       // 상대편 발언 종료 여부에 따라 1회당 발언 시간 다르게 계산
       if (isOpponentDone) {
-        setSpeakingTimer(savedTime.savedTotalTimer);
+        setSpeakingTimer(defaultTime.defaultTotalTimer);
       } else {
-        setSpeakingTimer(savedTime.savedSpeakingTimer);
+        setSpeakingTimer(defaultTime.defaultSpeakingTimer);
       }
     },
     [
       isSpeakingTimerAvailable,
-      savedTime.savedSpeakingTimer,
-      savedTime.savedTotalTimer,
       defaultTime.defaultSpeakingTimer,
+      defaultTime.defaultTotalTimer,
       totalTimer,
       pauseTimer,
     ],
@@ -284,7 +275,6 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     resetAndStartTimer,
     resetCurrentTimer,
     setTimers,
-    setSavedTime,
     setDefaultTime,
     setIsDone,
     clearTimer,
@@ -307,12 +297,6 @@ export interface TimeBasedTimerLogics {
   resetAndStartTimer: (isOpponentDone: boolean) => void;
   resetCurrentTimer: (isOpponentDone: boolean) => void;
   setTimers: (total: number | null, speaking?: number | null) => void;
-  setSavedTime: Dispatch<
-    SetStateAction<{
-      savedTotalTimer: number | null;
-      savedSpeakingTimer: number | null;
-    }>
-  >;
   setDefaultTime: Dispatch<
     SetStateAction<{
       defaultTotalTimer: number | null;

@@ -124,15 +124,18 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
    */
   const handleActivateTeam = useCallback(
     (team: TimeBasedStance) => {
-      // 클릭한 타이머 식별
-      const isPros = team === 'PROS';
-      const clickedTimer = isPros ? timer1 : timer2;
+      const clickedTimerStance = team === 'PROS' ? 'PROS' : 'CONS';
+      const clickedTimer = clickedTimerStance === 'PROS' ? timer1 : timer2;
 
-      // 클릭한 타이머가 종료 상태거나 현재 타이머와 동일한 타이머라면, 바로 반환
-      if (clickedTimer.isDone || prosConsSelected === team) return;
+      // 클릭한 타이머가 현재 타이머와 동일한 타이머라면, 바로 반환
+      if (prosConsSelected === clickedTimerStance) return;
 
-      // 아니라면 진영 전환
-      switchCamp();
+      // 아니라면, 타이머 변경
+      if (clickedTimer.isDone) {
+        setProsConsSelected(clickedTimerStance);
+      } else {
+        switchCamp();
+      }
     },
     [prosConsSelected, switchCamp, timer1, timer2],
   );
@@ -161,10 +164,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       const defaultSpeakingTimer = currentBox.timePerSpeaking;
       [timer1, timer2].forEach((timer) => {
         timer.setDefaultTime({ defaultTotalTimer, defaultSpeakingTimer });
-        timer.setSavedTime({
-          savedTotalTimer: defaultTotalTimer,
-          savedSpeakingTimer: defaultSpeakingTimer,
-        });
         timer.setTimers(defaultTotalTimer, defaultSpeakingTimer);
         timer.setIsDone(false);
       });
