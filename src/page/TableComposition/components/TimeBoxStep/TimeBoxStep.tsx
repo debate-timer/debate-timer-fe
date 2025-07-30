@@ -12,6 +12,7 @@ import DTCheck from '../../../../components/icons/Check';
 import FloatingActionButton from '../../../../components/FloatingActionButton/FloatingActionButton';
 import DTAdd from '../../../../components/icons/Add';
 import { useLayoutEffect, useRef, useState } from 'react';
+import clsx from 'clsx';
 
 interface TimeBoxStepProps {
   initData: DebateTableData;
@@ -151,7 +152,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           >
             <FloatingActionButton
               onClick={openModal}
-              className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+              className="bg-default-disabled/hover hover:bg-default-neutral pointer-events-auto my-[16px]"
             >
               <div className="text-body flex h-[56px] flex-row items-center justify-center gap-[12px] p-[16px]">
                 <DTAdd className="h-full p-[4px]" />
@@ -174,9 +175,13 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
           <button
             onClick={onFinishButtonClick}
-            className={`h-16 w-full ${
-              isAbledSummitButton ? 'button enabled' : 'button disabled'
-            }`}
+            className={clsx(
+              'flex h-full w-full gap-[12px] rounded-full p-[24px]',
+              {
+                'button enabled brand': !(!isAbledSummitButton || isSubmitting),
+              },
+              { 'button disabled': !isAbledSummitButton || isSubmitting },
+            )}
             disabled={!isAbledSummitButton || isSubmitting}
           >
             <DTCheck className="h-full" />

@@ -111,7 +111,7 @@ export const OnMinus: Story = {
   },
 };
 
-export const OnAdditionalTimerEnabled: Story = {
+export const OnProsAdditionalTimerAvailable: Story = {
   args: {
     normalTimerInstance: {
       timer: 150,
@@ -133,5 +133,32 @@ export const OnAdditionalTimerEnabled: Story = {
       speaker: '발언자',
     },
     teamName: '찬성',
+    isAdditionalTimerAvailable: true,
+  },
+};
+
+export const OnConsAdditionalTimerAvailable: Story = {
+  args: {
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+    },
+    item: {
+      stance: 'CONS',
+      speechType: '입론1',
+      boxType: 'TIME_BASED',
+      time: 30,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: '발언자',
+    },
+    teamName: '찬성',
+    isAdditionalTimerAvailable: true,
   },
 };

@@ -3,6 +3,7 @@ import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
 import { TimeBasedStance } from '../../../type/type';
+import CircularTimer from './CircularTimer';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;
@@ -53,7 +54,47 @@ export default function TimeBasedTimer({
       : 'shadow-camp-red'
     : '';
 
+  const rawTotalProgress =
+    totalTimer !== null && item.time
+      ? ((item.time - timer) / item.time) * 100
+      : 0;
+  const progress = Math.min(100, rawTotalProgress);
+  const progressMotionValue = useMotionValue(0);
+
   const bgColorClass = prosCons === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
+
+  return (
+    <div className="flex min-w-[480px] flex-col space-y-[16px]">
+      {/* 타이머 */}
+      <CircularTimer
+        progress={progressMotionValue}
+        stance={item.stance}
+        size={480}
+        strokeWidth={20}
+      >
+        <span
+          className={clsx(
+            'flex w-full flex-row items-center justify-center p-[16px] text-[110px] font-bold text-default-black',
+            { 'space-x-[8px]': totalTime < 0 },
+            { 'space-x-[16px]': totalTime >= 0 },
+          )}
+        >
+          <p className="flex flex-1 items-center justify-center">{minute}</p>
+          <p className="flex items-center justify-center">:</p>
+          <p className="flex flex-1 items-center justify-center">{second}</p>
+        </span>
+      </CircularTimer>
+
+      {/* 조작부 */}
+      <TimerController
+        isRunning={isRunning}
+        onStart={startTimer}
+        onPause={pauseTimer}
+        onReset={resetCurrentTimer}
+        stance={prosCons}
+      />
+    </div>
+  );
 
   return (
     <div

@@ -27,6 +27,7 @@ interface NormalTimerProps {
 
 export default function NormalTimer({
   normalTimerInstance,
+  isAdditionalTimerAvailable,
   item,
   teamName,
 }: NormalTimerProps) {
@@ -76,25 +77,29 @@ export default function NormalTimer({
         )}
 
         {/* 작전 시간 타이머 버튼 */}
-        <button
-          className={clsx(
-            'flex h-[68px] w-full items-center justify-center rounded-[20px] bg-default-white',
-          )}
-        >
-          <span
+        {isAdditionalTimerAvailable && (
+          <button
             className={clsx(
-              'flex h-[68px] w-full items-center justify-center rounded-[20px] text-[28px] font-semibold transition-all duration-200 ease-in-out',
-              { 'bg-camp-blue/50 hover:bg-camp-blue': item.stance === 'PROS' },
-              { 'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS' },
-              {
-                'bg-default-neutral/50 hover:bg-default-neutral':
-                  item.stance === 'NEUTRAL',
-              },
+              'flex h-[68px] w-full items-center justify-center rounded-[20px] bg-default-white',
             )}
           >
-            작전 시간
-          </span>
-        </button>
+            <span
+              className={clsx(
+                'flex h-[68px] w-full items-center justify-center rounded-[20px] text-[28px] font-semibold transition-all duration-200 ease-in-out',
+                {
+                  'bg-camp-blue/50 hover:bg-camp-blue': item.stance === 'PROS',
+                },
+                { 'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS' },
+                {
+                  'bg-default-neutral/50 hover:bg-default-neutral':
+                    item.stance === 'NEUTRAL',
+                },
+              )}
+            >
+              작전 시간
+            </span>
+          </button>
+        )}
       </span>
 
       {/* 우측 영역 */}

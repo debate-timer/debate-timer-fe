@@ -19,10 +19,7 @@ export default function ClearableInput({
         {...rest}
         value={value}
         disabled={disabled}
-        className={`
-          w-full rounded-md border border-neutral-300 p-3 pr-10 text-base text-neutral-900 placeholder-neutral-400 focus:outline-none
-          ${disabled ? 'bg-neutral-400' : ''}
-        `}
+        className="text-body w-full rounded-[4px] border border-default-border p-[12px] text-default-black placeholder-default-border focus:outline-none"
       />
       {value && !disabled && (
         <button
