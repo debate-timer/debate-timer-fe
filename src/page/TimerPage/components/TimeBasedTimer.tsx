@@ -2,8 +2,10 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
-import { TimeBasedStance } from '../../../type/type';
+import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
 import CircularTimer from './CircularTimer';
+import { useMotionValue } from 'framer-motion';
+import clsx from 'clsx';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;
@@ -13,12 +15,14 @@ type TimeBasedTimerInstance = {
   pauseTimer: () => void;
   resetCurrentTimer: () => void;
 };
+
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: TimeBasedTimerInstance;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: TimeBasedStance;
   teamName: string;
+  item: TimeBoxInfo;
 }
 
 export default function TimeBasedTimer({
@@ -27,6 +31,7 @@ export default function TimeBasedTimer({
   onActivate,
   prosCons,
   teamName,
+  item,
 }: TimeBasedTimerProps) {
   const {
     totalTimer,
@@ -55,34 +60,31 @@ export default function TimeBasedTimer({
     : '';
 
   const rawTotalProgress =
-    totalTimer !== null && item.time
-      ? ((item.time - timer) / item.time) * 100
+    totalTimer !== null && item.timePerTeam
+      ? ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100
       : 0;
-  const progress = Math.min(100, rawTotalProgress);
-  const progressMotionValue = useMotionValue(0);
+  const totalProgress = Math.min(100, rawTotalProgress);
+  const totalProgressMotionValue = useMotionValue(0);
 
   const bgColorClass = prosCons === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
 
   return (
-    <div className="flex min-w-[480px] flex-col space-y-[16px]">
+    <div className="flex min-w-[560px] flex-col items-center justify-center space-y-[18px]">
       {/* 타이머 */}
       <CircularTimer
-        progress={progressMotionValue}
+        progress={totalProgressMotionValue}
         stance={item.stance}
-        size={480}
+        size={560}
         strokeWidth={20}
       >
-        <span
-          className={clsx(
-            'flex w-full flex-row items-center justify-center p-[16px] text-[110px] font-bold text-default-black',
-            { 'space-x-[8px]': totalTime < 0 },
-            { 'space-x-[16px]': totalTime >= 0 },
-          )}
-        >
+        {/* 1회당 발언 시간 X */}
+        <span className="flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[110px] font-bold text-default-black">
           <p className="flex flex-1 items-center justify-center">{minute}</p>
           <p className="flex items-center justify-center">:</p>
           <p className="flex flex-1 items-center justify-center">{second}</p>
         </span>
+
+        {/* 1회당 발언 시간 O */}
       </CircularTimer>
 
       {/* 조작부 */}

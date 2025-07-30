@@ -54,6 +54,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             pauseTimer: timer1.pauseTimer,
             resetCurrentTimer: timer1.resetCurrentTimer,
           }}
+          item={data.table[index]}
           isSelected={prosConsSelected === 'PROS'}
           onActivate={() => handleActivateTeam('PROS')}
           prosCons="PROS"
@@ -69,6 +70,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             pauseTimer: timer2.pauseTimer,
             resetCurrentTimer: timer2.resetCurrentTimer,
           }}
+          item={data.table[index]}
           isSelected={prosConsSelected === 'CONS'}
           onActivate={() => handleActivateTeam('CONS')}
           prosCons="CONS"
