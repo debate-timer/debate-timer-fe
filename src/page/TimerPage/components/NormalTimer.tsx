@@ -150,7 +150,7 @@ export default function NormalTimer({
           isRunning={isRunning}
           onStart={startTimer}
           onPause={pauseTimer}
-          onReset={resetTimer}
+          onReset={() => resetTimer()}
           stance={item.stance}
         />
       </span>
