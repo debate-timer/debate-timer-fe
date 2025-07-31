@@ -74,7 +74,7 @@ export function useModal(options: UseModalOptions = {}) {
                 className={`absolute right-4 top-4 text-3xl ${closeButtonColor}`}
                 aria-label="모달 닫기"
               >
-                <DTClose className="size-[32px] text-default-black" />
+                <DTClose className="size-[32px]" />
               </button>
             )}
           </div>

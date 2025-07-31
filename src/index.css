@@ -69,7 +69,7 @@
 }
 
 .button.disabled {
-  @apply bg-default-disabled/hover text-default-white cursor-none;
+  @apply bg-default-disabled/hover text-default-white cursor-not-allowed;
 }
 
 p {

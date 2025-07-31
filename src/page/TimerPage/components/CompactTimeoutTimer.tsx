@@ -53,7 +53,7 @@ export default function CompactTimeoutTimer({
       state.pauseTimer();
       onClose();
     }
-  });
+  }, [onClose, state]);
 
   return (
     <div

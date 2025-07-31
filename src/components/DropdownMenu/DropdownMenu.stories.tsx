@@ -22,7 +22,7 @@ export const Default: Story = {
     onSelect: () => {},
     options: booleanOptions,
     placeholder: '선택',
-    selectedValue: '',
+    selectedValue: true,
   },
 };
 

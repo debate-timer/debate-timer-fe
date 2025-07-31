@@ -1,6 +1,9 @@
-import { PropsWithChildren } from 'react';
+import clsx from 'clsx';
+import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
-interface SmallIconButton extends PropsWithChildren {
+interface SmallIconContainerProps
+  extends PropsWithChildren,
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   background?: string;
   className?: string;
 }
@@ -9,14 +12,17 @@ export default function SmallIconContainer({
   background,
   children,
   className,
-}: SmallIconButton) {
+  ...buttonProps
+}: SmallIconContainerProps) {
   return (
     <button
-      className={`
-        flex items-center justify-center rounded-[8px]
-        ${background ? background : 'bg-default-white'}
-        ${className ? className : ''}
-      `}
+      {...buttonProps}
+      className={clsx(
+        'flex items-center justify-center rounded-[8px]',
+        { 'bg-default-white': !background },
+        { background: background },
+        className,
+      )}
     >
       {children}
     </button>

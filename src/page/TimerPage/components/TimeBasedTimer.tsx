@@ -55,16 +55,19 @@ export default function TimeBasedTimer({
 
   const initRawProgress = (): number => {
     if (speakingTimer === null) {
-      if (item.timePerTeam && totalTimer) {
+      if (item.timePerTeam && item.timePerTeam > 0 && totalTimer) {
         return ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100;
       }
-    } else {
-      if (item.timePerSpeaking && speakingTimer) {
-        return (
-          ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
-        );
-      }
+    } else if (
+      item.timePerSpeaking &&
+      item.timePerSpeaking > 0 &&
+      speakingTimer
+    ) {
+      return (
+        ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
+      );
     }
+
     return 0;
   };
 

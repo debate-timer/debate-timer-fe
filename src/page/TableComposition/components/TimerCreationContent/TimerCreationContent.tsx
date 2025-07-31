@@ -343,7 +343,6 @@ export default function TimerCreationContent({
   );
 
   const handleSpeechTypeChange = useCallback((selectedValue: SpeechType) => {
-    console.log(`# Current speech type = ${selectedValue}`);
     setCurrentSpeechType(selectedValue);
 
     if (selectedValue === 'CUSTOM') {

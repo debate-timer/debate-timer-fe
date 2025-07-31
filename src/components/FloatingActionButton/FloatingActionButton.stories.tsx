@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import FloatingActionButton from './FloatingActionButton';
-import { IoAdd } from 'react-icons/io5';
+import DTAdd from '../icons/Add';
 
 const meta: Meta<typeof FloatingActionButton> = {
   title: 'Components/FloatingActionButton',
@@ -19,7 +19,7 @@ export const Enabled: Story = {
       className="transform bg-brand duration-200 ease-in-out hover:bg-brand-hover"
     >
       <span className="text-subtitle flex flex-row items-center justify-center space-x-4 p-4 text-default-black">
-        <IoAdd />
+        <DTAdd />
         <p>추가하기</p>
       </span>
     </FloatingActionButton>

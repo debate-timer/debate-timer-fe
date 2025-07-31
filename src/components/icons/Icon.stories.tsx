@@ -60,7 +60,7 @@ export const OnHomeIcon: Story = {
   render: (args) => (
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
       <DTHome className="size-16" {...args} />
-      <p className="mt-2 text-sm text-gray-600">도움말</p>
+      <p className="mt-2 text-sm text-gray-600">홈</p>
     </div>
   ),
 };
