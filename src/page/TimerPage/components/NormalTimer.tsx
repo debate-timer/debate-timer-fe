@@ -65,16 +65,16 @@ export default function NormalTimer({
   return (
     <div className="flex flex-row space-x-[80px]">
       {/* 좌측 영역 */}
-      <span className="flex min-w-[450px] flex-col items-center justify-center">
+      <span className="flex w-[450px] flex-col items-center justify-center">
         <span className="flex w-full flex-col items-center justify-center space-y-[36px] px-[45px]">
           {/* 제목 */}
           <h1 className="text-[68px] font-bold">{titleText}</h1>
 
           {/* 발언자 및 팀 정보 */}
           {(teamName || item.speaker) && (
-            <span className="flex flex-row items-center justify-center space-x-[16px]">
+            <span className="flex w-full flex-row items-center justify-center space-x-[16px]">
               <DTDebate className="w-[36px]" />
-              <p className="text-[32px]">
+              <p className="truncate text-[28px]">
                 {teamName && teamName + ' 팀'}
                 {teamName && item.speaker && ' | '}
                 {item.speaker && item.speaker + ' 토론자'}

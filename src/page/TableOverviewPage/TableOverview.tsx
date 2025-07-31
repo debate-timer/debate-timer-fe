@@ -71,7 +71,15 @@ export default function TableOverview() {
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
-              className="button enabled neutral flex w-full flex-row gap-[12px] rounded-full p-[24px]"
+              className="button enabled neutral flex aspect-square rounded-full p-[20px]"
+              onClick={() => {
+                openShareModal();
+              }}
+            >
+              <DTShare className="h-full" />
+            </button>
+            <button
+              className="button enabled neutral flex aspect-square rounded-full p-[20px]"
               onClick={() => {
                 if (isGuestFlow()) {
                   navigate(`/composition?mode=edit&type=CUSTOMIZE`);
@@ -83,7 +91,6 @@ export default function TableOverview() {
               }}
             >
               <DTEdit className="h-full" />
-              수정하기
             </button>
             <div className="flex w-full space-x-2">
               <button
@@ -98,14 +105,6 @@ export default function TableOverview() {
               >
                 <DTDebate className="h-full" />
                 토론하기
-              </button>
-              <button
-                className="button enabled neutral flex aspect-square rounded-full p-[20px]"
-                onClick={() => {
-                  openShareModal();
-                }}
-              >
-                <DTShare className="h-full" />
               </button>
             </div>
           </div>

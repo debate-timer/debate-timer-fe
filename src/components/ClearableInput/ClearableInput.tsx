@@ -16,7 +16,7 @@ export default function ClearableInput({
   ...rest
 }: ClearableInputProps) {
   return (
-    <div className={clsx('relative', className)}>
+    <div className={clsx('relative w-full', className)}>
       <input
         {...rest}
         value={value}
