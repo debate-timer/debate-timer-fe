@@ -69,7 +69,7 @@ export default function TableOverview() {
         </DefaultLayout.ContentContainer>
 
         <DefaultLayout.StickyFooterWrapper>
-          <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
+          <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
               className="button enabled neutral flex w-full flex-row gap-[12px] rounded-full p-[24px]"
               onClick={() => {

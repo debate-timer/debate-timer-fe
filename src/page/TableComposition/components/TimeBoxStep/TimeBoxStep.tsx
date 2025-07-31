@@ -164,7 +164,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="relative mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
+        <div className="relative mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
             onClick={onEditTableInfoButtonClick}
             className="button enabled neutral flex h-full w-full gap-[12px] rounded-full p-[24px]"
