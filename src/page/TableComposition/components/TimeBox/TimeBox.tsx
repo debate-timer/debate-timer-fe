@@ -128,7 +128,7 @@ export default function TimeBox(props: TimeBoxProps) {
 
   const renderNeutralTimeoutPanel = () => (
     <div className="timebox neutral">
-      {renderDragHandle()}
+      {isModifiable && renderDragHandle()}
       <div className="absolute right-2 top-2">
         <TimeBoxManageButtons
           info={props.info}

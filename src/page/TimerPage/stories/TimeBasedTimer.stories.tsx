@@ -22,7 +22,7 @@ const mockTimerInstance = {
   clearTimer: () => {},
 };
 
-const TIMEBOX_SAMPLE: TimeBoxInfo = {
+const TIME_BASED_TIMEBOX_SAMPLE: TimeBoxInfo = {
   boxType: 'TIME_BASED',
   speaker: null,
   speechType: '주도권 토론',
@@ -50,7 +50,7 @@ export const OnPros: Story = {
     onActivate: () => {},
     prosCons: 'PROS',
     teamName: '찬성팀',
-    item: TIMEBOX_SAMPLE,
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };
 
@@ -63,7 +63,7 @@ export const OnCons: Story = {
     onActivate: () => {},
     prosCons: 'CONS',
     teamName: '반대팀',
-    item: TIMEBOX_SAMPLE,
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };
 
@@ -77,11 +77,11 @@ export const OnRunning: Story = {
     onActivate: () => {},
     prosCons: 'PROS',
     teamName: '찬성팀',
-    item: TIMEBOX_SAMPLE,
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };
 
-export const WhenOnlyTeamPerTime: Story = {
+export const WhenOnlyTimePerTeam: Story = {
   args: {
     timeBasedTimerInstance: {
       ...mockTimerInstance,
@@ -91,6 +91,20 @@ export const WhenOnlyTeamPerTime: Story = {
     onActivate: () => {},
     prosCons: 'PROS',
     teamName: '찬성팀',
-    item: TIMEBOX_SAMPLE,
+    item: TIME_BASED_TIMEBOX_SAMPLE,
+  },
+};
+
+export const OnDisabled: Story = {
+  args: {
+    timeBasedTimerInstance: {
+      ...mockTimerInstance,
+      speakingTimer: null,
+    },
+    isSelected: false,
+    onActivate: () => {},
+    prosCons: 'PROS',
+    teamName: '찬성팀',
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };

@@ -11,6 +11,11 @@ import DTLeftArrow from './LeftArrow';
 import DTDrag from './Drag';
 import DTCopy from './Copy';
 import DTDelete from './Delete';
+import DTEdit from './Edit';
+import DTPlay from './Play';
+import DTReset from './Reset';
+import DTShare from './Share';
+import DTExchange from './Exchange';
 
 const meta: Meta<typeof DTLogin> = {
   title: 'Design System/Icons',
@@ -175,6 +180,66 @@ export const OnDeleteIcon: Story = {
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
       <DTDelete className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">삭제</p>
+    </div>
+  ),
+};
+
+export const OnEditIcon: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTEdit className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">수정</p>
+    </div>
+  ),
+};
+
+export const OnPlayIcon: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTPlay className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">시작/재생</p>
+    </div>
+  ),
+};
+
+export const OnResetIcon: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTReset className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">초기화</p>
+    </div>
+  ),
+};
+
+export const OnShareIcon: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTShare className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">공유</p>
+    </div>
+  ),
+};
+
+export const OnExchangeIcon: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTExchange className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">교체</p>
     </div>
   ),
 };

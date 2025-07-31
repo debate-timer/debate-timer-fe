@@ -1,8 +1,8 @@
 // components/TimerView.tsx
+import DTExchange from '../../../components/icons/Exchange';
 import { TimerPageLogics } from '../hooks/useTimerPageState';
 import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
-import { FaExchangeAlt } from 'react-icons/fa';
 
 export default function TimerView({ state }: { state: TimerPageLogics }) {
   const {
@@ -43,7 +43,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
   }
   if (data && data.table[index].boxType === 'TIME_BASED') {
     return (
-      <div className="relative flex flex-row items-center justify-center space-x-[30px]">
+      <div className="flex flex-row items-center justify-center space-x-[30px]">
         {/* 왼쪽 타이머 */}
         <TimeBasedTimer
           timeBasedTimerInstance={{
@@ -60,6 +60,18 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
           prosCons="PROS"
           teamName={data.info.prosTeamName}
         />
+
+        {/* ENTER 버튼 */}
+        <button
+          onClick={switchCamp}
+          className="flex flex-col rounded-[14px] bg-default-black2 px-[32px] py-[8px] text-default-white shadow-xl"
+        >
+          <DTExchange className="size-[66px]" />
+          <p className="text-[24px] font-semibold lg:text-[18px] lg:font-bold">
+            ENTER
+          </p>
+        </button>
+
         {/* 오른쪽 타이머 */}
         <TimeBasedTimer
           timeBasedTimerInstance={{
@@ -76,16 +88,6 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
           prosCons="CONS"
           teamName={data.info.consTeamName}
         />
-        {/* ENTER 버튼 */}
-        <button
-          onClick={switchCamp}
-          className="absolute left-1/2 top-1/2 flex h-[78px] w-[78px] -translate-x-[70px] -translate-y-6 flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500 lg:h-[100px] lg:w-[100px] lg:-translate-x-20 lg:-translate-y-8"
-        >
-          <FaExchangeAlt className="text-[28px] lg:text-[36px]" />
-          <span className="text-[12px] font-semibold lg:text-[18px] lg:font-bold">
-            ENTER
-          </span>
-        </button>
       </div>
     );
   }

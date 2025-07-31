@@ -4,8 +4,9 @@ import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
 import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
 import CircularTimer from './CircularTimer';
-import { useMotionValue } from 'framer-motion';
+import { animate, useMotionValue } from 'framer-motion';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;
@@ -28,7 +29,6 @@ interface TimeBasedTimerProps {
 export default function TimeBasedTimer({
   timeBasedTimerInstance,
   isSelected,
-  onActivate,
   prosCons,
   teamName,
   item,
@@ -53,12 +53,6 @@ export default function TimeBasedTimer({
     Math.abs((speakingTimer ?? 0) % 60),
   );
 
-  const boxShadow = isRunning
-    ? prosCons === 'PROS'
-      ? 'shadow-camp-blue'
-      : 'shadow-camp-red'
-    : '';
-
   const rawTotalProgress =
     totalTimer !== null && item.timePerTeam
       ? ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100
@@ -66,25 +60,87 @@ export default function TimeBasedTimer({
   const totalProgress = Math.min(100, rawTotalProgress);
   const totalProgressMotionValue = useMotionValue(0);
 
-  const bgColorClass = prosCons === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
+  useEffect(() => {
+    animate(totalProgressMotionValue, totalProgress, {
+      duration: 0.7,
+      ease: 'easeOut',
+    });
+  }, [totalProgress, totalProgressMotionValue]);
 
   return (
-    <div className="flex min-w-[560px] flex-col items-center justify-center space-y-[18px]">
+    <div
+      data-testid="timer"
+      className={clsx(
+        'flex min-w-[560px] flex-col items-center justify-center space-y-[18px]',
+        {
+          'pointer-events-none opacity-50 grayscale': !isSelected,
+        },
+      )}
+    >
+      {/* 제목 */}
+      <section className="flex flex-row items-center justify-center space-x-[24px]">
+        <h1 className="text-[68px] font-bold text-default-black">{teamName}</h1>
+        <img
+          src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}
+          alt={prosCons === 'PROS' ? 'A키' : 'L키'}
+          className="size-[56px]"
+        />
+      </section>
+
       {/* 타이머 */}
       <CircularTimer
         progress={totalProgressMotionValue}
-        stance={item.stance}
+        stance={prosCons}
         size={560}
         strokeWidth={20}
       >
         {/* 1회당 발언 시간 X */}
-        <span className="flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[110px] font-bold text-default-black">
-          <p className="flex flex-1 items-center justify-center">{minute}</p>
-          <p className="flex items-center justify-center">:</p>
-          <p className="flex flex-1 items-center justify-center">{second}</p>
-        </span>
+        {speakingTimer === null && (
+          <span className="flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[110px] font-bold text-default-black">
+            <p className="flex flex-1 items-center justify-center">{minute}</p>
+            <p className="flex items-center justify-center">:</p>
+            <p className="flex flex-1 items-center justify-center">{second}</p>
+          </span>
+        )}
 
         {/* 1회당 발언 시간 O */}
+        {speakingTimer !== null && (
+          <span className="flex w-full flex-col items-center justify-center p-[16px]">
+            <h1 className="w-[112px] rounded-[8px] bg-default-black py-[6px] text-center text-[20px] text-default-white">
+              전체 시간
+            </h1>
+            <span className="flex flex-row text-[72px] font-semibold text-default-black">
+              <p className="flex w-[120px] items-center justify-center">
+                {minute}
+              </p>
+              <p className="flex items-center justify-center">:</p>
+              <p className="flex w-[120px] items-center justify-center">
+                {second}
+              </p>
+            </span>
+
+            <span className="h-[32px]"></span>
+
+            <h1
+              className={clsx(
+                'w-[180px] rounded-[8px] py-[6px] text-center text-[28px] text-default-white',
+                { 'bg-camp-blue': prosCons === 'PROS' },
+                { 'bg-camp-red': prosCons === 'CONS' },
+              )}
+            >
+              현재 시간
+            </h1>
+            <span className="flex flex-row text-[110px] font-bold text-default-black">
+              <p className="flex w-[180px] items-center justify-center">
+                {speakingMinute}
+              </p>
+              <p className="flex items-center justify-center">:</p>
+              <p className="flex w-[180px] items-center justify-center">
+                {speakingSecond}
+              </p>
+            </span>
+          </span>
+        )}
       </CircularTimer>
 
       {/* 조작부 */}
@@ -95,99 +151,6 @@ export default function TimeBasedTimer({
         onReset={resetCurrentTimer}
         stance={prosCons}
       />
-    </div>
-  );
-
-  return (
-    <div
-      onClick={onActivate}
-      className={`rounded-[45px] duration-100 ${boxShadow}`}
-    >
-      <div
-        data-testid="timer"
-        className={`flex min-h-[300px] w-[460px] flex-col items-center rounded-[45px] bg-neutral-200 transition-all duration-300 lg:w-[600px] xl:w-[720px] ${
-          isSelected ? '' : 'pointer-events-none opacity-50 grayscale'
-        }`}
-      >
-        {/* Timer Header */}
-        <div
-          className={`flex h-[80px] w-full items-center justify-between rounded-t-[45px] lg:h-[105px] xl:h-[139px] ${bgColorClass} relative text-[45px] font-semibold  text-neutral-50 lg:text-[60px] lg:font-bold xl:text-[75px]`}
-        >
-          <h2 className="absolute left-1/2 flex w-max -translate-x-1/2 transform items-center justify-center gap-2">
-            {teamName}
-            <img
-              src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}
-              alt={prosCons === 'PROS' ? 'A키' : 'ㅣ키'}
-              className="h-[35px] w-[35px] lg:h-[50px] lg:w-[50px] xl:h-[56px] xl:w-[56px]"
-            />
-          </h2>
-        </div>
-        {speakingTimer !== null ? (
-          <div className="h-7 lg:h-10" />
-        ) : (
-          <div className="h-12 lg:h-14 xl:h-20" />
-        )}
-        {/* 🚩 Timer 영역 */}
-        <div className="flex flex-col items-center space-y-[10px] lg:space-y-[15px] xl:space-y-[20px]">
-          {speakingTimer !== null ? (
-            <>
-              {/* 전체시간 타이머 (상단 작게 표시) */}
-              <div
-                className={`relative flex h-[60px] w-[400px] items-center justify-center  text-[54px] font-semibold text-neutral-900 lg:h-[70px] lg:w-[520px] lg:text-[68px] lg:font-bold xl:h-[80px] xl:w-[600px] xl:text-[80px]`}
-              >
-                <div className="absolute left-3 top-2 text-xs font-semibold lg:text-sm">
-                  전체 시간
-                </div>
-                <div className="flex flex-row items-center justify-center text-center xl:space-x-3">
-                  <p className="w-[95px] lg:w-[120px]">{minute}</p>
-                  <p className="w-[20px] -translate-y-[4px] lg:w-[20px]">:</p>
-                  <p className="w-[95px] lg:w-[120px]">{second}</p>
-                </div>
-              </div>
-
-              {/* 현재시간 타이머 (크게 표시) */}
-              <div
-                className={`relative flex h-[110px] w-[400px] items-center justify-center bg-white text-[70px] font-semibold lg:h-[130px] lg:w-[520px] lg:text-[90px] lg:font-bold xl:h-[160px] xl:w-[600px] xl:text-[110px]`}
-              >
-                <div className="absolute left-3 top-2 text-xs font-semibold lg:text-sm">
-                  현재 시간
-                </div>
-                <div className="flex flex-row items-center justify-center text-center xl:space-x-3">
-                  <p className="w-[110px] lg:w-[150px] xl:w-[170px]">
-                    {speakingMinute}
-                  </p>
-                  <p className="w-[40px] -translate-y-[6px] xl:w-[40px] xl:-translate-y-[10px]">
-                    :
-                  </p>
-                  <p className="w-[110px] lg:w-[150px] xl:w-[170px]">
-                    {speakingSecond}
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* 타이머가 하나일 때 (크게 표시) */}
-              <div
-                className={`flex h-[160px] w-[400px] items-center justify-center bg-white text-[75px] font-semibold text-neutral-900 shadow-inner lg:h-[199px] lg:w-[520px] lg:text-[100px] lg:font-bold xl:h-[220px] xl:w-[600px] xl:text-[120px]`}
-              >
-                {minute} : {second}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Timer controller 유지 */}
-        <div className="my-[15px] lg:my-[25px] xl:my-[30px]">
-          <TimerController
-            isRunning={isRunning}
-            onStart={startTimer}
-            onPause={pauseTimer}
-            onReset={resetCurrentTimer}
-            stance={prosCons}
-          />
-        </div>
-      </div>
     </div>
   );
 }

@@ -39,7 +39,6 @@ export default function CircularTimer({
       return `conic-gradient(from 0deg, ${BASE_COLOR} ${currentAngle}deg, ${PROGRESS_COLOR} ${currentAngle}deg 360deg)`;
     }
   });
-  console.log(`# angle = ${angle}`);
 
   return (
     <motion.div
