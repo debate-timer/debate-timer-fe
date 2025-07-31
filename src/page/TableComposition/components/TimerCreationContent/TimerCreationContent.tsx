@@ -63,6 +63,13 @@ interface TimerCreationContentProps {
   onClose: () => void;
 }
 
+interface BellInputConfig {
+  type: BellType;
+  min: number;
+  sec: number;
+  count: number;
+}
+
 export default function TimerCreationContent({
   beforeData,
   initData,
@@ -212,6 +219,7 @@ export default function TimerCreationContent({
         timePerTeam: null,
         timePerSpeaking: null,
         speaker,
+        bell,
       });
     } else {
       onSubmit({
@@ -224,6 +232,7 @@ export default function TimerCreationContent({
         timePerSpeaking:
           totalTimePerSpeaking !== 0 ? totalTimePerSpeaking : null,
         speaker: null,
+        bell: null,
       });
     }
     onClose();
@@ -499,4 +508,21 @@ export default function TimerCreationContent({
       </button>
     </div>
   );
+}
+
+function bellInputConfigToBellConfig(input: BellInputConfig): BellConfig {
+  let time = input.min * 60 + input.sec;
+  if (input.type === 'AFTER_END') time = -time;
+  return {
+    time,
+    count: input.count,
+    type: input.type,
+  };
+}
+
+function bellConfigToBellInputConfig(data: BellConfig): BellInputConfig {
+  const { type, time, count } = data;
+  const { minutes, seconds } = Formatting.formatSecondsToMinutes(time);
+  const converted = { type, min: minutes, sec: seconds, count };
+  return converted;
 }

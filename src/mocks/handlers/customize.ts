@@ -19,8 +19,6 @@ export const customizeHandlers = [
         agenda: '토론 주제',
         prosTeamName: '찬성',
         consTeamName: '반대',
-        warningBell: true,
-        finishBell: true,
       },
       table: [
         {
@@ -49,6 +47,10 @@ export const customizeHandlers = [
           timePerTeam: null,
           timePerSpeaking: null,
           speaker: '발언자 1',
+          bell: [
+            { type: 'BEFORE_END', time: 0, count: 2 },
+            { type: 'AFTER_START', time: 5, count: 1 },
+          ],
         },
         {
           stance: 'PROS',
@@ -58,6 +60,10 @@ export const customizeHandlers = [
           timePerTeam: null,
           timePerSpeaking: null,
           speaker: '발언자 1',
+          bell: [
+            { type: 'BEFORE_END', time: 0, count: 2 },
+            { type: 'AFTER_START', time: 7, count: 3 },
+          ],
         },
         {
           stance: 'NEUTRAL',
@@ -67,6 +73,7 @@ export const customizeHandlers = [
           timePerTeam: null,
           timePerSpeaking: null,
           speaker: null,
+          bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
         },
         {
           stance: 'CONS',
@@ -76,6 +83,7 @@ export const customizeHandlers = [
           timePerTeam: null,
           timePerSpeaking: null,
           speaker: '발언자 2',
+          bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
         },
         {
           stance: 'PROS',
@@ -85,6 +93,7 @@ export const customizeHandlers = [
           timePerTeam: null,
           timePerSpeaking: null,
           speaker: '발언자 2',
+          bell: [{ type: 'BEFORE_END', time: 0, count: 2 }],
         },
       ],
     });
@@ -105,8 +114,6 @@ export const customizeHandlers = [
         agenda: '토론 주제',
         prosTeamName: '찬성',
         consTeamName: '반대',
-        warningBell: true,
-        finishBell: true,
       },
       table: [
         {
@@ -182,8 +189,6 @@ export const customizeHandlers = [
         agenda: '토론 주제',
         prosTeamName: '찬성',
         consTeamName: '반대',
-        warningBell: true,
-        finishBell: true,
       },
       table: [
         {
@@ -270,8 +275,6 @@ export const customizeHandlers = [
         agenda: '토론 주제',
         prosTeamName: '찬성',
         consTeamName: '반대',
-        warningBell: true,
-        finishBell: true,
       },
       table: [
         {
