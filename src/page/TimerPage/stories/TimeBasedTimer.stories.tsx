@@ -30,6 +30,7 @@ const TIME_BASED_TIMEBOX_SAMPLE: TimeBoxInfo = {
   time: null,
   timePerSpeaking: 60,
   timePerTeam: 120,
+  bell: null,
 } as const;
 
 const meta: Meta<typeof TimeBasedTimer> = {

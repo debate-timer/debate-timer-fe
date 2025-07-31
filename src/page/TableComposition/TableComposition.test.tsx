@@ -80,7 +80,9 @@ describe('TableComposition', () => {
     expect(finishButton).toBeDisabled();
 
     // Add a new timebox
-    await userEvent.click(await screen.findByRole('button', { name: '+' }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: '타이머 추가' }),
+    );
     await userEvent.click(
       await screen.findByRole('button', { name: '설정 완료' }),
     );
