@@ -368,7 +368,7 @@ export default function TimerCreationContent({
   );
 
   return (
-    <div className="flex w-[800px] flex-col">
+    <div className="flex min-h-[600px] w-[800px] flex-col">
       {/* 헤더 */}
       <section className="mx-[50px] mt-[25px] flex flex-row justify-between">
         {/* 제목 */}
@@ -660,12 +660,10 @@ export default function TimerCreationContent({
                       <button
                         type="button"
                         className={clsx(
-                          'flex size-[28px] items-center justify-center rounded-[8px] p-[6px] text-default-white',
+                          'flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px]  text-default-white',
                           {
-                            'cursor-not-allowed bg-default-disabled/hover':
-                              !isBellAddEnabled,
+                            'cursor-not-allowed': !isBellAddEnabled,
                           },
-                          { 'bg-brand': isBellAddEnabled },
                         )}
                         onClick={handleAddBell}
                         disabled={!isBellAddEnabled}
