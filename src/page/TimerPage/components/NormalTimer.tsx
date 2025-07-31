@@ -6,12 +6,14 @@ import clsx from 'clsx';
 import DTDebate from '../../../components/icons/Debate';
 import { animate, useMotionValue } from 'framer-motion';
 import { useEffect } from 'react';
+import CompactTimeoutTimer from './CompactTimeoutTimer';
 
 type NormalTimerInstance = {
   timer: number | null;
   isAdditionalTimerOn: boolean;
   isRunning: boolean;
   handleChangeAdditionalTimer: () => void;
+  handleCloseAdditionalTimer: () => void;
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimer: () => void;
@@ -38,13 +40,15 @@ export default function NormalTimer({
     startTimer,
     pauseTimer,
     resetTimer,
+    handleChangeAdditionalTimer,
+    handleCloseAdditionalTimer,
   } = normalTimerInstance;
   const totalTime = timer ?? 0;
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(totalTime) / 60),
   );
   const second = Formatting.formatTwoDigits(Math.abs(totalTime % 60));
-  const titleText = isAdditionalTimerOn ? '작전 시간' : item.speechType;
+  const titleText = item.speechType;
   const rawProgress =
     timer !== null && item.time ? ((item.time - timer) / item.time) * 100 : 0;
   const progress = Math.min(100, rawProgress);
@@ -57,48 +61,62 @@ export default function NormalTimer({
     });
   }, [progress, progressMotionValue]);
 
+  // px-[45px]
   return (
     <div className="flex flex-row space-x-[80px]">
       {/* 좌측 영역 */}
-      <span className="flex min-w-[360px] flex-col items-center justify-center space-y-[36px]">
-        {/* 제목 */}
-        <h1 className="text-[68px] font-bold">{titleText}</h1>
+      <span className="flex min-w-[450px] flex-col items-center justify-center">
+        <span className="flex w-full flex-col items-center justify-center space-y-[36px] px-[45px]">
+          {/* 제목 */}
+          <h1 className="text-[68px] font-bold">{titleText}</h1>
 
-        {/* 발언자 및 팀 정보 */}
-        {(teamName || item.speaker) && (
-          <span className="flex flex-row items-center justify-center space-x-[16px]">
-            <DTDebate className="w-[36px]" />
-            <p className="text-[32px]">
-              {teamName && teamName + ' 팀'}
-              {teamName && item.speaker && ' | '}
-              {item.speaker && item.speaker + ' 토론자'}
-            </p>
-          </span>
-        )}
+          {/* 발언자 및 팀 정보 */}
+          {(teamName || item.speaker) && (
+            <span className="flex flex-row items-center justify-center space-x-[16px]">
+              <DTDebate className="w-[36px]" />
+              <p className="text-[32px]">
+                {teamName && teamName + ' 팀'}
+                {teamName && item.speaker && ' | '}
+                {item.speaker && item.speaker + ' 토론자'}
+              </p>
+            </span>
+          )}
 
-        {/* 작전 시간 타이머 버튼 */}
-        {isAdditionalTimerAvailable && (
-          <button
-            className={clsx(
-              'flex h-[68px] w-full items-center justify-center rounded-[20px] bg-default-white',
-            )}
-          >
-            <span
+          {/* 작전 시간 타이머 버튼 */}
+          {isAdditionalTimerAvailable && !isAdditionalTimerOn && (
+            <button
+              onClick={handleChangeAdditionalTimer}
               className={clsx(
-                'flex h-[68px] w-full items-center justify-center rounded-[20px] text-[28px] font-semibold transition-all duration-200 ease-in-out',
-                {
-                  'bg-camp-blue/50 hover:bg-camp-blue': item.stance === 'PROS',
-                },
-                { 'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS' },
-                {
-                  'bg-default-neutral/50 hover:bg-default-neutral':
-                    item.stance === 'NEUTRAL',
-                },
+                'flex h-[68px] w-full items-center justify-center rounded-[20px] bg-default-white',
               )}
             >
-              작전 시간
-            </span>
-          </button>
+              <span
+                className={clsx(
+                  'flex h-[68px] w-full items-center justify-center rounded-[20px] text-[28px] font-semibold transition-all duration-200 ease-in-out',
+                  {
+                    'bg-camp-blue/50 hover:bg-camp-blue':
+                      item.stance === 'PROS',
+                  },
+                  {
+                    'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS',
+                  },
+                  {
+                    'bg-default-neutral/50 hover:bg-default-neutral':
+                      item.stance === 'NEUTRAL',
+                  },
+                )}
+              >
+                작전 시간
+              </span>
+            </button>
+          )}
+        </span>
+
+        {isAdditionalTimerAvailable && isAdditionalTimerOn && (
+          <CompactTimeoutTimer
+            onClose={handleCloseAdditionalTimer}
+            className="mt-[56px]"
+          />
         )}
       </span>
 

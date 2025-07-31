@@ -24,6 +24,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
           isAdditionalTimerOn: normalTimer.isAdditionalTimerOn,
           isRunning: normalTimer.isRunning,
           handleChangeAdditionalTimer: normalTimer.handleChangeAdditionalTimer,
+          handleCloseAdditionalTimer: normalTimer.handleCloseAdditionalTimer,
           startTimer: normalTimer.startTimer,
           pauseTimer: normalTimer.pauseTimer,
           resetTimer: normalTimer.resetTimer,

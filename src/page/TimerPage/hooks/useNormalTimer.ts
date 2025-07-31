@@ -23,7 +23,6 @@ export function useNormalTimer(): NormalTimerLogics {
 
   // 작전 시간 타이머 작동 여부
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
-  const [savedTimer, setSavedTimer] = useState(0);
 
   /**
    * 타이머를 1초마다 1씩 감소시키며 시작
@@ -81,14 +80,8 @@ export function useNormalTimer(): NormalTimerLogics {
    */
   const handleChangeAdditionalTimer = useCallback(() => {
     pauseTimer();
-    if (!isAdditionalTimerOn) {
-      setSavedTimer(timer ?? 0);
-      setTimer(0);
-    } else {
-      setTimer(savedTimer);
-    }
     setIsAdditionalTimerOn(!isAdditionalTimerOn);
-  }, [isAdditionalTimerOn, pauseTimer, setTimer, savedTimer, timer]);
+  }, [isAdditionalTimerOn, pauseTimer]);
 
   /**
    * 작전시간 타이머 사용 시, 기존 타이머 저장
@@ -96,22 +89,7 @@ export function useNormalTimer(): NormalTimerLogics {
   const handleCloseAdditionalTimer = useCallback(() => {
     setIsAdditionalTimerOn(false);
   }, []);
-  //작전시간 종료 시, 자동으로 타이머 변경
-  useEffect(() => {
-    if (isAdditionalTimerOn && timer === 0 && isRunning) {
-      pauseTimer();
-      setTimer(savedTimer);
-      setIsAdditionalTimerOn(false);
-    }
-  }, [
-    isAdditionalTimerOn,
-    timer,
-    savedTimer,
-    pauseTimer,
-    setIsAdditionalTimerOn,
-    setTimer,
-    isRunning,
-  ]);
+
   useEffect(() => () => pauseTimer(), [pauseTimer]);
 
   return {
