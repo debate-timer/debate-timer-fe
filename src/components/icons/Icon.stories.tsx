@@ -16,6 +16,7 @@ import DTPlay from './Play';
 import DTReset from './Reset';
 import DTShare from './Share';
 import DTExchange from './Exchange';
+import DTBell from './Bell';
 
 const meta: Meta<typeof DTLogin> = {
   title: 'Design System/Icons',
@@ -240,6 +241,18 @@ export const OnExchangeIcon: Story = {
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
       <DTExchange className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">교체</p>
+    </div>
+  ),
+};
+
+export const OnBell: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTBell className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">타종</p>
     </div>
   ),
 };

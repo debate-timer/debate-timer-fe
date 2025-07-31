@@ -1,5 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import { TimeBoxInfo, Stance, TimeBoxType } from '../../../../type/type';
+import {
+  TimeBoxInfo,
+  Stance,
+  TimeBoxType,
+  BellType,
+  BellTypeToString,
+  BellConfig,
+} from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import normalTimerImage from '../../../../assets/timer/normal_timer.png';
 import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.png';
@@ -12,6 +19,8 @@ import DropdownMenu, {
 } from '../../../../components/DropdownMenu/DropdownMenu';
 import clsx from 'clsx';
 import TimeInputGroup from './TimeInputGroup';
+import DTBell from '../../../../components/icons/Bell';
+import DTAdd from '../../../../components/icons/Add';
 
 type TimerCreationOption =
   | 'TIMER_TYPE'
@@ -21,7 +30,8 @@ type TimerCreationOption =
   | 'TIME_PER_TEAM'
   | 'TIME_PER_SPEAKING'
   | 'SPEAKER'
-  | 'TIME_NORMAL';
+  | 'TIME_NORMAL'
+  | 'BELL';
 
 type SpeechType = 'OPENING' | 'REBUTTAL' | 'TIMEOUT' | 'CLOSING' | 'CUSTOM';
 
@@ -45,6 +55,7 @@ const NORMAL_OPTIONS: TimerCreationOption[] = [
   'TEAM',
   'TIME_NORMAL',
   'SPEAKER',
+  'BELL',
 ] as const;
 
 const TIME_BASED_OPTIONS: TimerCreationOption[] = [
@@ -108,6 +119,16 @@ export default function TimerCreationContent({
         return 'OPENING';
     }
   };
+
+  const initBellInput: BellInputConfig = useMemo(() => {
+    return {
+      type: 'BEFORE_END', // 기본값: 종료 전
+      min: 0,
+      sec: 0,
+      count: 1,
+    };
+  }, []);
+
   const initSpeechType =
     beforeData?.speechType ?? initData?.speechType ?? '입론';
   const [currentSpeechType, setCurrentSpeechType] = useState<SpeechType>(
@@ -145,6 +166,47 @@ export default function TimerCreationContent({
     beforeData?.speaker ?? initData?.speaker ?? '',
   );
 
+  // 종소리 input 상태
+  const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
+  const [bellType, setBellType] = useState<BellType>('BEFORE_END');
+
+  // bell의 time(초)은: before => 양수, after => 음수로 변환
+  const getInitialBells = (): BellInputConfig[] => {
+    if (beforeData?.bell && beforeData.bell.length > 0) {
+      return beforeData.bell.map(bellConfigToBellInputConfig);
+    }
+    if (initData?.bell && initData.bell.length > 0) {
+      return initData.bell.map(bellConfigToBellInputConfig);
+    }
+    return [
+      { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
+      { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
+    ];
+  };
+  const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
+  const isBellAddEnabled =
+    (bellInput.min >= 0 || bellInput.sec >= 0) &&
+    bellInput.count >= 1 &&
+    bellInput.count <= 3;
+
+  const handleAddBell = () => {
+    if (!isBellAddEnabled) return;
+    setBells([
+      ...bells,
+      {
+        type: bellInput.type,
+        min: bellInput.min,
+        sec: bellInput.sec,
+        count: bellInput.count,
+      },
+    ]);
+    setBellInput(initBellInput);
+  };
+
+  const handleDeleteBell = (idx: number) => {
+    setBells(bells.filter((_, i) => i !== idx));
+  };
+
   const isNormalTimer = timerType === 'NORMAL';
 
   const speechTypeOptions: DropdownMenuItem<SpeechType>[] = [
@@ -162,6 +224,15 @@ export default function TimerCreationContent({
       { value: 'NEUTRAL', label: STANCE_RECORD['NEUTRAL'] },
     ],
     [prosTeamName, consTeamName],
+  );
+
+  const bellOptions: DropdownMenuItem<BellType>[] = useMemo(
+    () => [
+      { value: 'BEFORE_END', label: BellTypeToString['BEFORE_END'] },
+      { value: 'AFTER_END', label: BellTypeToString['AFTER_END'] },
+      { value: 'AFTER_START', label: BellTypeToString['AFTER_START'] },
+    ],
+    [],
   );
 
   const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
@@ -210,6 +281,7 @@ export default function TimerCreationContent({
       stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
     }
 
+    const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
     if (timerType === 'NORMAL') {
       onSubmit({
         stance: stanceToSend,
@@ -237,6 +309,8 @@ export default function TimerCreationContent({
     }
     onClose();
   }, [
+    bells,
+    isNormalTimer,
     currentSpeechType,
     minutes,
     seconds,
@@ -294,7 +368,7 @@ export default function TimerCreationContent({
   );
 
   return (
-    <div className="flex h-[600px] w-[800px] flex-col">
+    <div className="flex w-[800px] flex-col">
       {/* 헤더 */}
       <section className="mx-[50px] mt-[25px] flex flex-row justify-between">
         {/* 제목 */}
@@ -494,6 +568,142 @@ export default function TimerCreationContent({
                       disabled={currentSpeechType === 'TIMEOUT'}
                     />
                   </TimerCreationContentItem>
+                );
+
+              case 'BELL':
+                return (
+                  <div
+                    className="flex w-full flex-col space-y-[16px]"
+                    key={`${timerType}-${index}`}
+                  >
+                    {/* 제목 */}
+                    <p className="text-body w-[80px] font-bold">종소리 설정</p>
+
+                    {/* 입력부 */}
+                    <span className="flex w-full flex-row items-center space-x-[4px]">
+                      {/* 벨 유형 */}
+                      <DropdownMenu
+                        className=""
+                        options={bellOptions}
+                        selectedValue={bellType}
+                        onSelect={(value: BellType) => {
+                          setBellType(value);
+                          setBellInput((prev) => ({
+                            ...prev,
+                            type: value,
+                          }));
+                        }}
+                      />
+                      <span className="w-[8px]"></span>
+
+                      {/* 분, 초, 타종 횟수 */}
+                      <input
+                        type="number"
+                        min={0}
+                        max={59}
+                        className="w-[48px] rounded-[4px] border border-default-border p-[8px] px-1"
+                        value={bellInput.min}
+                        onChange={(e) =>
+                          setBellInput((prev) => ({
+                            ...prev,
+                            min: Math.max(
+                              0,
+                              Math.min(59, Number(e.target.value)),
+                            ),
+                          }))
+                        }
+                        placeholder="분"
+                      />
+                      <span>분</span>
+
+                      <input
+                        type="number"
+                        min={0}
+                        max={59}
+                        className="w-[48px] rounded-[4px] border border-default-border p-[8px] px-1"
+                        value={bellInput.sec}
+                        onChange={(e) =>
+                          setBellInput((prev) => ({
+                            ...prev,
+                            sec: Math.max(
+                              0,
+                              Math.min(59, Number(e.target.value)),
+                            ),
+                          }))
+                        }
+                        placeholder="초"
+                      />
+                      <span>초</span>
+                      <span className="w-[8px]"></span>
+
+                      <DTBell className="w-[24px]" />
+                      <p>x</p>
+                      <input
+                        type="number"
+                        min={1}
+                        max={3}
+                        className="w-[48px] rounded-[4px] border border-default-border p-[8px] px-1"
+                        value={bellInput.count}
+                        onChange={(e) =>
+                          setBellInput((prev) => ({
+                            ...prev,
+                            count: Math.max(
+                              1,
+                              Math.min(3, Number(e.target.value)),
+                            ),
+                          }))
+                        }
+                        placeholder="횟수"
+                      />
+                      <span className="w-[8px]"></span>
+
+                      <button
+                        type="button"
+                        className={clsx(
+                          'flex size-[28px] items-center justify-center rounded-[8px] p-[6px] text-default-white',
+                          {
+                            'cursor-not-allowed bg-default-disabled/hover':
+                              !isBellAddEnabled,
+                          },
+                          { 'bg-brand': isBellAddEnabled },
+                        )}
+                        onClick={handleAddBell}
+                        disabled={!isBellAddEnabled}
+                      >
+                        <DTAdd />
+                      </button>
+                    </span>
+
+                    {/* 벨 리스트 */}
+                    <span className="flex h-[100px] w-full flex-col items-center gap-2 overflow-y-auto">
+                      {bells.map((bell, idx) => (
+                        <span
+                          key={idx}
+                          className="relative flex w-full flex-row rounded-[4px] border border-default-border bg-[#FFF2D0] px-[12px] py-[4px]"
+                        >
+                          <div className="flex items-center gap-1">
+                            <p className="text-[14px]">
+                              {BellTypeToString[bell.type]}
+                            </p>
+                            <p className="text-[14px]">
+                              {bell.min}분 {bell.sec}초
+                            </p>
+
+                            <span className="w-[8px]"></span>
+                            <DTBell className="size-[14px]" />
+                            <span className="text-[14px]">x {bell.count}</span>
+                          </div>
+
+                          <button
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-default-border"
+                            onClick={() => handleDeleteBell(idx)}
+                          >
+                            <DTClose className="size-[10px]" />
+                          </button>
+                        </span>
+                      ))}
+                    </span>
+                  </div>
                 );
               default:
                 return null;
