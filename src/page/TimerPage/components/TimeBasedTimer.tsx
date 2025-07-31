@@ -53,19 +53,31 @@ export default function TimeBasedTimer({
     Math.abs((speakingTimer ?? 0) % 60),
   );
 
-  const rawTotalProgress =
-    totalTimer !== null && item.timePerTeam
-      ? ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100
-      : 0;
-  const totalProgress = Math.min(100, rawTotalProgress);
-  const totalProgressMotionValue = useMotionValue(0);
+  const initRawProgress = (): number => {
+    if (speakingTimer === null) {
+      if (item.timePerTeam && totalTimer) {
+        return ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100;
+      }
+    } else {
+      if (item.timePerSpeaking && speakingTimer) {
+        return (
+          ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
+        );
+      }
+    }
+    return 0;
+  };
+
+  const rawProgress = initRawProgress();
+  const progress = Math.min(100, rawProgress);
+  const progressMotionValue = useMotionValue(0);
 
   useEffect(() => {
-    animate(totalProgressMotionValue, totalProgress, {
+    animate(progressMotionValue, progress, {
       duration: 0.7,
       ease: 'easeOut',
     });
-  }, [totalProgress, totalProgressMotionValue]);
+  }, [progress, progressMotionValue]);
 
   return (
     <div
@@ -89,7 +101,7 @@ export default function TimeBasedTimer({
 
       {/* 타이머 */}
       <CircularTimer
-        progress={totalProgressMotionValue}
+        progress={progressMotionValue}
         stance={prosCons}
         size={560}
         strokeWidth={20}
