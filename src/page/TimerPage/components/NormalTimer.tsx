@@ -72,9 +72,9 @@ export default function NormalTimer({
 
           {/* 발언자 및 팀 정보 */}
           {(teamName || item.speaker) && (
-            <span className="flex flex-row items-center justify-center space-x-[16px]">
+            <span className="flex w-full flex-row items-center justify-center space-x-[16px]">
               <DTDebate className="w-[36px]" />
-              <p className="text-[32px]">
+              <p className="text-[28px]">
                 {teamName && teamName + ' 팀'}
                 {teamName && item.speaker && ' | '}
                 {item.speaker && item.speaker + ' 토론자'}
