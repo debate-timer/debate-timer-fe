@@ -37,13 +37,6 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
   return (
     <>
       <div className="flex justify-end gap-2">
-        {onSubmitCopy && (
-          <button onClick={onSubmitCopy} aria-label="복사하기">
-            <SmallIconContainer className="size-[28px] p-[8px]">
-              <DTCopy className="h-full" />
-            </SmallIconContainer>
-          </button>
-        )}
         {onSubmitEdit && (
           <button onClick={openEditModal} aria-label="수정하기">
             <SmallIconContainer className="size-[28px] p-[8px]">
@@ -56,6 +49,13 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
             <SmallIconContainer className="size-[28px] p-[8px]">
               <DTDelete className="h-full" />
             </SmallIconContainer>{' '}
+          </button>
+        )}
+        {onSubmitCopy && (
+          <button onClick={onSubmitCopy} aria-label="복사하기">
+            <SmallIconContainer className="size-[28px] p-[8px]">
+              <DTCopy className="h-full" />
+            </SmallIconContainer>
           </button>
         )}
       </div>

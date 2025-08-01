@@ -367,7 +367,7 @@ export default function TimerCreationContent({
   );
 
   return (
-    <div className="flex min-h-[600px] w-[800px] flex-col">
+    <div className="flex w-[820px] flex-col">
       {/* 헤더 */}
       <section className="mx-[50px] mt-[25px] flex flex-row justify-between">
         {/* 제목 */}
@@ -375,10 +375,16 @@ export default function TimerCreationContent({
           <h1 className="text-subtitle">
             {timerType === 'NORMAL' ? '일반 타이머' : '자유토론 타이머'}
           </h1>
-          <p className="text-body text-default-neutral">
-            {timerType === 'NORMAL'
-              ? '한 팀의 발언 시간이 세팅된 일반적인 타이머'
-              : '팀별 발언 시간과 1회당 발언 시간이 세팅된 타이머\n1회당 발언 시간이 지나면, 상대 팀으로 발언권이 넘어감'}
+          <p className="text-body leading-[1.5] text-default-neutral ">
+            {timerType === 'NORMAL' ? (
+              '한 팀의 발언 시간이 세팅된 일반적인 타이머'
+            ) : (
+              <>
+                {'팀별 발언 시간과 1회당 발언 시간이 세팅된 타이머'}
+                <br />
+                {'1회당 발언 시간이 지나면, 상대 팀으로 발언권이 넘어감'}
+              </>
+            )}
           </p>
         </span>
 
@@ -389,23 +395,23 @@ export default function TimerCreationContent({
       </section>
 
       {/* 디바이더 */}
-      <span className="mx-[50px] my-[20px] h-[1px] bg-default-neutral"></span>
+      <span className="mx-[50px] mt-[20px] h-[1px] bg-default-neutral"></span>
 
       {/* 입력 폼 */}
-      <section className="mx-[50px] flex flex-1 flex-row">
+      <section className="mx-[50px] my-[30px] flex flex-1 flex-row">
         {/* 타이머 사진 */}
-        <span className="flex w-[250px] items-center justify-center">
+        <span className="relative flex w-[250px] items-center justify-center">
           {isNormalTimer ? (
             <img
               src={normalTimerImage}
               alt="normal-timer"
-              className="w-full object-contain"
+              className="absolute top-1/3 w-full -translate-y-1/2 object-contain"
             />
           ) : (
             <img
               src={timeBasedTimerImage}
               alt="time-based-timer"
-              className="w-full object-contain"
+              className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
             />
           )}
         </span>
@@ -414,7 +420,7 @@ export default function TimerCreationContent({
         <span className="w-[40px]"></span>
 
         {/* 옵션 */}
-        <span className="mb-[20px] flex w-full flex-1 flex-col space-y-[32px]">
+        <span className="flex w-full flex-1 flex-col space-y-[32px]">
           {options.map((timerType, index) => {
             switch (timerType) {
               // 타이머 종류
@@ -600,7 +606,7 @@ export default function TimerCreationContent({
                         type="number"
                         min={0}
                         max={59}
-                        className="w-[48px] rounded-[4px] border border-default-border p-[8px] px-1"
+                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                         value={bellInput.min}
                         onChange={(e) =>
                           setBellInput((prev) => ({
@@ -619,7 +625,7 @@ export default function TimerCreationContent({
                         type="number"
                         min={0}
                         max={59}
-                        className="w-[48px] rounded-[4px] border border-default-border p-[8px] px-1"
+                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                         value={bellInput.sec}
                         onChange={(e) =>
                           setBellInput((prev) => ({
@@ -641,7 +647,7 @@ export default function TimerCreationContent({
                         type="number"
                         min={1}
                         max={3}
-                        className="w-[48px] rounded-[4px] border border-default-border p-[8px] px-1"
+                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                         value={bellInput.count}
                         onChange={(e) =>
                           setBellInput((prev) => ({
@@ -659,7 +665,7 @@ export default function TimerCreationContent({
                       <button
                         type="button"
                         className={clsx(
-                          'flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px]  text-default-white',
+                          'flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px] text-default-white',
                           {
                             'cursor-not-allowed': !isBellAddEnabled,
                           },

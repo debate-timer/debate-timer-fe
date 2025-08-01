@@ -119,10 +119,10 @@ export default function TimeBox(props: TimeBoxProps) {
               </div>
             </>
           )}
-      <p className="text-detail mb-2 text-default-white">
+      <p className="text-[20px] font-bold text-default-white">
         {speechType} {speaker && `| ${speaker} 토론자`}
       </p>
-      <p className="text-title text-default-white">{timeStr}</p>
+      <p className="text-[28px] font-bold text-default-white">{timeStr}</p>
     </div>
   );
 
@@ -141,8 +141,8 @@ export default function TimeBox(props: TimeBoxProps) {
           }}
         />
       </div>
-      <p className="text-detail mb-2 text-default-white">{speechType}</p>
-      <p className="text-title text-default-white">{timeStr}</p>
+      <p className="text-[20px] font-bold text-default-black">{speechType}</p>
+      <p className="text-[28px] font-bold text-default-black">{timeStr}</p>
     </div>
   );
 
@@ -165,8 +165,12 @@ export default function TimeBox(props: TimeBoxProps) {
           </div>
         </>
       )}
-      <span className="font-semibold">{speechType}</span>
-      <span className="text-2xl font-semibold">{fullTimeStr}</span>
+      <span className="text-[20px] font-bold text-default-black">
+        {speechType}
+      </span>
+      <span className="text-[28px] font-bold text-default-black">
+        {fullTimeStr}
+      </span>
     </div>
   );
 

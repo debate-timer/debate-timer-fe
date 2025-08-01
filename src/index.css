@@ -36,7 +36,7 @@
 
 /* Timebox styles */
 .timebox {
-  @apply relative flex h-[92px] select-none flex-col items-center justify-center rounded-[12px] p-[12px];
+  @apply relative flex select-none flex-col items-center justify-center rounded-[12px] p-[12px];
 }
 
 .timebox.pros {

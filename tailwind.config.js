@@ -56,11 +56,11 @@ export default {
         ],
       },
       fontSize: {
-        'display-raw': ['72px', { lineHeight: '80px' }],
-        'title-raw': ['28px', { lineHeight: '28px' }],
-        'subtitle-raw': ['24px', { lineHeight: '36px' }],
-        'detail-raw': ['20px', { lineHeight: '20px' }],
-        'body-raw': ['16px', { lineHeight: '16px' }],
+        'display-raw': ['72px'],
+        'title-raw': ['28px'],
+        'subtitle-raw': ['24px'],
+        'detail-raw': ['20px'],
+        'body-raw': ['16px'],
         'timer-raw': ['110px'],
       },
       boxShadow: {
