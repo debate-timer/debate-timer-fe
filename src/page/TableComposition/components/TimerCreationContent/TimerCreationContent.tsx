@@ -108,11 +108,12 @@ export default function TimerCreationContent({
 
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
-    if (beforeData?.bell && beforeData.bell.length > 0) {
+    if (beforeData?.bell && beforeData.bell.length >= 0) {
       return beforeData.bell.map(bellConfigToBellInputConfig);
     }
-    if (initData?.bell && initData.bell.length > 0) {
-      return initData.bell.map(bellConfigToBellInputConfig);
+    if (initData) {
+      const initBell = initData.bell === null ? [] : initData.bell;
+      return initBell.map(bellConfigToBellInputConfig);
     }
     return [
       { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
