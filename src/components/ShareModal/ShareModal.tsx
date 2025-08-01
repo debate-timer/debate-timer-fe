@@ -1,20 +1,37 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { IoLinkOutline, IoShareOutline } from 'react-icons/io5';
 import LoadingSpinner from '../LoadingSpinner';
+import ErrorIndicator from '../ErrorIndicator/ErrorIndicator';
 
 interface ShareModalProps {
   shareUrl: string;
   copyState: boolean;
-  isUrlReady: boolean;
-  onClick: () => void;
+  isLoading: boolean;
+  isError: boolean;
+  onRefetch: () => void;
+  onCopyClicked: () => void;
 }
 
 export default function ShareModal({
   shareUrl,
   copyState,
-  isUrlReady,
-  onClick,
+  isLoading,
+  isError,
+  onRefetch,
+  onCopyClicked,
 }: ShareModalProps) {
+  // If error, print error message and let user be able to retry
+  if (isError) {
+    return (
+      <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
+        <ErrorIndicator onClickRetry={() => onRefetch()}>
+          QR 코드를 불러오지 못했어요...<br></br>다시 시도하시겠어요?
+        </ErrorIndicator>
+      </div>
+    );
+  }
+
+  // If no error or on loading, print modal contents
   return (
     <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
       <div
@@ -38,18 +55,18 @@ export default function ShareModal({
         {/* QR code is here. */}
         {/* If QR code is not prepared because response is not arrived, spinner will be shown. */}
         <div className="m-[50px] flex size-full items-center justify-center">
-          {isUrlReady && (
-            <QRCodeSVG
-              value={shareUrl}
-              bgColor="#f6f5f4"
-              className="size-full"
-            />
-          )}
-          {!isUrlReady && (
+          {isLoading && (
             <LoadingSpinner
               strokeWidth={3}
               size={'size-24'}
               color={'text-neutral-300'}
+            />
+          )}
+          {!isLoading && (
+            <QRCodeSVG
+              value={shareUrl}
+              bgColor="#f6f5f4"
+              className="size-full"
             />
           )}
         </div>
@@ -57,13 +74,16 @@ export default function ShareModal({
 
       {/* Button that copies URL to the user's clipboard. */}
       <button
-        className="button enabled relative flex h-[64px] w-[360px] items-center px-5"
+        className={`button ${!isLoading ? 'enabled' : 'disabled'} relative flex h-[64px] w-[360px] items-center px-5`}
+        disabled={isLoading}
         onClick={() => {
-          onClick();
+          if (!isLoading) {
+            onCopyClicked();
+          }
         }}
       >
         <p className="absolute left-1/2 -translate-x-1/2 transform text-[28px] font-bold">
-          공유 링크 복사
+          {isLoading ? '링크 준비 중' : '공유 링크 복사'}
         </p>
         <IoLinkOutline className="ml-auto size-8" />
       </button>

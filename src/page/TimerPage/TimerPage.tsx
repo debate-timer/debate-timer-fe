@@ -12,6 +12,8 @@ import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
+import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 
 export default function TimerPage() {
   const pathParams = useParams();
@@ -28,33 +30,45 @@ export default function TimerPage() {
   const state = useTimerPageState(tableId);
 
   useTimerHotkey(state);
-  const { data, bg, index, goToOtherItem } = state;
+  const { data, bg, index, goToOtherItem, isLoading, isError, refetch } = state;
 
-  if (!data) {
-    return null;
+  // If error, print error message and let user be able to retry
+  if (isError) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator onClickRetry={() => refetch()} />
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
   }
 
+  // If no error or on loading, print contents
   return (
     <>
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <HeaderTableInfo
-              name={
-                data === undefined || data.info.name.trim() === ''
-                  ? '테이블 이름 없음'
-                  : data.info.name
-              }
-            />
+            {!isLoading && data && (
+              <HeaderTableInfo
+                name={
+                  data.info.name.trim() === ''
+                    ? '테이블 이름 없음'
+                    : data.info.name
+                }
+              />
+            )}
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <HeaderTitle
-              title={
-                data === undefined || data.info.agenda.trim() === ''
-                  ? '주제 없음'
-                  : data.info.agenda
-              }
-            />
+            {!isLoading && data && (
+              <HeaderTitle
+                title={
+                  data.info.agenda.trim() === ''
+                    ? '주제 없음'
+                    : data.info.agenda
+                }
+              />
+            )}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
             <IconButton
@@ -66,21 +80,24 @@ export default function TimerPage() {
 
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
-          <div
-            className={`flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
-          >
-            {/* 타이머 두 개 + ENTER 버튼 */}
-            <TimerView state={state} />
-            {/* Round control buttons on the bottom side */}
-            {data && (
-              <RoundControlRow
-                table={data.table}
-                index={index}
-                goToOtherItem={goToOtherItem}
-                openDoneModal={openLoginAndStoreModalOrGoToOverviewPage}
-              />
-            )}
-          </div>
+          {isLoading && <LoadingIndicator />}
+          {!isLoading && (
+            <div
+              className={`flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
+            >
+              {/* 타이머 두 개 + ENTER 버튼 */}
+              <TimerView state={state} />
+              {/* Round control buttons on the bottom side */}
+              {data && (
+                <RoundControlRow
+                  table={data.table}
+                  index={index}
+                  goToOtherItem={goToOtherItem}
+                  openDoneModal={openLoginAndStoreModalOrGoToOverviewPage}
+                />
+              )}
+            </div>
+          )}
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
 

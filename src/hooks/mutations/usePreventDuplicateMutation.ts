@@ -1,7 +1,17 @@
 import { useRef, useCallback } from 'react';
-import { type DefaultError, useMutation, type UseMutationOptions, type UseMutationResult } from '@tanstack/react-query';
+import {
+  type DefaultError,
+  useMutation,
+  type UseMutationOptions,
+  type UseMutationResult,
+} from '@tanstack/react-query';
 
-export function usePreventDuplicateMutation<TData = unknown, TError = DefaultError, TVariables = void, TContext = unknown>(
+export function usePreventDuplicateMutation<
+  TData = unknown,
+  TError = DefaultError,
+  TVariables = void,
+  TContext = unknown,
+>(
   options: UseMutationOptions<TData, TError, TVariables, TContext>,
 ): UseMutationResult<TData, TError, TVariables, TContext> {
   // useRef를 통해 요청 여부를 저장

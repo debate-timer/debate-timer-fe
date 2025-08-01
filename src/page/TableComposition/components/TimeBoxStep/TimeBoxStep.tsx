@@ -8,9 +8,11 @@ import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableI
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
+import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator';
 
 interface TimeBoxStepProps {
   initData: DebateTableData;
+  isLoading: boolean;
   onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
   onFinishButtonClick: () => void;
   onEditTableInfoButtonClick: () => void;
@@ -21,6 +23,7 @@ interface TimeBoxStepProps {
 export default function TimeBoxStep(props: TimeBoxStepProps) {
   const {
     initData,
+    isLoading,
     onTimeBoxChange,
     onFinishButtonClick,
     onEditTableInfoButtonClick,
@@ -60,7 +63,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     });
   };
 
-  const isAbledSummitButton = initTimeBox.length !== 0;
+  const isSubmitButtonDisabled =
+    initTimeBox.length === 0 || isLoading || isSubmitting;
 
   const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
     return (
@@ -84,31 +88,34 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={initData.info.name} />
+          {!isLoading && <HeaderTableInfo name={initData.info.name} />}
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <HeaderTitle title={initData.info.agenda} />
+          {!isLoading && <HeaderTitle title={initData.info.agenda} />}
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
-          <PropsAndConsTitle
-            prosTeamName={initData.info.prosTeamName}
-            consTeamName={initData.info.consTeamName}
-          />
+        {isLoading && <LoadingIndicator />}
+        {!isLoading && (
+          <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
+            <PropsAndConsTitle
+              prosTeamName={initData.info.prosTeamName}
+              consTeamName={initData.info.consTeamName}
+            />
 
-          <DragAndDropWrapper>
-            {initTimeBox.map((info, index) => (
-              <div key={index + info.stance} style={getDraggingStyles(index)}>
-                {renderTimeBoxItem(info, index)}
-              </div>
-            ))}
-          </DragAndDropWrapper>
+            <DragAndDropWrapper>
+              {initTimeBox.map((info, index) => (
+                <div key={index + info.stance} style={getDraggingStyles(index)}>
+                  {renderTimeBoxItem(info, index)}
+                </div>
+              ))}
+            </DragAndDropWrapper>
 
-          <TimerCreationButton onClick={openModal} />
-        </section>
+            <TimerCreationButton onClick={openModal} />
+          </section>
+        )}
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
@@ -116,17 +123,22 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           {/* TODO: Need to add a function here */}
           <button
             onClick={onEditTableInfoButtonClick}
-            className="button enabled h-16 w-full"
+            className={`
+              h-16 w-full
+              ${isLoading ? 'button disabled' : 'button enabled'}
+            `}
+            disabled={isLoading}
           >
             토론 정보 수정하기
           </button>
 
           <button
             onClick={onFinishButtonClick}
-            className={`h-16 w-full ${
-              isAbledSummitButton ? 'button enabled' : 'button disabled'
-            }`}
-            disabled={!isAbledSummitButton || isSubmitting}
+            className={`
+              h-16 w-full
+              ${isSubmitButtonDisabled ? 'button disabled' : 'button enabled'}
+            `}
+            disabled={isSubmitButtonDisabled}
           >
             {isEdit ? '수정 완료' : '추가하기'}
           </button>

@@ -10,5 +10,6 @@ export function useGetDebateTableData(tableId: number, enabled?: boolean) {
       return repo.getTable(tableId);
     },
     enabled,
+    throwOnError: false,
   });
 }

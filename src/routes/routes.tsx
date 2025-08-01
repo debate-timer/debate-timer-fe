@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import TableListPage from '../page/TableListPage/TableListPage';
-import TableOverview from '../page/TableOverviewPage/TableOverview';
-import TableComposition from '../page/TableComposition/TableComposition';
+import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
+import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/OAuthPage/OAuth';
@@ -25,12 +25,12 @@ const routesConfig = [
   },
   {
     path: '/composition',
-    element: <TableComposition />,
+    element: <TableCompositionPage />,
     requiresAuth: false,
   },
   {
     path: '/overview/:type/:id',
-    element: <TableOverview />,
+    element: <TableOverviewPage />,
     requiresAuth: false,
   },
   {
