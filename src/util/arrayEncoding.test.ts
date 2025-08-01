@@ -13,8 +13,6 @@ describe('토론 테이블 인코딩 유틸리티', () => {
       agenda: '토론 주제',
       prosTeamName: '찬성',
       consTeamName: '반대',
-      warningBell: true,
-      finishBell: true,
     },
     table: [
       {
@@ -25,6 +23,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: 60,
         timePerSpeaking: 33,
         speaker: null,
+        bell: null,
       },
       {
         stance: 'NEUTRAL',
@@ -34,6 +33,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: 35,
         timePerSpeaking: null,
         speaker: null,
+        bell: null,
       },
       {
         stance: 'PROS',
@@ -43,6 +43,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: null,
         timePerSpeaking: null,
         speaker: '발언자 1',
+        bell: null,
       },
       {
         stance: 'PROS',
@@ -52,6 +53,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: null,
         timePerSpeaking: null,
         speaker: '발언자 1',
+        bell: null,
       },
       {
         stance: 'NEUTRAL',
@@ -61,6 +63,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: null,
         timePerSpeaking: null,
         speaker: null,
+        bell: null,
       },
       {
         stance: 'CONS',
@@ -70,6 +73,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: null,
         timePerSpeaking: null,
         speaker: '발언자 2',
+        bell: null,
       },
       {
         stance: 'PROS',
@@ -79,6 +83,7 @@ describe('토론 테이블 인코딩 유틸리티', () => {
         timePerTeam: null,
         timePerSpeaking: null,
         speaker: '발언자 2',
+        bell: null,
       },
     ],
   };

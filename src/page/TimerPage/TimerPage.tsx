@@ -31,8 +31,6 @@ export default function TimerPage() {
 
   useTimerHotkey(state);
   const {
-    warningBellRef,
-    finishBellRef,
     data,
     bg,
     index,
@@ -56,9 +54,6 @@ export default function TimerPage() {
   // If no error or on loading, print contents
   return (
     <>
-      <audio ref={warningBellRef} src="/sounds/bell-warning.mp3" />
-      <audio ref={finishBellRef} src="/sounds/bell-finish.mp3" />
-
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>

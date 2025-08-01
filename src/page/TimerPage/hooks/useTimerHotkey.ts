@@ -4,7 +4,6 @@ import { TimerPageLogics } from './useTimerPageState';
 /**
  * 타이머 페이지에서 키보드 단축키(핫키) 기능을 제공하는 커스텀 훅입니다.
  * - Space: 타이머 시작/일시정지
- * - ArrowLeft/ArrowRight: 이전/다음 라운드 이동
  * - KeyR: 타이머 리셋
  * - KeyA/KeyL: 각각 찬/반 진영 타이머 활성화
  * - Enter, NumpadEnter: 진영 전환
@@ -34,8 +33,6 @@ export function useTimerHotkey(state: TimerPageLogics) {
       // 핫키로 쓸 키 목록
       const keysToDisable = new Set([
         'Space',
-        'ArrowLeft',
-        'ArrowRight',
         'KeyR',
         'KeyA',
         'KeyL',
@@ -77,14 +74,6 @@ export function useTimerHotkey(state: TimerPageLogics) {
               toggleTimer(timer2);
             }
           }
-          break;
-        case 'ArrowLeft':
-          // 이전 라운드 이동
-          goToOtherItem(true);
-          break;
-        case 'ArrowRight':
-          // 다음 라운드 이동
-          goToOtherItem(false);
           break;
         case 'KeyR':
           // 타이머 리셋

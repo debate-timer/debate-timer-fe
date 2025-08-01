@@ -3,6 +3,13 @@ export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
 export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
 
+export type BellType = 'BEFORE_END' | 'AFTER_END' | 'AFTER_START';
+export type BellConfig = {
+  type: BellType;
+  time: number;
+  count: number;
+};
+
 // Type converters
 export const StanceToString: Record<Stance, string> = {
   PROS: '찬성',
@@ -15,6 +22,12 @@ export const TimeBoxTypeToString: Record<TimeBoxType, string> = {
   TIME_BASED: '자유토론 타이머',
 };
 
+export const BellTypeToString: Record<BellType, string> = {
+  BEFORE_END: '종료 전',
+  AFTER_END: '종료 후',
+  AFTER_START: '시작 후',
+};
+
 // Interfaces
 export interface User {
   id: string;
@@ -24,6 +37,7 @@ export interface User {
 export interface TimeBoxInfo {
   stance: Stance;
   speechType: string;
+  bell: BellConfig[] | null;
   boxType: TimeBoxType;
   time: number | null;
   timePerTeam: number | null;
@@ -36,8 +50,6 @@ export interface DebateInfo {
   agenda: string;
   prosTeamName: string;
   consTeamName: string;
-  warningBell: boolean;
-  finishBell: boolean;
 }
 
 export interface DebateTable {

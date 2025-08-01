@@ -31,6 +31,7 @@ export const OnPros: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '발언자',
+      bell: null,
     },
   },
 };
@@ -55,6 +56,7 @@ export const OnCons: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '발언자',
+      bell: null,
     },
   },
 };
@@ -79,6 +81,7 @@ export const OnNeutral: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '홍길동',
+      bell: null,
     },
   },
 };
@@ -103,6 +106,7 @@ export const OnRunning: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '홍길동',
+      bell: null,
     },
   },
 };
@@ -127,6 +131,7 @@ export const WhenAdditionalTimerAvailable: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '홍길동',
+      bell: null,
     },
   },
 };
@@ -151,6 +156,7 @@ export const OnAdditionalTimerEnabled: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '발언자',
+      bell: null,
     },
   },
 };

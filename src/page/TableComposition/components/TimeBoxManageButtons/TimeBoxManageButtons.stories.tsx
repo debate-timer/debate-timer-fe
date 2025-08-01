@@ -20,6 +20,7 @@ const normalTimeBoxInfo: TimeBoxInfo = {
   speaker: '김철수 토론자',
   timePerSpeaking: null,
   timePerTeam: null,
+  bell: [],
 };
 
 export const NormalTimeBox: Story = {
@@ -41,6 +42,7 @@ const timeBasedTimeBoxInfo: TimeBoxInfo = {
   speaker: null,
   timePerSpeaking: 120,
   timePerTeam: 480,
+  bell: [],
 };
 
 export const TimeBasedTimeBox: Story = {
