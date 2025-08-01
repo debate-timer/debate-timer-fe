@@ -30,15 +30,7 @@ export default function TimerPage() {
   const state = useTimerPageState(tableId);
 
   useTimerHotkey(state);
-  const {
-    data,
-    bg,
-    index,
-    goToOtherItem,
-    isLoading,
-    isError,
-    refetch,
-  } = state;
+  const { data, bg, index, goToOtherItem, isLoading, isError, refetch } = state;
 
   // If error, print error message and let user be able to retry
   if (isError) {
