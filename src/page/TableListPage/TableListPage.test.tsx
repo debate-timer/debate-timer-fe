@@ -5,6 +5,7 @@ import { describe, expect } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import TableListPage from './TableListPage';
 import userEvent from '@testing-library/user-event';
+import { Suspense } from 'react';
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
@@ -21,7 +22,9 @@ describe('TableListPage', () => {
   const renderTableListPage = () => {
     return render(
       <TestWrapper>
-        <TableListPage />
+        <Suspense>
+          <TableListPage />
+        </Suspense>
       </TestWrapper>,
     );
   };

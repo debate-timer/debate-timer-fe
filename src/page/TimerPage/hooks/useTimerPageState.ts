@@ -1,6 +1,5 @@
 import {
   Dispatch,
-  RefObject,
   SetStateAction,
   useCallback,
   useEffect,
@@ -22,7 +21,17 @@ import { useTimerBackground } from './useTimerBackground';
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
 export function useTimerPageState(tableId: number): TimerPageLogics {
-  const { data } = useGetDebateTableData(tableId);
+  // Get data with useQuery of TanStack Query
+  const {
+    data,
+    isLoading: isFetching,
+    isError: isFetchingError,
+    isRefetching,
+    isRefetchError,
+    refetch,
+  } = useGetDebateTableData(tableId);
+  const isLoading = isFetching || isRefetching;
+  const isError = isFetchingError || isRefetchError;
 
   // 추가 타이머가 가능한지 여부 (예: 사전에 설정한 "작전 시간"이 있으면 false)
   const isAdditionalTimerAvailable = useMemo(() => {
@@ -44,13 +53,10 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   const [prosConsSelected, setProsConsSelected] =
     useState<TimeBasedStance>('PROS');
 
-  // 벨 사운드 관련 훅 (벨 ref 제공)
-  const { warningBellRef, finishBellRef } = useBellSound({
-    timer1,
-    timer2,
+  // 벨 사운드 관련 훅
+  useBellSound({
     normalTimer,
-    isWarningBell: data?.info.warningBell,
-    isFinishBell: data?.info.finishBell,
+    bells: data?.table[index].bell,
   });
 
   const { bg, setBg } = useTimerBackground({
@@ -232,8 +238,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   ]);
 
   return {
-    warningBellRef,
-    finishBellRef,
     data,
     bg,
     setBg,
@@ -249,12 +253,13 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     switchCamp,
     handleActivateTeam,
     tableId,
+    isLoading,
+    isError,
+    refetch,
   };
 }
 
 export interface TimerPageLogics {
-  warningBellRef: RefObject<HTMLAudioElement>;
-  finishBellRef: RefObject<HTMLAudioElement>;
   data: DebateTableData | undefined;
   bg: TimerBGState;
   setBg: Dispatch<SetStateAction<TimerBGState>>;
@@ -270,4 +275,7 @@ export interface TimerPageLogics {
   switchCamp: () => void;
   handleActivateTeam: (team: TimeBasedStance) => void;
   tableId: number;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => void;
 }

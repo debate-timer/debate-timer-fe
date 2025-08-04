@@ -11,66 +11,93 @@ import { useTableShare } from '../../hooks/useTableShare';
 import { MdOutlineIosShare } from 'react-icons/md';
 import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
+import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 
-export default function TableOverview() {
+export default function TableOverviewPage() {
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
 
   // Only uses hooks related with customize due to the removal of parliamentary
-  const { data } = useGetDebateTableData(tableId);
+  const {
+    data,
+    isLoading: isFetching,
+    isError: isFetchError,
+    refetch,
+    isRefetching,
+    isRefetchError,
+  } = useGetDebateTableData(tableId);
   const onModifyCustomizeTableData = usePatchDebateTable((tableId) => {
     navigate(`/table/customize/${tableId}`);
   });
 
   // Hook for sharing tables
   const { openShareModal, TableShareModal } = useTableShare(tableId);
+  const isLoading = isFetching || isRefetching;
+  const isError = isFetchError || isRefetchError;
 
+  // If error, print error message and let user be able to retry
+  if (isError) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator onClickRetry={() => refetch()} />
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
+  }
+
+  // If no error or on loading, print contents
   return (
     <>
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <HeaderTableInfo name={data?.info.name} />
+            {!isLoading && <HeaderTableInfo name={data?.info.name} />}
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            <HeaderTitle title={data?.info.agenda} />
+            {!isLoading && <HeaderTitle title={data?.info.agenda} />}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
 
         <DefaultLayout.ContentContainer>
-          <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
-            <PropsAndConsTitle
-              prosTeamName={
-                data !== undefined
-                  ? data.info.prosTeamName
-                  : StanceToString['PROS']
-              }
-              consTeamName={
-                data !== undefined
-                  ? data.info.consTeamName
-                  : StanceToString['CONS']
-              }
-            />
+          {isLoading && <LoadingIndicator />}
+          {!isLoading && (
+            <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
+              <PropsAndConsTitle
+                prosTeamName={
+                  data !== undefined
+                    ? data.info.prosTeamName
+                    : StanceToString['PROS']
+                }
+                consTeamName={
+                  data !== undefined
+                    ? data.info.consTeamName
+                    : StanceToString['CONS']
+                }
+              />
 
-            <div className="flex w-full flex-col gap-2">
-              {data?.table.map((info, index) => (
-                <TimeBox
-                  key={index}
-                  info={info}
-                  prosTeamName={data.info.prosTeamName}
-                  consTeamName={data.info.consTeamName}
-                />
-              ))}
-            </div>
-          </section>
+              <div className="flex w-full flex-col gap-2">
+                {data?.table.map((info, index) => (
+                  <TimeBox
+                    key={index}
+                    info={info}
+                    prosTeamName={data.info.prosTeamName}
+                    consTeamName={data.info.consTeamName}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </DefaultLayout.ContentContainer>
 
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
-              className="button enabled-hover-neutral h-16 w-full"
+              className={`button ${isLoading ? 'disabled' : 'enabled-hover-neutral'} h-16 w-full`}
+              disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
                   navigate(`/composition?mode=edit&type=CUSTOMIZE`);
@@ -88,7 +115,8 @@ export default function TableOverview() {
             </button>
             <div className="flex h-16 w-full space-x-2">
               <button
-                className="button enabled flex-1"
+                className={`button ${isLoading ? 'disabled' : 'enabled'} flex-1`}
+                disabled={isLoading}
                 onClick={() => {
                   if (isGuestFlow()) {
                     navigate('/table/customize/guest');
@@ -104,7 +132,8 @@ export default function TableOverview() {
               </button>
 
               <button
-                className="button enabled-hover-neutral flex size-16 items-center justify-center"
+                className={`button ${isLoading ? 'disabled' : 'enabled-hover-neutral'} flex size-16 items-center justify-center`}
+                disabled={isLoading}
                 onClick={() => {
                   openShareModal();
                 }}

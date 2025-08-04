@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
-import { TableCompositionStep } from '../TableComposition';
+import { TableCompositionStep } from '../TableCompositionPage';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
@@ -24,8 +24,6 @@ const useTableFrom = (
           agenda: '',
           prosTeamName: '',
           consTeamName: '',
-          warningBell: true,
-          finishBell: true,
         },
         table: [],
       },
@@ -54,8 +52,6 @@ const useTableFrom = (
       const debateInfo: DebateInfo = {
         name: newInfo.name,
         agenda: newInfo.agenda,
-        warningBell: newInfo.warningBell,
-        finishBell: newInfo.finishBell,
         prosTeamName: newInfo.prosTeamName,
         consTeamName: newInfo.consTeamName,
       };

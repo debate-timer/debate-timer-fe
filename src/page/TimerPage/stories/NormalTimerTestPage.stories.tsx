@@ -14,6 +14,7 @@ const item: TimeBoxInfo = {
   time: 120,
   timePerTeam: null,
   timePerSpeaking: null,
+  bell: null,
 };
 
 function NormalTimerTestPage() {

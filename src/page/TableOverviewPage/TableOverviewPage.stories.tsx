@@ -1,20 +1,20 @@
 import { Meta, StoryObj } from '@storybook/react';
-import TableOverview from './TableOverview';
+import TableOverviewPage from './TableOverviewPage';
 import {
   // ParliamentaryTimeBoxInfo,
   TimeBoxInfo,
 } from '../../type/type';
 
 // 1) 메타 설정
-const meta: Meta<typeof TableOverview> = {
-  title: 'page/TableOverview',
-  component: TableOverview,
+const meta: Meta<typeof TableOverviewPage> = {
+  title: 'page/TableOverviewPage',
+  component: TableOverviewPage,
   tags: ['autodocs'],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof TableOverview>;
+type Story = StoryObj<typeof TableOverviewPage>;
 
 // 2) 스토리 정의
 export const Default: Story = {

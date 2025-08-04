@@ -1,18 +1,24 @@
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
-import LabeledCheckBox from '../../../../components/LabeledCheckBox/LabeledCheckBox';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { DebateInfo, StanceToString } from '../../../../type/type';
 
 interface TableNameAndTypeProps {
   info: DebateInfo;
+  isLoading: boolean;
   isEdit?: boolean;
   onInfoChange: (newInfo: DebateInfo) => void;
   onButtonClick: () => void;
 }
 
 export default function TableNameAndType(props: TableNameAndTypeProps) {
-  const { info, isEdit = false, onInfoChange, onButtonClick } = props;
+  const {
+    info,
+    isEdit = false,
+    onInfoChange,
+    isLoading,
+    onButtonClick,
+  } = props;
 
   const handleFieldChange = <K extends keyof DebateInfo>(
     field: K,
@@ -60,6 +66,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             onChange={(e) => handleFieldChange('name', e.target.value)}
             onClear={() => clearField('name')}
             placeholder="시간표 1"
+            disabled={isLoading}
           />
 
           <label className="flex items-center text-base font-semibold md:text-2xl">
@@ -70,6 +77,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             onChange={(e) => handleFieldChange('agenda', e.target.value)}
             onClear={() => clearField('agenda')}
             placeholder="토론 주제를 입력해주세요"
+            disabled={isLoading}
           />
           <>
             <label className="flex items-center text-base font-semibold md:text-2xl">
@@ -86,6 +94,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 }
                 onClear={() => clearTeamNameField('prosTeamName')}
                 placeholder={StanceToString['PROS']}
+                disabled={isLoading}
               />
               <span>vs.</span>
               <ClearableInput
@@ -98,35 +107,17 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 }
                 onClear={() => clearTeamNameField('consTeamName')}
                 placeholder={StanceToString['CONS']}
+                disabled={isLoading}
               />
             </div>
           </>
-
-          <label className="text-base font-semibold md:text-2xl">
-            종소리 설정
-          </label>
-          <div className="flex flex-col gap-3">
-            <LabeledCheckBox
-              label="발언 종료 30초 전 알림"
-              checked={info.warningBell}
-              onChange={(e) =>
-                handleFieldChange('warningBell', e.target.checked)
-              }
-            />
-            <LabeledCheckBox
-              label="발언 종료 알림"
-              checked={info.finishBell}
-              onChange={(e) =>
-                handleFieldChange('finishBell', e.target.checked)
-              }
-            />
-          </div>
         </section>
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-8 w-full max-w-4xl">
           <button
+            disabled={isLoading}
             onClick={() => {
               const pros = info.prosTeamName || '';
               const cons = info.consTeamName || '';

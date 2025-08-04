@@ -14,6 +14,7 @@ const meta: Meta<typeof TimeBox> = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '1번',
+      bell: [],
     },
   },
 };
@@ -32,6 +33,7 @@ export const ProsOpening: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '1번',
+      bell: [],
     },
   },
 };
@@ -47,6 +49,7 @@ export const ConsRebuttal: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '1번',
+      bell: [],
     },
   },
 };
@@ -62,6 +65,7 @@ export const NeutralTimeout: Story = {
       timePerTeam: null,
       timePerSpeaking: null,
       speaker: '1번',
+      bell: [],
     },
   },
 };
@@ -77,6 +81,7 @@ export const NeutralCustom: Story = {
       timePerTeam: 120,
       timePerSpeaking: 60,
       speaker: null,
+      bell: [],
     },
   },
 };
