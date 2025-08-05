@@ -13,12 +13,15 @@ import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
-import Cointoss from '../../assets/timer/cointoss.png';
+import TeamSelectionModal from '../../components/TeamSelectionModal/TeamSelectionModal';
+import { useState } from 'react';
+import Coins from '../../assets/teamSelection/coins.png';
 
 export default function TableOverviewPage() {
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
+  const [isTeamSelectionModalOpen, setIsTeamSelectionModalOpen] = useState(false);
 
   // Only uses hooks related with customize due to the removal of parliamentary
   const {
@@ -37,6 +40,15 @@ export default function TableOverviewPage() {
   const { openShareModal, TableShareModal } = useTableShare(tableId);
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
+
+  // 토론 시작하기 핸들러
+  const handleStartDebate = () => {
+    if (isGuestFlow()) {
+      navigate('/table/customize/guest');
+    } else {
+      onModifyCustomizeTableData.mutate({ tableId });
+    }
+  };
 
   // If error, print error message and let user be able to retry
   if (isError) {
@@ -94,12 +106,11 @@ export default function TableOverviewPage() {
           )}
           {!isLoading && (
             <div className="fixed right-4 top-32 flex flex-col items-center w-[10%]">
-              <img src={Cointoss} alt="" />
+              <img src={Coins} alt="" />
               <button
                 className="w-full bg-brand-main px-4 py-2 shadow-lg transition-colors rounded-full"  
                 onClick={() => {
-                  console.log('팀 선정하기 버튼 클릭!');
-                  // 여기에 팀 선정 기능 추가
+                  setIsTeamSelectionModalOpen(true);
                 }}
               >
                 팀 선정하기
@@ -161,6 +172,11 @@ export default function TableOverviewPage() {
       </DefaultLayout>
 
       <TableShareModal />
+      <TeamSelectionModal
+        isOpen={isTeamSelectionModalOpen}
+        onClose={() => setIsTeamSelectionModalOpen(false)}
+        onStartDebate={handleStartDebate}
+      />
     </>
   );
 }
