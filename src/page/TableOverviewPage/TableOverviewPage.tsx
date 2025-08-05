@@ -13,6 +13,7 @@ import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import Cointoss from '../../assets/timer/cointoss.png';
 
 export default function TableOverviewPage() {
   const { id } = useParams();
@@ -90,6 +91,20 @@ export default function TableOverviewPage() {
                 ))}
               </div>
             </section>
+          )}
+          {!isLoading && (
+            <div className="fixed right-4 top-32 flex flex-col items-center w-[10%]">
+              <img src={Cointoss} alt="" />
+              <button
+                className="w-full bg-brand-main px-4 py-2 shadow-lg transition-colors rounded-full"  
+                onClick={() => {
+                  console.log('팀 선정하기 버튼 클릭!');
+                  // 여기에 팀 선정 기능 추가
+                }}
+              >
+                팀 선정하기
+              </button>
+            </div>
           )}
         </DefaultLayout.ContentContainer>
 
