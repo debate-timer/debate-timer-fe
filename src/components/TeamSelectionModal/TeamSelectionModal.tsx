@@ -18,7 +18,6 @@ export default function TeamSelectionModal({
   onStartDebate,
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>('tossing');
-  const [showResult, setShowResult] = useState(false);
   
   const { isOpen: modalIsOpen, openModal, closeModal, ModalWrapper } = useModal({
     closeOnOverlayClick: true,
@@ -39,13 +38,11 @@ export default function TeamSelectionModal({
     if (modalIsOpen) {
       // 모달이 열리면 동전 던지기 시작
       setCoinState('tossing');
-      setShowResult(false);
-      
+
       // 3초 후 결과 표시
       const timer = setTimeout(() => {
         const result = Math.random() < 0.5 ? 'front' : 'back';
         setCoinState(result);
-        setShowResult(true);
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -66,17 +63,25 @@ export default function TeamSelectionModal({
         }}
       >
         <div className="flex flex-grow flex-col items-center justify-center">
-          <div className="flex flex-col items-center justify-center w-[150px] h-[250px] sm:w-[185px] sm:h-[280px] md:w-[210px] md:h-[320px] lg:w-[240px] lg:h-[300px]">
-            {/* 동전 던지는 중이면 Cointoss 이미지, 끝났다면 앞 또는 뒤의 이미지 + 앞 또는 뒤 뱃지 */}
-            {coinState === 'tossing' ? (
-              <div className="flex items-center justify-center h-32 w-28 sm:h-36 sm:w-32 md:h-40 md:w-36 lg:h-[240px] lg:w-[220px]">
-                <img
-                  src={Cointoss}
-                  alt="동전"
-                  className="h-full w-full object-contain"
-                />
+          {coinState === 'tossing' ? (
+            <>
+              <div className="flex flex-col items-center justify-center w-[150px] h-[250px] sm:w-[185px] sm:h-[280px] md:w-[210px] md:h-[320px] lg:w-[240px] lg:h-[300px]">
+                <div className="flex items-center justify-center h-32 w-28 sm:h-36 sm:w-32 md:h-40 md:w-36 lg:h-[240px] lg:w-[220px]">
+                  <img
+                    src={Cointoss}
+                    alt="동전"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
               </div>
-            ) : (
+              <div className="flex h-20 w-full items-center justify-center px-6">
+                <span className="text-lg font-semibold text-natural-1000 sm:text-xl md:text-2xl">
+                  코인 던지는중..
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center w-[150px] h-[250px] sm:w-[185px] sm:h-[280px] md:w-[210px] md:h-[320px] lg:w-[240px] lg:h-[300px]">
               <div className="flex flex-col items-center justify-center space-y-4">
                 <div className="flex items-center justify-center h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 lg:h-[220px] lg:w-[220px]">
                   <img
@@ -89,17 +94,11 @@ export default function TeamSelectionModal({
                   {coinState === 'front' ? '앞' : '뒤'}
                 </div>
               </div>
-            )}
-          </div>
-          {!showResult && (
-            <div className="flex h-20 w-full items-center justify-center px-6">
-              <span className="text-lg font-semibold text-natural-1000 sm:text-xl md:text-2xl">
-                코인 던지는중..
-              </span>
             </div>
           )}
         </div>
-        {showResult && (
+        {/* 모달의 콘텐츠 영역과 분리하기 위해 별도 작성 */}
+        {coinState !== 'tossing' && (
           <button
             className="w-full bg-brand-main py-4 font-semibold sm:py-5 md:py-6 lg:py-[27px] text-base sm:text-lg md:text-xl lg:text-[22px]"
             onClick={handleStartDebate}
