@@ -105,10 +105,10 @@ export default function TableOverviewPage() {
             </section>
           )}
           {!isLoading && (
-            <div className="fixed right-4 top-32 flex flex-col items-center w-[10%]">
-              <img src={Coins} alt="" />
+            <div className="fixed right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8 top-16 sm:top-20 md:top-24 lg:top-28 xl:top-32 flex flex-col items-center w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36 2xl:w-40">
+              <img src={Coins} alt="" className="w-full h-auto mb-2" />
               <button
-                className="w-full bg-brand-main px-4 py-2 shadow-lg transition-colors rounded-full"  
+                className="w-full bg-brand-main px-2 sm:px-3 md:px-4 lg:px-5 xl:px-6 py-1.5 sm:py-2 md:py-2.5 lg:py-3 text-xs sm:text-sm md:text-base lg:text-lg shadow-lg rounded-full font-bold"  
                 onClick={() => {
                   setIsTeamSelectionModalOpen(true);
                 }}
