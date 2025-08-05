@@ -1,8 +1,12 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useModal } from '../../hooks/useModal';
 import Cointoss from '../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../assets/teamSelection/coinback.png';
+
+// 효과음 객체
+const coinTossSound = new Audio('/sounds/cointoss.mp3');
+const coinResultSound = new Audio('/sounds/cointoss-result.mp3');
 
 interface TeamSelectionModalProps {
   isOpen: boolean;
@@ -18,7 +22,7 @@ export default function TeamSelectionModal({
   onStartDebate,
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>('tossing');
-  
+
   const { isOpen: modalIsOpen, openModal, closeModal, ModalWrapper } = useModal({
     closeOnOverlayClick: true,
     isCloseButtonExist: true,
@@ -38,6 +42,7 @@ export default function TeamSelectionModal({
     if (modalIsOpen) {
       // 모달이 열리면 동전 던지기 시작
       setCoinState('tossing');
+      coinTossSound.play();
 
       // 3초 후 결과 표시
       const timer = setTimeout(() => {
@@ -48,6 +53,13 @@ export default function TeamSelectionModal({
       return () => clearTimeout(timer);
     }
   }, [modalIsOpen]);
+
+  // Play result sound when coin state changes to front or back
+  useEffect(() => {
+    if (coinState === 'front' || coinState === 'back') {
+      coinResultSound.play();
+    }
+  }, [coinState]);
 
   const handleStartDebate = () => {
     closeModal();
