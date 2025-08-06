@@ -40,7 +40,7 @@ export default function TeamSelectionModal({
 
   useEffect(() => {
     if (modalIsOpen) {
-      // 모달이 열리면 동전 던지기 시작
+      // 모달이 열리면 동전 던지기 화면, 동전 던지기 효과음 실행
       setCoinState('tossing');
       coinTossSound.play();
 
@@ -54,7 +54,7 @@ export default function TeamSelectionModal({
     }
   }, [modalIsOpen]);
 
-  // Play result sound when coin state changes to front or back
+  // 동전 던지기 결과가 나오면 결과 효과음 실행
   useEffect(() => {
     if (coinState === 'front' || coinState === 'back') {
       coinResultSound.play();
