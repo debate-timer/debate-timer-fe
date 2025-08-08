@@ -198,6 +198,7 @@ export default function TimerCreationContent({
       },
     ]);
     setBellInput(initBellInput);
+    setBellType('BEFORE_END');
   };
 
   const handleDeleteBell = (idx: number) => {
@@ -235,27 +236,38 @@ export default function TimerCreationContent({
   const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
 
   const handleSubmit = useCallback(() => {
-    console.log(`# Handle submit`);
     const totalTime = minutes * 60 + seconds;
     const totalTimePerTeam = teamMinutes * 60 + teamSeconds;
     const totalTimePerSpeaking = speakerMinutes * 60 + speakerSeconds;
 
+    // 입력 검증 로직
     const errors: string[] = [];
 
-    if (currentSpeechType !== 'CUSTOM') {
+    if (timerType === 'NORMAL') {
+      if (totalTime <= 0) {
+        errors.push('발언 시간은 1초 이상이어야 해요.');
+      }
+
       // 타종 옵션 유효성 검사
       bells.forEach((item: BellInputConfig) => {
-        console.log(`# Bell verify`);
         if (item.type === 'BEFORE_END') {
-          const totalTime = minutes * 60 + seconds;
           const bellTime = item.min * 60 + item.sec;
 
-          console.log(`# bellTime > totalTime: ${bellTime} > ${totalTime}`);
           if (bellTime > totalTime) {
             errors.push('종료 전 타종은 발언 시간보다 길 수 없어요.');
           }
         }
       });
+    }
+
+    if (timerType === 'TIME_BASED') {
+      if (totalTimePerTeam <= 0) {
+        errors.push('팀당 발언 시간은 1초 이상이어야 해요.');
+      }
+
+      if (totalTimePerSpeaking > totalTimePerTeam) {
+        errors.push('1회당 발언 시간은 팀당 발언 시간을 초과할 수 없어요.');
+      }
     }
 
     // SpeechType에 맞게 문자열 매핑
@@ -306,7 +318,7 @@ export default function TimerCreationContent({
         time: totalTime,
         timePerTeam: null,
         timePerSpeaking: null,
-        speaker,
+        speaker: stanceToSend === 'NEUTRAL' ? null : speaker,
         bell,
       });
     } else {
@@ -358,8 +370,9 @@ export default function TimerCreationContent({
     [],
   );
 
-  const handleSpeechTypeChange = useCallback((selectedValue: SpeechType) => {
-    setCurrentSpeechType(selectedValue);
+  const handleSpeechTypeChange = useCallback(
+    (selectedValue: SpeechType) => {
+      setCurrentSpeechType(selectedValue);
 
     if (selectedValue === 'CUSTOM') {
       setSpeechTypeTextValue('');
@@ -486,7 +499,9 @@ export default function TimerCreationContent({
                       onChange={(e) => setSpeaker(e.target.value)}
                       onClear={() => setSpeaker('')}
                       placeholder="N번 토론자"
-                      disabled={stance === 'NEUTRAL'}
+                      disabled={
+                        stance === 'NEUTRAL' || currentSpeechType === 'TIMEOUT'
+                      }
                     />
                   </TimerCreationContentItem>
                 );

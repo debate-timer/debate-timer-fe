@@ -76,6 +76,7 @@ export default function NormalTimer({
           {/* 작전 시간 타이머 버튼 */}
           {isAdditionalTimerAvailable && !isAdditionalTimerOn && (
             <button
+              type="button"
               onClick={handleChangeAdditionalTimer}
               className={clsx(
                 'flex h-[68px] w-full items-center justify-center rounded-[20px] bg-default-white',
