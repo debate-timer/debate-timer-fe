@@ -374,10 +374,25 @@ export default function TimerCreationContent({
     (selectedValue: SpeechType) => {
       setCurrentSpeechType(selectedValue);
 
-    if (selectedValue === 'CUSTOM') {
-      setSpeechTypeTextValue('');
-    }
-  }, []);
+      if (selectedValue === 'CUSTOM') {
+        setSpeechTypeTextValue('');
+      }
+
+      if (selectedValue === 'TIMEOUT') {
+        setStance('NEUTRAL');
+        setSpeaker('');
+      }
+
+      if (
+        stance === 'NEUTRAL' &&
+        selectedValue !== 'CUSTOM' &&
+        selectedValue !== 'TIMEOUT'
+      ) {
+        setStance('PROS');
+      }
+    },
+    [stance],
+  );
 
   const handleStanceChange = useCallback(
     (selectedValue: Stance) => {
