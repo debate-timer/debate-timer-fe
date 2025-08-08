@@ -21,7 +21,7 @@ export default function ClearableInput({
         {...rest}
         value={value}
         disabled={disabled}
-        className="text-body w-full rounded-[4px] border border-default-border p-[12px] text-default-black placeholder-default-border focus:outline-none"
+        className="text-body h-[48px] w-full rounded-[4px] border border-default-border p-[12px] text-default-black placeholder-default-border focus:outline-none"
       />
       {value && !disabled && onClear && (
         <button

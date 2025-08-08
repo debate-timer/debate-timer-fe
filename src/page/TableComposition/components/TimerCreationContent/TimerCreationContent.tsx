@@ -468,7 +468,7 @@ export default function TimerCreationContent({
         <span className="w-[40px]"></span>
 
         {/* 옵션 */}
-        <span className="flex w-full flex-1 flex-col space-y-[32px]">
+        <span className="flex w-full flex-1 flex-col space-y-[16px]">
           {options.map((timerType, index) => {
             switch (timerType) {
               // 타이머 종류
