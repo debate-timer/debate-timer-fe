@@ -8,7 +8,7 @@ interface SmallIconContainerProps
   className?: string;
 }
 
-export default function SmallIconContainer({
+export default function SmallIconButtonContainer({
   background,
   children,
   className,

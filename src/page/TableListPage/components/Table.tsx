@@ -4,7 +4,7 @@ import { IoArrowForward } from 'react-icons/io5';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 import { useTableShare } from '../../../hooks/useTableShare';
-import SmallIconContainer from '../../../components/SmallIconContainer/SmallIconContainer';
+import SmallIconButtonContainer from '../../../components/SmallIconContainer/SmallIconContainer';
 import DTEdit from '../../../components/icons/Edit';
 import DTDelete from '../../../components/icons/Delete';
 import DTShare from '../../../components/icons/Share';
@@ -59,9 +59,9 @@ export default function Table({
               }}
               aria-label="수정하기"
             >
-              <SmallIconContainer className="size-[28px] p-[8px]">
+              <SmallIconButtonContainer className="size-[28px] p-[8px]">
                 <DTEdit className="h-full" />
-              </SmallIconContainer>
+              </SmallIconButtonContainer>
             </button>
             <button
               onClick={(e: React.MouseEvent) => {
@@ -70,9 +70,9 @@ export default function Table({
               }}
               aria-label="삭제하기"
             >
-              <SmallIconContainer className="size-[28px] p-[8px]">
+              <SmallIconButtonContainer className="size-[28px] p-[8px]">
                 <DTDelete className="h-full" />
-              </SmallIconContainer>
+              </SmallIconButtonContainer>
             </button>
             <button
               onClick={(e: React.MouseEvent) => {
@@ -81,9 +81,9 @@ export default function Table({
               }}
               aria-label="공유하기"
             >
-              <SmallIconContainer className="size-[28px] p-[8px]">
+              <SmallIconButtonContainer className="size-[28px] p-[8px]">
                 <DTShare className="h-full" />
-              </SmallIconContainer>
+              </SmallIconButtonContainer>
             </button>
           </div>
 

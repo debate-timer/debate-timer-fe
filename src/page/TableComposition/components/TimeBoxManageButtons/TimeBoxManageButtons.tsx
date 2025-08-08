@@ -2,7 +2,7 @@ import { TimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';
-import SmallIconContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
+import SmallIconButtonContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
 import DTCopy from '../../../../components/icons/Copy';
 import DTEdit from '../../../../components/icons/Edit';
 import DTDelete from '../../../../components/icons/Delete';
@@ -39,23 +39,23 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
       <div className="flex justify-end gap-2">
         {onSubmitEdit && (
           <button onClick={openEditModal} aria-label="수정하기">
-            <SmallIconContainer className="size-[28px] p-[8px]">
+            <SmallIconButtonContainer className="size-[28px] p-[8px]">
               <DTEdit className="h-full" />
-            </SmallIconContainer>{' '}
+            </SmallIconButtonContainer>
           </button>
         )}
         {onSubmitDelete && (
           <button onClick={openDeleteModal} aria-label="삭제하기">
-            <SmallIconContainer className="size-[28px] p-[8px]">
+            <SmallIconButtonContainer className="size-[28px] p-[8px]">
               <DTDelete className="h-full" />
-            </SmallIconContainer>{' '}
+            </SmallIconButtonContainer>
           </button>
         )}
         {onSubmitCopy && (
           <button onClick={onSubmitCopy} aria-label="복사하기">
-            <SmallIconContainer className="size-[28px] p-[8px]">
+            <SmallIconButtonContainer className="size-[28px] p-[8px]">
               <DTCopy className="h-full" />
-            </SmallIconContainer>
+            </SmallIconButtonContainer>
           </button>
         )}
       </div>

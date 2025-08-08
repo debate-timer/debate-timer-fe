@@ -3,7 +3,7 @@ import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import DTDrag from '../../../../components/icons/Drag';
-import SmallIconContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
+import SmallIconButtonContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
 
 interface TimeBoxEventHandlers {
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
@@ -76,9 +76,9 @@ export default function TimeBox(props: TimeBoxProps) {
       onMouseDown={onMouseDown}
       title="위/아래로 드래그"
     >
-      <SmallIconContainer className="w-[28px] px-[4px] py-[8px]">
+      <SmallIconButtonContainer className="w-[28px] px-[4px] py-[8px]">
         <DTDrag className="h-full" />
-      </SmallIconContainer>
+      </SmallIconButtonContainer>
     </div>
   );
 

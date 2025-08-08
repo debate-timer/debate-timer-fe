@@ -1,16 +1,16 @@
 import { Meta, StoryObj } from '@storybook/react';
-import SmallIconContainer from './SmallIconContainer';
+import SmallIconButtonContainer from './SmallIconContainer';
 import DTHome from '../icons/Home';
 
-const meta: Meta<typeof SmallIconContainer> = {
+const meta: Meta<typeof SmallIconButtonContainer> = {
   title: 'components/SmallIconContainer',
-  component: SmallIconContainer,
+  component: SmallIconButtonContainer,
   tags: ['autodocs'],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof SmallIconContainer>;
+type Story = StoryObj<typeof SmallIconButtonContainer>;
 
 export const Default: Story = {
   args: {
