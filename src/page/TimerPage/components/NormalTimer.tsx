@@ -4,9 +4,8 @@ import { Formatting } from '../../../util/formatting';
 import CircularTimer from './CircularTimer';
 import clsx from 'clsx';
 import DTDebate from '../../../components/icons/Debate';
-import { animate, useMotionValue } from 'framer-motion';
-import { useEffect } from 'react';
 import CompactTimeoutTimer from './CompactTimeoutTimer';
+import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 
 type NormalTimerInstance = {
   timer: number | null;
@@ -51,15 +50,7 @@ export default function NormalTimer({
   const titleText = item.speechType;
   const rawProgress =
     timer !== null && item.time ? ((item.time - timer) / item.time) * 100 : 0;
-  const progress = Math.min(100, rawProgress);
-  const progressMotionValue = useMotionValue(0);
-
-  useEffect(() => {
-    animate(progressMotionValue, progress, {
-      duration: 0.7,
-      ease: 'easeOut',
-    });
-  }, [progress, progressMotionValue]);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress);
 
   // px-[45px]
   return (

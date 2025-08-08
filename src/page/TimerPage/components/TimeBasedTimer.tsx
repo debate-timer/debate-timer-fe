@@ -4,9 +4,8 @@ import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
 import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
 import CircularTimer from './CircularTimer';
-import { animate, useMotionValue } from 'framer-motion';
 import clsx from 'clsx';
-import { useEffect } from 'react';
+import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;
@@ -72,15 +71,7 @@ export default function TimeBasedTimer({
   };
 
   const rawProgress = initRawProgress();
-  const progress = Math.min(100, rawProgress);
-  const progressMotionValue = useMotionValue(0);
-
-  useEffect(() => {
-    animate(progressMotionValue, progress, {
-      duration: 0.7,
-      ease: 'easeOut',
-    });
-  }, [progress, progressMotionValue]);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress);
 
   return (
     <div
