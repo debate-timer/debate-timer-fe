@@ -119,10 +119,11 @@ export default function TimeBox(props: TimeBoxProps) {
               </div>
             </>
           )}
-      <p className="text-[20px] font-bold text-default-white">
-        {speechType} {speaker && `| ${speaker} 토론자`}
-      </p>
-      <p className="text-[28px] font-bold text-default-white">{timeStr}</p>
+      <span className="flex flex-row text-[20px] text-default-black">
+        <p className="font-semibold">{speechType}</p>
+        {speaker && <p className="font-medium"> | {speaker} 토론자</p>}
+      </span>
+      <p className="text-[28px] font-medium text-default-black">{timeStr}</p>
     </div>
   );
 
@@ -141,8 +142,10 @@ export default function TimeBox(props: TimeBoxProps) {
           }}
         />
       </div>
-      <p className="text-[20px] font-bold text-default-black">{speechType}</p>
-      <p className="text-[28px] font-bold text-default-black">{timeStr}</p>
+      <p className="text-[20px] font-semibold text-default-black">
+        {speechType}
+      </p>
+      <p className="text-[28px] font-medium text-default-black">{timeStr}</p>
     </div>
   );
 
@@ -165,10 +168,10 @@ export default function TimeBox(props: TimeBoxProps) {
           </div>
         </>
       )}
-      <span className="text-[20px] font-bold text-default-black">
+      <span className="text-[20px] font-semibold text-default-black">
         {speechType}
       </span>
-      <span className="text-[28px] font-bold text-default-black">
+      <span className="text-[28px] font-medium text-default-black">
         {fullTimeStr}
       </span>
     </div>

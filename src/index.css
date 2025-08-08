@@ -11,19 +11,19 @@
 
 /* Text styles */
 .text-display {
-  @apply text-display-raw font-bold;
+  @apply text-display-raw;
 }
 
 .text-title {
-  @apply text-title-raw font-bold;
+  @apply text-title-raw;
 }
 
 .text-subtitle {
-  @apply text-subtitle-raw font-bold;
+  @apply text-subtitle-raw;
 }
 
 .text-detail {
-  @apply text-detail-raw font-bold;
+  @apply text-detail-raw;
 }
 
 .text-body {
@@ -40,19 +40,19 @@
 }
 
 .timebox.pros {
-  @apply bg-camp-blue w-1/2;
+  @apply bg-camp-blue/50 w-1/2;
 }
 
 .timebox.cons {
-  @apply bg-camp-red w-1/2;
+  @apply bg-camp-red/50 w-1/2;
 }
 
 .timebox.neutral {
-  @apply bg-default-neutral w-full;
+  @apply bg-default-neutral/60 w-full;
 }
 
 .timebox.time-based {
-  @apply bg-brand w-full;
+  @apply bg-brand/70 w-full;
 }
 
 /* Button styles */
@@ -61,11 +61,11 @@
 }
 
 .button.enabled.brand {
-  @apply bg-brand text-default-black hover:bg-brand-hover;
+  @apply bg-brand font-bold text-default-black hover:bg-brand-hover;
 }
 
 .button.enabled.neutral {
-  @apply border-[2px] border-default-disabled/hover bg-default-white text-default-black hover:bg-default-disabled/hover;
+  @apply border-[2px] font-semibold border-default-disabled/hover bg-default-white text-default-black hover:bg-default-disabled/hover;
 }
 
 .button.disabled {

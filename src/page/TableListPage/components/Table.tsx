@@ -28,14 +28,7 @@ export default function Table({
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
-  const bgColor = isHovered ? 'bg-semantic-table' : 'bg-brand';
-  const squareColor = isHovered ? 'bg-default-white' : 'bg-semantic-table';
-  const textBodyColor = isHovered
-    ? 'text-default-white'
-    : 'text-default-neutral';
-  const textTitleColor = isHovered
-    ? 'text-default-white'
-    : 'text-default-black';
+  const bgColor = isHovered ? 'bg-brand' : 'bg-brand/70';
   const psClass = isHovered ? 'ps-12' : 'ps-0';
 
   return (
@@ -104,15 +97,15 @@ export default function Table({
           className={`flex flex-grow flex-col items-start overflow-hidden ${psClass} w-full duration-300`}
         >
           <p
-            className={`text-[28px] font-bold ${textTitleColor} w-full truncate text-start duration-300`}
+            className={`w-full truncate text-start text-[28px] font-semibold text-default-black duration-300`}
           >
             {name}
           </p>
           <div
-            className={`my-3 size-[10px] text-start duration-300 ${squareColor}`}
+            className={`my-3 size-[10px] bg-semantic-table text-start duration-300`}
           ></div>
           <p
-            className={`text-[16px] duration-300 ${textBodyColor} w-full truncate text-start`}
+            className={`w-full truncate text-start text-[16px] text-default-black2 duration-300`}
           >
             주제 | {agenda}
           </p>

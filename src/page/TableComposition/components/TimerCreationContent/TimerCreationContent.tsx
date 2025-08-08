@@ -8,7 +8,9 @@ import {
   BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-import normalTimerImage from '../../../../assets/timer/normal_timer.png';
+import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.png';
+import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.png';
+import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.png';
 import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.png';
 import DTClose from '../../../../components/icons/Close';
 import TimerCreationContentItem from './TimerCreationContentMenuItem';
@@ -403,7 +405,13 @@ export default function TimerCreationContent({
         <span className="relative flex w-[250px] items-center justify-center">
           {isNormalTimer ? (
             <img
-              src={normalTimerImage}
+              src={
+                stance === 'NEUTRAL'
+                  ? normalTimerNeutralImage
+                  : stance === 'PROS'
+                    ? normalTimerProsImage
+                    : normalTimerConsImage
+              }
               alt="normal-timer"
               className="absolute top-1/3 w-full -translate-y-1/2 object-contain"
             />
@@ -420,7 +428,7 @@ export default function TimerCreationContent({
         <span className="w-[40px]"></span>
 
         {/* 옵션 */}
-        <span className="flex w-full flex-1 flex-col space-y-[32px]">
+        <span className="flex w-full flex-1 flex-col space-y-[40px]">
           {options.map((timerType, index) => {
             switch (timerType) {
               // 타이머 종류
@@ -463,7 +471,7 @@ export default function TimerCreationContent({
                       value={speaker}
                       onChange={(e) => setSpeaker(e.target.value)}
                       onClear={() => setSpeaker('')}
-                      placeholder="홍길동"
+                      placeholder="N번 토론자"
                       disabled={stance === 'NEUTRAL'}
                     />
                   </TimerCreationContentItem>
@@ -582,7 +590,9 @@ export default function TimerCreationContent({
                     key={`${timerType}-${index}`}
                   >
                     {/* 제목 */}
-                    <p className="text-body w-[80px] font-bold">종소리 설정</p>
+                    <p className="text-body w-[80px] font-medium">
+                      종소리 설정
+                    </p>
 
                     {/* 입력부 */}
                     <span className="flex w-full flex-row items-center space-x-[4px]">
