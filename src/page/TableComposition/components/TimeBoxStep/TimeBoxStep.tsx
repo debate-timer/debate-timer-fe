@@ -134,7 +134,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           <DragAndDropWrapper>
             {initTimeBox.length > 0 &&
               initTimeBox.map((info, index) => (
-                <div key={index + info.stance} style={getDraggingStyles(index)}>
+                <div key={crypto.randomUUID()} style={getDraggingStyles(index)}>
                   {renderTimeBoxItem(info, index)}
                 </div>
               ))}
