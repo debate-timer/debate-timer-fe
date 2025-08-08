@@ -50,7 +50,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
   const { openModal, closeModal, ModalWrapper } = useModal({});
-  const defaultIcons: HeaderIcons[] = ['home', 'auth']; // Icons that will be displayed on all pages are added here
+  const defaultIcons: HeaderIcons[] = ['home', 'auth'];
 
   return (
     <>
