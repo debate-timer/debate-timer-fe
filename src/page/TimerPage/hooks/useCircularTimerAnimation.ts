@@ -1,11 +1,8 @@
-import { animate, useMotionValue } from 'framer-motion';
+import { animate, clamp, useMotionValue } from 'framer-motion';
 import { useEffect } from 'react';
 
 export default function useCircularTimerAnimation(rawProgress: number) {
-  const progress = Math.max(
-    0,
-    Math.min(100, Number.isFinite(rawProgress) ? rawProgress : 0),
-  );
+  const progress = clamp(0, 100, rawProgress);
   const progressMotionValue = useMotionValue(0);
 
   useEffect(() => {
