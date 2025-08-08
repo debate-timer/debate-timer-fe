@@ -60,7 +60,7 @@ export default function DropdownMenu<T>({
   };
 
   const buttonClasses = clsx(
-    'relative flex min-h-[48px] w-full items-center justify-between rounded-md border bg-default-white px-4 py-2 text-left transition-all duration-200 ease-in-out',
+    'relative flex w-full items-center justify-between rounded-md border bg-default-white px-4 py-2 text-left transition-all duration-200 ease-in-out',
     'focus:outline-none',
     {
       'border-default-disabled/hover text-default-disabled/hover cursor-not-allowed':
