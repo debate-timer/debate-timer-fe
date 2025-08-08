@@ -186,13 +186,8 @@ export default function TimerCreationContent({
     ];
   };
   const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
-  const isBellAddEnabled =
-    (bellInput.min >= 0 || bellInput.sec >= 0) &&
-    bellInput.count >= 1 &&
-    bellInput.count <= 3;
 
   const handleAddBell = () => {
-    if (!isBellAddEnabled) return;
     setBells([
       ...bells,
       {
@@ -240,11 +235,28 @@ export default function TimerCreationContent({
   const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
 
   const handleSubmit = useCallback(() => {
+    console.log(`# Handle submit`);
     const totalTime = minutes * 60 + seconds;
     const totalTimePerTeam = teamMinutes * 60 + teamSeconds;
     const totalTimePerSpeaking = speakerMinutes * 60 + speakerSeconds;
 
     const errors: string[] = [];
+
+    if (currentSpeechType !== 'CUSTOM') {
+      // 타종 옵션 유효성 검사
+      bells.forEach((item: BellInputConfig) => {
+        console.log(`# Bell verify`);
+        if (item.type === 'BEFORE_END') {
+          const totalTime = minutes * 60 + seconds;
+          const bellTime = item.min * 60 + item.sec;
+
+          console.log(`# bellTime > totalTime: ${bellTime} > ${totalTime}`);
+          if (bellTime > totalTime) {
+            errors.push('종료 전 타종은 발언 시간보다 길 수 없어요.');
+          }
+        }
+      });
+    }
 
     // SpeechType에 맞게 문자열 매핑
     let speechTypeToSend: string;
@@ -270,17 +282,19 @@ export default function TimerCreationContent({
       if (timerType === 'NORMAL' && speechTypeTextValue.trim() === '') {
         errors.push('발언 유형을 입력해주세요.');
       }
+    }
 
-      if (errors.length > 0) {
-        alert(errors.join('\n'));
-        return;
-      } else {
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+      return;
+    } else {
+      if (currentSpeechType === 'CUSTOM') {
         speechTypeToSend = speechTypeTextValue;
         stanceToSend = 'NEUTRAL';
+      } else {
+        speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
+        stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
       }
-    } else {
-      speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
-      stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
     }
 
     const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
@@ -428,7 +442,7 @@ export default function TimerCreationContent({
         <span className="w-[40px]"></span>
 
         {/* 옵션 */}
-        <span className="flex w-full flex-1 flex-col space-y-[40px]">
+        <span className="flex w-full flex-1 flex-col space-y-[32px]">
           {options.map((timerType, index) => {
             switch (timerType) {
               // 타이머 종류
@@ -674,14 +688,8 @@ export default function TimerCreationContent({
 
                       <button
                         type="button"
-                        className={clsx(
-                          'flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px] text-default-white',
-                          {
-                            'cursor-not-allowed': !isBellAddEnabled,
-                          },
-                        )}
+                        className="flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px] text-default-white"
                         onClick={handleAddBell}
-                        disabled={!isBellAddEnabled}
                       >
                         <DTAdd />
                       </button>
