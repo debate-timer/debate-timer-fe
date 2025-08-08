@@ -170,7 +170,6 @@ export default function TimerCreationContent({
 
   // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
-  const [bellType, setBellType] = useState<BellType>('BEFORE_END');
 
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
@@ -198,7 +197,6 @@ export default function TimerCreationContent({
       },
     ]);
     setBellInput(initBellInput);
-    setBellType('BEFORE_END');
   };
 
   const handleDeleteBell = (idx: number) => {
@@ -644,9 +642,8 @@ export default function TimerCreationContent({
                       <DropdownMenu
                         className=""
                         options={bellOptions}
-                        selectedValue={bellType}
+                        selectedValue={bellInput.type}
                         onSelect={(value: BellType) => {
-                          setBellType(value);
                           setBellInput((prev) => ({
                             ...prev,
                             type: value,
