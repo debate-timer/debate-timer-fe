@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import DTDebate from '../../../components/icons/Debate';
 import CompactTimeoutTimer from './CompactTimeoutTimer';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
-import { useBreakpoint } from '../../../hooks/useBreakpoint';
+import useBreakpoint from '../../../hooks/useBreakpoint';
 
 type NormalTimerInstance = {
   timer: number | null;

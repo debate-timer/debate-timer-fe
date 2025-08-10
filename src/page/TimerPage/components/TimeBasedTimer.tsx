@@ -6,7 +6,7 @@ import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
 import CircularTimer from './CircularTimer';
 import clsx from 'clsx';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
-import { useBreakpoint } from '../../../hooks/useBreakpoint';
+import useBreakpoint from '../../../hooks/useBreakpoint';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;

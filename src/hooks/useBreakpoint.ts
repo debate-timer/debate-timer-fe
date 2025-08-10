@@ -4,10 +4,12 @@ const breakpoints = {
   md: 768,
   lg: 1280,
   xl: 1450,
-};
+} as const;
 
-export const useBreakpoint = () => {
-  const [breakpoint, setBreakpoint] = useState('');
+export type Breakpoint = 'default' | keyof typeof breakpoints;
+
+export default function useBreakpoint() {
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>('default');
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,4 +33,4 @@ export const useBreakpoint = () => {
   }, []);
 
   return breakpoint;
-};
+}
