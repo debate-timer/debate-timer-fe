@@ -5,21 +5,20 @@ import { MotionValue, useTransform, motion } from 'framer-motion';
 /**
  * CircularTimer 컴포넌트의 Props 정의
  * @property {number} progress - 타이머의 진행률 (0 ~ 100 사이의 값).
- * @property {number} [size=200] - 컴포넌트의 전체 지름 (px).
  * @property {number} [strokeWidth=15] - 테두리의 두께 (px).
  */
 interface CircularTimerProps {
   progress: MotionValue<number>;
-  size?: number;
-  strokeWidth?: number;
   stance: Stance;
+  strokeWidth?: number;
+  className?: string;
 }
 
 export default function CircularTimer({
   progress,
-  size = 200,
   strokeWidth = 15,
   stance,
+  className = 'w-[480px] h-[480px]',
   children,
 }: PropsWithChildren<CircularTimerProps>) {
   const BASE_COLOR = '#D6D7D9'; // bg-default-disabled/hover
@@ -39,21 +38,20 @@ export default function CircularTimer({
       return `conic-gradient(from 0deg, ${BASE_COLOR} ${currentAngle}deg, ${PROGRESS_COLOR} ${currentAngle}deg 360deg)`;
     }
   });
+  const strokeGap = `${strokeWidth * 2}px`;
 
   return (
     <motion.div
-      className="relative grid place-items-center rounded-full transition-all duration-500 ease-linear"
+      className={`relative grid place-items-center rounded-full transition-all duration-300 ease-in-out ${className}`}
       style={{
-        width: `${size}px`,
-        height: `${size}px`,
         backgroundImage,
       }}
     >
       <div
         className="absolute grid place-items-center rounded-full bg-default-white"
         style={{
-          width: `${size - strokeWidth * 2}px`,
-          height: `${size - strokeWidth * 2}px`,
+          width: `calc(100% - ${strokeGap})`,
+          height: `calc(100% - ${strokeGap})`,
         }}
       >
         {children}

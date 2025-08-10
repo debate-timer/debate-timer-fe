@@ -70,7 +70,7 @@ export default function TimerPage() {
         <DefaultLayout.ContentContainer noPadding={true}>
           <div
             className={clsx(
-              'flex h-full w-full flex-col items-center justify-center space-y-[100px]',
+              'flex h-full w-full flex-col items-center justify-center space-y-[32px] lg:space-y-[48px] xl:space-y-[60px]',
               bgColorMap[bg],
             )}
           >

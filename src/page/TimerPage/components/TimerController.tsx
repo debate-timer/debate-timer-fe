@@ -20,10 +20,10 @@ export default function TimerController({
   stance,
 }: TimerControllerProps) {
   return (
-    <div className="flex flex-row items-center justify-center space-x-[32px]">
+    <div className="flex flex-row items-center justify-center space-x-[16px] lg:space-x-[32px] xl:space-x-[24px]">
       {/* 초기화 버튼 */}
       <button
-        className="items-cent flex size-[92px] justify-center rounded-full bg-default-black2 p-[20px]"
+        className="items-cent flex size-[76px] justify-center rounded-full bg-default-black2 p-[20px] lg:size-[84px] xl:size-[92px]"
         onClick={onReset}
       >
         <DTReset className="size-full text-default-white" />
@@ -32,7 +32,7 @@ export default function TimerController({
       {/* 재생 및 일시정지 버튼 */}
       <button
         className={clsx(
-          'flex size-[92px] items-center justify-center rounded-full p-[20px]',
+          'flex size-[76px] items-center justify-center rounded-full p-[20px] lg:size-[84px] xl:size-[92px]',
           { 'bg-camp-blue': stance === 'PROS' },
           { 'bg-camp-red': stance === 'CONS' },
           { 'bg-default-neutral': stance === 'NEUTRAL' },
