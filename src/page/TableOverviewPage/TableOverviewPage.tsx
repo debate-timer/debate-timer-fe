@@ -13,16 +13,15 @@ import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
-import { useState } from 'react';
 import Coins from '../../assets/teamSelection/coins.png';
 import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
+import { useModal } from '../../hooks/useModal';
 
 export default function TableOverviewPage() {
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
-  const [isTeamSelectionModalOpen, setIsTeamSelectionModalOpen] =
-    useState(false);
+  const { openModal, closeModal, ModalWrapper } = useModal();
 
   // Only uses hooks related with customize due to the removal of parliamentary
   const {
@@ -51,7 +50,6 @@ export default function TableOverviewPage() {
     }
   };
 
-  // If error, print error message and let user be able to retry
   if (isError) {
     return (
       <DefaultLayout>
@@ -62,7 +60,6 @@ export default function TableOverviewPage() {
     );
   }
 
-  // If no error or on loading, print contents
   return (
     <>
       <DefaultLayout>
@@ -110,9 +107,7 @@ export default function TableOverviewPage() {
               <img src={Coins} alt="" className="mb-2 h-auto w-full" />
               <button
                 className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full bg-brand-main px-2 py-1.5 text-xs font-bold shadow-lg md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6"
-                onClick={() => {
-                  setIsTeamSelectionModalOpen(true);
-                }}
+                onClick={openModal}
               >
                 팀 선정하기
               </button>
@@ -173,11 +168,12 @@ export default function TableOverviewPage() {
       </DefaultLayout>
 
       <TableShareModal />
-      <TeamSelectionModal
-        isOpen={isTeamSelectionModalOpen}
-        onClose={() => setIsTeamSelectionModalOpen(false)}
-        onStartDebate={handleStartDebate}
-      />
+      <ModalWrapper closeButtonColor="text-natural-1000">
+        <TeamSelectionModal
+          onClose={closeModal}
+          onStartDebate={handleStartDebate}
+        />
+      </ModalWrapper>
     </>
   );
 }
