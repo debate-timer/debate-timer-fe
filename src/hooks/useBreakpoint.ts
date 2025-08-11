@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const breakpoints = {
   md: 768,
   lg: 1280,
-  xl: 1450,
+  xl: 1600,
 } as const;
 
 export type Breakpoint = 'default' | keyof typeof breakpoints;

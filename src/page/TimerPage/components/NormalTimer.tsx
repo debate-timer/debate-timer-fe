@@ -68,18 +68,16 @@ export default function NormalTimer({
   return (
     <div className="flex flex-row space-x-[80px]">
       {/* 좌측 영역 */}
-      <span className="flex w-[360px] flex-col items-center justify-center lg:w-[400px] xl:w-[450px]">
-        <span className="flex w-full flex-col items-center justify-center space-y-[20px] px-[45px] lg:space-y-[28px] xl:space-y-[36px]">
+      <span className="flex w-[360px] flex-col items-center justify-center xl:w-[450px]">
+        <span className="flex w-full flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
           {/* 제목 */}
-          <h1 className="text-[52px] font-bold lg:text-[60px] xl:text-[68px]">
-            {titleText}
-          </h1>
+          <h1 className="text-[52px] font-bold xl:text-[68px]">{titleText}</h1>
 
           {/* 발언자 및 팀 정보 */}
           {(teamName || item.speaker) && (
             <span className="flex w-full flex-row items-center justify-center space-x-[16px]">
-              <DTDebate className="w-[20px] lg:w-[24px] xl:w-[28px]" />
-              <p className="text-[20px] lg:text-[24px] xl:text-[28px]">
+              <DTDebate className="w-[20px] xl:w-[28px]" />
+              <p className="text-[20px] xl:text-[28px]">
                 {teamName && teamName + ' 팀'}
                 {teamName && item.speaker && ' | '}
                 {item.speaker && item.speaker + ' 토론자'}
@@ -93,12 +91,12 @@ export default function NormalTimer({
               type="button"
               onClick={handleChangeAdditionalTimer}
               className={clsx(
-                'flex h-[52px] w-full items-center justify-center rounded-[20px] bg-default-white lg:h-[60px] xl:h-[68px]',
+                'flex h-[52px] w-full items-center justify-center rounded-[20px] bg-default-white xl:h-[68px]',
               )}
             >
               <span
                 className={clsx(
-                  'flex h-[52px] w-full items-center justify-center rounded-[20px] text-[20px] font-semibold transition-all duration-200 ease-in-out lg:h-[60px] lg:text-[24px] xl:h-[68px] xl:text-[28px]',
+                  'flex h-[52px] w-full items-center justify-center rounded-[20px] text-[20px] font-semibold transition-all duration-200 ease-in-out xl:h-[68px] xl:text-[28px]',
                   {
                     'bg-camp-blue/50 hover:bg-camp-blue':
                       item.stance === 'PROS',
@@ -127,7 +125,7 @@ export default function NormalTimer({
       </span>
 
       {/* 우측 영역 */}
-      <span className="flex w-[360px] flex-col space-y-[16px] lg:w-[400px] xl:min-w-[480px]">
+      <span className="flex w-[360px] flex-col space-y-[16px] xl:min-w-[480px]">
         {/* 타이머 */}
         <CircularTimer
           progress={progressMotionValue}
@@ -137,7 +135,7 @@ export default function NormalTimer({
         >
           <span
             className={clsx(
-              'flex w-full flex-row items-center justify-center p-[16px] text-[70px] font-bold text-default-black lg:text-[90px] xl:text-[110px]',
+              'flex w-full flex-row items-center justify-center p-[16px] text-[70px] font-bold text-default-black xl:text-[110px]',
               { 'space-x-[8px]': totalTime < 0 },
               { 'space-x-[16px]': totalTime >= 0 },
             )}

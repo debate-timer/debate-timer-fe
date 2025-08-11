@@ -86,7 +86,7 @@ export default function TimerPage() {
           {!isLoading && (
             <div
               className={clsx(
-                'flex h-full w-full flex-col items-center justify-center space-y-[32px] lg:space-y-[48px] xl:space-y-[60px]',
+                'flex h-full w-full flex-col items-center justify-center space-y-[32px] xl:space-y-[60px]',
                 bgColorMap[bg],
               )}
             >

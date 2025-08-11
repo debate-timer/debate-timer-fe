@@ -79,8 +79,6 @@ export default function TimeBasedTimer({
     switch (breakpoint) {
       case 'xl':
         return 20;
-      case 'lg':
-        return 16;
       default:
         return 12;
     }
@@ -90,7 +88,7 @@ export default function TimeBasedTimer({
     <div
       data-testid="timer"
       className={clsx(
-        'flex w-[400px] flex-col items-center justify-center space-y-[12px] lg:w-[480px] lg:space-y-[16px] xl:min-w-[560px] xl:space-y-[20px]',
+        'flex w-[400px] flex-col items-center justify-center space-y-[12px] xl:min-w-[560px] xl:space-y-[20px]',
         {
           'pointer-events-none opacity-50 grayscale': !isSelected,
         },
@@ -98,13 +96,13 @@ export default function TimeBasedTimer({
     >
       {/* 제목 */}
       <section className="flex flex-row items-center justify-center space-x-[24px]">
-        <h1 className="text-[48px] font-bold text-default-black lg:text-[56px] xl:text-[64px]">
+        <h1 className="text-[48px] font-bold text-default-black xl:text-[64px]">
           {teamName}
         </h1>
         <img
           src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}
           alt={prosCons === 'PROS' ? 'A키' : 'L키'}
-          className="size-[44px] lg:size-[50px] xl:size-[56px]"
+          className="size-[44px] xl:size-[56px]"
         />
       </section>
 
@@ -113,7 +111,7 @@ export default function TimeBasedTimer({
         progress={progressMotionValue}
         stance={prosCons}
         strokeWidth={getStrokeWidth()}
-        className="size-[400px] lg:size-[480px] xl:size-[560px]"
+        className="size-[400px] xl:size-[560px]"
       >
         {/* 1회당 발언 시간 X */}
         {speakingTimer === null && (
@@ -126,25 +124,25 @@ export default function TimeBasedTimer({
 
         {/* 1회당 발언 시간 O */}
         {speakingTimer !== null && (
-          <span className="flex w-full flex-col items-center justify-center p-[8px] lg:p-[12px] xl:p-[16px]">
-            <h1 className="w-[88px] rounded-[8px] bg-default-black py-[6px] text-center text-[16px] text-default-white lg:w-[100px] lg:text-[18px] xl:w-[112px] xl:text-[20px]">
+          <span className="flex w-full flex-col items-center justify-center p-[8px] xl:p-[16px]">
+            <h1 className="w-[88px] rounded-[8px] bg-default-black py-[6px] text-center text-[16px] text-default-white xl:w-[112px] xl:text-[20px]">
               전체 시간
             </h1>
-            <span className="flex flex-row text-[56px] font-semibold text-default-black lg:text-[64px] xl:text-[72px]">
-              <p className="flex w-[80px] items-center justify-center lg:w-[100px] xl:w-[120px]">
+            <span className="flex flex-row text-[56px] font-semibold text-default-black xl:text-[72px]">
+              <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
                 {minute}
               </p>
               <p className="flex items-center justify-center">:</p>
-              <p className="flex w-[80px] items-center justify-center lg:w-[100px] xl:w-[120px]">
+              <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
                 {second}
               </p>
             </span>
 
-            <span className="h-[18px] lg:h-[24px] xl:h-[32px]"></span>
+            <span className="h-[18px] xl:h-[32px]"></span>
 
             <h1
               className={clsx(
-                'w-[140px] rounded-[8px] py-[6px] text-center text-[20px] text-default-white lg:w-[160px] lg:text-[24px] xl:w-[180px] xl:text-[28px]',
+                'w-[140px] rounded-[8px] py-[6px] text-center text-[20px] text-default-white xl:w-[180px] xl:text-[28px]',
                 { 'bg-camp-blue': prosCons === 'PROS' },
                 { 'bg-camp-red': prosCons === 'CONS' },
               )}
@@ -152,11 +150,11 @@ export default function TimeBasedTimer({
               현재 시간
             </h1>
             <span className="flex flex-row text-[70px] font-bold text-default-black lg:text-[90px] xl:text-[110px]">
-              <p className="flex w-[108px] items-center justify-center lg:w-[144px] xl:w-[180px]">
+              <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
                 {speakingMinute}
               </p>
               <p className="flex items-center justify-center">:</p>
-              <p className="flex w-[108px] items-center justify-center lg:w-[144px] xl:w-[180px]">
+              <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
                 {speakingSecond}
               </p>
             </span>

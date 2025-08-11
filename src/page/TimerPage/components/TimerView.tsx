@@ -65,12 +65,10 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
         {/* ENTER 버튼 */}
         <button
           onClick={switchCamp}
-          className="flex flex-col items-center justify-center rounded-[14px] bg-default-black2 px-[16px] py-[8px] text-default-white shadow-xl lg:px-[24px] xl:px-[32px]"
+          className="flex flex-col items-center justify-center rounded-[14px] bg-default-black2 px-[16px] py-[8px] text-default-white shadow-xl xl:px-[32px]"
         >
-          <DTExchange className="size-[48px] lg:size-[56px] xl:size-[64px]" />
-          <p className="text-[12px] font-semibold lg:text-[18px] lg:font-bold xl:text-[24px]">
-            ENTER
-          </p>
+          <DTExchange className="size-[48px] xl:size-[64px]" />
+          <p className="text-[12px] font-semibold xl:text-[24px]">ENTER</p>
         </button>
 
         {/* 오른쪽 타이머 */}

@@ -12,12 +12,12 @@ export default function RoundControlRow(props: RoundControlRowProps) {
   const { table, index, goToOtherItem, openDoneModal } = props;
   return (
     <div className="flex flex-row space-x-1 xl:space-x-8">
-      <div className="flex w-[175px] items-center justify-center lg:w-[200px]">
+      <div className="flex w-[175px] items-center justify-center xl:w-[200px]">
         {index !== 0 && (
           <RoundControlButton type="PREV" onClick={() => goToOtherItem(true)} />
         )}
       </div>
-      <div className="flex w-[175px] items-center justify-center lg:w-[200px]">
+      <div className="flex w-[175px] items-center justify-center xl:w-[200px]">
         {index === table.length - 1 ? (
           <RoundControlButton type="DONE" onClick={openDoneModal} />
         ) : (
