@@ -13,9 +13,11 @@ import FloatingActionButton from '../../../../components/FloatingActionButton/Fl
 import DTAdd from '../../../../components/icons/Add';
 import { useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator';
 
 interface TimeBoxStepProps {
   initData: DebateTableData;
+  isLoading: boolean;
   onTimeBoxChange: React.Dispatch<React.SetStateAction<TimeBoxInfo[]>>;
   onFinishButtonClick: () => void;
   onEditTableInfoButtonClick: () => void;
@@ -29,6 +31,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
   });
   const {
     initData,
+    isLoading,
     onTimeBoxChange,
     onFinishButtonClick,
     onEditTableInfoButtonClick,
@@ -36,7 +39,6 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     isSubmitting = false,
   } = props;
   const initTimeBox = initData.table;
-  const isAbledSummitButton = initTimeBox.length !== 0;
 
   const [isButtonFixed, setIsButtonFixed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +73,9 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       return [...prevData, copyItem];
     });
   };
+
+  const isSubmitButtonDisabled =
+    initTimeBox.length === 0 || isLoading || isSubmitting;
 
   const renderTimeBoxItem = (info: TimeBoxInfo, index: number) => {
     return (
@@ -113,61 +118,74 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          <HeaderTableInfo name={initData.info.name} />
+          {!isLoading && <HeaderTableInfo name={initData.info.name} />}
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          <HeaderTitle title={initData.info.agenda} />
+          {!isLoading && <HeaderTitle title={initData.info.agenda} />}
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        <div
-          ref={containerRef}
-          className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start"
-        >
-          <PropsAndConsTitle
-            prosTeamName={initData.info.prosTeamName}
-            consTeamName={initData.info.consTeamName}
-          />
-
-          <DragAndDropWrapper>
-            {initTimeBox.length > 0 &&
-              initTimeBox.map((info, index) => (
-                <div key={crypto.randomUUID()} style={getDraggingStyles(index)}>
-                  {renderTimeBoxItem(info, index)}
-                </div>
-              ))}
-
-            {/* 타임박스 추가 버튼이 화면 중앙 하단에 고정될 때, 
-            타임박스가 가려지지 않게 타임박스 추가 버튼 높이만큼의 여백을 추가 */}
-            {isButtonFixed && <span className="h-[32px]"></span>}
-          </DragAndDropWrapper>
-
+        {isLoading && <LoadingIndicator />}
+        {!isLoading && (
           <div
-            className={`
+            ref={containerRef}
+            className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start"
+          >
+            <PropsAndConsTitle
+              prosTeamName={initData.info.prosTeamName}
+              consTeamName={initData.info.consTeamName}
+            />
+
+            <DragAndDropWrapper>
+              {initTimeBox.length > 0 &&
+                initTimeBox.map((info, index) => (
+                  <div
+                    key={crypto.randomUUID()}
+                    style={getDraggingStyles(index)}
+                  >
+                    {renderTimeBoxItem(info, index)}
+                  </div>
+                ))}
+
+              {/* 타임박스 추가 버튼이 화면 중앙 하단에 고정될 때, 
+            타임박스가 가려지지 않게 타임박스 추가 버튼 높이만큼의 여백을 추가 */}
+              {isButtonFixed && <span className="h-[32px]"></span>}
+            </DragAndDropWrapper>
+
+            <div
+              className={`
               pointer-events-none flex w-full items-center justify-center
               ${addButtonClasses}
             `}
-          >
-            <FloatingActionButton
-              onClick={openModal}
-              className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
             >
-              <div className="text-body flex h-[56px] flex-row items-center justify-center gap-[12px] p-[16px]">
-                <DTAdd className="h-full p-[4px]" />
-                타이머 추가
-              </div>
-            </FloatingActionButton>
+              <FloatingActionButton
+                onClick={openModal}
+                className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+              >
+                <div className="text-body flex h-[56px] flex-row items-center justify-center gap-[12px] p-[16px]">
+                  <DTAdd className="h-full p-[4px]" />
+                  타이머 추가
+                </div>
+              </FloatingActionButton>
+            </div>
           </div>
-        </div>
+        )}
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
         <div className="relative mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
             onClick={onEditTableInfoButtonClick}
-            className="button enabled neutral flex h-full w-full gap-[12px] rounded-full p-[24px]"
+            className={clsx(
+              'flex h-full w-full gap-[12px] rounded-full p-[24px]',
+              {
+                'button disabled': isLoading,
+                'button enabled neutral': !isLoading,
+              },
+            )}
+            disabled={isLoading}
           >
             <DTEdit className="h-full" />
             토론 정보 수정하기
@@ -178,11 +196,11 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             className={clsx(
               'flex h-full w-full gap-[12px] rounded-full p-[24px]',
               {
-                'button enabled brand': !(!isAbledSummitButton || isSubmitting),
+                'button enabled brand': !isSubmitButtonDisabled,
+                'button disabled': !isSubmitButtonDisabled,
               },
-              { 'button disabled': !isAbledSummitButton || isSubmitting },
             )}
-            disabled={!isAbledSummitButton || isSubmitting}
+            disabled={isSubmitButtonDisabled}
           >
             <DTCheck className="h-full" />
             {isEdit ? '수정 완료' : '추가하기'}

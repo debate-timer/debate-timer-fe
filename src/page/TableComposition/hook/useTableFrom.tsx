@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
-import { TableCompositionStep } from '../TableComposition';
+import { TableCompositionStep } from '../TableCompositionPage';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';

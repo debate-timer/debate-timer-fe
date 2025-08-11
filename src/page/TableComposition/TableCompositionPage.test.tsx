@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { GlobalPortal } from '../../util/GlobalPortal';
-import TableComposition from './TableComposition';
+import TableCompositionPage from './TableCompositionPage';
 
 // ------------------
 // 테스트 래퍼 (TestWrapper)
@@ -62,7 +62,7 @@ describe('TableComposition', () => {
   it('Creation flow and timebox functionality test', async () => {
     render(
       <TestWrapper initialEntries={['/composition?mode=add']}>
-        <TableComposition />
+        <TableCompositionPage />
       </TestWrapper>,
     );
 
@@ -98,7 +98,7 @@ describe('TableComposition', () => {
       <TestWrapper
         initialEntries={['/composition?mode=edit&tableId=1&mode=CUSTOMIZE']}
       >
-        <TableComposition />
+        <TableCompositionPage />
       </TestWrapper>,
     );
 

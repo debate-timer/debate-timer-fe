@@ -21,7 +21,17 @@ import { useTimerBackground } from './useTimerBackground';
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
 export function useTimerPageState(tableId: number): TimerPageLogics {
-  const { data } = useGetDebateTableData(tableId);
+  // Get data with useQuery of TanStack Query
+  const {
+    data,
+    isLoading: isFetching,
+    isError: isFetchingError,
+    isRefetching,
+    isRefetchError,
+    refetch,
+  } = useGetDebateTableData(tableId);
+  const isLoading = isFetching || isRefetching;
+  const isError = isFetchingError || isRefetchError;
 
   // 추가 타이머가 가능한지 여부 (예: 사전에 설정한 "작전 시간"이 있으면 false)
   const isAdditionalTimerAvailable = useMemo(() => {
@@ -35,8 +45,8 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   const [index, setIndex] = useState(0);
 
   // 자유토론 타이머, 일반 타이머 상태 관리 커스텀 훅
-  const timer1 = useTimeBasedTimer({});
-  const timer2 = useTimeBasedTimer({});
+  const timer1 = useTimeBasedTimer();
+  const timer2 = useTimeBasedTimer();
   const normalTimer = useNormalTimer();
 
   // 현재 발언자('PROS'/'CONS')
@@ -77,41 +87,64 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   );
 
   /**
+   * 발언 진영 전환(ENTER 키/버튼)
+   * - pros → cons, cons → pros로 타이머/상태 전환
+   */
+  const switchCamp = useCallback(() => {
+    // 1. 현재 팀과 다음 팀의 정보 설정
+    const currentTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
+    const nextTimer = prosConsSelected === 'PROS' ? timer2 : timer1;
+    const nextTeam = prosConsSelected === 'PROS' ? 'CONS' : 'PROS';
+
+    // 2. 상대 팀이 시간을 모두 소진했을 경우, 차례를 넘기지 않고 반환
+    if (nextTimer.isDone) {
+      return;
+    }
+
+    // 3. 현재 팀의 발언이 종료되었는지 확인
+    const isOpponentDone =
+      currentTimer.totalTimer !== null && currentTimer.totalTimer <= 0;
+
+    // 4. 현재 타이머를 멈추기 전, 실행 중이었는지를 저장
+    const wasRunning = currentTimer.isRunning;
+
+    // 5. 이제 현재 타이머를 정지하고...
+    currentTimer.pauseTimer();
+
+    // 6. 발언권을 다음 팀에게 넘김 (현재 발언권 가진 팀을 다음 팀으로 설정)
+    setProsConsSelected(nextTeam);
+
+    if (wasRunning) {
+      // 7-1. 만약 타이머가 실행 중이었다면, 다음 타이머 초기화 후 즉시 시작
+      nextTimer.resetAndStartTimer(isOpponentDone);
+    } else {
+      // 7-1. 만약 타이머가 멈춰 있었다면, 다음 타이머 초기화만 진행
+      nextTimer.resetTimerForNextPhase(isOpponentDone);
+    }
+  }, [prosConsSelected, timer1, timer2]);
+
+  /**
    * 특정 진영(팀)을 활성화하는 함수
    * - 사용자가 좌/우 타이머 영역을 직접 클릭할 때 사용
    * - 현재 진영이 아닌 타이머를 클릭한 경우에만 동작
    */
   const handleActivateTeam = useCallback(
     (team: TimeBasedStance) => {
-      const isPros = team === 'PROS';
-      const currentTimer = isPros ? timer1 : timer2;
-      const otherTimer = isPros ? timer2 : timer1;
-      if (currentTimer.isDone || prosConsSelected === team) return;
+      const clickedTimerStance = team === 'PROS' ? 'PROS' : 'CONS';
+      const clickedTimer = clickedTimerStance === 'PROS' ? timer1 : timer2;
 
-      otherTimer.pauseTimer();
-      if (otherTimer.isRunning) {
-        currentTimer.startTimer();
+      // 클릭한 타이머가 현재 타이머와 동일한 타이머라면, 바로 반환
+      if (prosConsSelected === clickedTimerStance) return;
+
+      // 아니라면, 타이머 변경
+      if (clickedTimer.isDone) {
+        setProsConsSelected(clickedTimerStance);
+      } else {
+        switchCamp();
       }
-      setProsConsSelected(team);
     },
-    [prosConsSelected, timer1, timer2],
+    [prosConsSelected, switchCamp, timer1, timer2],
   );
-
-  /**
-   * 발언 진영 전환(ENTER 키/버튼)
-   * - pros → cons, cons → pros로 타이머/상태 전환
-   */
-  const switchCamp = useCallback(() => {
-    const currentTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
-    const nextTimer = prosConsSelected === 'PROS' ? timer2 : timer1;
-    const nextTeam = prosConsSelected === 'PROS' ? 'CONS' : 'PROS';
-    if (nextTimer.isDone) return;
-    currentTimer.pauseTimer();
-    if (!nextTimer.isDone && currentTimer.isRunning) {
-      nextTimer.startTimer();
-    }
-    setProsConsSelected(nextTeam);
-  }, [prosConsSelected, timer1, timer2]);
 
   /**
    * 라운드 이동/초기 진입 시 타이머 상태 초기화 및 셋업
@@ -137,12 +170,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       const defaultSpeakingTimer = currentBox.timePerSpeaking;
       [timer1, timer2].forEach((timer) => {
         timer.setDefaultTime({ defaultTotalTimer, defaultSpeakingTimer });
-        timer.setSavedTime({
-          savedTotalTimer: defaultTotalTimer,
-          savedSpeakingTimer: defaultSpeakingTimer,
-        });
         timer.setTimers(defaultTotalTimer, defaultSpeakingTimer);
-        timer.setIsSpeakingTimer(true);
         timer.setIsDone(false);
       });
     }
@@ -159,15 +187,13 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   ]);
 
   /**
-   * 진영 전환 시, 상대 타이머를 발언 구간에 맞게 초기화
+   * 진영 전환 시, 상대 타이머가 작동가능하면 isDone false로 변경
    */
   useEffect(() => {
-    if (prosConsSelected === 'CONS') {
-      if (timer1.speakingTimer === null) return;
-      timer1.resetTimerForNextPhase();
-    } else if (prosConsSelected === 'PROS') {
-      if (timer2.speakingTimer === null) return;
-      timer2.resetTimerForNextPhase();
+    const isPros = prosConsSelected === 'PROS';
+    const opponentTimer = isPros ? timer2 : timer1;
+    if (opponentTimer.totalTimer !== null && opponentTimer.totalTimer > 0) {
+      opponentTimer.setIsDone(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prosConsSelected]);
@@ -205,7 +231,6 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    prosConsSelected,
     timer1.totalTimer,
     timer1.speakingTimer,
     timer2.totalTimer,
@@ -228,6 +253,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     switchCamp,
     handleActivateTeam,
     tableId,
+    isLoading,
+    isError,
+    refetch,
   };
 }
 
@@ -247,4 +275,7 @@ export interface TimerPageLogics {
   switchCamp: () => void;
   handleActivateTeam: (team: TimeBasedStance) => void;
   tableId: number;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => void;
 }
