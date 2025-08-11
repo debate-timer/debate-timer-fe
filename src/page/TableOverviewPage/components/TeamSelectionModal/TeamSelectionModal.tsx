@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Cointoss from '../../../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../../../assets/teamSelection/coinback.png';
@@ -16,9 +16,11 @@ export default function TeamSelectionModal({
   const [coinState, setCoinState] = useState<CoinState>('tossing');
 
   // 효과음 객체
-  const coinTossSound = new Audio('/sounds/cointoss.mp3');
-  const coinResultSound = new Audio('/sounds/cointoss-result.mp3');
-
+  const coinTossSound = useMemo(() => new Audio('/sounds/cointoss.mp3'), []);
+  const coinResultSound = useMemo(
+    () => new Audio('/sounds/cointoss-result.mp3'),
+    [],
+  );
   useEffect(() => {
     // 모달이 열리면 동전 던지기 화면, 동전 던지기 효과음 실행
     setCoinState('tossing');
