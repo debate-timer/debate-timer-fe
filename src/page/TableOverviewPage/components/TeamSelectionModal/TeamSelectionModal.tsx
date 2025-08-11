@@ -21,25 +21,35 @@ export default function TeamSelectionModal({
     () => new Audio('/sounds/cointoss-result.mp3'),
     [],
   );
+
+  // 동전 던지는 소리
   useEffect(() => {
-    // 모달이 열리면 동전 던지기 화면, 동전 던지기 효과음 실행
     setCoinState('tossing');
     coinTossSound.play();
 
-    // 2초 후 결과 표시
     const timer = setTimeout(() => {
       const result = Math.random() < 0.5 ? 'front' : 'back';
       setCoinState(result);
     }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [coinTossSound, coinResultSound]);
+    return () => {
+      clearTimeout(timer);
+      coinTossSound.pause();
+      coinTossSound.currentTime = 0;
+    };
+  }, [coinTossSound]); // coinTossSound는 useMemo를 통해 딱 처음에 생성된 객체이기 때문에 currentTime = 0임을 보장한다.
 
-  // 동전 던지기 결과가 나오면 결과 효과음 실행
+  // 결과 소리
   useEffect(() => {
     if (coinState === 'front' || coinState === 'back') {
+      coinResultSound.currentTime = 0; // coinState에 따라 실행될 수 있기 때문에 플레이 전 무조건 0으로 돌린다.
       coinResultSound.play();
     }
+
+    return () => {
+      coinResultSound.pause();
+      coinResultSound.currentTime = 0;
+    };
   }, [coinState, coinResultSound]);
 
   const handleStartDebate = () => {
