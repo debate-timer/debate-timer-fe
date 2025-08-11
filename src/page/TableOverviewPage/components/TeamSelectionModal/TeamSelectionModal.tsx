@@ -31,14 +31,14 @@ export default function TeamSelectionModal({
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [coinTossSound, coinResultSound]);
 
   // 동전 던지기 결과가 나오면 결과 효과음 실행
   useEffect(() => {
     if (coinState === 'front' || coinState === 'back') {
       coinResultSound.play();
     }
-  }, [coinState]);
+  }, [coinState, coinResultSound]);
 
   const handleStartDebate = () => {
     onClose();
