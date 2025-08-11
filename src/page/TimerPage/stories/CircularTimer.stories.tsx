@@ -17,7 +17,6 @@ const value = new MotionValue<number>(30);
 export const OnPros: Story = {
   args: {
     progress: value,
-    size: 480,
     strokeWidth: 20,
     stance: 'PROS',
     children: <span className="text-timer text-default-black">02 : 30</span>,
@@ -27,7 +26,6 @@ export const OnPros: Story = {
 export const OnCons: Story = {
   args: {
     progress: value,
-    size: 480,
     strokeWidth: 20,
     stance: 'CONS',
     children: <span className="text-timer text-default-black">02 : 30</span>,
@@ -37,17 +35,15 @@ export const OnCons: Story = {
 export const OnNeutral: Story = {
   args: {
     progress: value,
-    size: 480,
     strokeWidth: 20,
     stance: 'NEUTRAL',
     children: <span className="text-timer text-default-black">02 : 30</span>,
   },
 };
 
-export const OnSmallerSize: Story = {
+export const OnNarrowerBorder: Story = {
   args: {
     progress: value,
-    size: 360,
     strokeWidth: 15,
     stance: 'NEUTRAL',
     children: (
