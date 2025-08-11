@@ -3,11 +3,6 @@ import Cointoss from '../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../assets/teamSelection/coinback.png';
 import { useModal } from '../../../../hooks/useModal';
-
-// 효과음 객체
-const coinTossSound = new Audio('/sounds/cointoss.mp3');
-const coinResultSound = new Audio('/sounds/cointoss-result.mp3');
-
 interface TeamSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,6 +17,9 @@ export default function TeamSelectionModal({
   onStartDebate,
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>('tossing');
+  // 효과음 객체
+  const coinTossSound = new Audio('/sounds/cointoss.mp3');
+  const coinResultSound = new Audio('/sounds/cointoss-result.mp3');
 
   const {
     isOpen: modalIsOpen,
