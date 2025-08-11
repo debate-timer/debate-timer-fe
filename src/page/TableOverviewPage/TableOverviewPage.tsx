@@ -13,9 +13,9 @@ import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
-import TeamSelectionModal from '../../components/TeamSelectionModal/TeamSelectionModal';
 import { useState } from 'react';
 import Coins from '../../assets/teamSelection/coins.png';
+import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
 
 export default function TableOverviewPage() {
   const { id } = useParams();

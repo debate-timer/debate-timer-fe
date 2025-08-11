@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useModal } from '../../hooks/useModal';
 import Cointoss from '../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../assets/teamSelection/coinback.png';
+import { useModal } from '../../../../hooks/useModal';
 
 // 효과음 객체
 const coinTossSound = new Audio('/sounds/cointoss.mp3');
