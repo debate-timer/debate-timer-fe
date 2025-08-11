@@ -21,7 +21,8 @@ export default function TableOverviewPage() {
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
-  const [isTeamSelectionModalOpen, setIsTeamSelectionModalOpen] = useState(false);
+  const [isTeamSelectionModalOpen, setIsTeamSelectionModalOpen] =
+    useState(false);
 
   // Only uses hooks related with customize due to the removal of parliamentary
   const {
@@ -105,10 +106,10 @@ export default function TableOverviewPage() {
             </section>
           )}
           {!isLoading && (
-            <div className="fixed right-2 sm:right-3 md:right-4 lg:right-6 xl:right-8 top-16 sm:top-20 md:top-24 lg:top-28 xl:top-32 flex flex-col items-center w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36 2xl:w-40">
-              <img src={Coins} alt="" className="w-full h-auto mb-2" />
+            <div className="sm:right-3 sm:top-20 sm:w-24 2xl:w-40 fixed right-2 top-16 flex w-20 flex-col items-center md:right-4 md:top-24 md:w-28 lg:right-6 lg:top-28 lg:w-32 xl:right-8 xl:top-32 xl:w-36">
+              <img src={Coins} alt="" className="mb-2 h-auto w-full" />
               <button
-                className="w-full bg-brand-main px-2 sm:px-3 md:px-4 lg:px-5 xl:px-6 py-1.5 sm:py-2 md:py-2.5 lg:py-3 text-xs sm:text-sm md:text-base lg:text-lg shadow-lg rounded-full font-bold"  
+                className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full bg-brand-main px-2 py-1.5 text-xs font-bold shadow-lg md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6"
                 onClick={() => {
                   setIsTeamSelectionModalOpen(true);
                 }}

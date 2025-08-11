@@ -23,7 +23,12 @@ export default function TeamSelectionModal({
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>('tossing');
 
-  const { isOpen: modalIsOpen, openModal, closeModal, ModalWrapper } = useModal({
+  const {
+    isOpen: modalIsOpen,
+    openModal,
+    closeModal,
+    ModalWrapper,
+  } = useModal({
     closeOnOverlayClick: true,
     isCloseButtonExist: true,
     onClose,
@@ -69,7 +74,7 @@ export default function TeamSelectionModal({
   return (
     <ModalWrapper closeButtonColor="text-natural-1000">
       <div
-        className="relative flex h-[280px] w-[280px] flex-col overflow-hidden sm:h-[350px] sm:w-[350px] md:h-[400px] md:w-[400px] lg:h-[452px] lg:w-[452px]"
+        className="sm:h-[350px] sm:w-[350px] relative flex h-[280px] w-[280px] flex-col overflow-hidden md:h-[400px] md:w-[400px] lg:h-[452px] lg:w-[452px]"
         style={{
           background: 'linear-gradient(180deg, #D1E5E9 0%, #FFF5D0 100%)',
         }}
@@ -77,8 +82,8 @@ export default function TeamSelectionModal({
         <div className="flex flex-grow flex-col items-center justify-center">
           {coinState === 'tossing' ? (
             <>
-              <div className="flex flex-col items-center justify-center w-[150px] h-[250px] sm:w-[185px] sm:h-[280px] md:w-[210px] md:h-[320px] lg:w-[240px] lg:h-[300px]">
-                <div className="flex items-center justify-center h-32 w-28 sm:h-36 sm:w-32 md:h-40 md:w-36 lg:h-[240px] lg:w-[220px]">
+              <div className="sm:w-[185px] sm:h-[280px] flex h-[250px] w-[150px] flex-col items-center justify-center md:h-[320px] md:w-[210px] lg:h-[300px] lg:w-[240px]">
+                <div className="sm:h-36 sm:w-32 flex h-32 w-28 items-center justify-center md:h-40 md:w-36 lg:h-[240px] lg:w-[220px]">
                   <img
                     src={Cointoss}
                     alt="동전"
@@ -87,22 +92,22 @@ export default function TeamSelectionModal({
                 </div>
               </div>
               <div className="flex h-20 w-full items-center justify-center px-6">
-                <span className="text-lg font-semibold text-natural-1000 sm:text-xl md:text-2xl">
+                <span className="text-natural-1000 sm:text-xl text-lg font-semibold md:text-2xl">
                   코인 던지는중..
                 </span>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center w-[150px] h-[250px] sm:w-[185px] sm:h-[280px] md:w-[210px] md:h-[320px] lg:w-[240px] lg:h-[300px]">
+            <div className="sm:w-[185px] sm:h-[280px] flex h-[250px] w-[150px] flex-col items-center justify-center md:h-[320px] md:w-[210px] lg:h-[300px] lg:w-[240px]">
               <div className="flex flex-col items-center justify-center space-y-4">
-                <div className="flex items-center justify-center h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 lg:h-[220px] lg:w-[220px]">
+                <div className="sm:h-32 sm:w-32 flex h-28 w-28 items-center justify-center md:h-36 md:w-36 lg:h-[220px] lg:w-[220px]">
                   <img
                     src={coinState === 'front' ? CoinFront : CoinBack}
                     alt="동전"
                     className="h-full w-full object-contain"
                   />
                 </div>
-                <div className="rounded-full bg-black px-4 py-3 text-lg font-semibold text-white sm:px-6 sm:py-4 md:px-8 md:text-2xl">
+                <div className="sm:px-6 sm:py-4 rounded-full bg-black px-4 py-3 text-lg font-semibold text-white md:px-8 md:text-2xl">
                   {coinState === 'front' ? '앞' : '뒤'}
                 </div>
               </div>
@@ -112,7 +117,7 @@ export default function TeamSelectionModal({
         {/* 모달의 콘텐츠 영역과 분리하기 위해 별도 작성 */}
         {coinState !== 'tossing' && (
           <button
-            className="w-full bg-brand-main py-4 font-semibold sm:py-5 md:py-6 lg:py-[27px] text-base sm:text-lg md:text-xl lg:text-[22px]"
+            className="sm:py-5 sm:text-lg w-full bg-brand-main py-4 text-base font-semibold md:py-6 md:text-xl lg:py-[27px] lg:text-[22px]"
             onClick={handleStartDebate}
           >
             토론 바로 시작하기
@@ -121,4 +126,4 @@ export default function TeamSelectionModal({
       </div>
     </ModalWrapper>
   );
-} 
+}
