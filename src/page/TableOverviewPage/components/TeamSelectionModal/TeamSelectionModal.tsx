@@ -24,11 +24,11 @@ export default function TeamSelectionModal({
     setCoinState('tossing');
     coinTossSound.play();
 
-    // 3초 후 결과 표시
+    // 2초 후 결과 표시
     const timer = setTimeout(() => {
       const result = Math.random() < 0.5 ? 'front' : 'back';
       setCoinState(result);
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -66,7 +66,7 @@ export default function TeamSelectionModal({
             </div>
             <div className="flex h-20 w-full items-center justify-center px-6">
               <span className="text-natural-1000 sm:text-xl text-lg font-semibold md:text-2xl">
-                코인 던지는중..
+                동전 던지는 중...
               </span>
             </div>
           </>
