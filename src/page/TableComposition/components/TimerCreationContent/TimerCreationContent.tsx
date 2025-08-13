@@ -118,7 +118,7 @@ export default function TimerCreationContent({
       case '작전 시간':
         return 'TIMEOUT';
       default:
-        return 'OPENING';
+        return 'CUSTOM';
     }
   };
 
@@ -137,7 +137,12 @@ export default function TimerCreationContent({
     getSpeechTypeFromString(initSpeechType),
   );
   const [speechTypeTextValue, setSpeechTypeTextValue] = useState<string>(
-    SPEECH_TYPE_RECORD[currentSpeechType],
+    currentSpeechType === 'CUSTOM'
+      ? (initData?.speechType ?? '')
+      : SPEECH_TYPE_RECORD[currentSpeechType],
+  );
+  console.log(
+    `# initSpeech: ${initSpeechType} / currentSpeech: ${currentSpeechType}`,
   );
 
   // 발언 시간
@@ -300,9 +305,11 @@ export default function TimerCreationContent({
       return;
     } else {
       if (currentSpeechType === 'CUSTOM') {
+        console.log('# 커스텀 스피치');
         speechTypeToSend = speechTypeTextValue;
-        stanceToSend = 'NEUTRAL';
+        stanceToSend = timerType === 'TIME_BASED' ? 'NEUTRAL' : stance;
       } else {
+        console.log('# 정해진 스피치');
         speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
         stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
       }
@@ -361,6 +368,7 @@ export default function TimerCreationContent({
       // 타이머 종류에 따라 발언 유형(speechType)을 적절하게 설정
       if (newTimerType === 'NORMAL') {
         setCurrentSpeechType('OPENING'); // 자유토론 > 일반 전환 시 '입론'으로 초기화
+        setStance('PROS');
       } else {
         setCurrentSpeechType('CUSTOM'); // 일반 > 자유토론 전환 시 '직접 입력'으로 초기화
         setSpeechTypeTextValue('');
