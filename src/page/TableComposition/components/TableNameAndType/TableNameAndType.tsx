@@ -139,7 +139,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               onInfoChange(updatedInfo);
               onButtonClick();
             }}
-            className="button enabled h-16 w-full"
+            className="button enabled brand w-full rounded-full"
           >
             다음
           </button>

@@ -11,7 +11,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
       <div>
         <div className="relative inline-block text-[min(max(0.875rem,1.5vw),1.4rem)] font-semibold">
           <span className="relative z-10">홈 | 설정</span>
-          <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand-main/70"></span>
+          <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand/70"></span>
         </div>
         <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
           토론 정보 관리 및 기록
@@ -44,7 +44,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
         <p>시간표를 저장하려면,</p>
         <p>디베이트 타이머에 로그인해보세요!</p>
         <button
-          className="mt-14 rounded-full border border-neutral-300 bg-brand-main px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-black transition-all duration-100 hover:bg-brand-sub1 hover:text-neutral-0"
+          className="mt-14 rounded-full border border-neutral-300 bg-brand px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-semantic-table hover:text-default-white"
           onClick={onLogin}
         >
           3초 로그인 하기

@@ -23,7 +23,7 @@ export default function MainSection({
       </h1>
       <button
         onClick={isLoggedIn() ? onDashboardButtonClicked : onStartWithoutLogin}
-        className="rounded-full border border-neutral-300 bg-brand-main px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-black transition-all duration-100 hover:bg-brand-sub1 hover:text-neutral-0"
+        className="rounded-full border border-neutral-300 bg-brand px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-semantic-table hover:text-default-white"
       >
         {isLoggedIn() ? '대시보드로 이동' : '비회원으로 시작하기'}
       </button>

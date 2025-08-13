@@ -1,5 +1,4 @@
 import TimeBox from '../TimeBox/TimeBox';
-import TimerCreationButton from '../TimerCreationButton/TimerCreationButton';
 import { useModal } from '../../../../hooks/useModal';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
@@ -8,6 +7,12 @@ import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableI
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
+import DTEdit from '../../../../components/icons/Edit';
+import DTCheck from '../../../../components/icons/Check';
+import FloatingActionButton from '../../../../components/FloatingActionButton/FloatingActionButton';
+import DTAdd from '../../../../components/icons/Add';
+import { useLayoutEffect, useRef, useState } from 'react';
+import clsx from 'clsx';
 import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator';
 
 interface TimeBoxStepProps {
@@ -21,6 +26,9 @@ interface TimeBoxStepProps {
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
+  });
   const {
     initData,
     isLoading,
@@ -31,7 +39,10 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     isSubmitting = false,
   } = props;
   const initTimeBox = initData.table;
-  const { openModal, closeModal, ModalWrapper } = useModal();
+
+  const [isButtonFixed, setIsButtonFixed] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const addButtonClasses = isButtonFixed ? 'sticky bottom-[16px]' : 'relative';
 
   const { handleMouseDown, getDraggingStyles, DragAndDropWrapper } =
     useDragAndDrop({
@@ -84,6 +95,25 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     );
   };
 
+  // 스크롤 바가 생기면, 타임박스 추가 버튼을 화면 중앙 하단에 고정
+  useLayoutEffect(() => {
+    const containerElement = containerRef.current;
+    if (!containerElement) {
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      const hasScrollbar =
+        entry.target.scrollHeight > entry.target.clientHeight;
+      setIsButtonFixed(hasScrollbar);
+    });
+
+    observer.observe(containerElement);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -99,53 +129,86 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <DefaultLayout.ContentContainer>
         {isLoading && <LoadingIndicator />}
         {!isLoading && (
-          <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
+          <div
+            ref={containerRef}
+            className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start"
+          >
             <PropsAndConsTitle
               prosTeamName={initData.info.prosTeamName}
               consTeamName={initData.info.consTeamName}
             />
 
             <DragAndDropWrapper>
-              {initTimeBox.map((info, index) => (
-                <div key={index + info.stance} style={getDraggingStyles(index)}>
-                  {renderTimeBoxItem(info, index)}
-                </div>
-              ))}
+              {initTimeBox.length > 0 &&
+                initTimeBox.map((info, index) => (
+                  <div
+                    key={crypto.randomUUID()}
+                    style={getDraggingStyles(index)}
+                  >
+                    {renderTimeBoxItem(info, index)}
+                  </div>
+                ))}
+
+              {/* 타임박스 추가 버튼이 화면 중앙 하단에 고정될 때, 
+            타임박스가 가려지지 않게 타임박스 추가 버튼 높이만큼의 여백을 추가 */}
+              {isButtonFixed && <span className="h-[32px]"></span>}
             </DragAndDropWrapper>
 
-            <TimerCreationButton onClick={openModal} />
-          </section>
+            <div
+              className={`
+              pointer-events-none flex w-full items-center justify-center
+              ${addButtonClasses}
+            `}
+            >
+              <FloatingActionButton
+                onClick={openModal}
+                className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+              >
+                <div className="text-body flex h-[56px] flex-row items-center justify-center gap-[12px] p-[16px]">
+                  <DTAdd className="h-full p-[4px]" />
+                  타이머 추가
+                </div>
+              </FloatingActionButton>
+            </div>
+          </div>
         )}
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
-          {/* TODO: Need to add a function here */}
+        <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
           <button
             onClick={onEditTableInfoButtonClick}
-            className={`
-              h-16 w-full
-              ${isLoading ? 'button disabled' : 'button enabled'}
-            `}
+            className={clsx(
+              'flex h-full w-full gap-[12px] rounded-full p-[24px]',
+              {
+                'button disabled': isLoading,
+                'button enabled neutral': !isLoading,
+              },
+            )}
             disabled={isLoading}
           >
+            <DTEdit className="h-full" />
             토론 정보 수정하기
           </button>
 
           <button
             onClick={onFinishButtonClick}
-            className={`
-              h-16 w-full
-              ${isSubmitButtonDisabled ? 'button disabled' : 'button enabled'}
-            `}
+            className={clsx(
+              'flex h-full w-full gap-[12px] rounded-full p-[24px]',
+              {
+                'button enabled brand': !isSubmitButtonDisabled,
+                'button disabled': isSubmitButtonDisabled,
+              },
+            )}
             disabled={isSubmitButtonDisabled}
           >
+            <DTCheck className="max-h-full" />
             {isEdit ? '수정 완료' : '추가하기'}
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
 
-      <ModalWrapper closeButtonColor="text-neutral-1000">
+      <ModalWrapper>
         <TimerCreationContent
           beforeData={initTimeBox[initTimeBox.length - 1] as TimeBoxInfo}
           prosTeamName={initData.info.prosTeamName}
