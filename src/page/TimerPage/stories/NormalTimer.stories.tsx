@@ -174,3 +174,31 @@ export const OnConsAdditionalTimerAvailable: Story = {
     isAdditionalTimerAvailable: true,
   },
 };
+
+export const OnSpeakerNameTooLong: Story = {
+  args: {
+    normalTimerInstance: {
+      timer: 150,
+      isRunning: false,
+      isAdditionalTimerOn: true,
+      setTimer: () => {},
+      startTimer: () => {},
+      pauseTimer: () => {},
+      resetTimer: () => {},
+      handleChangeAdditionalTimer: () => {},
+      handleCloseAdditionalTimer: () => {},
+    },
+    item: {
+      stance: 'CONS',
+      speechType: '입론1',
+      boxType: 'TIME_BASED',
+      time: 30,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: '발언자 2847277237',
+      bell: null,
+    },
+    teamName: '차아안서어엉',
+    isAdditionalTimerAvailable: true,
+  },
+};

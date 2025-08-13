@@ -81,7 +81,7 @@ export default function Table({
               }}
               aria-label="공유하기"
             >
-              <SmallIconButtonContainer className="size-[28px] p-[8px]">
+              <SmallIconButtonContainer className="size-[28px] p-[7px]">
                 <DTShare className="h-full" />
               </SmallIconButtonContainer>
             </button>
