@@ -198,7 +198,7 @@ export const OnSpeakerNameTooLong: Story = {
       speaker: '발언자 2847277237',
       bell: null,
     },
-    teamName: '차아안서어엉',
+    teamName: '매우 엄청 짱 길어서 감당이 불가능할 정도의 길이를 가진',
     isAdditionalTimerAvailable: true,
   },
 };

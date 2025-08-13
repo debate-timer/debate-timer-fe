@@ -58,7 +58,7 @@ export default function CompactTimeoutTimer({
   return (
     <div
       className={clsx(
-        'flex w-full flex-col items-center justify-center rounded-[10px] bg-default-neutral/50 p-[20px]',
+        'flex flex-col items-center justify-center rounded-[10px] bg-default-neutral/50 p-[20px]',
         'transition-all duration-700 ease-out',
         {
           'opacity-0 translate-y-8': !isMounted, // 초기 상태: 숨겨지고 아래로 내려감 (32px)
