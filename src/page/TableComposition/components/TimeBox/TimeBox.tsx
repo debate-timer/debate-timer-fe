@@ -4,6 +4,7 @@ import { TimeBoxInfo } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
 import DTDrag from '../../../../components/icons/Drag';
 import SmallIconButtonContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
+import clsx from 'clsx';
 
 interface TimeBoxEventHandlers {
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
@@ -119,7 +120,11 @@ export default function TimeBox(props: TimeBoxProps) {
               </div>
             </>
           )}
-      <span className="flex max-w-[200px] flex-row text-[20px] text-default-black">
+      <span
+        className={clsx('flex flex-row text-[20px] text-default-black', {
+          'max-w-[200px]': isModifiable,
+        })}
+      >
         <p className="truncate font-semibold">
           {speechType}
           {speaker && (
