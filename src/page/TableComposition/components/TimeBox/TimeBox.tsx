@@ -119,9 +119,13 @@ export default function TimeBox(props: TimeBoxProps) {
               </div>
             </>
           )}
-      <span className="flex flex-row text-[20px] text-default-black">
-        <p className="font-semibold">{speechType}</p>
-        {speaker && <p className="font-medium"> | {speaker} 토론자</p>}
+      <span className="flex max-w-[200px] flex-row text-[20px] text-default-black">
+        <p className="truncate font-semibold">
+          {speechType}
+          {speaker && (
+            <span className="font-medium">{` | ${speaker} 토론자`}</span>
+          )}
+        </p>
       </span>
       <p className="text-[28px] font-medium text-default-black">{timeStr}</p>
     </div>
