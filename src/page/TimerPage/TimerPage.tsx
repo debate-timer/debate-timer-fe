@@ -2,8 +2,6 @@ import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
-import IconButton from '../../components/IconButton/IconButton';
-import { IoHelpCircle } from 'react-icons/io5';
 import { useTimerPageState } from './hooks/useTimerPageState';
 import { useTimerHotkey } from './hooks/useTimerHotkey';
 import RoundControlRow from './components/RoundControlRow';
@@ -12,6 +10,8 @@ import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
+import DTHelp from '../../components/icons/Help';
+import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 
@@ -71,10 +71,12 @@ export default function TimerPage() {
             )}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
-            <IconButton
-              icon={<IoHelpCircle size={24} />}
+            <button
+              className="flex h-full items-center justify-center"
               onClick={openUseTooltipModal}
-            />
+            >
+              <DTHelp className="size-full" />
+            </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 
@@ -83,7 +85,10 @@ export default function TimerPage() {
           {isLoading && <LoadingIndicator />}
           {!isLoading && (
             <div
-              className={`flex h-full w-full flex-col items-center justify-center space-y-[25px] xl:space-y-[40px] ${bgColorMap[bg]}`}
+              className={clsx(
+                'flex h-full w-full flex-col items-center justify-center space-y-[32px] xl:space-y-[60px]',
+                bgColorMap[bg],
+              )}
             >
               {/* 타이머 두 개 + ENTER 버튼 */}
               <TimerView state={state} />

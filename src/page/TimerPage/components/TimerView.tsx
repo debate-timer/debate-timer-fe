@@ -1,8 +1,8 @@
 // components/TimerView.tsx
+import DTExchange from '../../../components/icons/Exchange';
 import { TimerPageLogics } from '../hooks/useTimerPageState';
 import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
-import { FaExchangeAlt } from 'react-icons/fa';
 
 export default function TimerView({ state }: { state: TimerPageLogics }) {
   const {
@@ -16,7 +16,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
     handleActivateTeam,
     switchCamp,
   } = state;
-  if (data?.table[index].boxType === 'NORMAL') {
+  if (data && data.table[index].boxType === 'NORMAL') {
     return (
       <NormalTimer
         normalTimerInstance={{
@@ -24,6 +24,7 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
           isAdditionalTimerOn: normalTimer.isAdditionalTimerOn,
           isRunning: normalTimer.isRunning,
           handleChangeAdditionalTimer: normalTimer.handleChangeAdditionalTimer,
+          handleCloseAdditionalTimer: normalTimer.handleCloseAdditionalTimer,
           startTimer: normalTimer.startTimer,
           pauseTimer: normalTimer.pauseTimer,
           resetTimer: normalTimer.resetTimer,
@@ -41,9 +42,9 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
       />
     );
   }
-  if (data?.table[index].boxType === 'TIME_BASED') {
+  if (data && data.table[index].boxType === 'TIME_BASED') {
     return (
-      <div className="relative flex flex-row items-center justify-center space-x-[30px]">
+      <div className="flex flex-row items-center justify-center space-x-[30px]">
         {/* 왼쪽 타이머 */}
         <TimeBasedTimer
           timeBasedTimerInstance={{
@@ -52,13 +53,24 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             isRunning: timer1.isRunning,
             startTimer: timer1.startTimer,
             pauseTimer: timer1.pauseTimer,
-            resetCurrentTimer: timer1.resetCurrentTimer,
+            resetCurrentTimer: () => timer1.resetCurrentTimer(timer2.isDone),
           }}
+          item={data.table[index]}
           isSelected={prosConsSelected === 'PROS'}
           onActivate={() => handleActivateTeam('PROS')}
           prosCons="PROS"
           teamName={data.info.prosTeamName}
         />
+
+        {/* ENTER 버튼 */}
+        <button
+          onClick={switchCamp}
+          className="flex flex-col items-center justify-center rounded-[14px] bg-default-black2 px-[16px] py-[8px] text-default-white shadow-xl xl:px-[32px]"
+        >
+          <DTExchange className="size-[48px] xl:size-[64px]" />
+          <p className="text-[12px] font-semibold xl:text-[24px]">ENTER</p>
+        </button>
+
         {/* 오른쪽 타이머 */}
         <TimeBasedTimer
           timeBasedTimerInstance={{
@@ -67,23 +79,14 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             isRunning: timer2.isRunning,
             startTimer: timer2.startTimer,
             pauseTimer: timer2.pauseTimer,
-            resetCurrentTimer: timer2.resetCurrentTimer,
+            resetCurrentTimer: () => timer2.resetCurrentTimer(timer1.isDone),
           }}
+          item={data.table[index]}
           isSelected={prosConsSelected === 'CONS'}
           onActivate={() => handleActivateTeam('CONS')}
           prosCons="CONS"
           teamName={data.info.consTeamName}
         />
-        {/* ENTER 버튼 */}
-        <button
-          onClick={switchCamp}
-          className="absolute left-1/2 top-1/2 flex h-[78px] w-[78px] -translate-x-[70px] -translate-y-6 flex-col items-center justify-center rounded-full bg-neutral-600 text-white shadow-lg transition hover:bg-neutral-500 lg:h-[100px] lg:w-[100px] lg:-translate-x-20 lg:-translate-y-8"
-        >
-          <FaExchangeAlt className="text-[28px] lg:text-[36px]" />
-          <span className="text-[12px] font-semibold lg:text-[18px] lg:font-bold">
-            ENTER
-          </span>
-        </button>
       </div>
     );
   }

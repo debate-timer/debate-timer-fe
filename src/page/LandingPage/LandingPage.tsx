@@ -16,7 +16,7 @@ export default function LandingPage() {
   } = useLandingPageHandlers();
 
   return (
-    <div className="flex h-full w-full items-center justify-center bg-neutral-0">
+    <div className="flex h-full w-full items-center justify-center bg-default-white">
       {/* 헤더 */}
       <Header onLoginButtonClicked={handleHeaderLoginButtonClick} />
 
@@ -33,7 +33,7 @@ export default function LandingPage() {
         </div>
 
         {/* 회색 배경 */}
-        <div className="flex w-full flex-col items-center bg-background-dark py-48">
+        <div className="flex w-full flex-col items-center bg-default-disabled/hover py-48">
           {/* 타이머 화면 */}
           <TimerSection />
         </div>

@@ -1,6 +1,6 @@
 import { ReactNode, useState, useCallback, useEffect } from 'react';
 import { GlobalPortal } from '../util/GlobalPortal';
-import { IoMdClose } from 'react-icons/io';
+import DTClose from '../components/icons/Close';
 
 interface UseModalOptions {
   closeOnOverlayClick?: boolean;
@@ -65,7 +65,7 @@ export function useModal(options: UseModalOptions = {}) {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           onClick={handleOverlayClick}
         >
-          <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
+          <div className="relative overflow-hidden rounded-[20px] bg-white shadow-lg">
             {children}
             {isCloseButtonExist && (
               <button
@@ -74,7 +74,7 @@ export function useModal(options: UseModalOptions = {}) {
                 className={`absolute right-4 top-4 text-3xl ${closeButtonColor}`}
                 aria-label="모달 닫기"
               >
-                <IoMdClose />
+                <DTClose className="size-[32px]" />
               </button>
             )}
           </div>

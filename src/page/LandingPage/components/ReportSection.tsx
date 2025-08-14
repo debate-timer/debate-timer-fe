@@ -20,7 +20,7 @@ export default function ReportSection() {
                 'noopener,noreferrer',
               )
             }
-            className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-black transition-all duration-100 hover:bg-brand-main"
+            className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-brand"
           >
             접수하기
           </button>
@@ -55,7 +55,7 @@ export default function ReportSection() {
                 'noopener,noreferrer',
               )
             }
-            className="text-[min(max(0.75rem,1vw),1.1rem)] text-neutral-500 transition-colors hover:text-neutral-700"
+            className="text-[min(max(0.75rem,1vw),1rem)] text-neutral-500 transition-colors hover:text-neutral-700"
           >
             서비스 이용약관
           </button>
