@@ -98,10 +98,7 @@ export default {
     screens: {
       md: '768px',
       lg: '1280px',
-      xl: {
-        min: '1600px',
-        raw: '(min-height: 1024px)',
-      },
+      xl: { raw: '(min-width: 1600px) and (min-height: 1024px)' },
     },
   },
 };
