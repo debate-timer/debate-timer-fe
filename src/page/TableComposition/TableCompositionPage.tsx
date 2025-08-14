@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
-import { isLoggedIn } from '../../util/accessToken';
+import { isGuestFlow } from '../../util/sessionStorage';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
@@ -25,7 +25,7 @@ export default function TableCompositionPage() {
   const mode = rawMode as Mode;
 
   if (
-    isLoggedIn() &&
+    !isGuestFlow() &&
     mode === 'edit' &&
     (rawTableId === null || isNaN(Number(rawTableId)))
   ) {
