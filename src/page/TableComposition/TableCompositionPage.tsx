@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 import { DebateInfo, TimeBoxInfo } from '../../type/type';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
+import { isLoggedIn } from '../../util/accessToken';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
@@ -23,7 +24,11 @@ export default function TableCompositionPage() {
   }
   const mode = rawMode as Mode;
 
-  if (mode === 'edit' && (rawTableId === null || isNaN(Number(rawTableId)))) {
+  if (
+    isLoggedIn() &&
+    mode === 'edit' &&
+    (rawTableId === null || isNaN(Number(rawTableId)))
+  ) {
     throw new Error('테이블 ID가 올바르지 않습니다.');
   }
   const tableId = rawTableId ? Number(rawTableId) : 0;
