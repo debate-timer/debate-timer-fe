@@ -81,24 +81,30 @@ export function useTimerHotkey(state: TimerPageLogics) {
             normalTimer.resetTimer();
           } else {
             if (prosConsSelected === 'PROS') {
-              timer1.resetCurrentTimer();
+              timer1.resetCurrentTimer(timer2.isDone);
             } else {
-              timer2.resetCurrentTimer();
+              timer2.resetCurrentTimer(timer1.isDone);
             }
           }
           break;
         case 'KeyA':
           // 찬성 진영 선택 및 반대 타이머 정지
-          if (!timer1.isDone) {
-            setProsConsSelected('PROS');
-            if (timer2.isRunning) timer2.pauseTimer();
+          if (prosConsSelected === 'CONS') {
+            if (timer1.isDone) {
+              setProsConsSelected('PROS');
+            } else {
+              switchCamp();
+            }
           }
           break;
         case 'KeyL':
           // 반대 진영 선택 및 찬성 타이머 정지
-          if (!timer2.isDone) {
-            setProsConsSelected('CONS');
-            if (timer1.isRunning) timer1.pauseTimer();
+          if (prosConsSelected === 'PROS') {
+            if (timer1.isDone) {
+              setProsConsSelected('CONS');
+            } else {
+              switchCamp();
+            }
           }
           break;
         case 'Enter':

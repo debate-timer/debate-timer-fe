@@ -19,8 +19,7 @@ export default function HeaderTableInfo(props: HeaderTitleProps) {
       )}
       {!isLoading && (
         <div className="flex flex-col space-y-[4px]">
-          <h1 className="text-sm">테이블 이름</h1>
-          <h1 className="text-2xl font-bold">{displayName}</h1>
+          <h1 className="text-2xl">{displayName}</h1>
         </div>
       )}
     </>

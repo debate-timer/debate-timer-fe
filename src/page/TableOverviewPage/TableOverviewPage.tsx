@@ -3,19 +3,21 @@ import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTit
 import { useNavigate, useParams } from 'react-router-dom';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
-import { RiEditFill, RiSpeakFill } from 'react-icons/ri';
 import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
-import { MdOutlineIosShare } from 'react-icons/md';
 import { StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
+import DTShare from '../../components/icons/Share';
+import DTDebate from '../../components/icons/Debate';
+import DTEdit from '../../components/icons/Edit';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import Coins from '../../assets/teamSelection/coins.png';
 import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
 import { useModal } from '../../hooks/useModal';
+import clsx from 'clsx';
 
 export default function TableOverviewPage() {
   const { id } = useParams();
@@ -120,9 +122,24 @@ export default function TableOverviewPage() {
         </DefaultLayout.ContentContainer>
 
         <DefaultLayout.StickyFooterWrapper>
-          <div className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
+          <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
-              className={`button ${isLoading ? 'disabled' : 'enabled-hover-neutral'} h-16 w-full`}
+              className={clsx('flex aspect-square rounded-full p-[20px]', {
+                'button disabled': isLoading,
+                'button enabled neutral': !isLoading,
+              })}
+              disabled={isLoading}
+              onClick={() => {
+                openShareModal();
+              }}
+            >
+              <DTShare className="h-full" />
+            </button>
+            <button
+              className={clsx('flex aspect-square rounded-full p-[20px]', {
+                'button disabled': isLoading,
+                'button enabled neutral': !isLoading,
+              })}
               disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
@@ -134,31 +151,22 @@ export default function TableOverviewPage() {
                 }
               }}
             >
-              <div className="flex items-center justify-center gap-2">
-                <RiEditFill />
-                수정하기
-              </div>
+              <DTEdit className="h-full" />
             </button>
-            <div className="flex h-16 w-full space-x-2">
+            <div className="flex w-full space-x-2">
               <button
-                className={`button ${isLoading ? 'disabled' : 'enabled'} flex-1`}
+                className={clsx(
+                  'flex flex-1 flex-row gap-[12px] rounded-full p-[24px]',
+                  {
+                    'button disabled': isLoading,
+                    'button enabled brand': !isLoading,
+                  },
+                )}
                 disabled={isLoading}
                 onClick={handleStartDebate}
               >
-                <div className="flex items-center justify-center gap-2">
-                  <RiSpeakFill />
-                  토론하기
-                </div>
-              </button>
-
-              <button
-                className={`button ${isLoading ? 'disabled' : 'enabled-hover-neutral'} flex size-16 items-center justify-center`}
-                disabled={isLoading}
-                onClick={() => {
-                  openShareModal();
-                }}
-              >
-                <MdOutlineIosShare className="m-4 size-full" />
+                <DTDebate className="h-full" />
+                토론하기
               </button>
             </div>
           </div>

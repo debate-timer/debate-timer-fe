@@ -1,4 +1,5 @@
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import DTLeftArrow from '../icons/LeftArrow';
+import DTRightArrow from '../icons/RightArrow';
 
 type RoundControlButtonTypes = 'PREV' | 'NEXT' | 'DONE';
 
@@ -13,12 +14,12 @@ export default function RoundControlButton({
 }: RoundControlButtonProps) {
   return (
     <button
-      className="flex h-[50px] w-[150px] flex-row items-center justify-center space-x-2 rounded-full border-[1px] border-neutral-300 bg-neutral-200 shadow-lg hover:bg-brand-main lg:h-[60px] lg:w-[170px] xl:h-[68px] xl:w-[200px]"
+      className="flex h-[50px] w-[150px] flex-row items-center justify-center space-x-2 rounded-full border-[1px] border-neutral-300 bg-neutral-200 hover:bg-brand lg:h-[60px] lg:w-[170px] xl:h-[68px] xl:w-[200px]"
       onClick={() => onClick()}
     >
       {type === 'PREV' && (
         <>
-          <FaArrowLeft className="size-[25px] lg:size-[31px] xl:size-[36px]" />
+          <DTLeftArrow className="size-[25px] lg:size-[31px] xl:size-[36px]" />
           <h1 className="text-[21px] font-semibold lg:text-[24px] xl:text-[28px]">
             이전 차례
           </h1>
@@ -29,7 +30,7 @@ export default function RoundControlButton({
           <h1 className="text-[21px] font-semibold lg:text-[24px] xl:text-[28px]">
             다음 차례
           </h1>
-          <FaArrowRight className="size-[25px] lg:size-[31px] xl:size-[36px]" />
+          <DTRightArrow className="size-[25px] lg:size-[31px] xl:size-[36px]" />
         </>
       )}
       {type === 'DONE' && (

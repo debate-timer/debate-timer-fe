@@ -1,17 +1,71 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   TimeBoxInfo,
   Stance,
   TimeBoxType,
   BellType,
-  BellConfig,
   BellTypeToString,
+  BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-import normalTimer from '../../../../assets/timer/normal_timer.png';
-import timeBasedTimer from '../../../../assets/timer/timebased_timer.png';
-import LabeledCheckBox from '../../../../components/LabeledCheckBox/LabeledCheckBox';
-import timeBasedPerSpeakingTimer from '../../../../assets/timer/timebased_perSpeaking_timer.png';
+import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.png';
+import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.png';
+import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.png';
+import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.png';
+import DTClose from '../../../../components/icons/Close';
+import TimerCreationContentItem from './TimerCreationContentMenuItem';
+import LabeledRadioButton from '../../../../components/LabeledRadioButton/LabeledRadioButton';
+import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
+import DropdownMenu, {
+  DropdownMenuItem,
+} from '../../../../components/DropdownMenu/DropdownMenu';
+import clsx from 'clsx';
+import TimeInputGroup from './TimeInputGroup';
+import DTBell from '../../../../components/icons/Bell';
+import DTAdd from '../../../../components/icons/Add';
+
+type TimerCreationOption =
+  | 'TIMER_TYPE'
+  | 'SPEECH_TYPE_NORMAL'
+  | 'SPEECH_TYPE_TIME_BASED'
+  | 'TEAM'
+  | 'TIME_PER_TEAM'
+  | 'TIME_PER_SPEAKING'
+  | 'SPEAKER'
+  | 'TIME_NORMAL'
+  | 'BELL';
+
+type SpeechType = 'OPENING' | 'REBUTTAL' | 'TIMEOUT' | 'CLOSING' | 'CUSTOM';
+
+const SPEECH_TYPE_RECORD: Record<SpeechType, string> = {
+  OPENING: '입론',
+  CLOSING: '최종 발언',
+  CUSTOM: '직접 입력',
+  REBUTTAL: '반론',
+  TIMEOUT: '작전 시간',
+} as const;
+
+const STANCE_RECORD: Record<Stance, string> = {
+  PROS: '찬성',
+  CONS: '반대',
+  NEUTRAL: '중립',
+} as const;
+
+const NORMAL_OPTIONS: TimerCreationOption[] = [
+  'TIMER_TYPE',
+  'SPEECH_TYPE_NORMAL',
+  'TEAM',
+  'TIME_NORMAL',
+  'SPEAKER',
+  'BELL',
+] as const;
+
+const TIME_BASED_OPTIONS: TimerCreationOption[] = [
+  'TIMER_TYPE',
+  'SPEECH_TYPE_TIME_BASED',
+  'TIME_PER_TEAM',
+  'TIME_PER_SPEAKING',
+] as const;
 
 interface TimerCreationContentProps {
   beforeData?: TimeBoxInfo;
@@ -46,14 +100,27 @@ export default function TimerCreationContent({
           : 'CONS'
       : (initData?.stance ?? 'PROS'),
   );
-  const [boxType, setBoxType] = useState<TimeBoxType>(
+  const [timerType, setTimerType] = useState<TimeBoxType>(
     beforeData?.boxType ?? initData?.boxType ?? 'NORMAL',
   );
 
-  const predefinedSpeechOptions = useMemo(
-    () => ['입론', '반론', '최종 발언', '작전 시간'],
-    [],
-  );
+  // 발언 유형 초기화
+  const getSpeechTypeFromString = (value: string): SpeechType => {
+    switch (value.trim()) {
+      case '입론':
+        return 'OPENING';
+      case '반론':
+        return 'REBUTTAL';
+      case '최종발언':
+      case '최종 발언':
+        return 'CLOSING';
+      case '작전시간':
+      case '작전 시간':
+        return 'TIMEOUT';
+      default:
+        return 'CUSTOM';
+    }
+  };
 
   const initBellInput: BellInputConfig = useMemo(() => {
     return {
@@ -66,9 +133,16 @@ export default function TimerCreationContent({
 
   const initSpeechType =
     beforeData?.speechType ?? initData?.speechType ?? '입론';
-  const [speechType, setSpeechType] = useState<string>(initSpeechType);
-  const [isCustomSpeech, setIsCustomSpeech] = useState(
-    !predefinedSpeechOptions.includes(initSpeechType),
+  const [currentSpeechType, setCurrentSpeechType] = useState<SpeechType>(
+    getSpeechTypeFromString(initSpeechType),
+  );
+  const [speechTypeTextValue, setSpeechTypeTextValue] = useState<string>(
+    currentSpeechType === 'CUSTOM'
+      ? (initData?.speechType ?? '')
+      : SPEECH_TYPE_RECORD[currentSpeechType],
+  );
+  console.log(
+    `# initSpeech: ${initSpeechType} / currentSpeech: ${currentSpeechType}`,
   );
 
   // 발언 시간
@@ -90,14 +164,10 @@ export default function TimerCreationContent({
   // 1회당 발언 시간
   const { minutes: initSpeakerMinutes, seconds: initSpeakerSeconds } =
     Formatting.formatSecondsToMinutes(
-      beforeData?.timePerSpeaking ?? initData?.timePerSpeaking ?? 180,
+      beforeData?.timePerSpeaking ?? initData?.timePerSpeaking ?? 0,
     );
   const [speakerMinutes, setSpeakerMinutes] = useState(initSpeakerMinutes);
   const [speakerSeconds, setSpeakerSeconds] = useState(initSpeakerSeconds);
-
-  const [useSpeakerTime, setUseSpeakerTime] = useState<boolean>(
-    (beforeData?.timePerSpeaking ?? initData?.timePerSpeaking) != null,
-  );
 
   const [speaker, setSpeaker] = useState<string>(
     beforeData?.speaker ?? initData?.speaker ?? '',
@@ -121,13 +191,8 @@ export default function TimerCreationContent({
     ];
   };
   const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
-  const isBellAddEnabled =
-    (bellInput.min >= 0 || bellInput.sec >= 0) &&
-    bellInput.count >= 1 &&
-    bellInput.count <= 3;
 
   const handleAddBell = () => {
-    if (!isBellAddEnabled) return;
     setBells([
       ...bells,
       {
@@ -143,529 +208,571 @@ export default function TimerCreationContent({
   const handleDeleteBell = (idx: number) => {
     setBells(bells.filter((_, i) => i !== idx));
   };
-  const handleSubmit = () => {
+
+  const isNormalTimer = timerType === 'NORMAL';
+
+  const speechTypeOptions: DropdownMenuItem<SpeechType>[] = [
+    { value: 'OPENING', label: SPEECH_TYPE_RECORD['OPENING'] },
+    { value: 'REBUTTAL', label: SPEECH_TYPE_RECORD['REBUTTAL'] },
+    { value: 'TIMEOUT', label: SPEECH_TYPE_RECORD['TIMEOUT'] },
+    { value: 'CLOSING', label: SPEECH_TYPE_RECORD['CLOSING'] },
+    { value: 'CUSTOM', label: SPEECH_TYPE_RECORD['CUSTOM'] },
+  ] as const;
+
+  const stanceOptions: DropdownMenuItem<Stance>[] = useMemo(
+    () => [
+      { value: 'PROS', label: prosTeamName },
+      { value: 'CONS', label: consTeamName },
+      { value: 'NEUTRAL', label: STANCE_RECORD['NEUTRAL'] },
+    ],
+    [prosTeamName, consTeamName],
+  );
+
+  const bellOptions: DropdownMenuItem<BellType>[] = useMemo(
+    () => [
+      { value: 'BEFORE_END', label: BellTypeToString['BEFORE_END'] },
+      { value: 'AFTER_END', label: BellTypeToString['AFTER_END'] },
+      { value: 'AFTER_START', label: BellTypeToString['AFTER_START'] },
+    ],
+    [],
+  );
+
+  const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
+
+  const handleSubmit = useCallback(() => {
     const totalTime = minutes * 60 + seconds;
     const totalTimePerTeam = teamMinutes * 60 + teamSeconds;
     const totalTimePerSpeaking = speakerMinutes * 60 + speakerSeconds;
 
+    // 입력 검증 로직
     const errors: string[] = [];
-    // 텍스트 길이 유효성 검사
-    if (speechType.length > 10) {
-      errors.push('발언 유형은 최대 10자까지 입력할 수 있습니다.');
+
+    if (timerType === 'NORMAL') {
+      if (totalTime <= 0) {
+        errors.push('발언 시간은 1초 이상이어야 해요.');
+      }
+
+      // 타종 옵션 유효성 검사
+      bells.forEach((item: BellInputConfig) => {
+        if (item.type === 'BEFORE_END') {
+          const bellTime = item.min * 60 + item.sec;
+
+          if (bellTime > totalTime) {
+            errors.push('종료 전 타종은 발언 시간보다 길 수 없어요.');
+          }
+        }
+      });
     }
-    if (speaker.length > 5) {
-      errors.push('발언자는 최대 5자까지 입력할 수 있습니다.');
+
+    if (timerType === 'TIME_BASED') {
+      if (totalTimePerTeam <= 0) {
+        errors.push('팀당 발언 시간은 1초 이상이어야 해요.');
+      }
+
+      if (totalTimePerSpeaking > totalTimePerTeam) {
+        errors.push('1회당 발언 시간은 팀당 발언 시간을 초과할 수 없어요.');
+      }
     }
-    // 발언시간 유효성 검사
-    if (
-      boxType === 'TIME_BASED' &&
-      useSpeakerTime &&
-      totalTimePerSpeaking > totalTimePerTeam
-    ) {
-      errors.push('1회당 발언 시간은 팀당 총 발언 시간보다 클 수 없습니다.');
+
+    // SpeechType에 맞게 문자열 매핑
+    let speechTypeToSend: string;
+    let stanceToSend: Stance;
+    if (currentSpeechType === 'CUSTOM') {
+      // 텍스트 길이 유효성 검사
+      if (speechTypeTextValue.length > 10) {
+        errors.push('발언 유형은 최대 10자까지 입력할 수 있습니다.');
+      }
+      if (speaker.length > 5) {
+        errors.push('발언자는 최대 5자까지 입력할 수 있습니다.');
+      }
+
+      // 발언시간 유효성 검사
+      if (
+        timerType === 'TIME_BASED' &&
+        totalTimePerSpeaking > totalTimePerTeam
+      ) {
+        errors.push('1회당 발언 시간은 팀당 총 발언 시간보다 클 수 없습니다.');
+      }
+
+      // 커스텀 타이머 발언유형 유효성 검사
+      if (timerType === 'NORMAL' && speechTypeTextValue.trim() === '') {
+        errors.push('발언 유형을 입력해주세요.');
+      }
     }
-    // 커스텀 타이머 발언유형 유효성 검사
-    if (boxType === 'NORMAL' && speechType.trim() === '') {
-      errors.push('발언 유형을 입력해주세요.');
-    }
+
     if (errors.length > 0) {
       alert(errors.join('\n'));
       return;
+    } else {
+      if (currentSpeechType === 'CUSTOM') {
+        console.log('# 커스텀 스피치');
+        speechTypeToSend = speechTypeTextValue;
+        stanceToSend = timerType === 'TIME_BASED' ? 'NEUTRAL' : stance;
+      } else {
+        console.log('# 정해진 스피치');
+        speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
+        stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
+      }
     }
 
     const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
-    if (boxType === 'NORMAL') {
+    if (timerType === 'NORMAL') {
       onSubmit({
-        stance,
-        speechType,
-        boxType,
+        stance: stanceToSend,
+        speechType: speechTypeToSend,
+        boxType: timerType,
         time: totalTime,
         timePerTeam: null,
         timePerSpeaking: null,
-        speaker,
+        speaker: stanceToSend === 'NEUTRAL' ? null : speaker,
         bell,
       });
     } else {
-      // TIME_BASED
       onSubmit({
-        stance: 'NEUTRAL',
-        speechType: speechType.trim() === '' ? '자유토론' : speechType,
-        boxType,
+        stance: stanceToSend,
+        speechType:
+          speechTypeToSend.trim() === '' ? '자유토론' : speechTypeToSend,
+        boxType: timerType,
         time: null,
         timePerTeam: totalTimePerTeam,
-        timePerSpeaking: useSpeakerTime ? totalTimePerSpeaking : null,
+        timePerSpeaking:
+          totalTimePerSpeaking !== 0 ? totalTimePerSpeaking : null,
         speaker: null,
         bell: null,
       });
     }
     onClose();
-  };
-
-  const validateTime = (value: string) =>
-    value === '' ? 0 : Math.max(0, Math.min(59, Number(value)));
-
-  const isNormalTimer = boxType === 'NORMAL';
-
-  // 자유토론 타이머로 전환되면 speechType 초기화
-  useEffect(() => {
-    if (!isNormalTimer) {
-      // 자유토론 타이머로 전환 시
-      /*
-      if (!initData?.speechType) {
-        setSpeechType('');
-      }
-        */
-      setIsCustomSpeech(true);
-    } else {
-      // 일반 타이머로 전환 시, speechType이 predefined에 있으면 custom 아님
-      setIsCustomSpeech(!predefinedSpeechOptions.includes(speechType));
-    }
-    if (stance === 'NEUTRAL') {
-      setSpeaker('');
-    }
   }, [
+    bells,
     isNormalTimer,
+    currentSpeechType,
+    minutes,
+    seconds,
+    onClose,
+    onSubmit,
+    speaker,
+    speakerMinutes,
+    speakerSeconds,
+    teamMinutes,
+    teamSeconds,
     stance,
-    speechType,
-    predefinedSpeechOptions,
-    initData?.speechType,
+    speechTypeTextValue,
+    timerType,
   ]);
 
+  const handleTimerChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newTimerType = event.target.value as TimeBoxType;
+      setTimerType(newTimerType);
+
+      // 타이머 종류에 따라 발언 유형(speechType)을 적절하게 설정
+      if (newTimerType === 'NORMAL') {
+        setCurrentSpeechType('OPENING'); // 자유토론 > 일반 전환 시 '입론'으로 초기화
+        setStance('PROS');
+      } else {
+        setCurrentSpeechType('CUSTOM'); // 일반 > 자유토론 전환 시 '직접 입력'으로 초기화
+        setSpeechTypeTextValue('');
+      }
+    },
+    [],
+  );
+
+  const handleSpeechTypeChange = useCallback(
+    (selectedValue: SpeechType) => {
+      setCurrentSpeechType(selectedValue);
+
+      if (selectedValue === 'CUSTOM') {
+        setSpeechTypeTextValue('');
+      }
+
+      if (selectedValue === 'TIMEOUT') {
+        setStance('NEUTRAL');
+        setSpeaker('');
+      }
+
+      if (
+        stance === 'NEUTRAL' &&
+        selectedValue !== 'CUSTOM' &&
+        selectedValue !== 'TIMEOUT'
+      ) {
+        setStance('PROS');
+      }
+    },
+    [stance],
+  );
+
+  const handleStanceChange = useCallback(
+    (selectedValue: Stance) => {
+      if (selectedValue === 'NEUTRAL') {
+        if (currentSpeechType !== 'CUSTOM') {
+          alert(
+            "중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다.",
+          );
+          return;
+        }
+      }
+
+      setStance(selectedValue);
+    },
+    [currentSpeechType],
+  );
+
   return (
-    <div className="relative p-6">
-      <div className="flex flex-col gap-1">
-        <div className="flex  flex-row items-center justify-center p-2">
-          <div className="flex  w-[260px] justify-center">
-            {/** 타이머 이미지 */}
-            {isNormalTimer ? (
-              <img
-                src={normalTimer}
-                alt="normal-timer"
-                className="h-full object-contain"
-              />
-            ) : useSpeakerTime ? (
-              <img
-                src={timeBasedPerSpeakingTimer}
-                alt="timebased-per-speaking-timer"
-                className="h-full object-contain"
-              />
+    <div className="flex w-[820px] flex-col">
+      {/* 헤더 */}
+      <section className="mx-[50px] mt-[25px] flex flex-row justify-between">
+        {/* 제목 */}
+        <span className="flex flex-col space-y-[16px]">
+          <h1 className="text-subtitle">
+            {timerType === 'NORMAL' ? '일반 타이머' : '자유토론 타이머'}
+          </h1>
+          <p className="text-body leading-[1.5] text-default-neutral ">
+            {timerType === 'NORMAL' ? (
+              '한 팀의 발언 시간이 세팅된 일반적인 타이머'
             ) : (
-              <img
-                src={timeBasedTimer}
-                alt="timebased-timer"
-                className="h-full object-contain"
-              />
-            )}
-          </div>
-
-          <div className="flex flex-col gap-6 p-5">
-            {/** boxType 라디오버튼 */}
-            <div className="flex items-center space-x-2">
-              <label
-                htmlFor="debate-type-select"
-                className="w-16 flex-shrink-0 font-semibold"
-              >
-                종류
-              </label>
-              <div className="flex w-full justify-between space-x-2">
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    name="boxType"
-                    value="NORMAL"
-                    checked={boxType === 'NORMAL'}
-                    onChange={(e) => {
-                      setBoxType(e.target.value as TimeBoxType);
-                      setSpeechType('');
-                    }}
-                  />
-                  일반 타이머
-                </label>
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    name="boxType"
-                    value="TIME_BASED"
-                    checked={boxType === 'TIME_BASED'}
-                    onChange={(e) => {
-                      setBoxType(e.target.value as TimeBoxType);
-                      setSpeechType('');
-                    }}
-                  />
-                  자유토론 타이머
-                </label>
-              </div>
-            </div>
-            {/** 발언유형 */}
-            <div className="flex items-center space-x-2">
-              <label
-                htmlFor="debate-type-select"
-                className="w-16 flex-shrink-0 font-semibold"
-              >
-                발언 유형
-              </label>
-
-              {isNormalTimer && (
-                <select
-                  id="speech-type-select"
-                  className="flex flex-grow rounded border p-1"
-                  value={
-                    predefinedSpeechOptions.includes(speechType)
-                      ? speechType
-                      : '직접 입력'
-                  }
-                  onChange={(e) => {
-                    const selectedValue = e.target.value;
-                    if (selectedValue === '작전 시간') {
-                      setStance('NEUTRAL');
-                    } else if (
-                      stance === 'NEUTRAL' &&
-                      selectedValue !== '작전 시간'
-                    ) {
-                      setStance('PROS');
-                    }
-                    if (selectedValue === '직접 입력') {
-                      setIsCustomSpeech(true);
-                      setSpeechType('');
-                    } else {
-                      setIsCustomSpeech(false);
-                      setSpeechType(selectedValue);
-                    }
-                  }}
-                >
-                  <option value="입론">입론</option>
-                  <option value="반론">반론</option>
-                  <option value="최종 발언">최종 발언</option>
-                  <option value="작전 시간">작전 시간</option>
-                  <option value="직접 입력">직접 입력</option>
-                </select>
-              )}
-              {isCustomSpeech && (
-                <input
-                  id="speech-type-input"
-                  type="text"
-                  className="flex w-full rounded border p-1"
-                  value={speechType}
-                  onChange={(e) => {
-                    setSpeechType(e.target.value);
-                  }}
-                  placeholder={isNormalTimer ? '예) 보충 질의' : '자유토론'}
-                />
-              )}
-            </div>
-            {/** 팀 */}
-            {isNormalTimer && (
-              <div className="flex items-center space-x-2">
-                <label
-                  htmlFor="stance-select"
-                  className="w-16 flex-shrink-0 font-semibold"
-                >
-                  팀
-                </label>
-                <select
-                  id="stance-select"
-                  className={`flex-1 rounded border p-1 ${
-                    speechType === '작전 시간'
-                      ? 'cursor-not-allowed bg-gray-100'
-                      : ''
-                  }`}
-                  value={stance}
-                  onChange={(e) => setStance(e.target.value as Stance)}
-                  disabled={speechType === '작전 시간'}
-                >
-                  <option value="PROS">{prosTeamName}</option>
-                  <option value="CONS">{consTeamName}</option>
-                  {(stance === 'NEUTRAL' || isCustomSpeech) && (
-                    <option value="NEUTRAL">공통</option>
-                  )}
-                </select>
-              </div>
-            )}
-            {/* 시간 */}
-            {isNormalTimer && (
-              <div className="flex w-full items-center space-x-2">
-                <label
-                  htmlFor="minutes-input"
-                  className="w-16 flex-shrink-0 font-semibold"
-                >
-                  시간
-                </label>
-                <div className="flex w-full min-w-1 flex-wrap space-x-2">
-                  <div className="flex min-w-10 flex-1 items-center">
-                    <input
-                      id="minutes-input"
-                      type="number"
-                      min={0}
-                      max={59}
-                      className="min-w-8 flex-grow rounded border p-1"
-                      value={minutes.toString()}
-                      onChange={(e) => setMinutes(validateTime(e.target.value))}
-                    />
-                    <span className="ml-1 flex-shrink-0">분</span>
-                  </div>
-                  <div className="flex min-w-10 flex-1 items-center">
-                    <input
-                      id="seconds-input"
-                      type="number"
-                      min={0}
-                      max={59}
-                      className="min-w-8 flex-grow rounded border p-1"
-                      value={seconds.toString()}
-                      onChange={(e) => setSeconds(validateTime(e.target.value))}
-                    />
-                    <span className="ml-1 flex-shrink-0">초</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            {/** 팀당 총 발언시간 */}
-            {!isNormalTimer && (
               <>
-                <div className="flex w-full items-center space-x-2">
-                  <label
-                    htmlFor="team-minutes-input"
-                    className="w-24 flex-shrink-0 font-semibold"
-                  >
-                    팀당 <br />총 발언 시간
-                  </label>
-                  <div className="flex w-full min-w-1 flex-wrap space-x-2">
-                    <div className="flex min-w-10 flex-1 items-center">
-                      <input
-                        id="team-minutes-input"
-                        type="number"
-                        min={0}
-                        max={59}
-                        className="min-w-8 flex-grow rounded border p-1"
-                        value={teamMinutes.toString()}
-                        onChange={(e) =>
-                          setTeamMinutes(validateTime(e.target.value))
-                        }
-                      />
-                      <span className="ml-1 flex-shrink-0">분</span>
-                    </div>
-                    <div className="flex min-w-10 flex-1 items-center">
-                      <input
-                        id="team-seconds-input"
-                        type="number"
-                        min={0}
-                        max={59}
-                        className="min-w-8 flex-grow rounded border p-1"
-                        value={teamSeconds.toString()}
-                        onChange={(e) =>
-                          setTeamSeconds(validateTime(e.target.value))
-                        }
-                      />
-                      <span className="ml-1 flex-shrink-0">초</span>
-                    </div>
-                  </div>
-                </div>
-                {/** 1회당 발언시간 */}
-                <div className="flex w-full items-center space-x-2">
-                  <div className="w-24 flex-shrink-0">
-                    <LabeledCheckBox
-                      id="speaker-toggle"
-                      label={
-                        <span className="ml-1 font-semibold">
-                          1회당 <br /> 발언 시간
-                        </span>
-                      }
-                      checked={useSpeakerTime}
-                      onChange={() => setUseSpeakerTime((prev) => !prev)}
-                    />
-                  </div>
-                  <div
-                    className={`flex w-full min-w-1 flex-wrap space-x-2 ${
-                      useSpeakerTime ? '' : 'text-gray-400'
-                    }`}
-                  >
-                    <div className="flex min-w-10 flex-1 items-center">
-                      <input
-                        id="speaker-minutes-input"
-                        type="number"
-                        min={0}
-                        max={59}
-                        className="min-w-8 flex-grow rounded border p-1"
-                        value={speakerMinutes.toString()}
-                        onChange={(e) =>
-                          setSpeakerMinutes(validateTime(e.target.value))
-                        }
-                        disabled={!useSpeakerTime}
-                      />
-                      <span className="ml-1 flex-shrink-0">분</span>
-                    </div>
-                    <div className="flex min-w-10 flex-1 items-center">
-                      <input
-                        id="speaker-seconds-input"
-                        type="number"
-                        min={0}
-                        max={59}
-                        className="min-w-8 flex-grow rounded border p-1"
-                        value={speakerSeconds.toString()}
-                        onChange={(e) =>
-                          setSpeakerSeconds(validateTime(e.target.value))
-                        }
-                        disabled={!useSpeakerTime}
-                      />
-                      <span className="ml-1 flex-shrink-0">초</span>
-                    </div>
-                  </div>
-                </div>
+                {'팀별 발언 시간과 1회당 발언 시간이 세팅된 타이머'}
+                <br />
+                {'1회당 발언 시간이 지나면, 상대 팀으로 발언권이 넘어감'}
               </>
             )}
+          </p>
+        </span>
 
-            {/** 발언자 */}
-            {isNormalTimer && (
-              <div className="flex min-w-0 items-center space-x-2">
-                <label
-                  htmlFor="speaker-number-input"
-                  className="w-16 flex-shrink-0 font-semibold"
-                >
-                  발언자
-                </label>
-                <input
-                  id="speaker-input"
-                  type="text"
-                  className={`flex flex-grow rounded border p-1 ${
-                    stance === 'NEUTRAL' ? 'cursor-not-allowed bg-gray-100' : ''
-                  }`}
-                  value={speaker}
-                  onChange={(e) => {
-                    if (stance === 'NEUTRAL') {
-                      setSpeaker('');
-                    } else {
-                      setSpeaker(e.target.value);
-                    }
-                  }}
-                  placeholder="1번"
-                  disabled={stance === 'NEUTRAL'}
-                />
-                <span className="whitespace-nowrap">토론자</span>
-              </div>
-            )}
-
-            {isNormalTimer && (
-              <div className="mt-3">
-                <label className="mb-1 block font-semibold">종소리 설정</label>
-                {/* 입력부 */}
-                <div className="mb-2 flex items-center gap-2">
-                  {/* direction 드롭다운 */}
-                  <select
-                    className="rounded border px-1"
-                    value={bellInput.type}
-                    onChange={(e) =>
-                      setBellInput((prev) => ({
-                        ...prev,
-                        type: e.target.value as BellType,
-                      }))
-                    }
-                  >
-                    <option value="BEFORE_END">
-                      {BellTypeToString['BEFORE_END']}
-                    </option>
-                    <option value="AFTER_END">
-                      {BellTypeToString['AFTER_END']}
-                    </option>
-                    <option value="AFTER_START">
-                      {BellTypeToString['AFTER_START']}
-                    </option>
-                  </select>
-                  <input
-                    type="number"
-                    min={0}
-                    max={59}
-                    className="w-12 rounded border px-1"
-                    value={bellInput.min}
-                    onChange={(e) =>
-                      setBellInput((prev) => ({
-                        ...prev,
-                        min: Math.max(0, Math.min(59, Number(e.target.value))),
-                      }))
-                    }
-                    placeholder="분"
-                  />
-                  <span>분</span>
-                  <input
-                    type="number"
-                    min={0}
-                    max={59}
-                    className="w-12 rounded border px-1"
-                    value={bellInput.sec}
-                    onChange={(e) =>
-                      setBellInput((prev) => ({
-                        ...prev,
-                        sec: Math.max(0, Math.min(59, Number(e.target.value))),
-                      }))
-                    }
-                    placeholder="초"
-                  />
-                  <span>초</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={3}
-                    className="w-12 rounded border px-1"
-                    value={bellInput.count}
-                    onChange={(e) =>
-                      setBellInput((prev) => ({
-                        ...prev,
-                        count: Math.max(1, Math.min(3, Number(e.target.value))),
-                      }))
-                    }
-                    placeholder="횟수"
-                  />
-                  <span role="img" aria-label="bell">
-                    🔔
-                  </span>
-                  <span className="whitespace-nowrap">x {bellInput.count}</span>
-                  <button
-                    type="button"
-                    className={`ml-2 rounded px-2 py-1 font-bold 
-      ${isBellAddEnabled ? 'bg-brand-main text-neutral-0' : 'cursor-not-allowed bg-neutral-300 text-neutral-0'}`}
-                    onClick={handleAddBell}
-                    disabled={!isBellAddEnabled}
-                  >
-                    +
-                  </button>
-                </div>
-                {/* 벨 리스트 */}
-                <div className="mb-2 flex h-[100px] flex-col items-center gap-2  overflow-y-auto">
-                  {bells.map((bell, idx) => (
-                    <div
-                      key={idx}
-                      className="scr flex w-full items-stretch justify-between rounded border border-yellow-200 bg-yellow-50 px-3 py-1"
-                    >
-                      <div className="flex items-center gap-1">
-                        <span className="font-semibold">
-                          {BellTypeToString[bell.type]}
-                        </span>
-                        <span className="ml-1 font-semibold">
-                          {bell.min}분 {bell.sec}초
-                        </span>
-                        <span className="ml-2" role="img" aria-label="bell">
-                          🔔
-                        </span>
-                        <span className="ml-1">x{bell.count}</span>
-                      </div>
-                      <button
-                        className="ml-2 font-bold text-neutral-500 hover:text-red-500"
-                        onClick={() => handleDeleteBell(idx)}
-                      >
-                        X
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <button
-          className="w-full rounded-xl border-[1px] border-neutral-700 p-2 text-[18px] font-semibold hover:bg-brand-main"
-          onClick={handleSubmit}
-        >
-          설정 완료
+        {/* 닫기 버튼 */}
+        <button onClick={onClose}>
+          <DTClose className="size-8 text-default-black" />
         </button>
-      </div>
+      </section>
+
+      {/* 디바이더 */}
+      <span className="mx-[50px] mt-[20px] h-[1px] bg-default-neutral"></span>
+
+      {/* 입력 폼 */}
+      <section className="mx-[50px] my-[30px] flex flex-1 flex-row">
+        {/* 타이머 사진 */}
+        <span className="relative flex w-[250px] items-center justify-center">
+          {isNormalTimer ? (
+            <img
+              src={
+                stance === 'NEUTRAL'
+                  ? normalTimerNeutralImage
+                  : stance === 'PROS'
+                    ? normalTimerProsImage
+                    : normalTimerConsImage
+              }
+              alt="normal-timer"
+              className="absolute top-1/3 w-full -translate-y-1/2 object-contain"
+            />
+          ) : (
+            <img
+              src={timeBasedTimerImage}
+              alt="time-based-timer"
+              className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
+            />
+          )}
+        </span>
+
+        {/* 여백 */}
+        <span className="w-[40px]"></span>
+
+        {/* 옵션 */}
+        <span className="flex w-full flex-1 flex-col space-y-[16px]">
+          {options.map((timerType, index) => {
+            switch (timerType) {
+              // 타이머 종류
+              case 'TIMER_TYPE':
+                return (
+                  <TimerCreationContentItem
+                    title="종류"
+                    key={`${timerType}-${index}`}
+                  >
+                    <span className="flex w-full flex-row space-x-[16px]">
+                      <LabeledRadioButton
+                        id="timer-type-normal"
+                        name="timer-type"
+                        value="NORMAL"
+                        label="일반 타이머"
+                        checked={isNormalTimer}
+                        onChange={handleTimerChange}
+                      />
+                      <LabeledRadioButton
+                        id="timer-type-time-based"
+                        name="timer-type"
+                        value="TIME_BASED"
+                        label="자유토론 타이머"
+                        checked={!isNormalTimer}
+                        onChange={handleTimerChange}
+                      />
+                    </span>
+                  </TimerCreationContentItem>
+                );
+
+              // 발언자
+              case 'SPEAKER':
+                return (
+                  <TimerCreationContentItem
+                    title="발언자"
+                    key={`${timerType}-${index}`}
+                  >
+                    <ClearableInput
+                      id="speaker"
+                      value={speaker}
+                      onChange={(e) => setSpeaker(e.target.value)}
+                      onClear={() => setSpeaker('')}
+                      placeholder="N번 토론자"
+                      disabled={
+                        stance === 'NEUTRAL' || currentSpeechType === 'TIMEOUT'
+                      }
+                    />
+                  </TimerCreationContentItem>
+                );
+
+              // 발언 시간 (일반 타이머)
+              case 'TIME_NORMAL':
+                return (
+                  <TimeInputGroup
+                    title={`발언 시간`}
+                    key={`${timerType}-${index}`}
+                    minutes={minutes}
+                    seconds={seconds}
+                    onMinutesChange={setMinutes}
+                    onSecondsChange={setSeconds}
+                  />
+                );
+
+              // 1회당 발언 시간 (시간 총량제 타이머)
+              case 'TIME_PER_SPEAKING':
+                return (
+                  <TimeInputGroup
+                    title={`1회당\n발언 시간`}
+                    key={`${timerType}-${index}`}
+                    minutes={speakerMinutes}
+                    seconds={speakerSeconds}
+                    onMinutesChange={setSpeakerMinutes}
+                    onSecondsChange={setSpeakerSeconds}
+                  />
+                );
+
+              // 팀당 발언 시간 (시간 총량제 타이머)
+              case 'TIME_PER_TEAM':
+                return (
+                  <TimeInputGroup
+                    title={`팀당\n발언 시간`}
+                    key={`${timerType}-${index}`}
+                    minutes={teamMinutes}
+                    seconds={teamSeconds}
+                    onMinutesChange={setTeamMinutes}
+                    onSecondsChange={setTeamSeconds}
+                  />
+                );
+
+              // 발언 유형 (시간 총량제 타이머)
+              case 'SPEECH_TYPE_TIME_BASED':
+                return (
+                  <TimerCreationContentItem
+                    title="발언 유형"
+                    key={`${timerType}-${index}`}
+                  >
+                    <ClearableInput
+                      id="speech-type-time-based"
+                      value={speechTypeTextValue}
+                      onChange={(e) => setSpeechTypeTextValue(e.target.value)}
+                      onClear={() => setSpeechTypeTextValue('')}
+                      placeholder="주도권 토론 등"
+                    />
+                  </TimerCreationContentItem>
+                );
+
+              // 발언 유형 (일반 타이머)
+              case 'SPEECH_TYPE_NORMAL':
+                return (
+                  <TimerCreationContentItem
+                    title="발언 유형"
+                    key={`${timerType}-${index}`}
+                  >
+                    <span className="flex flex-row items-center space-x-[16px]">
+                      <DropdownMenu
+                        className={clsx({
+                          'w-full': currentSpeechType !== 'CUSTOM',
+                        })}
+                        options={speechTypeOptions}
+                        selectedValue={currentSpeechType}
+                        onSelect={handleSpeechTypeChange}
+                        placeholder="선택"
+                      />
+
+                      {currentSpeechType === 'CUSTOM' && (
+                        <ClearableInput
+                          id="speech-type-normal"
+                          value={speechTypeTextValue}
+                          onChange={(e) =>
+                            setSpeechTypeTextValue(e.target.value)
+                          }
+                          onClear={() => setSpeechTypeTextValue('')}
+                          placeholder="입론, 반론, 작전 시간 등"
+                        />
+                      )}
+                    </span>
+                  </TimerCreationContentItem>
+                );
+
+              // 팀
+              case 'TEAM':
+                return (
+                  <TimerCreationContentItem
+                    title="팀"
+                    key={`${timerType}-${index}`}
+                  >
+                    <DropdownMenu
+                      className="w-full"
+                      options={stanceOptions}
+                      selectedValue={stance}
+                      onSelect={handleStanceChange}
+                      disabled={currentSpeechType === 'TIMEOUT'}
+                    />
+                  </TimerCreationContentItem>
+                );
+
+              case 'BELL':
+                return (
+                  <div
+                    className="flex w-full flex-col space-y-[16px]"
+                    key={`${timerType}-${index}`}
+                  >
+                    {/* 제목 */}
+                    <p className="text-body w-[80px] font-medium">
+                      종소리 설정
+                    </p>
+
+                    {/* 입력부 */}
+                    <span className="flex w-full flex-row items-center space-x-[4px]">
+                      {/* 벨 유형 */}
+                      <DropdownMenu
+                        className=""
+                        options={bellOptions}
+                        selectedValue={bellInput.type}
+                        onSelect={(value: BellType) => {
+                          setBellInput((prev) => ({
+                            ...prev,
+                            type: value,
+                          }));
+                        }}
+                      />
+                      <span className="w-[8px]"></span>
+
+                      {/* 분, 초, 타종 횟수 */}
+                      <input
+                        type="number"
+                        min={0}
+                        max={59}
+                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
+                        value={bellInput.min}
+                        onChange={(e) =>
+                          setBellInput((prev) => ({
+                            ...prev,
+                            min: Math.max(
+                              0,
+                              Math.min(59, Number(e.target.value)),
+                            ),
+                          }))
+                        }
+                        placeholder="분"
+                      />
+                      <span>분</span>
+
+                      <input
+                        type="number"
+                        min={0}
+                        max={59}
+                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
+                        value={bellInput.sec}
+                        onChange={(e) =>
+                          setBellInput((prev) => ({
+                            ...prev,
+                            sec: Math.max(
+                              0,
+                              Math.min(59, Number(e.target.value)),
+                            ),
+                          }))
+                        }
+                        placeholder="초"
+                      />
+                      <span>초</span>
+                      <span className="w-[8px]"></span>
+
+                      <DTBell className="w-[24px]" />
+                      <p>x</p>
+                      <input
+                        type="number"
+                        min={1}
+                        max={3}
+                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
+                        value={bellInput.count}
+                        onChange={(e) =>
+                          setBellInput((prev) => ({
+                            ...prev,
+                            count: Math.max(
+                              1,
+                              Math.min(3, Number(e.target.value)),
+                            ),
+                          }))
+                        }
+                        placeholder="횟수"
+                      />
+                      <span className="w-[8px]"></span>
+
+                      <button
+                        type="button"
+                        className="flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px] text-default-white"
+                        onClick={handleAddBell}
+                      >
+                        <DTAdd />
+                      </button>
+                    </span>
+
+                    {/* 벨 리스트 */}
+                    <span className="flex h-[100px] w-full flex-col items-center gap-2 overflow-y-auto">
+                      {bells.map((bell, idx) => (
+                        <span
+                          key={idx}
+                          className="relative flex w-full flex-row rounded-[4px] border border-default-border bg-[#FFF2D0] px-[12px] py-[4px]"
+                        >
+                          <div className="flex items-center gap-1">
+                            <p className="text-[14px]">
+                              {BellTypeToString[bell.type]}
+                            </p>
+                            <p className="text-[14px]">
+                              {bell.min}분 {bell.sec}초
+                            </p>
+
+                            <span className="w-[8px]"></span>
+                            <DTBell className="size-[14px]" />
+                            <span className="text-[14px]">x {bell.count}</span>
+                          </div>
+
+                          <button
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-default-border"
+                            onClick={() => handleDeleteBell(idx)}
+                          >
+                            <DTClose className="size-[10px]" />
+                          </button>
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                );
+              default:
+                return null;
+            }
+          })}
+        </span>
+      </section>
+
+      {/* 제출 버튼 */}
+      <button className="button enabled brand" onClick={handleSubmit}>
+        설정 완료
+      </button>
     </div>
   );
 }

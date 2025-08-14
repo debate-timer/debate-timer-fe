@@ -67,7 +67,7 @@ export interface DebateTableData {
 export type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
 export const bgColorMap: Record<TimerBGState, string> = {
   default: '',
-  warning: 'bg-brand-main', // 30초~11초 구간
-  danger: 'bg-brand-sub3', // 10초 이하
-  expired: 'bg-neutral-700', // 0초 이하
+  warning: 'bg-brand', // 30초~11초 구간
+  danger: 'bg-semantic-warning', // 10초 이하
+  expired: 'bg-default-timeout', // 0초 이하
 };

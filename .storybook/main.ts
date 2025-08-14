@@ -16,5 +16,17 @@ const config: StorybookConfig = {
   core: {
     builder: '@storybook/builder-vite',
   },
+  async viteFinal(config, { configType }) {
+    console.log(`# configType = ${configType}`);
+
+    // Storybook의 실행 모드를 테스트 모드로 고정하여
+    // msw가 잘 동작할 수 있게 준비
+    config.define = {
+      ...config.define,
+      'import.meta.env.MODE': JSON.stringify('test'),
+    };
+
+    return config;
+  },
 };
 export default config;

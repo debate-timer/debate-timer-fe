@@ -15,6 +15,7 @@ export function useNormalTimer(): NormalTimerLogics {
   // 타이머에 표시할 '남은 시간'(초)
   const [timer, setTimer] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // 타이머가 초기화될 때 사용하는 '기본 시간값' (reset 시 사용)
   const [defaultTimer, setDefaultTimer] = useState(0);
 
@@ -23,19 +24,45 @@ export function useNormalTimer(): NormalTimerLogics {
 
   // 작전 시간 타이머 작동 여부
   const [isAdditionalTimerOn, setIsAdditionalTimerOn] = useState(false);
-  const [savedTimer, setSavedTimer] = useState(0);
+
+  // 실제 시간 계산용 레퍼런스
+  const targetTimeRef = useRef<number | null>(null);
 
   /**
    * 타이머를 1초마다 1씩 감소시키며 시작
    * 이미 동작중이면 재시작하지 않음
    */
   const startTimer = useCallback(() => {
-    if (intervalRef.current !== null) return;
-    intervalRef.current = setInterval(() => {
-      setTimer((prev) => (prev === null ? null : prev - 1));
-    }, 1000);
+    if (intervalRef.current !== null || timer === null) return;
+
+    // 목표 시각을 실제 시각 기반으로 계산
+    // 예를 들어, 현재 시각이 오후 13시 00분 30초인데, 1회당 발언 시간이 30초라면,
+    // 1회당 발언 시간이 모두 끝나는 시간은 13시 01분 00초이므로,
+    // 해당 시간을 목표 시간으로 두는 식임
+    const startTime = Date.now();
+    targetTimeRef.current = startTime + timer * 1000;
+
+    // isRunning 상태를 true로 바꿔주고 인터벌 처리
     setIsRunning(true);
-  }, []);
+
+    // 목표 시각에 기반하여 타이머 계산
+    intervalRef.current = setInterval(() => {
+      // 목표 시각 레퍼런스의 유효성 확인
+      if (targetTimeRef.current === null) {
+        return;
+      }
+
+      // 현재 시각 확인
+      const now = Date.now();
+
+      // 목표 시각까지 얼마나 더 필요한지, 남은 시간을 초 단위로 계산
+      const remainingTotal = targetTimeRef.current - now;
+      const remainingSeconds = Math.ceil(remainingTotal / 1000);
+
+      // 계산한 남은 시간을 타이머에 반영
+      setTimer(remainingSeconds);
+    }, 200);
+  }, [timer]);
 
   /**
    * 타이머 일시정지 (setInterval 해제)
@@ -81,14 +108,8 @@ export function useNormalTimer(): NormalTimerLogics {
    */
   const handleChangeAdditionalTimer = useCallback(() => {
     pauseTimer();
-    if (!isAdditionalTimerOn) {
-      setSavedTimer(timer ?? 0);
-      setTimer(0);
-    } else {
-      setTimer(savedTimer);
-    }
     setIsAdditionalTimerOn(!isAdditionalTimerOn);
-  }, [isAdditionalTimerOn, pauseTimer, setTimer, savedTimer, timer]);
+  }, [isAdditionalTimerOn, pauseTimer]);
 
   /**
    * 작전시간 타이머 사용 시, 기존 타이머 저장
@@ -96,22 +117,7 @@ export function useNormalTimer(): NormalTimerLogics {
   const handleCloseAdditionalTimer = useCallback(() => {
     setIsAdditionalTimerOn(false);
   }, []);
-  //작전시간 종료 시, 자동으로 타이머 변경
-  useEffect(() => {
-    if (isAdditionalTimerOn && timer === 0 && isRunning) {
-      pauseTimer();
-      setTimer(savedTimer);
-      setIsAdditionalTimerOn(false);
-    }
-  }, [
-    isAdditionalTimerOn,
-    timer,
-    savedTimer,
-    pauseTimer,
-    setIsAdditionalTimerOn,
-    setTimer,
-    isRunning,
-  ]);
+
   useEffect(() => () => pauseTimer(), [pauseTimer]);
 
   return {
