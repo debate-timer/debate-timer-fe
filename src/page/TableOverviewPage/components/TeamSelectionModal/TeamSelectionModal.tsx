@@ -102,7 +102,7 @@ export default function TeamSelectionModal({
       {/* 모달의 콘텐츠 영역과 분리하기 위해 별도 작성 */}
       {coinState !== 'tossing' && (
         <button
-          className="sm:py-5 sm:text-lg w-full bg-brand-main py-4 text-base font-semibold md:py-6 md:text-xl lg:py-[27px] lg:text-[22px]"
+          className="sm:py-5 sm:text-lg w-full bg-brand py-4 text-base font-semibold md:py-6 md:text-xl lg:py-[27px] lg:text-[22px]"
           onClick={handleStartDebate}
         >
           토론 바로 시작하기
