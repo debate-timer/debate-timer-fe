@@ -114,7 +114,7 @@ export default function TableOverviewPage() {
                 alt="팀 선정하기"
                 className="mb-2 h-auto w-full"
               />
-              <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full bg-brand px-2 py-1.5 text-xs font-bold shadow-lg md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
+              <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full border-[2px] border-default-disabled/hover bg-default-white px-2 py-1.5 text-xs font-semibold text-default-black transition-colors duration-200 hover:bg-default-disabled/hover md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
                 팀 선정하기
               </div>
             </button>
