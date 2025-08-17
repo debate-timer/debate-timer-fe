@@ -14,12 +14,16 @@ import DTDebate from '../../components/icons/Debate';
 import DTEdit from '../../components/icons/Edit';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import Coins from '../../assets/teamSelection/coins.png';
+import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
+import { useModal } from '../../hooks/useModal';
 import clsx from 'clsx';
 
 export default function TableOverviewPage() {
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
+  const { openModal, closeModal, ModalWrapper } = useModal();
 
   // Only uses hooks related with customize due to the removal of parliamentary
   const {
@@ -39,7 +43,15 @@ export default function TableOverviewPage() {
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
 
-  // If error, print error message and let user be able to retry
+  // 토론 시작하기 핸들러
+  const handleStartDebate = () => {
+    if (isGuestFlow()) {
+      navigate('/table/customize/guest');
+    } else {
+      onModifyCustomizeTableData.mutate({ tableId });
+    }
+  };
+
   if (isError) {
     return (
       <DefaultLayout>
@@ -50,7 +62,6 @@ export default function TableOverviewPage() {
     );
   }
 
-  // If no error or on loading, print contents
   return (
     <>
       <DefaultLayout>
@@ -92,6 +103,21 @@ export default function TableOverviewPage() {
                 ))}
               </div>
             </section>
+          )}
+          {!isLoading && (
+            <button
+              onClick={openModal}
+              className="sm:right-3 sm:top-20 sm:w-24 2xl:w-40 fixed right-2 top-16 flex w-20 flex-col items-center md:right-4 md:top-24 md:w-28 lg:right-6 lg:top-28 lg:w-32 xl:right-8 xl:top-32 xl:w-36"
+            >
+              <img
+                src={Coins}
+                alt="팀 선정하기"
+                className="mb-2 h-auto w-full"
+              />
+              <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full border-[2px] border-default-disabled/hover bg-default-white px-2 py-1.5 text-xs font-semibold text-default-black transition-colors duration-200 hover:bg-default-disabled/hover md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
+                팀 선정하기
+              </div>
+            </button>
           )}
         </DefaultLayout.ContentContainer>
 
@@ -137,13 +163,7 @@ export default function TableOverviewPage() {
                   },
                 )}
                 disabled={isLoading}
-                onClick={() => {
-                  if (isGuestFlow()) {
-                    navigate('/table/customize/guest');
-                  } else {
-                    onModifyCustomizeTableData.mutate({ tableId });
-                  }
-                }}
+                onClick={handleStartDebate}
               >
                 <DTDebate className="h-full" />
                 토론하기
@@ -154,6 +174,12 @@ export default function TableOverviewPage() {
       </DefaultLayout>
 
       <TableShareModal />
+      <ModalWrapper closeButtonColor="text-natural-1000">
+        <TeamSelectionModal
+          onClose={closeModal}
+          onStartDebate={handleStartDebate}
+        />
+      </ModalWrapper>
     </>
   );
 }
