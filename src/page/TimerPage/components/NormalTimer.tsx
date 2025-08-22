@@ -57,8 +57,6 @@ export default function NormalTimer({
     switch (breakpoint) {
       case 'xl':
         return 20;
-      case 'lg':
-        return 16;
       default:
         return 12;
     }
@@ -91,7 +89,7 @@ export default function NormalTimer({
               type="button"
               onClick={handleChangeAdditionalTimer}
               className={clsx(
-                'flex h-[52px] w-[360px] items-center justify-center rounded-[20px] bg-default-white xl:h-[68px]',
+                'flex h-[52px] w-[320px] items-center justify-center rounded-[20px] bg-default-white xl:h-[68px] xl:w-[360px]',
               )}
             >
               <span
