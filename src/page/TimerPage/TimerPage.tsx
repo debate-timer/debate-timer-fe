@@ -86,7 +86,7 @@ export default function TimerPage() {
           {!isLoading && (
             <div
               className={clsx(
-                'flex h-full w-full flex-col items-center justify-center space-y-[32px] xl:space-y-[60px]',
+                'relative flex h-full w-full flex-col items-center justify-center space-y-[32px] xl:space-y-[60px]',
                 bgColorMap[bg],
               )}
             >
@@ -99,6 +99,7 @@ export default function TimerPage() {
                   index={index}
                   goToOtherItem={goToOtherItem}
                   openDoneModal={openLoginAndStoreModalOrGoToOverviewPage}
+                  className="absolute bottom-[66px]"
                 />
               )}
             </div>
