@@ -1,59 +1,74 @@
-# 디베이트 타이머
+# ⏲️ 디베이트 타이머: Debate Timer (Front-end)
 
-<p align="center">
-  <img width="526" height="379" alt="image" src="https://github.com/user-attachments/assets/4c9d1182-fc7b-4d5c-a675-bfe608a05bb7" />
-</p>
+디베이트 타이머의 Front-end 저장소입니다.  
+서비스는 토론 진행을 효율적으로 돕는 Debate Timer입니다.  
+전체 프로젝트 및 서비스 소개는 [조직 메인 페이지](https://github.com/debate-timer)에서 확인하세요.
 
-디베이트 타이머는 더 쉬운 토론 진행을 위한, 오직 토론을 위한 타이머입니다.  
-24년 12월부터 팀원들과 함께해온 디베이트 타이머의 여정을 소개합니다.
+서비스 바로가기: <https://www.debate-timer.com/>
 
-서비스 바로가기 : https://www.debate-timer.com/
+## 🛠️ 기술 스택
+
+| 항목          | 스택                        |
+| ------------- | --------------------------- |
+| Front-end     | React                       |
+| 빌드          | Vite                        |
+| 스타일링      | TailwindCSS v3              |
+| 테스트        | Vitest, Storybook, MSW      |
+| 네트워킹      | Axios, TanStack Query       |
+| 린팅 / 포매팅 | ESLint, StyleLint, Prettier |
 
 ---
 
-### 프로젝트 약력
+## 실행 방법
 
-- 경희대 토론 동아리 이감, 고려대 토론 동아리 코기토, 오산시 토론 멘토링 등등 총 5가지 이상의 학교, 학급 정규토론 수업 사용 중
-- 런칭 4개월 내(3월 ~) 회원 수 176명, 토론테이블 135개 포지셔닝
-- WAU(주간 활성 사용자) 50명 이상 지속 유지 중
-- 중앙대학교 토론 수업 '창의와 소통' 정규 수업 사용 및 실습
-- 총 7차에 달하는 유저 테스트를 통한 유저 중심의 애자일 개발 사이클 지속중
-- 직접 토론 강사 및 토론 동아리 부원들을 만나 도메인 분석 및 피드백 수렴 지속
+```bash
+# 의존성 설치
+npm install
 
-### 레포지토리 링크
+# 개발 서버 실행
+npm run dev
 
-FE : https://github.com/debate-timer/debate-timer-fe  
-BE : https://github.com/debate-timer/debate-timer-be
+# 테스트 실행
+npm run test
 
-<br><br>
+# 빌드
+npm run build
+```
 
-## 1. 디베이트 타이머의 시작
+---
 
-<p align="center">
-  <img width="672" height="373" alt="image" src="https://github.com/user-attachments/assets/3c352c3a-2042-4f6f-bccb-5d507b2937a0" />
-  <img width="672" height="373" alt="image" src="https://github.com/user-attachments/assets/f671c61b-7af6-4873-adf2-d181247c04d8" />
-</p>
+## 배포
 
-그렇게 팀 빌딩이 시작되었고, 토론과 소통에 관심을 가진 이들로 이루어진 프로젝트
-'디베이트 타이머'가 시작되었습니다.
+- AWS S3 + CloudFront를 사용하여 웹사이트 호스팅
+- GitHub Actions를 이용해 main 브랜치에 푸시 시 자동 배포
 
-<br><br>
+---
 
-## 2. 서비스 핵심 기능
+## 브랜치 전략
 
-<p align="center">
-  <img width="672" height="373" alt="image" src="https://github.com/user-attachments/assets/f7ffd2ad-2a47-43c3-acd4-ca76631d7d50" />
-  <img width="672" height="373" alt="image" src="https://github.com/user-attachments/assets/31c0b41f-e26c-44ad-b53d-8b650b3a39b7" />
-  <img width="672" height="373" alt="image" src="https://github.com/user-attachments/assets/604dc101-1780-4123-adb7-aacc7cff2ce4" />
-</p>
+- main: 배포용 안정화 브랜치
+- develop: 개발 중인 기능 통합 브랜치
+- feature/\*: 각 기능별 작업 브랜치
 
-<br><br>
+---
 
-## 3. 프로젝트 문화
+## 기여자
 
-<p align="center">
-  <img width="672" height="373" alt="image" src="https://github.com/user-attachments/assets/b49433de-2e3e-4b72-84de-c3262721bb86" />
-  <img width="672" height="379" alt="image" src="https://github.com/user-attachments/assets/7a965282-1db0-4a97-a249-ead6bda566f4" />
-</p>
+### 현재 활동 중
 
-<br><br>
+|                                                                                         **썬데이**                                                                                         |                                                                                          **치코**                                                                                           |                                                                                             **숀**                                                                                             |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <a href="https://github.com/useon" target="_blank"><img src="https://avatars.githubusercontent.com/u/74897720?v=4" width="150" height="150" style="border-radius: 50%;" alt="썬데이"/></a> | <a href="https://github.com/jaeml06" target="_blank"><img src="https://avatars.githubusercontent.com/u/107801932?v=4" width="150" height="150" style="border-radius: 50%;" alt="치코"/></a> | <a href="https://github.com/i-meant-to-be" target="_blank"><img src="https://avatars.githubusercontent.com/u/77564014?v=4" width="150" height="150" style="border-radius: 50%;" alt="숀"/></a> |
+
+### 휴식 중
+
+|                                                                                            **엘**                                                                                             |                                                                                          **케이티**                                                                                           |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <a href="https://github.com/eunwoo-levi" target="_blank"><img src="https://avatars.githubusercontent.com/u/162898956?v=4" width="150" height="150" style="border-radius: 50%;" alt="엘"/></a> | <a href="https://github.com/katie424" target="_blank"><img src="https://avatars.githubusercontent.com/u/80771814?v=4" width="150" height="150" style="border-radius: 50%;" alt="케이티"/></a> |
+
+---
+
+## 추가 링크
+
+- Backend Repository: <https://github.com/debate-timer/debate-timer-be>
+- Debate Timer Organization: <https://github.com/debate-timer>
