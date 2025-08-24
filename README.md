@@ -4,9 +4,9 @@
 우리는 토론 진행을 효율적으로 돕는 서비스를 제공하는 것을 목표로 토론에 진행에 필요한 다양한 형식의 타이머를 제공해요.  
 전체 프로젝트 및 서비스 소개는 [조직 메인 페이지](https://github.com/debate-timer)에서 확인하세요.
 
-서비스 바로가기: <https://www.debate-timer.com/>
+[서비스 바로가기](https://www.debate-timer.com)
 
-스토리 북 바로가기: <https://67691bb66b38f560017adb56-xnnumrqhen.chromatic.com/?path=/docs/components-clearableinput--docs/>
+[스토리 북 바로가기](https://67691bb66b38f560017adb56-xnnumrqhen.chromatic.com/?path=/docs/components-clearableinput--docs)
 
 ## 🛠️ 기술 스택
 
