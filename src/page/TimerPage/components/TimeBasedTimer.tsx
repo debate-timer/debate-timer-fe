@@ -115,7 +115,7 @@ export default function TimeBasedTimer({
       >
         {/* 1회당 발언 시간 X */}
         {speakingTimer === null && (
-          <span className="flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[110px] font-bold text-default-black">
+          <span className="flex w-full flex-row items-center justify-center p-[16px] text-[90px] font-bold text-default-black xl:text-[110px]">
             <p className="flex flex-1 items-center justify-center">{minute}</p>
             <p className="flex items-center justify-center">:</p>
             <p className="flex flex-1 items-center justify-center">{second}</p>
