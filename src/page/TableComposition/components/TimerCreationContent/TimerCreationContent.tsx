@@ -174,6 +174,15 @@ export default function TimerCreationContent({
     beforeData?.speaker ?? initData?.speaker ?? '',
   );
 
+  // 시간 총량제 타이머 샘플 이미지 및 대체 텍스트 결정
+  const isSpeakingTimerDisabled = speakerMinutes === 0 && speakerSeconds === 0;
+  const timeBasedPreviewSrc = isSpeakingTimerDisabled
+    ? timeBasedTimerOnlyTotalImage
+    : timeBasedTimerImage;
+  const timeBasedPreviewAlt = isSpeakingTimerDisabled
+    ? 'time-based-timer-only-total-timer'
+    : 'time-based-timer';
+
   // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
 
@@ -465,16 +474,10 @@ export default function TimerCreationContent({
               alt="normal-timer"
               className="absolute top-1/3 w-full -translate-y-1/2 object-contain"
             />
-          ) : speakerMinutes === 0 && speakerSeconds === 0 ? (
-            <img
-              src={timeBasedTimerOnlyTotalImage}
-              alt="time-based-timer-only-total-timer"
-              className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
-            />
           ) : (
             <img
-              src={timeBasedTimerImage}
-              alt="time-based-timer"
+              src={timeBasedPreviewSrc}
+              alt={timeBasedPreviewAlt}
               className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
             />
           )}
