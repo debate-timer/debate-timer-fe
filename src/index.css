@@ -7,6 +7,11 @@
     @apply font-pretendard;
     @apply bg-default-white;
   }
+
+  html,
+  body {
+    @apply text-default-black;
+  }
 }
 
 /* Text styles */
