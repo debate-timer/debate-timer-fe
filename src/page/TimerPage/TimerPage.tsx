@@ -99,7 +99,7 @@ export default function TimerPage() {
                   index={index}
                   goToOtherItem={goToOtherItem}
                   openDoneModal={openLoginAndStoreModalOrGoToOverviewPage}
-                  className="absolute bottom-[66px]"
+                  className="absolute bottom-[66px] left-1/2 -translate-x-1/2"
                 />
               )}
             </div>

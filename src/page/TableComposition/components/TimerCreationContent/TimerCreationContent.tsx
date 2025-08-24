@@ -468,7 +468,7 @@ export default function TimerCreationContent({
           ) : speakerMinutes === 0 && speakerSeconds === 0 ? (
             <img
               src={timeBasedTimerOnlyTotalImage}
-              alt="time-based-timer"
+              alt="time-based-timer-only-total-timer"
               className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
             />
           ) : (
