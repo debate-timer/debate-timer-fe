@@ -7,6 +7,7 @@ import CircularTimer from './CircularTimer';
 import clsx from 'clsx';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 import useBreakpoint from '../../../hooks/useBreakpoint';
+import { useMemo } from 'react';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;
@@ -41,6 +42,7 @@ export default function TimeBasedTimer({
     pauseTimer,
     resetCurrentTimer,
   } = timeBasedTimerInstance;
+
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(totalTimer ?? 0) / 60),
   );
@@ -55,20 +57,33 @@ export default function TimeBasedTimer({
 
   const initRawProgress = (): number => {
     if (speakingTimer === null) {
-      if (item.timePerTeam && item.timePerTeam > 0 && totalTimer) {
+      // 1회당 발언 시간 X일 때...
+      if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
+        // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
         return ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100;
+      } else {
+        // 팀당 발언 시간 타이머가 멈추거나 완료된 경우,
+        // 완료(100%)에 해당하는 진행도를 반환
+        return 100;
       }
-    } else if (
-      item.timePerSpeaking &&
-      item.timePerSpeaking > 0 &&
-      speakingTimer
-    ) {
-      return (
-        ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
-      );
+    } else {
+      // 1회당 발언 시간 O일 때...
+      if (
+        item.timePerSpeaking &&
+        speakingTimer &&
+        totalTimer &&
+        item.timePerSpeaking > 0
+      ) {
+        // 1회당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+        return (
+          ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
+        );
+      } else {
+        // 1회당 발언 시간 타이머가 멈추거나 완료된 경우,
+        // 완료(100%)에 해당하는 진행도를 반환
+        return 100;
+      }
     }
-
-    return 0;
   };
 
   const rawProgress = initRawProgress();
