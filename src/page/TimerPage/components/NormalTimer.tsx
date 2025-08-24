@@ -133,7 +133,7 @@ export default function NormalTimer({
         >
           <span
             className={clsx(
-              'flex w-full flex-row items-center justify-center p-[16px] text-[70px] font-bold text-default-black xl:text-[110px]',
+              'flex w-full flex-row items-center justify-center p-[16px] text-[70px] font-bold tabular-nums text-default-black xl:text-[110px]',
               { 'space-x-[8px]': totalTime < 0 },
               { 'space-x-[16px]': totalTime >= 0 },
             )}
