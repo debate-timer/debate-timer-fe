@@ -24,6 +24,10 @@
 ## 실행 방법
 
 ```bash
+사전 준비
+Node.js: v20.x LTS
+패키지 매니저: npm
+
 # 의존성 설치
 npm install
 
@@ -32,6 +36,9 @@ npm run dev
 
 # 테스트 실행
 npm run test
+
+# Storybook 실행
+npm run storybook
 
 # 빌드
 npm run build
