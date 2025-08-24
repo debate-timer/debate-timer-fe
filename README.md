@@ -5,6 +5,7 @@
 전체 프로젝트 및 서비스 소개는 [조직 메인 페이지](https://github.com/debate-timer)에서 확인하세요.
 
 서비스 바로가기: <https://www.debate-timer.com/>
+
 스토리 북 바로가기: <https://67691bb66b38f560017adb56-xnnumrqhen.chromatic.com/?path=/docs/components-clearableinput--docs/>
 
 ## 🛠️ 기술 스택
