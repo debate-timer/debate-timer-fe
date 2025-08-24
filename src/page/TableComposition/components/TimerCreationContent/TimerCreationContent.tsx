@@ -12,6 +12,7 @@ import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.png
 import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.png';
 import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.png';
 import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.png';
+import timeBasedTimerOnlyTotalImage from '../../../../assets/timer/time_based_timer_only_total.png';
 import DTClose from '../../../../components/icons/Close';
 import TimerCreationContentItem from './TimerCreationContentMenuItem';
 import LabeledRadioButton from '../../../../components/LabeledRadioButton/LabeledRadioButton';
@@ -463,6 +464,12 @@ export default function TimerCreationContent({
               }
               alt="normal-timer"
               className="absolute top-1/3 w-full -translate-y-1/2 object-contain"
+            />
+          ) : speakerMinutes === 0 && speakerSeconds === 0 ? (
+            <img
+              src={timeBasedTimerOnlyTotalImage}
+              alt="time-based-timer"
+              className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
             />
           ) : (
             <img
