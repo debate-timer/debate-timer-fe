@@ -10,14 +10,16 @@
 
 ## 🛠️ 기술 스택
 
-| 항목          | 스택                        |
-| ------------- | --------------------------- |
-| Front-end     | React                       |
-| 빌드          | Vite                        |
-| 스타일링      | TailwindCSS v3              |
-| 테스트        | Vitest, Storybook, MSW      |
-| 네트워킹      | Axios, TanStack Query       |
-| 린팅 / 포매팅 | ESLint, StyleLint, Prettier |
+| 항목          | 스택                           |
+| ------------- | ------------------------------ |
+| Core          | React, TypeScript              |
+| 빌드          | Vite                           |
+| 스타일링      | TailwindCSS v3                 |
+| 테스트        | Vitest, Storybook, MSW         |
+| 네트워킹      | Axios, TanStack Query          |
+| 린팅 / 포매팅 | ESLint, StyleLint, Prettier    |
+| CI / CD       | S3, CloudFront, Github Actions |
+| 분석          | GA4                            |
 
 ---
 
