@@ -6,8 +6,6 @@
 
 [서비스 바로가기](https://www.debate-timer.com)
 
-[스토리 북 바로가기](https://67691bb66b38f560017adb56-xnnumrqhen.chromatic.com/?path=/docs/components-clearableinput--docs)
-
 ## 🛠️ 기술 스택
 
 | 항목          | 스택                           |
