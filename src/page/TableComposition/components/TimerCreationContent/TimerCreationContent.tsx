@@ -8,11 +8,11 @@ import {
   BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.png';
-import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.png';
-import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.png';
-import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.png';
-import timeBasedTimerOnlyTotalImage from '../../../../assets/timer/time_based_timer_only_total.png';
+import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.jpg';
+import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.jpg';
+import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.jpg';
+import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.jpg';
+import timeBasedTimerOnlyTotalImage from '../../../../assets/timer/time_based_timer_only_total.jpg';
 import DTClose from '../../../../components/icons/Close';
 import TimerCreationContentItem from './TimerCreationContentMenuItem';
 import LabeledRadioButton from '../../../../components/LabeledRadioButton/LabeledRadioButton';
