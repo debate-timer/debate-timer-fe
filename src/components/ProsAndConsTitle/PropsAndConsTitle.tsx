@@ -8,7 +8,7 @@ export default function PropsAndConsTitle({
   consTeamName = '반대',
 }: PropsAndConsTitleProps) {
   return (
-    <div className="mx-auto flex w-full items-center justify-between gap-2 py-4">
+    <div className="mx-auto flex w-full items-center justify-between gap-2 pb-4">
       <div className="flex w-1/2 flex-col items-center">
         <span className="text-2xl font-bold text-camp-blue">
           {prosTeamName}
