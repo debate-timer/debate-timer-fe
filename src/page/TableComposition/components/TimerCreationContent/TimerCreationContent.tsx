@@ -709,15 +709,13 @@ export default function TimerCreationContent({
                         max={3}
                         className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                         value={bellInput.count}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const value = Number(e.target.value) % 10;
                           setBellInput((prev) => ({
                             ...prev,
-                            count: Math.max(
-                              1,
-                              Math.min(3, Number(e.target.value)),
-                            ),
-                          }))
-                        }
+                            count: Math.max(1, Math.min(3, Number(value))),
+                          }));
+                        }}
                         placeholder="횟수"
                       />
                       <span className="w-[8px]"></span>
