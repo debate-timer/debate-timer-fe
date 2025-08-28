@@ -8,10 +8,11 @@ import {
   BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
-import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.png';
-import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.png';
-import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.png';
-import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.png';
+import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.jpg';
+import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.jpg';
+import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.jpg';
+import timeBasedTimerImage from '../../../../assets/timer/time_based_timer.jpg';
+import timeBasedTimerOnlyTotalImage from '../../../../assets/timer/time_based_timer_only_total.jpg';
 import DTClose from '../../../../components/icons/Close';
 import TimerCreationContentItem from './TimerCreationContentMenuItem';
 import LabeledRadioButton from '../../../../components/LabeledRadioButton/LabeledRadioButton';
@@ -172,6 +173,15 @@ export default function TimerCreationContent({
   const [speaker, setSpeaker] = useState<string>(
     beforeData?.speaker ?? initData?.speaker ?? '',
   );
+
+  // 시간 총량제 타이머 샘플 이미지 및 대체 텍스트 결정
+  const isSpeakingTimerDisabled = speakerMinutes === 0 && speakerSeconds === 0;
+  const timeBasedPreviewSrc = isSpeakingTimerDisabled
+    ? timeBasedTimerOnlyTotalImage
+    : timeBasedTimerImage;
+  const timeBasedPreviewAlt = isSpeakingTimerDisabled
+    ? 'time-based-timer-only-total-timer'
+    : 'time-based-timer';
 
   // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
@@ -466,8 +476,8 @@ export default function TimerCreationContent({
             />
           ) : (
             <img
-              src={timeBasedTimerImage}
-              alt="time-based-timer"
+              src={timeBasedPreviewSrc}
+              alt={timeBasedPreviewAlt}
               className="absolute top-1/2 w-full -translate-y-1/2 object-contain"
             />
           )}

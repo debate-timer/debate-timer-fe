@@ -108,7 +108,7 @@ export default function NormalTimer({
                   },
                 )}
               >
-                작전 시간
+                작전 시간 사용
               </span>
             </button>
           )}
