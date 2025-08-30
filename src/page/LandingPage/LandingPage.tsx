@@ -6,6 +6,7 @@ import TableSection from './components/TableSection';
 import ReviewSection from './components/ReviewSection';
 import ReportSection from './components/ReportSection';
 import useLandingPageHandlers from './hooks/useLandingPageHandlers';
+import TemplateSelection from './components/TemplateSelection';
 
 export default function LandingPage() {
   const {
@@ -28,6 +29,8 @@ export default function LandingPage() {
             onStartWithoutLogin={handleStartWithoutLogin}
             onDashboardButtonClicked={handleDashboardButtonClick}
           />
+          {/*템플릿 선택 화면 */}
+          <TemplateSelection />
           {/* 시간표 설정화면 */}
           <TimeTableSection />
         </div>
