@@ -7,6 +7,7 @@ import ReviewSection from './components/ReviewSection';
 import ReportSection from './components/ReportSection';
 import useLandingPageHandlers from './hooks/useLandingPageHandlers';
 import TemplateSelection from './components/TemplateSelection';
+import ScrollHint from './components/ScrollHint';
 export default function LandingPage() {
   const {
     handleStartWithoutLogin,
@@ -28,6 +29,7 @@ export default function LandingPage() {
             onStartWithoutLogin={handleStartWithoutLogin}
             onDashboardButtonClicked={handleDashboardButtonClick}
           />
+          <ScrollHint />
           {/*템플릿 선택 화면 */}
           <TemplateSelection />
 
