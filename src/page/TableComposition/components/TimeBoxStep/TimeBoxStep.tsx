@@ -244,7 +244,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
               >
                 <div className="flex h-[56px] w-fit flex-row items-center justify-center space-x-[12px] p-[16px]">
                   <DTAdd className="h-full p-[4px]" />
-                  <p className="text-body">타이머 추가</p>
+                  <p className="text-body whitespace-nowrap">타이머 추가</p>
                 </div>
               </FloatingActionButton>
             </div>
