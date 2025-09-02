@@ -42,6 +42,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
   const [isButtonFixed, setIsButtonFixed] = useState(false);
   const [footerHeight, setFooterHeight] = useState(0);
+  const [buttonHeight, setButtonHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -52,30 +53,6 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       setData: onTimeBoxChange,
       throttleDelay: 50,
     });
-
-  // 스크롤바 상태와 버튼 위치를 계산하는 함수
-  const calculateButtonPosition = useCallback(() => {
-    const containerElement = containerRef.current;
-    const footerElement = footerRef.current;
-    const buttonElement = buttonRef.current;
-
-    if (!containerElement || !footerElement || !buttonElement) {
-      return;
-    }
-
-    // footer 높이 측정
-    const footerRect = footerElement.getBoundingClientRect();
-    const newFooterHeight = footerRect.height;
-    setFooterHeight(newFooterHeight);
-
-    // 두 프레임 대기로 확실한 레이아웃 재계산 보장
-    requestAnimationFrame(() => {
-      const hasScrollBar =
-        containerElement.scrollHeight > containerElement.clientHeight;
-
-      setIsButtonFixed(hasScrollBar);
-    });
-  }, []);
 
   const handleSubmitEdit = useCallback(
     (indexToEdit: number, updatedInfo: TimeBoxInfo) => {
@@ -113,12 +90,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     (data: TimeBoxInfo) => {
       onTimeBoxChange((prev) => [...prev, data]);
       closeModal();
-
-      setTimeout(() => {
-        calculateButtonPosition();
-      }, 100);
     },
-    [onTimeBoxChange, closeModal, calculateButtonPosition],
+    [onTimeBoxChange, closeModal],
   );
 
   const isSubmitButtonDisabled =
@@ -148,42 +121,72 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       return;
     }
 
-    calculateButtonPosition();
-
     const containerElement = containerRef.current;
-    if (!containerElement) {
+    const footerElement = footerRef.current;
+    const buttonElement = buttonRef.current;
+
+    if (!containerElement || !footerElement || !buttonElement) {
       return;
     }
 
-    const resizeObserver = new ResizeObserver(() => {
-      setTimeout(calculateButtonPosition, 50);
-    });
-    const mutationObserver = new MutationObserver(() => {
-      setTimeout(calculateButtonPosition, 50);
-    });
+    const calculatePosition = () => {
+      // 1. Footer 높이 측정
+      const newFooterHeight = footerElement.getBoundingClientRect().height;
+      if (footerHeight !== newFooterHeight) {
+        setFooterHeight(newFooterHeight);
+      }
 
+      // 2. 버튼의 실제 높이(offsetHeight) 측정 및 state 업데이트
+      const newButtonHeight = buttonElement.offsetHeight;
+      if (buttonHeight !== newButtonHeight) {
+        setButtonHeight(newButtonHeight);
+      }
+
+      // 3. 스크롤 바 유무 판단
+      const hasScrollBar =
+        containerElement.scrollHeight > containerElement.clientHeight;
+
+      // 4. 현재 상태와 다를 경우에만 상태 업데이트
+      if (isButtonFixed !== hasScrollBar) {
+        setIsButtonFixed(hasScrollBar);
+      }
+    };
+
+    calculatePosition();
+
+    const resizeObserver = new ResizeObserver(calculatePosition);
     resizeObserver.observe(containerElement);
-    mutationObserver.observe(containerElement, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-    });
+    resizeObserver.observe(footerElement);
 
     return () => {
       resizeObserver.disconnect();
-      mutationObserver.disconnect();
     };
-  }, [isLoading, initTimeBox.length, calculateButtonPosition]);
+  }, [
+    isLoading,
+    initTimeBox.length,
+    isButtonFixed,
+    buttonHeight,
+    footerHeight,
+  ]);
 
   // 윈도우 리사이즈 감지
   useLayoutEffect(() => {
     const handleResize = () => {
-      setTimeout(calculateButtonPosition, 100);
+      const containerElement = containerRef.current;
+      if (!containerElement) {
+        return;
+      }
+
+      const hasScrollBar =
+        containerElement.scrollHeight > containerElement.clientHeight;
+      if (isButtonFixed !== hasScrollBar) {
+        setIsButtonFixed(hasScrollBar);
+      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [calculateButtonPosition]);
+  }, [isButtonFixed]);
 
   return (
     <DefaultLayout>
@@ -200,29 +203,30 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <DefaultLayout.ContentContainer>
         {isLoading && <LoadingIndicator />}
         {!isLoading && (
-          <div
-            ref={containerRef}
-            className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start"
-          >
-            <PropsAndConsTitle
-              prosTeamName={initData.info.prosTeamName}
-              consTeamName={initData.info.consTeamName}
-            />
+          <div className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start">
+            <div ref={containerRef} className="overflow-y-auto">
+              <PropsAndConsTitle
+                prosTeamName={initData.info.prosTeamName}
+                consTeamName={initData.info.consTeamName}
+              />
 
-            <DragAndDropWrapper>
-              {initTimeBox.length > 0 &&
-                initTimeBox.map((info, index) => (
-                  <div
-                    key={crypto.randomUUID()}
-                    style={getDraggingStyles(index)}
-                  >
-                    {renderTimeBoxItem(info, index)}
-                  </div>
-                ))}
+              <DragAndDropWrapper>
+                {initTimeBox.length > 0 &&
+                  initTimeBox.map((info, index) => (
+                    <div
+                      key={crypto.randomUUID()}
+                      style={getDraggingStyles(index)}
+                    >
+                      {renderTimeBoxItem(info, index)}
+                    </div>
+                  ))}
 
-              {/* 버튼이 고정될 때에만 하단 여백 추가 */}
-              {isButtonFixed && <span className="h-[88px]"></span>}
-            </DragAndDropWrapper>
+                {/* 버튼이 고정될 때에만 하단 여백 추가 */}
+                {isButtonFixed && (
+                  <span style={{ height: `${buttonHeight}px` }}></span>
+                )}
+              </DragAndDropWrapper>
+            </div>
 
             <div
               ref={buttonRef}
