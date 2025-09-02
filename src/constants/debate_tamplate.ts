@@ -19,6 +19,7 @@ interface DebateTemplateList {
   TWO: DebateTemplate[];
   THREE: DebateTemplate[];
 }
+export const DEBATE_TEMPLATE: DebateTemplateList = {
   ONE: [
     {
       title: '산업통상자원부',
