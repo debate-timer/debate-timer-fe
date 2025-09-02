@@ -1,4 +1,4 @@
-import { DEBATE_TEMPLATE } from '../../../constants/debate_tamplate';
+import { DEBATE_TEMPLATE } from '../../../constants/debate_template';
 import TamplateApplicationSection from './TamplateApplicationSection';
 import TamplateList from './TamplateList';
 
