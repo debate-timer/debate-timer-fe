@@ -214,7 +214,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
                 {initTimeBox.length > 0 &&
                   initTimeBox.map((info, index) => (
                     <div
-                      key={crypto.randomUUID()}
+                      key={info.stance + info.speechType}
                       style={getDraggingStyles(index)}
                     >
                       {renderTimeBoxItem(info, index)}
