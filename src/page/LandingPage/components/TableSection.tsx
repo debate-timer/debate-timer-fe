@@ -21,7 +21,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
       <div className="flex flex-row items-center justify-center gap-8 px-4">
         <div className="flex w-1/2 flex-col items-center gap-4">
           <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
-            토론 기본정보 설정
+            토론 기본 정보 설정
           </h3>
           <p className="text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
             시간표 이름부터 주제까지!
