@@ -204,7 +204,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         {isLoading && <LoadingIndicator />}
         {!isLoading && (
           <div className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start">
-            <div ref={containerRef} className="overflow-y-auto">
+            <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto">
               <PropsAndConsTitle
                 prosTeamName={initData.info.prosTeamName}
                 consTeamName={initData.info.consTeamName}
