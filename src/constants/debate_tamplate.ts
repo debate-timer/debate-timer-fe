@@ -10,10 +10,15 @@ import seobangjeongto from '../assets/template_logo/seobangjeongto.png';
 import osansi from '../assets/template_logo/osansi.png';
 import nogotte from '../assets/template_logo/nogotte.png';
 import kogito from '../assets/template_logo/kogito.png';
+import { DebateTemplate } from '../type/type';
 function createTableShareUrl(encodeData: string): string {
   return `${import.meta.env.VITE_SHARE_BASE_URL}/share?data=${encodeData}`;
 }
-export const DEBATE_TAMPLATE = {
+interface DebateTemplateList {
+  ONE: DebateTemplate[];
+  TWO: DebateTemplate[];
+  THREE: DebateTemplate[];
+}
   ONE: [
     {
       title: '산업통상자원부',
