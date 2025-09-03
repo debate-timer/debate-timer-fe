@@ -422,6 +422,16 @@ export default function TimerCreationContent({
     [currentSpeechType],
   );
 
+  // 0 <= x <= 59로 범위가 제한되는 분과 초에 사용하는 검증 함수
+  const getValidateTimeValue = (value: string) => {
+    let num = parseInt(value, 10);
+    if (isNaN(num)) {
+      num = 0;
+    }
+
+    return Math.max(0, Math.min(59, num));
+  };
+
   return (
     <div className="flex w-[820px] flex-col">
       {/* 헤더 */}
@@ -668,39 +678,43 @@ export default function TimerCreationContent({
 
                       {/* 분, 초, 타종 횟수 */}
                       <input
-                        type="number"
-                        min={0}
-                        max={59}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                         value={bellInput.min}
-                        onChange={(e) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const safeValue = e.target.value.replace(
+                            /[^0-9]/g,
+                            '',
+                          );
+
                           setBellInput((prev) => ({
                             ...prev,
-                            min: Math.max(
-                              0,
-                              Math.min(59, Number(e.target.value)),
-                            ),
-                          }))
-                        }
+                            min: getValidateTimeValue(safeValue),
+                          }));
+                        }}
                         placeholder="분"
                       />
                       <span>분</span>
 
                       <input
-                        type="number"
-                        min={0}
-                        max={59}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                         value={bellInput.sec}
-                        onChange={(e) =>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const safeValue = e.target.value.replace(
+                            /[^0-9]/g,
+                            '',
+                          );
+
                           setBellInput((prev) => ({
                             ...prev,
-                            sec: Math.max(
-                              0,
-                              Math.min(59, Number(e.target.value)),
-                            ),
-                          }))
-                        }
+                            sec: getValidateTimeValue(safeValue),
+                          }));
+                        }}
                         placeholder="초"
                       />
                       <span>초</span>
