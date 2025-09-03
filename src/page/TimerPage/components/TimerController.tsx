@@ -36,6 +36,7 @@ export default function TimerController({
           { 'bg-camp-blue': stance === 'PROS' },
           { 'bg-camp-red': stance === 'CONS' },
           { 'bg-default-neutral': stance === 'NEUTRAL' },
+          { 'bg-brand': stance === 'FEEDBACK' },
         )}
         onClick={() => {
           if (isRunning) {
