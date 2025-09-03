@@ -674,6 +674,12 @@ export default function TimerCreationContent({
 
                       <button
                         className="h-full"
+                        type="button"
+                        aria-label={
+                          isBellExpanded
+                            ? '종소리 설정 접기'
+                            : '종소리 설정 펼치기'
+                        }
                         onClick={() => handleBellExpandButtonClick()}
                       >
                         <DTExpand className="h-full rounded-full p-[8px] text-default-black transition-colors duration-300 hover:bg-default-disabled/hover" />
