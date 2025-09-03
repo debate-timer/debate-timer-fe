@@ -68,6 +68,8 @@ const TIME_BASED_OPTIONS: TimerCreationOption[] = [
   'TIME_PER_SPEAKING',
 ] as const;
 
+const SAVED_BELL_CONFIGS_KEY = 'savedBellInputConfigs';
+
 interface TimerCreationContentProps {
   beforeData?: TimeBoxInfo;
   initData?: TimeBoxInfo;
@@ -180,22 +182,27 @@ export default function TimerCreationContent({
     ? 'time-based-timer-only-total-timer'
     : 'time-based-timer';
 
+  // 이전 종소리 설정
+  const rawBellConfigData = sessionStorage.getItem(SAVED_BELL_CONFIGS_KEY);
+  const defaultBellConfig: BellInputConfig[] = [
+    { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
+    { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
+  ];
+  const savedBellOptions: BellInputConfig[] =
+    rawBellConfigData === null
+      ? defaultBellConfig
+      : JSON.parse(rawBellConfigData);
+
   // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
 
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
-    if (beforeData?.bell && beforeData.bell.length >= 0) {
-      return beforeData.bell.map(bellConfigToBellInputConfig);
-    }
     if (initData) {
       const initBell = initData.bell === null ? [] : initData.bell;
       return initBell.map(bellConfigToBellInputConfig);
     }
-    return [
-      { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
-      { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
-    ];
+    return savedBellOptions;
   };
   const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
 
@@ -322,6 +329,7 @@ export default function TimerCreationContent({
 
     const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
     if (timerType === 'NORMAL') {
+      sessionStorage.setItem(SAVED_BELL_CONFIGS_KEY, JSON.stringify(bells));
       onSubmit({
         stance: stanceToSend,
         speechType: speechTypeToSend,
@@ -346,6 +354,7 @@ export default function TimerCreationContent({
         bell: null,
       });
     }
+
     onClose();
   }, [
     bells,
