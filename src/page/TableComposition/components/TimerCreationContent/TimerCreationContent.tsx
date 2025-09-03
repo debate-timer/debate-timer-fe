@@ -433,8 +433,8 @@ export default function TimerCreationContent({
   );
 
   const handleBellExpandButtonClick = useCallback(() => {
-    setIsBellExpanded(!isBellExpanded);
-  }, [isBellExpanded]);
+    setIsBellExpanded((prev) => !prev);
+  }, []);
 
   return (
     <div className="flex w-[820px] flex-col">
