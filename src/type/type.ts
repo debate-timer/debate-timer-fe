@@ -1,5 +1,5 @@
 // Types
-export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
+export type Stance = 'PROS' | 'CONS' | 'NEUTRAL' | 'FEEDBACK';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
 export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
 
@@ -15,6 +15,7 @@ export const StanceToString: Record<Stance, string> = {
   PROS: '찬성',
   CONS: '반대',
   NEUTRAL: '중립',
+  FEEDBACK: '피드백',
 };
 
 export const TimeBoxTypeToString: Record<TimeBoxType, string> = {
