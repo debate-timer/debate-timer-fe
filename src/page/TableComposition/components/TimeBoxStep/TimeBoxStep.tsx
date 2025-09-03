@@ -80,7 +80,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       onTimeBoxChange((prevData) => {
         const toCopy = prevData[indexToCopy];
         if (!toCopy) return prevData;
-        const copyItem = { ...toCopy };
+        const copyItem = JSON.parse(JSON.stringify(toCopy));
         return [...prevData, copyItem];
       });
     },
