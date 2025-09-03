@@ -44,6 +44,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
   const [footerHeight, setFooterHeight] = useState(0);
   const [buttonHeight, setButtonHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentListRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
@@ -122,10 +123,16 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     }
 
     const containerElement = containerRef.current;
+    const contentListElement = contentListRef.current;
     const footerElement = footerRef.current;
     const buttonElement = buttonRef.current;
 
-    if (!containerElement || !footerElement || !buttonElement) {
+    if (
+      !containerElement ||
+      !footerElement ||
+      !buttonElement ||
+      !contentListElement
+    ) {
       return;
     }
 
@@ -144,7 +151,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
       // 3. 스크롤 바 유무 판단
       const hasScrollBar =
-        containerElement.scrollHeight > containerElement.clientHeight;
+        contentListElement.scrollHeight > containerElement.clientHeight;
+      console.log('# hasScrollBar = ', hasScrollBar);
 
       // 4. 현재 상태와 다를 경우에만 상태 업데이트
       if (isButtonFixed !== hasScrollBar) {
@@ -203,8 +211,14 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <DefaultLayout.ContentContainer>
         {isLoading && <LoadingIndicator />}
         {!isLoading && (
-          <div className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start">
-            <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto">
+          <div
+            ref={containerRef}
+            className="relative mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col justify-start"
+          >
+            <div
+              ref={contentListRef}
+              className="min-h-0 flex-1 overflow-y-auto"
+            >
               <PropsAndConsTitle
                 prosTeamName={initData.info.prosTeamName}
                 consTeamName={initData.info.consTeamName}
@@ -226,31 +240,31 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
                   <span style={{ height: `${buttonHeight}px` }}></span>
                 )}
               </DragAndDropWrapper>
-            </div>
 
-            <div
-              ref={buttonRef}
-              className={clsx('flex items-center justify-center', {
-                'fixed left-1/2 -translate-x-1/2': isButtonFixed,
-                relative: !isButtonFixed,
-              })}
-              style={
-                isButtonFixed
-                  ? {
-                      bottom: `${footerHeight + 32}px`,
-                    }
-                  : {}
-              }
-            >
-              <FloatingActionButton
-                onClick={openModal}
-                className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+              <div
+                ref={buttonRef}
+                className={clsx('flex items-center justify-center', {
+                  'fixed left-1/2 -translate-x-1/2': isButtonFixed,
+                  relative: !isButtonFixed,
+                })}
+                style={
+                  isButtonFixed
+                    ? {
+                        bottom: `${footerHeight + 32}px`,
+                      }
+                    : {}
+                }
               >
-                <div className="flex h-[56px] w-fit flex-row items-center justify-center space-x-[12px] p-[16px]">
-                  <DTAdd className="h-full p-[4px]" />
-                  <p className="text-body whitespace-nowrap">타이머 추가</p>
-                </div>
-              </FloatingActionButton>
+                <FloatingActionButton
+                  onClick={openModal}
+                  className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+                >
+                  <div className="flex h-[56px] w-fit flex-row items-center justify-center space-x-[12px] p-[16px]">
+                    <DTAdd className="h-full p-[4px]" />
+                    <p className="text-body whitespace-nowrap">타이머 추가</p>
+                  </div>
+                </FloatingActionButton>
+              </div>
             </div>
           </div>
         )}
