@@ -81,6 +81,7 @@ export default {
           'disabled/hover': '#D6D7D9',
           neutral: '#A3A3A3',
           dim: '#222222',
+          dim2: '#F2F2F2',
           border: '#79747E',
           timeout: '#4F4F4F',
           white: '#FFFFFF',
