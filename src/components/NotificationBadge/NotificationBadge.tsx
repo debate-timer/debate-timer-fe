@@ -9,16 +9,20 @@ export default function NotificationBadge({
   count,
   className = '',
 }: NotificationBadgeProps) {
-  if (count === 0) {
+  // 음수, NaN 등 의도하지 않은 값 확인
+  const safeCount = Number.isFinite(count) ? Math.max(0, count) : 0;
+  if (safeCount === 0) {
     return null;
   }
 
-  const displayCount = count > 99 ? '99+' : count;
+  const displayCount = safeCount > 99 ? '99+' : safeCount;
 
   return (
     <span
+      role="status"
+      aria-label={`알림 ${displayCount}개`}
       className={clsx(
-        'inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white',
+        'inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-semantic-error px-[4px] text-[10px] font-bold leading-none text-default-white',
         className,
       )}
     >
