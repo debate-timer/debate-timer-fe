@@ -682,7 +682,15 @@ export default function TimerCreationContent({
                         }
                         onClick={() => handleBellExpandButtonClick()}
                       >
-                        <DTExpand className="h-full rounded-full p-[8px] text-default-black transition-colors duration-300 hover:bg-default-disabled/hover" />
+                        <DTExpand
+                          className={clsx(
+                            'h-full transform rounded-full p-[8px] text-default-black transition-all duration-300 ease-in-out hover:bg-default-disabled/hover',
+                            {
+                              'rotate-180': isBellExpanded,
+                              'rotate-0': !isBellExpanded,
+                            },
+                          )}
+                        />
                       </button>
                     </div>
 
