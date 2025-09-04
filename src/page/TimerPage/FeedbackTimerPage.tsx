@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useFeedbackTimer } from './hooks/useFeedbackTimer';
 import FeedbackTimer from './components/FeedbackTimer';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 
 const INITIAL_TIME = 0;
 
@@ -18,8 +19,9 @@ export default function FeedbackTimerPage() {
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer>
-        <div className="relative flex h-full w-full flex-col items-center justify-center space-y-[32px] pb-[66px] xl:space-y-[60px]">
+        <div className="relative flex h-full w-full flex-col items-center justify-center space-y-[54px] pb-[66px] xl:space-y-[60px]">
           <FeedbackTimer feedbackTimerInstance={feedbackTimerInstance} />
+          <GoToHomeButton />
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>
