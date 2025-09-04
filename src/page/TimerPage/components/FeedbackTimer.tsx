@@ -52,34 +52,30 @@ export default function FeedbackTimer({
   };
 
   return (
-    <div className="flex flex-row space-x-[80px]">
+    <div className="flex flex-row space-x-[80px] items-center">
       {/* 좌측 영역 */}
-      <span className="flex min-w-[360px] flex-col items-center justify-center xl:min-w-[450px]">
-        <span className="flex w-full flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
-          {/* 제목 */}
-          <h1 className="text-[52px] font-bold xl:text-[68px]">
-            피드백 타이머
-          </h1>
+      <div className="flex h-[186px] w-[466px] flex-shrink-0 flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
+        {/* 제목 */}
+        <h1 className="text-[52px] font-bold xl:text-[68px]">피드백 타이머</h1>
 
-          {/* 시간 조절 버튼 */}
-          <div className="flex flex-row gap-[16px] pt-[24px]">
-            {timeAdjustments.map(({ label, value }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => adjustTime(value)}
-                disabled={isRunning}
-                className={clsx(
-                  'flex h-[52px] w-[100px] items-center justify-center rounded-[16px] text-[20px] font-semibold text-default-black transition-all duration-200 ease-in-out',
-                  'bg-brand/80 hover:bg-brand disabled:cursor-not-allowed disabled:bg-default-neutral/50',
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </span>
-      </span>
+        {/* 시간 조절 버튼 */}
+        <div className="flex w-[466px] flex-row gap-[22px] pt-[24px]">
+          {timeAdjustments.map(({ label, value }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => adjustTime(value)}
+              disabled={isRunning}
+              className={clsx(
+                'flex h-[52px] w-[100px] items-center justify-center rounded-[16px] text-[20px] font-semibold text-default-black transition-all duration-200 ease-in-out',
+                'bg-brand/80 hover:bg-brand disabled:cursor-not-allowed disabled:bg-default-neutral/50',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* 우측 영역 */}
       <span className="flex w-[360px] flex-col space-y-[16px] xl:min-w-[480px]">
