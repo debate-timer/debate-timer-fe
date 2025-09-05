@@ -43,7 +43,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
 
       <div className="flex flex-col items-center justify-center gap-1 text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
         <p>시간표를 저장하려면,</p>
-        <p>디베이트 타이머에 로그인해보세요!</p>
+        <p>디베이트 타이머에 로그인해 보세요!</p>
         <button
           className="mt-14 rounded-full border border-neutral-300 bg-brand px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-semantic-table hover:text-default-white"
           onClick={onLogin}
