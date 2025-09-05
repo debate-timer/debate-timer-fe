@@ -9,7 +9,7 @@ export default function TemplateApplicationSection() {
           템플릿 신청하기
         </p>
         <p className="text-[min(max(0.875rem,1.25vw),1.2rem)] text-neutral-400">
-          새로운 템플릿도 신청해볼까요?
+          새로운 템플릿도 신청해 볼까요?
         </p>
         <button
           onClick={() =>
