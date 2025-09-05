@@ -42,7 +42,7 @@ export function useTimerPageModal(tableId: number) {
     if (isGuestFlow()) {
       openLoginAndStoreModal();
     } else {
-      navigate(`/overview/customize/${tableId}`);
+      navigate(`/debateEnd/${tableId}`);
     }
   };
 
