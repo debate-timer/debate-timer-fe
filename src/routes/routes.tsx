@@ -11,6 +11,7 @@ import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
+import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
 
 const routesConfig = [
   {
@@ -37,6 +38,11 @@ const routesConfig = [
     path: '/table/customize/:id',
     element: <TimerPage />,
     requiresAuth: false,
+  },
+  {
+    path: '/debateEnd/:id',
+    element: <DebateEndPage />,
+    requiresAuth: true,
   },
   {
     path: '/oauth',
