@@ -1,6 +1,7 @@
 import section501 from '../../../assets/landing/section5-1.png';
 import { LANDING_URLS } from '../../../constants/urls';
-export default function TamplateApplicationSection() {
+
+export default function TemplateApplicationSection() {
   return (
     <section className="flex flex-row justify-between gap-1">
       <div className="flex flex-col items-start justify-center gap-4">

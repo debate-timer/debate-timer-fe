@@ -1,6 +1,6 @@
 import { DEBATE_TEMPLATE } from '../../../constants/debate_template';
-import TamplateApplicationSection from './TamplateApplicationSection';
-import TamplateList from './TamplateList';
+import TemplateApplicationSection from './TemplateApplicationSection';
+import TemplateList from './TemplateList';
 
 export default function TemplateSelection() {
   return (
@@ -10,12 +10,12 @@ export default function TemplateSelection() {
           다양한 토론 템플릿을 원클릭으로 만나보세요!
         </h2>
       </div>
-      <TamplateList data={DEBATE_TEMPLATE.ONE} />
+      <TemplateList data={DEBATE_TEMPLATE.ONE} />
       <div className="mx-auto h-px w-11/12 bg-neutral-200" /> {/* 구분선 */}
-      <TamplateList data={DEBATE_TEMPLATE.TWO} />
+      <TemplateList data={DEBATE_TEMPLATE.TWO} />
       <div className="mx-auto h-px w-11/12 bg-neutral-200" />
-      <TamplateList data={DEBATE_TEMPLATE.THREE} />
-      <TamplateApplicationSection />
+      <TemplateList data={DEBATE_TEMPLATE.THREE} />
+      <TemplateApplicationSection />
     </section>
   );
 }
