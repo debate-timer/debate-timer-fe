@@ -1,4 +1,3 @@
-// src/page/LandingPage/components/ScrollHint.tsx
 import { useEffect, useState } from 'react';
 import arrowDown from '../../../assets/landing/bottom_arrow.png';
 type ScrollHintProps = {
@@ -21,55 +20,29 @@ export default function ScrollHint({ topThreshold = 10 }: ScrollHintProps) {
   }, [topThreshold]);
 
   return (
-    // <div
-    //   className={`
-    //     pointer-events-none fixed inset-x-0 bottom-10 flex justify-center
-    //     transition-all duration-300
-    //     ${visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}
-    //   `}
-    //   aria-hidden={!visible}
-    // >
-    //   <div
-    //     className={`
-    //       pointer-events-auto flex items-center gap-2 rounded-full
-    //       bg-default-white/90 px-4 py-2 text-[min(max(0.85rem,1.2vw),1rem)] font-medium shadow-[0_6px_18px_rgba(0,0,0,0.12)]
-    //       ring-1
-    //       ring-black/5 backdrop-blur
-    //       transition-colors hover:bg-default-white
-    //     `}
-    //   >
-    //     <svg
-    //       width="18"
-    //       height="18"
-    //       viewBox="0 0 24 24"
-    //       className="animate-bounce"
-    //       aria-hidden
-    //     >
-    //       <path
-    //         d="M6 9l6 6 6-6"
-    //         fill="none"
-    //         stroke="currentColor"
-    //         strokeWidth="2"
-    //         strokeLinecap="round"
-    //         strokeLinejoin="round"
-    //       />
-    //     </svg>
-    //     아래로 스크롤
-    //   </div>
-    // </div>
     <div
       className={`
-      pointer-events-none fixed inset-x-0 bottom-10 flex justify-center
-      transition-all duration-300
-      ${visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}
-    `}
+        pointer-events-none fixed inset-x-0 bottom-10 flex justify-center
+        transition-all duration-300
+        ${visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}
+      `}
       aria-hidden={!visible}
     >
-      <img
-        src={arrowDown}
-        alt="아래로 스크롤"
-        className="pointer-events-auto h-4 w-16 animate-bounce"
-      />
+      <div
+        className={`
+          pointer-events-auto flex items-center gap-2 rounded-full
+          bg-default-white/90 px-4 py-2 text-[min(max(0.85rem,1.2vw),1rem)] font-medium shadow-[0_6px_18px_rgba(0,0,0,0.12)]
+          ring-1
+          ring-black/5 backdrop-blur
+          transition-colors hover:bg-default-white
+        `}
+      >
+        <img
+          src={arrowDown}
+          alt="아래로 스크롤"
+          className="pointer-events-auto h-4 w-20 animate-bounce"
+        />
+      </div>
     </div>
   );
 }
