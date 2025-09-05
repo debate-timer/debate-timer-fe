@@ -680,7 +680,7 @@ export default function TimerCreationContent({
                             ? '종소리 설정 접기'
                             : '종소리 설정 펼치기'
                         }
-                        onClick={() => handleBellExpandButtonClick()}
+                        onClick={handleBellExpandButtonClick}
                       >
                         <DTExpand
                           className={clsx(
