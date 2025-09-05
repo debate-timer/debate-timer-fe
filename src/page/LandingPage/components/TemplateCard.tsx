@@ -40,22 +40,22 @@ export default function TemplateCard({
 
       {/* 액션 리스트 */}
       <ul className="mt-5 flex flex-col gap-1">
-        {actions.map((a, i) => (
-          <li key={`${a.label}-${i}`}>
+        {actions.map((action, index) => (
+          <li key={`${action.label}-${index}`}>
             <div className=" flex items-center justify-between gap-3 rounded-md bg-white px-3 py-2">
               <span className="truncate text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-neutral-800 ">
-                {a.label}
+                {action.label}
               </span>
 
               <a
-                href={a.href}
+                href={action.href}
                 className={[
                   'shrink-0 rounded-full px-4 py-1.5',
                   'text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium',
                   'bg-brand text-default-black border border-neutral-300',
                   'transition-colors duration-100 hover:bg-semantic-table hover:text-white',
                 ].join(' ')}
-                aria-label={`${a.label} 토론하기`}
+                aria-label={`${action.label} 토론하기`}
               >
                 토론하기
               </a>
