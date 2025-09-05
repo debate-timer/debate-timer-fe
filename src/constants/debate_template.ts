@@ -75,7 +75,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
     },
     {
       title: '토달래',
-      subtitle: '성서여대',
+      subtitle: '성신여대',
       logoSrc: todallae,
       actions: [
         {
