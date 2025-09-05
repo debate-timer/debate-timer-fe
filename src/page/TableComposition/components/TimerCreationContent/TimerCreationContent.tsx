@@ -701,7 +701,6 @@ export default function TimerCreationContent({
                         <span className="flex w-full flex-row items-center space-x-[4px]">
                           {/* 벨 유형 */}
                           <DropdownMenu
-                            className=""
                             options={bellOptions}
                             selectedValue={bellInput.type}
                             onSelect={(value: BellType) => {
