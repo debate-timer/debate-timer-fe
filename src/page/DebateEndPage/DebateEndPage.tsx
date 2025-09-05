@@ -21,31 +21,34 @@ export default function DebateEndPage() {
   return (
     <div
       style={backgroundStyle}
-      className="flex min-h-screen flex-col items-center justify-center font-pretendard"
+      className="flex min-h-screen flex-col items-center justify-center p-4 font-pretendard"
     >
-      <div className="mb-36 flex items-center gap-4">
-        <h1 className="text-display-raw font-semibold text-default-black">
+      <div className="mb-12 flex items-center justify-center gap-4 text-center lg:mb-16 xl:mb-24">
+        <h1 className="text-3xl font-semibold text-default-black md:text-4xl lg:text-5xl xl:text-display-raw">
           토론을 모두 마치셨습니다
         </h1>
-        <img src={clapImage} alt="박수" className="h-20 w-20" />
+        <img
+          src={clapImage}
+          alt="박수"
+          className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 xl:h-20 xl:w-20"
+        />
       </div>
 
-      <div className="flex gap-20">
+      <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-10 lg:gap-12 xl:gap-20">
         {/* 피드백 타이머 카드 */}
-        {/* 원래는 gap 30px이 맞지만 승패투표 카드 내부 정렬이랑 비슷하게 가져가기 위해 여기 간격을 더 띄운다. 승패투표 카드 구현 후 되돌리기 */}
         <button
           onClick={handleFeedbackClick}
-          className="flex h-[370px] w-[370px] cursor-pointer flex-col items-center justify-center gap-11 rounded-[34px] border-2 border-default-disabled/hover bg-white"
+          className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-white md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-11"
         >
           <img
             src={feedbackTimerImage}
             alt="피드백 타이머"
-            className="h-[108px] w-[108px]"
+            className="h-20 w-20 md:h-24 md:w-24 lg:h-[96px] lg:w-[96px] xl:h-[108px] xl:w-[108px]"
           />
-          <h2 className="text-title-raw font-bold text-default-black">
+          <h2 className="text-lg font-bold text-default-black md:text-xl lg:text-2xl xl:text-title-raw">
             피드백 타이머
           </h2>
-          <p className="text-detail-raw text-default-border">
+          <p className="text-sm text-default-border md:text-base lg:text-lg xl:text-detail-raw">
             심사평 및 Q&A용 타이머 →
           </p>
         </button>
@@ -53,30 +56,30 @@ export default function DebateEndPage() {
         {/* 승패투표 카드 */}
         <button
           onClick={handleFeedbackClick}
-          className="flex h-[370px] w-[370px] cursor-pointer flex-col items-center justify-center gap-[30px] rounded-[34px] border-2 border-default-disabled/hover bg-[#e3e3e3] text-default-disabled/hover"
+          className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-[#e3e3e3] text-default-disabled/hover md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-[30px]"
           disabled={true}
         >
           <img
             src={voteStampImage}
             alt="투표"
-            className="h-[108px] w-[108px]"
+            className="h-20 w-20 md:h-24 md:w-24 lg:h-[96px] lg:w-[96px] xl:h-[108px] xl:w-[108px]"
           />
-          <div>
-            <p className="text-title-raw font-semibold text-default-black">
+          <div className="text-center">
+            <p className="text-lg font-semibold text-default-black md:text-xl lg:text-2xl xl:text-title-raw">
               현재 &apos;승패투표&apos;
             </p>
-            <p className="text-title-raw font-semibold text-default-black">
+            <p className="text-lg font-semibold text-default-black md:text-xl lg:text-2xl xl:text-title-raw">
               페이지는
               <span className="font-bold text-[#F64740]">&nbsp;준비 중</span>
               입니다.
             </p>
           </div>
-          <p className="text-detail-raw text-default-border">
+          <p className="text-sm text-default-border md:text-base lg:text-lg xl:text-detail-raw">
             빠른 시일 내로 만나 뵙겠습니다.
           </p>
         </button>
       </div>
-      <div className="mt-[74px]">
+      <div className="mt-12 lg:mt-16 xl:mt-[74px]">
         <GoToHomeButton />
       </div>
     </div>
