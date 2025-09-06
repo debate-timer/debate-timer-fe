@@ -41,6 +41,7 @@ export default function TimeBasedTimer({
     pauseTimer,
     resetCurrentTimer,
   } = timeBasedTimerInstance;
+
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(totalTimer ?? 0) / 60),
   );
@@ -55,20 +56,31 @@ export default function TimeBasedTimer({
 
   const initRawProgress = (): number => {
     if (speakingTimer === null) {
-      if (item.timePerTeam && item.timePerTeam > 0 && totalTimer) {
+      // 1회당 발언 시간 X일 때...
+      if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
+        // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+        if (totalTimer <= 0) {
+          return 100;
+        }
         return ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100;
+      } else {
+        // 팀당 발언 시간 타이머가 멈추거나 완료된 경우,
+        // 완료(100%)에 해당하는 진행도를 반환
+        return 100;
       }
-    } else if (
-      item.timePerSpeaking &&
-      item.timePerSpeaking > 0 &&
-      speakingTimer
-    ) {
-      return (
-        ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
-      );
+    } else {
+      // 1회당 발언 시간 O일 때...
+      if (item.timePerSpeaking && speakingTimer && item.timePerSpeaking > 0) {
+        // 1회당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+        return (
+          ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
+        );
+      } else {
+        // 1회당 발언 시간 타이머가 멈추거나 완료된 경우,
+        // 완료(100%)에 해당하는 진행도를 반환
+        return 100;
+      }
     }
-
-    return 0;
   };
 
   const rawProgress = initRawProgress();
@@ -115,7 +127,7 @@ export default function TimeBasedTimer({
       >
         {/* 1회당 발언 시간 X */}
         {speakingTimer === null && (
-          <span className="flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[110px] font-bold text-default-black">
+          <span className="flex w-full flex-row items-center justify-center p-[16px] text-[90px] font-bold tabular-nums text-default-black xl:text-[110px]">
             <p className="flex flex-1 items-center justify-center">{minute}</p>
             <p className="flex items-center justify-center">:</p>
             <p className="flex flex-1 items-center justify-center">{second}</p>
@@ -128,7 +140,7 @@ export default function TimeBasedTimer({
             <h1 className="w-[88px] rounded-[8px] bg-default-black py-[6px] text-center text-[16px] text-default-white xl:w-[112px] xl:text-[20px]">
               전체 시간
             </h1>
-            <span className="flex flex-row text-[56px] font-semibold text-default-black xl:text-[72px]">
+            <span className="flex flex-row text-[56px] font-semibold tabular-nums text-default-black xl:text-[72px]">
               <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
                 {minute}
               </p>
@@ -149,7 +161,7 @@ export default function TimeBasedTimer({
             >
               현재 시간
             </h1>
-            <span className="flex flex-row text-[70px] font-bold text-default-black lg:text-[90px] xl:text-[110px]">
+            <span className="flex flex-row text-[70px] font-bold tabular-nums text-default-black lg:text-[90px] xl:text-[110px]">
               <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
                 {speakingMinute}
               </p>

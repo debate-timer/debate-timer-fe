@@ -10,14 +10,10 @@ interface UseBellSoundProps {
 export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
   // 종소리 여러 번 - 새로운 Audio로 재생
   function playBell(count: number) {
-    for (let i = 0; i < count; i++) {
-      setTimeout(() => {
-        const audio = new Audio('/sounds/bell-warning.mp3');
-        audio.play().catch((err) => {
-          console.warn('audio.play() 실패:', err);
-        });
-      }, i * 500);
-    }
+    const audio = new Audio(`/sounds/bell-${count}.mp3`);
+    audio.play().catch((err) => {
+      console.warn('audio.play() 실패:', err);
+    });
   }
 
   useEffect(() => {

@@ -121,7 +121,7 @@ export default function TimeBox(props: TimeBoxProps) {
             </>
           )}
       <span
-        className={clsx('flex flex-row text-[20px] text-default-black', {
+        className={clsx('flex flex-row text-[22px] text-default-black', {
           'max-w-[200px]': isModifiable,
         })}
       >
@@ -132,7 +132,7 @@ export default function TimeBox(props: TimeBoxProps) {
           )}
         </p>
       </span>
-      <p className="text-[28px] font-medium text-default-black">{timeStr}</p>
+      <p className="text-[22px] font-medium">{timeStr}</p>
     </div>
   );
 
@@ -151,10 +151,10 @@ export default function TimeBox(props: TimeBoxProps) {
           }}
         />
       </div>
-      <p className="text-[20px] font-semibold text-default-black">
+      <p className="text-[22px] font-semibold text-default-black">
         {speechType}
       </p>
-      <p className="text-[28px] font-medium text-default-black">{timeStr}</p>
+      <p className="text-[22px] font-medium text-default-black">{timeStr}</p>
     </div>
   );
 
@@ -177,10 +177,10 @@ export default function TimeBox(props: TimeBoxProps) {
           </div>
         </>
       )}
-      <span className="text-[20px] font-semibold text-default-black">
+      <span className="text-[22px] font-semibold text-default-black">
         {speechType}
       </span>
-      <span className="text-[28px] font-medium text-default-black">
+      <span className="text-[22px] font-medium text-default-black">
         {fullTimeStr}
       </span>
     </div>

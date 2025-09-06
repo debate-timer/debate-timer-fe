@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
 import { TimeBoxInfo } from '../../../type/type';
 
@@ -6,12 +7,13 @@ interface RoundControlRowProps {
   index: number;
   goToOtherItem: (isPrev: boolean) => void;
   openDoneModal: () => void;
+  className?: string;
 }
 
 export default function RoundControlRow(props: RoundControlRowProps) {
-  const { table, index, goToOtherItem, openDoneModal } = props;
+  const { table, index, goToOtherItem, openDoneModal, className = '' } = props;
   return (
-    <div className="flex flex-row space-x-1 xl:space-x-8">
+    <div className={clsx('flex flex-row space-x-1 xl:space-x-8', className)}>
       <div className="flex w-[175px] items-center justify-center xl:w-[200px]">
         {index !== 0 && (
           <RoundControlButton type="PREV" onClick={() => goToOtherItem(true)} />
