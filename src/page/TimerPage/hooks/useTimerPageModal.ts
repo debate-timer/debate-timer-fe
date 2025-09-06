@@ -38,7 +38,7 @@ export function useTimerPageModal(tableId: number) {
     // eslint-disable-next-line
   }, []);
 
-  const openLoginAndStoreModalOrGoToOverviewPage = () => {
+  const openLoginAndStoreModalOrGoToDebateEndPage = () => {
     if (isGuestFlow()) {
       openLoginAndStoreModal();
     } else {
@@ -55,6 +55,6 @@ export function useTimerPageModal(tableId: number) {
     closeUseTooltipModal,
     openLoginAndStoreModal,
     closeLoginAndStoreModal,
-    openLoginAndStoreModalOrGoToOverviewPage,
+    openLoginAndStoreModalOrGoToDebateEndPage,
   };
 }
