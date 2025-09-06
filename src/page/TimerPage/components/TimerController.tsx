@@ -21,10 +21,20 @@ export default function TimerController({
   stance,
   boxType,
 }: TimerControllerProps) {
+  const bgClass =
+    boxType === 'FEEDBACK'
+      ? 'bg-brand'
+      : stance === 'PROS'
+        ? 'bg-camp-blue'
+        : stance === 'CONS'
+          ? 'bg-camp-red'
+          : 'bg-default-neutral';
   return (
     <div className="flex flex-row items-center justify-center space-x-[16px] xl:space-x-[24px]">
       {/* 초기화 버튼 */}
       <button
+        type="button"
+        aria-label="타이머 초기화"
         className={clsx(
           'flex size-[76px] items-center justify-center rounded-full bg-default-black2 p-[20px] xl:size-[92px]',
           { 'hover:bg-[#676767]': boxType === 'FEEDBACK' },
@@ -36,15 +46,12 @@ export default function TimerController({
 
       {/* 재생 및 일시정지 버튼 */}
       <button
+        type="button"
+        aria-label={isRunning ? '일시정지' : '재생'}
+        aria-pressed={isRunning}
         className={clsx(
           'flex size-[76px] items-center justify-center rounded-full p-[20px] xl:size-[92px]',
-          { 'bg-camp-blue': stance === 'PROS' },
-          { 'bg-camp-red': stance === 'CONS' },
-          { 'bg-brand': boxType === 'FEEDBACK' },
-          {
-            'bg-default-neutral':
-              stance === 'NEUTRAL' && boxType !== 'FEEDBACK',
-          },
+          bgClass,
           { 'hover:bg-brand-hover': boxType === 'FEEDBACK' },
         )}
         onClick={() => {
