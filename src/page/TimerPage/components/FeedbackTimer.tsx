@@ -31,10 +31,9 @@ export default function FeedbackTimer({
   } = feedbackTimerInstance;
 
   const totalTime = timer ?? 0;
-  const minute = Formatting.formatTwoDigits(
-    Math.floor(Math.abs(totalTime) / 60),
-  );
-  const second = Formatting.formatTwoDigits(Math.abs(totalTime % 60));
+  const { minutes, seconds } = Formatting.formatSecondsToMinutes(totalTime);
+  const minute = Formatting.formatTwoDigits(minutes);
+  const second = Formatting.formatTwoDigits(seconds);
   const rawProgress =
     timer !== null && defaultTimer > 0
       ? ((defaultTimer - timer) / defaultTimer) * 100
