@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Cointoss from '../../../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../../../assets/teamSelection/coinback.png';
@@ -20,6 +20,7 @@ export default function TeamSelectionModal({
   onCoinStateChange,
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>(initialCoinState);
+  const hasResultSoundPlayedRef = useRef(false);
 
   const updateCoinState = useCallback(
     (newState: CoinState) => {
@@ -58,8 +59,16 @@ export default function TeamSelectionModal({
   // 결과 소리
   useEffect(() => {
     if (coinState === 'front' || coinState === 'back') {
-      coinResultSound.currentTime = 0;
-      coinResultSound.play();
+      // 아직 사운드가 재생되지 않았다면 재생
+      if (!hasResultSoundPlayedRef.current) {
+        coinResultSound.currentTime = 0;
+        coinResultSound.play();
+        hasResultSoundPlayedRef.current = true;
+      } else {
+        hasResultSoundPlayedRef.current = false;
+        coinResultSound.pause();
+        coinResultSound.currentTime = 0;
+      }
     }
     return () => {
       coinResultSound.pause();
