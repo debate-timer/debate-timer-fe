@@ -53,7 +53,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
       logoSrc: han_alm,
       actions: [
         {
-          label: '의화식 토론',
+          label: 'CEDA 토론',
           href: createTableShareUrl(
             'eJyrVspMUbIytjTUUcrMS8tXsqpWykvMTVWyUno7dc6bqX1vuucqOLu6OCq8bVvweuECJR2lksoCkLRzaHCIv69nlCtQKDE9NS8lESgIZBcU5ReHpCbm%2BkFMebNhzZuWjUDx5Pw8ZPHXG2a87mkAipcnFuVl5qU7pebkKFmlJeYUp%2BoopWXmZRZnIAnVAq1NTMoBaoyuViouScxLBpkREOQfDDShuCA1NTkjBOKsN%2FNaIc5Myq%2BACvn5B%2Fk6%2BoBcngmy2tDUAMIMSC0COUjJKq80JwcuFFyQmpgNdBBMuBjETy0CmmP4elOHUq0OkgOc%2Ff0wHPBq64Q3G1a8WbjhTdMavM4wItMZRkQ5g67hgC0iaB4OxDmDhuFAXEQMQDjQOT1ghsOApAfiogNU7uAPByNDmiZIujqAziFAXEqguQNiawHVv27d',
           ),
@@ -108,7 +108,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
         {
           label: '통일토론대회 형식 (준결승, 결승)',
           href: createTableShareUrl(
-            'eJztk09LAkEYh7%2FKMqeCPaRG1N7SPAi5K%2B56KSJGHXVpnV1co0IED6tIerBDIaWxRVCHDpsgFPSJ3PE7NNuWaH8srKxDp515YH7vs%2B87UwByEnC%2BJR8LZJxSAVcAGGYR4EC%2F0iXte6ZfMe0z066X%2Bsd1pt88JLX2DLko9ToW2b9jGfc7C1iQ39OcY4GYKAnh0FqQIphGOAkppGstp%2BoSglneTSfWNTFuKE%2BoeJjbVpPWonwH5rCM036kKIBLQUVHLEjJWNYzQ6hIy8K4Qg%2BuF4CehzjhZESigkgTdA2hREZytchpmf4GpXF19wnxQjS8vOqYy05p7%2Fycu4ygnCMEOLytKAMkaghuUaFnrDt7lKM5HrtTBUV2SCAg8L8rwAdjUvQx%2BoXDATENhtRaPcsYp7IwmYmz%2FbARzoTHN8KzOGEjvK8a8dZVmKrAVyfh8X7TKN4TMQ1y0mB63QaxrshllbSbIzpSKBzc9C%2BLwZWB0oiA6zTcsH%2Bl6Sj9hbdMui1yXmZsq0WObn%2FiGgPfp570tDw2ig%2BaOaDCs',
+            'eJztk09LAkEYh7%2FKMqeCPaRG1N7SPAi5K%2B56KSJGHXVpnV1co0IED6tIerBDIaWxRVCHDpsgFPSJ3PE7NNuWaH8srKxDp515YH7vs%2B87UwByEnC%2BJR8LZJxSAVcAGGYR4EC%2F0iXte6ZfMe0z066X%2Bsd1pt88JLX2DLko9ToW2b9jGfc7C1iQ39OcY4GYKAnh0FqQIphGOAkppGstp%2BoSglneTSfWNTFuKE%2BoeJjbVpPWonwH5rCM036kKIBLQUVHLEjJWNYzQ6hIy8K4Qg%2BuF4CehzjhZESigkgTdA2hREZytchpmf4GpXF19wnxQjS8vOqYy05p7%2Fycu4ygnCMEOLytKAMkaghuUaFnrDt7lKM5HrtTBUV2SCAg8L8rwAdjUvQx%2BoXDATENhtRaPcsYp7IwmYmz%2FbARzoTHN8KzOGEjvK8a8dZVmKrAVyfh8X7TKN4TMQ1y0mB63QaxrshllbSbIzpSKBzc9C%2BLwZWB0oiA6zTcsH%2Bl6Sj9hbdMui1yXmZsq0WObn%2FiGgPfp570tDw2ig%2BaOaDC',
           ),
         },
       ],
