@@ -144,9 +144,6 @@ export default function TimerCreationContent({
       ? (initData?.speechType ?? '')
       : SPEECH_TYPE_RECORD[currentSpeechType],
   );
-  console.log(
-    `# initSpeech: ${initSpeechType} / currentSpeech: ${currentSpeechType}`,
-  );
 
   // 종소리 영역 확장 여부
   const [isBellExpanded, setIsBellExpanded] = useState(false);
@@ -320,11 +317,9 @@ export default function TimerCreationContent({
       return;
     } else {
       if (currentSpeechType === 'CUSTOM') {
-        console.log('# 커스텀 스피치');
         speechTypeToSend = speechTypeTextValue;
         stanceToSend = timerType === 'TIME_BASED' ? 'NEUTRAL' : stance;
       } else {
-        console.log('# 정해진 스피치');
         speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
         stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
       }

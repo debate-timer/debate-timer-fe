@@ -77,7 +77,7 @@ export default function TimeBox(props: TimeBoxProps) {
       onMouseDown={onMouseDown}
       title="위/아래로 드래그"
     >
-      <SmallIconButtonContainer className="w-[28px] px-[4px] py-[8px]">
+      <SmallIconButtonContainer className="h-[36px] w-[28px] px-[4px] py-[8px]">
         <DTDrag className="h-full" />
       </SmallIconButtonContainer>
     </div>

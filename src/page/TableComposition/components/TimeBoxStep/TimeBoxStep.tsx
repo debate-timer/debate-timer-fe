@@ -11,7 +11,7 @@ import DTEdit from '../../../../components/icons/Edit';
 import DTCheck from '../../../../components/icons/Check';
 import FloatingActionButton from '../../../../components/FloatingActionButton/FloatingActionButton';
 import DTAdd from '../../../../components/icons/Add';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator';
 
@@ -41,8 +41,12 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
   const initTimeBox = initData.table;
 
   const [isButtonFixed, setIsButtonFixed] = useState(false);
+  const [footerHeight, setFooterHeight] = useState(0);
+  const [buttonHeight, setButtonHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const addButtonClasses = isButtonFixed ? 'sticky bottom-[16px]' : 'relative';
+  const contentListRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   const { handleMouseDown, getDraggingStyles, DragAndDropWrapper } =
     useDragAndDrop({
@@ -51,28 +55,45 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       throttleDelay: 50,
     });
 
-  const handleSubmitEdit = (indexToEdit: number, updatedInfo: TimeBoxInfo) => {
-    onTimeBoxChange((prevData) =>
-      prevData.map((item, index) =>
-        index === indexToEdit ? updatedInfo : item,
-      ),
-    );
-  };
+  const handleSubmitEdit = useCallback(
+    (indexToEdit: number, updatedInfo: TimeBoxInfo) => {
+      onTimeBoxChange((prevData) =>
+        prevData.map((item, index) =>
+          index === indexToEdit ? updatedInfo : item,
+        ),
+      );
+    },
+    [onTimeBoxChange],
+  );
 
-  const handleSubmitDelete = (indexToRemove: number) => {
-    onTimeBoxChange((prevData) =>
-      prevData.filter((_, index) => index !== indexToRemove),
-    );
-  };
+  const handleSubmitDelete = useCallback(
+    (indexToRemove: number) => {
+      onTimeBoxChange((prevData) =>
+        prevData.filter((_, index) => index !== indexToRemove),
+      );
+    },
+    [onTimeBoxChange],
+  );
 
-  const handleCopy = (indexToCopy: number) => {
-    onTimeBoxChange((prevData) => {
-      const toCopy = prevData[indexToCopy];
-      if (!toCopy) return prevData;
-      const copyItem = { ...toCopy };
-      return [...prevData, copyItem];
-    });
-  };
+  const handleCopy = useCallback(
+    (indexToCopy: number) => {
+      onTimeBoxChange((prevData) => {
+        const toCopy = prevData[indexToCopy];
+        if (!toCopy) return prevData;
+        const copyItem = JSON.parse(JSON.stringify(toCopy));
+        return [...prevData, copyItem];
+      });
+    },
+    [onTimeBoxChange],
+  );
+
+  const handleAddTimeBox = useCallback(
+    (data: TimeBoxInfo) => {
+      onTimeBoxChange((prev) => [...prev, data]);
+      closeModal();
+    },
+    [onTimeBoxChange, closeModal],
+  );
 
   const isSubmitButtonDisabled =
     initTimeBox.length === 0 || isLoading || isSubmitting;
@@ -95,24 +116,85 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     );
   };
 
-  // 스크롤 바가 생기면, 타임박스 추가 버튼을 화면 중앙 하단에 고정
+  // 레이아웃 변화 감지 및 버튼의 위치 계산
   useLayoutEffect(() => {
-    const containerElement = containerRef.current;
-    if (!containerElement) {
+    if (isLoading) {
       return;
     }
 
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const hasScrollbar =
-        entry.target.scrollHeight > entry.target.clientHeight;
-      setIsButtonFixed(hasScrollbar);
-    });
+    const containerElement = containerRef.current;
+    const contentListElement = contentListRef.current;
+    const footerElement = footerRef.current;
+    const buttonElement = buttonRef.current;
 
-    observer.observe(containerElement);
+    if (
+      !containerElement ||
+      !footerElement ||
+      !buttonElement ||
+      !contentListElement
+    ) {
+      return;
+    }
 
-    return () => observer.disconnect();
-  }, []);
+    const calculatePosition = () => {
+      // 1. Footer 높이 측정
+      const newFooterHeight = footerElement.getBoundingClientRect().height;
+      setFooterHeight(newFooterHeight);
+
+      // 2. 버튼의 실제 높이(offsetHeight) 측정 및 state 업데이트
+      const newButtonHeight = buttonElement.offsetHeight;
+      setButtonHeight(newButtonHeight);
+
+      // 3. 스크롤 바 유무 판단
+      const hasScrollBar =
+        contentListElement.scrollHeight > containerElement.clientHeight;
+
+      // 4. 현재 상태와 다를 경우에만 상태 업데이트
+      if (isButtonFixed !== hasScrollBar) {
+        setIsButtonFixed(hasScrollBar);
+      }
+    };
+
+    calculatePosition();
+
+    const resizeObserver = new ResizeObserver(calculatePosition);
+    resizeObserver.observe(contentListElement);
+    resizeObserver.observe(footerElement);
+    resizeObserver.observe(buttonElement);
+    resizeObserver.observe(containerElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [
+    isLoading,
+    initTimeBox.length,
+    isButtonFixed,
+    buttonHeight,
+    footerHeight,
+  ]);
+
+  // 윈도우 리사이즈 감지
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      const containerElement = containerRef.current;
+      const contentListElement = contentListRef.current;
+
+      if (!containerElement || !contentListElement) {
+        return;
+      }
+
+      const hasScrollBar =
+        contentListElement.scrollHeight > containerElement.clientHeight;
+
+      if (isButtonFixed !== hasScrollBar) {
+        setIsButtonFixed(hasScrollBar);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isButtonFixed]);
 
   return (
     <DefaultLayout>
@@ -131,51 +213,68 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
         {!isLoading && (
           <div
             ref={containerRef}
-            className="relative mx-auto flex h-full w-full max-w-4xl flex-col justify-start"
+            className="relative mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col justify-start"
           >
-            <PropsAndConsTitle
-              prosTeamName={initData.info.prosTeamName}
-              consTeamName={initData.info.consTeamName}
-            />
-
-            <DragAndDropWrapper>
-              {initTimeBox.length > 0 &&
-                initTimeBox.map((info, index) => (
-                  <div
-                    key={crypto.randomUUID()}
-                    style={getDraggingStyles(index)}
-                  >
-                    {renderTimeBoxItem(info, index)}
-                  </div>
-                ))}
-
-              {/* 타임박스 추가 버튼이 화면 중앙 하단에 고정될 때, 
-            타임박스가 가려지지 않게 타임박스 추가 버튼 높이만큼의 여백을 추가 */}
-              {isButtonFixed && <span className="h-[32px]"></span>}
-            </DragAndDropWrapper>
-
             <div
-              className={`
-              pointer-events-none flex w-full items-center justify-center
-              ${addButtonClasses}
-            `}
+              ref={contentListRef}
+              className="min-h-0 flex-1 overflow-y-auto"
             >
-              <FloatingActionButton
-                onClick={openModal}
-                className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+              <PropsAndConsTitle
+                prosTeamName={initData.info.prosTeamName}
+                consTeamName={initData.info.consTeamName}
+              />
+
+              <DragAndDropWrapper>
+                {initTimeBox.length > 0 &&
+                  initTimeBox.map((info, index) => (
+                    <div
+                      key={index + info.stance + info.speechType}
+                      style={getDraggingStyles(index)}
+                    >
+                      {renderTimeBoxItem(info, index)}
+                    </div>
+                  ))}
+
+                {/* 버튼이 고정될 때에만 하단 여백 추가 */}
+                {isButtonFixed && (
+                  <span style={{ height: `${buttonHeight}px` }}></span>
+                )}
+              </DragAndDropWrapper>
+
+              <div
+                ref={buttonRef}
+                className={clsx('flex items-center justify-center', {
+                  'fixed left-1/2 -translate-x-1/2': isButtonFixed,
+                  relative: !isButtonFixed,
+                })}
+                style={
+                  isButtonFixed
+                    ? {
+                        bottom: `${footerHeight + 32}px`,
+                      }
+                    : {}
+                }
               >
-                <div className="text-body flex h-[56px] flex-row items-center justify-center gap-[12px] p-[16px]">
-                  <DTAdd className="h-full p-[4px]" />
-                  타이머 추가
-                </div>
-              </FloatingActionButton>
+                <FloatingActionButton
+                  onClick={openModal}
+                  className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+                >
+                  <div className="flex h-[56px] w-fit flex-row items-center justify-center space-x-[12px] p-[16px]">
+                    <DTAdd className="h-full p-[4px]" />
+                    <p className="text-body whitespace-nowrap">타이머 추가</p>
+                  </div>
+                </FloatingActionButton>
+              </div>
             </div>
           </div>
         )}
       </DefaultLayout.ContentContainer>
 
       <DefaultLayout.StickyFooterWrapper>
-        <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
+        <div
+          ref={footerRef}
+          className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2"
+        >
           <button
             onClick={onEditTableInfoButtonClick}
             className={clsx(
@@ -202,7 +301,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             )}
             disabled={isSubmitButtonDisabled}
           >
-            <DTCheck className="max-h-full" />
+            <DTCheck className="h-full" />
             {isEdit ? '수정 완료' : '추가하기'}
           </button>
         </div>
@@ -213,9 +312,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           beforeData={initTimeBox[initTimeBox.length - 1] as TimeBoxInfo}
           prosTeamName={initData.info.prosTeamName}
           consTeamName={initData.info.consTeamName}
-          onSubmit={(data) => {
-            onTimeBoxChange((prev) => [...prev, data]);
-          }}
+          onSubmit={handleAddTimeBox}
           onClose={closeModal}
         />
       </ModalWrapper>
