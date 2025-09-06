@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Cointoss from '../../../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../../../assets/teamSelection/coinback.png';
@@ -20,6 +20,7 @@ export default function TeamSelectionModal({
   onCoinStateChange,
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>(initialCoinState);
+  const hasResultSoundPlayedRef = useRef(false);
 
   const updateCoinState = useCallback(
     (newState: CoinState) => {
@@ -36,36 +37,52 @@ export default function TeamSelectionModal({
     [],
   );
 
-  // 동전 던지는 소리
+  // 동전 던지는 소리 및 결과 처리
   useEffect(() => {
     if (coinState === 'tossing') {
+      // 동전 던질 때 false로 초기화
+      hasResultSoundPlayedRef.current = false;
+
+      coinTossSound.currentTime = 0;
       coinTossSound.play();
+
       const timer = setTimeout(() => {
-        // 다음 화면 상태 전환 직전에 사운드 명시적 정지
+        // 다음 화면 상태 전환 직전 사운드 명시적 정지
         coinTossSound.pause();
         coinTossSound.currentTime = 0;
+
+        // 결과 결정 및 상태 업데이트
         const result = Math.random() < 0.5 ? 'front' : 'back';
         updateCoinState(result);
+
+        // 결과 소리 바로 재생
+        setTimeout(() => {
+          if (!hasResultSoundPlayedRef.current) {
+            coinResultSound.currentTime = 0;
+            coinResultSound.play();
+            hasResultSoundPlayedRef.current = true;
+          }
+        }, 100); // 약간의 딜레이로 자연스럽게 연결
       }, 2000);
+
       return () => {
         clearTimeout(timer);
         coinTossSound.pause();
         coinTossSound.currentTime = 0;
       };
     }
-  }, [coinState, coinTossSound]); // coinTossSound는 useMemo를 통해 딱 처음에 생성된 객체이기 때문에 currentTime = 0임을 보장한다.
+  }, [coinState, coinTossSound, coinResultSound, updateCoinState]);
 
-  // 결과 소리
+  // 초기 상태에서 결과 상태로 직접 진입한 경우 (탭 전환 등)
   useEffect(() => {
-    if (coinState === 'front' || coinState === 'back') {
-      coinResultSound.currentTime = 0;
-      coinResultSound.play();
+    if (
+      (coinState === 'front' || coinState === 'back') &&
+      initialCoinState === coinState
+    ) {
+      // 초기값과 현재값이 같다면 이미 결과가 나온 상태이므로 소리 재생하지 않음
+      hasResultSoundPlayedRef.current = true;
     }
-    return () => {
-      coinResultSound.pause();
-      coinResultSound.currentTime = 0;
-    };
-  }, [coinState, coinResultSound]);
+  }, [coinState, initialCoinState]);
 
   const handleStart = () => {
     onClose();
