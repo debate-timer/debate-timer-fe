@@ -10,7 +10,7 @@ export default function DebateEndPage() {
   const navigate = useNavigate();
 
   const handleFeedbackClick = () => {
-    navigate(`/debateEnd/${tableId}/feedback`);
+    navigate(`/table/customize/${tableId}/end/feedback`);
   };
 
   const backgroundStyle = {

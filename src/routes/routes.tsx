@@ -40,7 +40,7 @@ const routesConfig = [
     requiresAuth: false,
   },
   {
-    path: '/debateEnd/:id',
+    path: '/table/customize/:id/end',
     element: <DebateEndPage />,
     requiresAuth: true,
   },
