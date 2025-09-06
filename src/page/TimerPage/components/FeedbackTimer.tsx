@@ -77,7 +77,7 @@ export default function FeedbackTimer({
       </div>
 
       {/* 우측 영역 */}
-      <span className="flex w-[360px] flex-col space-y-[16px] xl:min-w-[480px]">
+      <div className="flex w-[360px] flex-col space-y-[16px] xl:min-w-[480px]">
         {/* 타이머 */}
         <CircularTimer
           progress={progressMotionValue}
@@ -106,7 +106,7 @@ export default function FeedbackTimer({
           stance={'NEUTRAL'}
           boxType={'FEEDBACK'}
         />
-      </span>
+      </div>
     </div>
   );
 }
