@@ -82,7 +82,8 @@ export default function FeedbackTimer({
         {/* 타이머 */}
         <CircularTimer
           progress={progressMotionValue}
-          stance={'FEEDBACK'}
+          stance={'NEUTRAL'}
+          boxType={'FEEDBACK'}
           strokeWidth={getStrokeWidth()}
           className="aspect-square w-full"
         >
@@ -103,7 +104,8 @@ export default function FeedbackTimer({
           onStart={startTimer}
           onPause={pauseTimer}
           onReset={resetTimer}
-          stance={'FEEDBACK'}
+          stance={'NEUTRAL'}
+          boxType={'FEEDBACK'}
         />
       </span>
     </div>

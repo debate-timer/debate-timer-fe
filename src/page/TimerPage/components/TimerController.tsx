@@ -1,7 +1,7 @@
 import { GiPauseButton } from 'react-icons/gi';
 import DTReset from '../../../components/icons/Reset';
 import DTPlay from '../../../components/icons/Play';
-import { Stance } from '../../../type/type';
+import { Stance, TimeBoxType } from '../../../type/type';
 import clsx from 'clsx';
 
 interface TimerControllerProps {
@@ -10,6 +10,7 @@ interface TimerControllerProps {
   onReset: () => void;
   isRunning: boolean;
   stance: Stance;
+  boxType?: TimeBoxType;
 }
 
 export default function TimerController({
@@ -18,6 +19,7 @@ export default function TimerController({
   onReset,
   isRunning,
   stance,
+  boxType,
 }: TimerControllerProps) {
   return (
     <div className="flex flex-row items-center justify-center space-x-[16px] xl:space-x-[24px]">
@@ -35,8 +37,11 @@ export default function TimerController({
           'flex size-[76px] items-center justify-center rounded-full p-[20px] xl:size-[92px]',
           { 'bg-camp-blue': stance === 'PROS' },
           { 'bg-camp-red': stance === 'CONS' },
-          { 'bg-default-neutral': stance === 'NEUTRAL' },
-          { 'bg-brand': stance === 'FEEDBACK' },
+          { 'bg-brand': boxType === 'FEEDBACK' },
+          {
+            'bg-default-neutral':
+              stance === 'NEUTRAL' && boxType !== 'FEEDBACK',
+          },
         )}
         onClick={() => {
           if (isRunning) {

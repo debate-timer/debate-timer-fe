@@ -50,7 +50,6 @@ const STANCE_RECORD: Record<Stance, string> = {
   PROS: '찬성',
   CONS: '반대',
   NEUTRAL: '중립',
-  FEEDBACK: '피드백',
 } as const;
 
 const NORMAL_OPTIONS: TimerCreationOption[] = [
