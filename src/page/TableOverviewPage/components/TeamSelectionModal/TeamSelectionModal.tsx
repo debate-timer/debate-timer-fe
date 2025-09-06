@@ -6,6 +6,7 @@ import CoinBack from '../../../../assets/teamSelection/coinback.png';
 interface TeamSelectionModalProps {
   onClose: () => void;
   onStartDebate: () => void;
+  onEdit: () => void;
 }
 
 type CoinState = 'initial' | 'tossing' | 'front' | 'back';
@@ -13,6 +14,7 @@ type CoinState = 'initial' | 'tossing' | 'front' | 'back';
 export default function TeamSelectionModal({
   onClose,
   onStartDebate,
+  onEdit,
 }: TeamSelectionModalProps) {
   const [coinState, setCoinState] = useState<CoinState>('initial');
 
@@ -51,9 +53,14 @@ export default function TeamSelectionModal({
     };
   }, [coinState, coinResultSound]);
 
-  const handleStartDebate = () => {
+  const handleStart = () => {
     onClose();
     onStartDebate();
+  };
+
+  const handleEdit = () => {
+    onClose();
+    onEdit();
   };
 
   return (
@@ -123,13 +130,13 @@ export default function TeamSelectionModal({
           <div className="flex">
             <button
               className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled/hover py-3 text-lg font-semibold hover:bg-default-disabled/hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
-              onClick={handleStartDebate}
+              onClick={handleEdit}
             >
               토론 정보 수정하기
             </button>
             <button
               className="sm:text-lg sm:py-4 w-full bg-brand py-3 text-lg font-bold hover:bg-brand-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
-              onClick={handleStartDebate}
+              onClick={handleStart}
             >
               토론 바로 시작하기
             </button>

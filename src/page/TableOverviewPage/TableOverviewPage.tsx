@@ -52,6 +52,19 @@ export default function TableOverviewPage() {
     }
   };
 
+  // 토론 수정하기 핸들러
+  const handleEdit = () => {
+    if (isGuestFlow()) {
+      navigate(`/composition?mode=edit&type=CUSTOMIZE`, {
+        state: { step: 'NameAndType' },
+      });
+    } else {
+      navigate(`/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`, {
+        state: { step: 'NameAndType' },
+      });
+    }
+  };
+
   if (isError) {
     return (
       <DefaultLayout>
@@ -178,6 +191,7 @@ export default function TableOverviewPage() {
         <TeamSelectionModal
           onClose={closeModal}
           onStartDebate={handleStartDebate}
+          onEdit={handleEdit}
         />
       </ModalWrapper>
     </>
