@@ -152,7 +152,6 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       // 3. 스크롤 바 유무 판단
       const hasScrollBar =
         contentListElement.scrollHeight > containerElement.clientHeight;
-      console.log('# hasScrollBar = ', hasScrollBar);
 
       // 4. 현재 상태와 다를 경우에만 상태 업데이트
       if (isButtonFixed !== hasScrollBar) {
