@@ -139,15 +139,11 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     const calculatePosition = () => {
       // 1. Footer 높이 측정
       const newFooterHeight = footerElement.getBoundingClientRect().height;
-      if (footerHeight !== newFooterHeight) {
-        setFooterHeight(newFooterHeight);
-      }
+      setFooterHeight(newFooterHeight);
 
       // 2. 버튼의 실제 높이(offsetHeight) 측정 및 state 업데이트
       const newButtonHeight = buttonElement.offsetHeight;
-      if (buttonHeight !== newButtonHeight) {
-        setButtonHeight(newButtonHeight);
-      }
+      setButtonHeight(newButtonHeight);
 
       // 3. 스크롤 바 유무 판단
       const hasScrollBar =
