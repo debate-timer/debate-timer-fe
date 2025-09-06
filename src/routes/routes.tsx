@@ -40,7 +40,7 @@ const routesConfig = [
     requiresAuth: false,
   },
   {
-    path: '/debateEnd/:id/feedback',
+    path: '/table/customize/:id/end/feedback',
     element: <FeedbackTimerPage />,
     requiresAuth: true,
   },
