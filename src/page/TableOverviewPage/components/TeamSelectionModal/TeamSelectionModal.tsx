@@ -56,9 +56,6 @@ export default function TeamSelectionModal({
     onStartDebate();
   };
 
-  const bottomButtonClass =
-    'sm:py-5 sm:text-lg w-full bg-brand py-4 text-base font-semibold md:py-6 md:text-xl lg:py-[27px] lg:text-[22px] hover:bg-brand-hover';
-
   return (
     <div
       className="sm:h-[350px] sm:w-[350px] relative flex h-[280px] w-[280px] flex-col overflow-hidden md:h-[400px] md:w-[400px] lg:h-[452px] lg:w-[452px]"
@@ -116,16 +113,27 @@ export default function TeamSelectionModal({
       <div className="w-full">
         {coinState === 'initial' && (
           <button
-            className={bottomButtonClass}
+            className="sm:text-lg sm:py-4 w-full bg-brand py-3 text-[22px] font-semibold hover:bg-brand-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
             onClick={() => setCoinState('tossing')}
           >
             동전 던지기
           </button>
         )}
         {(coinState === 'front' || coinState === 'back') && (
-          <button className={bottomButtonClass} onClick={handleStartDebate}>
-            토론 바로 시작하기
-          </button>
+          <div className="flex">
+            <button
+              className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled/hover py-3 text-lg font-semibold hover:bg-default-disabled/hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
+              onClick={handleStartDebate}
+            >
+              토론 정보 수정하기
+            </button>
+            <button
+              className="sm:text-lg sm:py-4 w-full bg-brand py-3 text-lg font-bold hover:bg-brand-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
+              onClick={handleStartDebate}
+            >
+              토론 바로 시작하기
+            </button>
+          </div>
         )}
       </div>
     </div>
