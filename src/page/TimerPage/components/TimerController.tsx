@@ -25,7 +25,10 @@ export default function TimerController({
     <div className="flex flex-row items-center justify-center space-x-[16px] xl:space-x-[24px]">
       {/* 초기화 버튼 */}
       <button
-        className="items-cent flex size-[76px] justify-center rounded-full bg-default-black2 p-[20px] xl:size-[92px]"
+        className={clsx(
+          'flex size-[76px] items-center justify-center rounded-full bg-default-black2 p-[20px] xl:size-[92px]',
+          { 'hover:bg-[#676767]': boxType === 'FEEDBACK' },
+        )}
         onClick={onReset}
       >
         <DTReset className="size-full text-default-white" />
@@ -42,6 +45,7 @@ export default function TimerController({
             'bg-default-neutral':
               stance === 'NEUTRAL' && boxType !== 'FEEDBACK',
           },
+          { 'hover:bg-brand-hover': boxType === 'FEEDBACK' },
         )}
         onClick={() => {
           if (isRunning) {

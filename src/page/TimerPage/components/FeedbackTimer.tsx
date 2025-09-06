@@ -52,7 +52,7 @@ export default function FeedbackTimer({
   };
 
   return (
-    <div className="flex flex-row space-x-[80px] items-center">
+    <div className="flex flex-row items-center space-x-[80px]">
       {/* 좌측 영역 */}
       <div className="flex h-[186px] w-[466px] flex-shrink-0 flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
         {/* 제목 */}
@@ -68,7 +68,7 @@ export default function FeedbackTimer({
               disabled={isRunning}
               className={clsx(
                 'flex h-[52px] w-[100px] items-center justify-center rounded-[16px] text-[20px] font-semibold text-default-black transition-all duration-200 ease-in-out',
-                'bg-brand/80 hover:bg-brand disabled:cursor-not-allowed disabled:bg-default-neutral/50',
+                'bg-brand/80 hover:bg-brand-hover disabled:cursor-not-allowed disabled:bg-default-neutral/50',
               )}
             >
               {label}
