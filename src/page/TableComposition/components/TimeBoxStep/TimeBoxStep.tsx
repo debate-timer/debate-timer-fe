@@ -158,8 +158,10 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     calculatePosition();
 
     const resizeObserver = new ResizeObserver(calculatePosition);
-    resizeObserver.observe(containerElement);
+    resizeObserver.observe(contentListElement);
     resizeObserver.observe(footerElement);
+    resizeObserver.observe(buttonElement);
+    resizeObserver.observe(containerElement);
 
     return () => {
       resizeObserver.disconnect();
