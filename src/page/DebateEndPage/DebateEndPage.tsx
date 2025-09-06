@@ -38,7 +38,7 @@ export default function DebateEndPage() {
         {/* 피드백 타이머 카드 */}
         <button
           onClick={handleFeedbackClick}
-          className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-white md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-11"
+          className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-white transition-all duration-300 hover:border-[#FECD4C7D] hover:shadow-[0px_0px_22px_6px_#FECD4C63] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-11"
         >
           <img
             src={feedbackTimerImage}
