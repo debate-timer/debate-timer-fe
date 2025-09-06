@@ -178,12 +178,15 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
   useLayoutEffect(() => {
     const handleResize = () => {
       const containerElement = containerRef.current;
-      if (!containerElement) {
+      const contentListElement = contentListRef.current;
+
+      if (!containerElement || !contentListElement) {
         return;
       }
 
       const hasScrollBar =
-        containerElement.scrollHeight > containerElement.clientHeight;
+        contentListElement.scrollHeight > containerElement.clientHeight;
+
       if (isButtonFixed !== hasScrollBar) {
         setIsButtonFixed(hasScrollBar);
       }
