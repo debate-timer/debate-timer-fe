@@ -14,7 +14,7 @@ export default function TemplateApplicationSection() {
         <button
           onClick={() =>
             window.open(
-              LANDING_URLS.REPORT_FORM_URL,
+              LANDING_URLS.TEMPLATE_REGISTER_URL,
               '_blank',
               'noopener,noreferrer',
             )
