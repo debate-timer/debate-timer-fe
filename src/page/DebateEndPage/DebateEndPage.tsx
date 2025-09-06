@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import clapImage from '../../assets/datateEnd/clap.png';
-import feedbackTimerImage from '../../assets/datateEnd/feedback_timer.png';
-import voteStampImage from '../../assets/datateEnd/vote_stamp.png';
+import clapImage from '../../assets/debateEnd/clap.png';
+import feedbackTimerImage from '../../assets/debateEnd/feedback_timer.png';
+import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
 import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 
 export default function DebateEndPage() {
