@@ -2,6 +2,7 @@
 export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
 export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
+export type CoinState = 'initial' | 'tossing' | 'front' | 'back';
 
 export type BellType = 'BEFORE_END' | 'AFTER_END' | 'AFTER_START';
 export type BellConfig = {

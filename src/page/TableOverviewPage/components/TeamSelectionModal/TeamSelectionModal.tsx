@@ -1,22 +1,33 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Cointoss from '../../../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../../../assets/teamSelection/coinback.png';
+import { CoinState } from '../../../../type/type';
 
 interface TeamSelectionModalProps {
   onClose: () => void;
   onStartDebate: () => void;
   onEdit: () => void;
+  initialCoinState: CoinState;
+  onCoinStateChange: (state: CoinState) => void;
 }
-
-type CoinState = 'initial' | 'tossing' | 'front' | 'back';
 
 export default function TeamSelectionModal({
   onClose,
   onStartDebate,
   onEdit,
+  initialCoinState,
+  onCoinStateChange,
 }: TeamSelectionModalProps) {
-  const [coinState, setCoinState] = useState<CoinState>('initial');
+  const [coinState, setCoinState] = useState<CoinState>(initialCoinState);
+
+  const updateCoinState = useCallback(
+    (newState: CoinState) => {
+      setCoinState(newState);
+      onCoinStateChange(newState);
+    },
+    [onCoinStateChange],
+  );
 
   // 효과음 객체
   const coinTossSound = useMemo(() => new Audio('/sounds/cointoss.mp3'), []);
@@ -34,7 +45,7 @@ export default function TeamSelectionModal({
         coinTossSound.pause();
         coinTossSound.currentTime = 0;
         const result = Math.random() < 0.5 ? 'front' : 'back';
-        setCoinState(result);
+        updateCoinState(result);
       }, 2000);
       return () => {
         clearTimeout(timer);
@@ -124,7 +135,7 @@ export default function TeamSelectionModal({
         {coinState === 'initial' && (
           <button
             className="sm:text-lg sm:py-4 w-full bg-brand py-3 text-[22px] font-semibold hover:bg-brand-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
-            onClick={() => setCoinState('tossing')}
+            onClick={() => updateCoinState('tossing')}
           >
             동전 던지기
           </button>
