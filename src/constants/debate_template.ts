@@ -35,19 +35,6 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
       ],
     },
     {
-      title: '이감',
-      subtitle: '경희대',
-      logoSrc: igam,
-      actions: [
-        {
-          label: '하이브리드 토론',
-          href: createTableShareUrl(
-            'eJzFkk1LAkEYx7%2BKPOc9%2BAIhe1Pbg5C74q6XImLUUZfW2WXXqBAhIiPIgxCFhzW0Q3TwsEWCn8kZv0OzrZm9kBJkt3l%2BzPyfH88zDdBLIMbiMQF0UjZBbABBNQwisN7zxOuwy15oet3lBR236f2QXrmh6XmfDvogQP3Y8m%2Bm8qqmZNLbEkeogkkJccjPlm06GkY1eRboDdnZI%2BdFkyxy6nVp%2B4TzQ2QTnVSS2DBALCPDwQKUdaI71QXU5G1RweAPdxrg1BEp%2BhnZnKLyBMfCuFjVAi122wo0C%2BbRDMlKLpPY8s11v3UkHg6OWWz7QiCSA8OYI9XCaJ8LvWHHr7HNcyL06QKawoJASpG%2FCExGHeY9sIHHToc%2FakR%2FqRFdSWOtc%2FhuEf8wB1nKa7nX6E%2Bj6DC3P%2F%2B%2F7yZaOiPtJROqtDm3%2BdA70NkIh5fb%2BOXynYxcdtcKUc9lN%2BM%2FmUlspdWsy2O3%2BQJwVp3c',
-          ),
-        },
-      ],
-    },
-    {
       title: '건대타임',
       subtitle: '건국대',
       logoSrc: kondae_time,
@@ -141,6 +128,25 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
           label: '2:2 CEDA 토론',
           href: createTableShareUrl(
             'eJzllD9PwkAUwL9Kc3MHaIjRbvzpQCItoWXRGHOUAxrLtWkhagiJQzEmOOBCGIqpOujgUAcSTfhE9PwOXqkCKmFRiInb3S937%2F3y7t5rAa0M%2BESMY4GGKwbgWwDDOgI8CF4ccjcm%2FTHpDhmO55i0kEkyr%2BdecOMBFjROzfBUuigrUi67J1AEqwiXIYV0bVqGrSBYF6NgxH8kzhPlqoEXeeAPgsszyo%2BhhTVcTSFdB3wF6jZiQUXDml2LUMNqojbNCks6vbffAnYDYjUMkS9IMg1gmwipNSWyItedyLJknLwjUSrkkruhuBZm3olFqzyyQh3A46auz5BsInhEdT6wHe6RFW3b7EJ2USgqhWncLwJXxHMY0nUnvrPKY%2BuXPNKS%2BK0Kk1GP%2BA8Mub8gw8Eqifj2Gi3%2B31ss%2B5Gbf4ufViPOrVukR1xvNk%2FmHko2JxymkrKQmbl8yhzJJBbqNHeZSv%2F9H7K0T0Yuue0wge%2BS%2FvMm2mXp4NyExEH7DcztU4k%3D',
+          ),
+        },
+      ],
+    },
+    {
+      title: '이감',
+      subtitle: '경희대',
+      logoSrc: igam,
+      actions: [
+        {
+          label: '하이브리드 토론',
+          href: createTableShareUrl(
+            'eJzFkk1LAkEYx7%2BKPOc9%2BAIhe1Pbg5C74q6XImLUUZfW2WXXqBAhIiPIgxCFhzW0Q3TwsEWCn8kZv0OzrZm9kBJkt3l%2BzPyfH88zDdBLIMbiMQF0UjZBbABBNQwisN7zxOuwy15oet3lBR236f2QXrmh6XmfDvogQP3Y8m%2Bm8qqmZNLbEkeogkkJccjPlm06GkY1eRboDdnZI%2BdFkyxy6nVp%2B4TzQ2QTnVSS2DBALCPDwQKUdaI71QXU5G1RweAPdxrg1BEp%2BhnZnKLyBMfCuFjVAi122wo0C%2BbRDMlKLpPY8s11v3UkHg6OWWz7QiCSA8OYI9XCaJ8LvWHHr7HNcyL06QKawoJASpG%2FCExGHeY9sIHHToc%2FakR%2FqRFdSWOtc%2FhuEf8wB1nKa7nX6E%2Bj6DC3P%2F%2B%2F7yZaOiPtJROqtDm3%2BdA70NkIh5fb%2BOXynYxcdtcKUc9lN%2BM%2FmUlspdWsy2O3%2BQJwVp3c',
+          ),
+        },
+        {
+          label: '2:2 자유 토론',
+          href: createTableShareUrl(
+            'eJyrVspMUbIyMTTQUcrMS8tXsqpWykvMTVWyUnozd8urDRPedM9VMLIyUngzb8KbOQveti14vXCBko5SSWUBSI1zaHCIv69nlCtQKDE9NS8lESgIZBcU5ReHpCbm%2BkGN2rDmTctGoHhyfh6y%2BOsNM173NADFyxOL8jLz0p1Sc3KUrNISc4pTdZTSMvMyizOQhGqB1iYm5QA1RlcrFZck5iWDzAgI8g8GmlBckJqanBECcdabea0QZyblV0CF%2FPyDfB19QC7PBFltaQBhBaQWgdyjZJVXmpMDFwouSE3MBroHJlwM4qcWQbi1Oki2O%2Fv7DaDtfq6hIUFgc9EcgBJXCGeEePq6xjs5Bru6wJ2CYjPEMeZGBljcYggSJTEgts55s6hV4fWGOW%2Bm7aBHeGBNC%2FRwRGwtADF%2FL8A%3D',
           ),
         },
       ],
