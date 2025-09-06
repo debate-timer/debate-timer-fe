@@ -30,6 +30,9 @@ export default function TeamSelectionModal({
     if (coinState === 'tossing') {
       coinTossSound.play();
       const timer = setTimeout(() => {
+        // 다음 화면 상태 전환 직전에 사운드 명시적 정지
+        coinTossSound.pause();
+        coinTossSound.currentTime = 0;
         const result = Math.random() < 0.5 ? 'front' : 'back';
         setCoinState(result);
       }, 2000);
