@@ -1,7 +1,8 @@
-import section201 from '../../../assets/landing/section2-1.png';
-import section202 from '../../../assets/landing/section2-2.png';
-import section203 from '../../../assets/landing/section2-3.png';
-
+import timer from '../../../assets/landing/timer.png';
+import timerOperationTime from '../../../assets/landing/timer_operation_time.png';
+import timerTimeBased from '../../../assets/landing/timer_timebased.png';
+import keyInfo from '../../../assets/landing/key_info.png';
+import timeoutButton from '../../../assets/landing/timeout_button.png';
 export default function TimerSection() {
   return (
     <section
@@ -13,37 +14,47 @@ export default function TimerSection() {
           <span className="relative z-10">타이머 화면</span>
           <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand/70"></span>
         </div>
-        <h1 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
-          키보드 방향키로 더 편리한 조작
-        </h1>
+        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+          원하는 때에 <br />
+          작전 시간 사용하기
+        </h2>
       </div>
-      <div className="flex flex-col gap-4">
-        <img src={section201} alt="section201" className="w-full" />
-        <p className="text-right text-[min(max(0.75rem,1vw),1.1rem)] text-neutral-600">
-          일반 타이머
-        </p>
+      <div className="flex flex-row items-center justify-center gap-8 px-4">
+        <img src={timer} alt="section301" className="flex w-1/2" />
+        <div className="flex w-1/2 flex-col items-center gap-4">
+          <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
+            토론자가 작전 시간을
+            <br />
+            요청하면{' '}
+            <img
+              src={timeoutButton}
+              alt="작전 시간 사용"
+              className="inline-block h-[1.8rem] align-middle"
+              style={{ transform: 'translateY(-0.1em)' }}
+            />{' '}
+            <br />
+            버튼을 눌러 시간을 사용해요
+          </h3>
+        </div>
+      </div>
+      <div className="flex flex-row items-center justify-center gap-8 px-4">
+        <div className="flex w-1/2 flex-col items-center gap-4">
+          <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
+            작전 시간이 나타나면
+            <br /> 원하는 시간을 입력하세요!
+          </h3>
+        </div>
+        <img src={timerOperationTime} alt="section302" className="flex w-1/2" />
       </div>
 
-      <div className="flex flex-col items-center gap-1 font-medium text-neutral-600">
-        <p className="text-center text-[min(max(0.875rem,1.5vw),1.4rem)]">
-          토론자들이 손을 들고 작전 시간을 요청하면
-        </p>
-        <p className="text-center text-[min(max(0.875rem,1.5vw),1.4rem)]">
-          버튼을 통해 작전 시간을 세팅할 수 있어요.
-        </p>
+      <div>
+        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+          키보드 방향키로 <br />더 편리한 조작
+        </h2>
       </div>
-
-      <div className="mt-7 flex flex-col gap-4">
-        <img src={section202} alt="section202" className="w-full" />
-        <p className="text-right text-[min(max(0.75rem,1vw),1.1rem)] text-neutral-600">
-          자유토론형 타이머
-        </p>
-      </div>
-      <div className="flex flex-col items-center gap-6">
-        <p className="text-center text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
-          키보드로 타이머를 보다 편하게 조작해보세요!
-        </p>
-        <img src={section203} alt="section203" className="w-1/3" />
+      <div className="flex flex-row items-center justify-center gap-8 px-4">
+        <img src={keyInfo} alt="section203" className="m-10 w-1/3" />
+        <img src={timerTimeBased} alt="section203" className="w-1/2" />
       </div>
     </section>
   );

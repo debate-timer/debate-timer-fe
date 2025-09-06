@@ -71,3 +71,16 @@ export const bgColorMap: Record<TimerBGState, string> = {
   danger: 'bg-semantic-warning', // 10초 이하
   expired: 'bg-default-timeout', // 0초 이하
 };
+
+type Action = {
+  label: string; // 좌측에 표시할 토론 형식 이름 (예: "CEDA 토론")
+  href: string; // 우측 "토론하기" 버튼의 이동 링크
+};
+
+export type DebateTemplate = {
+  title: string; // 제목 (예: "서방정토")
+  subtitle?: string; // 서브 제목 (예: "서강대")
+  logoSrc?: string; // 로고 이미지
+  actions: Action[];
+  className?: string; // 카드의 추가 className이 필요하면 사용
+};
