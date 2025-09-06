@@ -122,7 +122,7 @@ export default function TeamSelectionModal({
               </div>
             </div>
             <div className="flex h-20 w-full items-center justify-center px-6">
-              <span className="text-natural-1000 sm:text-xl text-lg font-semibold md:text-2xl">
+              <span className="text-neutral-1000 sm:text-xl text-lg font-semibold md:text-2xl">
                 동전 던지는 중...
               </span>
             </div>

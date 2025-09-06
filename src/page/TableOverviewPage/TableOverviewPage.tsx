@@ -198,7 +198,7 @@ export default function TableOverviewPage() {
       </DefaultLayout>
 
       <TableShareModal />
-      <ModalWrapper closeButtonColor="text-natural-1000">
+      <ModalWrapper closeButtonColor="text-neutral-1000">
         <TeamSelectionModal
           onClose={closeModal}
           onStartDebate={handleStartDebate}
