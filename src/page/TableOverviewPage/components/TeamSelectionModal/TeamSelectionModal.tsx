@@ -92,7 +92,7 @@ export default function TeamSelectionModal({
                   className="h-full w-full object-contain"
                 />
               </div>
-              <div className="sm:px-6 sm:py-4 rounded-full bg-black px-4 py-3 text-lg font-semibold text-white md:px-8 md:text-2xl">
+              <div className="sm:px-3 sm:py-1 sm:text-lg rounded-full bg-black px-2 py-0.5 text-base font-semibold text-white md:px-4 md:py-1.5 md:text-xl lg:px-4 lg:py-1.5 lg:text-2xl xl:px-5 xl:py-2">
                 {coinState === 'front' ? '앞' : '뒤'}
               </div>
             </div>
