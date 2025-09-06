@@ -70,6 +70,8 @@ const TIME_BASED_OPTIONS: TimerCreationOption[] = [
   'TIME_PER_SPEAKING',
 ] as const;
 
+const SAVED_BELL_CONFIGS_KEY = 'savedBellInputConfigs';
+
 interface TimerCreationContentProps {
   beforeData?: TimeBoxInfo;
   initData?: TimeBoxInfo;
@@ -185,22 +187,27 @@ export default function TimerCreationContent({
     ? 'time-based-timer-only-total-timer'
     : 'time-based-timer';
 
+  // 이전 종소리 설정
+  const rawBellConfigData = sessionStorage.getItem(SAVED_BELL_CONFIGS_KEY);
+  const defaultBellConfig: BellInputConfig[] = [
+    { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
+    { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
+  ];
+  const savedBellOptions: BellInputConfig[] =
+    rawBellConfigData === null
+      ? defaultBellConfig
+      : JSON.parse(rawBellConfigData);
+
   // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
 
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
-    if (beforeData?.bell && beforeData.bell.length >= 0) {
-      return beforeData.bell.map(bellConfigToBellInputConfig);
-    }
     if (initData) {
       const initBell = initData.bell === null ? [] : initData.bell;
       return initBell.map(bellConfigToBellInputConfig);
     }
-    return [
-      { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
-      { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
-    ];
+    return savedBellOptions;
   };
   const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
 
@@ -327,6 +334,7 @@ export default function TimerCreationContent({
 
     const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
     if (timerType === 'NORMAL') {
+      sessionStorage.setItem(SAVED_BELL_CONFIGS_KEY, JSON.stringify(bells));
       onSubmit({
         stance: stanceToSend,
         speechType: speechTypeToSend,
@@ -351,6 +359,7 @@ export default function TimerCreationContent({
         bell: null,
       });
     }
+
     onClose();
   }, [
     bells,
@@ -430,6 +439,50 @@ export default function TimerCreationContent({
   const handleBellExpandButtonClick = useCallback(() => {
     setIsBellExpanded((prev) => !prev);
   }, []);
+
+  // 1, 2, 3으로 범위가 제한되는 종소리 횟수에 사용하는 변경 함수
+  const handleBellCountChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+      // Backspace 대응
+      if (value === '') {
+        setBellInput((prev) => ({
+          ...prev,
+          count: 1,
+        }));
+        return;
+      }
+
+      // 마지막 입력 문자를 가져옴
+      const lastInput = value.slice(-1);
+      let newCount;
+
+      if (['1', '2', '3'].includes(lastInput)) {
+        // 유효한 입력(1, 2, 3)이면 해당 값으로 설정
+        newCount = lastInput;
+      } else {
+        // 유효하지 않은 문자(알파벳, 1~3 이외 숫자 등)가 마지막에 입력된 경우 무시
+        return;
+      }
+
+      setBellInput((prev) => ({
+        ...prev,
+        count: Number(newCount),
+      }));
+    },
+    [],
+  );
+
+  // 0 <= x <= 59로 범위가 제한되는 분과 초에 사용하는 검증 함수
+  const getValidateTimeValue = (value: string) => {
+    let num = parseInt(value, 10);
+    if (isNaN(num)) {
+      num = 0;
+    }
+
+    return Math.max(0, Math.min(59, num));
+  };
 
   return (
     <div className="flex w-[820px] flex-col">
@@ -709,39 +762,47 @@ export default function TimerCreationContent({
 
                           {/* 분, 초, 타종 횟수 */}
                           <input
-                            type="number"
-                            min={0}
-                            max={59}
-                            className="w-[52px] rounded-[4px] border border-default-border p-[8px]"
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                             value={bellInput.min}
-                            onChange={(e) =>
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const safeValue = e.target.value.replace(
+                                /[^0-9]/g,
+                                '',
+                              );
+
                               setBellInput((prev) => ({
                                 ...prev,
-                                min: Math.max(
-                                  0,
-                                  Math.min(59, Number(e.target.value)),
-                                ),
-                              }))
-                            }
+                                min: getValidateTimeValue(safeValue),
+                              }));
+                            }}
                             placeholder="분"
                           />
                           <span>분</span>
 
                           <input
-                            type="number"
-                            min={0}
-                            max={59}
-                            className="w-[52px] rounded-[4px] border border-default-border p-[8px]"
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                             value={bellInput.sec}
-                            onChange={(e) =>
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const safeValue = e.target.value.replace(
+                                /[^0-9]/g,
+                                '',
+                              );
+
                               setBellInput((prev) => ({
                                 ...prev,
-                                sec: Math.max(
-                                  0,
-                                  Math.min(59, Number(e.target.value)),
-                                ),
-                              }))
-                            }
+                                sec: getValidateTimeValue(safeValue),
+                              }));
+                            }}
                             placeholder="초"
                           />
                           <span>초</span>
@@ -750,18 +811,11 @@ export default function TimerCreationContent({
                           <DTBell className="w-[24px]" />
                           <p>x</p>
                           <input
-                            type="number"
-                            min={1}
-                            max={3}
-                            className="w-[48px] rounded-[4px] border border-default-border p-[8px]"
+                            type="text"
+                            inputMode="numeric"
+                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                             value={bellInput.count}
-                            onChange={(e) => {
-                              const value = Number(e.target.value) % 10;
-                              setBellInput((prev) => ({
-                                ...prev,
-                                count: Math.max(1, Math.min(3, Number(value))),
-                              }));
-                            }}
+                            onChange={handleBellCountChange}
                             placeholder="횟수"
                           />
                           <span className="w-[8px]"></span>
