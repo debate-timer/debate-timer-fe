@@ -1,5 +1,5 @@
 import { type PropsWithChildren } from 'react';
-import { Stance } from '../../../type/type';
+import { Stance, TimeBoxType } from '../../../type/type';
 import { MotionValue, useTransform, motion } from 'framer-motion';
 
 /**
@@ -10,6 +10,7 @@ import { MotionValue, useTransform, motion } from 'framer-motion';
 interface CircularTimerProps {
   progress: MotionValue<number>;
   stance: Stance;
+  boxType?: TimeBoxType;
   strokeWidth?: number;
   className?: string;
 }
@@ -18,16 +19,19 @@ export default function CircularTimer({
   progress,
   strokeWidth = 15,
   stance,
+  boxType,
   className = 'w-[480px] h-[480px]',
   children,
 }: PropsWithChildren<CircularTimerProps>) {
   const BASE_COLOR = '#D6D7D9'; // bg-default-disabled/hover
   const PROGRESS_COLOR =
-    stance === 'NEUTRAL'
-      ? '#A3A3A3' // bg-default-neutral
-      : stance === 'PROS'
-        ? '#1E91D6' // bg-camp-blue
-        : '#E14666'; // bg-camp-red
+    boxType === 'FEEDBACK'
+      ? '#FECD4C' // bg-brand
+      : stance === 'NEUTRAL'
+        ? '#A3A3A3' // bg-default-neutral
+        : stance === 'PROS'
+          ? '#1E91D6' // bg-camp-blue
+          : '#E14666'; // bg-camp-red
   const angle = useTransform(progress, [0, 100], [0, 360]);
   const backgroundImage = useTransform(angle, (currentAngle) => {
     if (currentAngle >= 360) {

@@ -24,6 +24,8 @@ import clsx from 'clsx';
 import TimeInputGroup from './TimeInputGroup';
 import DTBell from '../../../../components/icons/Bell';
 import DTAdd from '../../../../components/icons/Add';
+import NotificationBadge from '../../../../components/NotificationBadge/NotificationBadge';
+import DTExpand from '../../../../components/icons/Expand';
 
 type TimerCreationOption =
   | 'TIMER_TYPE'
@@ -67,6 +69,8 @@ const TIME_BASED_OPTIONS: TimerCreationOption[] = [
   'TIME_PER_TEAM',
   'TIME_PER_SPEAKING',
 ] as const;
+
+const SAVED_BELL_CONFIGS_KEY = 'savedBellInputConfigs';
 
 interface TimerCreationContentProps {
   beforeData?: TimeBoxInfo;
@@ -142,9 +146,9 @@ export default function TimerCreationContent({
       ? (initData?.speechType ?? '')
       : SPEECH_TYPE_RECORD[currentSpeechType],
   );
-  console.log(
-    `# initSpeech: ${initSpeechType} / currentSpeech: ${currentSpeechType}`,
-  );
+
+  // 종소리 영역 확장 여부
+  const [isBellExpanded, setIsBellExpanded] = useState(false);
 
   // 발언 시간
   const { minutes: initMinutes, seconds: initSeconds } =
@@ -183,22 +187,27 @@ export default function TimerCreationContent({
     ? 'time-based-timer-only-total-timer'
     : 'time-based-timer';
 
+  // 이전 종소리 설정
+  const rawBellConfigData = sessionStorage.getItem(SAVED_BELL_CONFIGS_KEY);
+  const defaultBellConfig: BellInputConfig[] = [
+    { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
+    { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
+  ];
+  const savedBellOptions: BellInputConfig[] =
+    rawBellConfigData === null
+      ? defaultBellConfig
+      : JSON.parse(rawBellConfigData);
+
   // 종소리 input 상태
   const [bellInput, setBellInput] = useState<BellInputConfig>(initBellInput);
 
   // bell의 time(초)은: before => 양수, after => 음수로 변환
   const getInitialBells = (): BellInputConfig[] => {
-    if (beforeData?.bell && beforeData.bell.length >= 0) {
-      return beforeData.bell.map(bellConfigToBellInputConfig);
-    }
     if (initData) {
       const initBell = initData.bell === null ? [] : initData.bell;
       return initBell.map(bellConfigToBellInputConfig);
     }
-    return [
-      { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
-      { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
-    ];
+    return savedBellOptions;
   };
   const [bells, setBells] = useState<BellInputConfig[]>(getInitialBells);
 
@@ -315,11 +324,9 @@ export default function TimerCreationContent({
       return;
     } else {
       if (currentSpeechType === 'CUSTOM') {
-        console.log('# 커스텀 스피치');
         speechTypeToSend = speechTypeTextValue;
         stanceToSend = timerType === 'TIME_BASED' ? 'NEUTRAL' : stance;
       } else {
-        console.log('# 정해진 스피치');
         speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
         stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
       }
@@ -327,6 +334,7 @@ export default function TimerCreationContent({
 
     const bell = isNormalTimer ? bells.map(bellInputConfigToBellConfig) : null;
     if (timerType === 'NORMAL') {
+      sessionStorage.setItem(SAVED_BELL_CONFIGS_KEY, JSON.stringify(bells));
       onSubmit({
         stance: stanceToSend,
         speechType: speechTypeToSend,
@@ -351,6 +359,7 @@ export default function TimerCreationContent({
         bell: null,
       });
     }
+
     onClose();
   }, [
     bells,
@@ -426,6 +435,54 @@ export default function TimerCreationContent({
     },
     [currentSpeechType],
   );
+
+  const handleBellExpandButtonClick = useCallback(() => {
+    setIsBellExpanded((prev) => !prev);
+  }, []);
+
+  // 1, 2, 3으로 범위가 제한되는 종소리 횟수에 사용하는 변경 함수
+  const handleBellCountChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+      // Backspace 대응
+      if (value === '') {
+        setBellInput((prev) => ({
+          ...prev,
+          count: 1,
+        }));
+        return;
+      }
+
+      // 마지막 입력 문자를 가져옴
+      const lastInput = value.slice(-1);
+      let newCount;
+
+      if (['1', '2', '3'].includes(lastInput)) {
+        // 유효한 입력(1, 2, 3)이면 해당 값으로 설정
+        newCount = lastInput;
+      } else {
+        // 유효하지 않은 문자(알파벳, 1~3 이외 숫자 등)가 마지막에 입력된 경우 무시
+        return;
+      }
+
+      setBellInput((prev) => ({
+        ...prev,
+        count: Number(newCount),
+      }));
+    },
+    [],
+  );
+
+  // 0 <= x <= 59로 범위가 제한되는 분과 초에 사용하는 검증 함수
+  const getValidateTimeValue = (value: string) => {
+    let num = parseInt(value, 10);
+    if (isNaN(num)) {
+      num = 0;
+    }
+
+    return Math.max(0, Math.min(59, num));
+  };
 
   return (
     <div className="flex w-[820px] flex-col">
@@ -647,127 +704,164 @@ export default function TimerCreationContent({
               case 'BELL':
                 return (
                   <div
-                    className="flex w-full flex-col space-y-[16px]"
+                    className="flex w-full flex-col space-y-[8px]"
                     key={`${timerType}-${index}`}
                   >
-                    {/* 제목 */}
-                    <p className="text-body w-[80px] font-medium">
-                      종소리 설정
-                    </p>
+                    {/* 제목 및 종소리 횟수 배지 */}
+                    <div className="flex w-full flex-row justify-between">
+                      <div className="relative flex items-center space-x-[8px]">
+                        <p className="text-body w-[80px] font-medium">
+                          종소리 설정
+                        </p>
 
-                    {/* 입력부 */}
-                    <span className="flex w-full flex-row items-center space-x-[4px]">
-                      {/* 벨 유형 */}
-                      <DropdownMenu
-                        className=""
-                        options={bellOptions}
-                        selectedValue={bellInput.type}
-                        onSelect={(value: BellType) => {
-                          setBellInput((prev) => ({
-                            ...prev,
-                            type: value,
-                          }));
-                        }}
-                      />
-                      <span className="w-[8px]"></span>
-
-                      {/* 분, 초, 타종 횟수 */}
-                      <input
-                        type="number"
-                        min={0}
-                        max={59}
-                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
-                        value={bellInput.min}
-                        onChange={(e) =>
-                          setBellInput((prev) => ({
-                            ...prev,
-                            min: Math.max(
-                              0,
-                              Math.min(59, Number(e.target.value)),
-                            ),
-                          }))
-                        }
-                        placeholder="분"
-                      />
-                      <span>분</span>
-
-                      <input
-                        type="number"
-                        min={0}
-                        max={59}
-                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
-                        value={bellInput.sec}
-                        onChange={(e) =>
-                          setBellInput((prev) => ({
-                            ...prev,
-                            sec: Math.max(
-                              0,
-                              Math.min(59, Number(e.target.value)),
-                            ),
-                          }))
-                        }
-                        placeholder="초"
-                      />
-                      <span>초</span>
-                      <span className="w-[8px]"></span>
-
-                      <DTBell className="w-[24px]" />
-                      <p>x</p>
-                      <input
-                        type="number"
-                        min={1}
-                        max={3}
-                        className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
-                        value={bellInput.count}
-                        onChange={(e) => {
-                          const value = Number(e.target.value) % 10;
-                          setBellInput((prev) => ({
-                            ...prev,
-                            count: Math.max(1, Math.min(3, Number(value))),
-                          }));
-                        }}
-                        placeholder="횟수"
-                      />
-                      <span className="w-[8px]"></span>
+                        <NotificationBadge
+                          count={bells.length}
+                          className="absolute -right-[16px] -top-[4px]"
+                        />
+                      </div>
 
                       <button
+                        className="h-full"
                         type="button"
-                        className="flex size-[28px] items-center justify-center rounded-[8px] bg-default-disabled/hover p-[6px] text-default-white"
-                        onClick={handleAddBell}
+                        aria-label={
+                          isBellExpanded
+                            ? '종소리 설정 접기'
+                            : '종소리 설정 펼치기'
+                        }
+                        onClick={handleBellExpandButtonClick}
                       >
-                        <DTAdd />
+                        <DTExpand
+                          className={clsx(
+                            'h-full transform rounded-full p-[8px] text-default-black transition-all duration-300 ease-in-out hover:bg-default-disabled/hover',
+                            {
+                              'rotate-180': isBellExpanded,
+                              'rotate-0': !isBellExpanded,
+                            },
+                          )}
+                        />
                       </button>
-                    </span>
+                    </div>
 
-                    {/* 벨 리스트 */}
-                    <span className="flex h-[100px] w-full flex-col items-center gap-2 overflow-y-auto">
-                      {bells.map((bell, idx) => (
-                        <span
-                          key={idx}
-                          className="relative flex w-full flex-row rounded-[4px] border border-default-border bg-[#FFF2D0] px-[12px] py-[4px]"
-                        >
-                          <div className="flex items-center gap-1">
-                            <p className="text-[14px]">
-                              {BellTypeToString[bell.type]}
-                            </p>
-                            <p className="text-[14px]">
-                              {bell.min}분 {bell.sec}초
-                            </p>
+                    {/* 종소리 설정 영역 */}
+                    {isBellExpanded && (
+                      <div className="flex w-full flex-col space-y-[8px] rounded-[12px] bg-default-dim2 p-[8px]">
+                        {/* 입력부 */}
+                        <span className="flex w-full flex-row items-center space-x-[4px]">
+                          {/* 벨 유형 */}
+                          <DropdownMenu
+                            options={bellOptions}
+                            selectedValue={bellInput.type}
+                            onSelect={(value: BellType) => {
+                              setBellInput((prev) => ({
+                                ...prev,
+                                type: value,
+                              }));
+                            }}
+                          />
+                          <span className="w-[8px]"></span>
 
-                            <span className="w-[8px]"></span>
-                            <DTBell className="size-[14px]" />
-                            <span className="text-[14px]">x {bell.count}</span>
-                          </div>
+                          {/* 분, 초, 타종 횟수 */}
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
+                            value={bellInput.min}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const safeValue = e.target.value.replace(
+                                /[^0-9]/g,
+                                '',
+                              );
+
+                              setBellInput((prev) => ({
+                                ...prev,
+                                min: getValidateTimeValue(safeValue),
+                              }));
+                            }}
+                            placeholder="분"
+                          />
+                          <span>분</span>
+
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
+                            value={bellInput.sec}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const safeValue = e.target.value.replace(
+                                /[^0-9]/g,
+                                '',
+                              );
+
+                              setBellInput((prev) => ({
+                                ...prev,
+                                sec: getValidateTimeValue(safeValue),
+                              }));
+                            }}
+                            placeholder="초"
+                          />
+                          <span>초</span>
+                          <span className="w-[8px]"></span>
+
+                          <DTBell className="w-[24px]" />
+                          <p>x</p>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
+                            value={bellInput.count}
+                            onChange={handleBellCountChange}
+                            placeholder="횟수"
+                          />
+                          <span className="w-[8px]"></span>
 
                           <button
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-default-border"
-                            onClick={() => handleDeleteBell(idx)}
+                            type="button"
+                            className="flex size-[28px] items-center justify-center rounded-[8px] bg-brand p-[6px] text-default-white transition-colors duration-200 hover:bg-brand-hover"
+                            onClick={handleAddBell}
                           >
-                            <DTClose className="size-[10px]" />
+                            <DTAdd />
                           </button>
                         </span>
-                      ))}
-                    </span>
+
+                        {/* 벨 리스트 */}
+                        <span className="flex h-[100px] w-full flex-col items-center gap-2 overflow-y-auto">
+                          {bells.map((bell, idx) => (
+                            <span
+                              key={idx}
+                              className="relative flex w-full flex-row rounded-[4px] border border-default-border bg-[#FFF2D0] px-[12px] py-[4px]"
+                            >
+                              <div className="flex items-center gap-1">
+                                <p className="text-[14px]">
+                                  {BellTypeToString[bell.type]}
+                                </p>
+                                <p className="text-[14px]">
+                                  {bell.min}분 {bell.sec}초
+                                </p>
+
+                                <span className="w-[8px]"></span>
+                                <DTBell className="size-[14px]" />
+                                <span className="text-[14px]">
+                                  x {bell.count}
+                                </span>
+                              </div>
+
+                              <button
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-default-border"
+                                onClick={() => handleDeleteBell(idx)}
+                              >
+                                <DTClose className="size-[10px]" />
+                              </button>
+                            </span>
+                          ))}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 );
               default:
