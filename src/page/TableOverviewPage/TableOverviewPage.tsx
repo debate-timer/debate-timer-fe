@@ -7,7 +7,7 @@ import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
-import { StanceToString } from '../../type/type';
+import { CoinState, StanceToString } from '../../type/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import DTShare from '../../components/icons/Share';
 import DTDebate from '../../components/icons/Debate';
@@ -18,12 +18,23 @@ import Coins from '../../assets/teamSelection/coins.png';
 import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
 import { useModal } from '../../hooks/useModal';
 import clsx from 'clsx';
+import { useState, useCallback } from 'react';
 
 export default function TableOverviewPage() {
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
   const { openModal, closeModal, ModalWrapper } = useModal();
+  const [modalCoinState, setModalCoinState] = useState<CoinState>('initial');
+
+  const handleOpenModal = () => {
+    setModalCoinState('initial');
+    openModal();
+  };
+
+  const handleCoinStateChange = useCallback((newState: CoinState) => {
+    setModalCoinState(newState);
+  }, []);
 
   // Only uses hooks related with customize due to the removal of parliamentary
   const {
@@ -49,6 +60,19 @@ export default function TableOverviewPage() {
       navigate('/table/customize/guest');
     } else {
       onModifyCustomizeTableData.mutate({ tableId });
+    }
+  };
+
+  // 토론 수정하기 핸들러
+  const handleEdit = () => {
+    if (isGuestFlow()) {
+      navigate(`/composition?mode=edit&type=CUSTOMIZE`, {
+        state: { step: 'NameAndType' },
+      });
+    } else {
+      navigate(`/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`, {
+        state: { step: 'NameAndType' },
+      });
     }
   };
 
@@ -106,7 +130,7 @@ export default function TableOverviewPage() {
           )}
           {!isLoading && (
             <button
-              onClick={openModal}
+              onClick={handleOpenModal}
               className="sm:right-3 sm:top-20 sm:w-24 2xl:w-40 fixed right-2 top-16 flex w-20 flex-col items-center md:right-4 md:top-24 md:w-28 lg:right-6 lg:top-28 lg:w-32 xl:right-8 xl:top-32 xl:w-36"
             >
               <img
@@ -174,10 +198,13 @@ export default function TableOverviewPage() {
       </DefaultLayout>
 
       <TableShareModal />
-      <ModalWrapper closeButtonColor="text-natural-1000">
+      <ModalWrapper closeButtonColor="text-neutral-1000">
         <TeamSelectionModal
           onClose={closeModal}
           onStartDebate={handleStartDebate}
+          onEdit={handleEdit}
+          initialCoinState={modalCoinState}
+          onCoinStateChange={handleCoinStateChange}
         />
       </ModalWrapper>
     </>
