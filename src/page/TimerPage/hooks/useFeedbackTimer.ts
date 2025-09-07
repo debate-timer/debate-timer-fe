@@ -38,7 +38,7 @@ export function useFeedbackTimer(): FeedbackTimerLogics {
    * 이미 동작중이면 재시작하지 않음
    */
   const startTimer = useCallback(() => {
-    if (intervalRef.current !== null || timer === null) return;
+    if (intervalRef.current !== null || timer === null || timer <= 0) return;
 
     const startTime = Date.now();
     targetTimeRef.current = startTime + timer * 1000;
