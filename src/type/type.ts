@@ -1,7 +1,7 @@
 // Types
 export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
-export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
+export type TimeBoxType = 'NORMAL' | 'TIME_BASED' | 'FEEDBACK';
 
 export type BellType = 'BEFORE_END' | 'AFTER_END' | 'AFTER_START';
 export type BellConfig = {
@@ -20,6 +20,7 @@ export const StanceToString: Record<Stance, string> = {
 export const TimeBoxTypeToString: Record<TimeBoxType, string> = {
   NORMAL: '일반 타이머',
   TIME_BASED: '자유토론 타이머',
+  FEEDBACK: '피드백 타이머',
 };
 
 export const BellTypeToString: Record<BellType, string> = {

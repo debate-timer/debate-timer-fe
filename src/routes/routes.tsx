@@ -9,6 +9,7 @@ import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
+import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 
@@ -37,6 +38,11 @@ const routesConfig = [
     path: '/table/customize/:id',
     element: <TimerPage />,
     requiresAuth: false,
+  },
+  {
+    path: '/table/customize/:id/end/feedback',
+    element: <FeedbackTimerPage />,
+    requiresAuth: true,
   },
   {
     path: '/oauth',
