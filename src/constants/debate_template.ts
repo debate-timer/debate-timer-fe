@@ -83,13 +83,13 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
         {
           label: '열린 토론대회 예선, 본선',
           href: createTableShareUrl(
-            'eJzFks9LAkEUx%2F%2BVZc4Sgqf2puZByB%2FoeikiRh1zaRtlV6kQwcMWhoJ1MCXWMgq7GG1k5cFTf87O839otilRAk9hp5n5znvf93kzr4LULJJ9Xp8HqTRXQHIFUXxAkIxYszZtW%2Bxp4rw%2BStAZsYE9Pe2z2757cdWUoFsHs%2F%2Fxzl7GfEUeVDouunnBVFKJRcJbIS7hPUKzmIvcgztBx3bGdQl6XTYcOXYNrk%2BgZ0rT1jk88GJd6AyhPZHcso37NZ5f1AuGQvBBVCCBPQTzmeuZAp3Xmd3lUFw%2FxDpV6V6AaBqSc1gziAflVKoaeSGV9DKpclKc1njedgUZJUwzrkU8EUtyA6NISCaviE5EuWmzJkHDgusLZltwOeZR6cLRd0g0loj4N93mVZdk3St2caK7eEimZU2bSckiwfsc70c23DPRxbHqmaMJxqK%2FaEST%2F0ETDaWUxJfv4vPcTVjLdN6akpiLBRQlHAntBvzJ0MYMZ6G6APJ5vX%2FI07Ac24RRj92cQd9aGc7yz2IPdT7sbDCUVvdhy4d5VUQ71U8AxcEn',
+            'eJzFks9LAkEUx%2F%2BVZc4SG9KhvZV5EPIHul2KiMlGXVpH2TUqRPCwhaFgHUqJ1YyiLkYbWXnw1J%2Bz8%2Fwfmm1KlKBDiJ1m5jvvfd%2Fnzbwi0naQ4pf9PqTRVA4pRURxliAFsVp5eG6zx4H78iBBo8funOFxh113vIvLmgTNClid9zf23Ocr8qHCYd7LC6wl1Gg4tB7kEk4TuoO5yD24EzQct1%2BRoNVk3Z7rlKF9BC1LGtZP4Z4Xa0KjC%2BcDyStbvZ3j%2BXkjZ6oEZyMCCZwuWE9cT%2BbouM6cJofi%2Bj42qEbTy0TXkZLCukl8KKVRzcwIqWDskRInxds6z9soIrOAadKziMWjCW5g5glJZlTRiSg3rJUlqNrQPmOODRd9HrWdO%2FgKiUTj4aVVr3nNI1mUxS5GDA8PKXRP10dSIk%2FwLsf7lk3vTAxxLPnGaALRyA8a0eR%2F0ESCa2r803fyeW4GrG65rzVJzMUEihoKB7eWlxLBlRHORHUB5JflKfJUbdexoNdiVyfQsaeGM78g%2F%2F2v2H2Fzzq760qz%2B6%2FfZ3lWRJulD1QmwAI%3D',
           ),
         },
         {
           label: '열린 토론대회 결승',
           href: createTableShareUrl(
-            'eJzFks9LAkEUx%2F%2BVZc4Smh5ib2p7EPIHul6KiFVHXVrHZVepEMHDFpaCdTAlVjMKvRhtYWHgX7Qz%2Fg%2FNtmZKngzqNu877%2Fve5828EhBTgHU7PQ4gonQesCWAhBwELMD1yrSp46eJ%2BfrIkNYI9w1metbDdz3r5qbOmC8GuXgHDlA4kS2DPx7jw8HALkclIQNRSqAiNdMSpGWY4ypDOm08HJlGhXRPSUdjpo1LMqBd2qQ1JM0JY%2FWrPWxQv6zkVR4KuZDNQowh0Z6pnsyjRR0bbQpD9SNBQSLK%2BKAkAbagFKEDpEUkqtlvpUxBhYREbXsloBYElLQqRKLhGPWrMoTJLG8PYneb1isMqemke8VgQyfXY5qWyB%2FPckLhaNC7Yw0vWiSuTad9jEDF4gMsKkrSXIrJUDikfF%2ByasVQscOyY4HHHw794LGn%2FB%2BeEBfno5%2BFl5%2FofoIbmvlWn63EEgsfCHIHPm%2BM257zLHW3gTwLiL%2FnqemmoZFRB9%2Bek56%2BBo5raxWO27X%2BZ%2BFBlW477g%2F%2F8r9W7fM%2FIO2XPwDn1rrY',
+            'eJzFks9LAkEUx%2F%2BVZc4SGgWxN7U9CPkDXS9FxKijLq2j7CoVIniwsBSsgymxmlHoxWgLCwP%2Fop3Z%2F6HZ1kzJk0Hd5n3nfd%2F7vJlXBFIC8E4HkHAyC%2FgiwDCDAA9IvWw2NfI0MV4fOdoakb7OmWc9ctezbm7qnPGi04t34AD5k5xl8EYjYtDv2xWYBFMIJyATmZmVoC3dGFc52mmT4cjQy7R7SjsVzmxc0gHr0qatIW1OOKtf7WGN%2BXNKVhURzARsFqoPaeWZ6fEsnteJ3mYwTD%2BCCpZwyoNkGfB5pYAcIClhSU1%2FKyUGCmMys%2B0VgZqHOG5VCIWDEeZXcwjF06I9iN3NrJc5WtNo94ojukavxywtlj2e5gSCYb97xxpeskhc6077GEKKxQd4XJDlmRTJIXjI%2BL5k1YqRYoclxxyPNxj4wWNP%2BT88ASEqhj8LLz7R%2FYQ0KsZbfboSCyyizy8ceNwRYXvGs9DdBtqYQ%2Fw9T00z9AoddcjtOe1pK%2BC4tpbhuDadq%2F8WGVTZupP%2B8C8%2FbNlC%2FwPSfukDpaO6ow%3D%3D',
           ),
         },
       ],
@@ -217,7 +217,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
       ],
     },
     {
-      title: '노곧떼',
+      title: '노곳떼',
       subtitle: '한국외대',
       logoSrc: nogotte,
       actions: [
