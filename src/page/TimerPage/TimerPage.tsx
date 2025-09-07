@@ -24,7 +24,7 @@ export default function TimerPage() {
     closeUseTooltipModal,
     LoginAndStoreModalWrapper,
     closeLoginAndStoreModal,
-    openLoginAndStoreModalOrGoToOverviewPage,
+    openLoginAndStoreModalOrGoToDebateEndPage,
   } = useTimerPageModal(tableId);
 
   const state = useTimerPageState(tableId);
@@ -98,7 +98,7 @@ export default function TimerPage() {
                   table={data.table}
                   index={index}
                   goToOtherItem={goToOtherItem}
-                  openDoneModal={openLoginAndStoreModalOrGoToOverviewPage}
+                  openDoneModal={openLoginAndStoreModalOrGoToDebateEndPage}
                   className="absolute bottom-[66px] left-1/2 -translate-x-1/2"
                 />
               )}

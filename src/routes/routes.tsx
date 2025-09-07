@@ -12,6 +12,7 @@ import TimerPage from '../page/TimerPage/TimerPage';
 import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
+import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
 
 const routesConfig = [
   {
@@ -38,6 +39,11 @@ const routesConfig = [
     path: '/table/customize/:id',
     element: <TimerPage />,
     requiresAuth: false,
+  },
+  {
+    path: '/table/customize/:id/end',
+    element: <DebateEndPage />,
+    requiresAuth: true,
   },
   {
     path: '/table/customize/:id/end/feedback',
