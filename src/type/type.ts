@@ -1,7 +1,7 @@
 // Types
 export type Stance = 'PROS' | 'CONS' | 'NEUTRAL';
 export type TimeBasedStance = Exclude<Stance, 'NEUTRAL'>;
-export type TimeBoxType = 'NORMAL' | 'TIME_BASED';
+export type TimeBoxType = 'NORMAL' | 'TIME_BASED' | 'FEEDBACK';
 
 export type BellType = 'BEFORE_END' | 'AFTER_END' | 'AFTER_START';
 export type BellConfig = {
@@ -20,6 +20,7 @@ export const StanceToString: Record<Stance, string> = {
 export const TimeBoxTypeToString: Record<TimeBoxType, string> = {
   NORMAL: '일반 타이머',
   TIME_BASED: '자유토론 타이머',
+  FEEDBACK: '피드백 타이머',
 };
 
 export const BellTypeToString: Record<BellType, string> = {
@@ -70,4 +71,17 @@ export const bgColorMap: Record<TimerBGState, string> = {
   warning: 'bg-brand', // 30초~11초 구간
   danger: 'bg-semantic-warning', // 10초 이하
   expired: 'bg-default-timeout', // 0초 이하
+};
+
+type Action = {
+  label: string; // 좌측에 표시할 토론 형식 이름 (예: "CEDA 토론")
+  href: string; // 우측 "토론하기" 버튼의 이동 링크
+};
+
+export type DebateTemplate = {
+  title: string; // 제목 (예: "서방정토")
+  subtitle?: string; // 서브 제목 (예: "서강대")
+  logoSrc?: string; // 로고 이미지
+  actions: Action[];
+  className?: string; // 카드의 추가 className이 필요하면 사용
 };
