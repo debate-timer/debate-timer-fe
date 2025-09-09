@@ -1,108 +1,111 @@
 import { Meta, StoryObj } from '@storybook/react';
 import TimeBasedTimer from '../components/TimeBasedTimer';
+import { TimeBoxInfo } from '../../../type/type';
+
+// --- Mock 타이머 인스턴스 ---
+const mockTimerInstance = {
+  totalTimer: 150,
+  speakingTimer: 50,
+  isRunning: false,
+  isDone: false,
+  defaultTime: { defaultTotalTimer: 150, defaultSpeakingTimer: 50 },
+  isSpeakingTimer: true,
+  startTimer: () => {},
+  pauseTimer: () => {},
+  resetTimerForNextPhase: () => {},
+  resetCurrentTimer: () => {},
+  setTimers: () => {},
+  setSavedTime: () => {},
+  setDefaultTime: () => {},
+  setIsSpeakingTimer: () => {},
+  setIsDone: () => {},
+  clearTimer: () => {},
+};
+
+const TIME_BASED_TIMEBOX_SAMPLE: TimeBoxInfo = {
+  boxType: 'TIME_BASED',
+  speaker: null,
+  speechType: '주도권 토론',
+  stance: 'NEUTRAL',
+  time: null,
+  timePerSpeaking: 60,
+  timePerTeam: 120,
+  bell: null,
+} as const;
 
 const meta: Meta<typeof TimeBasedTimer> = {
   title: 'page/TimerPage/Components/TimeBasedTimer',
   component: TimeBasedTimer,
   tags: ['autodocs'],
 };
-
 export default meta;
 
 type Story = StoryObj<typeof TimeBasedTimer>;
 
 export const OnPros: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    timeBasedTimerInstance: {
+      ...mockTimerInstance,
     },
-    timer: 150,
-    isTimerChangeable: false,
-    isRunning: false,
-    item: {
-      stance: 'PROS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: 10,
-      speaker: '나',
-    },
+    isSelected: true,
+    onActivate: () => {},
+    prosCons: 'PROS',
+    teamName: '찬성팀',
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };
 
 export const OnCons: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    timeBasedTimerInstance: {
+      ...mockTimerInstance,
     },
-    timer: 150,
-    isTimerChangeable: false,
-    isRunning: false,
-    item: {
-      stance: 'CONS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: 10,
-      speaker: '나',
-    },
+    isSelected: true,
+    onActivate: () => {},
+    prosCons: 'CONS',
+    teamName: '반대팀',
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };
 
 export const OnRunning: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    timeBasedTimerInstance: {
+      ...mockTimerInstance,
+      isRunning: true,
     },
-    timer: 150,
-    isTimerChangeable: false,
-    isRunning: true,
-    item: {
-      stance: 'PROS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: 10,
-      speaker: '나',
-    },
+    isSelected: true,
+    onActivate: () => {},
+    prosCons: 'PROS',
+    teamName: '찬성팀',
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };
 
-export const WhenOnlyTeamPerTime: Story = {
+export const WhenOnlyTimePerTeam: Story = {
   args: {
-    onChangingTimer: () => {},
-    onPause: () => {},
-    onReset: () => {},
-    onStart: () => {},
-    goToOtherItem: (isPrev: boolean) => {
-      console.log(isPrev);
+    timeBasedTimerInstance: {
+      ...mockTimerInstance,
+      speakingTimer: null,
     },
-    timer: 150,
-    isTimerChangeable: true,
-    isRunning: false,
-    item: {
-      stance: 'PROS',
-      speechType: '입론1',
-      boxType: 'TIME_BASED',
-      time: null,
-      timePerTeam: 10,
-      timePerSpeaking: null,
-      speaker: '나',
+    isSelected: true,
+    onActivate: () => {},
+    prosCons: 'PROS',
+    teamName: '찬성팀',
+    item: TIME_BASED_TIMEBOX_SAMPLE,
+  },
+};
+
+export const OnDisabled: Story = {
+  args: {
+    timeBasedTimerInstance: {
+      ...mockTimerInstance,
+      speakingTimer: null,
     },
+    isSelected: false,
+    onActivate: () => {},
+    prosCons: 'PROS',
+    teamName: '찬성팀',
+    item: TIME_BASED_TIMEBOX_SAMPLE,
   },
 };

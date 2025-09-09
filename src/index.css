@@ -5,54 +5,78 @@
 @layer base {
   body {
     @apply font-pretendard;
-    @apply bg-background-default;
+    @apply bg-default-white;
+  }
+
+  html,
+  body {
+    @apply text-default-black;
   }
 }
 
-/* For buttons */
+/* Text styles */
+.text-display {
+  @apply text-display-raw;
+}
+
+.text-title {
+  @apply text-title-raw;
+}
+
+.text-subtitle {
+  @apply text-subtitle-raw;
+}
+
+.text-detail {
+  @apply text-detail-raw;
+}
+
+.text-body {
+  @apply text-body-raw;
+}
+
+.text-timer {
+  @apply text-timer-raw font-bold;
+}
+
+/* Timebox styles */
+.timebox {
+  @apply relative flex select-none flex-col items-center justify-center rounded-[12px] p-[12px];
+}
+
+.timebox.pros {
+  @apply bg-camp-blue/50 w-1/2;
+}
+
+.timebox.cons {
+  @apply bg-camp-red/50 w-1/2;
+}
+
+.timebox.neutral {
+  @apply bg-default-neutral/60 w-full;
+}
+
+.timebox.time-based {
+  @apply bg-brand/70 w-full;
+}
+
+/* Button styles */
 .button {
-  @apply rounded-[24px] border-[2px] border-neutral-700 text-[24px] font-bold transition-colors duration-200;
+  @apply text-subtitle transition-colors duration-200 flex flex-row items-center justify-center h-[72px];
 }
 
-.button.enabled {
-  @apply bg-background-default hover:bg-brand-main text-neutral-900;
+.button.enabled.brand {
+  @apply bg-brand font-bold text-default-black hover:bg-brand-hover;
 }
 
-.button.enabled-hover-neutral {
-  @apply bg-background-default hover:bg-neutral-300 text-neutral-900;
+.button.enabled.neutral {
+  @apply border-[2px] font-semibold border-default-disabled/hover bg-default-white text-default-black hover:bg-default-disabled/hover;
 }
 
 .button.disabled {
-  @apply bg-neutral-300 text-neutral-500 border-none;
-}
-
-/* For small buttons */
-.small-button {
-  @apply rounded-[24px] border-[2px] border-neutral-700 text-[20px] font-bold transition-colors duration-200;
-}
-
-.small-button.enabled {
-  @apply bg-background-default hover:bg-brand-main text-neutral-900;
-}
-
-.small-button.enabled-hover-neutral {
-  @apply bg-background-default hover:bg-neutral-300 text-neutral-900;
-}
-
-.small-button.disabled {
-  @apply bg-neutral-300 text-neutral-500 border-none;
+  @apply bg-default-disabled/hover text-default-white cursor-not-allowed;
 }
 
 p {
   white-space: pre-wrap;
-}
-
-.gradient-timer-running {
-  background-image: linear-gradient(270deg, #21c494, #21bdc4, #21c45d);
-}
-.gradient-timer-warning {
-  background-image: linear-gradient(270deg, #f5d60a, #f5ba0a, #f5f30a);
-}
-.gradient-timer-timeout {
-  background-image: linear-gradient(270deg, #f87171, #dc2626, #f43f5e);
 }

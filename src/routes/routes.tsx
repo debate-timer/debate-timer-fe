@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import TableListPage from '../page/TableListPage/TableListPage';
-import TableOverview from '../page/TableOverviewPage/TableOverview';
-import TableComposition from '../page/TableComposition/TableComposition';
+import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
+import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/OAuthPage/OAuth';
@@ -9,8 +9,10 @@ import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
+import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
+import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
 
 const routesConfig = [
   {
@@ -25,18 +27,28 @@ const routesConfig = [
   },
   {
     path: '/composition',
-    element: <TableComposition />,
+    element: <TableCompositionPage />,
     requiresAuth: false,
   },
   {
     path: '/overview/:type/:id',
-    element: <TableOverview />,
+    element: <TableOverviewPage />,
     requiresAuth: false,
   },
   {
     path: '/table/customize/:id',
     element: <TimerPage />,
     requiresAuth: false,
+  },
+  {
+    path: '/table/customize/:id/end',
+    element: <DebateEndPage />,
+    requiresAuth: true,
+  },
+  {
+    path: '/table/customize/:id/end/feedback',
+    element: <FeedbackTimerPage />,
+    requiresAuth: true,
   },
   {
     path: '/oauth',

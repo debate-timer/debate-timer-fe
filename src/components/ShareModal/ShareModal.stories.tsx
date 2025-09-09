@@ -17,8 +17,6 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
     agenda: '토론 주제',
     prosTeamName: '짜장',
     consTeamName: '짬뽕',
-    finishBell: true,
-    warningBell: false,
     name: '테이블 이름',
   },
   table: [
@@ -30,6 +28,7 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
       time: 60,
       timePerSpeaking: null,
       timePerTeam: null,
+      bell: null,
     },
     {
       stance: 'CONS',
@@ -39,6 +38,7 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
       time: 60,
       timePerSpeaking: null,
       timePerTeam: null,
+      bell: null,
     },
     {
       stance: 'NEUTRAL',
@@ -48,6 +48,7 @@ const shareUrl = createTableShareUrl('https://localhost:6006', {
       time: null,
       timePerSpeaking: 60,
       timePerTeam: 120,
+      bell: null,
     },
   ],
 });
@@ -57,8 +58,10 @@ export const OnQRCodeReady: Story = {
   args: {
     shareUrl: shareUrl,
     copyState: false,
-    isUrlReady: true,
-    onClick: () => {
+    isLoading: false,
+    isError: false,
+    onRefetch: () => {},
+    onCopyClicked: () => {
       navigator.clipboard.writeText(shareUrl);
     },
   },
@@ -69,7 +72,21 @@ export const OnLoadingData: Story = {
   args: {
     shareUrl: '',
     copyState: false,
-    isUrlReady: false,
-    onClick: () => {},
+    isLoading: true,
+    isError: false,
+    onRefetch: () => {},
+    onCopyClicked: () => {},
+  },
+};
+
+// When failed to process share URL
+export const OnFailure: Story = {
+  args: {
+    shareUrl: '',
+    copyState: false,
+    isLoading: false,
+    isError: true,
+    onRefetch: () => {},
+    onCopyClicked: () => {},
   },
 };

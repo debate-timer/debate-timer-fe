@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
-import { TableCompositionStep } from '../TableComposition';
+import { TableCompositionStep } from '../TableCompositionPage';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
@@ -24,8 +24,6 @@ const useTableFrom = (
           agenda: '',
           prosTeamName: '',
           consTeamName: '',
-          warningBell: true,
-          finishBell: true,
         },
         table: [],
       },
@@ -54,8 +52,6 @@ const useTableFrom = (
       const debateInfo: DebateInfo = {
         name: newInfo.name,
         agenda: newInfo.agenda,
-        warningBell: newInfo.warningBell,
-        finishBell: newInfo.finishBell,
         prosTeamName: newInfo.prosTeamName,
         consTeamName: newInfo.consTeamName,
       };
@@ -80,28 +76,31 @@ const useTableFrom = (
     });
   };
 
-  const { mutate: onAddTable } = useAddDebateTable((tableId) => {
-    removeValue();
-    navigate(`/overview/customize/${tableId}`);
-  });
-
-  const { mutate: onModifyTable } = usePutDebateTable((tableId) => {
-    removeValue();
-    if (isGuestFlow()) {
-      navigate(`/overview/customize/guest`);
-    } else {
+  const { mutate: onAddTable, isPending: isAddingTable } = useAddDebateTable(
+    (tableId) => {
+      removeValue();
       navigate(`/overview/customize/${tableId}`);
-    }
-  });
+    },
+  );
 
-  const AddTable = () => {
+  const { mutate: onModifyTable, isPending: isModifyingTable } =
+    usePutDebateTable((tableId) => {
+      removeValue();
+      if (isGuestFlow()) {
+        navigate(`/overview/customize/guest`);
+      } else {
+        navigate(`/overview/customize/${tableId}`);
+      }
+    });
+
+  const addTable = () => {
     onAddTable({
       info: formData.info,
       table: formData.table as TimeBoxInfo[],
     });
   };
 
-  const EditTable = (tableId: number) => {
+  const editTable = (tableId: number) => {
     onModifyTable({
       tableId,
       info: formData.info,
@@ -113,8 +112,10 @@ const useTableFrom = (
     formData,
     updateInfo,
     updateTable,
-    AddTable,
-    EditTable,
+    addTable,
+    editTable,
+    isAddingTable,
+    isModifyingTable,
   };
 };
 

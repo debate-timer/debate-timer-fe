@@ -1,19 +1,37 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePostUser } from '../../hooks/mutations/usePostUser';
-import { isGuestFlow } from '../../util/sessionStorage';
+import {
+  deleteSessionCustomizeTableData,
+  isGuestFlow,
+} from '../../util/sessionStorage';
 
 export default function OAuth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const hasProcessedLogin = useRef(false);
+
   const { mutate } = usePostUser(() => {
+    const keepGuestTable = sessionStorage.getItem('keepGuestTable');
+
+    if (keepGuestTable === 'false') {
+      deleteSessionCustomizeTableData();
+    }
+
+    sessionStorage.removeItem('keepGuestTable');
+
     if (isGuestFlow()) {
       navigate('/share');
     } else {
       navigate('/');
     }
   });
+
   useEffect(() => {
+    if (hasProcessedLogin.current === true) {
+      return;
+    }
+
     const loginOAuth = async () => {
       const code = searchParams.get('code');
       if (code === null) {
@@ -23,7 +41,12 @@ export default function OAuth() {
     };
 
     loginOAuth();
+
+    return () => {
+      hasProcessedLogin.current = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return null;
 }

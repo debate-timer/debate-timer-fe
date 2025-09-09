@@ -1,24 +1,29 @@
+import clsx from 'clsx';
 import { InputHTMLAttributes } from 'react';
 import { IoMdCloseCircle } from 'react-icons/io';
 
 interface ClearableInputProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string;
-  onClear: () => void;
+  disabled?: boolean;
+  onClear?: () => void;
 }
 
 export default function ClearableInput({
   value,
   onClear,
+  disabled = false,
+  className,
   ...rest
 }: ClearableInputProps) {
   return (
-    <div className="relative w-full">
+    <div className={clsx('relative w-full', className)}>
       <input
         {...rest}
         value={value}
-        className="w-full rounded-md border border-neutral-300 p-3 pr-10 text-base text-black placeholder-neutral-400 focus:outline-none"
+        disabled={disabled}
+        className="text-body h-[48px] w-full appearance-none rounded-[4px] border border-default-border p-[12px] text-default-black placeholder-default-border focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
-      {value && (
+      {value && !disabled && onClear && (
         <button
           type="button"
           onClick={onClear}

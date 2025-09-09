@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: DEPLOY_PROD
 
