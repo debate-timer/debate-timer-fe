@@ -197,19 +197,19 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
       logoSrc: osansi,
       actions: [
         {
-          label: '오산시 토론 - 초등부',
+          label: '초등부',
           href: createTableShareUrl(
             'eJztVsFKw0AQ%2FZWw5xTaKKXk1moEwSYlTS%2BKyFq3bTDdlqSiUgoiRQQ9KIJ4EKkgeLCHtIj0m9z1H9xtYkwxVPRgKeaWvLzMzL7HzGwbmDtAljKSCExcaQC5DTCsIyADevNAj116diu8nfTIfU9ICPT5lFwNyMsREEHrsMlZS6WioeVX1xUGwSrCO5CB7LlpNxwDwbrqB3P7tDtgeLmBwzhxb8g5D7cPbWziag5ZFpAr0HKQCComNp1aCOqwtHDbYj9utIHTgrjMYxR0rcgiOE2EyjXDK4sOn8jwlD6OBC%2BzQNxbej1itO3Ggc9RNT2fXeNHMXkt0mKSfR0nY9H942VXDEXfKhpZ3QiIC0l%2BjD3cAnKqIwbUnLKi6cqWoi7%2FgvlJlEJEL3uYlwiFXOhsenAB2VxSIOM9ywqgYhPBXSbpB%2Bzwd2Rze3iKQD5VKRn6WIdJBe8uaa8rMP9f3e403dKBbBPpf1IRf52oaUlTv7eUnvVJf6qlqUyEpRHqp3%2Fl0z9V32vZuKHmytLpM9K3NG6oP1SfXF7EG2p%2BLY2akV8sjRtqJurHG2oOLZ0%2BI%2BMNNYP7QXcUb6j5tTTyFh9YGs%2FICEs3O%2B8MouWw',
           ),
         },
         {
-          label: '오산시 토론 - 중등부',
+          label: '중등부',
           href: createTableShareUrl(
             'eJztVkFrwjAY%2FSsl5wp1goze3FZPWyu1Ow0ZVTNXVttiK2xIQUYZA3eYDIYHGQ6EHeahehj%2BpiX7D2utdhVLxzxMCrklX1%2B%2BJO%2F1fV86QKkDlqGBol3ogO0ATW5CwAI8GONbF%2FeG1NfdCL2OqAyFx330NEUfXUADuQG1uuzhvLHR0k0Jyk1%2BudKdYGfqxWu6Fo0jd4AeusCmgSVXVS9y1gGmJWs1%2F2NJFMreEtOAsHYp3RiLRLN3NLvHb3MqSEkhd4if5x6sql8vMbwgnhSOvZCl%2BJvkGCYYlmDL3xqwWltVw1DZgPKVojVWYdOfw1ZwjSpU1cWhrCB1oShx4nlZKohSJL9%2FrbZmATZr0yH0gCsKInfO8UdbIH%2BAexFgsHsUl4mkzNkVHxvSx3OnkrjgYZ3Blz4eOZSn4qfrJPGWZ1b3X%2BPrLxT607UzHQr875Li3gRNEiXN7jOb2sTQmN%2BK8MqWv0vK2Q%2B8SAyVKkMl18ilpMRQ%2F8g%2B6j%2BSDpVeQ8XVyA1JiaF2wj7pUCk0VHKNJB1qB%2B8DZ046VHoNFfuKDyUlNTJG0or9DTqI0dk%3D',
           ),
         },
         {
-          label: '오산시 토론 - 고등부',
+          label: '고등부',
           href: createTableShareUrl(
             'eJztVlFLwlAY%2FSvjPk%2BYCRJ7s5pPtclcTyEy9WajuQ03oZCBxIjAHpIgfJBYEPSQD9Mg%2FE3e9R%2B6czYnjkU%2BJIO93fvt3O%2Fee87O990ukBqApkggKecqoLtAEVsQ0MAdvro3jtsfEV%2B3NnqxiQwx%2F7DR4wR99gAJxCZUGiLG4bHWVnUBii12udIZu9YEx%2BuqEo4jZ4jue8AkgSHWZBw56wLdEJW697HEc2W8RNcgrF8I19oi0fQdTe%2FctxnhpySQM3KfZhhWU6%2BWGJbjTwrHOGRI3ia5POUPS7DtbQ1opSPLQaisQfFSUpo%2FYd2bw7Z%2FjRqU5cWhDD91oSgwfLUsFHhhlZ%2FyrtVRDEBnTTKAHjBFjmeqDHu0BXIF3AsB%2Fd3DuEwoZc6seNiAPpY5FfgFD%2BsMPg9c2yKwinPHiuPNo82%2F%2Fxpff6HQm66d6ZBjf5fU7Y%2FROFbS7D61qU0EjfmtCK9s%2BbsknH3fi6mhEmWo%2BBq5lDQ11D%2ByjwYPaYdKrqGiauSGpKmhdsJ%2B2qESaKj4Gpl2qB28D6xZ2qGSa6jIV3wgaVojIyStmN8r8tIZ',
           ),
