@@ -82,16 +82,19 @@ export function useFeedbackTimer(): FeedbackTimerLogics {
    */
   const adjustTime = useCallback(
     (amount: number) => {
-      if (isRunning) return;
+      if (isRunning) {
+        return;
+      }
 
-      setTimer((prevTimer) => {
-        const newTime = (prevTimer ?? 0) + amount;
+      let newTime: number;
+
+      setDefaultTimer((prevDefault) => {
+        newTime = prevDefault + amount;
         return newTime < 0 ? 0 : newTime;
       });
 
-      setDefaultTimer((prevDefault) => {
-        const newDefault = prevDefault + amount;
-        return newDefault < 0 ? 0 : newDefault;
+      setTimer(() => {
+        return newTime < 0 ? 0 : newTime;
       });
     },
     [isRunning],
