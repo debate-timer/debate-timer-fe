@@ -14,6 +14,7 @@ import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import { RiFullscreenFill, RiFullscreenExitFill } from 'react-icons/ri';
 
 export default function TimerPage() {
   const pathParams = useParams();
@@ -30,7 +31,17 @@ export default function TimerPage() {
   const state = useTimerPageState(tableId);
 
   useTimerHotkey(state);
-  const { data, bg, index, goToOtherItem, isLoading, isError, refetch } = state;
+  const {
+    data,
+    bg,
+    index,
+    goToOtherItem,
+    isLoading,
+    isError,
+    refetch,
+    isFullscreen,
+    toggleFullscreen,
+  } = state;
 
   // If error, print error message and let user be able to retry
   if (isError) {
@@ -72,10 +83,22 @@ export default function TimerPage() {
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
             <button
-              className="flex h-full items-center justify-center"
+              className="flex h-full items-center justify-center p-[4px]"
+              title="도움말"
               onClick={openUseTooltipModal}
             >
               <DTHelp className="size-full" />
+            </button>
+            <button
+              className="flex h-full items-center justify-center p-[4px]"
+              title="전체 화면"
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <RiFullscreenExitFill className="size-full" />
+              ) : (
+                <RiFullscreenFill className="size-full" />
+              )}
             </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
