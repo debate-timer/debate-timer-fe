@@ -18,6 +18,24 @@ import {
 import { useTimerBackground } from './useTimerBackground';
 
 /**
+ * 브라우저별 접두사가 붙은 전체 화면 속성을 포함하는 사용자 정의 인터페이스
+ */
+interface DocumentWithFullscreen extends Document {
+  mozCancelFullScreen?: () => Promise<void>;
+  webkitExitFullscreen?: () => Promise<void>;
+  msExitFullscreen?: () => Promise<void>;
+  mozFullScreenElement?: Element;
+  webkitFullscreenElement?: Element;
+  msFullscreenElement?: Element;
+}
+
+interface HTMLElementWithFullscreen extends HTMLElement {
+  mozRequestFullScreen?: () => Promise<void>;
+  webkitRequestFullscreen?: () => Promise<void>;
+  msRequestFullscreen?: () => Promise<void>;
+}
+
+/**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
 export function useTimerPageState(tableId: number): TimerPageLogics {
@@ -44,6 +62,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   // 현재 진행 중인 토론 순서 인덱스
   const [index, setIndex] = useState(0);
 
+  // 전체 화면 여부
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   // 자유토론 타이머, 일반 타이머 상태 관리 커스텀 훅
   const timer1 = useTimeBasedTimer();
   const timer2 = useTimeBasedTimer();
@@ -67,6 +88,54 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     data,
     index,
   });
+
+  /**
+   * 전체 화면 여부 토글
+   */
+  const toggleFullscreen = async () => {
+    const doc = document as DocumentWithFullscreen;
+    const element = document.documentElement as HTMLElementWithFullscreen;
+
+    try {
+      const isCurrentlyFullscreen =
+        doc.fullscreenElement ||
+        doc.webkitFullscreenElement ||
+        doc.mozFullScreenElement ||
+        doc.msFullscreenElement;
+
+      if (!isCurrentlyFullscreen) {
+        // 전체 화면 시작 (다양한 브라우저 지원)
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if (element.webkitRequestFullscreen) {
+          /* Safari */
+          await element.webkitRequestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+          /* Firefox */
+          await element.mozRequestFullScreen();
+        } else if (element.msRequestFullscreen) {
+          /* IE11 */
+          await element.msRequestFullscreen();
+        }
+      } else {
+        // 전체 화면 종료 (다양한 브라우저 지원)
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          /* Safari */
+          await doc.webkitExitFullscreen();
+        } else if (doc.mozCancelFullScreen) {
+          /* Firefox */
+          await doc.mozCancelFullScreen();
+        } else if (doc.msExitFullscreen) {
+          /* IE11 */
+          await doc.msExitFullscreen();
+        }
+      }
+    } catch (error) {
+      console.error('# Failed to toggle fullscreen mode:', error);
+    }
+  };
 
   /**
    * 라운드 이동 (이전/다음)
@@ -145,6 +214,44 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     },
     [prosConsSelected, switchCamp, timer1, timer2],
   );
+
+  /**
+   * 전체 화면 상태 변경을 감지
+   */
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const doc = document as DocumentWithFullscreen;
+      setIsFullscreen(
+        !!(
+          doc.fullscreenElement ||
+          doc.webkitFullscreenElement ||
+          doc.mozFullScreenElement ||
+          doc.msFullscreenElement
+        ),
+      );
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener(
+        'webkitfullscreenchange',
+        handleFullscreenChange,
+      );
+      document.removeEventListener(
+        'mozfullscreenchange',
+        handleFullscreenChange,
+      );
+      document.removeEventListener(
+        'MSFullscreenChange',
+        handleFullscreenChange,
+      );
+    };
+  });
 
   /**
    * 라운드 이동/초기 진입 시 타이머 상태 초기화 및 셋업
@@ -256,6 +363,8 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     isLoading,
     isError,
     refetch,
+    isFullscreen,
+    toggleFullscreen,
   };
 }
 
@@ -278,4 +387,6 @@ export interface TimerPageLogics {
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
+  isFullscreen: boolean;
+  toggleFullscreen: () => void;
 }
