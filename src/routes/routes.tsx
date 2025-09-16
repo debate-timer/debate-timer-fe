@@ -13,50 +13,51 @@ import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
+import LanguageWrapper from './LanguageWrapper';
 
-const routesConfig = [
+const appRoutes = [
   {
-    path: '/home',
+    path: 'home',
     element: <LandingPage />,
     requiresAuth: false,
   },
   {
-    path: '/',
+    path: '',
     element: <TableListPage />,
     requiresAuth: true,
   },
   {
-    path: '/composition',
+    path: 'composition',
     element: <TableCompositionPage />,
     requiresAuth: false,
   },
   {
-    path: '/overview/:type/:id',
+    path: 'overview/:type/:id',
     element: <TableOverviewPage />,
     requiresAuth: false,
   },
   {
-    path: '/table/customize/:id',
+    path: 'table/customize/:id',
     element: <TimerPage />,
     requiresAuth: false,
   },
   {
-    path: '/table/customize/:id/end',
+    path: 'table/customize/:id/end',
     element: <DebateEndPage />,
     requiresAuth: true,
   },
   {
-    path: '/table/customize/:id/end/feedback',
+    path: 'table/customize/:id/end/feedback',
     element: <FeedbackTimerPage />,
     requiresAuth: true,
   },
   {
-    path: '/oauth',
+    path: 'oauth',
     element: <OAuth />,
     requiresAuth: false,
   },
   {
-    path: '/share',
+    path: 'share',
     element: <TableSharingPage />,
     requiresAuth: false,
   },
@@ -67,6 +68,16 @@ const routesConfig = [
   },
 ];
 
+// 인증 보호 로직을 적용한 라우트
+const protectedAppRoutes = appRoutes.map((route) => ({
+  ...route,
+  element: route.requiresAuth ? (
+    <ProtectedRoute>{route.element}</ProtectedRoute>
+  ) : (
+    route.element
+  ),
+}));
+
 const router = createBrowserRouter([
   {
     element: (
@@ -75,14 +86,18 @@ const router = createBrowserRouter([
         <BackActionHandler />
       </>
     ),
-    children: routesConfig.map((route) => ({
-      ...route,
-      element: route.requiresAuth ? (
-        <ProtectedRoute>{route.element}</ProtectedRoute>
-      ) : (
-        route.element
-      ),
-    })),
+    children: [
+      {
+        path: '/',
+        element: <LanguageWrapper />,
+        children: protectedAppRoutes, // 기본 언어(ko) 라우트
+      },
+      {
+        path: ':lang', // 다른 언어 라우트
+        element: <LanguageWrapper />,
+        children: protectedAppRoutes,
+      },
+    ],
   },
 ]);
 
