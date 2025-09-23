@@ -64,7 +64,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         {isGuestFlow() && (
           <>
             {/* Guest mode indicator */}
-            <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+            <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
               비회원 모드
             </div>
 
