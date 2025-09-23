@@ -87,7 +87,7 @@ export default function TimerPage() {
               title="도움말"
               onClick={openUseTooltipModal}
             >
-              <DTHelp className="size-full" />
+              <DTHelp className="h-full" />
             </button>
             <button
               className="flex h-full items-center justify-center p-[4px]"
@@ -95,9 +95,9 @@ export default function TimerPage() {
               onClick={toggleFullscreen}
             >
               {isFullscreen ? (
-                <RiFullscreenExitFill className="size-full" />
+                <RiFullscreenExitFill className="h-full" />
               ) : (
-                <RiFullscreenFill className="size-full" />
+                <RiFullscreenFill className="h-full" />
               )}
             </button>
           </DefaultLayout.Header.Right>
