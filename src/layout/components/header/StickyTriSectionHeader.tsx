@@ -64,7 +64,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         {isGuestFlow() && (
           <>
             {/* Guest mode indicator */}
-            <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+            <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
               비회원 모드
             </div>
 
@@ -82,7 +82,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             case 'home':
               return (
                 <button
-                  className="flex h-full items-center justify-center"
+                  className="flex h-full items-center justify-center p-[4px]"
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     if (isGuestFlow()) {
@@ -97,7 +97,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             case 'auth':
               return (
                 <button
-                  className="flex h-full items-center justify-center"
+                  className="flex h-full items-center justify-center p-[4px]"
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     if (isLoggedIn()) {

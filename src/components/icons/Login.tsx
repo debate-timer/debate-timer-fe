@@ -7,40 +7,40 @@ export default function DTLogin({
 }: IconProps) {
   return (
     <svg
-      viewBox="0 0 45 44"
+      viewBox="0 0 28 30"
       fill="none"
       className={`
-        aspect-[45/44]
+        aspect-[28/30]
         ${className}
       `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
       <path
-        d="M33.7567 32.464V35.681C33.7567 36.7666 33.1532 37.6466 32.4007 37.6466H9.78112C9.03607 37.6466 8.42514 36.7666 8.42514 35.681V8.31899C8.42514 7.23339 9.02862 6.35339 9.78112 6.35339H32.4081C33.1532 6.35339 33.7641 7.23339 33.7641 8.31899V11.536"
+        d="M24.2115 24.0371V26.8155C24.2115 27.753 23.6903 28.513 23.0404 28.513H3.50533C2.86189 28.513 2.33426 27.753 2.33426 26.8155V3.18459C2.33426 2.24702 2.85545 1.48703 3.50533 1.48703H23.0468C23.6903 1.48703 24.2179 2.24702 24.2179 3.18459V5.96294"
         stroke={color}
-        strokeWidth="4.11753"
+        strokeWidth="2.7"
         strokeMiterlimit="10"
         strokeLinecap="round"
       />
       <path
-        d="M36.4256 22.0014L30.0853 26.9688"
+        d="M26.5165 15.0012L21.0407 19.2913"
         stroke={color}
-        strokeWidth="4.11753"
+        strokeWidth="2.7"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M36.4256 21.9977L30.0853 17.0385"
+        d="M26.5165 14.998L21.0407 10.715"
         stroke={color}
-        strokeWidth="4.11753"
+        strokeWidth="2.7"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M16.4389 22.0014H34.2827"
+        d="M9.25525 15.0012H24.6658"
         stroke={color}
-        strokeWidth="4.11753"
+        strokeWidth="2.7"
         strokeMiterlimit="10"
         strokeLinecap="round"
       />
