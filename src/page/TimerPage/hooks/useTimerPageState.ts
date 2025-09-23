@@ -92,7 +92,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   /**
    * 전체 화면 여부 토글
    */
-  const toggleFullscreen = async () => {
+  const toggleFullscreen = useCallback(async () => {
     const doc = document as DocumentWithFullscreen;
     const element = document.documentElement as HTMLElementWithFullscreen;
 
@@ -135,7 +135,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     } catch (error) {
       console.error('# Failed to toggle fullscreen mode:', error);
     }
-  };
+  }, []);
 
   /**
    * 라운드 이동 (이전/다음)
