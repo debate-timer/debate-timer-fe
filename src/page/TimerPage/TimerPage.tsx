@@ -90,14 +90,14 @@ export default function TimerPage() {
               <DTHelp className="h-full" />
             </button>
             <button
-              className="flex h-full items-center justify-center p-[4px]"
+              className="flex aspect-square h-full items-center justify-center p-[4px]"
               title="전체 화면"
               onClick={toggleFullscreen}
             >
               {isFullscreen ? (
-                <RiFullscreenExitFill className="h-full" />
+                <RiFullscreenExitFill className="h-full w-full" />
               ) : (
-                <RiFullscreenFill className="h-full" />
+                <RiFullscreenFill className="h-full w-full" />
               )}
             </button>
           </DefaultLayout.Header.Right>
