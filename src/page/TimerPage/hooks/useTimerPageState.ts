@@ -251,7 +251,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
         handleFullscreenChange,
       );
     };
-  });
+  }, []);
 
   /**
    * 라운드 이동/초기 진입 시 타이머 상태 초기화 및 셋업
