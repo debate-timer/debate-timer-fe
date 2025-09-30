@@ -21,7 +21,10 @@ export default function FeedbackTimerPage() {
       <DefaultLayout.ContentContainer>
         <div className="relative flex h-full w-full flex-col items-center justify-center space-y-[54px] pb-[66px] xl:space-y-[60px]">
           <FeedbackTimer feedbackTimerInstance={feedbackTimerInstance} />
-          <GoToHomeButton />
+
+          <div className="absolute bottom-[8%] xl:bottom-[12%]">
+            <GoToHomeButton />
+          </div>
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>

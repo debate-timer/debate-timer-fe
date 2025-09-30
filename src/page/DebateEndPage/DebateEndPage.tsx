@@ -21,7 +21,7 @@ export default function DebateEndPage() {
   return (
     <div
       style={backgroundStyle}
-      className="flex min-h-screen flex-col items-center justify-center p-4 font-pretendard"
+      className="relative flex min-h-screen flex-col items-center justify-center p-4"
     >
       <div className="mb-12 flex items-center justify-center gap-4 text-center lg:mb-16 xl:mb-24">
         <h1 className="text-3xl font-semibold text-default-black md:text-4xl lg:text-5xl xl:text-display-raw">
@@ -56,7 +56,7 @@ export default function DebateEndPage() {
         {/* 승패투표 카드 */}
         <button
           onClick={handleFeedbackClick}
-          className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-[#e3e3e3] text-default-disabled/hover md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-[30px]"
+          className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-[#e3e3e3] text-default-disabled/hover transition-all duration-300 md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-[30px]"
           disabled={true}
         >
           <img
@@ -79,7 +79,8 @@ export default function DebateEndPage() {
           </p>
         </button>
       </div>
-      <div className="mt-12 lg:mt-16 xl:mt-[74px]">
+
+      <div className="absolute bottom-[8%] xl:bottom-[12%]">
         <GoToHomeButton />
       </div>
     </div>
