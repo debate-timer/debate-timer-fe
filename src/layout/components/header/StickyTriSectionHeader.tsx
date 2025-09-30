@@ -83,6 +83,8 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
               return (
                 <button
                   className="flex h-full items-center justify-center"
+                  aria-label="홈으로 이동"
+                  title="홈으로 이동"
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     if (isGuestFlow()) {
@@ -98,6 +100,8 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
               return (
                 <button
                   className="flex h-full items-center justify-center"
+                  aria-label={isLoggedIn() ? '로그아웃' : '로그인'}
+                  title={isLoggedIn() ? '로그아웃' : '로그인'}
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     if (isLoggedIn()) {
