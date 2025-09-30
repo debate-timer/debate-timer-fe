@@ -84,7 +84,7 @@ export default function TimeBasedTimer({
   };
 
   const rawProgress = initRawProgress();
-  const progressMotionValue = useCircularTimerAnimation(rawProgress);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress, isRunning);
 
   const breakpoint = useBreakpoint();
   const getStrokeWidth = () => {
