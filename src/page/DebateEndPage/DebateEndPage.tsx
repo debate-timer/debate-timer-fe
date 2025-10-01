@@ -21,7 +21,7 @@ export default function DebateEndPage() {
   return (
     <div
       style={backgroundStyle}
-      className="relative flex min-h-screen flex-col items-center justify-center p-4"
+      className="relative flex h-screen w-full flex-col items-center justify-center p-4"
     >
       <div className="mb-12 flex items-center justify-center gap-4 text-center lg:mb-16 xl:mb-24">
         <h1 className="text-3xl font-semibold text-default-black md:text-4xl lg:text-5xl xl:text-display-raw">
@@ -80,7 +80,7 @@ export default function DebateEndPage() {
         </button>
       </div>
 
-      <div className="absolute bottom-[8%] xl:bottom-[12%]">
+      <div className="fixed bottom-[8%] xl:bottom-[12%]">
         <GoToHomeButton />
       </div>
     </div>
