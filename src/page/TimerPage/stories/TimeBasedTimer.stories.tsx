@@ -10,6 +10,7 @@ const mockTimerInstance = {
   isDone: false,
   defaultTime: { defaultTotalTimer: 150, defaultSpeakingTimer: 50 },
   isSpeakingTimer: true,
+  denominator: 1,
   startTimer: () => {},
   pauseTimer: () => {},
   resetTimerForNextPhase: () => {},
