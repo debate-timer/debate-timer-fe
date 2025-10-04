@@ -20,7 +20,7 @@ type TimeBasedTimerInstance = {
 
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: TimeBasedTimerInstance;
-  isOpponentFinished: boolean;
+  isOpponentDone: boolean;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: TimeBasedStance;
@@ -30,7 +30,7 @@ interface TimeBasedTimerProps {
 
 export default function TimeBasedTimer({
   timeBasedTimerInstance,
-  isOpponentFinished,
+  isOpponentDone,
   isSelected,
   prosCons,
   teamName,
@@ -59,7 +59,7 @@ export default function TimeBasedTimer({
   );
 
   const initRawProgress = (): number => {
-    if (isOpponentFinished) {
+    if (isOpponentDone) {
       if (speakingTimer === null) {
         // 1회당 발언 시간 X일 때...
         return ((denominator - (totalTimer ?? 0)) / denominator) * 100;
@@ -189,7 +189,7 @@ export default function TimeBasedTimer({
       {/* 조작부 */}
       <TimerController
         isRunning={isRunning}
-        onStart={() => startTimer(isOpponentFinished)}
+        onStart={() => startTimer(isOpponentDone)}
         onPause={pauseTimer}
         onReset={resetCurrentTimer}
         stance={prosCons}
