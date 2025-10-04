@@ -84,7 +84,7 @@ export default function TimeBasedTimer({
   };
 
   const rawProgress = initRawProgress();
-  const progressMotionValue = useCircularTimerAnimation(rawProgress);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress, isRunning);
 
   const breakpoint = useBreakpoint();
   const getStrokeWidth = () => {
@@ -141,11 +141,11 @@ export default function TimeBasedTimer({
               전체 시간
             </h1>
             <span className="flex flex-row text-[56px] font-semibold tabular-nums text-default-black xl:text-[72px]">
-              <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
+              <p className="flex w-[80px] items-center justify-center xl:w-[100px]">
                 {minute}
               </p>
               <p className="flex items-center justify-center">:</p>
-              <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
+              <p className="flex w-[80px] items-center justify-center xl:w-[100px]">
                 {second}
               </p>
             </span>
@@ -161,12 +161,12 @@ export default function TimeBasedTimer({
             >
               현재 시간
             </h1>
-            <span className="flex flex-row text-[70px] font-bold tabular-nums text-default-black lg:text-[90px] xl:text-[110px]">
-              <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
+            <span className="flex flex-row text-[80px] font-bold tabular-nums text-default-black xl:text-[110px]">
+              <p className="flex w-[120px] items-center justify-center xl:w-[180px]">
                 {speakingMinute}
               </p>
               <p className="flex items-center justify-center">:</p>
-              <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
+              <p className="flex w-[120px] items-center justify-center xl:w-[180px]">
                 {speakingSecond}
               </p>
             </span>

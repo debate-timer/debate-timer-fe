@@ -73,9 +73,11 @@ export default function TimerPage() {
           <DefaultLayout.Header.Right>
             <button
               className="flex h-full items-center justify-center"
+              aria-label="도움말"
+              title="도움말"
               onClick={openUseTooltipModal}
             >
-              <DTHelp className="size-full" />
+              <DTHelp className="h-full" />
             </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>

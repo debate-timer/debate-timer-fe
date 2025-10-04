@@ -160,7 +160,7 @@ export default function TeamSelectionModal({
         {(coinState === 'front' || coinState === 'back') && (
           <div className="flex">
             <button
-              className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled/hover py-3 text-lg font-semibold hover:bg-default-disabled/hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
+              className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled/hover bg-default-white py-3 text-lg font-semibold hover:bg-default-disabled/hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
               onClick={handleEdit}
             >
               토론 정보 수정하기

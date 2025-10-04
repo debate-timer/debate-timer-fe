@@ -38,13 +38,20 @@ type TimerCreationOption =
   | 'TIME_NORMAL'
   | 'BELL';
 
-type SpeechType = 'OPENING' | 'REBUTTAL' | 'TIMEOUT' | 'CLOSING' | 'CUSTOM';
+type SpeechType =
+  | 'OPENING'
+  | 'REBUTTAL'
+  | 'TIMEOUT'
+  | 'CLOSING'
+  | 'CROSS_EXAM'
+  | 'CUSTOM';
 
 const SPEECH_TYPE_RECORD: Record<SpeechType, string> = {
   OPENING: '입론',
   CLOSING: '최종 발언',
   CUSTOM: '직접 입력',
   REBUTTAL: '반론',
+  CROSS_EXAM: '교차 조사',
   TIMEOUT: '작전 시간',
 } as const;
 
@@ -122,6 +129,9 @@ export default function TimerCreationContent({
       case '작전시간':
       case '작전 시간':
         return 'TIMEOUT';
+      case '교차조사':
+      case '교차 조사':
+        return 'CROSS_EXAM';
       default:
         return 'CUSTOM';
     }
@@ -234,6 +244,7 @@ export default function TimerCreationContent({
     { value: 'OPENING', label: SPEECH_TYPE_RECORD['OPENING'] },
     { value: 'REBUTTAL', label: SPEECH_TYPE_RECORD['REBUTTAL'] },
     { value: 'TIMEOUT', label: SPEECH_TYPE_RECORD['TIMEOUT'] },
+    { value: 'CROSS_EXAM', label: SPEECH_TYPE_RECORD['CROSS_EXAM'] },
     { value: 'CLOSING', label: SPEECH_TYPE_RECORD['CLOSING'] },
     { value: 'CUSTOM', label: SPEECH_TYPE_RECORD['CUSTOM'] },
   ] as const;

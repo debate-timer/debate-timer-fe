@@ -33,7 +33,7 @@ export default function TemplateCard({
           <img
             src={logoSrc}
             alt={`${title} 로고`}
-            className="h-12 w-12 shrink-0 rounded-full object-contain"
+            className="h-12 w-12 shrink-0 object-contain"
           />
         )}
       </div>
