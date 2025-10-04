@@ -7,7 +7,6 @@ export default function GoToHomeButton() {
     navigate('/');
   };
 
-  // "flex h-[72px] w-[492px] items-center justify-center gap-[12px] rounded-full border-[2px] border-default-disabled/hover bg-default-white px-[16px] py-[11px] font-semibold text-default-black opacity-80 transition-colors duration-200 hover:bg-default-disabled/hover"
   return (
     <button
       type="button"
