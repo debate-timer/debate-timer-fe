@@ -88,12 +88,12 @@ export function useFeedbackTimer(): FeedbackTimerLogics {
 
       let newTime: number;
 
-      setDefaultTimer((prevDefault) => {
-        newTime = prevDefault + amount;
+      setTimer((prevTimer) => {
+        newTime = prevTimer === null ? 0 : prevTimer + amount;
         return newTime < 0 ? 0 : newTime;
       });
 
-      setTimer(() => {
+      setDefaultTimer(() => {
         return newTime < 0 ? 0 : newTime;
       });
     },
