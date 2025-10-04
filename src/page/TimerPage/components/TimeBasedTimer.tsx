@@ -12,13 +12,15 @@ type TimeBasedTimerInstance = {
   totalTimer: number | null;
   speakingTimer: number | null;
   isRunning: boolean;
-  startTimer: () => void;
+  startTimer: (isOpponentDone: boolean) => void;
   pauseTimer: () => void;
   resetCurrentTimer: () => void;
+  denominator: number;
 };
 
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: TimeBasedTimerInstance;
+  isOpponentFinished: boolean;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: TimeBasedStance;
@@ -28,6 +30,7 @@ interface TimeBasedTimerProps {
 
 export default function TimeBasedTimer({
   timeBasedTimerInstance,
+  isOpponentFinished,
   isSelected,
   prosCons,
   teamName,
@@ -40,6 +43,7 @@ export default function TimeBasedTimer({
     startTimer,
     pauseTimer,
     resetCurrentTimer,
+    denominator,
   } = timeBasedTimerInstance;
 
   const minute = Formatting.formatTwoDigits(
@@ -177,7 +181,7 @@ export default function TimeBasedTimer({
       {/* 조작부 */}
       <TimerController
         isRunning={isRunning}
-        onStart={startTimer}
+        onStart={() => startTimer(isOpponentFinished)}
         onPause={pauseTimer}
         onReset={resetCurrentTimer}
         stance={prosCons}

@@ -53,9 +53,13 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             isRunning: timer1.isRunning,
             startTimer: timer1.startTimer,
             pauseTimer: timer1.pauseTimer,
+            denominator: timer1.denominator,
             resetCurrentTimer: () => timer1.resetCurrentTimer(timer2.isDone),
           }}
           item={data.table[index]}
+          isOpponentFinished={
+            timer2.totalTimer === null || timer2.totalTimer <= 0
+          }
           isSelected={prosConsSelected === 'PROS'}
           onActivate={() => handleActivateTeam('PROS')}
           prosCons="PROS"
@@ -79,9 +83,13 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             isRunning: timer2.isRunning,
             startTimer: timer2.startTimer,
             pauseTimer: timer2.pauseTimer,
+            denominator: timer2.denominator,
             resetCurrentTimer: () => timer2.resetCurrentTimer(timer1.isDone),
           }}
           item={data.table[index]}
+          isOpponentFinished={
+            timer1.totalTimer === null || timer1.totalTimer <= 0
+          }
           isSelected={prosConsSelected === 'CONS'}
           onActivate={() => handleActivateTeam('CONS')}
           prosCons="CONS"
