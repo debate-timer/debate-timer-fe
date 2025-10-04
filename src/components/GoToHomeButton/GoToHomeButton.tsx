@@ -14,7 +14,7 @@ export default function GoToHomeButton() {
       onClick={handleClick}
       className="button enabled neutral flex w-[492px] flex-row space-x-[12px] rounded-full p-[24px]"
     >
-      <h1>홈으로 돌아가기 →</h1>
+      홈으로 돌아가기 →
     </button>
   );
 }
