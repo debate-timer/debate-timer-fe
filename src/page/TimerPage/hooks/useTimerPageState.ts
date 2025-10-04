@@ -16,24 +16,10 @@ import {
   TimerBGState,
 } from '../../../type/type';
 import { useTimerBackground } from './useTimerBackground';
-
-/**
- * 브라우저별 접두사가 붙은 전체 화면 속성을 포함하는 사용자 정의 인터페이스
- */
-interface DocumentWithFullscreen extends Document {
-  mozCancelFullScreen?: () => Promise<void>;
-  webkitExitFullscreen?: () => Promise<void>;
-  msExitFullscreen?: () => Promise<void>;
-  mozFullScreenElement?: Element;
-  webkitFullscreenElement?: Element;
-  msFullscreenElement?: Element;
-}
-
-interface HTMLElementWithFullscreen extends HTMLElement {
-  mozRequestFullScreen?: () => Promise<void>;
-  webkitRequestFullscreen?: () => Promise<void>;
-  msRequestFullscreen?: () => Promise<void>;
-}
+import {
+  DocumentWithFullscreen,
+  HTMLElementWithFullscreen,
+} from '../../../type/fullscreen';
 
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
