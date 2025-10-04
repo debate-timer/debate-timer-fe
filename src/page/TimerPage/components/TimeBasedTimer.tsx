@@ -59,30 +59,38 @@ export default function TimeBasedTimer({
   );
 
   const initRawProgress = (): number => {
-    if (speakingTimer === null) {
-      // 1회당 발언 시간 X일 때...
-      if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
-        // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
-        if (totalTimer <= 0) {
-          return 100;
-        }
-        return ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100;
+    if (isOpponentFinished) {
+      if (speakingTimer === null) {
+        // 1회당 발언 시간 X일 때...
+        return ((denominator - (totalTimer ?? 0)) / denominator) * 100;
       } else {
-        // 팀당 발언 시간 타이머가 멈추거나 완료된 경우,
-        // 완료(100%)에 해당하는 진행도를 반환
-        return 100;
+        // 1회당 발언 시간 O일 때...
+        return ((denominator - (speakingTimer ?? 0)) / denominator) * 100;
       }
     } else {
-      // 1회당 발언 시간 O일 때...
-      if (item.timePerSpeaking && speakingTimer && item.timePerSpeaking > 0) {
-        // 1회당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
-        return (
-          ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
-        );
+      if (speakingTimer === null) {
+        // 1회당 발언 시간 X일 때...
+        if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
+          // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+          if (totalTimer <= 0) {
+            return 100;
+          }
+          return ((item.timePerTeam - totalTimer) / denominator) * 100;
+        } else {
+          // 팀당 발언 시간 타이머가 멈추거나 완료된 경우,
+          // 완료(100%)에 해당하는 진행도를 반환
+          return 100;
+        }
       } else {
-        // 1회당 발언 시간 타이머가 멈추거나 완료된 경우,
-        // 완료(100%)에 해당하는 진행도를 반환
-        return 100;
+        // 1회당 발언 시간 O일 때...
+        if (item.timePerSpeaking && speakingTimer && item.timePerSpeaking > 0) {
+          // 1회당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+          return ((item.timePerSpeaking - speakingTimer) / denominator) * 100;
+        } else {
+          // 1회당 발언 시간 타이머가 멈추거나 완료된 경우,
+          // 완료(100%)에 해당하는 진행도를 반환
+          return 100;
+        }
       }
     }
   };
