@@ -89,7 +89,7 @@ export function useFeedbackTimer(): FeedbackTimerLogics {
       let newTime: number;
 
       setTimer((prevTimer) => {
-        newTime = prevTimer === null ? 0 : prevTimer + amount;
+        newTime = (prevTimer ?? 0) + amount;
         return newTime < 0 ? 0 : newTime;
       });
 
