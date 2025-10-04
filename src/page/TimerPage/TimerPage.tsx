@@ -40,6 +40,7 @@ export default function TimerPage() {
     isError,
     refetch,
     isFullscreen,
+    setFullscreen,
     toggleFullscreen,
   } = state;
 
@@ -121,7 +122,14 @@ export default function TimerPage() {
                   table={data.table}
                   index={index}
                   goToOtherItem={goToOtherItem}
-                  openDoneModal={openLoginAndStoreModalOrGoToDebateEndPage}
+                  openDoneModal={() => {
+                    // 전체 화면 상태에서 토론을 끝낼 경우, 전체 화면을 비활성화
+                    if (isFullscreen) {
+                      setFullscreen(false);
+                    }
+
+                    openLoginAndStoreModalOrGoToDebateEndPage();
+                  }}
                   className="absolute bottom-[66px] left-1/2 -translate-x-1/2"
                 />
               )}
