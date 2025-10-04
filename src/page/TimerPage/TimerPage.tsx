@@ -14,6 +14,7 @@ import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import { RiFullscreenFill, RiFullscreenExitFill } from 'react-icons/ri';
 
 export default function TimerPage() {
   const pathParams = useParams();
@@ -30,7 +31,18 @@ export default function TimerPage() {
   const state = useTimerPageState(tableId);
 
   useTimerHotkey(state);
-  const { data, bg, index, goToOtherItem, isLoading, isError, refetch } = state;
+  const {
+    data,
+    bg,
+    index,
+    goToOtherItem,
+    isLoading,
+    isError,
+    refetch,
+    isFullscreen,
+    setFullscreen,
+    toggleFullscreen,
+  } = state;
 
   // If error, print error message and let user be able to retry
   if (isError) {
@@ -72,10 +84,22 @@ export default function TimerPage() {
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
             <button
-              className="flex h-full items-center justify-center"
+              className="flex h-full items-center justify-center p-[4px]"
+              title="도움말"
               onClick={openUseTooltipModal}
             >
-              <DTHelp className="size-full" />
+              <DTHelp className="h-full" />
+            </button>
+            <button
+              className="flex aspect-square h-full items-center justify-center p-[4px]"
+              title="전체 화면"
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <RiFullscreenExitFill className="h-full w-full" />
+              ) : (
+                <RiFullscreenFill className="h-full w-full" />
+              )}
             </button>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
@@ -98,7 +122,14 @@ export default function TimerPage() {
                   table={data.table}
                   index={index}
                   goToOtherItem={goToOtherItem}
-                  openDoneModal={openLoginAndStoreModalOrGoToDebateEndPage}
+                  openDoneModal={() => {
+                    // 전체 화면 상태에서 토론을 끝낼 경우, 전체 화면을 비활성화
+                    if (isFullscreen) {
+                      setFullscreen(false);
+                    }
+
+                    openLoginAndStoreModalOrGoToDebateEndPage();
+                  }}
                   className="absolute bottom-[66px] left-1/2 -translate-x-1/2"
                 />
               )}
