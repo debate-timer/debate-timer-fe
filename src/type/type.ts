@@ -103,3 +103,25 @@ export type DebateTemplate = {
   actions: Action[];
   className?: string; // 카드의 추가 className이 필요하면 사용
 };
+
+type TeamStyleConfig = {
+  baseBg: string;
+  baseBorder: string;
+  label: string;
+  name: string;
+};
+export type TeamKey = 'PROS' | 'CONS';
+export const TEAM_STYLE: Record<TeamKey, TeamStyleConfig> = {
+  PROS: {
+    baseBg: 'bg-[#C2E8FF]',
+    baseBorder: 'border-[#1E91D6]',
+    label: 'text-[#1E91D6]',
+    name: 'text-[#1E91D6]',
+  },
+  CONS: {
+    baseBg: 'bg-[#FFC7D3]',
+    baseBorder: 'border-[#E14666]',
+    label: 'text-[#E14666]',
+    name: 'text-[#E14666]',
+  },
+};
