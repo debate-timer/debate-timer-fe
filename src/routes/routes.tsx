@@ -14,6 +14,9 @@ import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
 import DebateVotePage from '../page/DebateVotePage/DebateVotePage';
+import VoteParticipationPage from '../page/VoteParticipationPage/VoteParticipationPage';
+import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
+import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 
 const routesConfig = [
   {
@@ -55,6 +58,21 @@ const routesConfig = [
     path: '/table/customize/:id/end/vote',
     element: <DebateVotePage />,
     requiresAuth: true,
+  },
+  {
+    path: '/table/customize/:id/end/vote/result',
+    element: <DebateVoteResultPage />,
+    requiresAuth: true,
+  },
+  {
+    path: '/vote/:id',
+    element: <VoteParticipationPage />,
+    requiresAuth: false,
+  },
+  {
+    path: '/vote/end',
+    element: <VoteCompletePage />,
+    requiresAuth: false,
   },
   {
     path: '/oauth',
