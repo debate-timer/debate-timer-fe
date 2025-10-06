@@ -65,8 +65,25 @@ export interface DebateTableData {
   table: TimeBoxInfo[];
 }
 
-// ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
-export type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
+export interface CreatePollInfo {
+  status: 'PROGRESS' | 'DONE';
+  prosTeamName: string;
+  consTeamName: string;
+}
+export interface PollInfo extends CreatePollInfo {
+  totalCount: number;
+  prosCount: number;
+  consCount: number;
+  voterNames: string[];
+}
+
+export interface VoterPollInfo {
+  name: string;
+  participateCode: string;
+  team: 'PROS' | 'CONS';
+}
+export // ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
+type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
 export const bgColorMap: Record<TimerBGState, string> = {
   default: '',
   warning: 'bg-brand', // 30초~11초 구간
