@@ -5,6 +5,7 @@ import feedbackTimerImage from '../../assets/debateEnd/feedback_timer.png';
 import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
 import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
+import useCreatePoll from '../../hooks/mutations/useCreatePoll';
 
 export default function DebateEndPage() {
   const { id: tableId } = useParams();
@@ -14,10 +15,10 @@ export default function DebateEndPage() {
     navigate(`/table/customize/${tableId}/end/feedback`);
   };
 
-  const handleVoteClick = () => {
-    navigate(`/table/customize/${tableId}/end/vote`);
+  const handleVoteClick = (pollId: number) => {
+    navigate(`/table/customize/${pollId}/end/vote`);
   };
-
+  const { mutate } = useCreatePoll(handleVoteClick);
   const backgroundStyle = {
     background:
       'radial-gradient(50% 50% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',
@@ -62,7 +63,7 @@ export default function DebateEndPage() {
 
             {/* 승패투표 카드 */}
             <button
-              onClick={handleVoteClick}
+              onClick={() => mutate(Number(tableId))}
               className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-white transition-all duration-300 hover:border-brand/40 hover:shadow-[0px_0px_22px_6px_#FECD4C63] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-11"
             >
               <img
