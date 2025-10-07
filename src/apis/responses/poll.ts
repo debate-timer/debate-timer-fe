@@ -7,7 +7,7 @@ export interface PostPollResponseType extends BasePollInfo {
 
 // GET /api/polls/{pollId}
 export interface GetPollResponseType extends PollInfo {
-  id: string;
+  id: number;
 }
 
 // PATCH /api/polls/{pollId}
