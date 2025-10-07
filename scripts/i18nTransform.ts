@@ -26,7 +26,9 @@ async function processFile(filePath: string) {
 }
 
 async function main() {
-  const files = await glob('src/**/*.tsx');
+  const files = await glob('src/**/*.tsx', {
+    ignore: ['src/**/*.test.tsx', 'src/**/*.stories.tsx'],
+  });
   if (files.length === 0) {
     console.log('.tsx 파일을 찾지 못했습니다.');
     return;
