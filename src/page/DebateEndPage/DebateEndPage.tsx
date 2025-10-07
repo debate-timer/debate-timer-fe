@@ -5,7 +5,7 @@ import feedbackTimerImage from '../../assets/debateEnd/feedback_timer.png';
 import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
 import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import useCreatePoll from '../../hooks/mutations/useCreatePoll';
+import usePostPoll from '../../hooks/mutations/useCreatePoll';
 
 export default function DebateEndPage() {
   const { id: tableId } = useParams();
@@ -18,7 +18,7 @@ export default function DebateEndPage() {
   const handleVoteClick = (pollId: number) => {
     navigate(`/table/customize/${pollId}/end/vote`);
   };
-  const { mutate } = useCreatePoll(handleVoteClick);
+  const { mutate } = usePostPoll(handleVoteClick);
   const backgroundStyle = {
     background:
       'radial-gradient(50% 50% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',

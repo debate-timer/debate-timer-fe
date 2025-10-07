@@ -5,7 +5,7 @@ import {
   GetPollResponseType,
   GetVoterPollInfoResponseType,
   PatchPollResponseType,
-  PostCreatePollResponseType,
+  PostPollResponseType,
   PostVoterPollInfoResponseType,
 } from '../responses/poll';
 
@@ -27,11 +27,9 @@ export async function apiFunc(
 */
 
 // POST /api/polls/{tableId}
-export async function postCreatePoll(
-  tableId: number,
-): Promise<PostCreatePollResponseType> {
+export async function postPoll(tableId: number): Promise<PostPollResponseType> {
   const requestUrl: string = ApiUrl.poll;
-  const response = await request<PostCreatePollResponseType>(
+  const response = await request<PostPollResponseType>(
     'POST',
     requestUrl + `/${tableId}`,
     null,

@@ -1,11 +1,11 @@
-import { postCreatePoll } from '../../apis/apis/poll';
-import { PostCreatePollResponseType } from '../../apis/responses/poll';
+import { postPoll } from '../../apis/apis/poll';
+import { PostPollResponseType } from '../../apis/responses/poll';
 import { usePreventDuplicateMutation } from './usePreventDuplicateMutation';
 
-export default function useCreatePoll(onSuccess: (id: number) => void) {
+export default function usePostPoll(onSuccess: (id: number) => void) {
   return usePreventDuplicateMutation({
-    mutationFn: (id: number) => postCreatePoll(id),
-    onSuccess: (response: PostCreatePollResponseType) => {
+    mutationFn: (id: number) => postPoll(id),
+    onSuccess: (response: PostPollResponseType) => {
       onSuccess(response.id);
     },
   });

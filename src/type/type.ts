@@ -65,12 +65,12 @@ export interface DebateTableData {
   table: TimeBoxInfo[];
 }
 
-export interface CreatePollInfo {
+export interface BasePollInfo {
   status: 'PROGRESS' | 'DONE';
   prosTeamName: string;
   consTeamName: string;
 }
-export interface PollInfo extends CreatePollInfo {
+export interface PollInfo extends BasePollInfo {
   totalCount: number;
   prosCount: number;
   consCount: number;

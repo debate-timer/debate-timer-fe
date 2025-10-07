@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../../apis/endpoints';
 import {
   PatchPollResponseType,
-  PostCreatePollResponseType,
+  PostPollResponseType,
   PostVoterPollInfoResponseType,
 } from '../../apis/responses/poll';
 
@@ -26,7 +26,7 @@ export const customizeHandlers = [
 
   // POST /api/polls/{tableId}
   http.post(ApiUrl.poll + '/:tableId', async ({ request }) => {
-    const result = (await request.json()) as PostCreatePollResponseType;
+    const result = (await request.json()) as PostPollResponseType;
     console.log(
       `# tableId = ${result?.id}, prosTeamName = ${result?.prosTeamName}, consTeamName = ${result?.consTeamName}`,
     );
