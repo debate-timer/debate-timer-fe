@@ -1,5 +1,5 @@
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import CheckBox from '../../components/icons/Check-Box';
+import CheckBox from '../../components/icons/CheckBox';
 
 export default function VoteCompletePage() {
   return (
