@@ -6,6 +6,7 @@ import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
 import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import usePostPoll from '../../hooks/mutations/useCreatePoll';
+import MenuCard from './components/MenuCard';
 
 export default function DebateEndPage() {
   const { id: tableId } = useParams();
@@ -43,43 +44,26 @@ export default function DebateEndPage() {
           </div>
 
           <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-10 lg:gap-12 xl:gap-20">
-            {/* 피드백 타이머 카드 */}
-            <button
+            <MenuCard
+              title="피드백 타이머"
+              description="심사평 및 Q&A용 타이머 →"
+              imgSrc={feedbackTimerImage}
+              imgAlt="피드백 타이머"
               onClick={handleFeedbackClick}
-              className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-white transition-all duration-300 hover:border-brand/40 hover:shadow-[0px_0px_22px_6px_#FECD4C63] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-11"
-            >
-              <img
-                src={feedbackTimerImage}
-                alt="피드백 타이머"
-                className="h-20 w-20 md:h-24 md:w-24 lg:h-[96px] lg:w-[96px] xl:h-[108px] xl:w-[108px]"
-              />
-              <h2 className="text-lg font-bold text-default-black md:text-xl lg:text-2xl xl:text-title-raw">
-                피드백 타이머
-              </h2>
-              <p className="text-sm text-default-border md:text-base lg:text-lg xl:text-detail-raw">
-                심사평 및 Q&A용 타이머 →
-              </p>
-            </button>
+              ariaLabel="피드백 타이머로 이동"
+            />
 
-            {/* 승패투표 카드 */}
-            <button
-              onClick={() => mutate(Number(tableId))}
-              className="flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 rounded-[34px] border-2 border-default-disabled/hover bg-white transition-all duration-300 hover:border-brand/40 hover:shadow-[0px_0px_22px_6px_#FECD4C63] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px] xl:gap-11"
-            >
-              <img
-                src={voteStampImage}
-                alt="투표"
-                className="h-20 w-20 md:h-24 md:w-24 lg:h-[96px] lg:w-[96px] xl:h-[108px] xl:w-[108px]"
-              />
-              <div className="text-center">
-                <p className="text-lg font-semibold text-default-black md:text-xl lg:text-2xl xl:text-title-raw">
-                  승패투표 진행하기
-                </p>
-                <p className="text-sm text-default-border md:text-base lg:text-lg xl:text-detail-raw">
-                  QR 코드를 통해 투표 페이지로 이동해요.
-                </p>
-              </div>
-            </button>
+            <MenuCard
+              title="승패투표 진행하기"
+              description="QR 코드를 통해 투표 페이지로 이동해요."
+              imgSrc={voteStampImage}
+              imgAlt="승패투표"
+              onClick={() => {
+                if (!tableId) return; // NaN 방지
+                mutate(Number(tableId));
+              }}
+              ariaLabel="승패투표 생성 및 진행"
+            />
           </div>
           <div className="mt-12 lg:mt-16 xl:mt-[74px]">
             <GoToHomeButton />
