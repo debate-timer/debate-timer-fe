@@ -9,8 +9,9 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
 export default function DebateVoteResultPage() {
   const { id: pollIdParam } = useParams();
-  const pollId = Number(pollIdParam);
+  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
   const navigate = useNavigate();
+
   const {
     data,
     isLoading: isFetching,
@@ -52,6 +53,17 @@ export default function DebateVoteResultPage() {
     }
   }
 
+  if (!pollIdParam || Number.isNaN(pollId)) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator onClickRetry={() => navigate('/')}>
+            유효하지 않은 투표 결과 링크입니다.
+          </ErrorIndicator>
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
+  }
   if (isError) {
     return (
       <DefaultLayout>

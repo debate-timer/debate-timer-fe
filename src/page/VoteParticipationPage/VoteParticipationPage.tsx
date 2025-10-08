@@ -10,18 +10,17 @@ import { useGetVoterPollInfo } from '../../hooks/query/useGetVoterPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import usePostVoterPollInfo from '../../hooks/mutations/usePostVoterPollInfo';
+import { TeamKey } from '../../type/type';
 
 const TEAM_LABEL = {
   PROS: '찬성팀',
   CONS: '반대팀',
 } as const;
 
-type TeamKey = keyof typeof TEAM_LABEL;
-
 export default function VoteParticipationPage() {
   const { id: pollIdParam } = useParams();
   const navigate = useNavigate();
-  const pollId = Number(pollIdParam);
+  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
 
   const [participantName, setParticipantName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<TeamKey | null>(null);
@@ -64,6 +63,18 @@ export default function VoteParticipationPage() {
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
           <ErrorIndicator onClickRetry={() => refetch()} />
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
+  }
+
+  if (!pollIdParam || Number.isNaN(pollId)) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator onClickRetry={() => navigate('/')}>
+            유효하지 않은 투표 링크입니다.
+          </ErrorIndicator>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
     );
