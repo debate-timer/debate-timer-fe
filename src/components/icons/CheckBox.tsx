@@ -2,18 +2,23 @@ import DTCheck from './Check';
 import clsx from 'clsx';
 
 interface CheckBoxProps {
-  checkColor?: string; // 체크 표시 색상
   checked?: boolean;
   size?: number | string;
   className?: string;
 }
 
+/**
+ *text-* 클래스가 포함되면 자동으로 DTCheck로 전달
+ */
 export default function CheckBox({
-  checkColor = '#FFFFFF',
   checked = false,
   size = 24,
-  className,
+  className = '',
 }: CheckBoxProps) {
+  // text-로 시작하는 클래스만 추출
+  const textClass =
+    className.split(' ').find((c) => c.startsWith('text-')) ?? '';
+
   return (
     <div
       className={clsx(
@@ -26,7 +31,7 @@ export default function CheckBox({
         height: size,
       }}
     >
-      {checked && <DTCheck color={checkColor} className="w-2/3" />}
+      {checked && <DTCheck className={clsx('w-2/3', textClass)} />}
     </div>
   );
 }
