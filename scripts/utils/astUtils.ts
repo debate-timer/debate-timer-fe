@@ -21,6 +21,40 @@ export function parseCode(code: string) {
 }
 
 /**
+ * 리액트 컴포넌트 함수인지 판별
+ */
+function isReactComponentFunction(path: NodePath): boolean {
+  // 함수 선언문
+  if (path.isFunctionDeclaration()) {
+    return path.node.id?.name?.[0] === path.node.id?.name?.[0]?.toUpperCase();
+  }
+
+  // 화살표 함수 표현식 또는 함수 표현식
+  if (path.isArrowFunctionExpression() || path.isFunctionExpression()) {
+    const parent = path.parentPath;
+
+    // 변수 선언문
+    if (parent?.isVariableDeclarator()) {
+      const varName = (parent.node.id as t.Identifier)?.name;
+      return /^[A-Z]/.test(varName);
+    }
+
+    // 합성 컴포넌트
+    if (parent?.isAssignmentExpression()) {
+      const left = parent.get('left');
+      if (left.isMemberExpression()) {
+        const property = left.get('property');
+        if (property.isIdentifier()) {
+          return /^[A-Z]/.test(property.node.name);
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
  * AST에서 한글 문자열 탐색 및 변환
  */
 export function transformAST(ast: t.File) {
@@ -34,12 +68,7 @@ export function transformAST(ast: t.File) {
       const value = path.node.value.trim();
       if (value && KOREAN_REGEX.test(value)) {
         koreanKeys.add(value);
-        const component = path.findParent(
-          (p) =>
-            p.isFunctionDeclaration() ||
-            p.isArrowFunctionExpression() ||
-            p.isFunctionExpression(),
-        );
+        const component = path.findParent((p) => isReactComponentFunction(p));
         if (component) componentsToModify.add(component);
       }
     },
@@ -55,12 +84,7 @@ export function transformAST(ast: t.File) {
         )
       ) {
         koreanKeys.add(value);
-        const component = path.findParent(
-          (p) =>
-            p.isFunctionDeclaration() ||
-            p.isArrowFunctionExpression() ||
-            p.isFunctionExpression(),
-        );
+        const component = path.findParent((p) => isReactComponentFunction(p));
         if (component) componentsToModify.add(component);
       }
     },
@@ -88,10 +112,7 @@ export function transformAST(ast: t.File) {
   // 3️. 각 컴포넌트에 const { t } = useTranslation() 추가
   componentsToModify.forEach((componentPath) => {
     const bodyPath = componentPath.get('body');
-
-    if (Array.isArray(bodyPath) || !bodyPath.isBlockStatement()) {
-      return;
-    }
+    if (Array.isArray(bodyPath) || !bodyPath.isBlockStatement()) return;
 
     let hasHook = false;
     bodyPath.get('body').forEach((stmt) => {
