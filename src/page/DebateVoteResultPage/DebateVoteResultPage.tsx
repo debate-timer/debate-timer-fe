@@ -27,12 +27,12 @@ export default function DebateVoteResultPage() {
   const isError = isFetchError || isRefetchError;
   const { openModal, ModalWrapper } = useModal();
 
-  function getWinner(result: {
+  const getWinner = (result: {
     prosTeamName: string;
     consTeamName: string;
     prosCount: number;
     consCount: number;
-  }): { teamKey: TeamKey | null; teamName: string } {
+  }): { teamKey: TeamKey | null; teamName: string } => {
     const { prosTeamName, consTeamName, prosCount, consCount } = result;
 
     if (prosCount > consCount) {
@@ -51,7 +51,7 @@ export default function DebateVoteResultPage() {
         teamName: '무승부',
       };
     }
-  }
+  };
 
   if (!pollIdParam || Number.isNaN(pollId)) {
     return (
