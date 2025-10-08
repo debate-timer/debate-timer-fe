@@ -20,6 +20,7 @@ const TEAM_LABEL = {
 export default function VoteParticipationPage() {
   const { id: pollIdParam } = useParams();
   const navigate = useNavigate();
+  console.log('pollIdParam', pollIdParam);
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
 
   const [participantName, setParticipantName] = useState('');

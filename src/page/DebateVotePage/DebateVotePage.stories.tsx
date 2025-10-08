@@ -7,6 +7,8 @@ const meta: Meta<typeof DebateVotePage> = {
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen', // Storybook에서 전체 화면으로 표시
+    route: '/table/customize/123/end/vote',
+    routePattern: '/table/customize/:id/end/vote',
   },
 };
 
