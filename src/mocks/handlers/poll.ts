@@ -6,8 +6,8 @@ import {
   PostVoterPollInfoResponseType,
 } from '../../apis/responses/poll';
 
-export const customizeHandlers = [
-  // GET /api/table/customize/{tableId}
+export const pollHandlers = [
+  // GET /api/polls/:pollId
   http.get(ApiUrl.poll + '/:pollId', ({ params }) => {
     const { pollId } = params;
     console.log(`# pollId  = ${pollId}`);
