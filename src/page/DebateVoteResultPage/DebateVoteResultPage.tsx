@@ -9,7 +9,9 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
 export default function DebateVoteResultPage() {
   const { id: pollIdParam } = useParams();
+
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
+  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
   const navigate = useNavigate();
 
   const {
@@ -19,7 +21,7 @@ export default function DebateVoteResultPage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId);
+  } = useGetPollInfo(pollId, { enabled: isValidPollId });
   const handleGoHome = () => {
     navigate('/');
   };
@@ -53,7 +55,7 @@ export default function DebateVoteResultPage() {
     }
   };
 
-  if (!pollIdParam || Number.isNaN(pollId)) {
+  if (isValidPollId) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>

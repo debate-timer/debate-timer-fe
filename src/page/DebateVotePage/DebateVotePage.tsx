@@ -7,7 +7,8 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndpoll from '../../hooks/mutations/useFetchEndpoll';
 export default function DebateVotePage() {
   const { id: pollIdParam } = useParams();
-  const pollId = Number(pollIdParam);
+  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
+  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
   const navigate = useNavigate();
   const baseUrl =
     import.meta.env.MODE !== 'production'
@@ -31,7 +32,7 @@ export default function DebateVotePage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId, { refetchInterval: 5000 });
+  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isValidPollId });
   const { mutate } = useFetchEndpoll(handleGoToResult);
 
   const participants = data?.voterNames;
@@ -47,7 +48,17 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
-
+  if (!isValidPollId) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator onClickRetry={() => navigate('/')}>
+            유효하지 않은 투표 링크입니다.
+          </ErrorIndicator>
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
+  }
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer noPadding={true}>

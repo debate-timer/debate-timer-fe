@@ -20,8 +20,9 @@ const TEAM_LABEL = {
 export default function VoteParticipationPage() {
   const { id: pollIdParam } = useParams();
   const navigate = useNavigate();
-  console.log('pollIdParam', pollIdParam);
+  // 1) pollId 파싱 + 유효성 체크
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
+  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
 
   const [participantName, setParticipantName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<TeamKey | null>(null);
@@ -33,7 +34,7 @@ export default function VoteParticipationPage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetVoterPollInfo(pollId);
+  } = useGetVoterPollInfo(pollId, { enabled: isValidPollId });
   const { openModal, closeModal, ModalWrapper } = useModal();
 
   const isSubmitDisabled =
@@ -69,7 +70,7 @@ export default function VoteParticipationPage() {
     );
   }
 
-  if (!pollIdParam || Number.isNaN(pollId)) {
+  if (!isValidPollId) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
