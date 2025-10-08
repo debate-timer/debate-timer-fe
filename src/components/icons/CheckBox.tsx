@@ -2,7 +2,6 @@ import DTCheck from './Check';
 import clsx from 'clsx';
 
 interface CheckBoxProps {
-  color?: string; // 배경색
   checkColor?: string; // 체크 표시 색상
   checked?: boolean;
   size?: number | string;
@@ -10,7 +9,6 @@ interface CheckBoxProps {
 }
 
 export default function CheckBox({
-  color = '#FECD4C',
   checkColor = '#FFFFFF',
   checked = false,
   size = 24,
@@ -24,7 +22,6 @@ export default function CheckBox({
         className,
       )}
       style={{
-        backgroundColor: checked ? color : 'transparent',
         width: size,
         height: size,
       }}
