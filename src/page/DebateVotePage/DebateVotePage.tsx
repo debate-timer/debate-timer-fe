@@ -18,7 +18,6 @@ export default function DebateVotePage() {
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
-    if (!pollId || Number.isNaN(pollId)) return;
     navigate(`/table/customize/${pollId}/end/vote/result`);
   };
 
