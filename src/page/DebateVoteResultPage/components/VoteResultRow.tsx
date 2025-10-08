@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import CountUp from './CountUp';
+import AnimatedCounter from './CountUp';
 import { TEAM_STYLE, TeamKey } from '../../../type/type';
 
 type VoteBarProps = {
@@ -52,7 +52,7 @@ export default function VoteBar({
         </div>
 
         <div className="shrink-0 pl-4 text-2xl font-extrabold text-neutral-900">
-          <CountUp to={count} />명
+          <AnimatedCounter to={count} />명
         </div>
       </div>
     </div>

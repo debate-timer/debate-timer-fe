@@ -2,19 +2,19 @@
 import { useEffect, useState } from 'react';
 import { animate } from 'framer-motion';
 
-type CountUpProps = {
+type AnimatedCounterProps = {
   to: number;
   duration?: number; // 초
   delay?: number; // 초
   className?: string;
 };
 
-export default function CountUp({
+export default function AnimatedCounter({
   to,
   duration = 1.2,
   delay = 0,
   className,
-}: CountUpProps) {
+}: AnimatedCounterProps) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
