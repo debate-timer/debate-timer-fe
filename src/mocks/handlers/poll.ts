@@ -28,7 +28,7 @@ export const pollHandlers = [
   http.post(ApiUrl.poll + '/:tableId', async ({ request }) => {
     const result = (await request.json()) as PostPollResponseType;
     console.log(
-      `# tableId = ${result?.id}, prosTeamName = ${result?.prosTeamName}, consTeamName = ${result?.consTeamName}`,
+      `# pollId = ${result?.id}, prosTeamName = ${result?.prosTeamName}, consTeamName = ${result?.consTeamName}`,
     );
     return HttpResponse.json({
       id: 7,
@@ -39,10 +39,11 @@ export const pollHandlers = [
   }),
 
   // PATCH /api/polls/{pollId}
-  http.patch(ApiUrl.poll + '/:pollId', async ({ request }) => {
+  http.patch(ApiUrl.poll + '/:pollId', async ({ request, params }) => {
     const result = (await request.json()) as PatchPollResponseType;
+    const { pollId } = params;
     console.log(
-      `pollId = ${result?.id}, status = ${result?.status}, prosTeamName = ${result?.prosTeamName}, consTeamName = ${result?.consTeamName}`,
+      `pollId = ${pollId}, status = ${result?.status}, prosTeamName = ${result?.prosTeamName}, consTeamName = ${result?.consTeamName}`,
     );
 
     return HttpResponse.json({
@@ -58,7 +59,7 @@ export const pollHandlers = [
   }),
 
   // GET /api/polls/{pollId}/votes
-  http.delete(ApiUrl.poll + `/:pollId/votes`, ({ params }) => {
+  http.get(ApiUrl.poll + `/:pollId/votes`, ({ params }) => {
     const { pollId } = params;
     console.log(`# pollId  = ${pollId}`);
 
@@ -75,11 +76,11 @@ export const pollHandlers = [
   }),
 
   // POST /api/polls/{pollId}/votes
-  http.patch(ApiUrl.poll + '/:pollId/votes', async ({ request, params }) => {
+  http.post(ApiUrl.poll + '/:pollId/votes', async ({ request, params }) => {
     const { pollId } = params;
     const result = (await request.json()) as PostVoterPollInfoResponseType;
     console.log(
-      `# tableId = ${pollId}, name = ${result?.name}, participateCode = ${result?.participateCode}, team = ${result?.team}`,
+      `# pollId = ${pollId}, name = ${result?.name}, participateCode = ${result?.participateCode}, team = ${result?.team}`,
     );
 
     return HttpResponse.json({
