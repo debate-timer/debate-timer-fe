@@ -110,7 +110,7 @@ type TeamStyleConfig = {
   label: string;
   name: string;
 };
-export type TeamKey = 'PROS' | 'CONS';
+export type TeamKey = TimeBasedStance;
 export const TEAM_STYLE: Record<TeamKey, TeamStyleConfig> = {
   PROS: {
     baseBg: 'bg-[#C2E8FF]',
