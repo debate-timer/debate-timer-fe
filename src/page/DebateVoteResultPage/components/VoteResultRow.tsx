@@ -36,7 +36,7 @@ export default function VoteBar({
         className={`absolute inset-y-0 left-0 ${barTone} rounded-r-2xl`}
         initial={{ width: '0%' }}
         animate={{ width: `${percentage}%` }}
-        transition={{ duration: 1.2, ease: 'easeOut' }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
         aria-hidden
       />
 
