@@ -16,6 +16,7 @@ import {
   TimerBGState,
 } from '../../../type/type';
 import { useTimerBackground } from './useTimerBackground';
+import useFullscreen from '../../../hooks/useFullscreen';
 
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
@@ -67,6 +68,8 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     data,
     index,
   });
+
+  const { isFullscreen, setFullscreen, toggleFullscreen } = useFullscreen();
 
   /**
    * 라운드 이동 (이전/다음)
@@ -256,6 +259,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     isLoading,
     isError,
     refetch,
+    isFullscreen,
+    toggleFullscreen,
+    setFullscreen,
   };
 }
 
@@ -278,4 +284,7 @@ export interface TimerPageLogics {
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
+  isFullscreen: boolean;
+  toggleFullscreen: () => void;
+  setFullscreen: (value: boolean) => void;
 }
