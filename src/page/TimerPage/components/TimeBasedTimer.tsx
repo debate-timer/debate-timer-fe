@@ -12,15 +12,13 @@ type TimeBasedTimerInstance = {
   totalTimer: number | null;
   speakingTimer: number | null;
   isRunning: boolean;
-  startTimer: (isOpponentDone: boolean) => void;
+  startTimer: () => void;
   pauseTimer: () => void;
   resetCurrentTimer: () => void;
-  denominator: number;
 };
 
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: TimeBasedTimerInstance;
-  isOpponentDone: boolean;
   isSelected: boolean;
   onActivate?: () => void;
   prosCons: TimeBasedStance;
@@ -30,7 +28,6 @@ interface TimeBasedTimerProps {
 
 export default function TimeBasedTimer({
   timeBasedTimerInstance,
-  isOpponentDone,
   isSelected,
   prosCons,
   teamName,
@@ -43,7 +40,6 @@ export default function TimeBasedTimer({
     startTimer,
     pauseTimer,
     resetCurrentTimer,
-    denominator,
   } = timeBasedTimerInstance;
 
   const minute = Formatting.formatTwoDigits(
@@ -59,44 +55,36 @@ export default function TimeBasedTimer({
   );
 
   const initRawProgress = (): number => {
-    if (isOpponentDone) {
-      if (speakingTimer === null) {
-        // 1회당 발언 시간 X일 때...
-        return ((denominator - (totalTimer ?? 0)) / denominator) * 100;
+    if (speakingTimer === null) {
+      // 1회당 발언 시간 X일 때...
+      if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
+        // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+        if (totalTimer <= 0) {
+          return 100;
+        }
+        return ((item.timePerTeam - totalTimer) / item.timePerTeam) * 100;
       } else {
-        // 1회당 발언 시간 O일 때...
-        return ((denominator - (speakingTimer ?? 0)) / denominator) * 100;
+        // 팀당 발언 시간 타이머가 멈추거나 완료된 경우,
+        // 완료(100%)에 해당하는 진행도를 반환
+        return 100;
       }
     } else {
-      if (speakingTimer === null) {
-        // 1회당 발언 시간 X일 때...
-        if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
-          // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
-          if (totalTimer <= 0) {
-            return 100;
-          }
-          return ((item.timePerTeam - totalTimer) / denominator) * 100;
-        } else {
-          // 팀당 발언 시간 타이머가 멈추거나 완료된 경우,
-          // 완료(100%)에 해당하는 진행도를 반환
-          return 100;
-        }
+      // 1회당 발언 시간 O일 때...
+      if (item.timePerSpeaking && speakingTimer && item.timePerSpeaking > 0) {
+        // 1회당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
+        return (
+          ((item.timePerSpeaking - speakingTimer) / item.timePerSpeaking) * 100
+        );
       } else {
-        // 1회당 발언 시간 O일 때...
-        if (item.timePerSpeaking && speakingTimer && item.timePerSpeaking > 0) {
-          // 1회당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
-          return ((item.timePerSpeaking - speakingTimer) / denominator) * 100;
-        } else {
-          // 1회당 발언 시간 타이머가 멈추거나 완료된 경우,
-          // 완료(100%)에 해당하는 진행도를 반환
-          return 100;
-        }
+        // 1회당 발언 시간 타이머가 멈추거나 완료된 경우,
+        // 완료(100%)에 해당하는 진행도를 반환
+        return 100;
       }
     }
   };
 
   const rawProgress = initRawProgress();
-  const progressMotionValue = useCircularTimerAnimation(rawProgress);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress, isRunning);
 
   const breakpoint = useBreakpoint();
   const getStrokeWidth = () => {
@@ -153,11 +141,11 @@ export default function TimeBasedTimer({
               전체 시간
             </h1>
             <span className="flex flex-row text-[56px] font-semibold tabular-nums text-default-black xl:text-[72px]">
-              <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
+              <p className="flex w-[80px] items-center justify-center xl:w-[100px]">
                 {minute}
               </p>
               <p className="flex items-center justify-center">:</p>
-              <p className="flex w-[80px] items-center justify-center xl:w-[120px]">
+              <p className="flex w-[80px] items-center justify-center xl:w-[100px]">
                 {second}
               </p>
             </span>
@@ -173,12 +161,12 @@ export default function TimeBasedTimer({
             >
               현재 시간
             </h1>
-            <span className="flex flex-row text-[70px] font-bold tabular-nums text-default-black lg:text-[90px] xl:text-[110px]">
-              <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
+            <span className="flex flex-row text-[80px] font-bold tabular-nums text-default-black xl:text-[110px]">
+              <p className="flex w-[120px] items-center justify-center xl:w-[180px]">
                 {speakingMinute}
               </p>
               <p className="flex items-center justify-center">:</p>
-              <p className="flex w-[108px] items-center justify-center xl:w-[180px]">
+              <p className="flex w-[120px] items-center justify-center xl:w-[180px]">
                 {speakingSecond}
               </p>
             </span>
@@ -189,7 +177,7 @@ export default function TimeBasedTimer({
       {/* 조작부 */}
       <TimerController
         isRunning={isRunning}
-        onStart={() => startTimer(isOpponentDone)}
+        onStart={startTimer}
         onPause={pauseTimer}
         onReset={resetCurrentTimer}
         stance={prosCons}

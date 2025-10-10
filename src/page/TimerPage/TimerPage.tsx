@@ -85,11 +85,13 @@ export default function TimerPage() {
           <DefaultLayout.Header.Right>
             <button
               className="flex h-full items-center justify-center p-[4px]"
+              aria-label="도움말"
               title="도움말"
               onClick={openUseTooltipModal}
             >
               <DTHelp className="h-full" />
             </button>
+
             <button
               className="flex aspect-square h-full items-center justify-center p-[4px]"
               title="전체 화면"
