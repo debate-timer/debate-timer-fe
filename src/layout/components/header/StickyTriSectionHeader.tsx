@@ -11,6 +11,7 @@ import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 import DTHome from '../../../components/icons/Home';
 import DTLogin from '../../../components/icons/Login';
+import useFullscreen from '../../../hooks/useFullscreen';
 
 // The type of header icons will be declared here.
 type HeaderIcons = 'home' | 'auth';
@@ -50,6 +51,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const navigate = useNavigate();
   const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
   const { openModal, closeModal, ModalWrapper } = useModal({});
+  const { isFullscreen, setFullscreen } = useFullscreen();
   const defaultIcons: HeaderIcons[] = ['home', 'auth'];
 
   const handleLoginStart = (keepData: boolean) => {
@@ -64,7 +66,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         {isGuestFlow() && (
           <>
             {/* Guest mode indicator */}
-            <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+            <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
               비회원 모드
             </div>
 
@@ -87,6 +89,11 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                   title="홈으로 이동"
                   key={`${iconName}-${index}`}
                   onClick={() => {
+                    // 전체 화면 상태에서 홈으로 이동하는 경우, 전체 화면 비활성화
+                    if (isFullscreen) {
+                      setFullscreen(false);
+                    }
+
                     if (isGuestFlow()) {
                       deleteSessionCustomizeTableData();
                     }
@@ -104,6 +111,11 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                   title={isLoggedIn() ? '로그아웃' : '로그인'}
                   key={`${iconName}-${index}`}
                   onClick={() => {
+                    // 전체 화면 상태에서 홈으로 이동하는 경우, 전체 화면 비활성화
+                    if (isFullscreen) {
+                      setFullscreen(false);
+                    }
+
                     if (isLoggedIn()) {
                       logoutMutate();
                     } else {
