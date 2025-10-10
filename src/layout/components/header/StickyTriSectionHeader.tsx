@@ -84,7 +84,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             case 'home':
               return (
                 <button
-                  className="flex h-full items-center justify-center"
+                  className="flex h-full items-center justify-center p-[4px]"
                   aria-label="홈으로 이동"
                   title="홈으로 이동"
                   key={`${iconName}-${index}`}
@@ -106,7 +106,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             case 'auth':
               return (
                 <button
-                  className="flex h-full items-center justify-center"
+                  className="flex h-full items-center justify-center p-[4px]"
                   aria-label={isLoggedIn() ? '로그아웃' : '로그인'}
                   title={isLoggedIn() ? '로그아웃' : '로그인'}
                   key={`${iconName}-${index}`}
@@ -123,7 +123,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                     }
                   }}
                 >
-                  <DTLogin className="h-full" />
+                  <DTLogin className="h-full w-full" />
                 </button>
               );
             default:
