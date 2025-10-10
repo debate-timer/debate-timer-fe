@@ -50,19 +50,11 @@ export function useTimerHotkey(state: TimerPageLogics) {
       }
 
       // 찬/반 타이머 토글 (시작/정지)
-      const toggleTimeBasedTimer = () => {
-        if (prosConsSelected === 'PROS') {
-          if (timer1.isRunning) {
-            timer1.pauseTimer();
-          } else {
-            timer1.startTimer(timer2.isDone);
-          }
-        } else if (prosConsSelected === 'CONS') {
-          if (timer2.isRunning) {
-            timer2.pauseTimer();
-          } else {
-            timer2.startTimer(timer1.isDone);
-          }
+      const toggleTimer = (timer: typeof timer1 | typeof timer2) => {
+        if (timer.isRunning) {
+          timer.pauseTimer();
+        } else {
+          timer.startTimer();
         }
       };
 
@@ -76,7 +68,11 @@ export function useTimerHotkey(state: TimerPageLogics) {
               normalTimer.startTimer();
             }
           } else {
-            toggleTimeBasedTimer();
+            if (prosConsSelected === 'PROS') {
+              toggleTimer(timer1);
+            } else if (prosConsSelected === 'CONS') {
+              toggleTimer(timer2);
+            }
           }
           break;
         case 'KeyR':

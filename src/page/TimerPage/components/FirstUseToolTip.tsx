@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { LuKeyboard } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
-import { RiFullscreenExitFill, RiFullscreenFill } from 'react-icons/ri';
 
 // z-index
 // - 30: Tooltip
@@ -66,26 +65,6 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           <ListItem>좌우 방향키로 이전/다음 차례로 이동</ListItem>
           <ListItem>A/L 키로 토론 진영 변경</ListItem>
           <ListItem>Enter 키로 상대 진영으로 변경</ListItem>
-        </div>
-      </div>
-
-      <div className="flex flex-col space-y-1 text-slate-50">
-        <div className="mb-2 flex flex-row items-center space-x-4">
-          <RiFullscreenFill size={18} />
-          <h1 className="text-xl font-bold">전체 화면</h1>
-        </div>
-
-        <div className="text-m flex flex-col space-y-1 md:text-lg">
-          <ListItem>
-            화면 우측 상단 헤더의 전체 화면 버튼
-            <RiFullscreenFill className="mx-[2px] self-center" />
-            으로 활성화
-          </ListItem>
-          <ListItem>
-            화면 우측 상단 헤더의 전체 화면 닫기 버튼
-            <RiFullscreenExitFill className="mx-[2px] self-center" />
-            또는 ESC 키를 눌러 전체 화면 비활성화
-          </ListItem>
         </div>
       </div>
 
