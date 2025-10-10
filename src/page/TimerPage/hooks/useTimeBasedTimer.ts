@@ -39,7 +39,7 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
   const speakingTargetTimeRef = useRef<number | null>(null);
 
   // 진행률 계산용 변수
-  const [denominator, setDenominator] = useState<number>(1);
+  const [denominator, setDenominator] = useState(1);
   const updateDenominator = useCallback(
     (isOpponentDone: boolean) => {
       if (isOpponentDone) {
