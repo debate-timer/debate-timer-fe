@@ -82,7 +82,7 @@ export interface VoterPollInfo {
   participateCode: string;
   team: 'PROS' | 'CONS';
 }
-export // ===== 배경 색상 상태 타입 및 컬러 맵 정의 =====
+
 type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
 export const bgColorMap: Record<TimerBGState, string> = {
   default: '',
