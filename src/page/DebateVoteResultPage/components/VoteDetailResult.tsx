@@ -1,6 +1,6 @@
 // pages/VoteDetailResult.tsx
 import { motion } from 'framer-motion';
-import VoteResultRow from './VoteResultRow';
+import VoteBar from './VoteBar';
 
 type VoteDetailResultProps = {
   onGoHome?: () => void;
@@ -28,13 +28,13 @@ export default function VoteDetailResult({
           </h2>
 
           <div className="flex flex-col gap-4">
-            <VoteResultRow
+            <VoteBar
               teamKey="PROS"
               teamName={pros.name}
               count={pros.count}
               total={pros.count + cons.count}
             />
-            <VoteResultRow
+            <VoteBar
               teamKey="CONS"
               teamName={cons.name}
               count={cons.count}
