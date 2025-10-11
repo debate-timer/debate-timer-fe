@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import AnimatedCounter from './CountUp';
+import AnimatedCounter from './AnimatedCounter';
 import { TEAM_STYLE, TeamKey } from '../../../type/type';
 
 type VoteBarProps = {
