@@ -55,7 +55,7 @@ export default function DebateVoteResultPage() {
     }
   };
 
-  if (isValidPollId) {
+  if (!isValidPollId) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
