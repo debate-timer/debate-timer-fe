@@ -52,9 +52,6 @@ export default function VoteParticipationPage() {
         team: selectedTeam,
       },
     });
-
-    setParticipantName('');
-    setSelectedTeam(null);
   };
 
   const isLoading = isFetching || isRefetching;
