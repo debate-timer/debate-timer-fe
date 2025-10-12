@@ -4,7 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
-import useFetchEndPoll from '../../hooks/mutations/useFetchEndpoll';
+import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
 export default function DebateVotePage() {
   const { id: pollIdParam } = useParams();
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
