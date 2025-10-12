@@ -38,7 +38,7 @@ export default function FeedbackTimer({
     timer !== null && defaultTimer > 0
       ? ((defaultTimer - timer) / defaultTimer) * 100
       : 0;
-  const progressMotionValue = useCircularTimerAnimation(rawProgress);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress, isRunning);
   const breakpoint = useBreakpoint();
 
   const getStrokeWidth = () => {
