@@ -83,7 +83,7 @@ export interface VoterPollInfo {
   team: 'PROS' | 'CONS';
 }
 
-type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
+export type TimerBGState = 'default' | 'warning' | 'danger' | 'expired';
 export const bgColorMap: Record<TimerBGState, string> = {
   default: '',
   warning: 'bg-brand', // 30초~11초 구간
