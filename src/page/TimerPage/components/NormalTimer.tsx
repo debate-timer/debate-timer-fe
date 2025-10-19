@@ -51,7 +51,7 @@ export default function NormalTimer({
   const titleText = item.speechType;
   const rawProgress =
     timer !== null && item.time ? ((item.time - timer) / item.time) * 100 : 0;
-  const progressMotionValue = useCircularTimerAnimation(rawProgress);
+  const progressMotionValue = useCircularTimerAnimation(rawProgress, isRunning);
   const breakpoint = useBreakpoint();
   const getStrokeWidth = () => {
     switch (breakpoint) {

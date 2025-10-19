@@ -31,6 +31,9 @@ export default {
           },
         },
       },
+      backgroundImage: {
+        brandBackground: 'radial-gradient(80% 80% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',
+      },
       animation: {
         rotate: 'rotate 5s linear infinite',
         gradient: 'gradient 10s ease infinite',
