@@ -10,6 +10,7 @@ import seobangjeongto from '../assets/template_logo/seobangjeongto.png';
 import osansi from '../assets/template_logo/osansi.png';
 import nogotte from '../assets/template_logo/nogotte.png';
 import kogito from '../assets/template_logo/kogito.png';
+import mcu from '../assets/template_logo/mcu.png';
 import { DebateTemplate } from '../type/type';
 function createTableShareUrl(encodeData: string): string {
   return `${import.meta.env.VITE_SHARE_BASE_URL}/share?data=${encodeData}`;
@@ -185,6 +186,25 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
           label: '국회의장배 토론',
           href: createTableShareUrl(
             'eJzdk0FLAkEUx7%2BKzNnDah5qb2obCLkr7nopJEYddWmdXXZXKkSIsAj0YIdAQmU9BAUGk%2BCXcsfv0KxrainhKazb7o%2BZ%2F%2Fu94b0aUAuAj3BcEKi4qAO%2BBjCsIMAD2ui65JU6j9M7hzZ7gcn4bfrUor0O7T%2B7hAQYdgcOCAL7yvDOxzOyIiUTJwJDsIRwATLIvg1TtxQEK%2BI8lgxp453xvI5XuUs6buua8QtoYhWXYkjTAF%2BEmoWCoKhi1Sr7yDarqM6qwpzG7p3WgGVDnPciUmlJZgGWgVC%2BrPhWtH%2FrW%2Bb0yzkSpXQyeuyJq17lUJj1nptFs7B5MzHhSEoLZ4J4uDjHecpVbAM%2BXM%2F6MIVMrwPA46qmLZBsIHjOOvjElvePTJYackf3oB5cUY5L4n9QnozblLwE6IDQm%2BGOmIfXzDfNx98wF4WMkp7JfJuUNu06i0VcuiuJpHAWi8rC0ssv4jfwxcNXi%2BxzG8xmTS%2FEvGvbaT1QpxGgze6ENH5604PfetI1842jMCK7s3d72%2B3d7iln6x%2Fd%2BDWm',
+          ),
+        },
+      ],
+    },
+    {
+      title: '목포카톨릭대',
+      subtitle: '',
+      logoSrc: mcu,
+      actions: [
+        {
+          label: 'A형 토론(20분)',
+          href: createTableShareUrl(
+            'eJzNkkFLwzAUx79KyUmhYplTsLdu9jBw7Vi7iyKSbdlW7NLSTlTGwMO2k6AXZYcxpgdRmVBBRT9T0%2B%2Fgy6rSycTb8Jb8wnv%2FX17SRlYVyen1NRFZtOYguY0obhIko%2FDhPjqfsPfnqH8X3j6GZ6fCiqBEg0sh6o%2FD6%2FFSSgpfu8tIRK0TlxdkS4ap53M7KiBcJ7SKAcLa9RzfJLipxX1ZMGHdJ%2BAVhyZ5GAwgA%2FgR9qhF6xli20iuYdsnIqpZ1PIbCdSBWFy2oXC3jfwWphXeo1DUDejgu4RUGmasxUY9sAVado4%2FkaYX88o2N7d49KYEh9PW9NC2Y1ogHnf7gQyX4ANw%2B8I%2B3xOP37MjJjyyuvYvPDS1ZBanCbMqwWQVxi2w0QUbjuPnnBEzc3l1P6MY6ta3XBz0q146Jc2x25ASbrzq7ym9DNlNTwiDIbt6W%2Byw5n6exersdT4Avp5JzQ%3D%3D',
+          ),
+        },
+        {
+          label: 'B형 토론(25분)',
+          href: createTableShareUrl(
+            'eJyrVspMUbIyMTXRUcrMS8tXsqpWykvMTVWyUnq9auXb%2FjVvdm5527bi9bK1r3saFHQVnN7OmKrwtm3B64ULNIxMX29r0VTSUSqpLABpcA4NDvH39YxyBQolpqfmpSQCBYHsgqL84pDUxFw%2FiLlvNqx507IRKJ6cn4cs%2FnrDDKAdQPHyxKK8zLx0p9ScHCWrtMSc4lQdpbTMvMziDCShWqC1iUk5QI3R1UrFJYl5ySAzAoL8g4EmFBekpiZnhECc9WZeK9C1QNGk%2FAqokJ9%2FkK%2BjD8jlmSCrLQ2AkmCj80pzciCiAalFILehCQUXpCZmA90GEy4G8VOLQP6s1UFyh7O%2F36Bwh59raEgQ2AY0p0x4M2cBJBpRHBTi6esa7%2BQY7OoCdxTEApzOMjU3wOIqMwMkN4F0EQ6drXPeLGpVeL1hzptpO%2BgbSFgTDX2dE1sLAJl%2BRRA%3D',
           ),
         },
       ],
