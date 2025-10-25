@@ -191,7 +191,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
       ],
     },
     {
-      title: '목포카톨릭대',
+      title: '목포 가톨릭대',
       subtitle: '',
       logoSrc: mcu,
       actions: [
