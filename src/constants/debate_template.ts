@@ -11,6 +11,7 @@ import osansi from '../assets/template_logo/osansi.png';
 import nogotte from '../assets/template_logo/nogotte.png';
 import kogito from '../assets/template_logo/kogito.png';
 import mcu from '../assets/template_logo/mcu.png';
+import ylt from '../assets/template_logo/yuppm_law_track.png';
 import { DebateTemplate } from '../type/type';
 function createTableShareUrl(encodeData: string): string {
   return `${import.meta.env.VITE_SHARE_BASE_URL}/share?data=${encodeData}`;
@@ -70,6 +71,18 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
           label: 'CEDA 토론',
           href: createTableShareUrl(
             'eJzdkz9PwkAUwL9Kc3MH1Ei0G386kEhLaFk0xhxwQGO5Ni1GDSFxIIYEB1wMA5CyiEOHM9GEz8Sd38E7qogGGYW43fu9u%2Fd%2BebnXBFYZKHsH%2BzKwcMUBShNgWEdAAW%2B3Ae2GdNRn3aGUUtMJSZBxAGTQuHbFjVTBMPVs5ljlCFYRLkMO%2Bdn1HN9EsK5FhRgJWfuZ85KDlzklfXp3w%2Fkl9LCFq0lk20CpQNtHMqhY2PJrS6jF28KizR%2BeNIHfgLgkauTyusEr%2BC5CpZoZac2mhI0JJQP2MOW5onP1kdD0fDZxJPwtIXAY48l5A3xh2xHNIU8Y%2FkCGi%2BA5N%2FzEvoiRF4UtecknpWtb5bNyPq89Rp7YpMOG%2FXU%2BO7t%2FNaBNCmlqwczPm3xzYqN7FrQl1h3MSHudVPwvnXpsECy28EvJzGTVs2TCUNMLrajFr2LxWOyfzGrVh6KTDg1f6GMobc%2FWbcLptPUOQLEj%2Bg%3D%3D',
+          ),
+        },
+      ],
+    },
+    {
+      title: '연세행정법학회',
+      logoSrc: ylt,
+      actions: [
+        {
+          label: 'CEDA 토론',
+          href: createTableShareUrl(
+            'eJzNlD1rwkAYx79KuKFTCirSlmy%2BZBBqIiYuLaWcempovITE0hYRSrHFgkMW%2B0YpcaqDQyoU%2FEzm8h16MdaKtih0iFvud5fn%2BfG%2Fh2sCpQy4%2BH6UBQquaIBrAgzrCHCAPDqkPfYe7ondc0c9r%2FfsvXSZXSbFpxOMd2e7fRuwoHGl%2B4dTBUkWs5kjniJYRbgMKaTfuqGZMoJ1YVbTGZL2B%2BUlDS9y13lyu9eUX0ADK7iaRKoKuApUTcSCioIVs7aAWrQtLKr0x%2BMmMBsQl%2Fwaubwo0QqmjlCpJgda5O020CxqlzMkiPls4tA3V%2FzWsXiE7k5r43NVDXAOGb7cEpJ0BM%2Bo3Dc2%2FTUyaM2oO%2BqAFrsgkxKFFZnJp0WcAUP6DrkZbolTaAH9dlthBxTiBMW2cII2cwotoPAnaNVJ4AtyftpmKSOLvNrzN%2FPHSs5k%2BdNkQuLTc7OgyZ9qe5HIejN%2FuYmX1x24bYu8d9zhmNlhJiNnzVVGD%2F4f21TupPUFcJhU9g%3D%3D',
           ),
         },
       ],
@@ -191,7 +204,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
       ],
     },
     {
-      title: '목포 가톨릭대',
+      title: '목포가톨릭대',
       subtitle: '',
       logoSrc: mcu,
       actions: [
