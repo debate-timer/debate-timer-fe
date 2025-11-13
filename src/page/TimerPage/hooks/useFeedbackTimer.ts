@@ -6,15 +6,15 @@ import {
   useRef,
   useState,
 } from 'react';
-
+const INITIAL_TIME = 0;
 export function useFeedbackTimer(): FeedbackTimerLogics {
   // 타이머에 표시되는 현재 남은 시간
-  const [timer, setTimer] = useState<number | null>(null);
+  const [timer, setTimer] = useState<number | null>(INITIAL_TIME);
   // 타이머 요청에 대한 ID를 저장
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 타이머의 총 시간
-  const [defaultTimer, setDefaultTimer] = useState(0);
+  const [defaultTimer, setDefaultTimer] = useState(INITIAL_TIME);
 
   // 타이머가 현재 동작중인지 여부
   const [isRunning, setIsRunning] = useState(false);
@@ -72,9 +72,9 @@ export function useFeedbackTimer(): FeedbackTimerLogics {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setTimer(defaultTimer);
+    setTimer(INITIAL_TIME);
     setIsRunning(false);
-  }, [defaultTimer]);
+  }, []);
 
   /**
    * 타이머 시간을 조정 (타이머가 멈춰있을 때만)
