@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { TbCalendarTime } from 'react-icons/tb';
+import { RiCalendarScheduleLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
 interface GoToOverviewButtonProps {
@@ -26,7 +26,7 @@ export default function GoToOverviewButton({
         className,
       )}
     >
-      <TbCalendarTime className="aspect-square h-full" />
+      <RiCalendarScheduleLine className="aspect-square h-full" />
       <p>시간표로 돌아가기</p>
     </button>
   );
