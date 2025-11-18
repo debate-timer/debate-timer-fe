@@ -32,7 +32,7 @@ export default function FeedbackTimerPage() {
           <FeedbackTimer feedbackTimerInstance={feedbackTimerInstance} />
 
           <div className="fixed bottom-[8%] xl:bottom-[12%]">
-            <GoToDebateEndButton tableId={tableId} />
+            <GoToDebateEndButton tableId={tableId} className="w-[478px]" />
           </div>
         </div>
       </DefaultLayout.ContentContainer>

@@ -5,6 +5,7 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
+import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
 export default function DebateVotePage() {
   const navigate = useNavigate();
   const baseUrl =
@@ -26,9 +27,6 @@ export default function DebateVotePage() {
 
   const handleGoToResult = () => {
     navigate(`/table/customize/${tableId}/end/vote/result/${pollId}`);
-  };
-  const handleGoHome = () => {
-    navigate('/');
   };
 
   const {
@@ -120,17 +118,11 @@ export default function DebateVotePage() {
               <button
                 type="button"
                 onClick={() => mutate(pollId)}
-                className="button enabled brand w-full rounded-full"
+                className="button enabled brand flex flex-1 flex-row rounded-full p-[24px]"
               >
                 투표 결과 보기
               </button>
-              <button
-                type="button"
-                onClick={handleGoHome}
-                className="button enabled neutral w-full rounded-full"
-              >
-                홈으로 돌아가기 →
-              </button>
+              <GoToDebateEndButton tableId={tableId} className="flex-1" />
             </div>
           </DefaultLayout.StickyFooterWrapper>
         </div>

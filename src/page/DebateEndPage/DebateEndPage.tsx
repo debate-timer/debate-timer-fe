@@ -64,7 +64,7 @@ export default function DebateEndPage() {
       </div>
 
       <div className="fixed bottom-[8%] xl:bottom-[12%]">
-        <GoToOverviewButton tableId={Number(tableId)} />
+        <GoToOverviewButton tableId={Number(tableId)} className="w-[478px]" />
       </div>
     </div>
   );
