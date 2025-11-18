@@ -16,7 +16,7 @@ export default function DebateEndPage() {
   };
 
   const handleVoteClick = (pollId: number) => {
-    navigate(`/table/customize/${pollId}/end/vote`);
+    navigate(`/table/customize/${tableId}/end/vote/${pollId}`);
   };
   const { mutate } = usePostPoll(handleVoteClick);
   const backgroundStyle = {

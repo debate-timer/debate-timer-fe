@@ -6,25 +6,31 @@ import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
 export default function DebateVotePage() {
-  const { id: pollIdParam } = useParams();
-  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
-  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
   const navigate = useNavigate();
   const baseUrl =
     import.meta.env.MODE !== 'production'
       ? undefined
       : import.meta.env.VITE_SHARE_BASE_URL;
+
+  // 매개변수 검증
+  const { pollId: rawPollId, tableId: rawTableId } = useParams();
+  const pollId = rawPollId ? Number(rawPollId) : NaN;
+  const isPollIdValid = !!rawPollId && !Number.isNaN(pollId);
+  const tableId = rawTableId ? Number(rawTableId) : NaN;
+  const isTableIdValid = !!rawTableId && !Number.isNaN(tableId);
+  const isArgsValid = isPollIdValid && isTableIdValid;
+
   const voteUrl = useMemo(() => {
     return `${baseUrl}/vote/${pollId}`;
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
-    navigate(`/table/customize/${pollId}/end/vote/result`);
+    navigate(`/table/customize/${tableId}/end/vote/result/${pollId}`);
   };
-
   const handleGoHome = () => {
     navigate('/');
   };
+
   const {
     data,
     isLoading: isFetching,
@@ -32,7 +38,7 @@ export default function DebateVotePage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isValidPollId });
+  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isPollIdValid });
   const { mutate } = useFetchEndPoll(handleGoToResult);
 
   const participants = data?.voterNames;
@@ -48,7 +54,8 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
-  if (!isValidPollId) {
+
+  if (!isArgsValid) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
@@ -59,6 +66,7 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
+
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer noPadding={true}>
