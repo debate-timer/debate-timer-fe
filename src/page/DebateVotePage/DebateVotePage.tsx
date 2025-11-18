@@ -114,7 +114,7 @@ export default function DebateVotePage() {
           </main>
 
           <DefaultLayout.StickyFooterWrapper>
-            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2 bg-default-white">
+            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => mutate(pollId)}
