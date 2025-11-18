@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import clapImage from '../../assets/debateEnd/clap.png';
 import feedbackTimerImage from '../../assets/debateEnd/feedback_timer.png';
 import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
-import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 import usePostPoll from '../../hooks/mutations/useCreatePoll';
 import MenuCard from './components/MenuCard';
+import GoToOverviewButton from './components/GoToOverviewButton';
 
 export default function DebateEndPage() {
   const { id: tableId } = useParams();
@@ -64,7 +64,7 @@ export default function DebateEndPage() {
       </div>
 
       <div className="fixed bottom-[8%] xl:bottom-[12%]">
-        <GoToHomeButton />
+        <GoToOverviewButton tableId={Number(tableId)} />
       </div>
     </div>
   );
