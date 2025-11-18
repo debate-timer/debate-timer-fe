@@ -1,11 +1,14 @@
+import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 
 interface GoToDebateEndButtonProps {
   tableId: number;
+  className?: string;
 }
 
 export default function GoToDebateEndButton({
   tableId,
+  className = '',
 }: GoToDebateEndButtonProps) {
   const navigate = useNavigate();
   const handleClick = (tableId: number) => {
@@ -17,9 +20,12 @@ export default function GoToDebateEndButton({
       type="button"
       aria-label="토론 종료 화면으로 돌아가기"
       onClick={() => handleClick(tableId)}
-      className="button enabled neutral flex w-[492px] flex-row space-x-2 rounded-full p-[24px]"
+      className={clsx(
+        'button enabled neutral flex flex-row rounded-full p-[24px]',
+        className,
+      )}
     >
-      토론 종료 화면으로 돌아가기 →
+      뒤로 가기 →
     </button>
   );
 }
