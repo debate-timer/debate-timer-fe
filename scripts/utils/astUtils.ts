@@ -61,6 +61,11 @@ export function transformAST(ast: t.File) {
   const koreanKeys = new Set<string>();
   const componentsToModify = new Set<NodePath>();
   let hasUseTranslationImport = false;
+  const templateLiteralsToTransform: {
+    path: NodePath<t.TemplateLiteral>;
+    i18nKey: string;
+    objectProperties: t.ObjectProperty[];
+  }[] = [];
 
   // 1️. 한글 문자열 탐색
   traverse(ast, {
@@ -87,6 +92,69 @@ export function transformAST(ast: t.File) {
         const component = path.findParent((p) => isReactComponentFunction(p));
         if (component) componentsToModify.add(component);
       }
+    },
+    TemplateLiteral(path) {
+      const { quasis, expressions } = path.node;
+      const hasKorean = quasis.some((q) => KOREAN_REGEX.test(q.value.raw));
+      if (!hasKorean) return;
+
+      if (
+        path.parent.type === 'CallExpression' &&
+        t.isIdentifier(path.parent.callee) &&
+        path.parent.callee.name === 't'
+      ) {
+        return;
+      }
+
+      let i18nKey = '';
+      const objectProperties: t.ObjectProperty[] = [];
+
+      for (let i = 0; i < quasis.length; i++) {
+        i18nKey += quasis[i].value.raw;
+        if (i < expressions.length) {
+          const expr = expressions[i];
+          let placeholderName: string;
+
+          if (t.isIdentifier(expr)) {
+            placeholderName = expr.name;
+          } else if (
+            t.isMemberExpression(expr) &&
+            t.isIdentifier(expr.property)
+          ) {
+            placeholderName = expr.property.name;
+          } else {
+            placeholderName = `val${i}`;
+          }
+
+          let finalName = placeholderName;
+          let count = 1;
+          while (
+            objectProperties.some(
+              (p) => t.isIdentifier(p.key) && p.key.name === finalName,
+            )
+          ) {
+            finalName = `${placeholderName}${count++}`;
+          }
+
+          i18nKey += `{{${finalName}}}`;
+          objectProperties.push(
+            t.objectProperty(
+              t.identifier(finalName),
+              expr,
+              false,
+              t.isIdentifier(expr) && finalName === expr.name,
+            ),
+          );
+        }
+      }
+
+      koreanKeys.add(i18nKey);
+      const component = path.findParent((p) => isReactComponentFunction(p));
+      if (component) {
+        componentsToModify.add(component);
+      }
+
+      templateLiteralsToTransform.push({ path, i18nKey, objectProperties });
     },
     ImportDeclaration(path) {
       if (path.node.source.value === 'react-i18next') {
@@ -141,7 +209,23 @@ export function transformAST(ast: t.File) {
     }
   });
 
-  // 4️. 한글 텍스트를 t('...')로 감싸기
+  // 4️. 템플릿 리터럴 변환
+  templateLiteralsToTransform.forEach(({ path, i18nKey, objectProperties }) => {
+    const keyLiteral = t.stringLiteral(i18nKey);
+    if (objectProperties.length > 0) {
+      const interpolationObject = t.objectExpression(objectProperties);
+      const tCall = t.callExpression(t.identifier('t'), [
+        keyLiteral,
+        interpolationObject,
+      ]);
+      path.replaceWith(tCall);
+    } else {
+      const tCall = t.callExpression(t.identifier('t'), [keyLiteral]);
+      path.replaceWith(tCall);
+    }
+  });
+
+  // 5️. 한글 텍스트를 t('...')로 감싸기
   traverse(ast, {
     JSXText(path) {
       const value = path.node.value.trim();
