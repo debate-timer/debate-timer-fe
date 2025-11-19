@@ -26,7 +26,7 @@ export default function DebateVotePage() {
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
-    navigate(`/table/customize/${tableId}/end/vote/result/${pollId}`);
+    navigate(`/table/customize/${tableId}/end/vote/${pollId}/result`);
   };
 
   const {
