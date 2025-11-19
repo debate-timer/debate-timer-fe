@@ -8,7 +8,7 @@ import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
 export default function DebateVoteResultPage() {
-  const { id: pollIdParam } = useParams();
+  const { pollId: pollIdParam } = useParams();
 
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
   const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
