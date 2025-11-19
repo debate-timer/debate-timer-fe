@@ -10,14 +10,13 @@ const INITIAL_TIME = 0;
 export default function FeedbackTimerPage() {
   const feedbackTimerInstance = useFeedbackTimer();
   const { id } = useParams();
-  const rawTableId = Number(id);
+  const tableId = Number(id);
   const { setTimer, setDefaultTimer } = feedbackTimerInstance;
 
   // 테이블 ID 검증 로직
-  if (rawTableId === null || isNaN(Number(rawTableId))) {
+  if (!id || isNaN(tableId)) {
     throw new Error('테이블 ID가 올바르지 않습니다.');
   }
-  const tableId = rawTableId ? Number(rawTableId) : 0;
 
   useEffect(() => {
     // 페이지가 로드될 때 타이머의 초기 시간을 설정

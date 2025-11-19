@@ -8,21 +8,27 @@ import MenuCard from './components/MenuCard';
 import GoToOverviewButton from './components/GoToOverviewButton';
 
 export default function DebateEndPage() {
-  const { id: tableId } = useParams();
+  const { id } = useParams();
+  const tableId = Number(id);
   const navigate = useNavigate();
 
   const handleFeedbackClick = () => {
     navigate(`/table/customize/${tableId}/end/feedback`);
   };
-
   const handleVoteClick = (pollId: number) => {
     navigate(`/table/customize/${tableId}/end/vote/${pollId}`);
   };
   const { mutate } = usePostPoll(handleVoteClick);
+
   const backgroundStyle = {
     background:
       'radial-gradient(50% 50% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',
   };
+
+  // 테이블 ID 검증
+  if (!id || isNaN(tableId)) {
+    throw new Error('테이블 ID가 올바르지 않습니다.');
+  }
 
   return (
     <div
@@ -55,10 +61,7 @@ export default function DebateEndPage() {
           description="QR 코드를 통해 투표 페이지로 이동해요."
           imgSrc={voteStampImage}
           imgAlt="승패투표"
-          onClick={() => {
-            if (!tableId) return; // NaN 방지
-            mutate(Number(tableId));
-          }}
+          onClick={() => mutate(tableId)}
           ariaLabel="승패투표 생성 및 진행"
         />
       </div>
