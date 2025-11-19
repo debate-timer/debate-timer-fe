@@ -36,7 +36,7 @@ export default function DebateVotePage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isPollIdValid });
+  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isArgsValid });
   const { mutate } = useFetchEndPoll(handleGoToResult);
 
   const participants = data?.voterNames;
