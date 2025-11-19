@@ -44,14 +44,17 @@ export default function VoteDetailResult({
         </div>
 
         {/* 하단 CTA 바 */}
-        <div className="flex items-center justify-center bg-brand py-4">
-          <button
+        <button
+          onClick={onGoHome}
+          className="flex w-full items-center justify-center bg-brand py-4 transition hover:opacity-90"
+        >
+          <div
             onClick={onGoHome}
-            className="flex items-center text-lg font-bold text-default-black transition hover:opacity-90"
+            className="flex items-center text-lg font-bold text-default-black"
           >
             홈으로 돌아가기
-          </button>
-        </div>
+          </div>
+        </button>
       </motion.section>
     </main>
   );
