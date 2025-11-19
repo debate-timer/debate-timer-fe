@@ -48,10 +48,7 @@ export default function VoteDetailResult({
           onClick={onGoHome}
           className="flex w-full items-center justify-center bg-brand py-4 transition hover:opacity-90"
         >
-          <div
-            onClick={onGoHome}
-            className="flex items-center text-lg font-bold text-default-black"
-          >
+          <div className="flex items-center text-lg font-bold text-default-black">
             홈으로 돌아가기
           </div>
         </button>
