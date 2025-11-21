@@ -53,36 +53,3 @@ export async function writeJSON(
   await writeFile(filePath, JSON.stringify(data, null, 2));
   console.log(`[writeJSON] JSON 데이터 저장 완료: ${filePath}`);
 }
-
-/** 특정 확장자 파일들을 재귀적으로 찾기 */
-export async function getAllFiles(
-  dir: string,
-  ext: string,
-  fileList: string[] = [],
-): Promise<string[]> {
-  try {
-    // 비동기적으로 디렉토리 내용 읽기
-    const entries = await fsp.readdir(dir, { withFileTypes: true });
-
-    // 모든 재귀 호출을 Promise.all로 병렬 처리
-    const promises = entries.map(async (entry) => {
-      const fullPath = path.join(dir, entry.name);
-
-      if (entry.isDirectory()) {
-        // 디렉토리인 경우, 비동기 재귀 호출을 하고 결과 병합
-        const nestedFiles = await getAllFiles(fullPath, ext);
-        fileList.push(...nestedFiles);
-      } else if (entry.isFile() && entry.name.endsWith(ext)) {
-        // 파일인 경우, 리스트에 추가
-        fileList.push(fullPath);
-      }
-    });
-
-    // 모든 비동기 작업(하위 디렉토리 순회)이 완료될 때까지 기다림
-    await Promise.all(promises);
-  } catch (err) {
-    console.error(`에러 발생 디렉토리 ${dir}:`, err);
-  }
-
-  return fileList;
-}
