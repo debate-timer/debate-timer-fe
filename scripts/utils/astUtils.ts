@@ -61,20 +61,31 @@ export function transformAST(ast: t.File) {
   const koreanKeys = new Set<string>();
   const componentsToModify = new Set<NodePath>();
   let hasUseTranslationImport = false;
+  const simpleStringsToTransform: NodePath<t.StringLiteral | t.JSXText>[] = [];
   const templateLiteralsToTransform: {
     path: NodePath<t.TemplateLiteral>;
     i18nKey: string;
     objectProperties: t.ObjectProperty[];
   }[] = [];
 
-  // 1️. 한글 문자열 탐색
+  // 1️. 한글 문자열 탐색 및 변환 대상 수집
   traverse(ast, {
     JSXText(path) {
       const value = path.node.value.trim();
       if (value && KOREAN_REGEX.test(value)) {
-        koreanKeys.add(value);
         const component = path.findParent((p) => isReactComponentFunction(p));
-        if (component) componentsToModify.add(component);
+        if (component) {
+          const parentT = path.findParent(
+            (p) =>
+              p.isCallExpression() &&
+              p.get('callee').isIdentifier({ name: 't' }),
+          );
+          if (parentT) return;
+
+          simpleStringsToTransform.push(path);
+          koreanKeys.add(value);
+          componentsToModify.add(component);
+        }
       }
     },
     StringLiteral(path) {
@@ -88,9 +99,19 @@ export function transformAST(ast: t.File) {
           path.parent.type === 'ObjectProperty' && path.parent.key === path.node
         )
       ) {
-        koreanKeys.add(value);
         const component = path.findParent((p) => isReactComponentFunction(p));
-        if (component) componentsToModify.add(component);
+        if (component) {
+          const parentT = path.findParent(
+            (p) =>
+              p.isCallExpression() &&
+              p.get('callee').isIdentifier({ name: 't' }),
+          );
+          if (parentT) return;
+
+          simpleStringsToTransform.push(path);
+          koreanKeys.add(value);
+          componentsToModify.add(component);
+        }
       }
     },
     TemplateLiteral(path) {
@@ -105,6 +126,9 @@ export function transformAST(ast: t.File) {
       ) {
         return;
       }
+
+      const component = path.findParent((p) => isReactComponentFunction(p));
+      if (!component) return;
 
       let i18nKey = '';
       const objectProperties: t.ObjectProperty[] = [];
@@ -149,11 +173,7 @@ export function transformAST(ast: t.File) {
       }
 
       koreanKeys.add(i18nKey);
-      const component = path.findParent((p) => isReactComponentFunction(p));
-      if (component) {
-        componentsToModify.add(component);
-      }
-
+      componentsToModify.add(component);
       templateLiteralsToTransform.push({ path, i18nKey, objectProperties });
     },
     ImportDeclaration(path) {
@@ -225,53 +245,24 @@ export function transformAST(ast: t.File) {
     }
   });
 
-  // 5️. 한글 텍스트를 t('...')로 감싸기
-  traverse(ast, {
-    JSXText(path) {
-      const value = path.node.value.trim();
-      if (value && koreanKeys.has(value)) {
-        const parent = path.findParent(
-          (p) =>
-            p.isCallExpression() &&
-            t.isIdentifier(p.node.callee) &&
-            p.node.callee.name === 't',
-        );
-        if (parent) return;
+  // 5️. 컴포넌트 내부 한글 텍스트 t()로 감싸기
+  simpleStringsToTransform.forEach((path) => {
+    const value =
+      path.node.type === 'JSXText'
+        ? path.node.value.trim()
+        : (path.node as t.StringLiteral).value;
 
-        const tCall = t.callExpression(t.identifier('t'), [
-          t.stringLiteral(value),
-        ]);
+    const tCall = t.callExpression(t.identifier('t'), [t.stringLiteral(value)]);
+
+    if (path.isJSXText()) {
+      path.replaceWith(t.jsxExpressionContainer(tCall));
+    } else if (path.isStringLiteral()) {
+      if (path.parent.type === 'JSXAttribute') {
         path.replaceWith(t.jsxExpressionContainer(tCall));
+      } else {
+        path.replaceWith(tCall);
       }
-    },
-    StringLiteral(path) {
-      const value = path.node.value.trim();
-      if (
-        path.parent.type === 'CallExpression' &&
-        t.isIdentifier(path.parent.callee) &&
-        path.parent.callee.name === 't'
-      ) {
-        return;
-      }
-
-      if (
-        koreanKeys.has(value) &&
-        path.parent.type !== 'ImportDeclaration' &&
-        path.parent.type !== 'ExportNamedDeclaration'
-      ) {
-        if (path.parent.type === 'JSXAttribute') {
-          const tCall = t.callExpression(t.identifier('t'), [
-            t.stringLiteral(value),
-          ]);
-          path.replaceWith(t.jsxExpressionContainer(tCall));
-        } else {
-          const tCall = t.callExpression(t.identifier('t'), [
-            t.stringLiteral(value),
-          ]);
-          path.replaceWith(tCall);
-        }
-      }
-    },
+    }
   });
 
   return koreanKeys;
