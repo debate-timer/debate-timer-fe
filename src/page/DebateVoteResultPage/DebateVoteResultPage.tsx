@@ -107,7 +107,10 @@ export default function DebateVoteResultPage() {
 
           <DefaultLayout.StickyFooterWrapper>
             <div className="flex w-full max-w-[400px] flex-col items-center justify-center gap-2 md:w-full md:max-w-[800px] md:flex-row">
-              <GoToDebateEndButton tableId={3} className="w-full flex-1" />
+              <GoToDebateEndButton
+                tableId={tableId}
+                className="w-full flex-1"
+              />
               <button
                 type="button"
                 onClick={openModal}
