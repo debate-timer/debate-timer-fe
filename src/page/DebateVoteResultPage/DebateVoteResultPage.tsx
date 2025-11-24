@@ -107,10 +107,14 @@ export default function DebateVoteResultPage() {
 
           <DefaultLayout.StickyFooterWrapper>
             <div className="flex w-full max-w-[400px] flex-col items-center justify-center gap-2 md:w-full md:max-w-[800px] md:flex-row">
-              <GoToDebateEndButton
-                tableId={tableId}
-                className="w-full flex-1"
-              />
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="button enabled neutral flex w-full flex-1 rounded-full p-[24px]"
+                disabled={isLoading}
+              >
+                뒤로 가기 ←
+              </button>
               <button
                 type="button"
                 onClick={openModal}
