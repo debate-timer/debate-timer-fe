@@ -99,6 +99,7 @@ export default function DebateVoteResultPage() {
 
           <DefaultLayout.StickyFooterWrapper>
             <div className="flex w-full max-w-[400px] flex-col items-center justify-center gap-2 bg-default-white md:max-w-[800px] md:flex-row">
+              <GoToDebateEndButton tableId={3} className="flex-1" />
               <button
                 type="button"
                 onClick={openModal}
@@ -107,7 +108,6 @@ export default function DebateVoteResultPage() {
               >
                 세부 결과 확인하기
               </button>
-              <GoToDebateEndButton tableId={3} className="flex-1" />
             </div>
           </DefaultLayout.StickyFooterWrapper>
         </div>

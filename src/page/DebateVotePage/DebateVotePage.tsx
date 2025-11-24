@@ -115,6 +115,7 @@ export default function DebateVotePage() {
 
           <DefaultLayout.StickyFooterWrapper>
             <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2">
+              <GoToDebateEndButton tableId={tableId} className="flex-1" />
               <button
                 type="button"
                 onClick={() => mutate(pollId)}
@@ -122,7 +123,6 @@ export default function DebateVotePage() {
               >
                 투표 결과 보기
               </button>
-              <GoToDebateEndButton tableId={tableId} className="flex-1" />
             </div>
           </DefaultLayout.StickyFooterWrapper>
         </div>
