@@ -7,6 +7,8 @@ import VoteDetailResult from './components/VoteDetailResult';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
+import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
+import Table from '../TableListPage/components/Table';
 export default function DebateVoteResultPage() {
   const { pollId: pollIdParam } = useParams();
 
@@ -100,18 +102,12 @@ export default function DebateVoteResultPage() {
               <button
                 type="button"
                 onClick={openModal}
-                className="button enabled brand w-full rounded-full"
+                className="button enabled brand flex flex-1 rounded-full p-[24px]"
                 disabled={isLoading}
               >
                 세부 결과 확인하기
               </button>
-              <button
-                type="button"
-                onClick={handleGoHome}
-                className="button enabled neutral w-full rounded-full"
-              >
-                홈으로 돌아가기 →
-              </button>
+              <GoToDebateEndButton tableId={3} className="flex-1" />
             </div>
           </DefaultLayout.StickyFooterWrapper>
         </div>
