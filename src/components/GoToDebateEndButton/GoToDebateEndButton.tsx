@@ -25,7 +25,7 @@ export default function GoToDebateEndButton({
         className,
       )}
     >
-      뒤로 가기 →
+      뒤로 가기 ←
     </button>
   );
 }
