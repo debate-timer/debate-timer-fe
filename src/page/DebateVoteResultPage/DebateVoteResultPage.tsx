@@ -7,7 +7,6 @@ import VoteDetailResult from './components/VoteDetailResult';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
-import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
 import { useState } from 'react';
 import DialogModal from '../../components/DialogModal/DialogModal';
 export default function DebateVoteResultPage() {
