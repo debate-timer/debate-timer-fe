@@ -5,26 +5,30 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
+import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
 export default function DebateVotePage() {
-  const { id: pollIdParam } = useParams();
-  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
-  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
   const navigate = useNavigate();
   const baseUrl =
     import.meta.env.MODE !== 'production'
       ? undefined
       : import.meta.env.VITE_SHARE_BASE_URL;
+
+  // 매개변수 검증
+  const { pollId: rawPollId, tableId: rawTableId } = useParams();
+  const pollId = rawPollId ? Number(rawPollId) : NaN;
+  const isPollIdValid = !!rawPollId && !Number.isNaN(pollId);
+  const tableId = rawTableId ? Number(rawTableId) : NaN;
+  const isTableIdValid = !!rawTableId && !Number.isNaN(tableId);
+  const isArgsValid = isPollIdValid && isTableIdValid;
+
   const voteUrl = useMemo(() => {
     return `${baseUrl}/vote/${pollId}`;
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
-    navigate(`/table/customize/${pollId}/end/vote/result`);
+    navigate(`/table/customize/${tableId}/end/vote/${pollId}/result`);
   };
 
-  const handleGoHome = () => {
-    navigate('/');
-  };
   const {
     data,
     isLoading: isFetching,
@@ -32,7 +36,7 @@ export default function DebateVotePage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isValidPollId });
+  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isArgsValid });
   const { mutate } = useFetchEndPoll(handleGoToResult);
 
   const participants = data?.voterNames;
@@ -48,7 +52,8 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
-  if (!isValidPollId) {
+
+  if (!isArgsValid) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
@@ -59,6 +64,7 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
+
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer noPadding={true}>
@@ -108,20 +114,14 @@ export default function DebateVotePage() {
           </main>
 
           <DefaultLayout.StickyFooterWrapper>
-            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2 bg-default-white">
+            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2">
+              <GoToDebateEndButton tableId={tableId} className="flex-1" />
               <button
                 type="button"
                 onClick={() => mutate(pollId)}
-                className="button enabled brand w-full rounded-full"
+                className="button enabled brand flex flex-1 flex-row rounded-full p-[24px]"
               >
                 투표 결과 보기
-              </button>
-              <button
-                type="button"
-                onClick={handleGoHome}
-                className="button enabled neutral w-full rounded-full"
-              >
-                홈으로 돌아가기 →
               </button>
             </div>
           </DefaultLayout.StickyFooterWrapper>

@@ -55,12 +55,12 @@ const routesConfig = [
     requiresAuth: true,
   },
   {
-    path: '/table/customize/:id/end/vote',
+    path: '/table/customize/:tableId/end/vote/:pollId',
     element: <DebateVotePage />,
     requiresAuth: true,
   },
   {
-    path: '/table/customize/:id/end/vote/result',
+    path: '/table/customize/:tableId/end/vote/:pollId/result',
     element: <DebateVoteResultPage />,
     requiresAuth: true,
   },
