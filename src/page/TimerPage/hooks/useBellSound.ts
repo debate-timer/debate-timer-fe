@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NormalTimerLogics } from './useNormalTimer';
 import { BellConfig } from '../../../type/type';
 
@@ -8,9 +8,12 @@ interface UseBellSoundProps {
 }
 
 export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
+  const [volume, setVolume] = useState<number>(1.0);
+
   // 종소리 여러 번 - 새로운 Audio로 재생
   function playBell(count: number) {
     const audio = new Audio(`/sounds/bell-${count}.mp3`);
+    audio.volume = volume;
     audio.play().catch((err) => {
       console.warn('audio.play() 실패:', err);
     });
@@ -39,5 +42,7 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
         playBell(bell.count);
       }
     });
-  }, [normalTimer.timer, bells, normalTimer.defaultTimer]);
+  }, [normalTimer.timer, bells, normalTimer.defaultTimer, volume]);
+
+  return { volume, setVolume };
 }

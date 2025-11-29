@@ -18,6 +18,8 @@ import {
 import { useTimerBackground } from './useTimerBackground';
 import useFullscreen from '../../../hooks/useFullscreen';
 
+const VOLUME_SCALE = 10;
+
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
@@ -55,10 +57,28 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     useState<TimeBasedStance>('PROS');
 
   // 벨 사운드 관련 훅
-  useBellSound({
+  const { volume: rawVolume, setVolume: setRawVolume } = useBellSound({
     normalTimer,
     bells: data?.table[index].bell,
   });
+
+  // 볼륨 값과 조절 함수
+  // - React 내부적으로는 0.0 ~ 1.0 사이 값 사용
+  // - 아래 값과 함수를 통해 사용자에게는 0 ~ 10 사이 값으로 인식되게 값을 변형
+  const volume = Math.round(rawVolume * VOLUME_SCALE);
+  const setVolume = (value: number) => {
+    if (value < 0 || value > VOLUME_SCALE) {
+      return;
+    }
+
+    setRawVolume(value / VOLUME_SCALE);
+  };
+
+  // 벨 볼륨 관련
+  const [isVolumeBarOpen, setIsVolumeBarOpen] = useState(false);
+  const toggleVolumeBar = () => {
+    setIsVolumeBarOpen((prev) => !prev);
+  };
 
   const { bg, setBg } = useTimerBackground({
     timer1,
@@ -262,6 +282,10 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     isFullscreen,
     toggleFullscreen,
     setFullscreen,
+    volume,
+    setVolume,
+    isVolumeBarOpen,
+    toggleVolumeBar,
   };
 }
 
@@ -287,4 +311,8 @@ export interface TimerPageLogics {
   isFullscreen: boolean;
   toggleFullscreen: () => void;
   setFullscreen: (value: boolean) => void;
+  volume: number;
+  setVolume: (value: number) => void;
+  toggleVolumeBar: () => void;
+  isVolumeBarOpen: boolean;
 }
