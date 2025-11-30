@@ -9,6 +9,10 @@ interface VolumeBarProps {
   className?: string;
 }
 
+const MIN_VOLUME = 0;
+const MAX_VOLUME = 10;
+const STEP_VOLUME = 1;
+
 export default function VolumeBar({
   volume,
   onVolumeChange,
@@ -84,9 +88,9 @@ export default function VolumeBar({
           <CustomRangeSlider
             value={volume}
             onValueChange={onVolumeChange}
-            min={1}
-            max={10}
-            step={1}
+            min={MIN_VOLUME}
+            max={MAX_VOLUME}
+            step={STEP_VOLUME}
           />
         </div>
       </div>
