@@ -1,7 +1,9 @@
 // Integer 1-10, step = 1
 // Mute button available
+import { useState } from 'react';
 import CustomRangeSlider from '../CustomRangeSlider/CustomRangeSlider';
 import DTVolume from '../icons/Volume';
+import clsx from 'clsx';
 
 interface VolumeBarProps {
   volume: number;
@@ -18,6 +20,21 @@ export default function VolumeBar({
   onVolumeChange,
   className = '',
 }: VolumeBarProps) {
+  // 음소거 해제 시 가장 마지막의 볼륨 값을 복원하기 위함
+  const [lastVolume, setLastVolume] = useState(5);
+
+  // 음소거 로직
+  const handleMute = () => {
+    if (volume === 0) {
+      onVolumeChange(lastVolume === 0 ? 1 : lastVolume);
+    } else {
+      onVolumeChange(0);
+    }
+  };
+
+  // 음소거 버튼은 오직 볼륨이 0일 때에만 흐리게 강조됨
+  const isMuteButtonHighlighted = volume > 0;
+
   return (
     <div className={`relative h-[76px] w-[234px] ${className}`}>
       {/* SVG Layer */}
@@ -84,10 +101,24 @@ export default function VolumeBar({
       {/* Content Layer */}
       <div className="relative z-10 flex h-full w-full items-center justify-center px-4 pb-2 pt-5">
         <div className="flex w-full flex-row items-center gap-2">
-          <DTVolume className="size-[36px] text-default-black" />
+          <button onClick={handleMute} className="size-[36px]">
+            <DTVolume
+              className={clsx('size-full', {
+                'text-default-black': isMuteButtonHighlighted,
+                'text-default-disabled/hover': !isMuteButtonHighlighted,
+              })}
+            />
+          </button>
           <CustomRangeSlider
             value={volume}
-            onValueChange={onVolumeChange}
+            onValueChange={(value: number) => {
+              onVolumeChange(value);
+
+              // 마지막 볼륨이 0으로 저장되면, 음소거를 해제해도 음소거가 유지되는 버그를 피하기 위함
+              if (value > 0) {
+                setLastVolume(value);
+              }
+            }}
             min={MIN_VOLUME}
             max={MAX_VOLUME}
             step={STEP_VOLUME}
