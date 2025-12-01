@@ -307,13 +307,14 @@ export default function TimerCreationContent({
     // SpeechType에 맞게 문자열 매핑
     let speechTypeToSend: string;
     let stanceToSend: Stance;
+    if (speaker.trim().length > 5) {
+      errors.push('발언자는 최대 5자까지 입력할 수 있습니다.');
+    }
+
     if (currentSpeechType === 'CUSTOM') {
       // 텍스트 길이 유효성 검사
       if (speechTypeTextValue.length > 10) {
         errors.push('발언 유형은 최대 10자까지 입력할 수 있습니다.');
-      }
-      if (speaker.length > 5) {
-        errors.push('발언자는 최대 5자까지 입력할 수 있습니다.');
       }
 
       // 발언시간 유효성 검사
