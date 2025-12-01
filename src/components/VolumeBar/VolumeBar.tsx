@@ -1,6 +1,6 @@
 // Integer 1-10, step = 1
 // Mute button available
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CustomRangeSlider from '../CustomRangeSlider/CustomRangeSlider';
 import DTVolume from '../icons/Volume';
 import clsx from 'clsx';
@@ -35,6 +35,13 @@ export default function VolumeBar({
 
   // 음소거 버튼은 오직 볼륨이 0일 때에만 흐리게 강조됨
   const isNotMute = volume > 0;
+
+  // 외부에서 볼륨이 변경될 경우, 값을 관측하여 동기화
+  useEffect(() => {
+    if (volume > 0) {
+      setLastVolume(volume);
+    }
+  }, [volume]);
 
   return (
     <div className={`relative h-[76px] w-[234px] ${className}`}>
