@@ -19,10 +19,9 @@ export default function CustomRangeSlider({
   step = 1,
 }: CustomRangeSliderProps) {
   const [showTooltip, setShowTooltip] = useState(false);
-  const percentage = Math.min(
-    100,
-    Math.max(0, ((value - min) / (max - min)) * 100),
-  );
+  const range = max - min;
+  const percentage =
+    range <= 0 ? 0 : Math.min(100, Math.max(0, ((value - min) / range) * 100));
 
   return (
     <div className="relative mx-4 flex h-6 w-full items-center">

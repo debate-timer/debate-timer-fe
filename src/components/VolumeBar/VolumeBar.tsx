@@ -21,13 +21,14 @@ export default function VolumeBar({
   className = '',
 }: VolumeBarProps) {
   // 음소거 해제 시 가장 마지막의 볼륨 값을 복원하기 위함
-  const [lastVolume, setLastVolume] = useState(5);
+  const [lastVolume, setLastVolume] = useState(volume > 0 ? volume : 5);
 
   // 음소거 로직
   const handleMute = () => {
     if (volume === 0) {
       onVolumeChange(lastVolume === 0 ? 1 : lastVolume);
     } else {
+      setLastVolume(volume);
       onVolumeChange(0);
     }
   };

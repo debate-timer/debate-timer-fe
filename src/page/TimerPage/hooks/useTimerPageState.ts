@@ -59,7 +59,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   // 벨 사운드 관련 훅
   const { volume: rawVolume, setVolume: setRawVolume } = useBellSound({
     normalTimer,
-    bells: data?.table[index].bell,
+    bells: data?.table[index]?.bell,
   });
 
   // 볼륨 값과 조절 함수

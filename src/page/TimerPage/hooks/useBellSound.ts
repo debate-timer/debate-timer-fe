@@ -13,7 +13,12 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
   const [volume, setVolume] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved !== null ? Number(saved) : 1.0;
+      if (saved !== null) {
+        // NaN 등의 손상된 값 검증
+        const parsed = Number(saved);
+        return Number.isFinite(parsed) ? parsed : 1.0;
+      }
+      return 1.0;
     }
     return 1.0;
   });

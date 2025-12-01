@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import VolumeBar from './VolumeBar';
 
 const meta: Meta<typeof VolumeBar> = {
-  title: 'components/VolumeBar',
+  title: 'Components/VolumeBar',
   component: VolumeBar,
   tags: ['autodocs'],
 };
@@ -14,6 +14,6 @@ type Story = StoryObj<typeof VolumeBar>;
 export const Default: Story = {
   args: {
     volume: 0,
-    onVolumeChange: (delta: number) => console.log(delta),
+    onVolumeChange: (volume: number) => console.log(volume),
   },
 };
