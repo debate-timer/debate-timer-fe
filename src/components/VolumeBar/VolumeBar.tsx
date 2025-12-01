@@ -1,4 +1,4 @@
-// Integer 1-10, step = 1
+// Integer 0-10, step = 1
 // Mute button available
 import { useEffect, useState } from 'react';
 import CustomRangeSlider from '../CustomRangeSlider/CustomRangeSlider';
@@ -51,7 +51,7 @@ export default function VolumeBar({
         viewBox="0 0 234 76"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none" // Ensures SVG stretches if container resizes
+        preserveAspectRatio="none"
       >
         <g filter="url(#filter0_d_2434_13098)">
           <mask id="path-1-inside-1_2434_13098" fill="white">
