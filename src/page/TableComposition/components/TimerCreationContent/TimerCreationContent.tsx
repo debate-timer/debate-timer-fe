@@ -599,7 +599,8 @@ export default function TimerCreationContent({
                       value={speaker}
                       onChange={(e) => setSpeaker(e.target.value)}
                       onClear={() => setSpeaker('')}
-                      placeholder="N번 토론자"
+                      maxLength={5}
+                      placeholder="N번"
                       disabled={
                         stance === 'NEUTRAL' || currentSpeechType === 'TIMEOUT'
                       }
