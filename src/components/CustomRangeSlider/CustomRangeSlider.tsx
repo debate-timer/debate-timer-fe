@@ -63,6 +63,8 @@ export default function CustomRangeSlider({
         onChange={(e) => onValueChange(Number(e.target.value))}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
+        onFocus={() => setShowTooltip(true)}
+        onBlur={() => setShowTooltip(false)}
         className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
       />
     </div>

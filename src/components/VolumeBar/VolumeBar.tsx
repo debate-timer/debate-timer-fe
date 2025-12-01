@@ -34,7 +34,7 @@ export default function VolumeBar({
   };
 
   // 음소거 버튼은 오직 볼륨이 0일 때에만 흐리게 강조됨
-  const isMuteButtonHighlighted = volume > 0;
+  const isNotMute = volume > 0;
 
   return (
     <div className={`relative h-[76px] w-[234px] ${className}`}>
@@ -102,11 +102,16 @@ export default function VolumeBar({
       {/* Content Layer */}
       <div className="relative z-10 flex h-full w-full items-center justify-center px-4 pb-2 pt-5">
         <div className="flex w-full flex-row items-center gap-2">
-          <button onClick={handleMute} className="size-[36px]">
+          <button
+            onClick={handleMute}
+            className="size-[36px]"
+            title={isNotMute ? '음소거' : '음소거 해제'}
+            aria-label={isNotMute ? '음소거' : '음소거 해제'}
+          >
             <DTVolume
               className={clsx('size-full', {
-                'text-default-black': isMuteButtonHighlighted,
-                'text-default-disabled/hover': !isMuteButtonHighlighted,
+                'text-default-black': isNotMute,
+                'text-default-disabled/hover': !isNotMute,
               })}
             />
           </button>
