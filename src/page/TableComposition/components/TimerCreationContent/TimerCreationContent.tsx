@@ -95,6 +95,7 @@ interface BellInputConfig {
   count: number;
 }
 
+const MAX_SPEAKER_LEN = 5;
 export default function TimerCreationContent({
   beforeData,
   initData,
@@ -307,8 +308,8 @@ export default function TimerCreationContent({
     // SpeechType에 맞게 문자열 매핑
     let speechTypeToSend: string;
     let stanceToSend: Stance;
-    if (speaker.trim().length > 5) {
-      errors.push('발언자는 최대 5자까지 입력할 수 있습니다.');
+    if (speaker.trim().length > MAX_SPEAKER_LEN) {
+      errors.push(`발언자는 최대 ${MAX_SPEAKER_LEN}자까지 입력할 수 있습니다.`);
     }
 
     if (currentSpeechType === 'CUSTOM') {
@@ -599,7 +600,7 @@ export default function TimerCreationContent({
                       value={speaker}
                       onChange={(e) => setSpeaker(e.target.value)}
                       onClear={() => setSpeaker('')}
-                      maxLength={5}
+                      maxLength={MAX_SPEAKER_LEN}
                       placeholder="N번"
                       disabled={
                         stance === 'NEUTRAL' || currentSpeechType === 'TIMEOUT'
