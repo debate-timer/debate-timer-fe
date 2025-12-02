@@ -6,6 +6,8 @@ import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
 import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
+import { useModal } from '../../hooks/useModal';
+import DialogModal from '../../components/DialogModal/DialogModal';
 export default function DebateVotePage() {
   const navigate = useNavigate();
   const baseUrl =
@@ -37,7 +39,13 @@ export default function DebateVotePage() {
     refetch,
     isRefetchError,
   } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isArgsValid });
+  const { openModal, closeModal, ModalWrapper } = useModal();
   const { mutate } = useFetchEndPoll(handleGoToResult);
+  const handleConfirmEnd = () => {
+    if (!isArgsValid) return;
+    mutate(pollId);
+    closeModal();
+  };
 
   const participants = data?.voterNames;
   const isLoading = isFetching || isRefetching;
@@ -118,7 +126,7 @@ export default function DebateVotePage() {
               <GoToDebateEndButton tableId={tableId} className="flex-1" />
               <button
                 type="button"
-                onClick={() => mutate(pollId)}
+                onClick={openModal}
                 className="button enabled brand flex flex-1 flex-row rounded-full p-[24px]"
               >
                 투표 결과 보기
@@ -127,6 +135,19 @@ export default function DebateVotePage() {
           </DefaultLayout.StickyFooterWrapper>
         </div>
       </DefaultLayout.ContentContainer>
+      <ModalWrapper>
+        <DialogModal
+          right={{
+            text: '종료하기',
+            onClick: handleConfirmEnd,
+            isBold: true,
+          }}
+        >
+          <div className="text-neutral-1000 p-20 text-center text-lg font-semibold">
+            정말로 종료하시겠습니까?
+          </div>
+        </DialogModal>
+      </ModalWrapper>
     </DefaultLayout>
   );
 }
