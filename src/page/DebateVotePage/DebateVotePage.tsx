@@ -5,7 +5,6 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
-import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
 import { useModal } from '../../hooks/useModal';
 import DialogModal from '../../components/DialogModal/DialogModal';
 export default function DebateVotePage() {
@@ -122,8 +121,7 @@ export default function DebateVotePage() {
           </main>
 
           <DefaultLayout.StickyFooterWrapper>
-            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2">
-              <GoToDebateEndButton tableId={tableId} className="flex-1" />
+            <div className="flex w-full max-w-[400px] flex-row items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={openModal}
