@@ -598,7 +598,9 @@ export default function TimerCreationContent({
                     <ClearableInput
                       id="speaker"
                       value={speaker}
-                      onChange={(e) => setSpeaker(e.target.value)}
+                      onChange={(e) =>
+                        setSpeaker(e.target.value.slice(0, MAX_SPEAKER_LEN))
+                      }
                       onClear={() => setSpeaker('')}
                       maxLength={MAX_SPEAKER_LEN}
                       placeholder="N번"
