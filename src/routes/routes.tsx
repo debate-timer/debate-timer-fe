@@ -13,6 +13,10 @@ import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
+import DebateVotePage from '../page/DebateVotePage/DebateVotePage';
+import VoteParticipationPage from '../page/VoteParticipationPage/VoteParticipationPage';
+import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
+import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 import LanguageWrapper from './LanguageWrapper';
 
 const appRoutes = [
@@ -50,6 +54,26 @@ const appRoutes = [
     path: 'table/customize/:id/end/feedback',
     element: <FeedbackTimerPage />,
     requiresAuth: true,
+  },
+  {
+    path: 'table/customize/:tableId/end/vote/:pollId',
+    element: <DebateVotePage />,
+    requiresAuth: true,
+  },
+  {
+    path: 'table/customize/:tableId/end/vote/:pollId/result',
+    element: <DebateVoteResultPage />,
+    requiresAuth: true,
+  },
+  {
+    path: 'vote/:id',
+    element: <VoteParticipationPage />,
+    requiresAuth: false,
+  },
+  {
+    path: 'vote/end',
+    element: <VoteCompletePage />,
+    requiresAuth: false,
   },
   {
     path: 'oauth',

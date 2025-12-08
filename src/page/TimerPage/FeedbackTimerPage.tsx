@@ -1,27 +1,28 @@
-import { useEffect } from 'react';
 import { useFeedbackTimer } from './hooks/useFeedbackTimer';
 import FeedbackTimer from './components/FeedbackTimer';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
-
-const INITIAL_TIME = 0;
+import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
+import { useParams } from 'react-router-dom';
 
 export default function FeedbackTimerPage() {
   const feedbackTimerInstance = useFeedbackTimer();
-  const { setTimer, setDefaultTimer } = feedbackTimerInstance;
+  const { id } = useParams();
+  const tableId = Number(id);
 
-  useEffect(() => {
-    // 페이지가 로드될 때 타이머의 초기 시간을 설정
-    setTimer(INITIAL_TIME);
-    setDefaultTimer(INITIAL_TIME);
-  }, [setTimer, setDefaultTimer]);
+  // 테이블 ID 검증 로직
+  if (!id || isNaN(tableId)) {
+    throw new Error('테이블 ID가 올바르지 않습니다.');
+  }
 
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer>
-        <div className="relative flex h-full w-full flex-col items-center justify-center space-y-[54px] pb-[66px] xl:space-y-[60px]">
+        <div className="relative flex h-screen w-full flex-col items-center justify-center space-y-[54px] pb-[66px] xl:space-y-[60px]">
           <FeedbackTimer feedbackTimerInstance={feedbackTimerInstance} />
-          <GoToHomeButton />
+
+          <div className="fixed bottom-[8%] xl:bottom-[12%]">
+            <GoToDebateEndButton tableId={tableId} className="w-[478px]" />
+          </div>
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>

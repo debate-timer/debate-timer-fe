@@ -10,6 +10,8 @@ import seobangjeongto from '../assets/template_logo/seobangjeongto.png';
 import osansi from '../assets/template_logo/osansi.png';
 import nogotte from '../assets/template_logo/nogotte.png';
 import kogito from '../assets/template_logo/kogito.png';
+import mcu from '../assets/template_logo/mcu.png';
+import ylt from '../assets/template_logo/yuppm_law_track.png';
 import { DebateTemplate } from '../type/type';
 function createTableShareUrl(encodeData: string): string {
   return `${import.meta.env.VITE_SHARE_BASE_URL}/share?data=${encodeData}`;
@@ -69,6 +71,18 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
           label: 'CEDA 토론',
           href: createTableShareUrl(
             'eJzdkz9PwkAUwL9Kc3MH1Ei0G386kEhLaFk0xhxwQGO5Ni1GDSFxIIYEB1wMA5CyiEOHM9GEz8Sd38E7qogGGYW43fu9u%2Fd%2BebnXBFYZKHsH%2BzKwcMUBShNgWEdAAW%2B3Ae2GdNRn3aGUUtMJSZBxAGTQuHbFjVTBMPVs5ljlCFYRLkMO%2Bdn1HN9EsK5FhRgJWfuZ85KDlzklfXp3w%2Fkl9LCFq0lk20CpQNtHMqhY2PJrS6jF28KizR%2BeNIHfgLgkauTyusEr%2BC5CpZoZac2mhI0JJQP2MOW5onP1kdD0fDZxJPwtIXAY48l5A3xh2xHNIU8Y%2FkCGi%2BA5N%2FzEvoiRF4UtecknpWtb5bNyPq89Rp7YpMOG%2FXU%2BO7t%2FNaBNCmlqwczPm3xzYqN7FrQl1h3MSHudVPwvnXpsECy28EvJzGTVs2TCUNMLrajFr2LxWOyfzGrVh6KTDg1f6GMobc%2FWbcLptPUOQLEj%2Bg%3D%3D',
+          ),
+        },
+      ],
+    },
+    {
+      title: '연세행정법학회',
+      logoSrc: ylt,
+      actions: [
+        {
+          label: 'CEDA 토론',
+          href: createTableShareUrl(
+            'eJzNlD1rwkAYx79KuKFTCirSlmy%2BZBBqIiYuLaWcempovITE0hYRSrHFgkMW%2B0YpcaqDQyoU%2FEzm8h16MdaKtih0iFvud5fn%2BfG%2Fh2sCpQy4%2BH6UBQquaIBrAgzrCHCAPDqkPfYe7ondc0c9r%2FfsvXSZXSbFpxOMd2e7fRuwoHGl%2B4dTBUkWs5kjniJYRbgMKaTfuqGZMoJ1YVbTGZL2B%2BUlDS9y13lyu9eUX0ADK7iaRKoKuApUTcSCioIVs7aAWrQtLKr0x%2BMmMBsQl%2Fwaubwo0QqmjlCpJgda5O020CxqlzMkiPls4tA3V%2FzWsXiE7k5r43NVDXAOGb7cEpJ0BM%2Bo3Dc2%2FTUyaM2oO%2BqAFrsgkxKFFZnJp0WcAUP6DrkZbolTaAH9dlthBxTiBMW2cII2cwotoPAnaNVJ4AtyftpmKSOLvNrzN%2FPHSs5k%2BdNkQuLTc7OgyZ9qe5HIejN%2FuYmX1x24bYu8d9zhmNlhJiNnzVVGD%2F4f21TupPUFcJhU9g%3D%3D',
           ),
         },
       ],
@@ -185,6 +199,25 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
           label: '국회의장배 토론',
           href: createTableShareUrl(
             'eJzdk0FLAkEUx7%2BKzNnDah5qb2obCLkr7nopJEYddWmdXXZXKkSIsAj0YIdAQmU9BAUGk%2BCXcsfv0KxrainhKazb7o%2BZ%2F%2Fu94b0aUAuAj3BcEKi4qAO%2BBjCsIMAD2ui65JU6j9M7hzZ7gcn4bfrUor0O7T%2B7hAQYdgcOCAL7yvDOxzOyIiUTJwJDsIRwATLIvg1TtxQEK%2BI8lgxp453xvI5XuUs6buua8QtoYhWXYkjTAF%2BEmoWCoKhi1Sr7yDarqM6qwpzG7p3WgGVDnPciUmlJZgGWgVC%2BrPhWtH%2FrW%2Bb0yzkSpXQyeuyJq17lUJj1nptFs7B5MzHhSEoLZ4J4uDjHecpVbAM%2BXM%2F6MIVMrwPA46qmLZBsIHjOOvjElvePTJYackf3oB5cUY5L4n9QnozblLwE6IDQm%2BGOmIfXzDfNx98wF4WMkp7JfJuUNu06i0VcuiuJpHAWi8rC0ssv4jfwxcNXi%2BxzG8xmTS%2FEvGvbaT1QpxGgze6ENH5604PfetI1842jMCK7s3d72%2B3d7iln6x%2Fd%2BDWm',
+          ),
+        },
+      ],
+    },
+    {
+      title: '목포가톨릭대',
+      subtitle: '',
+      logoSrc: mcu,
+      actions: [
+        {
+          label: 'A형 토론(20분)',
+          href: createTableShareUrl(
+            'eJyrVspMUbIy0FHKzEvLV7KqVspLzE1VslJ6vWrl2%2F41rzY0vG1b8XrZ2tc9DQq6Co5vZ0xVeNu24PXCBRpGBq%2B3tWgq6SglpqfmpSQCtQDZBUX5xSGpibl%2BEEPebFjzpmUjUDw5Pw9Z%2FPWGGUADlWp1lEoSk3KAItHVSsUliXnJIMmAIP9goJbigtTU5IyQygKwQfNagXYCRZPyK6BCfv5Bvo4%2BQKGSTJCZlkAvJKXm5ChZ5ZXm5EBEA1KLQJaiCQUXpCZmZ%2Balw4SLQfzUIpAHanWQ3OHs7zco3OHnGhoSBLYB1Skb1ugDw1HhzbwJb%2BYsgEQKisNCPH1d450cg11d4I6DWITTeSZGBlhcZ2aA5DaQLsKhtHXOm0WtCq83zHkzbQd9Awtr4qGvc2JrAbVgNdA%3D',
+          ),
+        },
+        {
+          label: 'B형 토론(25분)',
+          href: createTableShareUrl(
+            'eJyrVspMUbIy0FHKzEvLV7KqVspLzE1VslJ6vWrl2%2F41rzY0vG1b8XrZ2tc9DQq6Ck5vZ0xVeNu24PXCBRpGpq%2B3tWgq6SglpqfmpSQCtQDZBUX5xSGpibl%2BEEPebFjzpmUjUDw5Pw9Z%2FPWGGUADlWp1lEoSk3KAItHVSsUliXnJIMmAIP9goJbigtTU5IyQygKwQfNagXYCRZPyK6BCfv5Bvo4%2BQKGSTJCZlkAvJKXm5ChZ5ZXm5EBEA1KLQJaiCQUXpCZmZ%2Balw4SLQfzUIpAHanWQ3OHs7zco3OHnGhoSBLYBzSkT3sxZAIkMFAeFePq6xjs5Bru6wB0FsQCns0zNDbC4yswAyU0gXYRDZ%2BucN4taFV5vmPNm2g76BhLWRENf58TWAgArWzES',
           ),
         },
       ],
