@@ -16,7 +16,7 @@ export async function readJSON<T = unknown>(filePath: string): Promise<T> {
 export async function ensureFile(filePath: string): Promise<void> {
   const dir = path.dirname(filePath);
 
-  // 1. 디렉토리 구조 보장 (writeFile에서 mkdir을 처리하므로, 여기서는 fsp.access를 사용)
+  // 1. 디렉토리 구조 보장
   try {
     // 디렉토리가 존재하는지 확인
     await fsp.access(dir);
