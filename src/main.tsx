@@ -5,6 +5,7 @@ import { GlobalPortal } from './util/GlobalPortal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import router from './routes/routes.tsx';
 import './index.css';
+import './i18n';
 import { setupGoogleAnalytics } from './util/setupGoogleAnalytics.tsx';
 
 // Functions that calls msw mocking worker
