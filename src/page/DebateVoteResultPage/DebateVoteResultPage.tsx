@@ -39,15 +39,10 @@ export default function DebateVoteResultPage() {
   useEffect(() => {
     if (!isArgsValid) return;
 
-    const redirectToEndPage = () => {
-      handleGoToEndPage();
-    };
-    window.addEventListener('popstate', redirectToEndPage);
-
-    return () => {
-      window.removeEventListener('popstate', redirectToEndPage);
-    };
+    window.addEventListener('popstate', handleGoToEndPage);
+    return () => window.removeEventListener('popstate', handleGoToEndPage);
   }, [handleGoToEndPage, isArgsValid]);
+
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
   const { openModal, ModalWrapper, closeModal } = useModal({
