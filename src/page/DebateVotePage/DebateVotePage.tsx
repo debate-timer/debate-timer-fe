@@ -42,8 +42,15 @@ export default function DebateVotePage() {
   const { mutate } = useFetchEndPoll(handleGoToResult);
   const handleConfirmEnd = () => {
     if (!isArgsValid) return;
-    mutate(pollId);
-    closeModal();
+    mutate(pollId, {
+      onSuccess: () => {
+        closeModal();
+      },
+      onError: () => {
+        closeModal();
+        alert('투표 종료에 실패했습니다.');
+      },
+    });
   };
 
   const participants = data?.voterNames;
