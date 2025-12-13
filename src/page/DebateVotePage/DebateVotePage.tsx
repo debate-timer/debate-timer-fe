@@ -136,13 +136,16 @@ export default function DebateVotePage() {
       <ModalWrapper>
         <DialogModal
           right={{
-            text: '종료하기',
+            text: '마감하기',
             onClick: handleConfirmEnd,
             isBold: true,
           }}
         >
-          <div className="text-neutral-1000 p-20 text-center text-lg font-semibold">
-            정말로 종료하시겠습니까?
+          <div className="px-16 py-24 text-center text-black">
+            <p className="text-xl font-semibold">투표를 마감하시겠습니까?</p>
+            <p className="mt-2 text-sm text-default-neutral">
+              투표를 마감하면 더이상 표를 받을 수 없습니다!
+            </p>
           </div>
         </DialogModal>
       </ModalWrapper>
