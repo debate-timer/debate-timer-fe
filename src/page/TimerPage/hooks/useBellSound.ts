@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NormalTimerLogics } from './useNormalTimer';
 import { BellConfig } from '../../../type/type';
 
@@ -62,18 +62,19 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
     }
   };
 
+  // playBell과 같은 콜백 함수에서 최신 volume 값을 참조하기 위해 ref를 동기화
   useEffect(() => {
     volumeRef.current = volume;
   }, [volume]);
 
   // 종소리 여러 번 - 새로운 Audio로 재생
-  function playBell(count: number) {
+  const playBell = useCallback((count: number) => {
     const audio = new Audio(`/sounds/bell-${count}.mp3`);
     audio.volume = volumeRef.current;
     audio.play().catch((err) => {
       console.warn('audio.play() 실패:', err);
     });
-  }
+  }, []);
 
   // 볼륨 변경 시 최신 값을 로컬 저장소에 저장
   // 500 ms 디바운싱 적용하여 성능 문제 예방
@@ -108,7 +109,7 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
         playBell(bell.count);
       }
     });
-  }, [normalTimer.timer, bells, normalTimer.defaultTimer]);
+  }, [normalTimer.timer, bells, normalTimer.defaultTimer, playBell]);
 
   return { volume, updateVolume };
 }
