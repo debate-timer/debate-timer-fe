@@ -24,6 +24,20 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
   });
   const volumeRef = useRef(volume);
 
+  // 안전하게 볼륨 값을 갱신하는 함수
+  const updateVolume = (value: number) => {
+    if (
+      value === null ||
+      Number.isNaN(value) ||
+      !Number.isFinite(value) ||
+      value < 0 ||
+      value > 1
+    ) {
+      setVolume(0.5);
+    }
+    setVolume(value);
+  };
+
   useEffect(() => {
     volumeRef.current = volume;
   }, [volume]);
@@ -72,5 +86,5 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
     });
   }, [normalTimer.timer, bells, normalTimer.defaultTimer]);
 
-  return { volume, setVolume };
+  return { volume, updateVolume };
 }
