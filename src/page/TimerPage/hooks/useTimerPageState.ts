@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableData';
@@ -170,6 +171,25 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     [prosConsSelected, switchCamp, timer1, timer2],
   );
 
+  // 볼륨 바 바깥 영역에서의 클릭을 처리하기 위한 레퍼런스와 함수
+  const volumeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        volumeRef.current &&
+        !volumeRef.current.contains(event.target as Node) &&
+        isVolumeBarOpen
+      ) {
+        toggleVolumeBar();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isVolumeBarOpen, toggleVolumeBar]);
+
   /**
    * 라운드 이동/초기 진입 시 타이머 상태 초기화 및 셋업
    */
@@ -287,6 +307,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     setVolume: updateVolume,
     isVolumeBarOpen,
     toggleVolumeBar,
+    volumeRef,
   };
 }
 
@@ -316,4 +337,5 @@ export interface TimerPageLogics {
   setVolume: (value: number) => void;
   toggleVolumeBar: () => void;
   isVolumeBarOpen: boolean;
+  volumeRef: React.RefObject<HTMLDivElement>;
 }

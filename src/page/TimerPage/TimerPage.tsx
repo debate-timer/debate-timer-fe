@@ -48,6 +48,7 @@ export default function TimerPage() {
     isFullscreen,
     setFullscreen,
     toggleFullscreen,
+    volumeRef,
   } = state;
 
   // If error, print error message and let user be able to retry
@@ -110,7 +111,7 @@ export default function TimerPage() {
               )}
             </button>
 
-            <div className="relative flex h-full flex-col">
+            <div className="relative flex h-full flex-col" ref={volumeRef}>
               <button
                 className="flex aspect-square h-full items-center justify-center p-[4px]"
                 aria-label="볼륨 조절"
