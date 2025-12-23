@@ -57,7 +57,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     useState<TimeBasedStance>('PROS');
 
   // 벨 사운드 관련 훅
-  const { volume: rawVolume, setVolume: setRawVolume } = useBellSound({
+  const { volume: rawVolume, updateVolume: updateRawVolume } = useBellSound({
     normalTimer,
     bells: data?.table[index]?.bell,
   });
@@ -66,13 +66,13 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   // - React 내부적으로는 0.0 ~ 1.0 사이 값 사용
   // - 아래 값과 함수를 통해 사용자에게는 0 ~ 10 사이 값으로 인식되게 값을 변형
   const volume = Math.round(rawVolume * VOLUME_SCALE);
-  const setVolume = (value: number) => {
+  const updateVolume = (value: number) => {
     if (value < 0 || value > VOLUME_SCALE) {
       return;
     }
 
     // UI 상의 0 ~ 10 볼륨을 React 내부 로직의 0.0 ~ 1.0으로 바꾸어서 갱신
-    updateVolume(value / VOLUME_SCALE);
+    updateRawVolume(value / VOLUME_SCALE);
   };
 
   // 벨 볼륨 관련
@@ -284,7 +284,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     toggleFullscreen,
     setFullscreen,
     volume,
-    setVolume,
+    setVolume: updateVolume,
     isVolumeBarOpen,
     toggleVolumeBar,
   };
