@@ -10,7 +10,8 @@ interface UseBellSoundProps {
 const STORAGE_KEY = 'timer-volume';
 
 export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
-  const [volume, setVolume] = useState<number>(() => {
+  // 볼륨 초기화 함수
+  const getAndInitVolume = () => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved !== null) {
@@ -21,7 +22,9 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
       return 1.0;
     }
     return 1.0;
-  });
+  };
+
+  const [volume, setVolume] = useState<number>(() => getAndInitVolume());
   const volumeRef = useRef(volume);
 
   // 안전하게 볼륨 값을 갱신하는 함수
