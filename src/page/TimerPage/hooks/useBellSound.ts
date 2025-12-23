@@ -8,20 +8,43 @@ interface UseBellSoundProps {
 }
 
 const STORAGE_KEY = 'timer-volume';
+const DEFAULT_VOLUME = 0.5;
 
 export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
+  /** 볼륨 값 검증 함수
+   *  @param value 검증하고자 하는 볼륨 값
+   *  @returns 검증 성공 여부 (`boolean`)
+   */
+  const isValidVolume = (value: number): boolean => {
+    if (
+      value === null ||
+      Number.isNaN(value) ||
+      !Number.isFinite(value) ||
+      value < 0.0 ||
+      value > 1.0
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   // 볼륨 초기화 함수
   const getAndInitVolume = () => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved !== null) {
-        // NaN 등의 손상된 값 검증
-        const parsed = Number(saved);
-        return Number.isFinite(parsed) ? parsed : 1.0;
+      // 로컬 저장소 값 자체가 null일 경우
+      if (saved === null) {
+        return DEFAULT_VOLUME;
       }
-      return 1.0;
+
+      // 볼륨 값 검증
+      if (isValidVolume(Number(saved))) {
+        return Number(saved);
+      } else {
+        return DEFAULT_VOLUME;
+      }
     }
-    return 1.0;
+    return DEFAULT_VOLUME;
   };
 
   const [volume, setVolume] = useState<number>(() => getAndInitVolume());
@@ -32,16 +55,11 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
    *  @param value 갱신할 볼륨 값 (실수 0.0부터 1.0 사이)
    */
   const updateVolume = (value: number) => {
-    if (
-      value === null ||
-      Number.isNaN(value) ||
-      !Number.isFinite(value) ||
-      value < 0.0 ||
-      value > 1.0
-    ) {
-      setVolume(0.5);
+    if (isValidVolume(value)) {
+      setVolume(value);
+    } else {
+      setVolume(DEFAULT_VOLUME);
     }
-    setVolume(value);
   };
 
   useEffect(() => {
