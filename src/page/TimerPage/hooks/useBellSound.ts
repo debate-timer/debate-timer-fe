@@ -27,14 +27,17 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
   const [volume, setVolume] = useState<number>(() => getAndInitVolume());
   const volumeRef = useRef(volume);
 
-  // 안전하게 볼륨 값을 갱신하는 함수
+  /** 안전하게 볼륨 값을 갱신하는 함수.
+   *  값이 정상적이지 않을 경우, 일괄 0.5로 초기화합니다.
+   *  @param value 갱신할 볼륨 값 (실수 0.0부터 1.0 사이)
+   */
   const updateVolume = (value: number) => {
     if (
       value === null ||
       Number.isNaN(value) ||
       !Number.isFinite(value) ||
-      value < 0 ||
-      value > 1
+      value < 0.0 ||
+      value > 1.0
     ) {
       setVolume(0.5);
     }

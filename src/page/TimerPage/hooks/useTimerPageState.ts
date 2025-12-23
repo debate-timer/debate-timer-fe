@@ -71,7 +71,8 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       return;
     }
 
-    setRawVolume(value / VOLUME_SCALE);
+    // UI 상의 0 ~ 10 볼륨을 React 내부 로직의 0.0 ~ 1.0으로 바꾸어서 갱신
+    updateVolume(value / VOLUME_SCALE);
   };
 
   // 벨 볼륨 관련
