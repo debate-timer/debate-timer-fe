@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
@@ -12,8 +13,8 @@ import DialogModal from '../../../components/DialogModal/DialogModal';
 import DTHome from '../../../components/icons/Home';
 import DTLogin from '../../../components/icons/Login';
 import useFullscreen from '../../../hooks/useFullscreen';
+import LanguageSelector from './LanguageSelector';
 
-// The type of header icons will be declared here.
 type HeaderIcons = 'home' | 'auth';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
@@ -64,21 +65,18 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
     <>
       <div className="flex h-full flex-1 items-center justify-end gap-[12px] text-right">
         {isGuestFlow() && (
-          <>
-            {/* Guest mode indicator */}
-            <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
-              비회원 모드
-            </div>
-
-            {/* Vertical divider */}
-            <div className="w-[1px] self-stretch bg-neutral-500" />
-          </>
+          <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+            비회원 모드
+          </div>
         )}
 
-        {/* Buttons given as an argument */}
+        <LanguageSelector />
+
+        <div className="w-[1px] self-stretch bg-neutral-500" />
+
+        {/* props으로 들어오는 버튼들 */}
         {buttons}
 
-        {/* Normal buttons */}
         {defaultIcons.map((iconName, index) => {
           switch (iconName) {
             case 'home':
@@ -103,6 +101,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                   <DTHome className="h-full" />
                 </button>
               );
+
             case 'auth':
               return (
                 <button
@@ -126,6 +125,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                   <DTLogin className="h-full w-full" />
                 </button>
               );
+
             default:
               return null;
           }

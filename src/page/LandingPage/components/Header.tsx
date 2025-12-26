@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { isLoggedIn } from '../../../util/accessToken';
+import LanguageSelector from '../../../layout/components/header/LanguageSelector';
 
 interface HeaderProps {
   onLoginButtonClicked: () => void;
@@ -24,15 +25,18 @@ export default function Header({ onLoginButtonClicked }: HeaderProps) {
       }`}
     >
       <div className="flex w-[90%] max-w-[1226px] items-center justify-between md:w-[70%]">
-        <div className="flex items-center text-[min(max(1.25rem,2vw),2rem)] font-semibold">
+        <p className="flex items-center text-body-raw font-semibold md:text-subtitle-raw">
           Debate Timer
+        </p>
+        <div className="flex items-center space-x-4">
+          <LanguageSelector />
+          <button
+            className="text-body-raw font-semibold md:text-subtitle-raw"
+            onClick={onLoginButtonClicked}
+          >
+            {!isLoggedIn() ? '3초 로그인' : '로그아웃'}
+          </button>
         </div>
-        <button
-          className="text-[min(max(0.875rem,1.25vw),1.2rem)]"
-          onClick={onLoginButtonClicked}
-        >
-          {!isLoggedIn() ? '3초 로그인' : '로그아웃'}
-        </button>
       </div>
     </header>
   );
