@@ -20,14 +20,16 @@ export default function LanguageWrapper() {
 
     if (lang === DEFAULT_LANG) {
       const nextPath = stripDefaultLangFromPath(location.pathname);
-      navigate(nextPath || '/', { replace: true });
+      const nextUrl = `${nextPath || '/'}${location.search}${location.hash}`;
+      navigate(nextUrl, { replace: true });
       return;
     }
 
     if (!lang && isSupportedLang(currentLang) && currentLang !== DEFAULT_LANG) {
       const nextPath = buildLangPath(location.pathname, currentLang);
       if (nextPath !== location.pathname) {
-        navigate(nextPath, { replace: true });
+        const nextUrl = `${nextPath}${location.search}${location.hash}`;
+        navigate(nextUrl, { replace: true });
         return;
       }
     }
