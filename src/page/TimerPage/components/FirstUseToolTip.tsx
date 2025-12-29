@@ -30,8 +30,9 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
           <ListItem>초기화 버튼을 눌러 타이머를 원래 시간으로 초기화</ListItem>
           <ListItem>마우스를 사용하여 타이머를 클릭 시, 진영 변경</ListItem>
           <ListItem>
-            타이머 동작 중 진영이 변경될 경우, 상대 진영의 타이머로 전환과
-            동시에 시작
+            {
+              '타이머 동작 중 진영이 변경될 경우, 상대 진영의 타이머로 전환과 동시에 시작'
+            }
           </ListItem>
         </div>
       </div>
