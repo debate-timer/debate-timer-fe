@@ -20,7 +20,7 @@ export default function DropdownMenu<T>({
   options,
   selectedValue,
   onSelect,
-  placeholder = '선택',
+  placeholder,
   disabled,
   className = '',
 }: DropdownMenuProps<T>) {
@@ -29,7 +29,7 @@ export default function DropdownMenu<T>({
 
   const selectedOptionLabel =
     options.find((option) => option.value === selectedValue)?.label ||
-    placeholder;
+    (placeholder ?? '선택');
 
   // 드롭다운 외부 클릭 시 닫히도록 처리
   useEffect(() => {
