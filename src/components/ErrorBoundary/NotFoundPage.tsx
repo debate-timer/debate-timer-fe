@@ -29,9 +29,10 @@ export default function NotFoundPage() {
 
           <div className="mb-20 flex flex-col space-y-2">
             <h1 className="text-xl font-bold">오류 내용</h1>
-            <p className="text-lg">
-              요청하신 페이지를 찾을 수 없어요. 홈 화면으로 돌아가 처음부터 다시
-              시도해주세요.
+            <p className="whitespace-pre-line text-lg">
+              {
+                '요청하신 페이지를 찾을 수 없어요.\n홈 화면으로 돌아가 처음부터 다시 시도해주세요.'
+              }
             </p>
           </div>
 

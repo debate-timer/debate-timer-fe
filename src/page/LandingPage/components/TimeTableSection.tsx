@@ -36,9 +36,7 @@ export default function TimeTableSection() {
             두가지 타이머
           </h3>
           <p className="text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
-            일반형과 자유토론형 타이머로,
-            <br />
-            다양한 토론 방식을 지원해요.
+            {'일반형과 자유토론형 타이머로\n다양한 토론 방식을 지원해요.'}
           </p>
         </div>
       </div>
@@ -48,9 +46,7 @@ export default function TimeTableSection() {
             종소리 설정
           </h3>
           <p className="text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
-            시간에 따른 종소리를 내마음대로
-            <br />
-            커스터마이징 할 수 있어요.
+            {'시간에 따른 종소리를 내마음대로\n커스터마이징 할 수 있어요.'}
           </p>
         </div>
         <img src={bellSetting} alt="section302" className="flex w-1/2" />

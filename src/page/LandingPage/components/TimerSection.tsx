@@ -3,6 +3,7 @@ import timerOperationTime from '../../../assets/landing/timer_operation_time.png
 import timerTimeBased from '../../../assets/landing/timer_timebased.png';
 import keyInfo from '../../../assets/landing/key_info.png';
 import timeoutButton from '../../../assets/landing/timeout_button.png';
+
 export default function TimerSection() {
   return (
     <section
@@ -14,15 +15,15 @@ export default function TimerSection() {
           <span className="relative z-10">타이머 화면</span>
           <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand/70"></span>
         </div>
-        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
-          원하는 때에 <br />
-          작전 시간 사용하기
+        <h2 className="mt-4 whitespace-pre-line text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+          {'원하는 때에\n작전 시간 사용하기'}
         </h2>
       </div>
       <div className="flex flex-row items-center justify-center gap-8 px-4">
         <img src={timer} alt="section301" className="flex w-1/2" />
         <div className="flex w-1/2 flex-col items-center gap-4">
           <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
+            {/* TODO: Trans를 활용해서 키 관리하기 */}
             토론자가 작전 시간을
             <br />
             요청하면{' '}
@@ -39,9 +40,8 @@ export default function TimerSection() {
       </div>
       <div className="flex flex-row items-center justify-center gap-8 px-4">
         <div className="flex w-1/2 flex-col items-center gap-4">
-          <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
-            작전 시간이 나타나면
-            <br /> 원하는 시간을 입력하세요!
+          <h3 className="whitespace-pre-line text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
+            {'작전 시간이 나타나면\n원하는 시간을 입력하세요!'}
           </h3>
         </div>
         <img src={timerOperationTime} alt="section302" className="flex w-1/2" />
@@ -49,7 +49,7 @@ export default function TimerSection() {
 
       <div>
         <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
-          키보드 방향키로 <br />더 편리한 조작
+          {'키보드 방향키로\n더 편리한 조작'}
         </h2>
       </div>
       <div className="flex flex-row items-center justify-center gap-8 px-4">

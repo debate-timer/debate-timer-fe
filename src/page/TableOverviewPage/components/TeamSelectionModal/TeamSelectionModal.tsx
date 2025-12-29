@@ -104,8 +104,8 @@ export default function TeamSelectionModal({
       <div className="flex flex-grow flex-col items-center justify-center">
         {coinState === 'initial' && (
           <div className="mt-7 flex flex-col items-center justify-center p-8 text-center">
-            <p className="sm:text-xl sm:leading-loose text-lg font-semibold leading-7 md:text-2xl md:leading-9 lg:text-3xl lg:leading-[45px] xl:text-[34px] xl:leading-[50px]">
-              팀별로 <br /> 동전의 앞 / 뒷면 중 <br /> 하나를 선택해 주세요.
+            <p className="sm:text-xl sm:leading-loose whitespace-pre-line text-lg font-semibold leading-7 md:text-2xl md:leading-9 lg:text-3xl lg:leading-[45px] xl:text-[34px] xl:leading-[50px]">
+              {'팀별로\n동전의 앞 / 뒷면 중\n하나를 선택해 주세요.'}
             </p>
           </div>
         )}

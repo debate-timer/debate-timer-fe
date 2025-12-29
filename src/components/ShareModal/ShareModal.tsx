@@ -26,7 +26,7 @@ export default function ShareModal({
     return (
       <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
         <ErrorIndicator onClickRetry={() => onRefetch()}>
-          QR 코드를 불러오지 못했어요...<br></br>다시 시도하시겠어요?
+          {'QR 코드를 불러오지 못했어요.\n다시 시도하시겠어요?'}
         </ErrorIndicator>
       </div>
     );
