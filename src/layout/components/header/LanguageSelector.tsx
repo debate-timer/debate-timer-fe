@@ -3,6 +3,12 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { DropdownMenuItem } from '../../../components/DropdownMenu/DropdownMenu'; // DropdownMenuItem 타입 재사용
 import DTExpand from '../../../components/icons/Expand';
+import {
+  buildLangPath,
+  getSelectedLangFromRoute,
+  isSupportedLang,
+} from '../../../util/languageRouting';
+import i18n from '../../../i18n';
 
 export default function LanguageSelector() {
   const navigate = useNavigate();
@@ -16,41 +22,22 @@ export default function LanguageSelector() {
 
   // URL 파라미터를 기반으로 현재 선택된 언어 결정
   // 유효한 언어 파라미터가 없으면 'ko'를 기본값으로 사용
-  const selectedLangValue =
-    LANG_OPTIONS.find((option) => option.value === currentLangParam)?.value ||
-    'ko';
+  const selectedLangValue = getSelectedLangFromRoute(
+    currentLangParam,
+    location.pathname,
+  );
   const selectedLangLabel =
     LANG_OPTIONS.find((option) => option.value === selectedLangValue)?.label ||
     'KR';
 
   const handleLanguageChange = (newLang: string) => {
-    const currentPathname = location.pathname;
-    const pathSegments = currentPathname.split('/'); // 현재 경로를 '/' 기준으로 분리합니다.
-    const hasLangSegment =
-      pathSegments.length > 1 &&
-      pathSegments[1] &&
-      LANG_OPTIONS.some((opt) => opt.value === pathSegments[1]);
-
-    let newPathname = currentPathname;
-    if (newLang === 'ko') {
-      if (hasLangSegment) {
-        pathSegments.splice(1, 1);
-        newPathname = pathSegments.join('/') || '/';
-      }
-      navigate(newPathname);
+    if (!isSupportedLang(newLang)) {
       return;
     }
-
-    // 현재 경로에 언어 세그먼트가 있는지 확인하고 대체하거나 추가합니다.
-    if (hasLangSegment) {
-      // 현재 경로에 언어 세그먼트가 있다면, 새 언어로 대체합니다.
-      pathSegments[1] = newLang;
-      newPathname = pathSegments.join('/');
-    } else {
-      // 현재 경로에 언어 세그먼트가 없다면 (예: '/', '/home'), 새 언어를 경로 앞에 추가합니다.
-      newPathname = `/${newLang}${currentPathname === '/' ? '' : currentPathname}`;
+    const newPathname = buildLangPath(location.pathname, newLang);
+    if (i18n.language !== newLang) {
+      i18n.changeLanguage(newLang);
     }
-
     navigate(newPathname);
   };
 
