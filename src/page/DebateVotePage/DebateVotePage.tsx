@@ -5,26 +5,31 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
+import { useModal } from '../../hooks/useModal';
+import DialogModal from '../../components/DialogModal/DialogModal';
 export default function DebateVotePage() {
-  const { id: pollIdParam } = useParams();
-  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
-  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
   const navigate = useNavigate();
   const baseUrl =
     import.meta.env.MODE !== 'production'
       ? undefined
       : import.meta.env.VITE_SHARE_BASE_URL;
+
+  // 매개변수 검증
+  const { pollId: rawPollId, tableId: rawTableId } = useParams();
+  const pollId = rawPollId ? Number(rawPollId) : NaN;
+  const isPollIdValid = !!rawPollId && !Number.isNaN(pollId);
+  const tableId = rawTableId ? Number(rawTableId) : NaN;
+  const isTableIdValid = !!rawTableId && !Number.isNaN(tableId);
+  const isArgsValid = isPollIdValid && isTableIdValid;
+
   const voteUrl = useMemo(() => {
     return `${baseUrl}/vote/${pollId}`;
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
-    navigate(`/table/customize/${pollId}/end/vote/result`);
+    navigate(`/table/customize/${tableId}/end/vote/${pollId}/result`);
   };
 
-  const handleGoHome = () => {
-    navigate('/');
-  };
   const {
     data,
     isLoading: isFetching,
@@ -32,8 +37,21 @@ export default function DebateVotePage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isValidPollId });
+  } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isArgsValid });
+  const { openModal, closeModal, ModalWrapper } = useModal();
   const { mutate } = useFetchEndPoll(handleGoToResult);
+  const handleConfirmEnd = () => {
+    if (!isArgsValid) return;
+    mutate(pollId, {
+      onSuccess: () => {
+        closeModal();
+      },
+      onError: () => {
+        closeModal();
+        alert('투표 종료에 실패했습니다.');
+      },
+    });
+  };
 
   const participants = data?.voterNames;
   const isLoading = isFetching || isRefetching;
@@ -48,7 +66,8 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
-  if (!isValidPollId) {
+
+  if (!isArgsValid) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
@@ -59,6 +78,7 @@ export default function DebateVotePage() {
       </DefaultLayout>
     );
   }
+
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer noPadding={true}>
@@ -108,25 +128,34 @@ export default function DebateVotePage() {
           </main>
 
           <DefaultLayout.StickyFooterWrapper>
-            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2 bg-default-white">
+            <div className="flex w-full max-w-[400px] flex-row items-center justify-center gap-2">
               <button
                 type="button"
-                onClick={() => mutate(pollId)}
-                className="button enabled brand w-full rounded-full"
+                onClick={openModal}
+                className="button enabled brand flex flex-1 flex-row rounded-full p-[24px]"
               >
                 투표 결과 보기
-              </button>
-              <button
-                type="button"
-                onClick={handleGoHome}
-                className="button enabled neutral w-full rounded-full"
-              >
-                홈으로 돌아가기 →
               </button>
             </div>
           </DefaultLayout.StickyFooterWrapper>
         </div>
       </DefaultLayout.ContentContainer>
+      <ModalWrapper>
+        <DialogModal
+          right={{
+            text: '마감하기',
+            onClick: handleConfirmEnd,
+            isBold: true,
+          }}
+        >
+          <div className="px-16 py-24 text-center text-black">
+            <p className="text-xl font-semibold">투표를 마감하시겠습니까?</p>
+            <p className="mt-2 text-sm text-default-neutral">
+              투표를 마감하면 더이상 표를 받을 수 없습니다!
+            </p>
+          </div>
+        </DialogModal>
+      </ModalWrapper>
     </DefaultLayout>
   );
 }

@@ -7,11 +7,18 @@ import VoteDetailResult from './components/VoteDetailResult';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
+import { useCallback, useEffect, useState } from 'react';
+import DialogModal from '../../components/DialogModal/DialogModal';
 export default function DebateVoteResultPage() {
-  const { id: pollIdParam } = useParams();
+  // 매개변수 검증
+  const { pollId: rawPollId, tableId: rawTableId } = useParams();
+  const pollId = rawPollId ? Number(rawPollId) : NaN;
+  const isPollIdValid = !!rawPollId && !Number.isNaN(pollId);
+  const tableId = rawTableId ? Number(rawTableId) : NaN;
+  const isTableIdValid = !!rawTableId && !Number.isNaN(tableId);
+  const isArgsValid = isPollIdValid && isTableIdValid;
 
-  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
-  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -21,13 +28,26 @@ export default function DebateVoteResultPage() {
     isRefetching,
     refetch,
     isRefetchError,
-  } = useGetPollInfo(pollId, { enabled: isValidPollId });
+  } = useGetPollInfo(pollId, { enabled: isArgsValid });
   const handleGoHome = () => {
     navigate('/');
   };
+  const handleGoToEndPage = useCallback(() => {
+    navigate(`/table/customize/${tableId}/end`, { replace: true });
+  }, [navigate, tableId]);
+
+  useEffect(() => {
+    if (!isArgsValid) return;
+
+    window.addEventListener('popstate', handleGoToEndPage);
+    return () => window.removeEventListener('popstate', handleGoToEndPage);
+  }, [handleGoToEndPage, isArgsValid]);
+
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
-  const { openModal, ModalWrapper } = useModal();
+  const { openModal, ModalWrapper, closeModal } = useModal({
+    onClose: () => setIsConfirmed(false),
+  });
 
   const getWinner = (result: {
     prosTeamName: string;
@@ -55,7 +75,7 @@ export default function DebateVoteResultPage() {
     }
   };
 
-  if (!isValidPollId) {
+  if (!isArgsValid) {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
@@ -96,38 +116,57 @@ export default function DebateVoteResultPage() {
           </main>
 
           <DefaultLayout.StickyFooterWrapper>
-            <div className="flex w-full max-w-[400px] flex-col items-center justify-center gap-2 bg-default-white md:max-w-[800px] md:flex-row">
+            <div className="flex w-full max-w-[400px] flex-col items-center justify-center gap-2 md:w-full md:max-w-[800px] md:flex-row">
               <button
                 type="button"
-                onClick={openModal}
-                className="button enabled brand w-full rounded-full"
+                onClick={handleGoToEndPage}
+                className="button enabled neutral flex w-full flex-1 rounded-full p-[24px]"
                 disabled={isLoading}
               >
-                세부 결과 확인하기
+                토론 종료화면으로
               </button>
               <button
                 type="button"
-                onClick={handleGoHome}
-                className="button enabled neutral w-full rounded-full"
+                onClick={openModal}
+                className="button enabled brand flex w-full flex-1 rounded-full p-[24px]"
+                disabled={isLoading}
               >
-                홈으로 돌아가기 →
+                세부 결과 확인하기
               </button>
             </div>
           </DefaultLayout.StickyFooterWrapper>
         </div>
       </DefaultLayout.ContentContainer>
       <ModalWrapper>
-        <VoteDetailResult
-          pros={{
-            name: data?.prosTeamName ?? '찬성팀',
-            count: data?.prosCount ?? 0,
-          }}
-          cons={{
-            name: data?.consTeamName ?? '반대팀',
-            count: data?.consCount ?? 0,
-          }}
-          onGoHome={handleGoHome}
-        />
+        {isConfirmed ? (
+          <VoteDetailResult
+            pros={{
+              name: data?.prosTeamName ?? '찬성팀',
+              count: data?.prosCount ?? 0,
+            }}
+            cons={{
+              name: data?.consTeamName ?? '반대팀',
+              count: data?.consCount ?? 0,
+            }}
+            onGoHome={handleGoHome}
+          />
+        ) : (
+          <DialogModal
+            left={{
+              text: '아니오',
+              onClick: () => closeModal(),
+            }}
+            right={{
+              text: '네',
+              onClick: () => setIsConfirmed(true),
+              isBold: true,
+            }}
+          >
+            <div className="break-keep px-20 py-10 text-center text-xl font-bold">
+              정말로 세부 결과를 공개할까요?
+            </div>
+          </DialogModal>
+        )}
       </ModalWrapper>
     </DefaultLayout>
   );

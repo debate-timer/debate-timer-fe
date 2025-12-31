@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NormalTimerLogics } from './useNormalTimer';
 import { BellConfig } from '../../../type/type';
 
@@ -7,14 +7,84 @@ interface UseBellSoundProps {
   bells?: BellConfig[] | null;
 }
 
+const STORAGE_KEY = 'timer-volume';
+const DEFAULT_VOLUME = 0.5;
+
 export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
+  /** 볼륨 값 검증 함수
+   *  @param value 검증하고자 하는 볼륨 값
+   *  @returns 검증 성공 여부 (`boolean`)
+   */
+  const isValidVolume = (value: number): boolean => {
+    if (
+      value === null ||
+      Number.isNaN(value) ||
+      !Number.isFinite(value) ||
+      value < 0.0 ||
+      value > 1.0
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  // 볼륨 초기화 함수
+  const getAndInitVolume = () => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      // 로컬 저장소 값 자체가 null일 경우
+      if (saved === null) {
+        return DEFAULT_VOLUME;
+      }
+
+      // 볼륨 값 검증
+      if (isValidVolume(Number(saved))) {
+        return Number(saved);
+      } else {
+        return DEFAULT_VOLUME;
+      }
+    }
+    return DEFAULT_VOLUME;
+  };
+
+  const [volume, setVolume] = useState<number>(() => getAndInitVolume());
+  const volumeRef = useRef(volume);
+
+  /** 안전하게 볼륨 값을 갱신하는 함수.
+   *  값이 정상적이지 않을 경우, 일괄 0.5로 초기화합니다.
+   *  @param value 갱신할 볼륨 값 (실수 0.0부터 1.0 사이)
+   */
+  const updateVolume = (value: number) => {
+    if (isValidVolume(value)) {
+      setVolume(value);
+    } else {
+      setVolume(DEFAULT_VOLUME);
+    }
+  };
+
+  // playBell과 같은 콜백 함수에서 최신 volume 값을 참조하기 위해 ref를 동기화
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
   // 종소리 여러 번 - 새로운 Audio로 재생
-  function playBell(count: number) {
+  const playBell = useCallback((count: number) => {
     const audio = new Audio(`/sounds/bell-${count}.mp3`);
+    audio.volume = volumeRef.current;
     audio.play().catch((err) => {
       console.warn('audio.play() 실패:', err);
     });
-  }
+  }, []);
+
+  // 볼륨 변경 시 최신 값을 로컬 저장소에 저장
+  // 500 ms 디바운싱 적용하여 성능 문제 예방
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, volume.toString());
+    }, 500);
+
+    return () => clearTimeout(timerId);
+  }, [volume]);
 
   useEffect(() => {
     const timerVal = normalTimer.timer;
@@ -39,5 +109,7 @@ export function useBellSound({ normalTimer, bells }: UseBellSoundProps) {
         playBell(bell.count);
       }
     });
-  }, [normalTimer.timer, bells, normalTimer.defaultTimer]);
+  }, [normalTimer.timer, bells, normalTimer.defaultTimer, playBell]);
+
+  return { volume, updateVolume };
 }

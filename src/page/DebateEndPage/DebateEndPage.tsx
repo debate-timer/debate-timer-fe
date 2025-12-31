@@ -3,26 +3,32 @@ import { useNavigate, useParams } from 'react-router-dom';
 import clapImage from '../../assets/debateEnd/clap.png';
 import feedbackTimerImage from '../../assets/debateEnd/feedback_timer.png';
 import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
-import GoToHomeButton from '../../components/GoToHomeButton/GoToHomeButton';
 import usePostPoll from '../../hooks/mutations/useCreatePoll';
 import MenuCard from './components/MenuCard';
+import GoToOverviewButton from './components/GoToOverviewButton';
 
 export default function DebateEndPage() {
-  const { id: tableId } = useParams();
+  const { id } = useParams();
+  const tableId = Number(id);
   const navigate = useNavigate();
 
   const handleFeedbackClick = () => {
     navigate(`/table/customize/${tableId}/end/feedback`);
   };
-
   const handleVoteClick = (pollId: number) => {
-    navigate(`/table/customize/${pollId}/end/vote`);
+    navigate(`/table/customize/${tableId}/end/vote/${pollId}`);
   };
   const { mutate } = usePostPoll(handleVoteClick);
+
   const backgroundStyle = {
     background:
       'radial-gradient(50% 50% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',
   };
+
+  // 테이블 ID 검증
+  if (!id || isNaN(tableId)) {
+    throw new Error('테이블 ID가 올바르지 않습니다.');
+  }
 
   return (
     <div
@@ -55,16 +61,13 @@ export default function DebateEndPage() {
           description="QR 코드를 통해 투표 페이지로 이동해요."
           imgSrc={voteStampImage}
           imgAlt="승패투표"
-          onClick={() => {
-            if (!tableId) return; // NaN 방지
-            mutate(Number(tableId));
-          }}
+          onClick={() => mutate(tableId)}
           ariaLabel="승패투표 생성 및 진행"
         />
       </div>
 
       <div className="fixed bottom-[8%] xl:bottom-[12%]">
-        <GoToHomeButton />
+        <GoToOverviewButton tableId={Number(tableId)} className="w-[478px]" />
       </div>
     </div>
   );

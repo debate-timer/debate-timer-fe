@@ -1,16 +1,14 @@
 import { PropsWithChildren } from 'react';
 
+interface DialogButton {
+  text: string;
+  onClick: () => void;
+  isBold?: boolean;
+}
+
 interface DialogModalProps extends PropsWithChildren {
-  left: {
-    text: string;
-    onClick: () => void;
-    isBold?: boolean;
-  };
-  right: {
-    text: string;
-    onClick: () => void;
-    isBold?: boolean;
-  };
+  left?: DialogButton;
+  right?: DialogButton;
 }
 
 export default function DialogModal({
@@ -18,12 +16,11 @@ export default function DialogModal({
   left,
   right,
 }: DialogModalProps) {
-  if (left.isBold === undefined || null) {
-    left.isBold = false;
-  }
-  if (right.isBold === undefined || null) {
-    right.isBold = false;
-  }
+  const leftIsBold = left?.isBold ?? false;
+  const rightIsBold = right?.isBold ?? false;
+  const hasButtons = Boolean(left || right);
+  const isSingleButton = Boolean(left && !right) || Boolean(right && !left);
+  const buttonWidthClass = isSingleButton ? 'w-full' : 'w-1/2';
 
   return (
     <div
@@ -34,34 +31,40 @@ export default function DialogModal({
       {children}
 
       {/** Buttons */}
-      <div className="w-full border-t border-neutral-300" />
-      <div className="flex w-full flex-row items-center justify-center">
-        {/** Left button */}
-        <button
-          data-testid="button-left"
-          className="w-1/2 py-4 hover:bg-neutral-300"
-          onClick={() => left.onClick()}
-        >
-          <p
-            className={`w-full ${left.isBold ? 'font-bold' : ''} text-neutral-1000`}
-          >
-            {left.text}
-          </p>
-        </button>
+      {hasButtons && (
+        <>
+          <div className="w-full border-t border-neutral-300" />
+          <div className="flex w-full flex-row items-center justify-center">
+            {left && (
+              <button
+                data-testid="button-left"
+                className={`${buttonWidthClass} py-4 hover:bg-neutral-300`}
+                onClick={left.onClick}
+              >
+                <p
+                  className={`w-full ${leftIsBold ? 'font-bold' : ''} text-neutral-1000`}
+                >
+                  {left.text}
+                </p>
+              </button>
+            )}
 
-        {/** Right button */}
-        <button
-          data-testid="button-right"
-          className="w-1/2 py-4 hover:bg-brand"
-          onClick={() => right.onClick()}
-        >
-          <p
-            className={`w-full ${right.isBold ? 'font-bold' : ''} text-neutral-1000`}
-          >
-            {right.text}
-          </p>
-        </button>
-      </div>
+            {right && (
+              <button
+                data-testid="button-right"
+                className={`${buttonWidthClass} py-4 hover:bg-brand`}
+                onClick={right.onClick}
+              >
+                <p
+                  className={`w-full ${rightIsBold ? 'font-bold' : ''} text-neutral-1000`}
+                >
+                  {right.text}
+                </p>
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
