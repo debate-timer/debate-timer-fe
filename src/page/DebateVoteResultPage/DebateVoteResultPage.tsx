@@ -7,7 +7,7 @@ import VoteDetailResult from './components/VoteDetailResult';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import DialogModal from '../../components/DialogModal/DialogModal';
 export default function DebateVoteResultPage() {
   // 매개변수 검증
@@ -32,6 +32,17 @@ export default function DebateVoteResultPage() {
   const handleGoHome = () => {
     navigate('/');
   };
+  const handleGoToEndPage = useCallback(() => {
+    navigate(`/table/customize/${tableId}/end`, { replace: true });
+  }, [navigate, tableId]);
+
+  useEffect(() => {
+    if (!isArgsValid) return;
+
+    window.addEventListener('popstate', handleGoToEndPage);
+    return () => window.removeEventListener('popstate', handleGoToEndPage);
+  }, [handleGoToEndPage, isArgsValid]);
+
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
   const { openModal, ModalWrapper, closeModal } = useModal({
@@ -108,11 +119,11 @@ export default function DebateVoteResultPage() {
             <div className="flex w-full max-w-[400px] flex-col items-center justify-center gap-2 md:w-full md:max-w-[800px] md:flex-row">
               <button
                 type="button"
-                onClick={() => navigate(-1)}
+                onClick={handleGoToEndPage}
                 className="button enabled neutral flex w-full flex-1 rounded-full p-[24px]"
                 disabled={isLoading}
               >
-                뒤로 가기 ←
+                토론 종료화면으로
               </button>
               <button
                 type="button"

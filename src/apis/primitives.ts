@@ -42,10 +42,17 @@ export async function request<T>(
     if (axios.isAxiosError(error)) {
       // If error is raised during API request,
       // pass it as an APIError
+      const responseData = error.response?.data;
+      const message =
+        typeof responseData === 'string'
+          ? responseData
+          : typeof responseData === 'object' && responseData !== null
+            ? JSON.stringify(responseData)
+            : error.message;
       const apiError = new APIError(
-        error.response?.data || error.message,
+        message,
         error.response?.status || 500,
-        error.response?.data,
+        responseData,
       );
       throw apiError;
     }
