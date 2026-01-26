@@ -69,7 +69,7 @@ export default function UpdateModal({
       {/* 버튼 영역 */}
       <button
         className="flex h-[88px] flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
-        onClick={() => handleDetailButtonClick()}
+        onClick={handleDetailButtonClick}
       >
         <p className="text-[22px] font-semibold">자세히 보기</p>
       </button>
