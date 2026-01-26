@@ -19,10 +19,9 @@ const getSafeDateFromStorage = (): Date | null => {
 export default function UpdateModalWrapper() {
   // 상태 관리, 환경 변수 및 기타 변수 선언
   const [isChecked, setIsChecked] = useState(false);
-  const newContentUrl = import.meta.env.VITE_UPDATE_CONTENT_URL;
 
   // 모달 훅 사용
-  const { openModal, closeModal, ModalWrapper } = useModal({
+  const { openModal, ModalWrapper } = useModal({
     onClose: () => {
       // 모달 닫을 때 '일주일 간 보지 않기'가 체크되어 있으면, 현재 시간을 로컬 저장소에 기록
       if (isChecked) {
@@ -30,13 +29,6 @@ export default function UpdateModalWrapper() {
       }
     },
   });
-
-  // '자세히 보기' 버튼 클릭 시 동작
-  const handleClickDetailButton = () => {
-    // 모달 닫고 Notion 업데이트 소개 페이지로 이동
-    closeModal();
-    window.open(newContentUrl, '_blank', 'noopener,noreferrer');
-  };
 
   // 모달이 열리는 조건 확인
   useEffect(() => {
@@ -69,7 +61,6 @@ export default function UpdateModalWrapper() {
           data={LATEST_PATCH_NOTE}
           isChecked={isChecked}
           onChecked={setIsChecked}
-          onClickDetailButton={() => handleClickDetailButton()}
         />
       </ModalWrapper>
     </>

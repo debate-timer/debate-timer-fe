@@ -16,5 +16,5 @@ export const LATEST_PATCH_NOTE: PatchNoteData = {
   description:
     '토론 종료 후 피드백 & 투표 기능으로 다양한 서비스를 이용하세요!',
   image: PatchNoteImage,
-  link: 'https://notion.so',
+  link: 'https://bustling-bathtub-b3a.notion.site/2f41550c60cf80f69227e3145f6e19cc?pvs=143',
 };

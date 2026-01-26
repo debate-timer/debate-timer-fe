@@ -6,15 +6,20 @@ interface UpdateModalProps {
   data: PatchNoteData;
   isChecked: boolean;
   onChecked: (value: boolean) => void;
-  onClickDetailButton: () => void;
 }
 
 export default function UpdateModal({
   data,
   isChecked,
   onChecked,
-  onClickDetailButton,
 }: UpdateModalProps) {
+  // '자세히 보기' 버튼 클릭 시 동작
+  const handleDetailButtonClick = () => {
+    if (data.link) {
+      window.open(data.link, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="flex size-[1000px] flex-col rounded-[22px] bg-default-white">
       {/* 메인 컨텐츠 */}
@@ -64,7 +69,7 @@ export default function UpdateModal({
       {/* 버튼 영역 */}
       <button
         className="flex h-[88px] flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
-        onClick={onClickDetailButton}
+        onClick={() => handleDetailButtonClick()}
       >
         <p className="text-[22px] font-semibold">자세히 보기</p>
       </button>
