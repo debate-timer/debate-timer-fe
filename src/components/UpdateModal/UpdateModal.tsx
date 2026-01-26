@@ -1,0 +1,73 @@
+import MegaphoneAsset from './MegaphoneAsset';
+import NoticeAsset from './NoticeAsset';
+import { PatchNoteData } from '../../constants/patch_note';
+
+interface UpdateModalProps {
+  data: PatchNoteData;
+  isChecked: boolean;
+  onChecked: (value: boolean) => void;
+  onClickDetailButton: () => void;
+}
+
+export default function UpdateModal({
+  data,
+  isChecked,
+  onChecked,
+  onClickDetailButton,
+}: UpdateModalProps) {
+  return (
+    <div className="flex size-[1000px] flex-col rounded-[22px] bg-default-white">
+      {/* 메인 컨텐츠 */}
+      <div className="flex h-[600px] w-full flex-col bg-[#EFF0F4] p-[45px]">
+        <div className="flex w-full flex-row items-center space-x-[28px]">
+          <MegaphoneAsset className="h-[130px] w-[157px]" />
+          <div className="flex flex-col space-y-[18px]">
+            <p className="font-[20px] leading-none text-default-black">
+              디베이트 타이머에 새로운 기능이 생겼어요!
+            </p>
+            <NoticeAsset />
+          </div>
+        </div>
+
+        <div className="flex w-full flex-1">
+          {data.image && (
+            <img
+              src={data.image}
+              alt="업데이트 이미지"
+              className="h-full w-full rounded-lg object-contain"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* 텍스트 컨텐츠 */}
+      <div className="flex w-full flex-1 flex-col p-[8px]">
+        {/* 타이틀 및 내용 */}
+        <div className="flex h-full flex-col items-center justify-center">
+          <p className="text-[45px] font-bold text-brand">{data.title}</p>
+          <div className="mb-[16px] mt-[8px] h-[2px] w-[100px] bg-brand" />
+          <p className="text-center text-[24px]">{data.description}</p>
+        </div>
+
+        {/* '일주일 간 보지 않기' 체크박스 */}
+        <div className="flex w-full flex-row items-center space-x-[8px]">
+          <input
+            type="checkbox"
+            className="border-gray size-[24px] rounded-[4px]"
+            checked={isChecked}
+            onChange={() => onChecked(!isChecked)}
+          />
+          <p>일주일 간 보지 않기</p>
+        </div>
+      </div>
+
+      {/* 버튼 영역 */}
+      <button
+        className="flex h-[88px] flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
+        onClick={onClickDetailButton}
+      >
+        <p className="text-[22px] font-semibold">자세히 보기</p>
+      </button>
+    </div>
+  );
+}
