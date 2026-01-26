@@ -5,7 +5,7 @@ export interface PatchNoteData {
   version: string; // 로컬 스토리지 키 관리를 위한 버전 (이 버전을 바꾸면 사용자의 '다시 보지 않기'가 초기화됨)
   title: string; // 패치 노트 제목
   description: string; // 패치 노트 설명
-  image: string; // 이미지는 선택 사항
+  image: string; // 이미지
   link: string; // 외부 공지 링크 (Notion 등)
 }
 
