@@ -42,14 +42,12 @@ export default function UpdateModalWrapper() {
       const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
       if (daysDiff < 7) {
-        console.log('모달 열지 않기');
         return;
       }
     }
 
     // 차이가 7일 초과할 시 모달 열기
     openModal();
-    console.log('모달 열기');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 페이지 열릴 때 최초 1회만 실행되도록 의존성 배열을 비웠음
