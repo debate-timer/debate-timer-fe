@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useModal } from '../../hooks/useModal';
 import UpdateModal from './UpdateModal';
 import { LATEST_PATCH_NOTE } from '../../constants/patch_note';
@@ -14,12 +14,13 @@ interface StoredStatus {
 export default function UpdateModalWrapper() {
   // 상태 관리, 환경 변수 및 기타 변수 선언
   const [isChecked, setIsChecked] = useState(false);
+  const isCheckedRef = useRef(isChecked);
 
   // 모달 훅 사용
   const { openModal, ModalWrapper } = useModal({
     onClose: () => {
       // 모달 닫을 때 '일주일 간 보지 않기'가 체크되어 있으면, 현재 시간과 패치 노트 버전을 로컬 저장소에 기록
-      if (isChecked) {
+      if (isCheckedRef.current) {
         const status: StoredStatus = {
           version: LATEST_PATCH_NOTE.version,
           dismissedAt: new Date().toISOString(),
@@ -28,6 +29,10 @@ export default function UpdateModalWrapper() {
       }
     },
   });
+
+  useEffect(() => {
+    isCheckedRef.current = isChecked;
+  }, [isChecked]);
 
   // 모달이 열리는 조건 확인
   useEffect(() => {
