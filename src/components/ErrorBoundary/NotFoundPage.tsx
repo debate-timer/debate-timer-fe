@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { IoHome } from 'react-icons/io5';
 
 export default function NotFoundPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -17,21 +19,24 @@ export default function NotFoundPage() {
         <div className="flex w-full flex-col items-start justify-start px-8 py-10">
           <div className="mb-20 flex flex-col font-bold">
             <h1 className="mb-5 text-[120px]">🤔</h1>
-            <h1 className="text-4xl md:text-5xl">페이지를 찾을 수 없어요...</h1>
+            <h1 className="text-4xl md:text-5xl">
+              {t('페이지를 찾을 수 없어요...')}
+            </h1>
           </div>
 
           <div className="mb-10 flex flex-col space-y-2">
-            <h1 className="text-xl font-bold">요청 URL</h1>
+            <h1 className="text-xl font-bold">{t('요청 URL')}</h1>
             <p className="text-lg">
               {decodeURIComponent(window.location.href)}
             </p>
           </div>
 
           <div className="mb-20 flex flex-col space-y-2">
-            <h1 className="text-xl font-bold">오류 내용</h1>
-            <p className="text-lg">
-              요청하신 페이지를 찾을 수 없어요. 홈 화면으로 돌아가 처음부터 다시
-              시도해주세요.
+            <h1 className="text-xl font-bold">{t('오류 내용')}</h1>
+            <p className="whitespace-pre-line text-lg">
+              {t(
+                '요청하신 페이지를 찾을 수 없어요.\n홈 화면으로 돌아가 처음부터 다시 시도해주세요.',
+              )}
             </p>
           </div>
 
@@ -42,7 +47,9 @@ export default function NotFoundPage() {
           >
             <div className="flex flex-row items-center justify-center space-x-4">
               <IoHome size={30} />
-              <h1 className="mt-0.5 text-2xl font-semibold">홈으로 돌아가기</h1>
+              <h1 className="mt-0.5 text-2xl font-semibold">
+                {t('홈으로 돌아가기')}
+              </h1>
             </div>
           </button>
         </div>

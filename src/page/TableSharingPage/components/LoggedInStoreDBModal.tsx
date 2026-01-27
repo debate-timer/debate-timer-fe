@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 
 /**
@@ -20,17 +21,18 @@ export default function LoggedInStoreDBModal({
   onSave,
   onContinue,
 }: LoggedInStoreDBModalProps) {
+  const { t } = useTranslation();
   return (
     <DialogModal
-      left={{ text: '비회원 상태로 토론하기', onClick: () => onContinue() }}
+      left={{ text: t('비회원 상태로 토론하기'), onClick: () => onContinue() }}
       right={{
-        text: '저장하기',
+        text: t('저장하기'),
         onClick: () => onSave(),
         isBold: true,
       }}
     >
       <h1 className="break-keep px-20 py-10 text-center text-xl font-bold">
-        공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?
+        {t('공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?')}
       </h1>
     </DialogModal>
   );

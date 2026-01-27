@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ReactNode, useState, useCallback, useEffect } from 'react';
 import { GlobalPortal } from '../util/GlobalPortal';
 import DTClose from '../components/icons/Close';
@@ -57,6 +58,7 @@ export function useModal(options: UseModalOptions = {}) {
     children: ReactNode;
     closeButtonColor?: string;
   }) => {
+    const { t } = useTranslation();
     if (!isOpen) return null;
 
     return (
@@ -72,7 +74,7 @@ export function useModal(options: UseModalOptions = {}) {
                 type="button"
                 onClick={closeModal}
                 className={`absolute right-4 top-4 text-3xl ${closeButtonColor}`}
-                aria-label="모달 닫기"
+                aria-label={t('모달 닫기')}
               >
                 <DTClose className="size-[32px]" />
               </button>

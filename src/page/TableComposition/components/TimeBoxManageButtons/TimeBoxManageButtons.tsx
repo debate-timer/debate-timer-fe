@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TimeBoxInfo } from '../../../../type/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
@@ -19,6 +20,7 @@ interface TimeBoxManageButtonsProps {
 }
 
 export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
+  const { t } = useTranslation();
   const {
     openModal: openEditModal,
     closeModal: closeEditModal,
@@ -38,21 +40,21 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
     <>
       <div className="flex justify-end gap-2">
         {onSubmitEdit && (
-          <button onClick={openEditModal} aria-label="수정하기">
+          <button onClick={openEditModal} aria-label={t('수정하기')}>
             <SmallIconButtonContainer className="size-[28px] p-[8px]">
               <DTEdit className="h-full" />
             </SmallIconButtonContainer>
           </button>
         )}
         {onSubmitDelete && (
-          <button onClick={openDeleteModal} aria-label="삭제하기">
+          <button onClick={openDeleteModal} aria-label={t('삭제하기')}>
             <SmallIconButtonContainer className="size-[28px] p-[8px]">
               <DTDelete className="h-full" />
             </SmallIconButtonContainer>
           </button>
         )}
         {onSubmitCopy && (
-          <button onClick={onSubmitCopy} aria-label="복사하기">
+          <button onClick={onSubmitCopy} aria-label={t('복사하기')}>
             <SmallIconButtonContainer className="size-[28px] p-[8px]">
               <DTCopy className="h-full" />
             </SmallIconButtonContainer>
@@ -77,9 +79,9 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
       {onSubmitDelete && (
         <DeleteModalWrapper>
           <DialogModal
-            left={{ text: '취소', onClick: () => closeDeleteModal() }}
+            left={{ text: t('취소'), onClick: () => closeDeleteModal() }}
             right={{
-              text: '삭제',
+              text: t('삭제'),
               onClick: () => {
                 onSubmitDelete();
                 closeDeleteModal();
@@ -88,7 +90,7 @@ export default function TimeBoxManageButtons(props: TimeBoxManageButtonsProps) {
             }}
           >
             <h1 className="px-20 py-10 text-xl font-bold">
-              이 타이머를 삭제하시겠습니까?
+              {t('이 타이머를 삭제하시겠습니까?')}
             </h1>
           </DialogModal>
         </DeleteModalWrapper>

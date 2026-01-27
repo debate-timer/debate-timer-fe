@@ -116,7 +116,7 @@ export function transformAST(ast: t.File) {
     },
     TemplateLiteral(path) {
       const { quasis, expressions } = path.node;
-      const hasKorean = quasis.some((q) => KOREAN_REGEX.test(q.value.raw));
+      const hasKorean = quasis.some((q) => KOREAN_REGEX.test(q.value.cooked));
       if (!hasKorean) return;
 
       if (
@@ -134,7 +134,7 @@ export function transformAST(ast: t.File) {
       const objectProperties: t.ObjectProperty[] = [];
 
       for (let i = 0; i < quasis.length; i++) {
-        i18nKey += quasis[i].value.raw;
+        i18nKey += quasis[i].value.cooked;
         if (i < expressions.length) {
           const expr = expressions[i];
           let placeholderName: string;

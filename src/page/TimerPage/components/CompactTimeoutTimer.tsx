@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import DTClose from '../../../components/icons/Close';
 import { useNormalTimer } from '../hooks/useNormalTimer';
@@ -33,6 +34,7 @@ export default function CompactTimeoutTimer({
   onClose,
   className,
 }: CompactTimeoutTimerProps) {
+  const { t } = useTranslation();
   const state = useNormalTimer();
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(state.timer ?? 0) / 60),
@@ -68,7 +70,7 @@ export default function CompactTimeoutTimer({
       )}
     >
       <span className="relative flex w-full items-center justify-center">
-        <h1 className="text-[36px] font-bold">작전 시간</h1>
+        <h1 className="text-[36px] font-bold">{t('작전 시간')}</h1>
         <button className="absolute end-[20px]" onClick={onClose}>
           <DTClose className="size-[24px]" />
         </button>
@@ -88,7 +90,7 @@ export default function CompactTimeoutTimer({
             }
           }}
         >
-          -1분
+          {t('-1분')}
         </CompactTimeoutTimerButton>
         <CompactTimeoutTimerButton
           onClick={() => {
@@ -97,7 +99,7 @@ export default function CompactTimeoutTimer({
             }
           }}
         >
-          -30초
+          {t('-30초')}
         </CompactTimeoutTimerButton>
 
         {/* 재생 및 일시정지 버튼 */}
@@ -122,12 +124,12 @@ export default function CompactTimeoutTimer({
         <CompactTimeoutTimerButton
           onClick={() => state.setTimer((state.timer ?? 0) + 30)}
         >
-          +30초
+          {t('+30초')}
         </CompactTimeoutTimerButton>
         <CompactTimeoutTimerButton
           onClick={() => state.setTimer((state.timer ?? 0) + 60)}
         >
-          +1분
+          {t('+1분')}
         </CompactTimeoutTimerButton>
       </span>
     </div>
