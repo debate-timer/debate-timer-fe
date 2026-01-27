@@ -6,6 +6,7 @@ import { Formatting } from '../../../../util/formatting';
 import DTDrag from '../../../../components/icons/Drag';
 import SmallIconButtonContainer from '../../../../components/SmallIconContainer/SmallIconContainer';
 import clsx from 'clsx';
+import { normalizeSpeechTypeKey } from '../../../../util/speechType';
 
 interface TimeBoxEventHandlers {
   onSubmitEdit?: (updatedInfo: TimeBoxInfo) => void;
@@ -37,6 +38,11 @@ export default function TimeBox(props: TimeBoxProps) {
   const onSubmitCopy = eventHandlers?.onSubmitCopy;
   const onMouseDown = eventHandlers?.onMouseDown;
   const isModifiable = !!eventHandlers;
+
+  const getSpeechTypeLabel = (value: string) => {
+    const normalized = normalizeSpeechTypeKey(value);
+    return normalized ? t(normalized) : value;
+  };
   let timeStr = '';
   let timePerSpeakingStr = '';
 
@@ -131,7 +137,7 @@ export default function TimeBox(props: TimeBoxProps) {
         })}
       >
         <p className="truncate font-semibold">
-          {speechType}
+          {getSpeechTypeLabel(speechType)}
           {speaker && (
             <span className="font-medium">
               {t(' | {{speaker}} 토론자', { speaker })}
@@ -159,7 +165,7 @@ export default function TimeBox(props: TimeBoxProps) {
         />
       </div>
       <p className="text-[22px] font-semibold text-default-black">
-        {speechType}
+        {getSpeechTypeLabel(speechType)}
       </p>
       <p className="text-[22px] font-medium text-default-black">{timeStr}</p>
     </div>
@@ -185,7 +191,7 @@ export default function TimeBox(props: TimeBoxProps) {
         </>
       )}
       <span className="text-[22px] font-semibold text-default-black">
-        {speechType}
+        {getSpeechTypeLabel(speechType)}
       </span>
       <span className="text-[22px] font-medium text-default-black">
         {fullTimeStr}

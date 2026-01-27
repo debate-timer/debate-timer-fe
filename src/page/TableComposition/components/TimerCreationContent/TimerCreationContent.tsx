@@ -9,6 +9,10 @@ import {
   BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
+import {
+  SPEECH_TYPE_RECORD,
+  type SpeechTypeKey,
+} from '../../../../util/speechType';
 import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.jpg';
 import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.jpg';
 import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.jpg';
@@ -39,22 +43,7 @@ type TimerCreationOption =
   | 'TIME_NORMAL'
   | 'BELL';
 
-type SpeechType =
-  | 'OPENING'
-  | 'REBUTTAL'
-  | 'TIMEOUT'
-  | 'CLOSING'
-  | 'CROSS_EXAM'
-  | 'CUSTOM';
-
-const SPEECH_TYPE_RECORD: Record<SpeechType, string> = {
-  OPENING: '입론',
-  CLOSING: '최종 발언',
-  CUSTOM: '직접 입력',
-  REBUTTAL: '반론',
-  CROSS_EXAM: '교차 조사',
-  TIMEOUT: '작전 시간',
-} as const;
+type SpeechType = SpeechTypeKey;
 
 const STANCE_RECORD: Record<Stance, string> = {
   PROS: '찬성',
@@ -96,6 +85,7 @@ interface BellInputConfig {
   count: number;
 }
 
+const MAX_SPEAKER_LEN = 5;
 export default function TimerCreationContent({
   beforeData,
   initData,
@@ -120,20 +110,21 @@ export default function TimerCreationContent({
 
   // 발언 유형 초기화
   const getSpeechTypeFromString = (value: string): SpeechType => {
-    switch (value.trim()) {
-      case t('입론'):
+    const normalize = (val: string) => val.replace(/\s+/g, '').trim();
+    const normalized = normalize(value);
+    switch (normalized) {
+      case normalize(SPEECH_TYPE_RECORD.OPENING):
         return 'OPENING';
-      case t('반론'):
+      case normalize(SPEECH_TYPE_RECORD.REBUTTAL):
         return 'REBUTTAL';
-      case t('최종발언'):
-      case t('최종 발언'):
+      case normalize(SPEECH_TYPE_RECORD.CLOSING):
         return 'CLOSING';
-      case t('작전시간'):
-      case t('작전 시간'):
+      case normalize(SPEECH_TYPE_RECORD.TIMEOUT):
         return 'TIMEOUT';
-      case t('교차조사'):
-      case t('교차 조사'):
+      case normalize(SPEECH_TYPE_RECORD.CROSS_EXAM):
         return 'CROSS_EXAM';
+      case normalize(SPEECH_TYPE_RECORD.OPEN_DEBATE):
+        return 'OPEN_DEBATE';
       default:
         return 'CUSTOM';
     }
@@ -149,14 +140,16 @@ export default function TimerCreationContent({
   }, []);
 
   const initSpeechType =
-    beforeData?.speechType ?? initData?.speechType ?? t('입론');
+    beforeData?.speechType ??
+    initData?.speechType ??
+    SPEECH_TYPE_RECORD.OPENING;
   const [currentSpeechType, setCurrentSpeechType] = useState<SpeechType>(
     getSpeechTypeFromString(initSpeechType),
   );
   const [speechTypeTextValue, setSpeechTypeTextValue] = useState<string>(
     currentSpeechType === 'CUSTOM'
       ? (initData?.speechType ?? '')
-      : SPEECH_TYPE_RECORD[currentSpeechType],
+      : t(SPEECH_TYPE_RECORD[currentSpeechType]),
   );
 
   // 종소리 영역 확장 여부
@@ -244,12 +237,12 @@ export default function TimerCreationContent({
   const isNormalTimer = timerType === 'NORMAL';
 
   const speechTypeOptions: DropdownMenuItem<SpeechType>[] = [
-    { value: 'OPENING', label: SPEECH_TYPE_RECORD['OPENING'] },
-    { value: 'REBUTTAL', label: SPEECH_TYPE_RECORD['REBUTTAL'] },
-    { value: 'TIMEOUT', label: SPEECH_TYPE_RECORD['TIMEOUT'] },
-    { value: 'CROSS_EXAM', label: SPEECH_TYPE_RECORD['CROSS_EXAM'] },
-    { value: 'CLOSING', label: SPEECH_TYPE_RECORD['CLOSING'] },
-    { value: 'CUSTOM', label: SPEECH_TYPE_RECORD['CUSTOM'] },
+    { value: 'OPENING', label: t(SPEECH_TYPE_RECORD['OPENING']) },
+    { value: 'REBUTTAL', label: t(SPEECH_TYPE_RECORD['REBUTTAL']) },
+    { value: 'TIMEOUT', label: t(SPEECH_TYPE_RECORD['TIMEOUT']) },
+    { value: 'CROSS_EXAM', label: t(SPEECH_TYPE_RECORD['CROSS_EXAM']) },
+    { value: 'CLOSING', label: t(SPEECH_TYPE_RECORD['CLOSING']) },
+    { value: 'CUSTOM', label: t(SPEECH_TYPE_RECORD['CUSTOM']) },
   ] as const;
 
   const stanceOptions: DropdownMenuItem<Stance>[] = useMemo(
@@ -312,6 +305,14 @@ export default function TimerCreationContent({
     // SpeechType에 맞게 문자열 매핑
     let speechTypeToSend: string;
     let stanceToSend: Stance;
+    if (speaker.trim().length > MAX_SPEAKER_LEN) {
+      errors.push(
+        t('발언자는 최대 {{MAX_SPEAKER_LEN}}자까지 입력할 수 있습니다.', {
+          MAX_SPEAKER_LEN,
+        }),
+      );
+    }
+
     if (currentSpeechType === 'CUSTOM') {
       // 텍스트 길이 유효성 검사
       if (speechTypeTextValue.length > 10) {
@@ -367,7 +368,9 @@ export default function TimerCreationContent({
       onSubmit({
         stance: stanceToSend,
         speechType:
-          speechTypeToSend.trim() === '' ? t('자유토론') : speechTypeToSend,
+          speechTypeToSend.trim() === ''
+            ? SPEECH_TYPE_RECORD.OPEN_DEBATE
+            : speechTypeToSend,
         boxType: timerType,
         time: null,
         timePerTeam: totalTimePerTeam,
@@ -601,9 +604,12 @@ export default function TimerCreationContent({
                     <ClearableInput
                       id="speaker"
                       value={speaker}
-                      onChange={(e) => setSpeaker(e.target.value)}
+                      onChange={(e) =>
+                        setSpeaker(e.target.value.slice(0, MAX_SPEAKER_LEN))
+                      }
                       onClear={() => setSpeaker('')}
                       placeholder={t('N번 토론자')}
+                      maxLength={MAX_SPEAKER_LEN}
                       disabled={
                         stance === 'NEUTRAL' || currentSpeechType === 'TIMEOUT'
                       }
@@ -729,7 +735,6 @@ export default function TimerCreationContent({
                         <p className="text-body w-[80px] font-medium">
                           {t('종소리 설정')}
                         </p>
-
                         <NotificationBadge
                           count={bells.length}
                           className="absolute -right-[16px] -top-[4px]"
