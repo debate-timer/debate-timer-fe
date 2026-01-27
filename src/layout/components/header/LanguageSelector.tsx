@@ -37,10 +37,11 @@ export default function LanguageSelector() {
       return;
     }
     const newPathname = buildLangPath(location.pathname, newLang);
+    const nextUrl = `${newPathname}${location.search}${location.hash}`;
     if (i18n.language !== newLang) {
       i18n.changeLanguage(newLang);
     }
-    navigate(newPathname);
+    navigate(nextUrl);
   };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);

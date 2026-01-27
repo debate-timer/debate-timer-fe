@@ -37,7 +37,7 @@ export default function LanguageWrapper() {
     if (isSupportedLang(selectedLang) && i18n.language !== selectedLang) {
       i18n.changeLanguage(selectedLang);
     }
-  }, [lang, location.pathname, navigate]);
+  }, [lang, location.hash, location.pathname, location.search, navigate]);
 
   return <Outlet />;
 }

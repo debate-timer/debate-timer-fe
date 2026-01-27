@@ -20,14 +20,21 @@ import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionMod
 import { useModal } from '../../hooks/useModal';
 import clsx from 'clsx';
 import { useState, useCallback } from 'react';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function TableOverviewPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
   const { openModal, closeModal, ModalWrapper } = useModal();
   const [modalCoinState, setModalCoinState] = useState<CoinState>('initial');
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const handleOpenModal = () => {
     setModalCoinState('initial');
@@ -48,7 +55,7 @@ export default function TableOverviewPage() {
     isRefetchError,
   } = useGetDebateTableData(tableId);
   const onModifyCustomizeTableData = usePatchDebateTable((tableId) => {
-    navigate(`/table/customize/${tableId}`);
+    navigate(buildLangPath(`/table/customize/${tableId}`, lang));
   });
 
   // Hook for sharing tables
@@ -59,7 +66,7 @@ export default function TableOverviewPage() {
   // 토론 시작하기 핸들러
   const handleStartDebate = () => {
     if (isGuestFlow()) {
-      navigate('/table/customize/guest');
+      navigate(buildLangPath('/table/customize/guest', lang));
     } else {
       onModifyCustomizeTableData.mutate({ tableId });
     }
@@ -68,13 +75,17 @@ export default function TableOverviewPage() {
   // 토론 수정하기 핸들러
   const handleEdit = () => {
     if (isGuestFlow()) {
-      navigate(`/composition?mode=edit&type=CUSTOMIZE`, {
+      navigate(buildLangPath(`/composition?mode=edit&type=CUSTOMIZE`, lang), {
         state: { step: 'NameAndType' },
       });
     } else {
-      navigate(`/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`, {
-        state: { step: 'NameAndType' },
-      });
+      navigate(
+        buildLangPath(
+          `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+          lang,
+        ),
+        { state: { step: 'NameAndType' } },
+      );
     }
   };
 
@@ -170,10 +181,18 @@ export default function TableOverviewPage() {
               disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
-                  navigate(`/composition?mode=edit&type=CUSTOMIZE`);
+                  navigate(
+                    buildLangPath(
+                      `/composition?mode=edit&type=CUSTOMIZE`,
+                      lang,
+                    ),
+                  );
                 } else {
                   navigate(
-                    `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+                    buildLangPath(
+                      `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+                      lang,
+                    ),
                   );
                 }
               }}
