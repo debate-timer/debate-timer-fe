@@ -27,7 +27,7 @@ export default function GoToDebateEndButton({
         className,
       )}
     >
-      {t('뒤로 가기 ←')}
+      {t('토론 종료 화면으로 돌아가기')}
     </button>
   );
 }

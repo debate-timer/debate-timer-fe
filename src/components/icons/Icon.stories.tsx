@@ -17,6 +17,7 @@ import DTReset from './Reset';
 import DTShare from './Share';
 import DTExchange from './Exchange';
 import DTBell from './Bell';
+import DTVolume from './Volume';
 
 const meta: Meta<typeof DTLogin> = {
   title: 'Design System/Icons',
@@ -253,6 +254,18 @@ export const OnBell: Story = {
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
       <DTBell className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">타종</p>
+    </div>
+  ),
+};
+
+export const OnVolume: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTVolume className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">볼륨 조절</p>
     </div>
   ),
 };

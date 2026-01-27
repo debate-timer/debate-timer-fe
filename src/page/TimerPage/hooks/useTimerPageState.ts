@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useGetDebateTableData } from '../../../hooks/query/useGetDebateTableData';
@@ -17,6 +18,8 @@ import {
 } from '../../../type/type';
 import { useTimerBackground } from './useTimerBackground';
 import useFullscreen from '../../../hooks/useFullscreen';
+
+const VOLUME_SCALE = 10;
 
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
@@ -55,10 +58,29 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     useState<TimeBasedStance>('PROS');
 
   // 벨 사운드 관련 훅
-  useBellSound({
+  const { volume: rawVolume, updateVolume: updateRawVolume } = useBellSound({
     normalTimer,
-    bells: data?.table[index].bell,
+    bells: data?.table[index]?.bell,
   });
+
+  // 볼륨 값과 조절 함수
+  // - React 내부적으로는 0.0 ~ 1.0 사이 값 사용
+  // - 아래 값과 함수를 통해 사용자에게는 0 ~ 10 사이 값으로 인식되게 값을 변형
+  const volume = Math.round(rawVolume * VOLUME_SCALE);
+  const updateVolume = (value: number) => {
+    if (value < 0 || value > VOLUME_SCALE) {
+      return;
+    }
+
+    // UI 상의 0 ~ 10 볼륨을 React 내부 로직의 0.0 ~ 1.0으로 바꾸어서 갱신
+    updateRawVolume(value / VOLUME_SCALE);
+  };
+
+  // 벨 볼륨 관련
+  const [isVolumeBarOpen, setIsVolumeBarOpen] = useState(false);
+  const toggleVolumeBar = useCallback(() => {
+    setIsVolumeBarOpen((prev) => !prev);
+  }, []);
 
   const { bg, setBg } = useTimerBackground({
     timer1,
@@ -148,6 +170,25 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     },
     [prosConsSelected, switchCamp, timer1, timer2],
   );
+
+  // 볼륨 바 바깥 영역에서의 클릭을 처리하기 위한 레퍼런스와 함수
+  const volumeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        volumeRef.current &&
+        !volumeRef.current.contains(event.target as Node) &&
+        isVolumeBarOpen
+      ) {
+        toggleVolumeBar();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isVolumeBarOpen, toggleVolumeBar]);
 
   /**
    * 라운드 이동/초기 진입 시 타이머 상태 초기화 및 셋업
@@ -262,6 +303,11 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     isFullscreen,
     toggleFullscreen,
     setFullscreen,
+    volume,
+    setVolume: updateVolume,
+    isVolumeBarOpen,
+    toggleVolumeBar,
+    volumeRef,
   };
 }
 
@@ -287,4 +333,9 @@ export interface TimerPageLogics {
   isFullscreen: boolean;
   toggleFullscreen: () => void;
   setFullscreen: (value: boolean) => void;
+  volume: number;
+  setVolume: (value: number) => void;
+  toggleVolumeBar: () => void;
+  isVolumeBarOpen: boolean;
+  volumeRef: React.RefObject<HTMLDivElement>;
 }

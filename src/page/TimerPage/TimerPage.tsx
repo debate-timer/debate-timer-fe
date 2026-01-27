@@ -16,6 +16,8 @@ import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import { RiFullscreenFill, RiFullscreenExitFill } from 'react-icons/ri';
+import DTVolume from '../../components/icons/Volume';
+import VolumeBar from '../../components/VolumeBar/VolumeBar';
 
 export default function TimerPage() {
   const { t } = useTranslation();
@@ -41,9 +43,14 @@ export default function TimerPage() {
     isLoading,
     isError,
     refetch,
+    isVolumeBarOpen,
+    toggleVolumeBar,
+    volume,
+    setVolume,
     isFullscreen,
     setFullscreen,
     toggleFullscreen,
+    volumeRef,
   } = state;
 
   // If error, print error message and let user be able to retry
@@ -105,6 +112,26 @@ export default function TimerPage() {
                 <RiFullscreenFill className="h-full w-full" />
               )}
             </button>
+
+            <div className="relative flex h-full flex-col" ref={volumeRef}>
+              <button
+                className="flex aspect-square h-full items-center justify-center p-[4px]"
+                aria-label={t('볼륨 조절')}
+                title={t('볼륨 조절')}
+                onClick={toggleVolumeBar}
+              >
+                <DTVolume className="h-full w-full" />
+              </button>
+
+              {isVolumeBarOpen && (
+                <div className="absolute -right-[60px] top-[48px]">
+                  <VolumeBar
+                    volume={volume}
+                    onVolumeChange={(value: number) => setVolume(value)}
+                  />
+                </div>
+              )}
+            </div>
           </DefaultLayout.Header.Right>
         </DefaultLayout.Header>
 

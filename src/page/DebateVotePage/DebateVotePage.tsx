@@ -6,7 +6,9 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
-import GoToDebateEndButton from '../../components/GoToDebateEndButton/GoToDebateEndButton';
+import { useModal } from '../../hooks/useModal';
+import DialogModal from '../../components/DialogModal/DialogModal';
+
 export default function DebateVotePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -39,7 +41,20 @@ export default function DebateVotePage() {
     refetch,
     isRefetchError,
   } = useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isArgsValid });
+  const { openModal, closeModal, ModalWrapper } = useModal();
   const { mutate } = useFetchEndPoll(handleGoToResult);
+  const handleConfirmEnd = () => {
+    if (!isArgsValid) return;
+    mutate(pollId, {
+      onSuccess: () => {
+        closeModal();
+      },
+      onError: () => {
+        closeModal();
+        alert(t('투표 종료에 실패했습니다.'));
+      },
+    });
+  };
 
   const participants = data?.voterNames;
   const isLoading = isFetching || isRefetching;
@@ -119,11 +134,10 @@ export default function DebateVotePage() {
           </main>
 
           <DefaultLayout.StickyFooterWrapper>
-            <div className="flex w-full max-w-[800px] flex-row items-center justify-center gap-2">
-              <GoToDebateEndButton tableId={tableId} className="flex-1" />
+            <div className="flex w-full max-w-[400px] flex-row items-center justify-center gap-2">
               <button
                 type="button"
-                onClick={() => mutate(pollId)}
+                onClick={openModal}
                 className="button enabled brand flex flex-1 flex-row rounded-full p-[24px]"
               >
                 {t('투표 결과 보기')}
@@ -132,6 +146,24 @@ export default function DebateVotePage() {
           </DefaultLayout.StickyFooterWrapper>
         </div>
       </DefaultLayout.ContentContainer>
+      <ModalWrapper>
+        <DialogModal
+          right={{
+            text: t('마감하기'),
+            onClick: handleConfirmEnd,
+            isBold: true,
+          }}
+        >
+          <div className="px-16 py-24 text-center text-black">
+            <p className="text-xl font-semibold">
+              {t('투표를 마감하시겠습니까?')}
+            </p>
+            <p className="mt-2 text-sm text-default-neutral">
+              {t('투표를 마감하면 더이상 표를 받을 수 없습니다!')}
+            </p>
+          </div>
+        </DialogModal>
+      </ModalWrapper>
     </DefaultLayout>
   );
 }
