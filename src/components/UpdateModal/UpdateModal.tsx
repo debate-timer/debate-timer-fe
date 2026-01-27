@@ -23,9 +23,9 @@ export default function UpdateModal({
   return (
     <div className="flex size-[1000px] flex-col rounded-[22px] bg-default-white">
       {/* 메인 컨텐츠 */}
-      <div className="flex h-[600px] w-full flex-col bg-[#EFF0F4] p-[45px]">
-        <div className="flex w-full flex-row items-center space-x-[28px]">
-          <MegaphoneAsset className="h-[130px] w-[157px]" />
+      <div className="flex h-[600px] w-full flex-col space-y-[20px] bg-[#EFF0F4] p-[45px]">
+        <div className="flex w-full flex-row items-center space-x-[10px]">
+          <MegaphoneAsset className="w-[107px]" />
           <div className="flex flex-col space-y-[18px]">
             <p className="font-[20px] leading-none text-default-black">
               디베이트 타이머에 새로운 기능이 생겼어요!
