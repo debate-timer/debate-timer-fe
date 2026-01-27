@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { isLoggedIn } from '../../../util/accessToken';
 import LanguageSelector from '../../../layout/components/header/LanguageSelector';
@@ -7,6 +8,7 @@ interface HeaderProps {
 }
 
 export default function Header({ onLoginButtonClicked }: HeaderProps) {
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function Header({ onLoginButtonClicked }: HeaderProps) {
             className="text-body-raw font-semibold md:text-subtitle-raw"
             onClick={onLoginButtonClicked}
           >
-            {!isLoggedIn() ? '3초 로그인' : '로그아웃'}
+            {!isLoggedIn() ? t('3초 로그인') : t('로그아웃')}
           </button>
         </div>
       </div>

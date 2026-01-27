@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { IoHome } from 'react-icons/io5';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ interface ErrorPageProps {
 }
 
 export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const goToHome = () => {
     onReset();
@@ -21,8 +23,9 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
   // to let user know exact reason of error.
   const title =
     error instanceof APIError
-      ? ERROR_STATUS_TABLE[error.status] || `${error.status} 오류`
-      : '오류가 발생했어요...';
+      ? ERROR_STATUS_TABLE[error.status] ||
+        t('{{status}} 오류', { status: error.status })
+      : t('오류가 발생했어요...');
 
   return (
     <DefaultLayout>
@@ -40,12 +43,12 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
           </div>
 
           <div className="mb-10 flex flex-col space-y-2">
-            <h1 className="text-xl font-bold">오류 내용</h1>
+            <h1 className="text-xl font-bold">{t('오류 내용')}</h1>
             <p className="text-lg">{error.message}</p>
           </div>
 
           <div className="mb-20 flex flex-col space-y-2">
-            <h1 className="text-xl font-bold">스택</h1>
+            <h1 className="text-xl font-bold">{t('스택')}</h1>
             <p className="text-lg">{stack}</p>
           </div>
 
@@ -56,7 +59,9 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
           >
             <div className="flex flex-row items-center justify-center space-x-4">
               <IoHome size={30} />
-              <h1 className="mt-0.5 text-2xl font-semibold">홈으로 돌아가기</h1>
+              <h1 className="mt-0.5 text-2xl font-semibold">
+                {t('홈으로 돌아가기')}
+              </h1>
             </div>
           </button>
         </div>

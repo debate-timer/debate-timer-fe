@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
@@ -17,6 +18,7 @@ import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator
 import { RiFullscreenFill, RiFullscreenExitFill } from 'react-icons/ri';
 
 export default function TimerPage() {
+  const { t } = useTranslation();
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
   const {
@@ -65,7 +67,7 @@ export default function TimerPage() {
               <HeaderTableInfo
                 name={
                   data.info.name.trim() === ''
-                    ? '테이블 이름 없음'
+                    ? t('테이블 이름 없음')
                     : data.info.name
                 }
               />
@@ -76,7 +78,7 @@ export default function TimerPage() {
               <HeaderTitle
                 title={
                   data.info.agenda.trim() === ''
-                    ? '주제 없음'
+                    ? t('주제 없음')
                     : data.info.agenda
                 }
               />
@@ -85,8 +87,8 @@ export default function TimerPage() {
           <DefaultLayout.Header.Right>
             <button
               className="flex h-full items-center justify-center p-[4px]"
-              aria-label="도움말"
-              title="도움말"
+              aria-label={t('도움말')}
+              title={t('도움말')}
               onClick={openUseTooltipModal}
             >
               <DTHelp className="h-full" />
@@ -94,7 +96,7 @@ export default function TimerPage() {
 
             <button
               className="flex aspect-square h-full items-center justify-center p-[4px]"
-              title="전체 화면"
+              title={t('전체 화면')}
               onClick={toggleFullscreen}
             >
               {isFullscreen ? (

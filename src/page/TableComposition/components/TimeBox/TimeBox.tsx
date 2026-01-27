@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { HTMLAttributes } from 'react';
 import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { TimeBoxInfo } from '../../../../type/type';
@@ -20,6 +21,7 @@ interface TimeBoxProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export default function TimeBox(props: TimeBoxProps) {
+  const { t } = useTranslation();
   const {
     stance,
     speechType,
@@ -40,18 +42,21 @@ export default function TimeBox(props: TimeBoxProps) {
 
   if (boxType === 'NORMAL') {
     const { minutes, seconds } = Formatting.formatSecondsToMinutes(time!);
-    timeStr = `${minutes}분 ${seconds}초`;
+    timeStr = t('{{minutes}}분 {{seconds}}초', { minutes, seconds });
   } else {
     const { minutes, seconds } = Formatting.formatSecondsToMinutes(
       timePerTeam!,
     );
-    timeStr = `팀당 ${minutes}분 ${seconds}초`;
+    timeStr = t('팀당 {{minutes}}분 {{seconds}}초', { minutes, seconds });
   }
 
   if (timePerSpeaking !== null) {
     const { minutes, seconds } =
       Formatting.formatSecondsToMinutes(timePerSpeaking);
-    timePerSpeakingStr = `발언당 ${minutes}분 ${seconds}초`;
+    timePerSpeakingStr = t('발언당 {{minutes}}분 {{seconds}}초', {
+      minutes,
+      seconds,
+    });
   }
   const fullTimeStr = timePerSpeakingStr
     ? `${timeStr} | ${timePerSpeakingStr}`
@@ -75,7 +80,7 @@ export default function TimeBox(props: TimeBoxProps) {
         ${isPros ? 'right-[10px]' : 'left-[10px]'}
       `}
       onMouseDown={onMouseDown}
-      title="위/아래로 드래그"
+      title={t('위/아래로 드래그')}
     >
       <SmallIconButtonContainer className="h-[36px] w-[28px] px-[4px] py-[8px]">
         <DTDrag className="h-full" />
@@ -128,7 +133,9 @@ export default function TimeBox(props: TimeBoxProps) {
         <p className="truncate font-semibold">
           {speechType}
           {speaker && (
-            <span className="font-medium">{` | ${speaker} 토론자`}</span>
+            <span className="font-medium">
+              {t(' | {{speaker}} 토론자', { speaker })}
+            </span>
           )}
         </p>
       </span>

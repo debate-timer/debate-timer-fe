@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import TableNameAndType from './components/TableNameAndType/TableNameAndType';
 import useFunnel from '../../hooks/useFunnel';
@@ -14,13 +15,14 @@ export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
 
 export default function TableCompositionPage() {
+  const { t } = useTranslation();
   // URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();
   const rawMode = searchParams.get('mode');
   const rawTableId = searchParams.get('tableId');
 
   if (rawMode !== 'edit' && rawMode !== 'add') {
-    throw new Error('테이블 모드가 올바르지 않습니다.');
+    throw new Error(t('테이블 모드가 올바르지 않습니다.'));
   }
   const mode = rawMode as Mode;
 
@@ -29,7 +31,7 @@ export default function TableCompositionPage() {
     mode === 'edit' &&
     (rawTableId === null || isNaN(Number(rawTableId)))
   ) {
-    throw new Error('테이블 ID가 올바르지 않습니다.');
+    throw new Error(t('테이블 ID가 올바르지 않습니다.'));
   }
   const tableId = rawTableId ? Number(rawTableId) : 0;
 
@@ -78,9 +80,9 @@ export default function TableCompositionPage() {
   const handleButtonClick = () => {
     const patchedInfo = {
       ...formData.info,
-      name: formData.info.name ?? '시간표 1',
-      prosTeamName: formData.info.prosTeamName ?? '찬성',
-      consTeamName: formData.info.consTeamName ?? '반대',
+      name: formData.info.name ?? t('시간표 1'),
+      prosTeamName: formData.info.prosTeamName ?? t('찬성'),
+      consTeamName: formData.info.consTeamName ?? t('반대'),
     };
     updateInfo(patchedInfo);
 
@@ -97,7 +99,7 @@ export default function TableCompositionPage() {
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
           <ErrorIndicator onClickRetry={() => refetch()}>
-            {'시간표 정보를 불러오지 못했어요.\n다시 시도할까요?'}
+            {t('시간표 정보를 불러오지 못했어요.\n다시 시도할까요?')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
@@ -119,6 +121,7 @@ export default function TableCompositionPage() {
               onButtonClick={() => goToStep('TimeBox')}
             />
           ),
+
           TimeBox: (
             <TimeBoxStep
               initData={formData}

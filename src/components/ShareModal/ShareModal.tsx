@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
 import { IoLinkOutline, IoShareOutline } from 'react-icons/io5';
 import LoadingSpinner from '../LoadingSpinner';
@@ -21,12 +22,13 @@ export default function ShareModal({
   onRefetch,
   onCopyClicked,
 }: ShareModalProps) {
+  const { t } = useTranslation();
   // If error, print error message and let user be able to retry
   if (isError) {
     return (
       <div className="flex w-[500px] flex-col items-center justify-center space-y-10 p-[40px]">
         <ErrorIndicator onClickRetry={() => onRefetch()}>
-          {'QR 코드를 불러오지 못했어요.\n다시 시도하시겠어요?'}
+          {t('QR 코드를 불러오지 못했어요.\n다시 시도하시겠어요?')}
         </ErrorIndicator>
       </div>
     );
@@ -44,7 +46,7 @@ export default function ShareModal({
             <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4  p-[30px] text-default-white">
               <IoShareOutline className="size-[120px]" />
               <p className="whitespace-nowrap text-center text-[20px]">
-                링크가 클립보드에 복사됨
+                {t('링크가 클립보드에 복사됨')}
               </p>
             </div>
           </div>
@@ -89,7 +91,7 @@ export default function ShareModal({
         }}
       >
         <IoLinkOutline className="size-[24px]" />
-        <p>{isLoading ? '링크 준비 중' : '공유 링크 복사'}</p>
+        <p>{isLoading ? t('링크 준비 중') : t('공유 링크 복사')}</p>
       </button>
     </div>
   );

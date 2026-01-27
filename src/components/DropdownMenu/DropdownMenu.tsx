@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
 import DTExpand from '../icons/Expand';
 import clsx from 'clsx';
@@ -24,12 +25,13 @@ export default function DropdownMenu<T>({
   disabled,
   className = '',
 }: DropdownMenuProps<T>) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedOptionLabel =
     options.find((option) => option.value === selectedValue)?.label ||
-    (placeholder ?? '선택');
+    (placeholder ?? t('선택'));
 
   // 드롭다운 외부 클릭 시 닫히도록 처리
   useEffect(() => {

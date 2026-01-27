@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +22,7 @@ import clsx from 'clsx';
 import { useState, useCallback } from 'react';
 
 export default function TableOverviewPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
@@ -135,11 +137,12 @@ export default function TableOverviewPage() {
             >
               <img
                 src={Coins}
-                alt="팀 선정하기"
+                alt={t('팀 선정하기')}
                 className="mb-2 h-auto w-full"
               />
+
               <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full border-[2px] border-default-disabled/hover bg-default-white px-2 py-1.5 text-xs font-semibold text-default-black transition-colors duration-200 hover:bg-default-disabled/hover md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
-                팀 선정하기
+                {t('팀 선정하기')}
               </div>
             </button>
           )}
@@ -190,7 +193,7 @@ export default function TableOverviewPage() {
                 onClick={handleStartDebate}
               >
                 <DTDebate className="h-full" />
-                토론하기
+                {t('토론하기')}
               </button>
             </div>
           </div>

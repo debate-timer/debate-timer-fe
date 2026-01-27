@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import TimeBox from '../TimeBox/TimeBox';
 import { useModal } from '../../../../hooks/useModal';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
@@ -26,6 +27,7 @@ interface TimeBoxStepProps {
 }
 
 export default function TimeBoxStep(props: TimeBoxStepProps) {
+  const { t } = useTranslation();
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
@@ -261,7 +263,9 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
                 >
                   <div className="flex h-[56px] w-fit flex-row items-center justify-center space-x-[12px] p-[16px]">
                     <DTAdd className="h-full p-[4px]" />
-                    <p className="text-body whitespace-nowrap">타이머 추가</p>
+                    <p className="text-body whitespace-nowrap">
+                      {t('타이머 추가')}
+                    </p>
                   </div>
                 </FloatingActionButton>
               </div>
@@ -287,7 +291,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             disabled={isLoading}
           >
             <DTEdit className="h-full" />
-            토론 정보 수정하기
+            {t('토론 정보 수정하기')}
           </button>
 
           <button
@@ -302,7 +306,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
             disabled={isSubmitButtonDisabled}
           >
             <DTCheck className="h-full" />
-            {isEdit ? '수정 완료' : '추가하기'}
+            {isEdit ? t('수정 완료') : t('추가하기')}
           </button>
         </div>
       </DefaultLayout.StickyFooterWrapper>

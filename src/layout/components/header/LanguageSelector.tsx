@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
@@ -11,6 +12,7 @@ import {
 import i18n from '../../../i18n';
 
 export default function LanguageSelector() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { lang: currentLangParam } = useParams();
@@ -90,7 +92,7 @@ export default function LanguageSelector() {
         onClick={() => setIsMenuOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isMenuOpen}
-        aria-label="언어 선택"
+        aria-label={t('언어 선택')}
       >
         {/* 현재 선택된 언어 표시 */}
         <span className="text-body-raw font-semibold md:text-subtitle-raw">

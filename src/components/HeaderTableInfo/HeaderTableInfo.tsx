@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Skeleton from '../Skeleton/Skeleton';
 
 interface HeaderTitleProps {
@@ -6,8 +7,9 @@ interface HeaderTitleProps {
 }
 
 export default function HeaderTableInfo(props: HeaderTitleProps) {
+  const { t } = useTranslation();
   const { name, skeletonEnabled: isLoading = false } = props;
-  const displayName = !name?.trim() ? '테이블 이름 없음' : name.trim();
+  const displayName = !name?.trim() ? t('테이블 이름 없음') : name.trim();
 
   return (
     <>

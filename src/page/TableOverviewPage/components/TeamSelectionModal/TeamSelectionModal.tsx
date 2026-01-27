@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Cointoss from '../../../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../../../assets/teamSelection/coinfront.png';
@@ -19,6 +20,7 @@ export default function TeamSelectionModal({
   initialCoinState,
   onCoinStateChange,
 }: TeamSelectionModalProps) {
+  const { t } = useTranslation();
   const [coinState, setCoinState] = useState<CoinState>(initialCoinState);
   const hasResultSoundPlayedRef = useRef(false);
 
@@ -105,7 +107,7 @@ export default function TeamSelectionModal({
         {coinState === 'initial' && (
           <div className="mt-7 flex flex-col items-center justify-center p-8 text-center">
             <p className="sm:text-xl sm:leading-loose whitespace-pre-line text-lg font-semibold leading-7 md:text-2xl md:leading-9 lg:text-3xl lg:leading-[45px] xl:text-[34px] xl:leading-[50px]">
-              {'팀별로\n동전의 앞 / 뒷면 중\n하나를 선택해 주세요.'}
+              {t('팀별로\n동전의 앞 / 뒷면 중\n하나를 선택해 주세요.')}
             </p>
           </div>
         )}
@@ -116,14 +118,14 @@ export default function TeamSelectionModal({
               <div className="sm:h-36 sm:w-32 flex h-32 w-28 items-center justify-center md:h-40 md:w-36 lg:h-[240px] lg:w-[220px]">
                 <img
                   src={Cointoss}
-                  alt="동전"
+                  alt={t('동전')}
                   className="h-full w-full object-contain"
                 />
               </div>
             </div>
             <div className="flex h-20 w-full items-center justify-center px-6">
               <span className="text-neutral-1000 sm:text-xl text-lg font-semibold md:text-2xl">
-                동전 던지는 중...
+                {t('동전 던지는 중...')}
               </span>
             </div>
           </>
@@ -135,12 +137,12 @@ export default function TeamSelectionModal({
               <div className="sm:h-32 sm:w-32 flex h-28 w-28 items-center justify-center md:h-36 md:w-36 lg:h-[220px] lg:w-[220px]">
                 <img
                   src={coinState === 'front' ? CoinFront : CoinBack}
-                  alt="동전"
+                  alt={t('동전')}
                   className="h-full w-full object-contain"
                 />
               </div>
               <div className="sm:px-3 sm:py-1 sm:text-lg rounded-full bg-black px-2 py-0.5 text-base font-semibold text-white md:px-4 md:py-1.5 md:text-xl lg:px-4 lg:py-1.5 lg:text-2xl xl:px-5 xl:py-2">
-                {coinState === 'front' ? '앞' : '뒤'}
+                {coinState === 'front' ? t('앞') : t('뒤')}
               </div>
             </div>
           </div>
@@ -154,7 +156,7 @@ export default function TeamSelectionModal({
             className="sm:text-lg sm:py-4 w-full bg-brand py-3 text-[22px] font-semibold hover:bg-brand-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
             onClick={() => updateCoinState('tossing')}
           >
-            동전 던지기
+            {t('동전 던지기')}
           </button>
         )}
         {(coinState === 'front' || coinState === 'back') && (
@@ -163,13 +165,13 @@ export default function TeamSelectionModal({
               className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled/hover bg-default-white py-3 text-lg font-semibold hover:bg-default-disabled/hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
               onClick={handleEdit}
             >
-              토론 정보 수정하기
+              {t('토론 정보 수정하기')}
             </button>
             <button
               className="sm:text-lg sm:py-4 w-full bg-brand py-3 text-lg font-bold hover:bg-brand-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
               onClick={handleStart}
             >
-              토론 바로 시작하기
+              {t('토론 바로 시작하기')}
             </button>
           </div>
         )}

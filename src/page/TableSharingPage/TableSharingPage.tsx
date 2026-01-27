@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
@@ -44,6 +45,7 @@ function getDecodedDataOrNull(
  * - 로그인 상태가 아닐 경우, 비회원 플로우 실행
  */
 export default function TableSharingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
@@ -71,14 +73,14 @@ export default function TableSharingPage() {
                 // 저장 실패 시
                 () => {
                   closeModal();
-                  throw new Error('공유받은 테이블을 저장하지 못했어요.');
+                  throw new Error(t('공유받은 테이블을 저장하지 못했어요.'));
                 },
               );
           },
           () => {
             // 세션 저장소에서 테이블을 불러오지 못할 때
             closeModal();
-            throw new Error('테이블 데이터를 확인할 수 없어요.');
+            throw new Error(t('테이블 데이터를 확인할 수 없어요.'));
           },
         );
       } else {
@@ -90,7 +92,7 @@ export default function TableSharingPage() {
     } else {
       // On this case, getRepository() will automatically decide what data source to use
       if (!decodedData) {
-        throw new Error('공유된 데이터가 비어 있어요.');
+        throw new Error(t('공유된 데이터가 비어 있어요.'));
       }
 
       sessionDebateTableRepository.deleteTable();
@@ -101,7 +103,7 @@ export default function TableSharingPage() {
         },
         () => {
           // Handling error
-          throw new Error('공유된 토론 테이블을 DB에 저장하지 못했어요.');
+          throw new Error(t('공유된 토론 테이블을 DB에 저장하지 못했어요.'));
         },
       );
     }
@@ -115,7 +117,8 @@ export default function TableSharingPage() {
           size={'size-24'}
           color={'text-brand-main'}
         />
-        <p className="text-2xl">데이터를 처리하고 있습니다...</p>
+
+        <p className="text-2xl">{t('데이터를 처리하고 있습니다...')}</p>
       </div>
 
       <ModalWrapper>
@@ -131,7 +134,7 @@ export default function TableSharingPage() {
                 },
                 () => {
                   closeModal();
-                  throw new Error('공유받은 테이블을 저장하지 못했어요.');
+                  throw new Error(t('공유받은 테이블을 저장하지 못했어요.'));
                 },
               );
             }}
@@ -143,7 +146,7 @@ export default function TableSharingPage() {
                 },
                 () => {
                   closeModal();
-                  throw new Error('공유받은 데이터 처리에 실패했어요.');
+                  throw new Error(t('공유받은 데이터 처리에 실패했어요.'));
                 },
               );
             }}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -33,6 +34,7 @@ export default function NormalTimer({
   item,
   teamName,
 }: NormalTimerProps) {
+  const { t } = useTranslation();
   const {
     timer,
     isAdditionalTimerOn,
@@ -76,9 +78,9 @@ export default function NormalTimer({
             <span className="flex max-w-[600px] flex-row items-center justify-center space-x-[16px]">
               <DTDebate className="w-[20px] flex-shrink-0 xl:w-[28px]" />
               <p className="truncate text-[20px] xl:text-[28px]">
-                {teamName && teamName + ' 팀'}
+                {teamName && teamName + t(' 팀')}
                 {teamName && item.speaker && ' | '}
-                {item.speaker && item.speaker + ' 토론자'}
+                {item.speaker && item.speaker + t(' 토론자')}
               </p>
             </span>
           )}
@@ -108,7 +110,7 @@ export default function NormalTimer({
                   },
                 )}
               >
-                작전 시간 사용
+                {t('작전 시간 사용')}
               </span>
             </button>
           )}

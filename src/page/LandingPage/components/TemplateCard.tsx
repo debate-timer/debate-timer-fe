@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { DebateTemplate } from '../../../type/type';
 import clsx from 'clsx';
 
@@ -8,6 +9,7 @@ export default function TemplateCard({
   actions,
   className,
 }: DebateTemplate) {
+  const { t } = useTranslation();
   return (
     <article
       className={clsx(
@@ -32,7 +34,7 @@ export default function TemplateCard({
         {logoSrc && (
           <img
             src={logoSrc}
-            alt={`${title} 로고`}
+            alt={t('{{title}} 로고', { title })}
             className="h-12 w-12 shrink-0 object-contain"
           />
         )}
@@ -50,9 +52,9 @@ export default function TemplateCard({
               <a
                 href={action.href}
                 className="shrink-0 rounded-full border border-neutral-300 bg-brand px-4 py-1.5 text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-default-black transition-colors duration-100 hover:bg-semantic-table hover:text-white"
-                aria-label={`${action.label} 토론하기`}
+                aria-label={t('{{label}} 토론하기', { label: action.label })}
               >
-                토론하기
+                {t('토론하기')}
               </a>
             </div>
           </li>

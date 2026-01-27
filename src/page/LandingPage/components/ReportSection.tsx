@@ -1,16 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import section501 from '../../../assets/landing/section5-1.png';
 import { LANDING_URLS } from '../../../constants/urls';
 
 export default function ReportSection() {
+  const { t } = useTranslation();
   return (
     <section id="section5" className="flex flex-col gap-16">
       <div className="flex flex-row justify-between gap-1">
         <div className="flex flex-col items-start justify-center gap-4">
           <p className="text-[min(max(1.2rem,2vw),2.3rem)] font-semibold">
-            버그 및 불편사항 제보
+            {t('버그 및 불편사항 제보')}
           </p>
           <p className="text-[min(max(0.875rem,1.25vw),1.2rem)] text-neutral-400">
-            디베이트 타이머 사용 중 불편함을 느끼셨나요?
+            {t('디베이트 타이머 사용 중 불편함을 느끼셨나요?')}
           </p>
           <button
             onClick={() =>
@@ -22,14 +24,14 @@ export default function ReportSection() {
             }
             className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-brand"
           >
-            접수하기
+            {t('접수하기')}
           </button>
         </div>
         <img src={section501} alt="section501" className="w-[30%]" />
       </div>
       <div className="flex flex-col items-start justify-center gap-4">
         <p className="text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium">
-          디베이트 타이머
+          {t('디베이트 타이머')}
         </p>
         <div className="flex items-center gap-1">
           <button
@@ -42,7 +44,7 @@ export default function ReportSection() {
             }
             className="text-[min(max(0.75rem,1vw),1rem)] text-neutral-500 transition-colors hover:text-neutral-700"
           >
-            개인정보처리방침
+            {t('개인정보처리방침')}
           </button>
           <span className="text-[min(max(0.75rem,1vw),1rem)] text-neutral-500">
             |
@@ -57,7 +59,7 @@ export default function ReportSection() {
             }
             className="text-[min(max(0.75rem,1vw),1rem)] text-neutral-500 transition-colors hover:text-neutral-700"
           >
-            서비스 이용약관
+            {t('서비스 이용약관')}
           </button>
         </div>
       </div>

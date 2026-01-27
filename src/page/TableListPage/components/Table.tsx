@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { DebateTable } from '../../../type/type';
 import { IoArrowForward } from 'react-icons/io5';
@@ -23,6 +24,7 @@ export default function Table({
   onEdit,
   onClick,
 }: TableProps) {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const { openShareModal, TableShareModal } = useTableShare(id);
   const { openModal, closeModal, ModalWrapper } = useModal({
@@ -57,7 +59,7 @@ export default function Table({
                 e.stopPropagation();
                 onEdit();
               }}
-              aria-label="수정하기"
+              aria-label={t('수정하기')}
             >
               <SmallIconButtonContainer className="size-[28px] p-[8px]">
                 <DTEdit className="h-full" />
@@ -68,7 +70,7 @@ export default function Table({
                 e.stopPropagation();
                 openModal();
               }}
-              aria-label="삭제하기"
+              aria-label={t('삭제하기')}
             >
               <SmallIconButtonContainer className="size-[28px] p-[8px]">
                 <DTDelete className="h-full" />
@@ -79,7 +81,7 @@ export default function Table({
                 e.stopPropagation();
                 openShareModal();
               }}
-              aria-label="공유하기"
+              aria-label={t('공유하기')}
             >
               <SmallIconButtonContainer className="size-[28px] p-[7px]">
                 <DTShare className="h-full" />
@@ -107,16 +109,18 @@ export default function Table({
           <p
             className={`w-full truncate text-start text-[16px] text-default-black2 duration-300`}
           >
-            주제 | {agenda}
+            {t('주제 |')}
+
+            {agenda}
           </p>
         </div>
       </button>
 
       <ModalWrapper>
         <DialogModal
-          left={{ text: '취소', onClick: () => closeModal() }}
+          left={{ text: t('취소'), onClick: () => closeModal() }}
           right={{
-            text: '삭제',
+            text: t('삭제'),
             isBold: true,
             onClick: () => {
               onDelete();
@@ -125,7 +129,9 @@ export default function Table({
           }}
         >
           <div className="flex flex-col items-center justify-center space-y-2 px-16 py-8">
-            <p className="text-xl font-bold">테이블을 삭제하시겠습니까?</p>
+            <p className="text-xl font-bold">
+              {t('테이블을 삭제하시겠습니까?')}
+            </p>
             <p className="text-sm">{name}</p>
           </div>
         </DialogModal>

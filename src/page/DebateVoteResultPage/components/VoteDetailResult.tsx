@@ -1,4 +1,4 @@
-// pages/VoteDetailResult.tsx
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import VoteBar from './VoteBar';
 
@@ -13,6 +13,7 @@ export default function VoteDetailResult({
   pros,
   cons,
 }: VoteDetailResultProps) {
+  const { t } = useTranslation();
   return (
     <main className="flex items-center justify-center bg-white">
       <motion.section
@@ -24,7 +25,7 @@ export default function VoteDetailResult({
         {/* 내용 */}
         <div className="px-6 pb-8 pt-10">
           <h2 className="mb-6 text-center text-[min(max(1.25rem,2.4vw),1.6rem)]">
-            투표 세부 결과
+            {t('투표 세부 결과')}
           </h2>
 
           <div className="flex flex-col gap-4">
@@ -34,6 +35,7 @@ export default function VoteDetailResult({
               count={pros.count}
               total={pros.count + cons.count}
             />
+
             <VoteBar
               teamKey="CONS"
               teamName={cons.name}
@@ -49,7 +51,7 @@ export default function VoteDetailResult({
           className="flex w-full items-center justify-center bg-brand py-4 transition hover:opacity-90"
         >
           <div className="flex items-center text-lg font-bold text-default-black">
-            홈으로 돌아가기
+            {t('홈으로 돌아가기')}
           </div>
         </button>
       </motion.section>
