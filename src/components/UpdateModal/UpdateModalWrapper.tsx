@@ -30,9 +30,10 @@ export default function UpdateModalWrapper() {
     },
   });
 
-  useEffect(() => {
-    isCheckedRef.current = isChecked;
-  }, [isChecked]);
+  const handleCheckedChange = (checked: boolean) => {
+    setIsChecked(checked);
+    isCheckedRef.current = checked;
+  };
 
   // 모달이 열리는 조건 확인
   useEffect(() => {
@@ -86,7 +87,7 @@ export default function UpdateModalWrapper() {
         <UpdateModal
           data={LATEST_PATCH_NOTE}
           isChecked={isChecked}
-          onChecked={setIsChecked}
+          onChecked={handleCheckedChange}
         />
       </ModalWrapper>
     </>
