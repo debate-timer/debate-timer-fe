@@ -22,6 +22,7 @@ export const Default: Story = {
         '토론 종료 후 피드백 & 투표 기능으로\n다양한 서비스를 이용하세요!',
       link: 'https://notion.so/',
       image: PatchNoteImage,
+      mode: 'predefined',
     } as PredefinedPatchNoteData,
     isChecked: false,
     onChecked: () => {},
