@@ -66,16 +66,19 @@ export default function UpdateModal({
             </div>
 
             {/* '일주일 간 보지 않기' 체크박스 */}
-            <div className="flex w-full flex-row items-center space-x-[8px]">
+            <label
+              htmlFor="update-modal-hide-for-week-predefined"
+              className="flex w-full flex-row items-center space-x-[8px]"
+            >
               <input
-                id="update-modal-hide-for-week"
+                id="update-modal-hide-for-week-predefined"
                 type="checkbox"
                 className="border-gray size-[24px] rounded-[4px]"
                 checked={isChecked}
                 onChange={(e) => onChecked(e.target.checked)}
               />
               <p>일주일 간 보지 않기</p>
-            </div>
+            </label>
           </div>
         </>
       ) : (
@@ -90,16 +93,19 @@ export default function UpdateModal({
           )}
 
           {/* '일주일 간 보지 않기' 체크박스 */}
-          <div className="absolute bottom-[8px] start-[8px] flex w-full flex-row items-center space-x-[8px]">
+          <label
+            htmlFor="update-modal-hide-for-week-image-only"
+            className="absolute bottom-[8px] start-[8px] flex w-full flex-row items-center space-x-[8px]"
+          >
             <input
-              id="update-modal-hide-for-week"
+              id="update-modal-hide-for-week-image-only"
               type="checkbox"
               className="border-gray size-[24px] rounded-[4px]"
               checked={isChecked}
               onChange={(e) => onChecked(e.target.checked)}
             />
             <p>일주일 간 보지 않기</p>
-          </div>
+          </label>
         </div>
       )}
 
