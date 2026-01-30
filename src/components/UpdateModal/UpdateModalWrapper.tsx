@@ -4,6 +4,8 @@ import UpdateModal from './UpdateModal';
 import { LATEST_PATCH_NOTE } from '../../constants/patch_note';
 
 const STORAGE_KEY = 'update_notification_status';
+const DISMISS_DURATION_DAYS = 7;
+const MILLIS_IN_A_DAY = 1000 * 3600 * 24;
 
 // 로컬 스토리지에 저장될 패치 노트의 데이터 타입 정의
 interface StoredStatus {
@@ -66,9 +68,9 @@ export default function UpdateModalWrapper() {
       // 버전이 동일하다면, 7일이 지났는지 확인
       const now = new Date();
       const timeDiff = now.getTime() - dismissDate.getTime();
-      const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+      const daysDiff = Math.floor(timeDiff / MILLIS_IN_A_DAY);
 
-      if (daysDiff >= 7) {
+      if (daysDiff >= DISMISS_DURATION_DAYS) {
         openModal();
         return;
       }
