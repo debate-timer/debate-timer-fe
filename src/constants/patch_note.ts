@@ -2,30 +2,32 @@
 import PatchNoteImage from '../assets/patchNote/0001.png';
 
 // 기본적인 패치 노트 인터페이스
-export interface PatchNoteData {
+interface BasePatchNoteData {
   version: string; // 로컬 스토리지 키 관리를 위한 버전 (이 버전을 바꾸면 사용자의 '다시 보지 않기'가 초기화됨)
   link: string;
   image: string;
-  mode: 'predefined' | 'image-only';
 }
 
 // 사전 정의된 패치 노트 인터페이스
-export interface PredefinedPatchNoteData extends PatchNoteData {
+export interface PredefinedPatchNoteData extends BasePatchNoteData {
   mode: 'predefined';
   title: string;
   description: string;
 }
 
 // 이미지만 존재하는 패치 노트 인터페이스
-export interface ImageOnlyPatchNoteData extends PatchNoteData {
+export interface ImageOnlyPatchNoteData extends BasePatchNoteData {
   mode: 'image-only';
 }
+
+// 패치 노트 데이터 타입 (두 가지 인터페이스의 유니언 타입)
+export type PatchNoteData = PredefinedPatchNoteData | ImageOnlyPatchNoteData;
 
 // PatchNoteData 타입이 PredefinedPatchNoteData인지 ImagePatchNoteData인지 구별하는 함수
 export function isPredefinedPatchNote(
   data: PatchNoteData,
 ): data is PredefinedPatchNoteData {
-  // 'title' 속성이 data 객체 안에 있는지 확인
+  // 'mode'가 'predefined'인지 확인
   return data.mode === 'predefined';
 }
 
