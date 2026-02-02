@@ -2,7 +2,8 @@ import clsx from 'clsx';
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
 interface SmallIconContainerProps
-  extends PropsWithChildren,
+  extends
+    PropsWithChildren,
     Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   background?: string;
   className?: string;
