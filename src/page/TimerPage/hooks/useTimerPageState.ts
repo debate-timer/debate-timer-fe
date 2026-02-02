@@ -337,5 +337,5 @@ export interface TimerPageLogics {
   setVolume: (value: number) => void;
   toggleVolumeBar: () => void;
   isVolumeBarOpen: boolean;
-  volumeRef: React.RefObject<HTMLDivElement>;
+  volumeRef: React.RefObject<HTMLDivElement | null>;
 }
