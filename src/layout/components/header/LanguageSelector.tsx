@@ -42,6 +42,7 @@ export default function LanguageSelector() {
       i18n.changeLanguage(newLang);
     }
     navigate(nextUrl);
+    setIsMenuOpen(false);
   };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -115,7 +116,6 @@ export default function LanguageSelector() {
             className={menuItemClasses(option.value)}
             onClick={() => {
               handleLanguageChange(option.value);
-              setIsMenuOpen(false);
             }}
             role="option"
             aria-selected={option.value === selectedLangValue}
