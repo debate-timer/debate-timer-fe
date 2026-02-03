@@ -37,7 +37,7 @@ export default function TimeTableSection() {
           <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
             {t('두가지 타이머')}
           </h3>
-          <p className="text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
+          <p className="whitespace-pre-line text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
             {t('일반형과 자유토론형 타이머로\n다양한 토론 방식을 지원해요.')}
           </p>
         </div>
@@ -47,7 +47,7 @@ export default function TimeTableSection() {
           <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
             {t('종소리 설정')}
           </h3>
-          <p className="text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
+          <p className="whitespace-pre-line text-[min(max(0.875rem,1.5vw),1.4rem)] font-medium text-neutral-600">
             {t('시간에 따른 종소리를 내마음대로\n커스터마이징 할 수 있어요.')}
           </p>
         </div>

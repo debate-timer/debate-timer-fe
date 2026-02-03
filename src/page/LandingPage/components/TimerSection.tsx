@@ -52,7 +52,7 @@ export default function TimerSection() {
       </div>
 
       <div>
-        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+        <h2 className="mt-4 whitespace-pre-line text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
           {t('키보드 방향키로\n더 편리한 조작')}
         </h2>
       </div>
