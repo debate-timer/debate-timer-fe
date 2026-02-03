@@ -4,6 +4,11 @@ import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useNavigate } from 'react-router-dom';
 import { APIError } from '../../apis/primitives';
 import { ERROR_STATUS_TABLE } from '../../constants/errors';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 interface ErrorPageProps {
   error: Error;
@@ -12,11 +17,14 @@ interface ErrorPageProps {
 }
 
 export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const homePath = buildLangPath('/home', lang);
   const goToHome = () => {
     onReset();
-    navigate('/home', { replace: true });
+    navigate(homePath, { replace: true });
   };
 
   // If error is from API request, print status code

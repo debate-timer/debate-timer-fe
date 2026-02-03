@@ -7,18 +7,27 @@ import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
 import usePostPoll from '../../hooks/mutations/useCreatePoll';
 import MenuCard from './components/MenuCard';
 import GoToOverviewButton from './components/GoToOverviewButton';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function DebateEndPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const handleFeedbackClick = () => {
-    navigate(`/table/customize/${tableId}/end/feedback`);
+    navigate(buildLangPath(`/table/customize/${tableId}/end/feedback`, lang));
   };
   const handleVoteClick = (pollId: number) => {
-    navigate(`/table/customize/${tableId}/end/vote/${pollId}`);
+    navigate(
+      buildLangPath(`/table/customize/${tableId}/end/vote/${pollId}`, lang),
+    );
   };
   const { mutate } = usePostPoll(handleVoteClick);
 

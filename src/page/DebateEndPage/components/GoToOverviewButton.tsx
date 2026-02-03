@@ -2,6 +2,11 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { RiCalendarScheduleLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
 interface GoToOverviewButtonProps {
   tableId: number;
@@ -12,10 +17,12 @@ export default function GoToOverviewButton({
   tableId,
   className = '',
 }: GoToOverviewButtonProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const handleClick = (tableId: number) => {
-    navigate(`/overview/customize/${tableId}`);
+    const currentLang = i18n.resolvedLanguage ?? i18n.language;
+    const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+    navigate(buildLangPath(`/overview/customize/${tableId}`, lang));
   };
 
   return (

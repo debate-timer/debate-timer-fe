@@ -2,10 +2,18 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { IoHome } from 'react-icons/io5';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function NotFoundPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const rootPath = buildLangPath('/', lang);
 
   return (
     <DefaultLayout>
@@ -43,7 +51,7 @@ export default function NotFoundPage() {
           <button
             className="rounded-full bg-zinc-300 px-8 py-4 hover:bg-zinc-400"
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate(rootPath)}
           >
             <div className="flex flex-row items-center justify-center space-x-4">
               <IoHome size={30} />

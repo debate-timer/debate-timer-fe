@@ -14,6 +14,11 @@ import DTHome from '../../../components/icons/Home';
 import DTLogin from '../../../components/icons/Login';
 import useFullscreen from '../../../hooks/useFullscreen';
 import LanguageSelector from './LanguageSelector';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
 type HeaderIcons = 'home' | 'auth';
 
@@ -48,10 +53,13 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
 };
 
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { children: buttons } = props;
   const navigate = useNavigate();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const homePath = buildLangPath('/home', lang);
+  const { mutate: logoutMutate } = useLogout(() => navigate(homePath));
   const { openModal, closeModal, ModalWrapper } = useModal({});
   const { isFullscreen, setFullscreen } = useFullscreen();
   const defaultIcons: HeaderIcons[] = ['home', 'auth'];
@@ -96,7 +104,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                     if (isGuestFlow()) {
                       deleteSessionCustomizeTableData();
                     }
-                    navigate('/home');
+                    navigate(homePath);
                   }}
                 >
                   <DTHome className="h-full" />

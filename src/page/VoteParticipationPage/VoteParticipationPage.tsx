@@ -12,6 +12,11 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import usePostVoterPollInfo from '../../hooks/mutations/usePostVoterPollInfo';
 import { TeamKey } from '../../type/type';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 const TEAM_LABEL = {
   PROS: '찬성팀',
@@ -19,9 +24,11 @@ const TEAM_LABEL = {
 } as const;
 
 export default function VoteParticipationPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id: pollIdParam } = useParams();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   // 1) pollId 파싱 + 유효성 체크
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
   const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
@@ -42,7 +49,9 @@ export default function VoteParticipationPage() {
   const isSubmitDisabled =
     participantName.trim().length === 0 || selectedTeam === null;
 
-  const { mutate } = usePostVoterPollInfo(() => navigate(`/vote/end`));
+  const { mutate } = usePostVoterPollInfo(() =>
+    navigate(buildLangPath('/vote/end', lang)),
+  );
 
   const handleSubmit = () => {
     if (isSubmitDisabled) return;
@@ -73,7 +82,7 @@ export default function VoteParticipationPage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate('/')}>
+          <ErrorIndicator onClickRetry={() => navigate(buildLangPath('/', lang))}>
             {t('유효하지 않은 투표 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>

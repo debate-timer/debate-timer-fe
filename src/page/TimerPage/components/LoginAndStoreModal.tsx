@@ -3,6 +3,11 @@ import { ComponentType, ReactNode } from 'react';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 import { oAuthLogin } from '../../../util/googleAuth';
 import { useNavigate } from 'react-router-dom';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
 interface LoginAndStoreModalProps {
   Wrapper: ComponentType<{
@@ -16,8 +21,10 @@ export function LoginAndStoreModal({
   Wrapper,
   onClose,
 }: LoginAndStoreModalProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   return (
     <Wrapper closeButtonColor="text-neutral-1000">
@@ -26,7 +33,7 @@ export function LoginAndStoreModal({
           text: t('아니오'),
           onClick: () => {
             onClose();
-            navigate('/overview/customize/guest');
+            navigate(buildLangPath('/overview/customize/guest', lang));
           },
         }}
         right={{

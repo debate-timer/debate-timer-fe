@@ -3,9 +3,18 @@ import { useEffect } from 'react';
 import { useModal } from '../../../hooks/useModal';
 import { useNavigate } from 'react-router-dom';
 import { isGuestFlow } from '../../../util/sessionStorage';
+import { useTranslation } from 'react-i18next';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
 export function useTimerPageModal(tableId: number) {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const IS_VISITED = 'isVisited';
   const TRUE = 'true';
 
@@ -42,7 +51,7 @@ export function useTimerPageModal(tableId: number) {
     if (isGuestFlow()) {
       openLoginAndStoreModal();
     } else {
-      navigate(`/table/customize/${tableId}/end`);
+      navigate(buildLangPath(`/table/customize/${tableId}/end`, lang));
     }
   };
 

@@ -14,6 +14,11 @@ import {
   PostDebateTableResponseType,
 } from '../../apis/responses/debateTable';
 import { isGuestFlow } from '../../util/sessionStorage';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 function getDecodedDataOrNull(
   encodedData: string | null,
@@ -45,8 +50,10 @@ function getDecodedDataOrNull(
  * - 로그인 상태가 아닐 경우, 비회원 플로우 실행
  */
 export default function TableSharingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
@@ -68,7 +75,7 @@ export default function TableSharingPage() {
                 (value: PostDebateTableResponseType) => {
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
-                  navigate(`/overview/customize/${value.id}`);
+                  navigate(buildLangPath(`/overview/customize/${value.id}`, lang));
                 },
                 // 저장 실패 시
                 () => {
@@ -99,7 +106,7 @@ export default function TableSharingPage() {
       sessionDebateTableRepository.addTable(decodedData).then(
         () => {
           // On success
-          navigate(`/overview/customize/guest`);
+          navigate(buildLangPath(`/overview/customize/guest`, lang));
         },
         () => {
           // Handling error
@@ -107,7 +114,7 @@ export default function TableSharingPage() {
         },
       );
     }
-  }, [decodedData, navigate, openModal, closeModal, encodedData]);
+  }, [decodedData, navigate, openModal, closeModal, encodedData, lang]);
 
   return (
     <>
@@ -130,7 +137,7 @@ export default function TableSharingPage() {
                 (value) => {
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
-                  navigate(`/overview/customize/${value.id}`);
+                  navigate(buildLangPath(`/overview/customize/${value.id}`, lang));
                 },
                 () => {
                   closeModal();
@@ -142,7 +149,7 @@ export default function TableSharingPage() {
               sessionDebateTableRepository.addTable(decodedData).then(
                 () => {
                   closeModal();
-                  navigate('/overview/customize/guest');
+                  navigate(buildLangPath('/overview/customize/guest', lang));
                 },
                 () => {
                   closeModal();

@@ -8,10 +8,17 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import useFetchEndPoll from '../../hooks/mutations/useFetchEndPoll';
 import { useModal } from '../../hooks/useModal';
 import DialogModal from '../../components/DialogModal/DialogModal';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function DebateVotePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const baseUrl =
     import.meta.env.MODE !== 'production'
       ? undefined
@@ -30,7 +37,12 @@ export default function DebateVotePage() {
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
-    navigate(`/table/customize/${tableId}/end/vote/${pollId}/result`);
+    navigate(
+      buildLangPath(
+        `/table/customize/${tableId}/end/vote/${pollId}/result`,
+        lang,
+      ),
+    );
   };
 
   const {
@@ -74,7 +86,7 @@ export default function DebateVotePage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate('/')}>
+          <ErrorIndicator onClickRetry={() => navigate(buildLangPath('/', lang))}>
             {t('유효하지 않은 투표 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>

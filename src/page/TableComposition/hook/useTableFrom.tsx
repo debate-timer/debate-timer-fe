@@ -6,6 +6,12 @@ import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
 import { usePutDebateTable } from '../../../hooks/mutations/usePutDebateTable';
 import { isGuestFlow } from '../../../util/sessionStorage';
+import { useTranslation } from 'react-i18next';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
 const useTableFrom = (
   currentStep: TableCompositionStep,
@@ -13,6 +19,9 @@ const useTableFrom = (
 ) => {
   const navigationType = useNavigationType();
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   // Set default value as CUSTOMIZE to prevent users to make PARLIAMENTARY tables
   const [formData, setFormData, removeValue] =
@@ -79,7 +88,7 @@ const useTableFrom = (
   const { mutate: onAddTable, isPending: isAddingTable } = useAddDebateTable(
     (tableId) => {
       removeValue();
-      navigate(`/overview/customize/${tableId}`);
+      navigate(buildLangPath(`/overview/customize/${tableId}`, lang));
     },
   );
 
@@ -87,9 +96,9 @@ const useTableFrom = (
     usePutDebateTable((tableId) => {
       removeValue();
       if (isGuestFlow()) {
-        navigate(`/overview/customize/guest`);
+        navigate(buildLangPath(`/overview/customize/guest`, lang));
       } else {
-        navigate(`/overview/customize/${tableId}`);
+        navigate(buildLangPath(`/overview/customize/${tableId}`, lang));
       }
     });
 

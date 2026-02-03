@@ -10,9 +10,14 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
 import { useCallback, useEffect, useState } from 'react';
 import DialogModal from '../../components/DialogModal/DialogModal';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function DebateVoteResultPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // 매개변수 검증
   const { pollId: rawPollId, tableId: rawTableId } = useParams();
   const pollId = rawPollId ? Number(rawPollId) : NaN;
@@ -23,6 +28,9 @@ export default function DebateVoteResultPage() {
 
   const [isConfirmed, setIsConfirmed] = useState(false);
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const rootPath = buildLangPath('/', lang);
 
   const {
     data,
@@ -33,11 +41,13 @@ export default function DebateVoteResultPage() {
     isRefetchError,
   } = useGetPollInfo(pollId, { enabled: isArgsValid });
   const handleGoHome = () => {
-    navigate('/');
+    navigate(rootPath);
   };
   const handleGoToEndPage = useCallback(() => {
-    navigate(`/table/customize/${tableId}/end`, { replace: true });
-  }, [navigate, tableId]);
+    navigate(buildLangPath(`/table/customize/${tableId}/end`, lang), {
+      replace: true,
+    });
+  }, [lang, navigate, tableId]);
 
   useEffect(() => {
     if (!isArgsValid) return;
@@ -82,7 +92,7 @@ export default function DebateVoteResultPage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate('/')}>
+          <ErrorIndicator onClickRetry={() => navigate(rootPath)}>
             {t('유효하지 않은 투표 결과 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>
