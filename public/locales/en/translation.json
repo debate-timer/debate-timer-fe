@@ -188,7 +188,7 @@
   "1회당 발언 시간은 팀당 총 발언 시간보다 클 수 없습니다.": "Per-turn Speaking Time cannot exceed the total team Speaking Time.",
   "발언 유형을 입력해주세요.": "Please enter a Speech Type.",
   "자유토론": "Open Debate",
-  "중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다.": "Netural can only be selected when Speech Type is 'Custom'.",
+  "중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다.": "Neutral can only be selected when Speech Type is 'Custom'.",
   "일반 타이머": "Standard timer",
   "자유토론 타이머": "Open Debate timer",
   "한 팀의 발언 시간이 세팅된 일반적인 타이머": "A standard timer with a single team's Speaking Time set",
