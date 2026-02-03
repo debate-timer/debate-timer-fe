@@ -21,11 +21,16 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
 
   // If error is from API request, print status code
   // to let user know exact reason of error.
-  const title =
-    error instanceof APIError
-      ? ERROR_STATUS_TABLE[error.status] ||
-        t('{{status}} 오류', { status: error.status })
-      : t('오류가 발생했어요...');
+  const title = (() => {
+    if (!(error instanceof APIError)) {
+      return t('오류가 발생했어요...');
+    }
+
+    const statusKey = ERROR_STATUS_TABLE[error.status];
+    return statusKey
+      ? t(statusKey)
+      : t('{{status}} 오류', { status: error.status });
+  })();
 
   return (
     <DefaultLayout>
