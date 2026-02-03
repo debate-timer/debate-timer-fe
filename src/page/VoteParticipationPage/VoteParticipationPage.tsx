@@ -77,7 +77,9 @@ export default function VoteParticipationPage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate(buildLangPath('/', lang))}>
+          <ErrorIndicator
+            onClickRetry={() => navigate(buildLangPath('/', lang))}
+          >
             {t('유효하지 않은 투표 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>
@@ -173,7 +175,7 @@ export default function VoteParticipationPage() {
             <h2 className="text-xl font-semibold">
               {t('투표를 제출하시겠습니까?')}
             </h2>
-            <p className="text-bas mt-2">
+            <p className="mt-2 text-base">
               {t('(제출 후에는 변경이 불가능 합니다.)')}
             </p>
           </div>
