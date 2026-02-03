@@ -104,7 +104,7 @@ export default function LanguageSelector() {
           className={clsx('w-[12px] transition-transform duration-200', {
             'rotate-180': isMenuOpen,
           })}
-        />{' '}
+        />
       </button>
 
       {/* 언어 선택 메뉴 패널 */}
