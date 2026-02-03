@@ -109,8 +109,7 @@ export default function Table({
           <p
             className={`w-full truncate text-start text-[16px] text-default-black2 duration-300`}
           >
-            {t('주제 |')}
-
+            {t('주제 | ')}
             {agenda}
           </p>
         </div>
