@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import UpdateModal from './UpdateModal'; // 이미지 임포트는 아래와 같이
-import PatchNoteImage from '../assets/patchNote/0001.png';
+import PatchNoteImage from '../../assets/patchNote/0001.png';
 import { PredefinedPatchNoteData } from '../../constants/patch_note';
 
 const meta: Meta<typeof UpdateModal> = {
