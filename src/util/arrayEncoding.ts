@@ -21,11 +21,14 @@ export function decodeDebateTableData(encodedData: string): DebateTableData {
 }
 
 export function createTableShareUrl(
-  baseUrl: string,
+  baseUrl: string | undefined,
   data: DebateTableData,
 ): string {
   const encoded = encodeDebateTableData(data);
-  return `${baseUrl}/share?data=${encoded}`;
+  const resolvedBaseUrl =
+    baseUrl && baseUrl.trim() !== '' ? baseUrl : window.location.origin;
+  const normalizedBaseUrl = resolvedBaseUrl.replace(/\/+$/, '');
+  return `${normalizedBaseUrl}/share?data=${encoded}`;
 }
 
 export function extractTableShareUrl(url: string): DebateTableData | null {
