@@ -19,10 +19,15 @@ export default function NotificationBadge({
 
   const displayCount = safeCount > 99 ? '99+' : safeCount;
 
+  const ariaLabel = t('알림 개수', {
+    count: safeCount,
+    displayCount,
+  });
+
   return (
     <span
       role="status"
-      aria-label={t('알림 {{displayCount}}개', { displayCount })}
+      aria-label={ariaLabel}
       className={clsx(
         'inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-semantic-error px-[4px] text-[10px] font-bold leading-none text-default-white',
         className,

@@ -55,7 +55,7 @@ export default function VoteBar({
 
         <div className="shrink-0 pl-4 text-2xl font-extrabold text-neutral-900">
           <AnimatedCounter to={count} />
-          {t('명')}
+          {t('명', { count })}
         </div>
       </div>
     </div>
