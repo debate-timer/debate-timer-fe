@@ -11,20 +11,15 @@ interface UpdateModalProps {
   data: PatchNoteData;
   isChecked: boolean;
   onChecked: (value: boolean) => void;
+  onClickDetailButton: () => void;
 }
 
 export default function UpdateModal({
   data,
   isChecked,
   onChecked,
+  onClickDetailButton,
 }: UpdateModalProps) {
-  // '자세히 보기' 버튼 클릭 시 동작
-  const handleDetailButtonClick = () => {
-    if (data.link) {
-      window.open(data.link, '_blank', 'noopener,noreferrer');
-    }
-  };
-
   return (
     <div className="flex aspect-square w-[clamp(800px,min(62.5vw,90vh),1000px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
       {isPredefinedPatchNote(data) ? (
@@ -118,7 +113,7 @@ export default function UpdateModal({
       {/* 버튼 영역 */}
       <button
         className="flex h-[8.8%] flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
-        onClick={handleDetailButtonClick}
+        onClick={onClickDetailButton}
       >
         <p className="text-[clamp(16px,1.375vw,22px)] font-semibold">
           자세히 보기
