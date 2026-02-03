@@ -18,11 +18,6 @@ import {
   isSupportedLang,
 } from '../../util/languageRouting';
 
-const TEAM_LABEL = {
-  PROS: '찬성팀',
-  CONS: '반대팀',
-} as const;
-
 export default function VoteParticipationPage() {
   const { t, i18n } = useTranslation();
   const { id: pollIdParam } = useParams();
@@ -120,7 +115,7 @@ export default function VoteParticipationPage() {
 
                 <div className="mt-10 flex w-full flex-col items-center gap-4 md:flex-row md:items-stretch md:justify-center md:gap-20">
                   <VoteTeamButton
-                    label={TEAM_LABEL.PROS}
+                    label={t('찬성팀')}
                     name={data?.prosTeamName ?? t('찬성팀')}
                     teamkey="PROS"
                     isSelected={selectedTeam === 'PROS'}
@@ -129,7 +124,7 @@ export default function VoteParticipationPage() {
                   />
 
                   <VoteTeamButton
-                    label={TEAM_LABEL.CONS}
+                    label={t('반대팀')}
                     name={data?.consTeamName ?? t('반대팀')}
                     teamkey="CONS"
                     isSelected={selectedTeam === 'CONS'}
