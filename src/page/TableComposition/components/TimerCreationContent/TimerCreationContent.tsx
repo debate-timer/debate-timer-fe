@@ -5,7 +5,6 @@ import {
   Stance,
   TimeBoxType,
   BellType,
-  BellTypeToString,
   BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
@@ -49,6 +48,12 @@ const STANCE_RECORD: Record<Stance, string> = {
   PROS: '찬성',
   CONS: '반대',
   NEUTRAL: '중립',
+} as const;
+
+const BELL_TYPE_LABEL_KEYS: Record<BellType, string> = {
+  BEFORE_END: '종료 전',
+  AFTER_END: '종료 후',
+  AFTER_START: '시작 후',
 } as const;
 
 const NORMAL_OPTIONS: TimerCreationOption[] = [
@@ -255,15 +260,11 @@ export default function TimerCreationContent({
     [prosTeamName, consTeamName],
   );
 
-  const bellOptions: DropdownMenuItem<BellType>[] = useMemo(
-    () => [
-      { value: 'BEFORE_END', label: BellTypeToString['BEFORE_END'] },
-      { value: 'AFTER_END', label: BellTypeToString['AFTER_END'] },
-      { value: 'AFTER_START', label: BellTypeToString['AFTER_START'] },
-    ],
-
-    [],
-  );
+  const bellOptions: DropdownMenuItem<BellType>[] = [
+    { value: 'BEFORE_END', label: t(BELL_TYPE_LABEL_KEYS['BEFORE_END']) },
+    { value: 'AFTER_END', label: t(BELL_TYPE_LABEL_KEYS['AFTER_END']) },
+    { value: 'AFTER_START', label: t(BELL_TYPE_LABEL_KEYS['AFTER_START']) },
+  ];
 
   const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
 
@@ -861,13 +862,13 @@ export default function TimerCreationContent({
                             >
                               <div className="flex items-center gap-1">
                                 <p className="text-[14px]">
-                                  {BellTypeToString[bell.type]}
+                                  {t(BELL_TYPE_LABEL_KEYS[bell.type])}
                                 </p>
                                 <p className="text-[14px]">
-                                  {bell.min}
-                                  {t('분')}
-                                  {bell.sec}
-                                  {t('초')}
+                                  {t('{{minutes}}분 {{seconds}}초', {
+                                    minutes: bell.min,
+                                    seconds: bell.sec,
+                                  })}
                                 </p>
 
                                 <span className="w-[8px]"></span>
