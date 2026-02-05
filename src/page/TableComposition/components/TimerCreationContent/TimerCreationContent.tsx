@@ -258,10 +258,10 @@ export default function TimerCreationContent({
     () => [
       { value: 'PROS', label: prosTeamName },
       { value: 'CONS', label: consTeamName },
-      { value: 'NEUTRAL', label: STANCE_RECORD['NEUTRAL'] },
+      { value: 'NEUTRAL', label: t(STANCE_RECORD['NEUTRAL']) },
     ],
 
-    [prosTeamName, consTeamName],
+    [prosTeamName, consTeamName, t],
   );
 
   const bellOptions: DropdownMenuItem<BellType>[] = [
