@@ -8,10 +8,7 @@ export function useTableShare(tableId: number) {
   const { isOpen, openModal, closeModal, ModalWrapper } = useModal();
   const [copyState, setCopyState] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
-  const baseUrl =
-    import.meta.env.MODE !== 'production'
-      ? undefined
-      : import.meta.env.VITE_SHARE_BASE_URL;
+  const baseUrl = import.meta.env.VITE_SHARE_BASE_URL;
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);

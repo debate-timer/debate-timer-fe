@@ -4,6 +4,12 @@ import {
   removeAccessToken,
   setAccessToken,
 } from '../util/accessToken';
+import i18n from '../i18n';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../util/languageRouting';
 
 // Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
@@ -66,7 +72,9 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.error('Refresh Token is invalid or expired', refreshError);
         // 재발급도 실패하면 -> 로그인 페이지 이동
-        window.location.href = '/home';
+        const currentLang = i18n.resolvedLanguage ?? i18n.language;
+        const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+        window.location.href = buildLangPath('/home', lang);
         removeAccessToken();
         return Promise.reject(refreshError);
       }

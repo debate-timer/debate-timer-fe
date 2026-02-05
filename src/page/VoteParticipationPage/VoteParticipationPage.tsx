@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import clsx from 'clsx';
@@ -11,15 +12,18 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import usePostVoterPollInfo from '../../hooks/mutations/usePostVoterPollInfo';
 import { TeamKey } from '../../type/type';
-
-const TEAM_LABEL = {
-  PROS: '찬성팀',
-  CONS: '반대팀',
-} as const;
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function VoteParticipationPage() {
+  const { t, i18n } = useTranslation();
   const { id: pollIdParam } = useParams();
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   // 1) pollId 파싱 + 유효성 체크
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
   const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
@@ -40,7 +44,9 @@ export default function VoteParticipationPage() {
   const isSubmitDisabled =
     participantName.trim().length === 0 || selectedTeam === null;
 
-  const { mutate } = usePostVoterPollInfo(() => navigate(`/vote/end`));
+  const { mutate } = usePostVoterPollInfo(() =>
+    navigate(buildLangPath('/vote/end', lang)),
+  );
 
   const handleSubmit = () => {
     if (isSubmitDisabled) return;
@@ -71,8 +77,10 @@ export default function VoteParticipationPage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate('/')}>
-            유효하지 않은 투표 링크입니다.
+          <ErrorIndicator
+            onClickRetry={() => navigate(buildLangPath('/', lang))}
+          >
+            {t('유효하지 않은 투표 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
@@ -88,7 +96,7 @@ export default function VoteParticipationPage() {
             <div className="flex w-full  flex-1 flex-col items-center gap-10">
               <header className="mt-6 flex w-full flex-col items-center text-center">
                 <h1 className="sm:text-4xl text-3xl font-bold text-default-black">
-                  승패투표
+                  {t('승패투표')}
                 </h1>
               </header>
 
@@ -98,7 +106,7 @@ export default function VoteParticipationPage() {
                     htmlFor="participant-name"
                     className="sm:text-xl whitespace-nowrap text-lg font-semibold text-default-black"
                   >
-                    참여자 :
+                    {t('참여자 :')}
                   </label>
                   <ClearableInput
                     value={participantName}
@@ -109,16 +117,17 @@ export default function VoteParticipationPage() {
 
                 <div className="mt-10 flex w-full flex-col items-center gap-4 md:flex-row md:items-stretch md:justify-center md:gap-20">
                   <VoteTeamButton
-                    label={TEAM_LABEL.PROS}
-                    name={data?.prosTeamName ?? '찬성팀'}
+                    label={t('찬성팀')}
+                    name={data?.prosTeamName ?? t('찬성팀')}
                     teamkey="PROS"
                     isSelected={selectedTeam === 'PROS'}
                     selectedTeam={selectedTeam}
                     onSelect={() => setSelectedTeam('PROS')}
                   />
+
                   <VoteTeamButton
-                    label={TEAM_LABEL.CONS}
-                    name={data?.consTeamName ?? '반대팀'}
+                    label={t('반대팀')}
+                    name={data?.consTeamName ?? t('반대팀')}
                     teamkey="CONS"
                     isSelected={selectedTeam === 'CONS'}
                     selectedTeam={selectedTeam}
@@ -142,19 +151,19 @@ export default function VoteParticipationPage() {
             onClick={openModal}
             disabled={isSubmitDisabled}
           >
-            {'투표완료'}
+            {t('투표완료')}
           </button>
         </DefaultLayout.StickyFooterWrapper>
       </DefaultLayout.ContentContainer>
       <ModalWrapper>
         <DialogModal
           left={{
-            text: '다시 투표하기',
+            text: t('다시 투표하기'),
             onClick: () => closeModal(),
             isBold: true,
           }}
           right={{
-            text: '제출하기',
+            text: t('제출하기'),
             onClick: () => {
               handleSubmit();
               closeModal();
@@ -163,8 +172,12 @@ export default function VoteParticipationPage() {
           }}
         >
           <div className="flex flex-col items-center justify-center px-14 py-24 text-center">
-            <h2 className="text-xl font-semibold">투표를 제출하시겠습니까?</h2>
-            <p className="text-bas mt-2">(제출 후에는 변경이 불가능 합니다.)</p>
+            <h2 className="text-xl font-semibold">
+              {t('투표를 제출하시겠습니까?')}
+            </h2>
+            <p className="mt-2 text-base">
+              {t('(제출 후에는 변경이 불가능 합니다.)')}
+            </p>
           </div>
         </DialogModal>
       </ModalWrapper>
