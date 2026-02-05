@@ -6,6 +6,7 @@ import {
   buildLangPath,
   DEFAULT_LANG,
   isSupportedLang,
+  stripDefaultLangFromPath,
 } from '../util/languageRouting';
 
 export default function BackActionHandler() {
@@ -15,8 +16,11 @@ export default function BackActionHandler() {
     const currentLang = i18n.resolvedLanguage ?? i18n.language;
     const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
     const rootPath = buildLangPath('/', lang);
+    const normalizedPathname = stripDefaultLangFromPath(
+      window.location.pathname,
+    );
 
-    if (getAccessToken() !== null && window.location.pathname === rootPath) {
+    if (getAccessToken() !== null && normalizedPathname === rootPath) {
       // Push the current state again to prevent going back
       navigate(rootPath);
     }
