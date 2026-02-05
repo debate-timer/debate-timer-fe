@@ -102,28 +102,33 @@ const protectedAppRoutes = appRoutes.map((route) => ({
   ),
 }));
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      element: (
+        <>
+          <ErrorBoundaryWrapper />
+          <BackActionHandler />
+        </>
+      ),
+      children: [
+        {
+          path: '/',
+          element: <LanguageWrapper />,
+          children: protectedAppRoutes, // 기본 언어(ko) 라우트
+        },
+        {
+          path: ':lang', // 다른 언어 라우트
+          element: <LanguageWrapper />,
+          children: protectedAppRoutes,
+        },
+      ],
+    },
+  ],
   {
-    element: (
-      <>
-        <ErrorBoundaryWrapper />
-        <BackActionHandler />
-      </>
-    ),
-    children: [
-      {
-        path: '/',
-        element: <LanguageWrapper />,
-        children: protectedAppRoutes, // 기본 언어(ko) 라우트
-      },
-      {
-        path: ':lang', // 다른 언어 라우트
-        element: <LanguageWrapper />,
-        children: protectedAppRoutes,
-      },
-    ],
+    basename: import.meta.env.VITE_BASE_PATH || '/',
   },
-]);
+);
 
 // 라우트 변경 시 Google Analytics 이벤트 전송
 router.subscribe(({ location }) => {

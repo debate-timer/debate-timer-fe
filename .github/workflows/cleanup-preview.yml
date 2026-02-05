@@ -1,0 +1,36 @@
+name: Cleanup-Preview
+
+on:
+  pull_request:
+    types: [closed]
+    branches: ['develop']
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    environment: DEPLOY_PREVIEW
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_PREVIEW_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_PREVIEW_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Delete Preview from S3
+        run: |
+          aws s3 rm s3://${{ secrets.AWS_PREVIEW_BUCKET_NAME }}/pr-${{ github.event.pull_request.number }}/ --recursive
+
+      - name: Comment Cleanup Notice
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: '🧹 Preview 배포가 정리되었습니다.'
+            });
