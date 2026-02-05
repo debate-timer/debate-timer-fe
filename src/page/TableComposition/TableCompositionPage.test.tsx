@@ -30,6 +30,10 @@ function TestWrapper({
               path="/:lang/overview/customize/1"
               element={<h1 data-testid="overview-page">Overview Page</h1>}
             />
+            <Route
+              path="/overview/customize/1"
+              element={<h1 data-testid="overview-page">Overview Page</h1>}
+            />
           </Routes>
         </MemoryRouter>
       </GlobalPortal.Provider>

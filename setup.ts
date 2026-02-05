@@ -22,6 +22,12 @@ i18n.options.react = {
   useSuspense: false,
 };
 
+// 로컬스토리에 언어 설정
+if (typeof localStorage !== 'undefined') {
+  localStorage.setItem('i18nextLng', 'ko');
+}
+i18n.changeLanguage('ko');
+
 // vitest.setup.ts 또는 setupTests.ts
 // ResizeObserver를 전역적으로 모킹합니다.
 global.ResizeObserver = class ResizeObserver {
