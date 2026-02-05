@@ -27,7 +27,7 @@ function TestWrapper({
 
             {/* 실제로 이동하고 싶은 /overview 경로 - 테스트용 컴포넌트 */}
             <Route
-              path="/overview/customize/1"
+              path="/:lang/overview/customize/1"
               element={<h1 data-testid="overview-page">Overview Page</h1>}
             />
           </Routes>
