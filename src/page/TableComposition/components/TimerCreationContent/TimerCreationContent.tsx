@@ -148,13 +148,17 @@ export default function TimerCreationContent({
     beforeData?.speechType ??
     initData?.speechType ??
     SPEECH_TYPE_RECORD.OPENING;
+  const isTimeBasedInit =
+    (beforeData?.boxType ?? initData?.boxType ?? 'NORMAL') === 'TIME_BASED';
   const [currentSpeechType, setCurrentSpeechType] = useState<SpeechType>(
-    getSpeechTypeFromString(initSpeechType),
+    isTimeBasedInit ? 'CUSTOM' : getSpeechTypeFromString(initSpeechType),
   );
   const [speechTypeTextValue, setSpeechTypeTextValue] = useState<string>(
-    currentSpeechType === 'CUSTOM'
-      ? (initData?.speechType ?? '')
-      : t(SPEECH_TYPE_RECORD[currentSpeechType]),
+    isTimeBasedInit
+      ? initSpeechType
+      : currentSpeechType === 'CUSTOM'
+        ? (initData?.speechType ?? '')
+        : t(SPEECH_TYPE_RECORD[currentSpeechType]),
   );
 
   // 종소리 영역 확장 여부
@@ -341,9 +345,12 @@ export default function TimerCreationContent({
       alert(errors.join('\n'));
       return;
     } else {
-      if (currentSpeechType === 'CUSTOM') {
+      if (timerType === 'TIME_BASED') {
         speechTypeToSend = speechTypeTextValue;
-        stanceToSend = timerType === 'TIME_BASED' ? 'NEUTRAL' : stance;
+        stanceToSend = 'NEUTRAL';
+      } else if (currentSpeechType === 'CUSTOM') {
+        speechTypeToSend = speechTypeTextValue;
+        stanceToSend = stance;
       } else {
         speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
         stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
