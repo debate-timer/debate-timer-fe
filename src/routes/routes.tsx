@@ -18,6 +18,7 @@ import VoteParticipationPage from '../page/VoteParticipationPage/VoteParticipati
 import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
 import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 import LanguageWrapper from './LanguageWrapper';
+import UpdateModalWrapper from '../components/UpdateModal/UpdateModalWrapper';
 
 const appRoutes = [
   {
@@ -108,6 +109,7 @@ const router = createBrowserRouter([
       <>
         <ErrorBoundaryWrapper />
         <BackActionHandler />
+        <UpdateModalWrapper />
       </>
     ),
     children: [
