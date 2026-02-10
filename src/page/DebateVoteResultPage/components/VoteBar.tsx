@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import AnimatedCounter from './AnimatedCounter';
 import { TEAM_STYLE, TeamKey } from '../../../type/type';
@@ -17,9 +18,10 @@ export default function VoteBar({
   total,
   heightClass = 'h-20',
 }: VoteBarProps) {
+  const { t } = useTranslation();
   const style = TEAM_STYLE[teamKey];
   const percentage = total > 0 ? (count / total) * 100 : 0;
-  const sideLabel = teamKey === 'PROS' ? '찬성팀' : '반대팀';
+  const sideLabel = teamKey === 'PROS' ? t('찬성팀') : t('반대팀');
 
   // 배경 바 색상은 좀 더 투명하게
   const barTone =
@@ -52,7 +54,8 @@ export default function VoteBar({
         </div>
 
         <div className="shrink-0 pl-4 text-2xl font-extrabold text-neutral-900">
-          <AnimatedCounter to={count} />명
+          <AnimatedCounter to={count} />
+          {t('명', { count })}
         </div>
       </div>
     </div>

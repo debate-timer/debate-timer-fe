@@ -1,20 +1,43 @@
 import { useEffect } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import i18n from '../i18n';
-
-const supportedLangs = ['ko', 'en'];
+import {
+  DEFAULT_LANG,
+  buildLangPath,
+  getSelectedLangFromRoute,
+  isSupportedLang,
+  stripDefaultLangFromPath,
+} from '../util/languageRouting';
 
 export default function LanguageWrapper() {
   const { lang } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // URL에 lang 파라미터가 없으면 'ko'를 기본값으로 사용
-    const currentLang = lang || 'ko';
+    const selectedLang = getSelectedLangFromRoute(lang, location.pathname);
+    const currentLang = i18n.resolvedLanguage ?? i18n.language;
 
-    if (supportedLangs.includes(currentLang) && i18n.language !== currentLang) {
-      i18n.changeLanguage(currentLang);
+    if (lang === DEFAULT_LANG) {
+      const nextPath = stripDefaultLangFromPath(location.pathname);
+      const nextUrl = `${nextPath || '/'}${location.search}${location.hash}`;
+      navigate(nextUrl, { replace: true });
+      return;
     }
-  }, [lang]);
+
+    if (!lang && isSupportedLang(currentLang) && currentLang !== DEFAULT_LANG) {
+      const nextPath = buildLangPath(location.pathname, currentLang);
+      if (nextPath !== location.pathname) {
+        const nextUrl = `${nextPath}${location.search}${location.hash}`;
+        navigate(nextUrl, { replace: true });
+        return;
+      }
+    }
+
+    if (isSupportedLang(selectedLang) && i18n.language !== selectedLang) {
+      i18n.changeLanguage(selectedLang);
+    }
+  }, [lang, location.hash, location.pathname, location.search, navigate]);
 
   return <Outlet />;
 }

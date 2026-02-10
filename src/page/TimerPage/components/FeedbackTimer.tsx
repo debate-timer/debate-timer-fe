@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import CircularTimer from './CircularTimer';
@@ -10,16 +11,10 @@ interface FeedbackTimerProps {
   feedbackTimerInstance: FeedbackTimerLogics;
 }
 
-const timeAdjustments = [
-  { label: '-5분', value: -300 },
-  { label: '-1분', value: -60 },
-  { label: '+1분', value: 60 },
-  { label: '+5분', value: 300 },
-];
-
 export default function FeedbackTimer({
   feedbackTimerInstance,
 }: FeedbackTimerProps) {
+  const { t } = useTranslation();
   const {
     timer,
     isRunning,
@@ -29,6 +24,13 @@ export default function FeedbackTimer({
     adjustTime,
     defaultTimer,
   } = feedbackTimerInstance;
+
+  const timeAdjustments = [
+    { label: t('-5분'), value: -300 },
+    { label: t('-1분'), value: -60 },
+    { label: t('+1분'), value: 60 },
+    { label: t('+5분'), value: 300 },
+  ];
 
   const totalTime = timer ?? 0;
   const { minutes, seconds } = Formatting.formatSecondsToMinutes(totalTime);
@@ -55,7 +57,9 @@ export default function FeedbackTimer({
       {/* 좌측 영역 */}
       <div className="flex h-[186px] w-[466px] flex-shrink-0 flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
         {/* 제목 */}
-        <h1 className="text-[52px] font-bold xl:text-[68px]">피드백 타이머</h1>
+        <h1 className="text-[52px] font-bold xl:text-[68px]">
+          {t('피드백 타이머')}
+        </h1>
 
         {/* 시간 조절 버튼 */}
         <div className="flex w-[466px] flex-row gap-[22px] pt-[24px]">

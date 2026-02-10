@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
@@ -12,8 +13,13 @@ import DialogModal from '../../../components/DialogModal/DialogModal';
 import DTHome from '../../../components/icons/Home';
 import DTLogin from '../../../components/icons/Login';
 import useFullscreen from '../../../hooks/useFullscreen';
+import LanguageSelector from './LanguageSelector';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
-// The type of header icons will be declared here.
 type HeaderIcons = 'home' | 'auth';
 
 function StickyTriSectionHeader(props: PropsWithChildren) {
@@ -47,9 +53,13 @@ StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
 };
 
 StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
+  const { t, i18n } = useTranslation();
   const { children: buttons } = props;
   const navigate = useNavigate();
-  const { mutate: logoutMutate } = useLogout(() => navigate('/home'));
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const homePath = buildLangPath('/home', lang);
+  const { mutate: logoutMutate } = useLogout(() => navigate(homePath));
   const { openModal, closeModal, ModalWrapper } = useModal({});
   const { isFullscreen, setFullscreen } = useFullscreen();
   const defaultIcons: HeaderIcons[] = ['home', 'auth'];
@@ -64,29 +74,26 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
     <>
       <div className="flex h-full flex-1 items-center justify-end gap-[12px] text-right">
         {isGuestFlow() && (
-          <>
-            {/* Guest mode indicator */}
-            <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
-              비회원 모드
-            </div>
-
-            {/* Vertical divider */}
-            <div className="w-[1px] self-stretch bg-neutral-500" />
-          </>
+          <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+            {t('비회원 모드')}
+          </div>
         )}
 
-        {/* Buttons given as an argument */}
+        <LanguageSelector />
+
+        <div className="w-[1px] self-stretch bg-neutral-500" />
+
+        {/* props으로 들어오는 버튼들 */}
         {buttons}
 
-        {/* Normal buttons */}
         {defaultIcons.map((iconName, index) => {
           switch (iconName) {
             case 'home':
               return (
                 <button
                   className="flex h-full items-center justify-center p-[4px]"
-                  aria-label="홈으로 이동"
-                  title="홈으로 이동"
+                  aria-label={t('홈으로 이동')}
+                  title={t('홈으로 이동')}
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     // 전체 화면 상태에서 홈으로 이동하는 경우, 전체 화면 비활성화
@@ -97,18 +104,19 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                     if (isGuestFlow()) {
                       deleteSessionCustomizeTableData();
                     }
-                    navigate('/home');
+                    navigate(homePath);
                   }}
                 >
                   <DTHome className="h-full" />
                 </button>
               );
+
             case 'auth':
               return (
                 <button
                   className="flex h-full items-center justify-center p-[4px]"
-                  aria-label={isLoggedIn() ? '로그아웃' : '로그인'}
-                  title={isLoggedIn() ? '로그아웃' : '로그인'}
+                  aria-label={isLoggedIn() ? t('로그아웃') : t('로그인')}
+                  title={isLoggedIn() ? t('로그아웃') : t('로그인')}
                   key={`${iconName}-${index}`}
                   onClick={() => {
                     // 전체 화면 상태에서 홈으로 이동하는 경우, 전체 화면 비활성화
@@ -126,6 +134,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                   <DTLogin className="h-full w-full" />
                 </button>
               );
+
             default:
               return null;
           }
@@ -135,18 +144,21 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
       <ModalWrapper closeButtonColor="text-neutral-1000">
         <DialogModal
           left={{
-            text: '아니오',
+            text: t('아니오'),
             onClick: () => handleLoginStart(false),
           }}
           right={{
-            text: '네',
+            text: t('네'),
             onClick: () => handleLoginStart(true),
             isBold: true,
           }}
         >
           <div className="break-keep px-20 py-10 text-center text-xl font-bold">
-            비회원으로 사용하던 시간표가 있습니다. <br />
-            로그인 후에도 이 시간표를 계속 사용하시겠습니까?
+            <p className="whitespace-pre-line">
+              {t(
+                '비회원으로 사용하던 시간표가 있습니다.\n로그인 후에도 이 시간표를 계속 사용하시겠습니까?',
+              )}
+            </p>
           </div>
         </DialogModal>
       </ModalWrapper>

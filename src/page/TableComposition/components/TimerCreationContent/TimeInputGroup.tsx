@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import TimerCreationContentItem from './TimerCreationContentMenuItem';
 
@@ -16,6 +17,7 @@ export default function TimeInputGroup({
   onMinutesChange,
   onSecondsChange,
 }: TimeInputGroupProps) {
+  const { t } = useTranslation();
   const validateTime = (value: string) =>
     value === '' ? 0 : Math.max(0, Math.min(59, Number(value)));
 
@@ -29,7 +31,8 @@ export default function TimeInputGroup({
             onChange={(e) => onMinutesChange(validateTime(e.target.value))}
             onClear={() => onMinutesChange(0)}
           />
-          <p className="text-body">분</p>
+
+          <p className="text-body">{t('분')}</p>
         </span>
         <span className="w-[16px]"></span>
         <span className="flex flex-1 flex-row items-center space-x-[8px]">
@@ -39,7 +42,8 @@ export default function TimeInputGroup({
             onChange={(e) => onSecondsChange(validateTime(e.target.value))}
             onClear={() => onSecondsChange(0)}
           />
-          <p className="text-body">초</p>
+
+          <p className="text-body">{t('초')}</p>
         </span>
       </span>
     </TimerCreationContentItem>

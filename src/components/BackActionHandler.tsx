@@ -1,15 +1,30 @@
 import { useCallback, useEffect } from 'react';
 import { getAccessToken } from '../util/accessToken';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+  stripDefaultLangFromPath,
+} from '../util/languageRouting';
 
 export default function BackActionHandler() {
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const handleBackAction = useCallback(() => {
-    if (getAccessToken() !== null && window.location.pathname === '/') {
+    const currentLang = i18n.resolvedLanguage ?? i18n.language;
+    const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+    const rootPath = buildLangPath('/', lang);
+    const normalizedPathname = stripDefaultLangFromPath(
+      window.location.pathname,
+    );
+
+    if (getAccessToken() !== null && normalizedPathname === rootPath) {
       // Push the current state again to prevent going back
-      navigate('/');
+      navigate(rootPath);
     }
-  }, [navigate]);
+  }, [i18n.language, i18n.resolvedLanguage, navigate]);
 
   useEffect(() => {
     const onPopState = () => {

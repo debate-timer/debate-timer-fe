@@ -78,9 +78,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
 
   // 벨 볼륨 관련
   const [isVolumeBarOpen, setIsVolumeBarOpen] = useState(false);
-  const toggleVolumeBar = () => {
+  const toggleVolumeBar = useCallback(() => {
     setIsVolumeBarOpen((prev) => !prev);
-  };
+  }, []);
 
   const { bg, setBg } = useTimerBackground({
     timer1,

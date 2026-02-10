@@ -14,7 +14,9 @@ import mcu from '../assets/template_logo/mcu.png';
 import ylt from '../assets/template_logo/yuppm_law_track.png';
 import { DebateTemplate } from '../type/type';
 function createTableShareUrl(encodeData: string): string {
-  return `${import.meta.env.VITE_SHARE_BASE_URL}/share?data=${encodeData}`;
+  const baseUrl = import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  return `${normalizedBaseUrl}/share?data=${encodeData}`;
 }
 interface DebateTemplateList {
   ONE: DebateTemplate[];

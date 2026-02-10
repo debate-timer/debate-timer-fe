@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -7,6 +8,7 @@ import DTDebate from '../../../components/icons/Debate';
 import CompactTimeoutTimer from './CompactTimeoutTimer';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 import useBreakpoint from '../../../hooks/useBreakpoint';
+import { normalizeSpeechTypeKey } from '../../../util/speechType';
 
 type NormalTimerInstance = {
   timer: number | null;
@@ -33,6 +35,11 @@ export default function NormalTimer({
   item,
   teamName,
 }: NormalTimerProps) {
+  const { t } = useTranslation();
+  const getSpeechTypeLabel = (value: string) => {
+    const normalized = normalizeSpeechTypeKey(value);
+    return normalized ? t(normalized) : value;
+  };
   const {
     timer,
     isAdditionalTimerOn,
@@ -48,7 +55,7 @@ export default function NormalTimer({
     Math.floor(Math.abs(totalTime) / 60),
   );
   const second = Formatting.formatTwoDigits(Math.abs(totalTime % 60));
-  const titleText = item.speechType;
+  const titleText = getSpeechTypeLabel(item.speechType);
   const rawProgress =
     timer !== null && item.time ? ((item.time - timer) / item.time) * 100 : 0;
   const progressMotionValue = useCircularTimerAnimation(rawProgress, isRunning);
@@ -76,9 +83,9 @@ export default function NormalTimer({
             <span className="flex max-w-[600px] flex-row items-center justify-center space-x-[16px]">
               <DTDebate className="w-[20px] flex-shrink-0 xl:w-[28px]" />
               <p className="truncate text-[20px] xl:text-[28px]">
-                {teamName && teamName + ' 팀'}
-                {teamName && item.speaker && ' | '}
-                {item.speaker && item.speaker + ' 토론자'}
+                {teamName && t('{{team}} 팀', { team: teamName })}
+                {item.speaker &&
+                  t(' | {{speaker}} 토론자', { speaker: item.speaker })}
               </p>
             </span>
           )}
@@ -108,7 +115,7 @@ export default function NormalTimer({
                   },
                 )}
               >
-                작전 시간 사용
+                {t('작전 시간 사용')}
               </span>
             </button>
           )}

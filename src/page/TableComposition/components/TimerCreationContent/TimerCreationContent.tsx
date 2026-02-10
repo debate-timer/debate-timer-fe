@@ -1,13 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useState } from 'react';
 import {
   TimeBoxInfo,
   Stance,
   TimeBoxType,
   BellType,
-  BellTypeToString,
   BellConfig,
 } from '../../../../type/type';
 import { Formatting } from '../../../../util/formatting';
+import {
+  SPEECH_TYPE_RECORD,
+  type SpeechTypeKey,
+} from '../../../../util/speechType';
 import normalTimerProsImage from '../../../../assets/timer/normal_timer_pros.jpg';
 import normalTimerConsImage from '../../../../assets/timer/normal_timer_cons.jpg';
 import normalTimerNeutralImage from '../../../../assets/timer/normal_timer_neutral.jpg';
@@ -38,27 +42,18 @@ type TimerCreationOption =
   | 'TIME_NORMAL'
   | 'BELL';
 
-type SpeechType =
-  | 'OPENING'
-  | 'REBUTTAL'
-  | 'TIMEOUT'
-  | 'CLOSING'
-  | 'CROSS_EXAM'
-  | 'CUSTOM';
-
-const SPEECH_TYPE_RECORD: Record<SpeechType, string> = {
-  OPENING: '입론',
-  CLOSING: '최종 발언',
-  CUSTOM: '직접 입력',
-  REBUTTAL: '반론',
-  CROSS_EXAM: '교차 조사',
-  TIMEOUT: '작전 시간',
-} as const;
+type SpeechType = SpeechTypeKey;
 
 const STANCE_RECORD: Record<Stance, string> = {
   PROS: '찬성',
   CONS: '반대',
   NEUTRAL: '중립',
+} as const;
+
+const BELL_TYPE_LABEL_KEYS: Record<BellType, string> = {
+  BEFORE_END: '종료 전',
+  AFTER_END: '종료 후',
+  AFTER_START: '시작 후',
 } as const;
 
 const NORMAL_OPTIONS: TimerCreationOption[] = [
@@ -104,6 +99,7 @@ export default function TimerCreationContent({
   onSubmit,
   onClose,
 }: TimerCreationContentProps) {
+  const { t } = useTranslation();
   const [stance, setStance] = useState<Stance>(
     beforeData?.stance
       ? beforeData?.stance === 'NEUTRAL'
@@ -119,20 +115,21 @@ export default function TimerCreationContent({
 
   // 발언 유형 초기화
   const getSpeechTypeFromString = (value: string): SpeechType => {
-    switch (value.trim()) {
-      case '입론':
+    const normalize = (val: string) => val.replace(/\s+/g, '').trim();
+    const normalized = normalize(value);
+    switch (normalized) {
+      case normalize(SPEECH_TYPE_RECORD.OPENING):
         return 'OPENING';
-      case '반론':
+      case normalize(SPEECH_TYPE_RECORD.REBUTTAL):
         return 'REBUTTAL';
-      case '최종발언':
-      case '최종 발언':
+      case normalize(SPEECH_TYPE_RECORD.CLOSING):
         return 'CLOSING';
-      case '작전시간':
-      case '작전 시간':
+      case normalize(SPEECH_TYPE_RECORD.TIMEOUT):
         return 'TIMEOUT';
-      case '교차조사':
-      case '교차 조사':
+      case normalize(SPEECH_TYPE_RECORD.CROSS_EXAM):
         return 'CROSS_EXAM';
+      case normalize(SPEECH_TYPE_RECORD.OPEN_DEBATE):
+        return 'OPEN_DEBATE';
       default:
         return 'CUSTOM';
     }
@@ -148,14 +145,20 @@ export default function TimerCreationContent({
   }, []);
 
   const initSpeechType =
-    beforeData?.speechType ?? initData?.speechType ?? '입론';
+    beforeData?.speechType ??
+    initData?.speechType ??
+    SPEECH_TYPE_RECORD.OPENING;
+  const isTimeBasedInit =
+    (beforeData?.boxType ?? initData?.boxType ?? 'NORMAL') === 'TIME_BASED';
   const [currentSpeechType, setCurrentSpeechType] = useState<SpeechType>(
-    getSpeechTypeFromString(initSpeechType),
+    isTimeBasedInit ? 'CUSTOM' : getSpeechTypeFromString(initSpeechType),
   );
   const [speechTypeTextValue, setSpeechTypeTextValue] = useState<string>(
-    currentSpeechType === 'CUSTOM'
-      ? (initData?.speechType ?? '')
-      : SPEECH_TYPE_RECORD[currentSpeechType],
+    isTimeBasedInit
+      ? initSpeechType
+      : currentSpeechType === 'CUSTOM'
+        ? (initData?.speechType ?? '')
+        : t(SPEECH_TYPE_RECORD[currentSpeechType]),
   );
 
   // 종소리 영역 확장 여부
@@ -204,6 +207,7 @@ export default function TimerCreationContent({
     { type: 'BEFORE_END', min: 0, sec: 30, count: 1 },
     { type: 'BEFORE_END', min: 0, sec: 0, count: 2 },
   ];
+
   const savedBellOptions: BellInputConfig[] =
     rawBellConfigData === null
       ? defaultBellConfig
@@ -242,31 +246,29 @@ export default function TimerCreationContent({
   const isNormalTimer = timerType === 'NORMAL';
 
   const speechTypeOptions: DropdownMenuItem<SpeechType>[] = [
-    { value: 'OPENING', label: SPEECH_TYPE_RECORD['OPENING'] },
-    { value: 'REBUTTAL', label: SPEECH_TYPE_RECORD['REBUTTAL'] },
-    { value: 'TIMEOUT', label: SPEECH_TYPE_RECORD['TIMEOUT'] },
-    { value: 'CROSS_EXAM', label: SPEECH_TYPE_RECORD['CROSS_EXAM'] },
-    { value: 'CLOSING', label: SPEECH_TYPE_RECORD['CLOSING'] },
-    { value: 'CUSTOM', label: SPEECH_TYPE_RECORD['CUSTOM'] },
+    { value: 'OPENING', label: t(SPEECH_TYPE_RECORD['OPENING']) },
+    { value: 'REBUTTAL', label: t(SPEECH_TYPE_RECORD['REBUTTAL']) },
+    { value: 'TIMEOUT', label: t(SPEECH_TYPE_RECORD['TIMEOUT']) },
+    { value: 'CROSS_EXAM', label: t(SPEECH_TYPE_RECORD['CROSS_EXAM']) },
+    { value: 'CLOSING', label: t(SPEECH_TYPE_RECORD['CLOSING']) },
+    { value: 'CUSTOM', label: t(SPEECH_TYPE_RECORD['CUSTOM']) },
   ] as const;
 
   const stanceOptions: DropdownMenuItem<Stance>[] = useMemo(
     () => [
       { value: 'PROS', label: prosTeamName },
       { value: 'CONS', label: consTeamName },
-      { value: 'NEUTRAL', label: STANCE_RECORD['NEUTRAL'] },
+      { value: 'NEUTRAL', label: t(STANCE_RECORD['NEUTRAL']) },
     ],
-    [prosTeamName, consTeamName],
+
+    [prosTeamName, consTeamName, t],
   );
 
-  const bellOptions: DropdownMenuItem<BellType>[] = useMemo(
-    () => [
-      { value: 'BEFORE_END', label: BellTypeToString['BEFORE_END'] },
-      { value: 'AFTER_END', label: BellTypeToString['AFTER_END'] },
-      { value: 'AFTER_START', label: BellTypeToString['AFTER_START'] },
-    ],
-    [],
-  );
+  const bellOptions: DropdownMenuItem<BellType>[] = [
+    { value: 'BEFORE_END', label: t(BELL_TYPE_LABEL_KEYS['BEFORE_END']) },
+    { value: 'AFTER_END', label: t(BELL_TYPE_LABEL_KEYS['AFTER_END']) },
+    { value: 'AFTER_START', label: t(BELL_TYPE_LABEL_KEYS['AFTER_START']) },
+  ];
 
   const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
 
@@ -280,7 +282,7 @@ export default function TimerCreationContent({
 
     if (timerType === 'NORMAL') {
       if (totalTime <= 0) {
-        errors.push('발언 시간은 1초 이상이어야 해요.');
+        errors.push(t('발언 시간은 1초 이상이어야 해요.'));
       }
 
       // 타종 옵션 유효성 검사
@@ -289,7 +291,7 @@ export default function TimerCreationContent({
           const bellTime = item.min * 60 + item.sec;
 
           if (bellTime > totalTime) {
-            errors.push('종료 전 타종은 발언 시간보다 길 수 없어요.');
+            errors.push(t('종료 전 타종은 발언 시간보다 길 수 없어요.'));
           }
         }
       });
@@ -297,25 +299,30 @@ export default function TimerCreationContent({
 
     if (timerType === 'TIME_BASED') {
       if (totalTimePerTeam <= 0) {
-        errors.push('팀당 발언 시간은 1초 이상이어야 해요.');
+        errors.push(t('팀당 발언 시간은 1초 이상이어야 해요.'));
       }
 
       if (totalTimePerSpeaking > totalTimePerTeam) {
-        errors.push('1회당 발언 시간은 팀당 발언 시간을 초과할 수 없어요.');
+        errors.push(t('1회당 발언 시간은 팀당 발언 시간을 초과할 수 없어요.'));
       }
     }
 
     // SpeechType에 맞게 문자열 매핑
     let speechTypeToSend: string;
     let stanceToSend: Stance;
-    if (speaker.trim().length > MAX_SPEAKER_LEN) {
-      errors.push(`발언자는 최대 ${MAX_SPEAKER_LEN}자까지 입력할 수 있습니다.`);
+    const trimmedSpeakerLength = speaker.trim().length;
+    if (trimmedSpeakerLength > MAX_SPEAKER_LEN) {
+      errors.push(
+        t('발언자는 최대 {{MAX_SPEAKER_LEN}}자까지 입력할 수 있습니다.', {
+          MAX_SPEAKER_LEN,
+        }),
+      );
     }
 
     if (currentSpeechType === 'CUSTOM') {
       // 텍스트 길이 유효성 검사
       if (speechTypeTextValue.length > 10) {
-        errors.push('발언 유형은 최대 10자까지 입력할 수 있습니다.');
+        errors.push(t('발언 유형은 최대 10자까지 입력할 수 있습니다.'));
       }
 
       // 발언시간 유효성 검사
@@ -323,12 +330,14 @@ export default function TimerCreationContent({
         timerType === 'TIME_BASED' &&
         totalTimePerSpeaking > totalTimePerTeam
       ) {
-        errors.push('1회당 발언 시간은 팀당 총 발언 시간보다 클 수 없습니다.');
+        errors.push(
+          t('1회당 발언 시간은 팀당 총 발언 시간보다 클 수 없습니다.'),
+        );
       }
 
       // 커스텀 타이머 발언유형 유효성 검사
       if (timerType === 'NORMAL' && speechTypeTextValue.trim() === '') {
-        errors.push('발언 유형을 입력해주세요.');
+        errors.push(t('발언 유형을 입력해주세요.'));
       }
     }
 
@@ -336,9 +345,12 @@ export default function TimerCreationContent({
       alert(errors.join('\n'));
       return;
     } else {
-      if (currentSpeechType === 'CUSTOM') {
+      if (timerType === 'TIME_BASED') {
         speechTypeToSend = speechTypeTextValue;
-        stanceToSend = timerType === 'TIME_BASED' ? 'NEUTRAL' : stance;
+        stanceToSend = 'NEUTRAL';
+      } else if (currentSpeechType === 'CUSTOM') {
+        speechTypeToSend = speechTypeTextValue;
+        stanceToSend = stance;
       } else {
         speechTypeToSend = SPEECH_TYPE_RECORD[currentSpeechType];
         stanceToSend = currentSpeechType === 'TIMEOUT' ? 'NEUTRAL' : stance;
@@ -362,7 +374,9 @@ export default function TimerCreationContent({
       onSubmit({
         stance: stanceToSend,
         speechType:
-          speechTypeToSend.trim() === '' ? '자유토론' : speechTypeToSend,
+          speechTypeToSend.trim() === ''
+            ? SPEECH_TYPE_RECORD.OPEN_DEBATE
+            : speechTypeToSend,
         boxType: timerType,
         time: null,
         timePerTeam: totalTimePerTeam,
@@ -389,6 +403,7 @@ export default function TimerCreationContent({
     teamSeconds,
     stance,
     speechTypeTextValue,
+    t,
     timerType,
   ]);
 
@@ -438,7 +453,7 @@ export default function TimerCreationContent({
       if (selectedValue === 'NEUTRAL') {
         if (currentSpeechType !== 'CUSTOM') {
           alert(
-            "중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다.",
+            t("중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다."),
           );
           return;
         }
@@ -446,7 +461,7 @@ export default function TimerCreationContent({
 
       setStance(selectedValue);
     },
-    [currentSpeechType],
+    [currentSpeechType, t],
   );
 
   const handleBellExpandButtonClick = useCallback(() => {
@@ -504,18 +519,14 @@ export default function TimerCreationContent({
         {/* 제목 */}
         <span className="flex flex-col space-y-[16px]">
           <h1 className="text-subtitle">
-            {timerType === 'NORMAL' ? '일반 타이머' : '자유토론 타이머'}
+            {timerType === 'NORMAL' ? t('일반 타이머') : t('자유토론 타이머')}
           </h1>
-          <p className="text-body leading-[1.5] text-default-neutral ">
-            {timerType === 'NORMAL' ? (
-              '한 팀의 발언 시간이 세팅된 일반적인 타이머'
-            ) : (
-              <>
-                {'팀별 발언 시간과 1회당 발언 시간이 세팅된 타이머'}
-                <br />
-                {'1회당 발언 시간이 지나면, 상대 팀으로 발언권이 넘어감'}
-              </>
-            )}
+          <p className="text-body whitespace-pre-line leading-[1.5] text-default-neutral ">
+            {timerType === 'NORMAL'
+              ? t('한 팀의 발언 시간이 세팅된 일반적인 타이머')
+              : t(
+                  '팀별 발언 시간과 1회당 발언 시간이 세팅된 타이머\n1회당 발언 시간이 지나면, 상대 팀으로 발언권이 넘어감',
+                )}
           </p>
         </span>
 
@@ -564,7 +575,7 @@ export default function TimerCreationContent({
               case 'TIMER_TYPE':
                 return (
                   <TimerCreationContentItem
-                    title="종류"
+                    title={t('종류')}
                     key={`${timerType}-${index}`}
                   >
                     <span className="flex w-full flex-row space-x-[16px]">
@@ -572,15 +583,16 @@ export default function TimerCreationContent({
                         id="timer-type-normal"
                         name="timer-type"
                         value="NORMAL"
-                        label="일반 타이머"
+                        label={t('일반 타이머')}
                         checked={isNormalTimer}
                         onChange={handleTimerChange}
                       />
+
                       <LabeledRadioButton
                         id="timer-type-time-based"
                         name="timer-type"
                         value="TIME_BASED"
-                        label="자유토론 타이머"
+                        label={t('자유토론 타이머')}
                         checked={!isNormalTimer}
                         onChange={handleTimerChange}
                       />
@@ -592,7 +604,7 @@ export default function TimerCreationContent({
               case 'SPEAKER':
                 return (
                   <TimerCreationContentItem
-                    title="발언자"
+                    title={t('발언자')}
                     key={`${timerType}-${index}`}
                   >
                     <ClearableInput
@@ -602,8 +614,8 @@ export default function TimerCreationContent({
                         setSpeaker(e.target.value.slice(0, MAX_SPEAKER_LEN))
                       }
                       onClear={() => setSpeaker('')}
+                      placeholder={t('N번 토론자')}
                       maxLength={MAX_SPEAKER_LEN}
-                      placeholder="N번"
                       disabled={
                         stance === 'NEUTRAL' || currentSpeechType === 'TIMEOUT'
                       }
@@ -615,7 +627,7 @@ export default function TimerCreationContent({
               case 'TIME_NORMAL':
                 return (
                   <TimeInputGroup
-                    title={`발언 시간`}
+                    title={t('발언 시간')}
                     key={`${timerType}-${index}`}
                     minutes={minutes}
                     seconds={seconds}
@@ -628,7 +640,7 @@ export default function TimerCreationContent({
               case 'TIME_PER_SPEAKING':
                 return (
                   <TimeInputGroup
-                    title={`1회당\n발언 시간`}
+                    title={t('1회당\n발언 시간')}
                     key={`${timerType}-${index}`}
                     minutes={speakerMinutes}
                     seconds={speakerSeconds}
@@ -641,7 +653,7 @@ export default function TimerCreationContent({
               case 'TIME_PER_TEAM':
                 return (
                   <TimeInputGroup
-                    title={`팀당\n발언 시간`}
+                    title={t('팀당\n발언 시간')}
                     key={`${timerType}-${index}`}
                     minutes={teamMinutes}
                     seconds={teamSeconds}
@@ -654,7 +666,7 @@ export default function TimerCreationContent({
               case 'SPEECH_TYPE_TIME_BASED':
                 return (
                   <TimerCreationContentItem
-                    title="발언 유형"
+                    title={t('발언 유형')}
                     key={`${timerType}-${index}`}
                   >
                     <ClearableInput
@@ -662,7 +674,7 @@ export default function TimerCreationContent({
                       value={speechTypeTextValue}
                       onChange={(e) => setSpeechTypeTextValue(e.target.value)}
                       onClear={() => setSpeechTypeTextValue('')}
-                      placeholder="주도권 토론 등"
+                      placeholder={t('주도권 토론 등')}
                     />
                   </TimerCreationContentItem>
                 );
@@ -671,7 +683,7 @@ export default function TimerCreationContent({
               case 'SPEECH_TYPE_NORMAL':
                 return (
                   <TimerCreationContentItem
-                    title="발언 유형"
+                    title={t('발언 유형')}
                     key={`${timerType}-${index}`}
                   >
                     <span className="flex flex-row items-center space-x-[16px]">
@@ -682,7 +694,7 @@ export default function TimerCreationContent({
                         options={speechTypeOptions}
                         selectedValue={currentSpeechType}
                         onSelect={handleSpeechTypeChange}
-                        placeholder="선택"
+                        placeholder={t('선택')}
                       />
 
                       {currentSpeechType === 'CUSTOM' && (
@@ -693,7 +705,7 @@ export default function TimerCreationContent({
                             setSpeechTypeTextValue(e.target.value)
                           }
                           onClear={() => setSpeechTypeTextValue('')}
-                          placeholder="입론, 반론, 작전 시간 등"
+                          placeholder={t('입론, 반론, 작전 시간 등')}
                         />
                       )}
                     </span>
@@ -704,7 +716,7 @@ export default function TimerCreationContent({
               case 'TEAM':
                 return (
                   <TimerCreationContentItem
-                    title="팀"
+                    title={t('팀')}
                     key={`${timerType}-${index}`}
                   >
                     <DropdownMenu
@@ -727,9 +739,8 @@ export default function TimerCreationContent({
                     <div className="flex w-full flex-row justify-between">
                       <div className="relative flex items-center space-x-[8px]">
                         <p className="text-body w-[80px] font-medium">
-                          종소리 설정
+                          {t('종소리 설정')}
                         </p>
-
                         <NotificationBadge
                           count={bells.length}
                           className="absolute -right-[16px] -top-[4px]"
@@ -741,8 +752,8 @@ export default function TimerCreationContent({
                         type="button"
                         aria-label={
                           isBellExpanded
-                            ? '종소리 설정 접기'
-                            : '종소리 설정 펼치기'
+                            ? t('종소리 설정 접기')
+                            : t('종소리 설정 펼치기')
                         }
                         onClick={handleBellExpandButtonClick}
                       >
@@ -774,6 +785,7 @@ export default function TimerCreationContent({
                               }));
                             }}
                           />
+
                           <span className="w-[8px]"></span>
 
                           {/* 분, 초, 타종 횟수 */}
@@ -796,9 +808,10 @@ export default function TimerCreationContent({
                                 min: getValidateTimeValue(safeValue),
                               }));
                             }}
-                            placeholder="분"
+                            placeholder={t('분')}
                           />
-                          <span>분</span>
+
+                          <span>{t('분')}</span>
 
                           <input
                             type="text"
@@ -819,9 +832,10 @@ export default function TimerCreationContent({
                                 sec: getValidateTimeValue(safeValue),
                               }));
                             }}
-                            placeholder="초"
+                            placeholder={t('초')}
                           />
-                          <span>초</span>
+
+                          <span>{t('초')}</span>
                           <span className="w-[8px]"></span>
 
                           <DTBell className="w-[24px]" />
@@ -832,8 +846,9 @@ export default function TimerCreationContent({
                             className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
                             value={bellInput.count}
                             onChange={handleBellCountChange}
-                            placeholder="횟수"
+                            placeholder={t('횟수')}
                           />
+
                           <span className="w-[8px]"></span>
 
                           <button
@@ -854,10 +869,13 @@ export default function TimerCreationContent({
                             >
                               <div className="flex items-center gap-1">
                                 <p className="text-[14px]">
-                                  {BellTypeToString[bell.type]}
+                                  {t(BELL_TYPE_LABEL_KEYS[bell.type])}
                                 </p>
                                 <p className="text-[14px]">
-                                  {bell.min}분 {bell.sec}초
+                                  {t('{{minutes}}분 {{seconds}}초', {
+                                    minutes: bell.min,
+                                    seconds: bell.sec,
+                                  })}
                                 </p>
 
                                 <span className="w-[8px]"></span>
@@ -880,6 +898,7 @@ export default function TimerCreationContent({
                     )}
                   </div>
                 );
+
               default:
                 return null;
             }
@@ -889,7 +908,7 @@ export default function TimerCreationContent({
 
       {/* 제출 버튼 */}
       <button className="button enabled brand" onClick={handleSubmit}>
-        설정 완료
+        {t('설정 완료')}
       </button>
     </div>
   );

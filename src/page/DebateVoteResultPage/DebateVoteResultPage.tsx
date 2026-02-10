@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
@@ -9,7 +10,14 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
 import { useCallback, useEffect, useState } from 'react';
 import DialogModal from '../../components/DialogModal/DialogModal';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
+
 export default function DebateVoteResultPage() {
+  const { t, i18n } = useTranslation();
   // 매개변수 검증
   const { pollId: rawPollId, tableId: rawTableId } = useParams();
   const pollId = rawPollId ? Number(rawPollId) : NaN;
@@ -20,6 +28,9 @@ export default function DebateVoteResultPage() {
 
   const [isConfirmed, setIsConfirmed] = useState(false);
   const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const rootPath = buildLangPath('/', lang);
 
   const {
     data,
@@ -30,11 +41,13 @@ export default function DebateVoteResultPage() {
     isRefetchError,
   } = useGetPollInfo(pollId, { enabled: isArgsValid });
   const handleGoHome = () => {
-    navigate('/');
+    navigate(rootPath);
   };
   const handleGoToEndPage = useCallback(() => {
-    navigate(`/table/customize/${tableId}/end`, { replace: true });
-  }, [navigate, tableId]);
+    navigate(buildLangPath(`/table/customize/${tableId}/end`, lang), {
+      replace: true,
+    });
+  }, [lang, navigate, tableId]);
 
   useEffect(() => {
     if (!isArgsValid) return;
@@ -70,7 +83,7 @@ export default function DebateVoteResultPage() {
     } else {
       return {
         teamKey: null,
-        teamName: '무승부',
+        teamName: t('무승부'),
       };
     }
   };
@@ -79,8 +92,8 @@ export default function DebateVoteResultPage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate('/')}>
-            유효하지 않은 투표 결과 링크입니다.
+          <ErrorIndicator onClickRetry={() => navigate(rootPath)}>
+            {t('유효하지 않은 투표 결과 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
@@ -96,8 +109,8 @@ export default function DebateVoteResultPage() {
     );
   }
   const { teamKey, teamName } = getWinner({
-    prosTeamName: data?.prosTeamName || '찬성팀',
-    consTeamName: data?.consTeamName || '반대팀',
+    prosTeamName: data?.prosTeamName || t('찬성팀'),
+    consTeamName: data?.consTeamName || t('반대팀'),
     prosCount: data?.prosCount || 0,
     consCount: data?.consCount || 0,
   });
@@ -107,7 +120,7 @@ export default function DebateVoteResultPage() {
         <div className="flex min-h-screen w-full flex-col items-center justify-center bg-brandBackground px-6 py-10 ">
           <header className="flex w-full max-w-[1120px] flex-col items-center gap-2 text-center">
             <h1 className="text-3xl font-bold text-default-black lg:text-4xl xl:text-display-raw">
-              승패투표
+              {t('승패투표')}
             </h1>
           </header>
 
@@ -123,7 +136,7 @@ export default function DebateVoteResultPage() {
                 className="button enabled neutral flex w-full flex-1 rounded-full p-[24px]"
                 disabled={isLoading}
               >
-                토론 종료화면으로
+                {t('토론 종료 화면으로 돌아가기')}
               </button>
               <button
                 type="button"
@@ -131,7 +144,7 @@ export default function DebateVoteResultPage() {
                 className="button enabled brand flex w-full flex-1 rounded-full p-[24px]"
                 disabled={isLoading}
               >
-                세부 결과 확인하기
+                {t('세부 결과 확인하기')}
               </button>
             </div>
           </DefaultLayout.StickyFooterWrapper>
@@ -141,11 +154,11 @@ export default function DebateVoteResultPage() {
         {isConfirmed ? (
           <VoteDetailResult
             pros={{
-              name: data?.prosTeamName ?? '찬성팀',
+              name: data?.prosTeamName ?? t('찬성팀'),
               count: data?.prosCount ?? 0,
             }}
             cons={{
-              name: data?.consTeamName ?? '반대팀',
+              name: data?.consTeamName ?? t('반대팀'),
               count: data?.consCount ?? 0,
             }}
             onGoHome={handleGoHome}
@@ -153,17 +166,17 @@ export default function DebateVoteResultPage() {
         ) : (
           <DialogModal
             left={{
-              text: '아니오',
+              text: t('아니오'),
               onClick: () => closeModal(),
             }}
             right={{
-              text: '네',
+              text: t('네'),
               onClick: () => setIsConfirmed(true),
               isBold: true,
             }}
           >
             <div className="break-keep px-20 py-10 text-center text-xl font-bold">
-              정말로 세부 결과를 공개할까요?
+              {t('정말로 세부 결과를 공개할까요?')}
             </div>
           </DialogModal>
         )}

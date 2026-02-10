@@ -1,6 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { RiCalendarScheduleLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../../util/languageRouting';
 
 interface GoToOverviewButtonProps {
   tableId: number;
@@ -11,15 +17,18 @@ export default function GoToOverviewButton({
   tableId,
   className = '',
 }: GoToOverviewButtonProps) {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const handleClick = (tableId: number) => {
-    navigate(`/overview/customize/${tableId}`);
+    const currentLang = i18n.resolvedLanguage ?? i18n.language;
+    const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+    navigate(buildLangPath(`/overview/customize/${tableId}`, lang));
   };
 
   return (
     <button
       type="button"
-      aria-label="시간표로 돌아가기"
+      aria-label={t('시간표로 돌아가기')}
       onClick={() => handleClick(tableId)}
       className={clsx(
         'button enabled neutral flex flex-row space-x-2 rounded-full p-[24px]',
@@ -27,7 +36,7 @@ export default function GoToOverviewButton({
       )}
     >
       <RiCalendarScheduleLine className="aspect-square h-full" />
-      <p>시간표로 돌아가기</p>
+      <p>{t('시간표로 돌아가기')}</p>
     </button>
   );
 }
