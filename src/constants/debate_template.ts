@@ -9,7 +9,7 @@ import hantomak from '../assets/template_logo/hantomak.png';
 import seobangjeongto from '../assets/template_logo/seobangjeongto.png';
 import osansi from '../assets/template_logo/osansi.png';
 import nogotte from '../assets/template_logo/nogotte.png';
-import kogito from '../assets/template_logo/kogito.png';
+import korea from '../assets/template_logo/korea.png';
 import mcu from '../assets/template_logo/mcu.png';
 import ylt from '../assets/template_logo/yuppm_law_track.png';
 import { DebateTemplate } from '../type/type';
@@ -83,6 +83,19 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
           label: 'CEDA 토론',
           href: createTableShareUrl(
             'eJzNlD1rwkAYx79KuKFTCirSlmy%2BZBBqIiYuLaWcempovITE0hYRSrHFgkMW%2B0YpcaqDQyoU%2FEzm8h16MdaKtih0iFvud5fn%2BfG%2Fh2sCpQy4%2BH6UBQquaIBrAgzrCHCAPDqkPfYe7ondc0c9r%2FfsvXSZXSbFpxOMd2e7fRuwoHGl%2B4dTBUkWs5kjniJYRbgMKaTfuqGZMoJ1YVbTGZL2B%2BUlDS9y13lyu9eUX0ADK7iaRKoKuApUTcSCioIVs7aAWrQtLKr0x%2BMmMBsQl%2Fwaubwo0QqmjlCpJgda5O020CxqlzMkiPls4tA3V%2FzWsXiE7k5r43NVDXAOGb7cEpJ0BM%2Bo3Dc2%2FTUyaM2oO%2BqAFrsgkxKFFZnJp0WcAUP6DrkZbolTaAH9dlthBxTiBMW2cII2cwotoPAnaNVJ4AtyftpmKSOLvNrzN%2FPHSs5k%2BdNkQuLTc7OgyZ9qe5HIejN%2FuYmX1x24bYu8d9zhmNlhJiNnzVVGD%2F4f21TupPUFcJhU9g%3D%3D',
+          ),
+        },
+      ],
+    },
+    {
+      title: 'FEDC',
+      subtitle: '고려대',
+      logoSrc: korea,
+      actions: [
+        {
+          label: 'FEDC 토론',
+          href: createTableShareUrl(
+            'eJzVlr9PwkAUx%2F%2BV5ganmiBGo90ESmIiLeHHoiHmgAMay7WhEDWEhAFcdNBEjENDqkYnhhqjceAvouf%2F4B1FQgwUwyBl633be%2Fd537z3rnWg5IGwFdzlgYILGhDqAMMyAgKIipEw93VhOQ8W4EH1XGdiOJ1MybH9Q5FKsIhwHlKRPusVzUghWJbcvcTukdYr1XMantQd%2B965alL9FFawgoshpKpAKEDVQDwoKFgxShNSgx4LsyrdeFQHRhXiHIsRT8hJGsHQEcqVUi4W6bZdzKx2NpIkORHbO2DkCjt6Ixigb4exabBRNiExKifEY1GKjL8LMOYargIh2Mi4YhxVWApAwDVVHUtJHcETmsKPbLA1qjA7GvwEbliWVglXEtOpxBDkF%2FENsVocuTQHdssLfPu%2FuNnyj0ZzrOzsjqffO0vye3Y1j6jXSLc3n38z4KPydnEHb32OPPVJ99mX4NOMXwnwmR16TUxrPK89GtRXHcos9wb2XYXMmdzLmiSLubu0i2ZBd311jX%2FcDuym23LrPmafesesCPusafdukse2Y5vk7pMjVsd56a3cv8kwBc7NwZfeT60bX1JnGt%2BsKGJW',
           ),
         },
       ],
@@ -277,7 +290,7 @@ export const DEBATE_TEMPLATE: DebateTemplateList = {
     {
       title: '코기토',
       subtitle: '고려대',
-      logoSrc: kogito,
+      logoSrc: korea,
       actions: [
         {
           label: '2:2 일반토론대회 형식',
