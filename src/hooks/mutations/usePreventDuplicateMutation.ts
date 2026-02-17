@@ -23,9 +23,9 @@ export function usePreventDuplicateMutation<
     TError,
     TVariables,
     TContext
-  >['onSettled'] = (data, error, variables, context) => {
+  >['onSettled'] = (...args) => {
     isMutatingRef.current = false;
-    options.onSettled?.(data, error, variables, context);
+    options.onSettled?.(...args);
   };
 
   const mutation = useMutation({ ...options, onSettled });
