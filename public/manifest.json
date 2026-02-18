@@ -1,0 +1,27 @@
+{
+  "short_name": "디베이트 타이머",
+  "name": "디베이트 타이머 - Debate Timer",
+  "icons": [
+    {
+      "src": "/favicons/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64 32x32 24x24 16x16"
+    },
+    {
+      "src": "/favicons/favicon192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicons/favicon512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#FECD4C"
+}
