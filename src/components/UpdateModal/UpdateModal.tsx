@@ -4,7 +4,6 @@ import {
   ImageOnlyPatchNoteData,
   isPredefinedPatchNote,
   PatchNoteData,
-  PredefinedPatchNoteData,
 } from '../../constants/patch_note';
 
 interface UpdateModalProps {
@@ -58,11 +57,11 @@ export default function UpdateModal({
             {/* 타이틀 및 내용 */}
             <div className="flex h-full flex-col items-center justify-center">
               <p className="text-[clamp(32px,2.8vw,45px)] font-bold text-brand">
-                {(data as PredefinedPatchNoteData).title}
+                {data.title}
               </p>
               <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] bg-brand" />
               <p className="text-center text-[clamp(20px,1.5vw,24px)]">
-                {(data as PredefinedPatchNoteData).description}
+                {data.description}
               </p>
             </div>
 
