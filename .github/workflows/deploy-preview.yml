@@ -59,9 +59,13 @@ jobs:
           <script>
             var params = new URLSearchParams(window.location.search);
             var state = params.get('state');
-            if (state) {
+            var validStateRegex = /^\/pr-\d+$/;
+            if (state && validStateRegex.test(state)) {
               params.delete('state');
               window.location.replace(state + '/oauth?' + params.toString());
+            } else {
+              document.title = 'Error';
+              document.body.textContent = '잘못된 접근입니다. (Invalid OAuth State)';
             }
           </script>
           </body>
