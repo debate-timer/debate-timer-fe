@@ -20,7 +20,7 @@ export default function UpdateModal({
   onClickDetailButton,
 }: UpdateModalProps) {
   return (
-    <div className="flex aspect-square w-[clamp(800px,min(62.5vw,90vh),1000px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
+    <div className="flex aspect-square w-[clamp(600px,min(47.5vw,90vh),780px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
       {isPredefinedPatchNote(data) ? (
         <>
           {/* 메인 컨텐츠 */}
