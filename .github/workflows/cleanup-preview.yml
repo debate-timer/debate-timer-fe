@@ -24,6 +24,12 @@ jobs:
         run: |
           aws s3 rm s3://${{ secrets.AWS_PREVIEW_BUCKET_NAME }}/pr-${{ github.event.pull_request.number }}/ --recursive
 
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.AWS_PREVIEW_CLOUDFRONT_ID }} \
+            --paths "/pr-${{ github.event.pull_request.number }}/*"
+
       - name: Comment Cleanup Notice
         uses: actions/github-script@v7
         with:
