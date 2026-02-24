@@ -20,18 +20,18 @@ export default function UpdateModal({
   onClickDetailButton,
 }: UpdateModalProps) {
   return (
-    <div className="flex aspect-square w-[clamp(800px,min(62.5vw,90vh),1000px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
+    <div className="flex aspect-square w-[clamp(600px,min(47.5vw,90vh),780px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
       {isPredefinedPatchNote(data) ? (
         <>
           {/* 메인 컨텐츠 */}
           <div className="flex h-[60%] w-full flex-col gap-[2%] bg-[#EFF0F4] p-[4.5%]">
-            <div className="flex w-full flex-row items-center gap-[1%]">
-              <div className="w-[15.7%] shrink-0">
-                <MegaphoneAsset className="h-auto w-full" />
+            <div className="flex h-[clamp(72px,6vh,96px)] w-full flex-row items-center gap-[1%]">
+              <div className="h-full w-[15.7%] shrink-0">
+                <MegaphoneAsset className="my-[8px] h-[80px] w-[93px]" />
               </div>
 
-              <div className="flex w-full flex-col space-y-[2.0%]">
-                <p className="text-[clamp(14px,1.25vw,20px)] leading-none text-default-black">
+              <div className="flex w-full flex-col space-y-[clamp(15px,1.25vw,20px)]">
+                <p className="text-[clamp(12px,0.875vw,14px)] leading-none text-default-black">
                   디베이트 타이머에 새로운 기능이 생겼어요!
                 </p>
 
@@ -56,11 +56,11 @@ export default function UpdateModal({
           <div className="flex w-full flex-1 flex-col p-[1%]">
             {/* 타이틀 및 내용 */}
             <div className="flex h-full flex-col items-center justify-center">
-              <p className="text-[clamp(32px,2.8vw,45px)] font-bold text-brand">
+              <p className="text-[clamp(26px,2.1vw,34px)] font-bold text-brand">
                 {data.title}
               </p>
               <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] bg-brand" />
-              <p className="text-center text-[clamp(20px,1.5vw,24px)]">
+              <p className="text-center text-[clamp(14px,1.1vw,18px)]">
                 {data.description}
               </p>
             </div>
@@ -73,11 +73,13 @@ export default function UpdateModal({
               <input
                 id="update-modal-hide-for-week-predefined"
                 type="checkbox"
-                className="border-gray size-[clamp(16px,1.5vw,20px)] rounded-[4px]"
+                className="border-gray size-[clamp(12px,0.93vw,15px)] rounded-[4px]"
                 checked={isChecked}
                 onChange={(e) => onChecked(e.target.checked)}
               />
-              <p className="text-[clamp(13px,1vw,16px)]">일주일 간 보지 않기</p>
+              <p className="text-[clamp(10px,0.75vw,12px)]">
+                일주일 간 보지 않기
+              </p>
             </label>
           </div>
         </>
@@ -100,11 +102,13 @@ export default function UpdateModal({
             <input
               id="update-modal-hide-for-week-image-only"
               type="checkbox"
-              className="border-gray size-[clamp(16px,1.5vw,20px)] rounded-[4px]"
+              className="border-gray size-[clamp(16px,1.25vw,20px)] rounded-[4px]"
               checked={isChecked}
               onChange={(e) => onChecked(e.target.checked)}
             />
-            <p className="text-[clamp(13px,1vw,16px)]">일주일 간 보지 않기</p>
+            <p className="text-[clamp(10px,0.75vw,12px)]">
+              일주일 간 보지 않기
+            </p>
           </label>
         </div>
       )}
