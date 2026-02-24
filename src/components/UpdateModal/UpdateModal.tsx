@@ -73,7 +73,7 @@ export default function UpdateModal({
               <input
                 id="update-modal-hide-for-week-predefined"
                 type="checkbox"
-                className="border-gray size-[clamp(16px,1.25vw,20px)] rounded-[4px]"
+                className="border-gray size-[clamp(12px,0.93vw,15px)] rounded-[4px]"
                 checked={isChecked}
                 onChange={(e) => onChecked(e.target.checked)}
               />
