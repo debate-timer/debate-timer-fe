@@ -71,5 +71,7 @@ export default function TemplateCard({
 function createTableShareUrl(encodeData: string): string {
   const baseUrl = import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
-  return `${normalizedBaseUrl}/share?data=${encodeData}`;
+  const basePath = import.meta.env.VITE_BASE_PATH;
+  const pathPrefix = basePath && basePath !== '/' ? basePath : '';
+  return `${normalizedBaseUrl}${pathPrefix}/share?data=${encodeData}`;
 }
