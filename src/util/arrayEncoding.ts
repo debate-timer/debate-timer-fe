@@ -28,7 +28,9 @@ export function createTableShareUrl(
   const resolvedBaseUrl =
     baseUrl && baseUrl.trim() !== '' ? baseUrl : window.location.origin;
   const normalizedBaseUrl = resolvedBaseUrl.replace(/\/+$/, '');
-  return `${normalizedBaseUrl}/share?data=${encoded}`;
+  const basePath = import.meta.env.VITE_BASE_PATH;
+  const pathPrefix = basePath && basePath !== '/' ? basePath : '';
+  return `${normalizedBaseUrl}${pathPrefix}/share?data=${encoded}`;
 }
 
 export function extractTableShareUrl(url: string): DebateTableData | null {

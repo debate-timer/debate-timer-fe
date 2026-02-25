@@ -19,7 +19,7 @@ i18n
 
     // 번역 파일을 불러올 위치
     backend: {
-      loadPath: '/locales/{{lng}}/translation.json',
+      loadPath: `${import.meta.env.VITE_BASE_PATH || ''}/locales/{{lng}}/translation.json`,
     },
 
     // React와 함께 사용할 때의 옵션

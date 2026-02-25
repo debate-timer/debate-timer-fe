@@ -33,7 +33,9 @@ export default function DebateVotePage() {
   const isArgsValid = isPollIdValid && isTableIdValid;
 
   const voteUrl = useMemo(() => {
-    return `${baseUrl}/vote/${pollId}`;
+    const basePath = import.meta.env.VITE_BASE_PATH;
+    const pathPrefix = basePath && basePath !== '/' ? basePath : '';
+    return `${baseUrl}${pathPrefix}/vote/${pollId}`;
   }, [baseUrl, pollId]);
 
   const handleGoToResult = () => {
