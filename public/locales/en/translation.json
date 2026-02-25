@@ -242,6 +242,7 @@
   "음소거 해제": "Unmute",
   "발언자는 최대 {{MAX_SPEAKER_LEN}}자까지 입력할 수 있습니다.": "Speaker can be up to {{MAX_SPEAKER_LEN}} characters.",
   "템플릿을 불러오는 중입니다...": "Loading templates...",
+  "템플릿을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.": "Failed to load templates. Please try again later.",
   "400 잘못된 요청": "400 Bad Request",
   "401 권한 없음": "401 Unauthorized",
   "403 거부됨": "403 Forbidden",

@@ -12,7 +12,7 @@ export default function TemplateList({ organizations }: TemplateListProps) {
     >
       {organizations.map((organization) => (
         <TemplateCard
-          key={organization.organization}
+          key={`${organization.organization}-${organization.affiliation}`}
           organization={organization}
         />
       ))}
