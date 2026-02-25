@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { customizeHandlers } from './customize';
 import { memberHandlers } from './member';
 import { pollHandlers } from './poll';
+import { organizationHandlers } from './organization';
 
 const TRANSLATIONS: Record<string, Record<string, string>> = {
   ko: {
@@ -45,4 +46,5 @@ export const allHandlers = [
   ...memberHandlers,
   ...customizeHandlers,
   ...pollHandlers,
+  ...organizationHandlers,
 ];
