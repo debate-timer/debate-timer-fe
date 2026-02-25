@@ -1,16 +1,20 @@
-import { DebateTemplate } from '../../../type/type';
+import { Organization } from '../../../type/type';
 import TemplateCard from './TemplateCard';
 
 interface TemplateListProps {
-  data: DebateTemplate[];
+  organizations: Organization[];
 }
-export default function TemplateList({ data }: TemplateListProps) {
+
+export default function TemplateList({ organizations }: TemplateListProps) {
   return (
     <div
       className={'grid grid-cols-2 gap-5 lg:grid-cols-3'} // 2열, lg에서 3열
     >
-      {data.map((template) => (
-        <TemplateCard key={template.title} {...template} />
+      {organizations.map((organization) => (
+        <TemplateCard
+          key={organization.organization}
+          organization={organization}
+        />
       ))}
     </div>
   );
