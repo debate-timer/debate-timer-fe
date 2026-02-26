@@ -1,5 +1,5 @@
 // 이미지 임포트는 아래와 같이
-import PatchNoteImage from '../assets/patchNote/0001.png';
+import PatchNoteImage from '../assets/patchNote/0002.png';
 
 // 기본적인 패치 노트 인터페이스
 interface BasePatchNoteData {
@@ -34,7 +34,7 @@ export function isPredefinedPatchNote(
 // 현재 활성화된 업데이트 데이터 (이 부분만 수정해서 배포하면 됨)
 export const LATEST_PATCH_NOTE: PredefinedPatchNoteData = {
   mode: 'predefined',
-  version: '0001',
+  version: '0002',
   title: '피드백 & 투표',
   description:
     '토론 종료 후 피드백 & 투표 기능으로 다양한 서비스를 이용하세요!',
