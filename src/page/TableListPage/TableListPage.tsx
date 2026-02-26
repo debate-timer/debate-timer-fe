@@ -4,7 +4,6 @@ import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { Suspense } from 'react';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import TableListPageContent from './components/TableListPageContent';
-import UpdateModalWrapper from '../../components/UpdateModal/UpdateModalWrapper';
 
 export default function TableListPage() {
   const { t } = useTranslation();
@@ -21,8 +20,6 @@ export default function TableListPage() {
       <DefaultLayout.ContentContainer>
         <Suspense fallback={<LoadingIndicator />}>
           <TableListPageContent />
-
-          <UpdateModalWrapper />
         </Suspense>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>
