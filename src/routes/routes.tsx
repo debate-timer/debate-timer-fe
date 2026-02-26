@@ -110,7 +110,6 @@ const router = createBrowserRouter(
         <>
           <ErrorBoundaryWrapper />
           <BackActionHandler />
-          <UpdateModalWrapper />
         </>
       ),
       children: [
