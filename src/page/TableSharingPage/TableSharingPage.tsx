@@ -75,7 +75,9 @@ export default function TableSharingPage() {
                 (value: PostDebateTableResponseType) => {
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
-                  navigate(buildLangPath(`/overview/customize/${value.id}`, lang));
+                  navigate(
+                    buildLangPath(`/overview/customize/${value.id}`, lang),
+                  );
                 },
                 // 저장 실패 시
                 () => {
@@ -137,7 +139,9 @@ export default function TableSharingPage() {
                 (value) => {
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
-                  navigate(buildLangPath(`/overview/customize/${value.id}`, lang));
+                  navigate(
+                    buildLangPath(`/overview/customize/${value.id}`, lang),
+                  );
                 },
                 () => {
                   closeModal();

@@ -88,7 +88,9 @@ export default function DebateVotePage() {
     return (
       <DefaultLayout>
         <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => navigate(buildLangPath('/', lang))}>
+          <ErrorIndicator
+            onClickRetry={() => navigate(buildLangPath('/', lang))}
+          >
             {t('유효하지 않은 투표 링크입니다.')}
           </ErrorIndicator>
         </DefaultLayout.ContentContainer>
