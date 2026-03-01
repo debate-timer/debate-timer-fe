@@ -24,7 +24,7 @@ export default function UpdateModal({
       {isPredefinedPatchNote(data) ? (
         <>
           {/* 메인 컨텐츠 */}
-          <div className="flex h-[60%] w-full flex-col gap-[2%] bg-[#EFF0F4] p-[4.5%]">
+          <div className="flex h-[59.5%] w-full flex-col gap-[clamp(36px,2.75vw,44px)] bg-[#EFF0F4] p-[4.5%]">
             <div className="flex h-[clamp(72px,6vh,96px)] w-full flex-row items-center gap-[1%]">
               <div className="h-full w-[15.7%] shrink-0">
                 <MegaphoneAsset className="my-[8px] h-[80px] w-[93px]" />

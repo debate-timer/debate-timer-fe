@@ -8,6 +8,7 @@ import ReportSection from './components/ReportSection';
 import useLandingPageHandlers from './hooks/useLandingPageHandlers';
 import TemplateSelection from './components/TemplateSelection';
 import ScrollHint from './components/ScrollHint';
+import UpdateModalWrapper from '../../components/UpdateModal/UpdateModalWrapper';
 export default function LandingPage() {
   const {
     handleStartWithoutLogin,
@@ -17,46 +18,50 @@ export default function LandingPage() {
   } = useLandingPageHandlers();
 
   return (
-    <div className="flex h-full w-full items-center justify-center bg-default-white">
-      {/* 헤더 */}
-      <Header onLoginButtonClicked={handleHeaderLoginButtonClick} />
+    <>
+      <div className="flex h-full w-full items-center justify-center bg-default-white">
+        {/* 헤더 */}
+        <Header onLoginButtonClicked={handleHeaderLoginButtonClick} />
 
-      <main className="flex w-full flex-col items-center">
-        {/* 흰색 배경 */}
-        <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 pb-48 pt-20 md:w-[64%]">
-          {/* 메인 화면 */}
-          <MainSection
-            onStartWithoutLogin={handleStartWithoutLogin}
-            onDashboardButtonClicked={handleDashboardButtonClick}
-          />
-          <ScrollHint />
-          {/*템플릿 선택 화면 */}
-          <TemplateSelection />
+        <main className="flex w-full flex-col items-center">
+          {/* 흰색 배경 */}
+          <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 pb-48 pt-20 md:w-[64%]">
+            {/* 메인 화면 */}
+            <MainSection
+              onStartWithoutLogin={handleStartWithoutLogin}
+              onDashboardButtonClicked={handleDashboardButtonClick}
+            />
+            <ScrollHint />
+            {/*템플릿 선택 화면 */}
+            <TemplateSelection />
 
-          {/* 시간표 설정화면 */}
-          <TimeTableSection />
-        </div>
+            {/* 시간표 설정화면 */}
+            <TimeTableSection />
+          </div>
 
-        {/* 회색 배경 */}
-        <div className="flex w-full flex-col items-center bg-default-disabled/hover py-48">
-          {/* 타이머 화면 */}
-          <TimerSection />
-        </div>
+          {/* 회색 배경 */}
+          <div className="flex w-full flex-col items-center bg-default-disabled/hover py-48">
+            {/* 타이머 화면 */}
+            <TimerSection />
+          </div>
 
-        {/* 흰색 배경 */}
-        <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
-          {/* 홈 설정 */}
-          <TableSection onLogin={handleTableSectionLoginButtonClick} />
-        </div>
-        <div className="flex w-full flex-col items-center bg-black py-48">
-          {/* 리뷰 */}
-          <ReviewSection onStartWithoutLogin={handleStartWithoutLogin} />
-        </div>
-        <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
-          {/* 버그 및 불편사항 제보 */}
-          <ReportSection />
-        </div>
-      </main>
-    </div>
+          {/* 흰색 배경 */}
+          <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
+            {/* 홈 설정 */}
+            <TableSection onLogin={handleTableSectionLoginButtonClick} />
+          </div>
+          <div className="flex w-full flex-col items-center bg-black py-48">
+            {/* 리뷰 */}
+            <ReviewSection onStartWithoutLogin={handleStartWithoutLogin} />
+          </div>
+          <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 py-48 md:w-[64%]">
+            {/* 버그 및 불편사항 제보 */}
+            <ReportSection />
+          </div>
+        </main>
+      </div>
+
+      <UpdateModalWrapper />
+    </>
   );
 }
