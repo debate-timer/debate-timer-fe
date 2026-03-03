@@ -135,13 +135,13 @@ export default function TableOverviewPage() {
               <PropsAndConsTitle
                 prosTeamName={
                   data !== undefined
-                    ? data.info.prosTeamName
-                    : StanceToString['PROS']
+                    ? t(data.info.prosTeamName)
+                    : t(StanceToString['PROS'])
                 }
                 consTeamName={
                   data !== undefined
-                    ? data.info.consTeamName
-                    : StanceToString['CONS']
+                    ? t(data.info.consTeamName)
+                    : t(StanceToString['CONS'])
                 }
               />
 

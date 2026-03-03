@@ -238,8 +238,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
               className="min-h-0 flex-1 overflow-y-auto"
             >
               <PropsAndConsTitle
-                prosTeamName={initData.info.prosTeamName}
-                consTeamName={initData.info.consTeamName}
+                prosTeamName={t(initData.info.prosTeamName)}
+                consTeamName={t(initData.info.consTeamName)}
               />
 
               <DragAndDropWrapper>
