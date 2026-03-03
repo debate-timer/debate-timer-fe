@@ -70,26 +70,10 @@ export default function TimerPage() {
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            {!isLoading && data && (
-              <HeaderTableInfo
-                name={
-                  data.info.name.trim() === ''
-                    ? t('테이블 이름 없음')
-                    : data.info.name
-                }
-              />
-            )}
+            {!isLoading && <HeaderTableInfo name={data?.info.name} />}
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            {!isLoading && data && (
-              <HeaderTitle
-                title={
-                  data.info.agenda.trim() === ''
-                    ? t('주제 없음')
-                    : data.info.agenda
-                }
-              />
-            )}
+            {!isLoading && <HeaderTitle title={data?.info.agenda} />}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
             <button
