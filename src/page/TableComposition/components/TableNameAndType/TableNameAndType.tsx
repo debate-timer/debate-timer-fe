@@ -128,10 +128,10 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               const pros = info.prosTeamName || '';
               const cons = info.consTeamName || '';
 
-              const isTooLong = pros.length > 8 || cons.length > 8;
+              const isTooLong = pros.length > 15 || cons.length > 15;
 
               if (isTooLong) {
-                alert(t('팀명은 최대 8자까지 입력할 수 있습니다.'));
+                alert(t('팀명은 최대 15자까지 입력할 수 있습니다.'));
                 return;
               }
 
