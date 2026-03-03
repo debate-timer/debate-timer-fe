@@ -9,7 +9,7 @@ export const organizationHandlers = [
         {
           organization: '한앎',
           affiliation: '한양대',
-          iconPath: '/icons/icon1.png',
+          iconPath: '/icon/icon1.png',
           templates: [
             {
               name: '템플릿1',
@@ -24,7 +24,7 @@ export const organizationHandlers = [
         {
           organization: '한모름',
           affiliation: '양한대',
-          iconPath: '/icons/icon2.png',
+          iconPath: '/icon/icon2.png',
           templates: [
             {
               name: '템플릿1',
