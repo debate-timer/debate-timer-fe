@@ -35,7 +35,9 @@ export function createTableShareUrlFromTable(
 
 export function createTableShareUrlFromEncodedData(encodeData: string): string {
   const baseUrl = import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
-  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  const resolvedBaseUrl =
+    baseUrl && baseUrl.trim() !== '' ? baseUrl : window.location.origin;
+  const normalizedBaseUrl = resolvedBaseUrl.replace(/\/+$/, '');
   const basePath = import.meta.env.VITE_BASE_PATH;
   const pathPrefix = basePath && basePath !== '/' ? basePath : '';
   return `${normalizedBaseUrl}${pathPrefix}/share?data=${encodeData}`;
