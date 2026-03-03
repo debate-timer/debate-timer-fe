@@ -256,8 +256,8 @@ export default function TimerCreationContent({
 
   const stanceOptions: DropdownMenuItem<Stance>[] = useMemo(
     () => [
-      { value: 'PROS', label: prosTeamName },
-      { value: 'CONS', label: consTeamName },
+      { value: 'PROS', label: t(prosTeamName) },
+      { value: 'CONS', label: t(consTeamName) },
       { value: 'NEUTRAL', label: t(STANCE_RECORD['NEUTRAL']) },
     ],
 
@@ -609,7 +609,7 @@ export default function TimerCreationContent({
                   >
                     <ClearableInput
                       id="speaker"
-                      value={speaker}
+                      value={t(speaker)}
                       onChange={(e) =>
                         setSpeaker(e.target.value.slice(0, MAX_SPEAKER_LEN))
                       }
