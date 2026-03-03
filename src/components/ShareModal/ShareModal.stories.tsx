@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import ShareModal from './ShareModal';
-import { createTableShareUrl } from '../../util/arrayEncoding';
+import { createTableShareUrlFromTable } from '../../util/arrayEncoding';
 
 const meta: Meta<typeof ShareModal> = {
   title: 'components/ShareModal',
@@ -12,7 +12,7 @@ export default meta;
 
 type Story = StoryObj<typeof ShareModal>;
 
-const shareUrl = createTableShareUrl('https://localhost:6006', {
+const shareUrl = createTableShareUrlFromTable('https://localhost:6006', {
   info: {
     agenda: '토론 주제',
     prosTeamName: '짜장',

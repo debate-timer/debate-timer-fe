@@ -11,4 +11,5 @@ export const ApiUrl = {
   parliamentary: makeUrl('/table/parliamentary'),
   customize: makeUrl('/table/customize'),
   poll: makeUrl('/polls'),
+  organization: makeUrl('/organizations'),
 };
