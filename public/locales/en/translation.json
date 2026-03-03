@@ -181,6 +181,9 @@
   "작전시간": "Prep Time",
   "교차조사": "Cross Fire",
   "직접입력": "Custom",
+  "1번": "No.1",
+  "2번": "No.2",
+  "3번": "No.3",
   "발언 시간은 1초 이상이어야 해요.": "Speaking Time must be at least 1 second.",
   "종료 전 타종은 발언 시간보다 길 수 없어요.": "The bell before the end cannot be longer than the Speaking Time.",
   "팀당 발언 시간은 1초 이상이어야 해요.": "Speaking Time per team must be at least 1 second.",
@@ -190,7 +193,7 @@
   "1회당 발언 시간은 팀당 총 발언 시간보다 클 수 없습니다.": "Per-turn Speaking Time cannot exceed the total team Speaking Time.",
   "발언 유형을 입력해주세요.": "Please enter a Speech Type.",
   "자유토론": "Open Debate",
-  "중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다.": "Neutral can only be selected when Speech Type is 'Custom'.",
+  "중립은 발언 유형이 '직접입력'일 경우에만 선택할 수 있습니다.": "Neutral can only be selected when Speech Type is 'Custom'.",
   "중립": "Neutral",
   "일반 타이머": "Standard timer",
   "자유토론 타이머": "Open Debate timer",
@@ -248,5 +251,7 @@
   "500 내부 서버 오류": "500 Internal Server Error",
   "502 게이트웨이 불량": "502 Bad Gateway",
   "503 서비스가 일시적으로 중단됨": "503 Service Unavailable",
-  "504 게이트웨이 시간 초과": "504 Gateway Timeout"
+  "504 게이트웨이 시간 초과": "504 Gateway Timeout",
+  "나의 토론 주제": "My Debate Topic",
+  "나의 시간표": "My Schedule"
 }

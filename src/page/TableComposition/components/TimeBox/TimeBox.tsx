@@ -140,7 +140,7 @@ export default function TimeBox(props: TimeBoxProps) {
           {getSpeechTypeLabel(speechType)}
           {speaker && (
             <span className="font-medium">
-              {t(' | {{speaker}} 토론자', { speaker })}
+              {t(' | {{speaker}} 토론자', { speaker: t(speaker) })}
             </span>
           )}
         </p>
