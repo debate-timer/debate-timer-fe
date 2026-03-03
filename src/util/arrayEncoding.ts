@@ -20,7 +20,7 @@ export function decodeDebateTableData(encodedData: string): DebateTableData {
   }
 }
 
-export function createTableShareUrl(
+export function createTableShareUrlFromTable(
   baseUrl: string | undefined,
   data: DebateTableData,
 ): string {
@@ -31,6 +31,14 @@ export function createTableShareUrl(
   const basePath = import.meta.env.VITE_BASE_PATH;
   const pathPrefix = basePath && basePath !== '/' ? basePath : '';
   return `${normalizedBaseUrl}${pathPrefix}/share?data=${encoded}`;
+}
+
+export function createTableShareUrlFromEncodedData(encodeData: string): string {
+  const baseUrl = import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  const basePath = import.meta.env.VITE_BASE_PATH;
+  const pathPrefix = basePath && basePath !== '/' ? basePath : '';
+  return `${normalizedBaseUrl}${pathPrefix}/share?data=${encodeData}`;
 }
 
 export function extractTableShareUrl(url: string): DebateTableData | null {

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Organization } from '../../../type/type';
 import clsx from 'clsx';
+import { createTableShareUrlFromEncodedData } from '../../../util/arrayEncoding';
 
 interface TemplateCardProps {
   organization: Organization;
@@ -54,7 +55,7 @@ export default function TemplateCard({
               </span>
 
               <a
-                href={createTableShareUrl(template.data)}
+                href={createTableShareUrlFromEncodedData(template.data)}
                 className="shrink-0 rounded-full border border-neutral-300 bg-brand px-4 py-1.5 text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-default-black transition-colors duration-100 hover:bg-semantic-table hover:text-white"
                 aria-label={t('{{label}} 토론하기', { label: template.name })}
               >
@@ -66,12 +67,4 @@ export default function TemplateCard({
       </ul>
     </article>
   );
-}
-
-function createTableShareUrl(encodeData: string): string {
-  const baseUrl = import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
-  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
-  const basePath = import.meta.env.VITE_BASE_PATH;
-  const pathPrefix = basePath && basePath !== '/' ? basePath : '';
-  return `${normalizedBaseUrl}${pathPrefix}/share?data=${encodeData}`;
 }
