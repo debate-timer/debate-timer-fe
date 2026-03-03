@@ -202,10 +202,26 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left>
-          {!isLoading && <HeaderTableInfo name={initData.info.name} />}
+          {!isLoading && initData && (
+            <HeaderTableInfo
+              name={
+                initData.info.name.trim() === ''
+                  ? t('테이블 이름 없음')
+                  : t(initData.info.name)
+              }
+            />
+          )}
         </DefaultLayout.Header.Left>
         <DefaultLayout.Header.Center>
-          {!isLoading && <HeaderTitle title={initData.info.agenda} />}
+          {!isLoading && (
+            <HeaderTitle
+              title={
+                initData.info.agenda.trim() === ''
+                  ? t('주제 없음')
+                  : t(initData.info.agenda)
+              }
+            />
+          )}
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
@@ -222,8 +238,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
               className="min-h-0 flex-1 overflow-y-auto"
             >
               <PropsAndConsTitle
-                prosTeamName={initData.info.prosTeamName}
-                consTeamName={initData.info.consTeamName}
+                prosTeamName={t(initData.info.prosTeamName)}
+                consTeamName={t(initData.info.consTeamName)}
               />
 
               <DragAndDropWrapper>

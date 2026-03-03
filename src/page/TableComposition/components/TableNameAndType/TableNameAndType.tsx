@@ -66,7 +66,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             {t('토론 시간표 이름')}
           </label>
           <ClearableInput
-            value={info.name}
+            value={t(info.name)}
             onChange={(e) => handleFieldChange('name', e.target.value)}
             onClear={() => clearField('name')}
             placeholder={t('시간표 1')}
@@ -77,7 +77,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             {t('토론 주제')}
           </label>
           <ClearableInput
-            value={info.agenda}
+            value={t(info.agenda)}
             onChange={(e) => handleFieldChange('agenda', e.target.value)}
             onClear={() => clearField('agenda')}
             placeholder={t('토론 주제를 입력해주세요')}
@@ -90,7 +90,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             </label>
             <div className="flex items-center gap-8">
               <ClearableInput
-                value={info.prosTeamName || ''}
+                value={t(info.prosTeamName) || ''}
                 onChange={(e) =>
                   onInfoChange({
                     ...info,
@@ -98,13 +98,13 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                   })
                 }
                 onClear={() => clearTeamNameField('prosTeamName')}
-                placeholder={StanceToString['PROS']}
+                placeholder={t(StanceToString['PROS'])}
                 disabled={isLoading}
               />
 
               <span>vs.</span>
               <ClearableInput
-                value={info.consTeamName || ''}
+                value={t(info.consTeamName) || ''}
                 onChange={(e) =>
                   onInfoChange({
                     ...info,
@@ -112,7 +112,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                   })
                 }
                 onClear={() => clearTeamNameField('consTeamName')}
-                placeholder={StanceToString['CONS']}
+                placeholder={t(StanceToString['CONS'])}
                 disabled={isLoading}
               />
             </div>
@@ -128,10 +128,10 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               const pros = info.prosTeamName || '';
               const cons = info.consTeamName || '';
 
-              const isTooLong = pros.length > 8 || cons.length > 8;
+              const isTooLong = pros.length > 15 || cons.length > 15;
 
               if (isTooLong) {
-                alert(t('팀명은 최대 8자까지 입력할 수 있습니다.'));
+                alert(t('팀명은 최대 15자까지 입력할 수 있습니다.'));
                 return;
               }
 
