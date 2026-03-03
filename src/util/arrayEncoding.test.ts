@@ -1,5 +1,6 @@
 import { DebateTableData } from '../type/type';
 import {
+  createTableShareUrlFromEncodedData,
   createTableShareUrlFromTable,
   decodeDebateTableData,
   encodeDebateTableData,
@@ -99,13 +100,23 @@ describe('토론 테이블 인코딩 유틸리티', () => {
     expect(() => decodeURIComponent(encoded)).not.toThrow();
   });
 
-  test('createEncodedURL 함수는 data 쿼리 파라미터가 포함된 올바른 URL을 생성해야 한다', () => {
+  test('createTableShareUrlFromTable 함수는 data 쿼리 파라미터가 포함된 올바른 URL을 생성해야 한다', () => {
     const baseUrl = 'https://example.com/';
     const url = createTableShareUrlFromTable(baseUrl, sampleData);
     const parsed = new URL(url);
     const encodedData = parsed.searchParams.get('data');
     expect(encodedData).toBeTruthy();
     const decoded = decodeDebateTableData(encodedData!);
+    expect(decoded).toEqual(sampleData);
+  });
+
+  test('createTableShareUrlFromEncodedData 함수도 data 쿼리 파라미터가 포함된 올바른 URL을 생성해야 한다', () => {
+    const encodedData = encodeDebateTableData(sampleData);
+    const url = createTableShareUrlFromEncodedData(encodedData);
+    const parsed = new URL(url);
+    const decodedData = parsed.searchParams.get('data');
+    expect(decodedData).toBeTruthy();
+    const decoded = decodeDebateTableData(decodedData!);
     expect(decoded).toEqual(sampleData);
   });
 
