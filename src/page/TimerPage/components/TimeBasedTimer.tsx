@@ -111,7 +111,7 @@ export default function TimeBasedTimer({
       {/* 제목 */}
       <section className="flex flex-row items-center justify-center space-x-[24px]">
         <h1 className="text-[48px] font-bold text-default-black xl:text-[64px]">
-          {teamName}
+          {t(teamName)}
         </h1>
         <img
           src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}

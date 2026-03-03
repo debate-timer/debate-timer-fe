@@ -83,9 +83,9 @@ export default function NormalTimer({
             <span className="flex max-w-[600px] flex-row items-center justify-center space-x-[16px]">
               <DTDebate className="w-[20px] flex-shrink-0 xl:w-[28px]" />
               <p className="truncate text-[20px] xl:text-[28px]">
-                {teamName && t('{{team}} 팀', { team: teamName })}
+                {teamName && t('{{team}} 팀', { team: t(teamName) })}
                 {item.speaker &&
-                  t(' | {{speaker}} 토론자', { speaker: item.speaker })}
+                  t(' | {{speaker}} 토론자', { speaker: t(item.speaker) })}
               </p>
             </span>
           )}
