@@ -1,15 +1,13 @@
-import { useTranslation } from 'react-i18next';
 import Skeleton from '../Skeleton/Skeleton';
 
 interface HeaderTitleProps {
   title?: string;
   skeletonEnabled?: boolean;
+  emptyText?: string;
 }
 
 export default function HeaderTitle(props: HeaderTitleProps) {
-  const { t } = useTranslation();
   const { title, skeletonEnabled: isLoading = false } = props;
-  const displayTitle = !title?.trim() ? '주제 없음' : title.trim();
 
   return (
     <>
@@ -20,7 +18,7 @@ export default function HeaderTitle(props: HeaderTitleProps) {
       )}
       {!isLoading && (
         <h1 className="w-full max-w-[50vw] overflow-hidden text-ellipsis whitespace-nowrap text-3xl">
-          {t(displayTitle)}
+          {title}
         </h1>
       )}
     </>
