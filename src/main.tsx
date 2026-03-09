@@ -18,7 +18,7 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
       .start({
         onUnhandledRequest: (request, print) => {
           // Let worker dismiss non-api calls by check whether url includes '/api'
-          if (!request.url.includes('/api')) {
+          if (!request.url.includes('/api') && !request.url.includes('/icon')) {
             console.log(
               "Dismissed request that doesn't include /api/: " + request.url,
             );
