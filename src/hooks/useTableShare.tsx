@@ -2,16 +2,13 @@ import { useModal } from './useModal';
 import ShareModal from '../components/ShareModal/ShareModal';
 import { useGetDebateTableData } from './query/useGetDebateTableData';
 import { useEffect, useState } from 'react';
-import { createTableShareUrl } from '../util/arrayEncoding';
+import { createTableShareUrlFromTable } from '../util/arrayEncoding';
 
 export function useTableShare(tableId: number) {
   const { isOpen, openModal, closeModal, ModalWrapper } = useModal();
   const [copyState, setCopyState] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
-  const baseUrl =
-    import.meta.env.MODE !== 'production'
-      ? undefined
-      : import.meta.env.VITE_SHARE_BASE_URL;
+  const baseUrl = import.meta.env.VITE_SHARE_BASE_URL;
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -35,7 +32,7 @@ export function useTableShare(tableId: number) {
   // Process URL when data is successfully fetched
   useEffect(() => {
     if (data) {
-      setShareUrl(createTableShareUrl(baseUrl, data));
+      setShareUrl(createTableShareUrlFromTable(baseUrl, data));
     }
   }, [baseUrl, data]);
 

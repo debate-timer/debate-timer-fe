@@ -1,5 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 interface GoToDebateEndButtonProps {
   tableId: number;
@@ -10,22 +16,25 @@ export default function GoToDebateEndButton({
   tableId,
   className = '',
 }: GoToDebateEndButtonProps) {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const handleClick = (tableId: number) => {
-    navigate(`/table/customize/${tableId}/end`);
+    const currentLang = i18n.resolvedLanguage ?? i18n.language;
+    const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+    navigate(buildLangPath(`/table/customize/${tableId}/end`, lang));
   };
 
   return (
     <button
       type="button"
-      aria-label="토론 종료 화면으로 돌아가기"
+      aria-label={t('토론 종료 화면으로 돌아가기')}
       onClick={() => handleClick(tableId)}
       className={clsx(
         'button enabled neutral flex flex-row rounded-full p-[24px]',
         className,
       )}
     >
-      뒤로 가기 ←
+      {t('토론 종료 화면으로 돌아가기')}
     </button>
   );
 }

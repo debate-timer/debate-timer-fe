@@ -5,11 +5,20 @@ import {
   deleteSessionCustomizeTableData,
   isGuestFlow,
 } from '../../util/sessionStorage';
+import { useTranslation } from 'react-i18next';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function OAuth() {
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasProcessedLogin = useRef(false);
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const { mutate } = usePostUser(() => {
     const keepGuestTable = sessionStorage.getItem('keepGuestTable');
@@ -21,9 +30,9 @@ export default function OAuth() {
     sessionStorage.removeItem('keepGuestTable');
 
     if (isGuestFlow()) {
-      navigate('/share');
+      navigate(buildLangPath('/share', lang));
     } else {
-      navigate('/');
+      navigate(buildLangPath('/', lang));
     }
   });
 

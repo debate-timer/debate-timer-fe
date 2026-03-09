@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,13 +20,21 @@ import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionMod
 import { useModal } from '../../hooks/useModal';
 import clsx from 'clsx';
 import { useState, useCallback } from 'react';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 export default function TableOverviewPage() {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
   const { openModal, closeModal, ModalWrapper } = useModal();
   const [modalCoinState, setModalCoinState] = useState<CoinState>('initial');
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const handleOpenModal = () => {
     setModalCoinState('initial');
@@ -46,7 +55,7 @@ export default function TableOverviewPage() {
     isRefetchError,
   } = useGetDebateTableData(tableId);
   const onModifyCustomizeTableData = usePatchDebateTable((tableId) => {
-    navigate(`/table/customize/${tableId}`);
+    navigate(buildLangPath(`/table/customize/${tableId}`, lang));
   });
 
   // Hook for sharing tables
@@ -57,7 +66,7 @@ export default function TableOverviewPage() {
   // 토론 시작하기 핸들러
   const handleStartDebate = () => {
     if (isGuestFlow()) {
-      navigate('/table/customize/guest');
+      navigate(buildLangPath('/table/customize/guest', lang));
     } else {
       onModifyCustomizeTableData.mutate({ tableId });
     }
@@ -66,13 +75,17 @@ export default function TableOverviewPage() {
   // 토론 수정하기 핸들러
   const handleEdit = () => {
     if (isGuestFlow()) {
-      navigate(`/composition?mode=edit&type=CUSTOMIZE`, {
+      navigate(buildLangPath(`/composition?mode=edit&type=CUSTOMIZE`, lang), {
         state: { step: 'NameAndType' },
       });
     } else {
-      navigate(`/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`, {
-        state: { step: 'NameAndType' },
-      });
+      navigate(
+        buildLangPath(
+          `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+          lang,
+        ),
+        { state: { step: 'NameAndType' } },
+      );
     }
   };
 
@@ -135,11 +148,12 @@ export default function TableOverviewPage() {
             >
               <img
                 src={Coins}
-                alt="팀 선정하기"
+                alt={t('팀 선정하기')}
                 className="mb-2 h-auto w-full"
               />
+
               <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full border-[2px] border-default-disabled/hover bg-default-white px-2 py-1.5 text-xs font-semibold text-default-black transition-colors duration-200 hover:bg-default-disabled/hover md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
-                팀 선정하기
+                {t('팀 선정하기')}
               </div>
             </button>
           )}
@@ -167,10 +181,18 @@ export default function TableOverviewPage() {
               disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
-                  navigate(`/composition?mode=edit&type=CUSTOMIZE`);
+                  navigate(
+                    buildLangPath(
+                      `/composition?mode=edit&type=CUSTOMIZE`,
+                      lang,
+                    ),
+                  );
                 } else {
                   navigate(
-                    `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+                    buildLangPath(
+                      `/composition?mode=edit&tableId=${tableId}&type=CUSTOMIZE`,
+                      lang,
+                    ),
                   );
                 }
               }}
@@ -190,7 +212,7 @@ export default function TableOverviewPage() {
                 onClick={handleStartDebate}
               >
                 <DTDebate className="h-full" />
-                토론하기
+                {t('토론하기')}
               </button>
             </div>
           </div>

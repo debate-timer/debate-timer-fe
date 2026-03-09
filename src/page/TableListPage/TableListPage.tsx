@@ -1,16 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { Suspense } from 'react';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import TableListPageContent from './components/TableListPageContent';
+import UpdateModalWrapper from '../../components/UpdateModal/UpdateModalWrapper';
 
 export default function TableListPage() {
+  const { t } = useTranslation();
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left />
         <DefaultLayout.Header.Center>
-          <HeaderTitle title="토론 시간표를 선택해주세요" />
+          <HeaderTitle title={t('토론 시간표를 선택해주세요')} />
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
@@ -18,6 +21,8 @@ export default function TableListPage() {
       <DefaultLayout.ContentContainer>
         <Suspense fallback={<LoadingIndicator />}>
           <TableListPageContent />
+
+          <UpdateModalWrapper />
         </Suspense>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>

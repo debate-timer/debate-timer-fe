@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import arrowDown from '../../../assets/landing/bottom_arrow.png';
 type ScrollHintProps = {
@@ -5,6 +6,7 @@ type ScrollHintProps = {
 };
 
 export default function ScrollHint({ topThreshold = 10 }: ScrollHintProps) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function ScrollHint({ topThreshold = 10 }: ScrollHintProps) {
       >
         <img
           src={arrowDown}
-          alt="아래로 스크롤"
+          alt={t('아래로 스크롤')}
           className="pointer-events-auto h-4 w-20 animate-bounce"
         />
       </div>

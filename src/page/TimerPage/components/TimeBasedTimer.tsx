@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
@@ -33,6 +34,7 @@ export default function TimeBasedTimer({
   teamName,
   item,
 }: TimeBasedTimerProps) {
+  const { t } = useTranslation();
   const {
     totalTimer,
     speakingTimer,
@@ -113,7 +115,7 @@ export default function TimeBasedTimer({
         </h1>
         <img
           src={prosCons === 'PROS' ? KeyboardKeyA : KeyboardKeyL}
-          alt={prosCons === 'PROS' ? 'A키' : 'L키'}
+          alt={prosCons === 'PROS' ? t('A키') : t('L키')}
           className="size-[44px] xl:size-[56px]"
         />
       </section>
@@ -138,7 +140,7 @@ export default function TimeBasedTimer({
         {speakingTimer !== null && (
           <span className="flex w-full flex-col items-center justify-center p-[8px] xl:p-[16px]">
             <h1 className="w-[88px] rounded-[8px] bg-default-black py-[6px] text-center text-[16px] text-default-white xl:w-[112px] xl:text-[20px]">
-              전체 시간
+              {t('전체 시간')}
             </h1>
             <span className="flex flex-row text-[56px] font-semibold tabular-nums text-default-black xl:text-[72px]">
               <p className="flex w-[80px] items-center justify-center xl:w-[100px]">
@@ -159,7 +161,7 @@ export default function TimeBasedTimer({
                 { 'bg-camp-red': prosCons === 'CONS' },
               )}
             >
-              현재 시간
+              {t('현재 시간')}
             </h1>
             <span className="flex flex-row text-[80px] font-bold tabular-nums text-default-black xl:text-[110px]">
               <p className="flex w-[120px] items-center justify-center xl:w-[180px]">

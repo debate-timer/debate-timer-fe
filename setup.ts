@@ -2,6 +2,7 @@ import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { server } from './src/mocks/server';
 import { vi } from 'vitest';
+import i18n from './src/i18n';
 
 // msw 서버 시작
 beforeAll(() => {
@@ -15,6 +16,17 @@ afterEach(() => server.resetHandlers());
 
 // msw 서버 종료
 afterAll(() => server.close());
+
+i18n.options.react = {
+  ...(i18n.options.react ?? {}),
+  useSuspense: false,
+};
+
+// 로컬스토리에 언어 설정
+if (typeof localStorage !== 'undefined') {
+  localStorage.setItem('i18nextLng', 'ko');
+}
+i18n.changeLanguage('ko');
 
 // vitest.setup.ts 또는 setupTests.ts
 // ResizeObserver를 전역적으로 모킹합니다.
