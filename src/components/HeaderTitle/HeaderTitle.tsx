@@ -3,7 +3,6 @@ import Skeleton from '../Skeleton/Skeleton';
 interface HeaderTitleProps {
   title?: string;
   skeletonEnabled?: boolean;
-  emptyText?: string;
 }
 
 export default function HeaderTitle(props: HeaderTitleProps) {
