@@ -671,7 +671,7 @@ export default function TimerCreationContent({
                   >
                     <ClearableInput
                       id="speech-type-time-based"
-                      value={speechTypeTextValue}
+                      value={t(speechTypeTextValue)}
                       onChange={(e) => setSpeechTypeTextValue(e.target.value)}
                       onClear={() => setSpeechTypeTextValue('')}
                       placeholder={t('주도권 토론 등')}
