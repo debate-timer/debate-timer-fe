@@ -73,19 +73,19 @@ export default function NormalTimer({
   return (
     <div className="flex flex-row space-x-[80px]">
       {/* 좌측 영역 */}
-      <span className="flex min-w-[360px] flex-col items-center justify-center xl:min-w-[450px]">
+      <span className="flex w-[360px] flex-shrink-0 flex-col items-center justify-center xl:w-[450px]">
         <span className="flex w-full flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
           {/* 제목 */}
           <h1 className="text-[52px] font-bold xl:text-[68px]">{titleText}</h1>
 
           {/* 발언자 및 팀 정보 */}
           {(teamName || item.speaker) && (
-            <span className="flex max-w-[600px] flex-row items-center justify-center space-x-[16px]">
+            <span className="flex w-full max-w-[600px] flex-row items-center justify-center space-x-[16px]">
               <DTDebate className="w-[20px] flex-shrink-0 xl:w-[28px]" />
-              <p className="truncate text-[20px] xl:text-[28px]">
-                {teamName && t('{{team}} 팀', { team: teamName })}
+              <p className="min-w-0 flex-1 truncate text-[20px] xl:text-[28px]">
+                {teamName && t('{{team}} 팀', { team: t(teamName) })}
                 {item.speaker &&
-                  t(' | {{speaker}} 토론자', { speaker: item.speaker })}
+                  t(' | {{speaker}} 토론자', { speaker: t(item.speaker) })}
               </p>
             </span>
           )}
@@ -130,7 +130,7 @@ export default function NormalTimer({
       </span>
 
       {/* 우측 영역 */}
-      <span className="flex w-[360px] flex-col space-y-[16px] xl:min-w-[480px]">
+      <span className="flex w-[360px] flex-shrink-0 flex-col space-y-[16px] xl:w-[480px]">
         {/* 타이머 */}
         <CircularTimer
           progress={progressMotionValue}

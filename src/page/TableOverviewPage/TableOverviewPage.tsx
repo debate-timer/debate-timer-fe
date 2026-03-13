@@ -104,10 +104,26 @@ export default function TableOverviewPage() {
       <DefaultLayout>
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            {!isLoading && <HeaderTableInfo name={data?.info.name} />}
+            {!isLoading && data && (
+              <HeaderTableInfo
+                name={
+                  data.info.name.trim() === ''
+                    ? t('테이블 이름 없음')
+                    : t(data.info.name)
+                }
+              />
+            )}
           </DefaultLayout.Header.Left>
           <DefaultLayout.Header.Center>
-            {!isLoading && <HeaderTitle title={data?.info.agenda} />}
+            {!isLoading && data && (
+              <HeaderTitle
+                title={
+                  data.info.agenda.trim() === ''
+                    ? t('주제 없음')
+                    : t(data.info.agenda)
+                }
+              />
+            )}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
@@ -119,13 +135,13 @@ export default function TableOverviewPage() {
               <PropsAndConsTitle
                 prosTeamName={
                   data !== undefined
-                    ? data.info.prosTeamName
-                    : StanceToString['PROS']
+                    ? t(data.info.prosTeamName)
+                    : t(StanceToString['PROS'])
                 }
                 consTeamName={
                   data !== undefined
-                    ? data.info.consTeamName
-                    : StanceToString['CONS']
+                    ? t(data.info.consTeamName)
+                    : t(StanceToString['CONS'])
                 }
               />
 
