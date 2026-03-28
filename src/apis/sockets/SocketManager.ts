@@ -80,7 +80,7 @@ class SocketManager {
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
     // 환경 변수에서 URL 로드
-    const wsUrl = import.meta.env.VITE_WS_BASE_URL;
+    const wsUrl = import.meta.env.VITE_API_BASE_URL + '/ws';
 
     this.client = new Client({
       // wss:// 대신 https:// 주소를 SockJS 팩토리에 주입
