@@ -80,7 +80,7 @@ export const useSocket = () => {
       subscriptions.current.clear();
 
       // 페이지를 나갈 때 소켓 연결을 끊을 것인가? (정책 결정 후 수정 예정)
-      // socketManager.disconnect();
+      socketManager.disconnect();
     };
   }, []);
 
