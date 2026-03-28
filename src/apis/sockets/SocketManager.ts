@@ -207,17 +207,18 @@ class SocketManager {
   }
 
   /**
-   * 현재 횟수에 따라 재연결 요청 딜레이를 지수 백오프 방식으로 계산하는 함수
-   * - 계산식은 `딜레이 = 기본 재시도 대기 시간 * 2 ^ 현재 재시도 횟수`
+   * 현재 횟수에 따라 재연결 요청 딜레이를 풀 지터 + 지수 백오프 방식으로 계산하는 함수입니다. (0, 최대 딜레이 상한선) 사이 난수를 반환합니다.
+   * - `최대 딜레이 상한선 = 기본 재시도 대기 시간 * 2 ^ 현재 재시도 횟수`
    * - 기본 재시도 대기 시간은 소켓 연결 시 `SocketOptions`에서 지정
    * - 현재 재시도 횟수는 소켓 연결 후 인스턴스 수준 변수로 내부에서 관리됨
    * @param currentRetryCount 현재 재시도 횟수
    * @returns 재연결 요청까지 필요한 딜레이 시간
    */
   private calculateBackoffDelay(currentRetryCount: number): number {
-    const exponentialDelay =
+    // 최대 지터 상한선 계산
+    const maxExponentialDelay =
       this.currentOptions.baseRetryDelayMs * Math.pow(2, currentRetryCount);
-    return exponentialDelay + this.currentOptions.jitterMs;
+    return Math.floor(Math.random() * maxExponentialDelay);
   }
 }
 
