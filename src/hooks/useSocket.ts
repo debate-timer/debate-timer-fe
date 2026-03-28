@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import { socketManager, SocketOptions } from '../apis/sockets/SocketManager';
+import { SocketMessage } from '../apis/sockets/type';
 
 export const useSocket = () => {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
@@ -18,7 +19,7 @@ export const useSocket = () => {
 
   // 메시지 발신 (Publish)
   const publish = useCallback(
-    <T extends object>(destination: string, body: T, headers: StompHeaders) => {
+    (destination: string, body: SocketMessage, headers: StompHeaders) => {
       socketManager.publish(destination, body, headers);
     },
     [],
