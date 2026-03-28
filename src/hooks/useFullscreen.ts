@@ -89,7 +89,7 @@ export default function useFullscreen() {
     }
   }, [isFullscreen]);
 
-  // 값을 직접 입력하는 함수
+  // 값을 직접입력하는 함수
   const setFullscreen = useCallback(async (value: boolean) => {
     const element = document.documentElement as HTMLElementWithFullscreen;
     const isCurrentlyFullscreen = !!getFullscreenElement();

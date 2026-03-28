@@ -10,7 +10,7 @@ export type SpeechTypeKey =
 export const SPEECH_TYPE_RECORD: Record<SpeechTypeKey, string> = {
   OPENING: '입론',
   CLOSING: '최종발언',
-  CUSTOM: '직접 입력',
+  CUSTOM: '직접입력',
   REBUTTAL: '반론',
   CROSS_EXAM: '교차조사',
   TIMEOUT: '작전시간',

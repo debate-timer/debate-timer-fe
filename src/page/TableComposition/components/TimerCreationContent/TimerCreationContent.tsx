@@ -256,8 +256,8 @@ export default function TimerCreationContent({
 
   const stanceOptions: DropdownMenuItem<Stance>[] = useMemo(
     () => [
-      { value: 'PROS', label: prosTeamName },
-      { value: 'CONS', label: consTeamName },
+      { value: 'PROS', label: t(prosTeamName) },
+      { value: 'CONS', label: t(consTeamName) },
       { value: 'NEUTRAL', label: t(STANCE_RECORD['NEUTRAL']) },
     ],
 
@@ -417,7 +417,7 @@ export default function TimerCreationContent({
         setCurrentSpeechType('OPENING'); // 자유토론 > 일반 전환 시 '입론'으로 초기화
         setStance('PROS');
       } else {
-        setCurrentSpeechType('CUSTOM'); // 일반 > 자유토론 전환 시 '직접 입력'으로 초기화
+        setCurrentSpeechType('CUSTOM'); // 일반 > 자유토론 전환 시 '직접입력'으로 초기화
         setSpeechTypeTextValue('');
       }
     },
@@ -453,7 +453,7 @@ export default function TimerCreationContent({
       if (selectedValue === 'NEUTRAL') {
         if (currentSpeechType !== 'CUSTOM') {
           alert(
-            t("중립은 발언 유형이 '직접 입력'일 경우에만 선택할 수 있습니다."),
+            t("중립은 발언 유형이 '직접입력'일 경우에만 선택할 수 있습니다."),
           );
           return;
         }
@@ -609,7 +609,7 @@ export default function TimerCreationContent({
                   >
                     <ClearableInput
                       id="speaker"
-                      value={speaker}
+                      value={t(speaker)}
                       onChange={(e) =>
                         setSpeaker(e.target.value.slice(0, MAX_SPEAKER_LEN))
                       }
@@ -671,7 +671,7 @@ export default function TimerCreationContent({
                   >
                     <ClearableInput
                       id="speech-type-time-based"
-                      value={speechTypeTextValue}
+                      value={t(speechTypeTextValue)}
                       onChange={(e) => setSpeechTypeTextValue(e.target.value)}
                       onClear={() => setSpeechTypeTextValue('')}
                       placeholder={t('주도권 토론 등')}

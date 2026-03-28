@@ -75,7 +75,7 @@ export default function TimerPage() {
                 name={
                   data.info.name.trim() === ''
                     ? t('테이블 이름 없음')
-                    : data.info.name
+                    : t(data.info.name)
                 }
               />
             )}
@@ -86,7 +86,7 @@ export default function TimerPage() {
                 title={
                   data.info.agenda.trim() === ''
                     ? t('주제 없음')
-                    : data.info.agenda
+                    : t(data.info.agenda)
                 }
               />
             )}
