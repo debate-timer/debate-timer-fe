@@ -10,10 +10,10 @@ export type TimerEventTypes =
   | 'TEAM_SWITCH';
 
 // 데이터가 없는 이벤트
-export type NullDataEventTypes = 'FINISHED' | 'ERROR';
+export type NonTimerEventType = 'FINISHED' | 'ERROR';
 
 // 데이터가 반드시 포함되는 이벤트
-export type SocketEventType = TimerEventTypes | NullDataEventTypes;
+export type SocketEventType = TimerEventTypes | NonTimerEventType;
 
 /** 소켓 통신에 사용되는, 타이머 이벤트 데이터 페이로드 */
 export interface TimerDataPayload {
@@ -41,6 +41,6 @@ export type SocketMessage =
       data: TimerDataPayload;
     }
   | {
-      eventType: NullDataEventTypes;
+      eventType: NonTimerEventType;
       data: null;
     };
