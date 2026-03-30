@@ -17,7 +17,12 @@ import { SocketMessage } from '../apis/sockets/type';
  */
 export const useSocket = () => {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
-  const subscriptions = useRef<Map<string, StompSubscription>>(new Map());
+  const activeSubscriptions = useRef<Map<string, StompSubscription>>(new Map());
+
+  // 재연결시 복구를 위해 지금까지 구독했던 채널과 콜백을 저장하는 보관서
+  const subscriptionInfos = useRef<Map<string, (message: IMessage) => void>>(
+    new Map(),
+  );
 
   /**
    * 소켓 연결
@@ -72,17 +77,21 @@ export const useSocket = () => {
    */
   const subscribe = useCallback(
     (destination: string, callback: (message: IMessage) => void) => {
-      // 이미 해당 채널을 구독 중이면 Map에서 구독 제거하여 재구독 가능하게 함
-      const existing = subscriptions.current.get(destination);
-      if (existing) {
-        existing.unsubscribe();
-        subscriptions.current.delete(destination);
-      }
+      // 구독 정보를 백업 리스트에 등록
+      subscriptionInfos.current.set(destination, callback);
 
-      // 구독 중이지 않다면, 구독 요청 후 성공 시 useRef로 유지하는 Map에 저장
-      const subscription = socketManager.subscribe(destination, callback);
-      if (subscription) {
-        subscriptions.current.set(destination, subscription);
+      // 소켓이 연결된 상태라면 즉시 구독 실행
+      if (socketManager.isConnected()) {
+        // 중복 구독 방지
+        if (activeSubscriptions.current.has(destination)) {
+          return;
+        }
+
+        // 중복이 아니라면 리스트에 등록
+        const subscription = socketManager.subscribe(destination, callback);
+        if (subscription) {
+          activeSubscriptions.current.set(destination, subscription);
+        }
       }
     },
     [],
@@ -94,23 +103,51 @@ export const useSocket = () => {
    * @param destination - 구독을 해제할 채널
    */
   const unsubscribe = useCallback((destination: string) => {
-    const subscription = subscriptions.current.get(destination);
+    // 백업 리스트의 구독 정보를 제거
+    subscriptionInfos.current.delete(destination);
+
+    // 현재 활성화되어 있는 구독 리스트에서도 제거
+    const subscription = activeSubscriptions.current.get(destination);
     if (subscription) {
-      subscription.unsubscribe(); // STOMP 서버에 해제 요청
-      subscriptions.current.delete(destination); // 맵에서 제거
+      subscription.unsubscribe();
+      activeSubscriptions.current.delete(destination);
     }
   }, []);
 
   // 클린업
   useEffect(() => {
-    return () => {
-      // 현재 컴포넌트가 만들어둔 모든 구독을 순회하며 일괄 해제합니다.
-      subscriptions.current.forEach((sub) => sub.unsubscribe());
+    // 소켓이 연결될 때마다 실행될 핸들러
+    const handleConnect = () => {
+      // 기존 활성화된 구독 리스트 초기화
+      activeSubscriptions.current.clear();
 
-      // 아래 Ref의 경우 React에 의해 렌더링되는 컴포넌트를 지시하지 않기 때문에,
-      // 주석의 경고와 전혀 연관이 없으므로 경고를 꺼 둡니다.
+      // 백업 리스트의 모든 구독을 다시 활성화
+      subscriptionInfos.current.forEach((callback, destination) => {
+        const subscription = socketManager.subscribe(destination, callback);
+        if (subscription) {
+          activeSubscriptions.current.set(destination, subscription);
+        }
+      });
+    };
+
+    // 이 핸들러 함수를 발행자(SocketManager)에 등록
+    socketManager.onConnectEvent(handleConnect);
+
+    // 언마운트 시 구독 클리어하는 함수
+    return () => {
+      // 먼저 발행자(SocketManager)에게 등록된 핸들러부터 제거
+      socketManager.offConnectEvent(handleConnect);
+
+      // 활성화된 모든 구독 해제
+      activeSubscriptions.current.forEach((subscription) =>
+        subscription.unsubscribe(),
+      );
+
+      // 아래 2줄에 대한 경고는 Ref가 React 컴포넌트일 경우에만 유효하므로, 여기선 비활성화
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      subscriptions.current.clear();
+      activeSubscriptions.current.clear();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      subscriptionInfos.current.clear();
     };
   }, []);
 

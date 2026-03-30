@@ -55,6 +55,36 @@ class SocketManager {
     return SocketManager.instance;
   }
 
+  // 재연결 시 안정적 구독 복구를 위한 리스너를 모아두는 Set
+  // - 관찰자 패턴(observer pattern) 적용
+  // - 관찰자(observer)는 구독을 관리하는 useSocket 훅
+  // - 발행자(publisher)는 재연결 여부를 알리는 이 클래스 (SocketManager)
+  private connectListeners: Set<() => void> = new Set();
+
+  /**
+   * 관찰자를 등록하는 함수
+   * @param listener - 연결 수립 시 각 구독에서 실행할 콜백 함수
+   */
+  public onConnectEvent(listener: () => void) {
+    this.connectListeners.add(listener);
+  }
+
+  /**
+   * 관찰자를 제거하는 함수
+   * @param listener - 제거할 콜백 함수
+   */
+  public offConnectEvent(listener: () => void) {
+    this.connectListeners.delete(listener);
+  }
+
+  /**
+   * 연결 여부를 확인하는 함수
+   * @returns 연결 여부
+   */
+  public isConnected(): boolean {
+    return this.client?.connected ?? false;
+  }
+
   /**
    * 웹 소켓(STOMP) 연결을 초기화하고 서버와 세션을 수립합니다.
    * HTTPS에서 WS로 업그레이드 시 청중과 사회자 모두 무인증으로 연결합니다.
@@ -71,6 +101,7 @@ class SocketManager {
     if (this.client && this.client.active) return;
 
     // 사용자가 지정한 옵션이 있다면 덮어쓰기
+    this.retryCount = 0;
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
     // 환경 변수에서 URL 로드
@@ -96,10 +127,8 @@ class SocketManager {
         console.log('✅ 웹 소켓(STOMP) 연결 성공');
         this.retryCount = 0;
 
-        // 옵션으로 전달된 콜백이 있다면 실행
-        if (options?.onConnect) {
-          options.onConnect();
-        }
+        // 모든 관찰자에게 연결이 수립되었다고 알림
+        this.connectListeners.forEach((listener) => listener());
       },
 
       onStompError: (frame) => {
@@ -212,7 +241,10 @@ class SocketManager {
     // 최대 지터 상한선 계산
     const maxExponentialDelay =
       this.currentOptions.baseRetryDelayMs * Math.pow(2, currentRetryCount);
-    return Math.floor(Math.random() * maxExponentialDelay);
+
+    // 난수가 0이 될 경우 STOMP가 재연결 비활성화로 파악하는 것을 막기 위해
+    // 계산한 값에 10 ms를 추가
+    return Math.floor(Math.random() * maxExponentialDelay) + 10;
   }
 }
 
