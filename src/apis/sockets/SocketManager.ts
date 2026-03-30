@@ -8,7 +8,6 @@ import { SocketMessage } from './type';
  * - `baseRetryDelayMs` 기본 재시도 대기 시간 (기본값 1000 ms)
  * - `heartbeatInMs` 수신 하트비트 주기 (기본값 10000 ms)
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
- * - `onConnect` 연결 시 실행할 콜백 함수
  */
 export interface SocketOptions {
   /** 최대 재시도 횟수 (기본값: 3) */
@@ -22,9 +21,6 @@ export interface SocketOptions {
 
   /** 발신 하트비트 주기 (기본값: 10000ms) */
   heartbeatOutMs?: number;
-
-  /** 연결이 성공적으로 수립된 직후 실행될 콜백 함수 */
-  onConnect?: () => void;
 }
 
 // 기본값 객체 선언 (onConnect를 제외한 모든 필수 속성 정의)
@@ -94,7 +90,6 @@ class SocketManager {
    * @param options.baseRetryDelayMs - 지수 백오프 계산의 기준이 되는 초기 지연 시간 (기본값: 1000)
    * @param options.heartbeatInMs - 서버 > 클라이언트 수신 하트비트 주기(ms) (기본값: 10000)
    * @param options.heartbeatOutMs - 클라이언트 > 서버 발신 하트비트 주기(ms) (기본값: 10000)
-   * @param options.onConnect - 연결이 성공적으로 수립된 직후 실행될 콜백 함수
    */
   public connect(options?: SocketOptions) {
     // 이미 클라이언트가 존재하고 연결되어 있다면 중복 연결 방지
@@ -107,7 +102,7 @@ class SocketManager {
     // 환경 변수에서 URL 로드
     const wsUrl = import.meta.env.VITE_API_BASE_URL + '/ws';
 
-    this.client = new Client({
+    const newClient = new Client({
       // wss:// 대신 https:// 주소를 SockJS 팩토리에 주입
       webSocketFactory: () => new SockJS(wsUrl),
 
@@ -137,12 +132,19 @@ class SocketManager {
       },
 
       onWebSocketClose: () => {
+        // 현재 SocketManager가 관리하는 중인 최신 소켓과 일치하는지 검증
+        if (this.client !== newClient) {
+          console.log('👻 과거 세션의 지연된 close 이벤트가 무시되었습니다.');
+          return;
+        }
+
         console.log('⚠️ 웹 소켓 연결이 종료되었습니다.');
         this.handleReconnection();
       },
     });
 
     // 실제 연결 시동
+    this.client = newClient;
     this.client.activate();
   }
 
