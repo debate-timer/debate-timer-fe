@@ -3,30 +3,55 @@ import { IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import { socketManager, SocketOptions } from '../apis/sockets/SocketManager';
 import { SocketMessage } from '../apis/sockets/type';
 
+/**
+ * 소켓 연결을 돕는 React 훅입니다. 제공되는 함수는 아래와 같습니다:
+ *
+ * - `connect`는 기존 HTTP 연결을 WS 연결로 업그레이드합니다. `options`를 통해 설정을 변경할 수 있습니다.
+ * 기본값은 [SocketManager.ts](../apis/sockets/SocketManager.ts) 참고.
+ * - `disconnect`는 소켓 연결을 끊습니다. 소켓 연결을 끊어야 할 책임은 소켓을 연결한 페이지에 있습니다.
+ * - `subscribe`는 특정 채널을 구독합니다.
+ * - `unsubscribe`는 특정 채널의 구독을 끊습니다. 이 훅이 언마운트될 때, 현재 구독된 채널들에 대해 자동으로 호출됩니다.
+ * - `publish`는 특정 채널로 메시지를 발행합니다.
+ *
+ * 특히, 구독 해제의 책임은 이 훅에 있으나, 연결 자체를 끊는 책임은 소켓을 호출한 페이지에 있다는 점을 유념해주세요.
+ */
 export const useSocket = () => {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
   const subscriptions = useRef<Map<string, StompSubscription>>(new Map());
 
-  // 연결
+  /**
+   * 소켓 연결
+   * HTTP 연결을 WS 연결로 업그레이드.
+   * @param options - (선택 옵션) 소켓 연결에 사용할 옵션. 상세 항목은 [SocketManager.ts](../apis/sockets/SocketManager.ts) 참고.
+   */
   const connect = useCallback((options?: SocketOptions) => {
     socketManager.connect(options);
   }, []);
 
-  // 해제
+  /**
+   * 소켓 연결 해제
+   * WS 연결을 끊음.
+   */
   const disconnect = useCallback(() => {
     socketManager.disconnect();
   }, []);
 
-  // 메시지 발신 (Publish)
+  /**
+   * 메시지 발행
+   * 특정 채널로 메시지 발행.
+   * @param destination - 목적지 채널
+   * @param body - 발행할 메시지
+   * @param headers - (선택 옵션) 필요에 따라 사용 가능한 STOMP 헤더.
+   */
   const publish = useCallback(
-    (destination: string, body: SocketMessage, headers: StompHeaders) => {
+    (destination: string, body: SocketMessage, headers?: StompHeaders) => {
       socketManager.publish(destination, body, headers);
     },
     [],
   );
 
   /**
-   * 구독 (Subscribe)
+   * 구독
    *
    * 이 함수는 반드시 소켓이 연결된 뒤에 사용해야 합니다!
    * 더 정확히 말하면, 소켓이 연결 성공 후에 실행하는 콜백 함수인 `onConnect` 안에
@@ -59,7 +84,11 @@ export const useSocket = () => {
     [],
   );
 
-  // 수동 구독 해제
+  /**
+   * 수동 구독 해제
+   * 수동으로 구독을 해제하는 함수.
+   * @param destination - 구독을 해제할 채널
+   */
   const unsubscribe = useCallback((destination: string) => {
     const subscription = subscriptions.current.get(destination);
     if (subscription) {
@@ -78,9 +107,6 @@ export const useSocket = () => {
       // 주석의 경고와 전혀 연관이 없으므로 경고를 꺼 둡니다.
       // eslint-disable-next-line react-hooks/exhaustive-deps
       subscriptions.current.clear();
-
-      // 페이지를 나갈 때 소켓 연결을 끊을 것인가? (정책 결정 후 수정 예정)
-      socketManager.disconnect();
     };
   }, []);
 
