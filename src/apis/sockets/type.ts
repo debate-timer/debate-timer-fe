@@ -18,7 +18,7 @@ export type SocketEventType = TimerEventTypes | NonTimerEventType;
 /** 소켓 통신에 사용되는, 타이머 이벤트 데이터 페이로드 */
 export interface TimerDataPayload {
   /** 타이머 유형 (자유토론, 일반) */
-  timerType: Omit<TimeBoxType, 'FEEDBACK'>;
+  timerType: Exclude<TimeBoxType, 'FEEDBACK'>;
 
   /** 현재 타이머 순서
    * - 0부터 시작

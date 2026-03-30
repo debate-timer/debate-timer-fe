@@ -4,7 +4,7 @@ import { SocketMessage } from './type';
 
 /**
  * 소켓 설정을 정하는 인터페이스
- * - `maxRetires` 최대 재시도 횟수 (기본값 3회)
+ * - `maxRetries` 최대 재시도 횟수 (기본값 3회)
  * - `baseRetryDelayMs` 기본 재시도 대기 시간 (기본값 1000 ms)
  * - `heartbeatInMs` 수신 하트비트 주기 (기본값 10000 ms)
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
