@@ -36,11 +36,15 @@ const clientInstances = vi.hoisted(
  */
 vi.mock('@stomp/stompjs', () => {
   class MockClient {
-    activate = vi.fn();
-    deactivate = vi.fn();
+    activate = vi.fn().mockImplementation(() => {
+      this.active = true;
+    });
+    deactivate = vi.fn().mockImplementation(() => {
+      this.active = false;
+    });
     publish = vi.fn();
     subscribe = vi.fn();
-    active = true;
+    active = false;
     connected = false;
     reconnectDelay: number;
     config: StompConfig;
