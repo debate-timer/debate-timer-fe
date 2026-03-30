@@ -59,21 +59,10 @@ export const useSocket = () => {
    * 구독
    *
    * 이 함수는 반드시 소켓이 연결된 뒤에 사용해야 합니다!
-   * 더 정확히 말하면, 소켓이 연결 성공 후에 실행하는 콜백 함수인 `onConnect` 안에
-   * 구독 함수를 넣어서 사용해야 해요.
    * 애초에 소켓이 연결되기도 전에 구독을 요청하는 것 자체가 모순적인 일이니까요.
    *
-   * 예를 들어, 아래 코드와 같이요:
-   * ```
-   * useEffect(() => {
-   *   connect({
-   *     onConnect: () => {
-   *       // ✅ 소켓 연결이 완전히 끝난 뒤에 구독해야 안전합니다!
-   *       subscribe('/topic/room/123', (msg) => console.log(msg));
-   *     }
-   *   });
-   * }, []);
-   * ```
+   * @params destination - 목적지 채널
+   * @params callback - 구독 이후 메시지를 받을 때마다 수행할 동작이 묘사된 콜백 함수
    */
   const subscribe = useCallback(
     (destination: string, callback: (message: IMessage) => void) => {
