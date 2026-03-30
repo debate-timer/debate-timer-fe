@@ -24,7 +24,7 @@ export interface SocketOptions {
 }
 
 // 기본값 객체 선언 (onConnect를 제외한 모든 필수 속성 정의)
-const DEFAULT_OPTIONS: Required<Omit<SocketOptions, 'onConnect'>> = {
+const DEFAULT_OPTIONS: Required<SocketOptions> = {
   maxRetries: 3,
   baseRetryDelayMs: 1000,
   heartbeatInMs: 10000,
@@ -100,7 +100,12 @@ class SocketManager {
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
     // 환경 변수에서 URL 로드
-    const wsUrl = import.meta.env.VITE_API_BASE_URL + '/ws';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    if (!baseUrl) {
+      console.error('VITE_API_BASE_URL 환경 변수가 설정되지 않았습니다.');
+      return;
+    }
+    const wsUrl = baseUrl + '/ws';
 
     const newClient = new Client({
       // wss:// 대신 https:// 주소를 SockJS 팩토리에 주입
@@ -217,7 +222,12 @@ class SocketManager {
         '🚨 최대 재연결 시도 횟수를 초과했습니다. 연결을 포기합니다.',
       );
       this.client.reconnectDelay = 0;
-      this.client.deactivate();
+
+      // 클라이언트 분리
+      const clientToDeactivate = this.client;
+      this.client = null;
+      clientToDeactivate.deactivate();
+
       return;
     }
 
