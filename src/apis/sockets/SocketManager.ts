@@ -5,7 +5,6 @@ import { SocketMessage } from './type';
 /**
  * 소켓 설정을 정하는 인터페이스
  * - `maxRetires` 최대 재시도 횟수 (기본값 3회)
- * - `jitterMs` 백엔드 부하를 막기 위한 지터 (기본값 500 ms)
  * - `baseRetryDelayMs` 기본 재시도 대기 시간 (기본값 1000 ms)
  * - `heartbeatInMs` 수신 하트비트 주기 (기본값 10000 ms)
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
@@ -14,9 +13,6 @@ import { SocketMessage } from './type';
 export interface SocketOptions {
   /** 최대 재시도 횟수 (기본값: 3) */
   maxRetries?: number;
-
-  /** 백엔드 부하를 막기 위한 지터(난수 분산) 값 (기본값: 500ms) */
-  jitterMs?: number;
 
   /** 지수 백오프 계산의 기준이 되는 초기 지연 시간 (기본값: 1000ms) */
   baseRetryDelayMs?: number;
@@ -34,7 +30,6 @@ export interface SocketOptions {
 // 기본값 객체 선언 (onConnect를 제외한 모든 필수 속성 정의)
 const DEFAULT_OPTIONS: Required<Omit<SocketOptions, 'onConnect'>> = {
   maxRetries: 3,
-  jitterMs: 500,
   baseRetryDelayMs: 1000,
   heartbeatInMs: 10000,
   heartbeatOutMs: 10000,
@@ -66,7 +61,6 @@ class SocketManager {
    *
    * @param options - 소켓 클라이언트 동작을 제어하는 선택적 설정 객체
    * @param options.maxRetries - 최대 재연결 시도 횟수 (기본값: 3)
-   * @param options.jitterMs - 재연결 지연 시간에 추가될 지터(난수 분산) 값 (기본값: 500)
    * @param options.baseRetryDelayMs - 지수 백오프 계산의 기준이 되는 초기 지연 시간 (기본값: 1000)
    * @param options.heartbeatInMs - 서버 > 클라이언트 수신 하트비트 주기(ms) (기본값: 10000)
    * @param options.heartbeatOutMs - 클라이언트 > 서버 발신 하트비트 주기(ms) (기본값: 10000)
