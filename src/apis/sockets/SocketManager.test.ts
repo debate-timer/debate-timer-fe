@@ -135,9 +135,9 @@ describe('SocketManager', () => {
      * handleReconnection()은 현재 retryCount로 딜레이를 계산한 후 retryCount를 증가시킵니다.
      *
      * Math.random = 0.5, baseRetryDelayMs = 1000 고정 시:
-     *   초기 connect:  calculateBackoffDelay(0) = floor(0.5 * 1000 * 2^0) = 500
-     *   1번째 close:   calculateBackoffDelay(0) = floor(0.5 * 1000 * 2^0) = 500  → retryCount: 0 → 1
-     *   2번째 close:   calculateBackoffDelay(1) = floor(0.5 * 1000 * 2^1) = 1000 → retryCount: 1 → 2
+     *   초기 connect:  calculateBackoffDelay(0) = floor(0.5 * 1000 * 2^0) = 500 + 10
+     *   1번째 close:   calculateBackoffDelay(0) = floor(0.5 * 1000 * 2^0) = 500 + 10  → retryCount: 0 → 1
+     *   2번째 close:   calculateBackoffDelay(1) = floor(0.5 * 1000 * 2^1) = 1000 + 10 → retryCount: 1 → 2
      */
     it('onWebSocketClose 발생 시 지수 백오프 딜레이를 갱신해야 한다', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
@@ -145,16 +145,16 @@ describe('SocketManager', () => {
 
       const client = getLatestClient();
 
-      // 초기 딜레이: calculateBackoffDelay(0) = 500
-      expect(client.reconnectDelay).toBe(500);
+      // 초기 딜레이: calculateBackoffDelay(0) = 500 + 10
+      expect(client.reconnectDelay).toBe(500 + 10);
 
-      // 1번째 끊김: retryCount=0 기준 계산 → 500, 이후 retryCount=1
+      // 1번째 끊김: retryCount=0 기준 계산 → 500 + 10, 이후 retryCount=1
       client.config.onWebSocketClose?.({} as CloseEvent);
-      expect(client.reconnectDelay).toBe(500);
+      expect(client.reconnectDelay).toBe(500 + 10);
 
       // 2번째 끊김: retryCount=1 기준 계산 → 1000, 이후 retryCount=2
       client.config.onWebSocketClose?.({} as CloseEvent);
-      expect(client.reconnectDelay).toBe(1000);
+      expect(client.reconnectDelay).toBe(1000 + 10);
     });
 
     it('최대 재시도 횟수(maxRetries) 초과 시 reconnectDelay를 0으로 설정하고 연결을 해제해야 한다', () => {
@@ -185,9 +185,9 @@ describe('SocketManager', () => {
       // 재연결 성공 → retryCount 0으로 리셋
       client.config.onConnect?.({} as IMessage);
 
-      // 끊김 1번: retryCount=0 기준 계산 → 500 (retryCount가 리셋됐으므로)
+      // 끊김 1번: retryCount=0 기준 계산 → 500 + 10 (retryCount가 리셋됐으므로)
       client.config.onWebSocketClose?.({} as CloseEvent);
-      expect(client.reconnectDelay).toBe(500);
+      expect(client.reconnectDelay).toBe(500 + 10);
     });
   });
 
