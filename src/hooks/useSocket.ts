@@ -72,8 +72,12 @@ export const useSocket = () => {
    */
   const subscribe = useCallback(
     (destination: string, callback: (message: IMessage) => void) => {
-      // 이미 해당 채널을 구독 중이면 중복 구독 방지
-      if (subscriptions.current.has(destination)) return;
+      // 이미 해당 채널을 구독 중이면 Map에서 구독 제거하여 재구독 가능하게 함
+      const existing = subscriptions.current.get(destination);
+      if (existing) {
+        existing.unsubscribe();
+        subscriptions.current.delete(destination);
+      }
 
       // 구독 중이지 않다면, 구독 요청 후 성공 시 useRef로 유지하는 Map에 저장
       const subscription = socketManager.subscribe(destination, callback);
