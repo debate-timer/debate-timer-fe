@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as Sentry from '@sentry/react';
 import {
   getAccessToken,
   removeAccessToken,
@@ -13,12 +14,13 @@ import {
 
 // Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
+const requestTimeoutMs = 5000;
 
 // Axios instance
 export const axiosInstance = axios.create({
   baseURL:
     currentMode === 'test' ? undefined : import.meta.env.VITE_API_BASE_URL,
-  timeout: 5000,
+  timeout: requestTimeoutMs,
   timeoutErrorMessage:
     '시간 초과로 인해 요청을 처리하지 못했어요... 잠시 후 다시 시도해 주세요.',
   headers: {
@@ -37,6 +39,40 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+
+function captureClientApiError(error: unknown) {
+  if (!axios.isAxiosError(error)) {
+    return;
+  }
+
+  const { response, config, code } = error;
+  const status = response?.status;
+
+  // 4xx 응답만 수집하고, 인증 재발급/서버 오류/네트워크 실패는 제외
+  if (status === undefined || status === 401 || status < 400 || status >= 500) {
+    return;
+  }
+
+  if (code === 'ECONNABORTED') {
+    return;
+  }
+
+  Sentry.captureException(error, {
+    tags: {
+      errorType: 'api-client-error',
+      httpStatus: String(status),
+    },
+    extra: {
+      url: config?.url,
+      method: config?.method,
+      baseURL: config?.baseURL,
+      params: config?.params,
+      requestData: config?.data,
+      responseData: response?.data,
+      timeout: config?.timeout ?? requestTimeoutMs,
+    },
+  });
+}
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
@@ -79,6 +115,9 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
+    captureClientApiError(error);
+
     return Promise.reject(error);
   },
 );
