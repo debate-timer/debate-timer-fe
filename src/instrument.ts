@@ -15,8 +15,8 @@ if (import.meta.env.PROD && dsn) {
         blockAllMedia: true,
       }),
     ],
-    // 초기 도입 단계에서는 추적 데이터를 넉넉히 수집하고, 이후 필요 시 낮춤
-    tracesSampleRate: 1.0,
+    // 백엔드는 Datadog를 사용 중이므로, 프론트 단독 성능 추적만 낮은 비율로 수집
+    tracesSampleRate: 0.1,
     // 일반 세션 Replay는 수집 X
     replaysSessionSampleRate: 0,
     // 에러가 발생한 세션은 모두 Replay로 남김
