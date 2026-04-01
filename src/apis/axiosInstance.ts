@@ -48,19 +48,15 @@ function captureClientApiError(error: unknown) {
   const { response, config, code } = error;
   const status = response?.status;
 
-  // 4xx 응답만 수집하고, 인증 재발급/서버 오류/네트워크 실패는 제외
-  if (status === undefined || status === 401 || status < 400 || status >= 500) {
-    return;
-  }
-
-  if (code === 'ECONNABORTED') {
+  // 401 재발급 흐름과 정상/리다이렉트 응답만 제외하고, 4xx/5xx/네트워크 실패/타임아웃은 수집
+  if (status === 401 || (status !== undefined && status < 400)) {
     return;
   }
 
   Sentry.captureException(error, {
     tags: {
-      errorType: 'api-client-error',
-      httpStatus: String(status),
+      errorType: 'api-error',
+      httpStatus: status ? String(status) : 'network-error',
     },
     extra: {
       url: config?.url,
@@ -70,6 +66,7 @@ function captureClientApiError(error: unknown) {
       requestData: config?.data,
       responseData: response?.data,
       timeout: config?.timeout ?? requestTimeoutMs,
+      errorCode: code,
     },
   });
 }
@@ -106,6 +103,14 @@ axiosInstance.interceptors.response.use(
         originalRequest.headers.Authorization = `${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        if (
+          axios.isAxiosError(refreshError) &&
+          refreshError.response?.status !== 401 &&
+          refreshError.response?.status !== 403
+        ) {
+          captureClientApiError(refreshError);
+        }
+
         console.error('Refresh Token is invalid or expired', refreshError);
         // 재발급도 실패하면 -> 로그인 페이지 이동
         const currentLang = i18n.resolvedLanguage ?? i18n.language;
