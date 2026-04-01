@@ -8,9 +8,10 @@ const viteConfig = defineViteConfig(({ mode }) => {
   const isProductionBuild = mode === 'production';
   const hasSentryAuth =
     !!env.SENTRY_AUTH_TOKEN && !!env.SENTRY_ORG && !!env.SENTRY_PROJECT;
+  const shouldUploadSourcemaps = isProductionBuild && hasSentryAuth;
   const plugins = [react()];
 
-  if (isProductionBuild && hasSentryAuth) {
+  if (shouldUploadSourcemaps) {
     plugins.push(
       sentryVitePlugin({
         authToken: env.SENTRY_AUTH_TOKEN,
@@ -28,7 +29,7 @@ const viteConfig = defineViteConfig(({ mode }) => {
     base: env.VITE_BASE_PATH || '/',
     plugins,
     build: {
-      sourcemap: isProductionBuild ? 'hidden' : false,
+      sourcemap: shouldUploadSourcemaps ? 'hidden' : false,
     },
     server: {
       proxy: {
