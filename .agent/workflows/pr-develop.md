@@ -17,6 +17,12 @@ description: Create a PR from current branch to develop branch with automated ti
 
 6. Push current branch to remote if not already pushed.
 
-7. Create PR: `gh pr create --base develop --title "{title}" --body "{body}"` using heredoc for multi-line body.
+7. Create PR using heredoc to safely handle special characters in the body:
+   ```
+   gh pr create --base develop --title "{title}" --body "$(cat <<'EOF'
+   {body}
+   EOF
+   )"
+   ```
 
 8. Output the created PR URL to the user.

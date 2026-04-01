@@ -11,114 +11,126 @@ const COLOR_AXIS = '#333333';
 
 // Ideal composition size: 1280x720
 
-const Title: React.FC<{children: React.ReactNode}> = ({children}) => (
-	<div style={{textAlign: 'center', marginBottom: 40}}>
-		<div style={{color: COLOR_TEXT, fontSize: 48, fontWeight: 600}}>
-			{children}
+function Title({children}: {children: React.ReactNode}) {
+	return (
+		<div style={{textAlign: 'center', marginBottom: 40}}>
+			<div style={{color: COLOR_TEXT, fontSize: 48, fontWeight: 600}}>
+				{children}
+			</div>
 		</div>
-	</div>
-);
+	);
+}
 
-const YAxis: React.FC<{steps: number[]; height: number}> = ({
+function YAxis({
 	steps,
 	height,
-}) => (
-	<div
-		style={{
-			display: 'flex',
-			flexDirection: 'column',
-			justifyContent: 'space-between',
-			height,
-			paddingRight: 16,
-		}}
-	>
-		{steps
-			.slice()
-			.reverse()
-			.map((step) => (
-				<div
-					key={step}
-					style={{
-						color: COLOR_MUTED,
-						fontSize: 20,
-						textAlign: 'right',
-					}}
-				>
-					{step.toLocaleString()}
-				</div>
-			))}
-	</div>
-);
-
-const Bar: React.FC<{
+}: {
+	steps: number[];
 	height: number;
-	progress: number;
-}> = ({height, progress}) => (
-	<div
-		style={{
-			flex: 1,
-			display: 'flex',
-			flexDirection: 'column',
-			justifyContent: 'flex-end',
-		}}
-	>
+}) {
+	return (
 		<div
 			style={{
-				width: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'space-between',
 				height,
-				backgroundColor: COLOR_BAR,
-				borderRadius: '8px 8px 0 0',
-				opacity: progress,
+				paddingRight: 16,
 			}}
-		/>
-	</div>
-);
+		>
+			{steps
+				.slice()
+				.reverse()
+				.map((step) => (
+					<div
+						key={step}
+						style={{
+							color: COLOR_MUTED,
+							fontSize: 20,
+							textAlign: 'right',
+						}}
+					>
+						{step.toLocaleString()}
+					</div>
+				))}
+		</div>
+	);
+}
 
-const XAxis: React.FC<{
+function Bar({height, progress}: {height: number; progress: number}) {
+	return (
+		<div
+			style={{
+				flex: 1,
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'flex-end',
+			}}
+		>
+			<div
+				style={{
+					width: '100%',
+					height,
+					backgroundColor: COLOR_BAR,
+					borderRadius: '8px 8px 0 0',
+					opacity: progress,
+				}}
+			/>
+		</div>
+	);
+}
+
+function XAxis({
+	children,
+	labels,
+	height,
+}: {
 	children: React.ReactNode;
 	labels: string[];
 	height: number;
-}> = ({children, labels, height}) => (
-	<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-		<div
-			style={{
-				display: 'flex',
-				alignItems: 'flex-end',
-				gap: 16,
-				height,
-				borderLeft: `2px solid ${COLOR_AXIS}`,
-				borderBottom: `2px solid ${COLOR_AXIS}`,
-				paddingLeft: 16,
-			}}
-		>
-			{children}
+}) {
+	return (
+		<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'flex-end',
+					gap: 16,
+					height,
+					borderLeft: `2px solid ${COLOR_AXIS}`,
+					borderBottom: `2px solid ${COLOR_AXIS}`,
+					paddingLeft: 16,
+				}}
+			>
+				{children}
+			</div>
+			<div
+				style={{
+					display: 'flex',
+					gap: 16,
+					paddingLeft: 16,
+					marginTop: 12,
+				}}
+			>
+				{labels.map((label) => (
+					<div
+						key={label}
+						style={{
+							flex: 1,
+							textAlign: 'center',
+							color: COLOR_MUTED,
+							fontSize: 20,
+						}}
+					>
+						{label}
+					</div>
+				))}
+			</div>
 		</div>
-		<div
-			style={{
-				display: 'flex',
-				gap: 16,
-				paddingLeft: 16,
-				marginTop: 12,
-			}}
-		>
-			{labels.map((label) => (
-				<div
-					key={label}
-					style={{
-						flex: 1,
-						textAlign: 'center',
-						color: COLOR_MUTED,
-						fontSize: 20,
-					}}
-				>
-					{label}
-				</div>
-			))}
-		</div>
-	</div>
-);
+	);
+}
 
-export const MyAnimation = () => {
+export default function MyAnimation() {
 	const frame = useCurrentFrame();
 	const {fps, height} = useVideoConfig();
 
@@ -170,4 +182,4 @@ export const MyAnimation = () => {
 			</div>
 		</AbsoluteFill>
 	);
-};
+}
