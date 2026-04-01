@@ -69,8 +69,6 @@ function captureClientApiError(error: unknown) {
       method: config?.method,
       baseURL: config?.baseURL,
       params: config?.params,
-      requestData: config?.data,
-      responseData: response?.data,
       timeout: config?.timeout ?? requestTimeoutMs,
       errorCode: code,
     },
