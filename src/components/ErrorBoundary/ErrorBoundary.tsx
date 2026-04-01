@@ -15,6 +15,10 @@ interface ErrorBoundaryState {
 const defaultError = new Error('알 수 없는 오류');
 const defaultStack = '스택 정보 없음';
 
+type SentryCapturedError = {
+  __sentry_captured__?: boolean;
+};
+
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
@@ -32,12 +36,19 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // 렌더링 단계에서 잡힌 에러와 component stack을 함께 전송합니다.
-    Sentry.captureException(error, {
-      extra: {
-        componentStack: errorInfo.componentStack,
-      },
-    });
+    // 이미 API 인터셉터 등에서 캡처된 에러가 아니라면 전송
+    if (!(error as SentryCapturedError).__sentry_captured__) {
+      Sentry.captureException(error, {
+        tags: {
+          errorType: 'render-error',
+        },
+        extra: {
+          pathname: window.location.pathname,
+          search: window.location.search,
+          componentStack: errorInfo.componentStack,
+        },
+      });
+    }
 
     console.log(error, errorInfo);
   }

@@ -16,6 +16,10 @@ import {
 const currentMode = import.meta.env.MODE;
 const requestTimeoutMs = 5000;
 
+type SentryCapturedError = {
+  __sentry_captured__?: boolean;
+};
+
 // Axios instance
 export const axiosInstance = axios.create({
   baseURL:
@@ -59,6 +63,8 @@ function captureClientApiError(error: unknown) {
       httpStatus: status ? String(status) : 'network-error',
     },
     extra: {
+      pathname: window.location.pathname,
+      search: window.location.search,
       url: config?.url,
       method: config?.method,
       baseURL: config?.baseURL,
@@ -69,6 +75,8 @@ function captureClientApiError(error: unknown) {
       errorCode: code,
     },
   });
+
+  (error as SentryCapturedError).__sentry_captured__ = true;
 }
 
 // Response interceptor
