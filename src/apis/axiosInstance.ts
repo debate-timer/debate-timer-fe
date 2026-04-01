@@ -121,6 +121,7 @@ axiosInstance.interceptors.response.use(
         // 재발급도 실패하면 -> 로그인 페이지 이동
         const currentLang = i18n.resolvedLanguage ?? i18n.language;
         const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+        Sentry.setUser(null);
         window.location.href = buildLangPath('/home', lang);
         removeAccessToken();
         return Promise.reject(refreshError);
