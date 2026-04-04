@@ -43,7 +43,26 @@ Generate a concise short name (2-4 words, kebab-case) for the feature:
   - "투표 결과 캘린더 표시" → "vote-results-calendar"
   - "모임 생성 플로우 개선" → "meet-create-flow"
 
-### Step 2: GitHub Issue Setup
+### Step 2: Issue Type Selection
+
+**MUST ask the user** which type of work this is:
+
+> 작업 타입을 선택해주세요:
+>
+> 1. feat — 기능 개발
+> 2. fix — 버그 수정
+> 3. design — UI 관련
+> 4. docs — 문서 관련
+> 5. refactor — 리팩토링 (기능 변경 없음)
+> 6. chore — 파일/설정 변경
+> 7. config — 외부 라이브러리 설정
+> 8. test — 테스트 코드
+> 9. style — 코드 컨벤션
+> 10. hotfix — 긴급 수정
+
+Set `{TYPE}` = selected type in lowercase (e.g., `feat`), `{TYPE_UPPER}` = uppercase (e.g., `FEAT`).
+
+### Step 3: GitHub Issue Setup
 
 1. Verify `gh` CLI is authenticated:
 
@@ -63,7 +82,7 @@ Generate a concise short name (2-4 words, kebab-case) for the feature:
    **If option 1 (new issue)**:
 
    ```bash
-   gh issue create --title "[FEAT] {FEATURE_SLUG}" --body "## 개요\n{feature description}\n\n## 관련 명세\n> \`specs/feat/NNN-{slug}/spec.md\`" --label "feat"
+   gh issue create --title "[{TYPE_UPPER}] {FEATURE_SLUG}" --body "## 개요\n{feature description}\n\n## 관련 명세\n> \`specs/{TYPE}/NNN-{slug}/spec.md\`" --label "{TYPE}"
    ```
 
    Capture the returned issue number (e.g., `#96`).
@@ -74,7 +93,7 @@ Generate a concise short name (2-4 words, kebab-case) for the feature:
    - If the issue does not exist, ERROR and ask again
    - Use the provided issue number for all subsequent steps
 
-### Step 3: Branch Setup
+### Step 4: Branch Setup
 
 **MUST ask the user** which base branch to use:
 
@@ -89,20 +108,20 @@ Based on selection:
 # If option 2 (recommended):
 git checkout develop && git pull origin develop
 # Then create feature branch:
-git checkout -b "feat/#{ISSUE_NUMBER}-{FEATURE_SLUG}"
+git checkout -b "{TYPE}/#{ISSUE_NUMBER}-{FEATURE_SLUG}"
 ```
 
 **Note**: Shell commands must quote `#` in branch names (e.g., `"feat/#96-social-login"`).
 
-### Step 4: Spec Directory & File Creation
+### Step 5: Spec Directory & File Creation
 
 Run the script to create the spec directory structure:
 
 ```bash
-.specify/scripts/bash/create-new-feature.sh --json --no-branch --type-prefix feat --number {ISSUE_NUMBER} --short-name "{SLUG}" --issue-number {ISSUE_NUMBER} "{FEATURE_DESCRIPTION}"
+.specify/scripts/bash/create-new-feature.sh --json --no-branch --type-prefix {TYPE} --number {ISSUE_NUMBER} --short-name "{SLUG}" --issue-number {ISSUE_NUMBER} "{FEATURE_DESCRIPTION}"
 ```
 
-This creates `specs/feat/{NNN}-{SLUG}/` and copies the spec template.
+This creates `specs/{TYPE}/{NNN}-{SLUG}/` and copies the spec template.
 Parse JSON output for `SPEC_FILE`, `FEATURE_DIR`, `FEATURE_NUM`.
 
 **NNN zero-padding rule**: 96 → `096`, 306 → `306`, 1024 → `1024`.
@@ -113,7 +132,7 @@ Parse JSON output for `SPEC_FILE`, `FEATURE_DIR`, `FEATURE_NUM`.
 - The JSON is provided in the terminal as output — always refer to it to get the actual content.
 - For single quotes in args, use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot")
 
-### Step 5: Write Specification (CREATE Mode)
+### Step 6: Write Specification (CREATE Mode)
 
 1. Load `.specify/templates/spec-template.md` to understand required sections.
 
@@ -142,15 +161,15 @@ Parse JSON output for `SPEC_FILE`, `FEATURE_DIR`, `FEATURE_NUM`.
 
 3. Write the specification to SPEC_FILE using the template structure.
 
-### Step 5-B: UPDATE Mode
+### Step 6-B: UPDATE Mode
 
 If the user specifies they want to update an existing spec:
 
-- Search `specs/feat/` for directories matching the keyword or current branch issue number.
+- Search `specs/{TYPE}/` (or all `specs/*/` if type is unknown) for directories matching the keyword or current branch issue number.
 - Load the existing spec and apply the requested changes.
 - Preserve existing clarifications and structure.
 
-### Step 6: Auto-Clarify Loop
+### Step 7: Auto-Clarify Loop
 
 After writing the initial spec, automatically run a lightweight clarification pass:
 
@@ -185,7 +204,7 @@ After writing the initial spec, automatically run a lightweight clarification pa
 
 6. For **UPDATE mode**: Ask user "명확화 루프를 실행하시겠습니까?" before running.
 
-### Step 7: Quality Validation
+### Step 8: Quality Validation
 
 Generate a checklist file at `FEATURE_DIR/checklists/requirements.md`:
 
@@ -228,15 +247,15 @@ Generate a checklist file at `FEATURE_DIR/checklists/requirements.md`:
 
 Validate the spec against each checklist item (max 3 iterations).
 
-### Step 8: Completion Report
+### Step 9: Completion Report
 
 ```
 ✅ 명세 생성 완료!
 
-📁 specs/feat/{NNN}-{slug}/spec.md
+📁 specs/{TYPE}/{NNN}-{slug}/spec.md
 🔗 GitHub Issue: #{ISSUE_NUMBER}
-🌿 브랜치: feat/#{ISSUE_NUMBER}-{slug}
-✅ 체크리스트: specs/feat/{NNN}-{slug}/checklists/requirements.md
+🌿 브랜치: {TYPE}/#{ISSUE_NUMBER}-{slug}
+✅ 체크리스트: specs/{TYPE}/{NNN}-{slug}/checklists/requirements.md
 📊 명확화: {N}개 질문 완료, {M}개 카테고리 Partial/Missing
 
 👉 다음 단계: /speckits/plan 을 실행하여 구현 계획을 수립하세요.
