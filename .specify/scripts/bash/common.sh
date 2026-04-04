@@ -28,24 +28,27 @@ get_current_branch() {
 
     # For non-git repos, try to find the latest feature directory
     local repo_root=$(get_repo_root)
-    local specs_dir="$repo_root/specs/feat"
+    local specs_base="$repo_root/specs"
 
-    if [[ -d "$specs_dir" ]]; then
+    if [[ -d "$specs_base" ]]; then
         local latest_feature=""
         local highest=0
 
-        for dir in "$specs_dir"/*; do
-            if [[ -d "$dir" ]]; then
-                local dirname=$(basename "$dir")
-                if [[ "$dirname" =~ ^([0-9]+)- ]]; then
-                    local number=${BASH_REMATCH[1]}
-                    number=$((10#$number))
-                    if [[ "$number" -gt "$highest" ]]; then
-                        highest=$number
-                        latest_feature=$dirname
+        for type_dir in "$specs_base"/*/; do
+            [[ -d "$type_dir" ]] || continue
+            for dir in "$type_dir"*/; do
+                if [[ -d "$dir" ]]; then
+                    local dirname=$(basename "$dir")
+                    if [[ "$dirname" =~ ^([0-9]+)- ]]; then
+                        local number=${BASH_REMATCH[1]}
+                        number=$((10#$number))
+                        if [[ "$number" -gt "$highest" ]]; then
+                            highest=$number
+                            latest_feature=$dirname
+                        fi
                     fi
                 fi
-            fi
+            done
         done
 
         if [[ -n "$latest_feature" ]]; then
@@ -107,21 +110,33 @@ check_feature_branch() {
     return 1
 }
 
-get_feature_dir() { echo "$1/specs/feat/$2"; }
+get_feature_dir() {
+    local repo_root="$1"
+    local branch_name="$2"
+    find_feature_dir_by_prefix "$repo_root" "$branch_name"
+}
 
 # Find feature directory by issue number or numeric prefix
-# Supports: feat/#96-social-login → specs/feat/096-*
-#           096-social-login → specs/feat/096-*
+# Supports: fix/#441-slug → specs/fix/441-*
+#           feat/#96-social-login → specs/feat/096-*
+#           096-social-login → specs/feat/096-* (legacy)
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
-    local specs_dir="$repo_root/specs/feat"
+
+    # Extract type prefix from branch name (e.g., fix/#441-slug → fix, feat/#96-slug → feat)
+    local type_prefix="feat"  # default for legacy branches
+    if [[ "$branch_name" =~ ^([a-z]+)/#[0-9]+ ]]; then
+        type_prefix="${BASH_REMATCH[1]}"
+    fi
+
+    local specs_dir="$repo_root/specs/$type_prefix"
 
     # Extract issue number from branch name
     local issue_num=$(extract_issue_number "$branch_name")
 
     if [[ -z "$issue_num" ]]; then
-        # If no issue number found, fall back to exact match under specs/feat/
+        # If no issue number found, fall back to exact match under specs/{type}/
         echo "$specs_dir/$branch_name"
         return
     fi
@@ -129,7 +144,7 @@ find_feature_dir_by_prefix() {
     # Zero-pad to 3 digits for matching
     local padded=$(printf "%03d" "$((10#$issue_num))")
 
-    # Search for directories in specs/feat/ that start with this prefix
+    # Search for directories in specs/{type}/ that start with this prefix
     local matches=()
     if [[ -d "$specs_dir" ]]; then
         for dir in "$specs_dir"/"$padded"-*; do
