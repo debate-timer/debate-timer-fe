@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import { socketManager, SocketOptions } from '../apis/sockets/SocketManager';
 import { SocketMessage } from '../apis/sockets/type';
@@ -23,6 +23,9 @@ export const useSocket = () => {
   const subscriptionInfos = useRef<Map<string, (message: IMessage) => void>>(
     new Map(),
   );
+
+  // 오류 안내를 위한 상태
+  const [error, setError] = useState<Error | null>(null);
 
   /**
    * 소켓 연결
@@ -107,16 +110,44 @@ export const useSocket = () => {
   useEffect(() => {
     // 소켓이 연결될 때마다 실행될 핸들러
     const handleConnect = () => {
-      // 기존 활성화된 구독 리스트 초기화
-      activeSubscriptions.current.clear();
+      const recover = () => {
+        // 기존 활성화된 구독 리스트 초기화
+        activeSubscriptions.current.clear();
 
-      // 백업 리스트의 모든 구독을 다시 활성화
-      subscriptionInfos.current.forEach((callback, destination) => {
-        const subscription = socketManager.subscribe(destination, callback);
-        if (subscription) {
+        // 백업 리스트의 모든 구독을 다시 활성화
+        subscriptionInfos.current.forEach((callback, destination) => {
+          const subscription = socketManager.subscribe(destination, callback);
+          if (!subscription) {
+            throw new Error(`채널 구독 실패: ${destination}`);
+          }
           activeSubscriptions.current.set(destination, subscription);
-        }
-      });
+        });
+      };
+
+      // 재시도 및 오류 복구 최초 1회
+      try {
+        recover();
+      } catch (error) {
+        console.warn('🚨 리스너 복구 1차 실패, 1초 후 재시도합니다.', error);
+
+        // 1초 후 2차 복구 시도
+        setTimeout(() => {
+          try {
+            recover();
+          } catch (retryError) {
+            console.error(
+              '🚨 재시도 실패! 복구 불가능한 상태입니다.',
+              retryError,
+            );
+            // 💡 훅이 자체적으로 에러 상태를 업데이트
+            setError(
+              retryError instanceof Error
+                ? retryError
+                : new Error(String(retryError)),
+            );
+          }
+        }, 1000);
+      }
     };
 
     // 이 핸들러 함수를 발행자(SocketManager)에 등록
@@ -152,5 +183,6 @@ export const useSocket = () => {
     subscribe,
     unsubscribe,
     publish,
+    error,
   };
 };

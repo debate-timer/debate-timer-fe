@@ -128,7 +128,13 @@ class SocketManager {
         this.retryCount = 0;
 
         // 모든 관찰자에게 연결이 수립되었다고 알림
-        this.connectListeners.forEach((listener) => listener());
+        this.connectListeners.forEach((listener) => {
+          try {
+            listener();
+          } catch (error) {
+            console.error('리스너 오류 발생. 다음 리스너로 진행합니다.', error);
+          }
+        });
       },
 
       onStompError: (frame) => {
