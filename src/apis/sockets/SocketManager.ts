@@ -165,6 +165,7 @@ class SocketManager {
       this.retryCount = 0;
       this.client = null;
       this.currentOptions = DEFAULT_OPTIONS;
+      this.connectListeners.clear();
 
       console.log('🛑 웹 소켓 연결을 수동으로 해제했습니다.');
     }

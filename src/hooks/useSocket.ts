@@ -122,6 +122,11 @@ export const useSocket = () => {
     // 이 핸들러 함수를 발행자(SocketManager)에 등록
     socketManager.onConnectEvent(handleConnect);
 
+    // 리스너 등록 이후 연결이 이미 되어 있는 게 확인되면, 핸들러 바로 실행
+    if (socketManager.isConnected()) {
+      handleConnect();
+    }
+
     // 언마운트 시 구독 클리어하는 함수
     return () => {
       // 먼저 발행자(SocketManager)에게 등록된 핸들러부터 제거

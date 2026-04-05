@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { socketManager } from './SocketManager';
-import type { IMessage, StompConfig } from '@stomp/stompjs';
+import type { IFrame, StompConfig } from '@stomp/stompjs';
 import { SocketMessage } from './type';
 
 // ------------------------------------------------------------------
@@ -183,7 +183,7 @@ describe('SocketManager', () => {
       client.config.onWebSocketClose?.({} as CloseEvent);
 
       // 재연결 성공 → retryCount 0으로 리셋
-      client.config.onConnect?.({} as IMessage);
+      client.config.onConnect?.({} as IFrame);
 
       // 끊김 1번: retryCount=0 기준 계산 → 500 + 10 (retryCount가 리셋됐으므로)
       client.config.onWebSocketClose?.({} as CloseEvent);
@@ -235,6 +235,31 @@ describe('SocketManager', () => {
         headers: undefined,
         body: JSON.stringify(message),
       });
+    });
+  });
+
+  describe('Connect Listeners (Observer Pattern)', () => {
+    it('onConnectEvent로 등록한 리스너가 onConnect 시 호출되어야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onConnectEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame);
+
+      expect(listener).toHaveBeenCalledOnce();
+    });
+
+    it('offConnectEvent로 제거한 리스너는 onConnect 시 호출되지 않아야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onConnectEvent(listener);
+      socketManager.offConnectEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame);
+
+      expect(listener).not.toHaveBeenCalled();
     });
   });
 });
