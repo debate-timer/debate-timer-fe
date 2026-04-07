@@ -36,6 +36,8 @@ get_current_branch() {
 
         for type_dir in "$specs_base"/*/; do
             [[ -d "$type_dir" ]] || continue
+            local type_name
+            type_name="$(basename "$type_dir")"
             for dir in "$type_dir"*/; do
                 if [[ -d "$dir" ]]; then
                     local dirname=$(basename "$dir")
@@ -44,7 +46,7 @@ get_current_branch() {
                         number=$((10#$number))
                         if [[ "$number" -gt "$highest" ]]; then
                             highest=$number
-                            latest_feature=$dirname
+                            latest_feature="${type_name}/#${dirname}"
                         fi
                     fi
                 fi

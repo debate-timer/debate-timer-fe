@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
@@ -56,6 +56,21 @@ describe('TimerPage - 헤더 음소거 아이콘', () => {
     // VolumeBar 음소거 버튼 클릭 (볼륨 > 0이면 title='음소거')
     const muteButton = await screen.findByTitle('음소거');
     await userEvent.click(muteButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('volume-icon-muted')).toBeInTheDocument();
+    });
+  });
+
+  it('VolumeBar 슬라이더를 0으로 내리면 헤더 아이콘이 즉시 음소거로 변경된다', async () => {
+    localStorage.setItem('timer-volume', '0.5');
+    renderTimerPage();
+
+    const volumeButton = screen.getByRole('button', { name: '볼륨 조절' });
+    await userEvent.click(volumeButton);
+
+    const slider = await screen.findByRole('slider');
+    fireEvent.change(slider, { target: { value: '0' } });
 
     await waitFor(() => {
       expect(screen.getByTestId('volume-icon-muted')).toBeInTheDocument();
