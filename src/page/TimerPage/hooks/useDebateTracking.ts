@@ -75,13 +75,24 @@ export default function useDebateTracking() {
 
   // 새로고침, 탭 비가시화, SPA 이탈 시 abandon 이벤트를 보낼 리스너를 등록한다.
   useEffect(() => {
+    let abandonTimer: ReturnType<typeof setTimeout> | null = null;
+
     function handleBeforeUnload() {
       sendAbandonEvent('unload');
     }
 
     function handleVisibilityChange() {
       if (document.visibilityState === 'hidden') {
-        sendAbandonEvent('visibility');
+        // 짧은 탭 전환을 abandon으로 오기록하지 않도록 10초 딜레이 후 발화한다.
+        abandonTimer = setTimeout(() => {
+          sendAbandonEvent('visibility');
+        }, 10000);
+      } else {
+        // 탭으로 돌아오면 예약된 abandon을 취소한다.
+        if (abandonTimer !== null) {
+          clearTimeout(abandonTimer);
+          abandonTimer = null;
+        }
       }
     }
 
@@ -91,6 +102,9 @@ export default function useDebateTracking() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (abandonTimer !== null) {
+        clearTimeout(abandonTimer);
+      }
       // SPA navigation 이탈
       sendAbandonEvent('navigation');
     };
