@@ -38,18 +38,18 @@ const useLandingPageHandlers = () => {
   const handleTableSectionLoginButtonClick = useCallback(() => {
     if (!isLoggedIn()) {
       trackEvent('login_started', {
-        trigger_page: '/home',
+        trigger_page: homePath,
         trigger_context: 'landing_table_section',
       });
       setLoginTrigger({
-        trigger_page: '/home',
+        trigger_page: homePath,
         trigger_context: 'landing_table_section',
       });
       oAuthLogin();
     } else {
       navigate(rootPath);
     }
-  }, [navigate, rootPath, trackEvent]);
+  }, [homePath, navigate, rootPath, trackEvent]);
   // 로그인된 사용자를 메인 화면으로 이동시킨다.
   const handleDashboardButtonClick = useCallback(() => {
     navigate(rootPath);
@@ -58,18 +58,18 @@ const useLandingPageHandlers = () => {
   const handleHeaderLoginButtonClick = useCallback(() => {
     if (!isLoggedIn()) {
       trackEvent('login_started', {
-        trigger_page: '/home',
+        trigger_page: homePath,
         trigger_context: 'landing_header',
       });
       setLoginTrigger({
-        trigger_page: '/home',
+        trigger_page: homePath,
         trigger_context: 'landing_header',
       });
       oAuthLogin();
     } else {
       logoutMutate();
     }
-  }, [logoutMutate, trackEvent]);
+  }, [homePath, logoutMutate, trackEvent]);
 
   return {
     handleStartWithoutLogin,
