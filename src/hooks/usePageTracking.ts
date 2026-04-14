@@ -19,6 +19,7 @@ export default function usePageTracking() {
   const matches = useMatches();
   const entryTimeRef = useRef<number>(Date.now());
   const previousPathRef = useRef<string>('');
+  const hasTrackedLeaveRef = useRef(false);
 
   const lastMatch = matches[matches.length - 1];
   const normalizedPath = normalizePath(location.pathname, lastMatch?.params ?? {});
@@ -27,6 +28,9 @@ export default function usePageTracking() {
 
   useEffect(() => {
     const currentPath = normalizedPathRef.current;
+
+    // 새 페이지 진입 시 가드 초기화
+    hasTrackedLeaveRef.current = false;
 
     // 새 페이지 page_view 발화
     analyticsManager.trackPageView({
@@ -41,6 +45,8 @@ export default function usePageTracking() {
 
     // 언마운트 또는 경로 변경 시 page_leave 발화 (1회만)
     return () => {
+      if (hasTrackedLeaveRef.current) return;
+      hasTrackedLeaveRef.current = true;
       const duration = Date.now() - entryTimeRef.current;
       analyticsManager.trackEvent('page_leave', {
         page_title: document.title,
@@ -53,6 +59,8 @@ export default function usePageTracking() {
   // pagehide/beforeunload 시 마지막 페이지 page_leave + flush
   useEffect(() => {
     function handlePageHide() {
+      if (hasTrackedLeaveRef.current) return;
+      hasTrackedLeaveRef.current = true;
       const duration = Date.now() - entryTimeRef.current;
       analyticsManager.trackEvent('page_leave', {
         page_title: document.title,
