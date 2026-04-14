@@ -7,6 +7,7 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../util/languageRouting';
+import { setLoginTrigger } from '../util/analytics/loginTrigger';
 
 export default function ProtectedRoute(props: PropsWithChildren) {
   const { children } = props;
@@ -18,9 +19,13 @@ export default function ProtectedRoute(props: PropsWithChildren) {
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const homePath = buildLangPath('/home', lang);
 
-  return isAuthenticated ? (
-    children
-  ) : (
-    <Navigate to={homePath} state={{ from: location }} replace />
-  );
+  if (!isAuthenticated) {
+    setLoginTrigger({
+      trigger_page: location.pathname,
+      trigger_context: 'protected_route',
+    });
+    return <Navigate to={homePath} state={{ from: location }} replace />;
+  }
+
+  return children;
 }

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { logout } from '../../apis/apis/member';
-import { removeAccessToken } from '../../util/accessToken';
+import { removeAccessToken, removeMemberId } from '../../util/accessToken';
+import { analyticsManager } from '../../util/analytics';
 
 export default function useLogout(onSuccess: () => void) {
   return useMutation({
@@ -10,6 +11,8 @@ export default function useLogout(onSuccess: () => void) {
     },
     onSuccess: () => {
       removeAccessToken();
+      removeMemberId();
+      analyticsManager.reset();
       onSuccess();
     },
   });

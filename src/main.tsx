@@ -6,7 +6,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import router from './routes/routes.tsx';
 import './index.css';
 import './i18n';
-import { setupGoogleAnalytics } from './util/setupGoogleAnalytics.tsx';
+import { setupAnalytics, analyticsManager } from './util/analytics';
+import {
+  getAccessToken,
+  getMemberId,
+  removeMemberId,
+} from './util/accessToken';
+import i18n from './i18n';
 
 // Functions that calls msw mocking worker
 if (import.meta.env.VITE_MOCK_API === 'true') {
@@ -41,7 +47,28 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
 
 // Function that initializes main React app
 function initializeApp() {
-  setupGoogleAnalytics();
+  setupAnalytics();
+
+  // memberId 복원: accessToken + memberId 모두 존재 시 identity 설정
+  const memberId = getMemberId();
+  if (getAccessToken() && memberId) {
+    analyticsManager.setUserId(memberId);
+    analyticsManager.setUserProperties({
+      user_type: 'member',
+      language: document.documentElement.lang || 'ko',
+    });
+  } else if (memberId) {
+    // accessToken 없이 memberId만 있으면 비회원 처리
+    removeMemberId();
+  }
+
+  // 언어 변경 시 user property 업데이트
+  i18n.on('languageChanged', (lng: string) => {
+    analyticsManager.setUserProperties({
+      user_type: getAccessToken() ? 'member' : 'guest',
+      language: lng,
+    });
+  });
 
   // Call queryClient for TanStack Query
   const queryClient = new QueryClient({
