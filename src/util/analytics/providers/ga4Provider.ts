@@ -71,7 +71,7 @@ export class GA4Provider implements AnalyticsProvider {
    * 파라미터는 받지 않으며, 반환값은 없다.
    */
   reset(): void {
-    ReactGA.set({ userId: undefined });
+    ReactGA.set({ user_id: null });
   }
 
   /**
