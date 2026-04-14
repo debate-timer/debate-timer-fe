@@ -294,8 +294,10 @@
 
 예시 값:
 - `landing_header`: 랜딩 페이지 헤더의 로그인 버튼
-- `timer_save_prompt`: 타이머에서 저장 유도로 로그인
-- `share_prompt`: 공유 기능 사용 시 로그인 유도
+- `landing_table_section`: 랜딩 페이지 테이블 섹션 CTA에서 로그인
+- `timer_modal`: 타이머에서 저장 유도로 로그인
+- `share_save`: 공유 기능 사용 시 로그인 유도
+- `protected_route`: 인증이 필요한 페이지 진입 시 로그인
 
 **핵심 질문**: 어느 상황에서 로그인 전환이 가장 많이 일어나는가?
 
