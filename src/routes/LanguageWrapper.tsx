@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import i18n from '../i18n';
+import usePageTracking from '../hooks/usePageTracking';
 import {
   DEFAULT_LANG,
   buildLangPath,
@@ -13,6 +14,8 @@ export default function LanguageWrapper() {
   const { lang } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+
+  usePageTracking();
 
   useEffect(() => {
     const selectedLang = getSelectedLangFromRoute(lang, location.pathname);
