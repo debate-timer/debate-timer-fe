@@ -12,6 +12,7 @@ import {
   getMemberId,
   removeMemberId,
 } from './util/accessToken';
+import { DEFAULT_LANG } from './util/languageRouting';
 import i18n from './i18n';
 
 // Functions that calls msw mocking worker
@@ -55,7 +56,7 @@ function initializeApp() {
     analyticsManager.setUserId(memberId);
     analyticsManager.setUserProperties({
       user_type: 'member',
-      language: document.documentElement.lang || 'ko',
+      language: document.documentElement.lang || DEFAULT_LANG,
     });
   } else if (memberId) {
     // accessToken 없이 memberId만 있으면 비회원 처리

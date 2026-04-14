@@ -1,4 +1,5 @@
 import { isLoggedIn } from '../accessToken';
+import { DEFAULT_LANG } from '../languageRouting';
 import type {
   AnalyticsEventMap,
   AnalyticsEventName,
@@ -95,7 +96,7 @@ export class AnalyticsManager implements AnalyticsManagerInterface {
   private getGlobalProperties(): GlobalEventProperties {
     return {
       user_type: isLoggedIn() ? 'member' : 'guest',
-      language: document.documentElement.lang || 'ko',
+      language: document.documentElement.lang || DEFAULT_LANG,
       page_path: window.location.pathname,
     };
   }

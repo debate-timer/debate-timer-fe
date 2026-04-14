@@ -5,6 +5,7 @@ import type {
   AnalyticsEventName,
   PageViewProperties,
 } from '../util/analytics/types';
+import { DEFAULT_LANG } from '../util/languageRouting';
 
 export default function useAnalytics() {
   const trackEvent = useCallback(
@@ -25,7 +26,7 @@ export default function useAnalytics() {
     analyticsManager.setUserId(String(memberId));
     analyticsManager.setUserProperties({
       user_type: 'member',
-      language: document.documentElement.lang || 'ko',
+      language: document.documentElement.lang || DEFAULT_LANG,
     });
   }, []);
 
