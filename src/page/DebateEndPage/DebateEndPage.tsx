@@ -19,9 +19,10 @@ export default function DebateEndPage() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
+  const isTableIdValid = !!id && !Number.isNaN(tableId);
   const navigate = useNavigate();
   const { trackEvent } = useAnalytics();
-  useGetDebateTableData(tableId);
+  useGetDebateTableData(tableId, isTableIdValid);
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
@@ -45,7 +46,7 @@ export default function DebateEndPage() {
   };
 
   // 테이블 ID 검증
-  if (!id || isNaN(tableId)) {
+  if (!isTableIdValid) {
     throw new Error(t('테이블 ID가 올바르지 않습니다.'));
   }
 
