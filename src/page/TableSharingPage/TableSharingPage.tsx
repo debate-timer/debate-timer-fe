@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
 import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
@@ -63,20 +63,24 @@ export default function TableSharingPage() {
   });
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
-  const decodedData = getDecodedDataOrNull(encodedData);
+  // encodedData가 변경될 때만 디코딩을 재실행해 effect 의존성을 안정화한다.
+  const decodedData = useMemo(() => getDecodedDataOrNull(encodedData), [encodedData]);
   const source = searchParams.get('source');
   const isTemplateEntry = source === 'template';
 
-  // 공유 링크 유입 추적: 템플릿 진입이 아닌 실제 공유 링크일 때만 발화
+  // 공유 링크 유입 추적: encodedData/isTemplateEntry에만 의존해 1회만 발화한다.
   useEffect(() => {
     if (encodedData && !isTemplateEntry) {
       trackEvent('share_link_entered', { referrer: document.referrer });
     }
-    if (isTemplateEntry) {
+  }, [encodedData, isTemplateEntry, trackEvent]);
+
+  // 템플릿 유입 정보는 decodedData가 유효할 때만 저장한다.
+  useEffect(() => {
+    if (isTemplateEntry && decodedData) {
       const org = searchParams.get('org');
       const tmpl = searchParams.get('tmpl');
       if (org && tmpl) {
-        // 템플릿 유입 정보를 저장해 이후 template_used 이벤트에 연결한다.
         setTemplateOrigin({
           organization_name: org,
           template_name: tmpl,
@@ -84,7 +88,7 @@ export default function TableSharingPage() {
         });
       }
     }
-  }, [encodedData, isTemplateEntry, searchParams, trackEvent]);
+  }, [decodedData, isTemplateEntry, searchParams]);
 
   // 로그인 상태와 URL 형태에 따라 저장 모달, 게스트 복사, 즉시 저장 플로우를 분기한다.
   useEffect(() => {
