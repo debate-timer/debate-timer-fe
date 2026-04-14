@@ -8,7 +8,7 @@ import VoteDetailResult from './components/VoteDetailResult';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { TeamKey } from '../../type/type';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import DialogModal from '../../components/DialogModal/DialogModal';
 import {
   buildLangPath,
@@ -29,6 +29,7 @@ export default function DebateVoteResultPage() {
   const isArgsValid = isPollIdValid && isTableIdValid;
 
   const { trackEvent } = useAnalytics();
+  const hasTrackedPollResultRef = useRef(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const navigate = useNavigate();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
@@ -54,6 +55,9 @@ export default function DebateVoteResultPage() {
     });
   }, [lang, navigate, tableId]);
 
+  const isLoading = isFetching || isRefetching;
+  const isError = isFetchError || isRefetchError;
+
   // 브라우저 뒤로가기 입력을 종료 화면 복귀 동작으로 치환한다.
   useEffect(() => {
     if (!isArgsValid) return;
@@ -62,15 +66,13 @@ export default function DebateVoteResultPage() {
     return () => window.removeEventListener('popstate', handleGoToEndPage);
   }, [handleGoToEndPage, isArgsValid]);
 
-  // 결과 페이지 최초 진입 시 poll_result_viewed 이벤트를 기록한다.
+  // 결과 데이터 로드 성공 후 poll_result_viewed 이벤트를 1회만 기록한다.
   useEffect(() => {
-    if (isPollIdValid) {
+    if (isArgsValid && data && !isError && !hasTrackedPollResultRef.current) {
+      hasTrackedPollResultRef.current = true;
       trackEvent('poll_result_viewed', { poll_id: pollId });
     }
-  }, [isPollIdValid, pollId, trackEvent]);
-
-  const isLoading = isFetching || isRefetching;
-  const isError = isFetchError || isRefetchError;
+  }, [data, isArgsValid, isError, pollId, trackEvent]);
   const { openModal, ModalWrapper, closeModal } = useModal({
     onClose: () => setIsConfirmed(false),
   });
