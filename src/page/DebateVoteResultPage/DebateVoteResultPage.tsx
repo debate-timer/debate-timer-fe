@@ -15,7 +15,9 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import useAnalytics from '../../hooks/useAnalytics';
 
+// 투표 결과를 불러오고 종료 화면 복귀 흐름을 제어하는 페이지다.
 export default function DebateVoteResultPage() {
   const { t, i18n } = useTranslation();
   // 매개변수 검증
@@ -26,6 +28,7 @@ export default function DebateVoteResultPage() {
   const isTableIdValid = !!rawTableId && !Number.isNaN(tableId);
   const isArgsValid = isPollIdValid && isTableIdValid;
 
+  const { trackEvent } = useAnalytics();
   const [isConfirmed, setIsConfirmed] = useState(false);
   const navigate = useNavigate();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
@@ -40,15 +43,18 @@ export default function DebateVoteResultPage() {
     refetch,
     isRefetchError,
   } = useGetPollInfo(pollId, { enabled: isArgsValid });
+  // 세부 결과 확인 후 홈으로 이동한다.
   const handleGoHome = () => {
     navigate(rootPath);
   };
+  // 뒤로가기 시에도 종료 화면으로 복귀하도록 경로를 고정한다.
   const handleGoToEndPage = useCallback(() => {
     navigate(buildLangPath(`/table/customize/${tableId}/end`, lang), {
       replace: true,
     });
   }, [lang, navigate, tableId]);
 
+  // 브라우저 뒤로가기 입력을 종료 화면 복귀 동작으로 치환한다.
   useEffect(() => {
     if (!isArgsValid) return;
 
@@ -56,12 +62,20 @@ export default function DebateVoteResultPage() {
     return () => window.removeEventListener('popstate', handleGoToEndPage);
   }, [handleGoToEndPage, isArgsValid]);
 
+  // 결과 페이지 최초 진입 시 poll_result_viewed 이벤트를 기록한다.
+  useEffect(() => {
+    if (isPollIdValid) {
+      trackEvent('poll_result_viewed', { poll_id: pollId });
+    }
+  }, [isPollIdValid, pollId, trackEvent]);
+
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
   const { openModal, ModalWrapper, closeModal } = useModal({
     onClose: () => setIsConfirmed(false),
   });
 
+  // 득표 수를 비교해 승리 팀 또는 무승부 상태를 계산한다.
   const getWinner = (result: {
     prosTeamName: string;
     consTeamName: string;

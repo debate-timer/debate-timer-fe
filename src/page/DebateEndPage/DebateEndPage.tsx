@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import useAnalytics from '../../hooks/useAnalytics';
 import clapImage from '../../assets/debateEnd/clap.png';
 import feedbackTimerImage from '../../assets/debateEnd/feedback_timer.png';
 import voteStampImage from '../../assets/debateEnd/vote_stamp.png';
@@ -12,19 +12,27 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 
+// 토론 종료 후 피드백 타이머와 투표 진행 액션을 제공하는 페이지다.
 export default function DebateEndPage() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
+  const { trackEvent } = useAnalytics();
+  useGetDebateTableData(tableId);
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
+  // 피드백 타이머 진입 시 feedback_timer_started 이벤트를 기록한다.
   const handleFeedbackClick = () => {
+    trackEvent('feedback_timer_started', { table_id: tableId });
     navigate(buildLangPath(`/table/customize/${tableId}/end/feedback`, lang));
   };
+  // 투표 생성 직후 poll_created 이벤트를 기록하고 투표 화면으로 이동한다.
   const handleVoteClick = (pollId: number) => {
+    trackEvent('poll_created', { table_id: tableId, poll_id: pollId });
     navigate(
       buildLangPath(`/table/customize/${tableId}/end/vote/${pollId}`, lang),
     );

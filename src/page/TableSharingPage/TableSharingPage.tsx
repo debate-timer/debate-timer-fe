@@ -19,7 +19,10 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import useAnalytics from '../../hooks/useAnalytics';
+import { setTemplateOrigin } from '../../util/analytics/templateOrigin';
 
+// 공유 URL의 data 파라미터를 안전하게 디코딩하고 실패 시 null을 반환한다.
 function getDecodedDataOrNull(
   encodedData: string | null,
 ): DebateTableData | null {
@@ -52,6 +55,7 @@ function getDecodedDataOrNull(
 export default function TableSharingPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { trackEvent } = useAnalytics();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const { openModal, closeModal, ModalWrapper } = useModal({
@@ -60,7 +64,29 @@ export default function TableSharingPage() {
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
   const decodedData = getDecodedDataOrNull(encodedData);
+  const source = searchParams.get('source');
+  const isTemplateEntry = source === 'template';
 
+  // 공유 링크 유입 추적: 템플릿 진입이 아닌 실제 공유 링크일 때만 발화
+  useEffect(() => {
+    if (encodedData && !isTemplateEntry) {
+      trackEvent('share_link_entered', { referrer: document.referrer });
+    }
+    if (isTemplateEntry) {
+      const org = searchParams.get('org');
+      const tmpl = searchParams.get('tmpl');
+      if (org && tmpl) {
+        // 템플릿 유입 정보를 저장해 이후 template_used 이벤트에 연결한다.
+        setTemplateOrigin({
+          organization_name: org,
+          template_name: tmpl,
+          template_label: `${org} - ${tmpl}`,
+        });
+      }
+    }
+  }, [encodedData, isTemplateEntry, searchParams, trackEvent]);
+
+  // 로그인 상태와 URL 형태에 따라 저장 모달, 게스트 복사, 즉시 저장 플로우를 분기한다.
   useEffect(() => {
     if (isLoggedIn()) {
       if (isGuestFlow() && encodedData === null) {
@@ -131,10 +157,11 @@ export default function TableSharingPage() {
       </div>
 
       <ModalWrapper>
-        {/* On this case, we have to specify the data source */}
+        {/* 로그인 사용자는 저장 여부에 따라 계정 저장 또는 게스트 이어하기를 선택한다. */}
         {decodedData && (
           <LoggedInStoreDBModal
             onSave={() => {
+              // 공유받은 테이블을 계정에 저장한 뒤 개요 화면으로 이동한다.
               apiDebateTableRepository.addTable(decodedData).then(
                 (value) => {
                   closeModal();
@@ -150,6 +177,7 @@ export default function TableSharingPage() {
               );
             }}
             onContinue={() => {
+              // 공유받은 테이블을 세션에만 저장하고 게스트 플로우로 이어간다.
               sessionDebateTableRepository.addTable(decodedData).then(
                 () => {
                   closeModal();

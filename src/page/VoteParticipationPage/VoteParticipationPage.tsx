@@ -17,7 +17,9 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import useAnalytics from '../../hooks/useAnalytics';
 
+// 투표 참여자의 입력을 받고 제출을 처리하는 페이지다.
 export default function VoteParticipationPage() {
   const { t, i18n } = useTranslation();
   const { id: pollIdParam } = useParams();
@@ -28,6 +30,7 @@ export default function VoteParticipationPage() {
   const pollId = pollIdParam ? Number(pollIdParam) : NaN;
   const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
 
+  const { trackEvent } = useAnalytics();
   const [participantName, setParticipantName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<TeamKey | null>(null);
 
@@ -48,8 +51,10 @@ export default function VoteParticipationPage() {
     navigate(buildLangPath('/vote/end', lang)),
   );
 
+  // 유효한 입력이 모였을 때 poll_voted 이벤트를 기록하고 투표를 제출한다.
   const handleSubmit = () => {
-    if (isSubmitDisabled) return;
+    if (isSubmitDisabled || !selectedTeam) return;
+    trackEvent('poll_voted', { poll_id: pollId, team: selectedTeam });
     mutate({
       pollId: pollId,
       voterInfo: {
