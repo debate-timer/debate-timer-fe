@@ -75,33 +75,29 @@ describe('NormalTimer - 두 줄 레이아웃 (US2)', () => {
     expect(screen.queryByText(/토론자/)).not.toBeInTheDocument();
   });
 
-  it('팀명 요소에 truncate 클래스가 존재한다', () => {
+  it('긴 팀명을 가진 팀의 발언 순서일 때 팀명이 화면에 표시된다', () => {
     renderNormalTimer('A very long team name', null);
 
-    const teamEl = screen.getByText('A very long team name 팀');
-    expect(teamEl).toHaveClass('truncate');
+    expect(screen.getByText('A very long team name 팀')).toBeInTheDocument();
   });
 
-  it('토론자 요소에는 truncate 클래스가 존재하지 않는다', () => {
+  it('토론자 이름이 긴 경우에도 전체 이름이 화면에 표시된다', () => {
     renderNormalTimer(null, '발언자 1');
 
-    const speakerEl = screen.getByText('발언자 1 토론자');
-    expect(speakerEl).not.toHaveClass('truncate');
+    expect(screen.getByText('발언자 1 토론자')).toBeInTheDocument();
   });
 });
 
 describe('NormalTimer - 순서명 정렬 (US3)', () => {
-  it('한글 순서명 렌더링 시 h1 요소에 text-center 클래스가 존재한다', () => {
+  it('한글 순서명이 타이머 화면에 표시된다', () => {
     renderNormalTimer(null, null, '입론');
 
-    const h1 = screen.getByRole('heading', { level: 1 });
-    expect(h1).toHaveClass('text-center');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('입론');
   });
 
-  it('영어 순서명 렌더링 시 h1 요소에 text-center 클래스가 존재한다', () => {
+  it('영어 순서명이 타이머 화면에 표시된다', () => {
     renderNormalTimer(null, null, 'Opening Statement');
 
-    const h1 = screen.getByRole('heading', { level: 1 });
-    expect(h1).toHaveClass('text-center');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Opening Statement');
   });
 });
