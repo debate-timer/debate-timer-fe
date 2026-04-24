@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as Sentry from '@sentry/react';
 import {
   getAccessToken,
   removeAccessToken,
@@ -13,12 +14,17 @@ import {
 
 // Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
+const requestTimeoutMs = 5000;
+
+type SentryCapturedError = {
+  __sentry_captured__?: boolean;
+};
 
 // Axios instance
 export const axiosInstance = axios.create({
   baseURL:
     currentMode === 'test' ? undefined : import.meta.env.VITE_API_BASE_URL,
-  timeout: 5000,
+  timeout: requestTimeoutMs,
   timeoutErrorMessage:
     '시간 초과로 인해 요청을 처리하지 못했어요... 잠시 후 다시 시도해 주세요.',
   headers: {
@@ -37,6 +43,39 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+
+function captureClientApiError(error: unknown) {
+  if (!axios.isAxiosError(error)) {
+    return;
+  }
+
+  const { response, config, code } = error;
+  const status = response?.status;
+
+  // 401 재발급 흐름과 정상/리다이렉트 응답만 제외하고, 4xx/5xx/네트워크 실패/타임아웃은 수집
+  if (status === 401 || (status !== undefined && status < 400)) {
+    return;
+  }
+
+  Sentry.captureException(error, {
+    tags: {
+      errorType: 'api-error',
+      httpStatus: status ? String(status) : 'network-error',
+    },
+    extra: {
+      pathname: window.location.pathname,
+      search: window.location.search,
+      url: config?.url,
+      method: config?.method,
+      baseURL: config?.baseURL,
+      params: config?.params,
+      timeout: config?.timeout ?? requestTimeoutMs,
+      errorCode: code,
+    },
+  });
+
+  (error as SentryCapturedError).__sentry_captured__ = true;
+}
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
@@ -70,15 +109,27 @@ axiosInstance.interceptors.response.use(
         originalRequest.headers.Authorization = `${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        if (
+          axios.isAxiosError(refreshError) &&
+          refreshError.response?.status !== 401 &&
+          refreshError.response?.status !== 403
+        ) {
+          captureClientApiError(refreshError);
+        }
+
         console.error('Refresh Token is invalid or expired', refreshError);
         // 재발급도 실패하면 -> 로그인 페이지 이동
         const currentLang = i18n.resolvedLanguage ?? i18n.language;
         const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+        Sentry.setUser(null);
         window.location.href = buildLangPath('/home', lang);
         removeAccessToken();
         return Promise.reject(refreshError);
       }
     }
+
+    captureClientApiError(error);
+
     return Promise.reject(error);
   },
 );

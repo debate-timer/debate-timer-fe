@@ -116,7 +116,7 @@ export default function TableSharingPage() {
         },
       );
     }
-  }, [decodedData, navigate, openModal, closeModal, encodedData, lang]);
+  }, [decodedData, navigate, openModal, closeModal, encodedData, lang, t]);
 
   return (
     <>

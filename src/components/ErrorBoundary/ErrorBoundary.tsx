@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import * as Sentry from '@sentry/react';
 import ErrorPage from './ErrorPage';
 
 interface ErrorBoundaryProps {
@@ -13,6 +14,10 @@ interface ErrorBoundaryState {
 
 const defaultError = new Error('알 수 없는 오류');
 const defaultStack = '스택 정보 없음';
+
+type SentryCapturedError = {
+  __sentry_captured__?: boolean;
+};
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -31,7 +36,20 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // You can also log the error to an error reporting service
+    // 이미 API 인터셉터 등에서 캡처된 에러가 아니라면 전송
+    if (!(error as SentryCapturedError).__sentry_captured__) {
+      Sentry.captureException(error, {
+        tags: {
+          errorType: 'render-error',
+        },
+        extra: {
+          pathname: window.location.pathname,
+          search: window.location.search,
+          componentStack: errorInfo.componentStack,
+        },
+      });
+    }
+
     console.log(error, errorInfo);
   }
 
