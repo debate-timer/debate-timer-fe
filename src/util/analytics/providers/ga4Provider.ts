@@ -54,7 +54,7 @@ export class GA4Provider implements AnalyticsProvider {
    * `userId`는 서비스 사용자 ID이며, 반환값은 없다.
    */
   setUserId(userId: string): void {
-    ReactGA.set({ userId });
+    ReactGA.set({ user_id: userId });
   }
 
   /**
