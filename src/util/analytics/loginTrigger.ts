@@ -64,9 +64,16 @@ export function clearLoginTrigger(): void {
 }
 
 /**
- * 현재 로그인 진입 정보가 저장되어 있는지 확인한다.
- * 파라미터는 받지 않으며, 저장값 존재 여부를 불리언으로 반환한다.
+ * 현재 유효한 로그인 진입 정보가 저장되어 있는지 확인한다.
+ * 파라미터는 받지 않으며, 만료/파싱 실패 건은 false로 본다.
  */
 export function hasLoginTrigger(): boolean {
-  return sessionStorage.getItem(STORAGE_KEY) !== null;
+  const raw = sessionStorage.getItem(STORAGE_KEY);
+  if (!raw) return false;
+  try {
+    const stored: StoredLoginTrigger = JSON.parse(raw);
+    return Date.now() - stored.timestamp <= EXPIRY_MS;
+  } catch {
+    return false;
+  }
 }
