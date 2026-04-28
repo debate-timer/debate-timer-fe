@@ -1,6 +1,10 @@
 import { renderHook } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import type { PropsWithChildren } from 'react';
+import {
+  RouterProvider,
+  createMemoryRouter,
+  Outlet,
+} from 'react-router-dom';
+import type { PropsWithChildren, ReactNode } from 'react';
 import usePageTracking from './usePageTracking';
 import { analyticsManager } from '../util/analytics';
 
@@ -12,11 +16,28 @@ vi.mock('../util/analytics', () => ({
   },
 }));
 
-function createWrapper(initialEntries: string[] = ['/home']) {
+function createWrapper(initialPath: string = '/home') {
   return function Wrapper({ children }: PropsWithChildren) {
-    return (
-      <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+    function Layout({ slot }: { slot: ReactNode }) {
+      return (
+        <>
+          {slot}
+          <Outlet />
+        </>
+      );
+    }
+
+    const router = createMemoryRouter(
+      [
+        {
+          path: '*',
+          element: <Layout slot={children} />,
+        },
+      ],
+      { initialEntries: [initialPath] },
     );
+
+    return <RouterProvider router={router} />;
   };
 }
 
@@ -30,12 +51,12 @@ describe('usePageTracking', () => {
     vi.useRealTimers();
   });
 
-  test('마운트 시 page_view 이벤트가 발생한다', () => {
+  test('페이지에 진입하면 page_view가 한 번 기록된다', () => {
     renderHook(() => usePageTracking(), { wrapper: createWrapper() });
     expect(analyticsManager.trackPageView).toHaveBeenCalledTimes(1);
   });
 
-  test('언마운트 시 page_leave 이벤트가 발생한다', () => {
+  test('페이지를 떠나면 머문 시간과 함께 page_leave가 기록된다', () => {
     const { unmount } = renderHook(() => usePageTracking(), {
       wrapper: createWrapper(),
     });
@@ -51,7 +72,7 @@ describe('usePageTracking', () => {
     );
   });
 
-  test('duration_ms가 진입 시각부터 이탈 시각까지의 차이이다', () => {
+  test('page_leave의 duration_ms는 실제로 머문 시간을 반영한다', () => {
     const { unmount } = renderHook(() => usePageTracking(), {
       wrapper: createWrapper(),
     });
