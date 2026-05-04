@@ -226,6 +226,7 @@
   "발언당 {{minutes}}분 {{seconds}}초": "{{minutes}}m {{seconds}}s per speech",
   "위/아래로 드래그": "Drag up/down",
   " | {{speaker}} 토론자": " | {{speaker}} Debater",
+  "{{speaker}} 토론자": "{{speaker}} Debater",
   "토론 정보를 {{val0}}해주세요": "Please {{val0}} the debate info",
   "수정": "edit",
   "설정": "configure",
