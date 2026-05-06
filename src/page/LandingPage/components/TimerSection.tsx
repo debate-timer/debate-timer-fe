@@ -25,7 +25,7 @@ export default function TimerSection() {
         <div className="flex w-1/2 flex-col items-center gap-4">
           <h3 className="whitespace-pre-line text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
             {t(
-              '토론자가 작전 시간을 요청하면\n 작전 시간 버튼을 눌러 시간을 사용해요',
+              '토론자가 작전 시간을 요청하면\n작전 시간 버튼을 눌러 시간을 사용해요',
             )}
           </h3>
         </div>
