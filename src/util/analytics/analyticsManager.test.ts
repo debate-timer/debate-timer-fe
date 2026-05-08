@@ -41,6 +41,7 @@ describe('AnalyticsManager', () => {
     manager.trackEvent('template_selected', {
       organization_name: 'org',
       template_name: 'tmpl',
+      template_label: 'org - tmpl',
     });
 
     expect(p1.trackEvent).toHaveBeenCalled();
@@ -108,6 +109,7 @@ describe('AnalyticsManager', () => {
       manager.trackEvent('template_selected', {
         organization_name: 'org',
         template_name: 'tmpl',
+        template_label: 'org - tmpl',
       });
     }).not.toThrow();
   });
@@ -125,6 +127,7 @@ describe('AnalyticsManager', () => {
     manager.trackEvent('template_selected', {
       organization_name: 'org',
       template_name: 'tmpl',
+      template_label: 'org - tmpl',
     });
 
     expect(normalProvider.trackEvent).toHaveBeenCalled();
@@ -137,6 +140,7 @@ describe('AnalyticsManager', () => {
     manager.trackEvent('template_selected', {
       organization_name: 'org',
       template_name: 'tmpl',
+      template_label: 'org - tmpl',
     });
 
     const calledWith = vi.mocked(provider.trackEvent).mock.calls[0];

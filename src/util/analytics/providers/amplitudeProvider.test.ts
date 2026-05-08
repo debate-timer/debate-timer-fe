@@ -36,6 +36,7 @@ describe('AmplitudeProvider', () => {
     const props = {
       organization_name: 'org',
       template_name: 'tmpl',
+      template_label: 'org - tmpl',
       user_type: 'guest' as const,
       language: 'ko',
       page_path: '/home',
