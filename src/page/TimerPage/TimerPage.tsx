@@ -20,7 +20,11 @@ import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator
 import { isGuestFlow } from '../../util/sessionStorage';
 import useAnalytics from '../../hooks/useAnalytics';
 import { consumeTemplateOrigin } from '../../util/analytics/templateOrigin';
-import { RiFullscreenFill, RiFullscreenExitFill } from 'react-icons/ri';
+import {
+  RiFullscreenFill,
+  RiFullscreenExitFill,
+  RiVolumeMuteFill,
+} from 'react-icons/ri';
 import DTVolume from '../../components/icons/Volume';
 import VolumeBar from '../../components/VolumeBar/VolumeBar';
 
@@ -46,6 +50,7 @@ export default function TimerPage() {
 
   useTimerHotkey(state);
   const timerStartedRef = useRef(false);
+  const isMuted = state.volume === 0;
   const {
     data,
     bg,
@@ -160,7 +165,17 @@ export default function TimerPage() {
                 title={t('볼륨 조절')}
                 onClick={toggleVolumeBar}
               >
-                <DTVolume className="h-full w-full" />
+                {isMuted ? (
+                  <RiVolumeMuteFill
+                    className="h-full w-full"
+                    data-testid="volume-icon-muted"
+                  />
+                ) : (
+                  <DTVolume
+                    className="h-full w-full"
+                    data-testid="volume-icon-normal"
+                  />
+                )}
               </button>
 
               {isVolumeBarOpen && (

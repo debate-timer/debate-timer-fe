@@ -4,7 +4,6 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import CircularTimer from './CircularTimer';
 import clsx from 'clsx';
-import DTDebate from '../../../components/icons/Debate';
 import CompactTimeoutTimer from './CompactTimeoutTimer';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 import useBreakpoint from '../../../hooks/useBreakpoint';
@@ -76,17 +75,26 @@ export default function NormalTimer({
       <span className="flex w-[360px] flex-shrink-0 flex-col items-center justify-center xl:w-[450px]">
         <span className="flex w-full flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
           {/* 제목 */}
-          <h1 className="text-[52px] font-bold xl:text-[68px]">{titleText}</h1>
+          <h1 className="text-center text-[52px] font-bold xl:text-[68px]">
+            {titleText}
+          </h1>
 
           {/* 발언자 및 팀 정보 */}
           {(teamName || item.speaker) && (
-            <span className="flex w-full max-w-[600px] flex-row items-center justify-center space-x-[16px]">
-              <DTDebate className="w-[20px] flex-shrink-0 xl:w-[28px]" />
-              <p className="min-w-0 flex-1 truncate text-[20px] xl:text-[28px]">
-                {teamName && t('{{team}} 팀', { team: t(teamName) })}
-                {item.speaker &&
-                  t(' | {{speaker}} 토론자', { speaker: t(item.speaker) })}
-              </p>
+            <span className="flex w-full max-w-[600px] flex-col items-center justify-center gap-y-[8px] xl:gap-y-[12px]">
+              {teamName && (
+                <p className="w-full min-w-0 truncate text-center text-[20px] xl:text-[28px]">
+                  {t('{{team}} 팀', { team: t(teamName) })}
+                </p>
+              )}
+              {teamName && item.speaker && (
+                <hr className="w-1/3 border-[1.2px] border-current opacity-30" />
+              )}
+              {item.speaker && (
+                <p className="w-full min-w-0 text-center text-[20px] xl:text-[28px]">
+                  {t('{{speaker}} 토론자', { speaker: t(item.speaker) })}
+                </p>
+              )}
             </span>
           )}
 
