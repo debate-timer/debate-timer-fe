@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useMutation } from '@tanstack/react-query';
 import { logout } from '../../apis/apis/member';
 import { removeAccessToken, removeMemberId } from '../../util/accessToken';
@@ -13,6 +14,7 @@ export default function useLogout(onSuccess: () => void) {
       removeAccessToken();
       removeMemberId();
       analyticsManager.reset();
+      Sentry.setUser(null);
       onSuccess();
     },
   });
