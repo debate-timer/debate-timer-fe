@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/react';
 import {
   getAccessToken,
   removeAccessToken,
+  removeMemberId,
   setAccessToken,
 } from '../util/accessToken';
 import i18n from '../i18n';
@@ -11,6 +12,7 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../util/languageRouting';
+import { analyticsManager } from '../util/analytics';
 
 // Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
@@ -124,6 +126,8 @@ axiosInstance.interceptors.response.use(
         Sentry.setUser(null);
         window.location.href = buildLangPath('/home', lang);
         removeAccessToken();
+        removeMemberId();
+        analyticsManager.reset();
         return Promise.reject(refreshError);
       }
     }

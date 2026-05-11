@@ -2,17 +2,20 @@ import { useTranslation } from 'react-i18next';
 import { Organization } from '../../../type/type';
 import clsx from 'clsx';
 import { createTableShareUrlFromEncodedData } from '../../../util/arrayEncoding';
+import useAnalytics from '../../../hooks/useAnalytics';
 
 interface TemplateCardProps {
   organization: Organization;
   className?: string; // 카드의 추가 className이 필요하면 사용
 }
 
+// 단체별 템플릿 링크와 선택 액션을 보여주는 카드다.
 export default function TemplateCard({
   organization,
   className = '',
 }: TemplateCardProps) {
   const { t } = useTranslation();
+  const { trackEvent } = useAnalytics();
   const logoUrl = import.meta.env.VITE_API_BASE_URL + organization.iconPath;
 
   return (
@@ -54,10 +57,18 @@ export default function TemplateCard({
                 {template.name}
               </span>
 
+              {/* 템플릿 선택 시 template_selected 이벤트를 기록하고 공유 링크로 이동한다. */}
               <a
-                href={createTableShareUrlFromEncodedData(template.data)}
+                href={`${createTableShareUrlFromEncodedData(template.data)}&source=template&org=${encodeURIComponent(organization.organization)}&tmpl=${encodeURIComponent(template.name)}`}
                 className="shrink-0 rounded-full border border-neutral-300 bg-brand px-4 py-1.5 text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-default-black transition-colors duration-100 hover:bg-semantic-table hover:text-white"
                 aria-label={t('{{label}} 토론하기', { label: template.name })}
+                onClick={() =>
+                  trackEvent('template_selected', {
+                    organization_name: organization.organization,
+                    template_name: template.name,
+                    template_label: `${organization.organization} - ${template.name}`,
+                  })
+                }
               >
                 {t('토론하기')}
               </a>

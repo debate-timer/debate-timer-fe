@@ -19,6 +19,7 @@
     "i18n:transform": "tsx scripts/i18nTransform.ts"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.39.0",
     "@sentry/react": "^10.50.0",
     "@stomp/stompjs": "^7.3.0",
     "@tanstack/eslint-plugin-query": "^5.91.4",
