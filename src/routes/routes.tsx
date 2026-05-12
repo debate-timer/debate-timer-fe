@@ -5,7 +5,6 @@ import TableCompositionPage from '../page/TableComposition/TableCompositionPage'
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/OAuthPage/OAuth';
-import ReactGA from 'react-ga4';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
@@ -129,10 +128,5 @@ const router = createBrowserRouter(
     basename: import.meta.env.VITE_BASE_PATH || '/',
   },
 );
-
-// 라우트 변경 시 Google Analytics 이벤트 전송
-router.subscribe(({ location }) => {
-  ReactGA.send({ hitType: 'pageview', page: location.pathname });
-});
 
 export default router;

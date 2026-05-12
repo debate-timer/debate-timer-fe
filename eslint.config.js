@@ -26,7 +26,7 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   // 기본 설정 옵션
   {
-    ignores: ['dist', 'public/mockServiceWorker.js'], // 배포 디렉터리(dist) 제외
+    ignores: ['dist', 'public/mockServiceWorker.js', '.agents/', '.claude/', '.agent/', '.codex/'], // 배포 디렉터리(dist) 및 AI 에이전트 설정 파일 제외
   },
   {
     // 확장 규칙 설정

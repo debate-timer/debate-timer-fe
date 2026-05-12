@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { setAccessToken } from '../../util/accessToken';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
@@ -39,6 +40,10 @@ export async function postUser(code: string): Promise<PostUserResponseType> {
   } else {
     throw new Error('Authorization 헤더가 존재하지 않습니다.');
   }
+
+  Sentry.setUser({
+    id: String(response.data.id),
+  });
 
   return response.data;
 }

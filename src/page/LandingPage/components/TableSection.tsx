@@ -50,7 +50,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
           className="mt-14 rounded-full border border-neutral-300 bg-brand px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-semantic-table hover:text-default-white"
           onClick={onLogin}
         >
-          {t('3초 로그인 하기')}
+          {t('3초 로그인')}
         </button>
       </div>
     </section>

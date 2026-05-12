@@ -1,0 +1,202 @@
+#!/usr/bin/env bash
+# Common functions and variables for all scripts
+
+# Get repository root, with fallback for non-git repositories
+get_repo_root() {
+    if git rev-parse --show-toplevel >/dev/null 2>&1; then
+        git rev-parse --show-toplevel
+    else
+        # Fall back to script location for non-git repos
+        local script_dir="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        (cd "$script_dir/../../.." && pwd)
+    fi
+}
+
+# Get current branch, with fallback for non-git repositories
+get_current_branch() {
+    # First check if SPECIFY_FEATURE environment variable is set
+    if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
+        echo "$SPECIFY_FEATURE"
+        return
+    fi
+
+    # Then check git if available
+    if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
+        git rev-parse --abbrev-ref HEAD
+        return
+    fi
+
+    # For non-git repos, try to find the latest feature directory
+    local repo_root=$(get_repo_root)
+    local specs_base="$repo_root/specs"
+
+    if [[ -d "$specs_base" ]]; then
+        local latest_feature=""
+        local highest=0
+
+        for type_dir in "$specs_base"/*/; do
+            [[ -d "$type_dir" ]] || continue
+            local type_name
+            type_name="$(basename "$type_dir")"
+            for dir in "$type_dir"*/; do
+                if [[ -d "$dir" ]]; then
+                    local dirname=$(basename "$dir")
+                    if [[ "$dirname" =~ ^([0-9]+)- ]]; then
+                        local number=${BASH_REMATCH[1]}
+                        number=$((10#$number))
+                        if [[ "$number" -gt "$highest" ]]; then
+                            highest=$number
+                            latest_feature="${type_name}/#${dirname}"
+                        fi
+                    fi
+                fi
+            done
+        done
+
+        if [[ -n "$latest_feature" ]]; then
+            echo "$latest_feature"
+            return
+        fi
+    fi
+
+    echo "main"  # Final fallback
+}
+
+# Check if we have git available
+has_git() {
+    git rev-parse --show-toplevel >/dev/null 2>&1
+}
+
+# Extract issue number from branch name
+# Supports: feat/#96-slug, feat/#096-slug, 096-slug
+extract_issue_number() {
+    local branch="$1"
+
+    # Pattern: feat/#NNN-slug or type/#NNN-slug
+    if [[ "$branch" =~ ^[a-z]+/#([0-9]+)- ]]; then
+        echo "${BASH_REMATCH[1]}"
+        return
+    fi
+
+    # Pattern: NNN-slug (legacy)
+    if [[ "$branch" =~ ^([0-9]{3})- ]]; then
+        echo "${BASH_REMATCH[1]}"
+        return
+    fi
+
+    echo ""
+}
+
+check_feature_branch() {
+    local branch="$1"
+    local has_git_repo="$2"
+
+    # For non-git repos, we can't enforce branch naming but still provide output
+    if [[ "$has_git_repo" != "true" ]]; then
+        echo "[specify] Warning: Git repository not detected; skipped branch validation" >&2
+        return 0
+    fi
+
+    # Accept: feat/#96-slug, fix/#88-jm, type/#NNN-slug
+    if [[ "$branch" =~ ^[a-z]+/#[0-9]+- ]]; then
+        return 0
+    fi
+
+    # Accept: 001-feature-name (legacy pattern)
+    if [[ "$branch" =~ ^[0-9]{3}- ]]; then
+        return 0
+    fi
+
+    echo "ERROR: Not on a feature branch. Current branch: $branch" >&2
+    echo "Feature branches should be named like: feat/#96-feature-name or 001-feature-name" >&2
+    return 1
+}
+
+get_feature_dir() {
+    local repo_root="$1"
+    local branch_name="$2"
+    find_feature_dir_by_prefix "$repo_root" "$branch_name"
+}
+
+# Find feature directory by issue number or numeric prefix
+# Supports: fix/#441-slug → specs/fix/441-*
+#           feat/#96-social-login → specs/feat/096-*
+#           096-social-login → specs/feat/096-* (legacy)
+find_feature_dir_by_prefix() {
+    local repo_root="$1"
+    local branch_name="$2"
+
+    # Extract type prefix from branch name (e.g., fix/#441-slug → fix, feat/#96-slug → feat)
+    local type_prefix="feat"  # default for legacy branches
+    if [[ "$branch_name" =~ ^([a-z]+)/#[0-9]+ ]]; then
+        type_prefix="${BASH_REMATCH[1]}"
+    fi
+
+    local specs_dir="$repo_root/specs/$type_prefix"
+
+    # Extract issue number from branch name
+    local issue_num=$(extract_issue_number "$branch_name")
+
+    if [[ -z "$issue_num" ]]; then
+        # If no issue number found, fall back to exact match under specs/{type}/
+        echo "$specs_dir/$branch_name"
+        return
+    fi
+
+    # Zero-pad to 3 digits for matching
+    local padded=$(printf "%03d" "$((10#$issue_num))")
+
+    # Search for directories in specs/{type}/ that start with this prefix
+    local matches=()
+    if [[ -d "$specs_dir" ]]; then
+        for dir in "$specs_dir"/"$padded"-*; do
+            if [[ -d "$dir" ]]; then
+                matches+=("$(basename "$dir")")
+            fi
+        done
+    fi
+
+    # Handle results
+    if [[ ${#matches[@]} -eq 0 ]]; then
+        # No match found - return the padded path (will fail later with clear error)
+        echo "$specs_dir/$padded-$branch_name"
+    elif [[ ${#matches[@]} -eq 1 ]]; then
+        # Exactly one match - perfect!
+        echo "$specs_dir/${matches[0]}"
+    else
+        # Multiple matches - this shouldn't happen with proper naming convention
+        echo "ERROR: Multiple spec directories found with prefix '$padded': ${matches[*]}" >&2
+        echo "Please ensure only one spec directory exists per issue number." >&2
+        echo "$specs_dir/${matches[0]}"  # Return first match
+    fi
+}
+
+get_feature_paths() {
+    local repo_root=$(get_repo_root)
+    local current_branch=$(get_current_branch)
+    local has_git_repo="false"
+
+    if has_git; then
+        has_git_repo="true"
+    fi
+
+    # Use prefix-based lookup to support branch → specs/feat/ mapping
+    local feature_dir=$(find_feature_dir_by_prefix "$repo_root" "$current_branch")
+
+    cat <<EOF
+REPO_ROOT='$repo_root'
+CURRENT_BRANCH='$current_branch'
+HAS_GIT='$has_git_repo'
+FEATURE_DIR='$feature_dir'
+FEATURE_SPEC='$feature_dir/spec.md'
+IMPL_PLAN='$feature_dir/plan.md'
+TASKS='$feature_dir/tasks.md'
+RESEARCH='$feature_dir/research.md'
+DATA_MODEL='$feature_dir/data-model.md'
+QUICKSTART='$feature_dir/quickstart.md'
+CONTRACTS_DIR='$feature_dir/contracts'
+EOF
+}
+
+check_file() { [[ -f "$1" ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
+check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" || echo "  ✗ $2"; }

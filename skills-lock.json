@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "computedHash": "2f673b7710813ac07c71c0a54657f740078aec6585f15edf351494499e1f9ac3"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f98931159fa9c7fed043bcd18a891a46dcf89ababa38df13a4c5b7b30dc0ce07"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "12bab0ca6a45898a9b7eed06260adfb1f91cddbba02c689b680cebb5d9c2420c"
+    },
+    "frontend-fundamentals": {
+      "source": "local",
+      "sourceType": "local",
+      "computedHash": "04c3c2f445074e5ac1c93dff3a5193e20b7b13b5884b2e450f1b0e4ee159b7e3"
+    }
+  }
+}

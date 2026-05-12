@@ -25,7 +25,9 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import useAnalytics from '../../hooks/useAnalytics';
 
+// 토론 개요를 보여주고 공유, 수정, 시작 액션을 제공하는 페이지다.
 export default function TableOverviewPage() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
@@ -33,19 +35,22 @@ export default function TableOverviewPage() {
   const navigate = useNavigate();
   const { openModal, closeModal, ModalWrapper } = useModal();
   const [modalCoinState, setModalCoinState] = useState<CoinState>('initial');
+  const { trackEvent } = useAnalytics();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
+  // 팀 선정 모달을 초기 상태로 열어준다.
   const handleOpenModal = () => {
     setModalCoinState('initial');
     openModal();
   };
 
+  // 동전 애니메이션 단계 변화를 모달 상태에 반영한다.
   const handleCoinStateChange = useCallback((newState: CoinState) => {
     setModalCoinState(newState);
   }, []);
 
-  // Only uses hooks related with customize due to the removal of parliamentary
+  // 커스터마이즈 테이블 정보만 조회하도록 관련 훅만 사용한다.
   const {
     data,
     isLoading: isFetching,
@@ -58,7 +63,7 @@ export default function TableOverviewPage() {
     navigate(buildLangPath(`/table/customize/${tableId}`, lang));
   });
 
-  // Hook for sharing tables
+  // 공유 모달 열기와 링크 생성 로직을 함께 제공한다.
   const { openShareModal, TableShareModal } = useTableShare(tableId);
   const isLoading = isFetching || isRefetching;
   const isError = isFetchError || isRefetchError;
@@ -184,6 +189,10 @@ export default function TableOverviewPage() {
               })}
               disabled={isLoading}
               onClick={() => {
+                // 공유 버튼 클릭 시 table_shared 이벤트를 기록한다.
+                trackEvent('table_shared', {
+                  table_id: isGuestFlow() ? 'guest' : tableId,
+                });
                 openShareModal();
               }}
             >
