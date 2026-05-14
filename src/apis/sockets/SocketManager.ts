@@ -10,6 +10,12 @@ import { SocketMessage } from './type';
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
  */
 export interface SocketOptions {
+  /** SockJS 연결에 사용할 전체 URL. 지정하면 baseUrl보다 우선합니다. */
+  url?: string;
+
+  /** SockJS 연결에 사용할 API base URL. 지정하면 `${baseUrl}/ws`로 연결합니다. */
+  baseUrl?: string;
+
   /** 최대 재시도 횟수 (기본값: 3) */
   maxRetries?: number;
 
@@ -24,7 +30,10 @@ export interface SocketOptions {
 }
 
 // 기본값 객체 선언 (onConnect를 제외한 모든 필수 속성 정의)
-const DEFAULT_OPTIONS: Required<SocketOptions> = {
+type ResolvedSocketOptions = Required<Omit<SocketOptions, 'url' | 'baseUrl'>> &
+  Pick<SocketOptions, 'url' | 'baseUrl'>;
+
+const DEFAULT_OPTIONS: ResolvedSocketOptions = {
   maxRetries: 3,
   baseRetryDelayMs: 1000,
   heartbeatInMs: 10000,
@@ -36,7 +45,7 @@ class SocketManager {
   // 변수
   private client: Client | null = null;
   private static instance: SocketManager;
-  private currentOptions = DEFAULT_OPTIONS; // 소켓 설정을 저장하는 변수
+  private currentOptions: ResolvedSocketOptions = DEFAULT_OPTIONS; // 소켓 설정을 저장하는 변수
   private retryCount: number = 0;
 
   // 싱글톤 패턴 적용
@@ -99,13 +108,11 @@ class SocketManager {
     this.retryCount = 0;
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
-    // 환경 변수에서 URL 로드
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    if (!baseUrl) {
+    const wsUrl = this.resolveWebSocketUrl(this.currentOptions);
+    if (!wsUrl) {
       console.error('VITE_API_BASE_URL 환경 변수가 설정되지 않았습니다.');
       return;
     }
-    const wsUrl = baseUrl + '/ws';
 
     const newClient = new Client({
       // wss:// 대신 https:// 주소를 SockJS 팩토리에 주입
@@ -264,6 +271,19 @@ class SocketManager {
     // 난수가 0이 될 경우 STOMP가 재연결 비활성화로 파악하는 것을 막기 위해
     // 계산한 값에 10 ms를 추가
     return Math.floor(Math.random() * maxExponentialDelay) + 10;
+  }
+
+  private resolveWebSocketUrl(options: SocketOptions): string | null {
+    if (options.url) {
+      return options.url;
+    }
+
+    const baseUrl = options.baseUrl ?? import.meta.env.VITE_API_BASE_URL;
+    if (!baseUrl) {
+      return null;
+    }
+
+    return `${baseUrl}/ws`;
   }
 }
 
