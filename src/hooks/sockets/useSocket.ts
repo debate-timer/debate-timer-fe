@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
-import { socketManager, SocketOptions } from '../apis/sockets/SocketManager';
-import { SocketMessage } from '../apis/sockets/type';
+import { socketManager, SocketOptions } from '../../apis/sockets/SocketManager';
+import { SocketMessage } from '../../apis/sockets/type';
 
 /**
  * 소켓 연결을 돕는 React 훅입니다. 제공되는 함수는 아래와 같습니다:
@@ -15,7 +15,7 @@ import { SocketMessage } from '../apis/sockets/type';
  *
  * 특히, 구독 해제의 책임은 이 훅에 있으나, 연결 자체를 끊는 책임은 소켓을 호출한 페이지에 있다는 점을 유념해주세요.
  */
-export const useSocket = () => {
+export default function useSocket() {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
   const activeSubscriptions = useRef<Map<string, StompSubscription>>(new Map());
 
@@ -185,4 +185,4 @@ export const useSocket = () => {
     publish,
     error,
   };
-};
+}
