@@ -283,7 +283,8 @@ class SocketManager {
       return null;
     }
 
-    return `${baseUrl}/ws`;
+    const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+    return `${normalizedBaseUrl}/ws`;
   }
 }
 

@@ -11,7 +11,7 @@ export default function useGetChairmanToken(
       const { data } = await getChairmanToken(tableId);
       return data.chairmanToken;
     },
-    enabled,
+    enabled: enabled && Boolean(tableId),
     staleTime: Infinity,
   });
 }
