@@ -17,18 +17,70 @@ import useSocket from './useSocket';
  * 특정 제어 메시지를 지정된 채널로 송신(Publish)할 수 있습니다.
  *
  * @param {number} roomId - 관리할 토론방의 고유 ID
- * @returns {Object} 메시지 목록(messages), 제어 액션 함수(sendDebateEvent), 연결 제어 함수 등
+ * @returns {Object} 사회자 소켓 상태와 제어 함수를 반환합니다.
+ * @returns {number} returns.signalCount - 현재 소켓 세션에서 수신한 신호 수입니다.
+ * @returns {number | null} returns.lastSignalTime - 현재 소켓 세션에서 마지막으로 신호를 수신한 시각의 타임스탬프입니다.
+ * @returns {Function} returns.connect - `useSocket.connect`에 위임하기 전에 현재 신호 상태를 초기화합니다.
+ * @returns {Function} returns.disconnect - `useSocket.disconnect`에 위임하기 전에 현재 신호 상태를 초기화합니다.
+ * @returns {Function} returns.sendDebateEvent - 현재 방으로 사회자 토론 이벤트를 발행합니다.
+ * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
 export default function useChairmanSocket(roomId: number) {
-  const { connect, disconnect, subscribe, unsubscribe, publish, error } =
-    useSocket();
+  const {
+    connect,
+    disconnect,
+    subscribe,
+    unsubscribe,
+    publish,
+    addConnectionListener,
+    error,
+  } = useSocket();
 
   const [signalCount, setSignalCount] = useState<number>(0);
   const [lastSignalTime, setLastSignalTime] = useState<number | null>(null);
 
+  /**
+   * 현재 사회자 소켓 세션에서 누적된 신호 메타데이터를 초기화합니다.
+   * 세션 간에 오래된 신호 수나 타임스탬프가 남지 않도록, 래핑된 connect 및
+   * disconnect 제어 함수에서 사용하는 초기화 동작을 한곳에 모읍니다.
+   */
+  const resetSignalState = useCallback(() => {
+    setSignalCount(0);
+    setLastSignalTime(null);
+  }, []);
+
+  /**
+   * 이전에 수신한 신호 상태를 초기화한 뒤 사회자 소켓을 시작합니다.
+   * 새 연결이 이전 세션의 신호 수나 마지막 신호 타임스탬프 없이 시작되도록
+   * `useSocket.connect`를 래핑합니다.
+   */
+  const connectChairmanSocket = useCallback(
+    (options?: Parameters<typeof connect>[0]) => {
+      resetSignalState();
+      connect(options);
+    },
+    [connect, resetSignalState],
+  );
+
+  /**
+   * 현재 신호 메타데이터를 초기화한 뒤 사회자 소켓을 종료합니다.
+   * 수동으로 연결을 해제할 때도 React 상태에 남아 있을 수 있는 세션 단위 신호
+   * 상태를 제거하기 위해 `useSocket.disconnect`를 래핑합니다.
+   */
+  const disconnectChairmanSocket = useCallback(() => {
+    resetSignalState();
+    disconnect();
+  }, [disconnect, resetSignalState]);
+
+  useEffect(() => {
+    return addConnectionListener(resetSignalState);
+  }, [addConnectionListener, resetSignalState]);
+
   // 서버로부터 토론 이벤트를 갱신해달라는 요청을 받게 될 채널 구독
   useEffect(() => {
     const destination = `/chairman/${roomId}`;
+
+    resetSignalState();
 
     subscribe(destination, () => {
       setSignalCount((prev) => prev + 1);
@@ -38,7 +90,7 @@ export default function useChairmanSocket(roomId: number) {
     return () => {
       unsubscribe(destination);
     };
-  }, [roomId, subscribe, unsubscribe]);
+  }, [roomId, resetSignalState, subscribe, unsubscribe]);
 
   useEffect(() => {
     if (!error) {
@@ -46,8 +98,9 @@ export default function useChairmanSocket(roomId: number) {
     }
 
     // TODO: Replace with Toast when a global Toast API is available.
+    resetSignalState();
     console.error('Chairman socket connection failed.', error);
-  }, [error]);
+  }, [error, resetSignalState]);
 
   // 사회자 권한으로 특정 제어 메시지를 발행하는 함수
   const sendDebateEvent = useCallback(
@@ -84,8 +137,8 @@ export default function useChairmanSocket(roomId: number) {
   return {
     signalCount,
     lastSignalTime,
-    connect,
-    disconnect,
+    connect: connectChairmanSocket,
+    disconnect: disconnectChairmanSocket,
     sendDebateEvent,
     error,
   };

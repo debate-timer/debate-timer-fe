@@ -121,6 +121,37 @@ describe('useSocket', () => {
     );
   });
 
+  it('연결 이벤트가 발생하면 등록한 연결 리스너를 구독 복구 전에 호출해야 한다', () => {
+    const connectionListener = vi.fn();
+    const recoverCallback = vi.fn();
+    const subscription = createSubscription();
+    socketManagerMock.subscribe.mockReturnValue(subscription);
+
+    const listenerHook = renderHook(() => useSocket());
+
+    act(() => {
+      listenerHook.result.current.addConnectionListener(connectionListener);
+      listenerHook.result.current.subscribe('/topic/recover', recoverCallback);
+    });
+
+    socketManagerMock.subscribe.mockClear();
+
+    act(() => {
+      getConnectListener()();
+    });
+
+    expect(connectionListener).toHaveBeenCalledOnce();
+    expect(socketManagerMock.subscribe).toHaveBeenCalledWith(
+      '/topic/recover',
+      recoverCallback,
+    );
+    expect(connectionListener.mock.invocationCallOrder[0]).toBeLessThan(
+      socketManagerMock.subscribe.mock.invocationCallOrder[0],
+    );
+
+    listenerHook.unmount();
+  });
+
   it('재연결 구독 복구가 재시도 후에도 실패하면 error 상태를 설정해야 한다', async () => {
     vi.useFakeTimers();
     const callback = vi.fn();

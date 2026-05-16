@@ -24,6 +24,8 @@ export default function useSocket() {
     new Map(),
   );
 
+  const connectionListeners = useRef<Set<() => void>>(new Set());
+
   // 오류 안내를 위한 상태
   const [error, setError] = useState<Error | null>(null);
 
@@ -42,6 +44,14 @@ export default function useSocket() {
    */
   const disconnect = useCallback(() => {
     socketManager.disconnect();
+  }, []);
+
+  const addConnectionListener = useCallback((listener: () => void) => {
+    connectionListeners.current.add(listener);
+
+    return () => {
+      connectionListeners.current.delete(listener);
+    };
   }, []);
 
   /**
@@ -111,6 +121,8 @@ export default function useSocket() {
     // 소켓이 연결될 때마다 실행될 핸들러
     const handleConnect = () => {
       const recover = () => {
+        connectionListeners.current.forEach((listener) => listener());
+
         // 기존 활성화된 구독 리스트 초기화
         activeSubscriptions.current.clear();
 
@@ -173,6 +185,8 @@ export default function useSocket() {
       activeSubscriptions.current.clear();
       // eslint-disable-next-line react-hooks/exhaustive-deps
       subscriptionInfos.current.clear();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      connectionListeners.current.clear();
     };
   }, []);
 
@@ -183,6 +197,7 @@ export default function useSocket() {
     subscribe,
     unsubscribe,
     publish,
+    addConnectionListener,
     error,
   };
 }
