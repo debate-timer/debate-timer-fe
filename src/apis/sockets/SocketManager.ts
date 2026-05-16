@@ -110,7 +110,9 @@ class SocketManager {
 
     const wsUrl = this.resolveWebSocketUrl(this.currentOptions);
     if (!wsUrl) {
-      console.error('VITE_API_BASE_URL 환경 변수가 설정되지 않았습니다.');
+      console.error(
+        '웹소켓 연결 주소를 결정할 수 없습니다. url 또는 baseUrl 옵션, 혹은 VITE_API_BASE_URL 환경 변수를 확인해주세요.',
+      );
       return;
     }
 
