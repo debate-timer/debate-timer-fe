@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -100,7 +100,7 @@ describe('TableComposition', () => {
     const enabledFinishButton = await screen.findByRole('button', {
       name: '추가하기',
     });
-    expect(enabledFinishButton).toBeEnabled();
+    await waitFor(() => expect(enabledFinishButton).toBeEnabled());
     await userEvent.click(enabledFinishButton);
     expect(await screen.findByTestId('overview-page')).toBeInTheDocument();
   });
