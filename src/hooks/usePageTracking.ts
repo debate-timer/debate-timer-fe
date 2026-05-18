@@ -2,7 +2,10 @@ import { useEffect, useRef } from 'react';
 import { useLocation, useMatches } from 'react-router-dom';
 import { analyticsManager } from '../util/analytics';
 
-function normalizePath(pathname: string, params: Readonly<Record<string, string | undefined>>): string {
+function normalizePath(
+  pathname: string,
+  params: Readonly<Record<string, string | undefined>>,
+): string {
   let normalized = pathname;
   // 긴 값부터 치환해야 짧은 값이 긴 값의 일부를 덮어쓰는 것을 방지
   const entries = Object.entries(params)
@@ -22,7 +25,10 @@ export default function usePageTracking() {
   const hasTrackedLeaveRef = useRef(false);
 
   const lastMatch = matches[matches.length - 1];
-  const normalizedPath = normalizePath(location.pathname, lastMatch?.params ?? {});
+  const normalizedPath = normalizePath(
+    location.pathname,
+    lastMatch?.params ?? {},
+  );
   const normalizedPathRef = useRef(normalizedPath);
   normalizedPathRef.current = normalizedPath;
 

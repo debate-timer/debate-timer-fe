@@ -64,7 +64,10 @@ export default function TableSharingPage() {
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
   // encodedData가 변경될 때만 디코딩을 재실행해 effect 의존성을 안정화한다.
-  const decodedData = useMemo(() => getDecodedDataOrNull(encodedData), [encodedData]);
+  const decodedData = useMemo(
+    () => getDecodedDataOrNull(encodedData),
+    [encodedData],
+  );
   const source = searchParams.get('source');
   const isTemplateEntry = source === 'template';
 
