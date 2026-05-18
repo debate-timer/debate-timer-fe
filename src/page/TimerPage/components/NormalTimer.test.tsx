@@ -98,6 +98,8 @@ describe('NormalTimer - 순서명 정렬 (US3)', () => {
   it('영어 순서명이 타이머 화면에 표시된다', () => {
     renderNormalTimer(null, null, 'Opening Statement');
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Opening Statement');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Opening Statement',
+    );
   });
 });

@@ -9,8 +9,8 @@
 - **page/**: 페이지 단위 컴포넌트. 각 페이지는 로컬 `components/`, `hooks/` 하위 디렉토리를 가진다.
 - **components/**: 페이지 간 재사용 가능한 UI 컴포넌트. 폴더 단위로 관리.
 - **hooks/**: 공유 커스텀 훅.
-  - `query/` — TanStack Query 래핑 (useGet*)
-  - `mutations/` — TanStack Mutation 래핑 (usePost*, usePatch*, useDelete*)
+  - `query/` — TanStack Query 래핑 (useGet\*)
+  - `mutations/` — TanStack Mutation 래핑 (usePost*, usePatch*, useDelete\*)
   - 루트 — 유틸리티 훅 (useModal, useMobile 등)
 - **apis/**: API 통신 레이어.
   - `apis/` — Axios 기반 API 함수
@@ -36,6 +36,7 @@
 - **Boolean**: `is`/`has`/`should` 접두사 (e.g., `isLoading`, `hasError`).
 - **이벤트 핸들러**: `handle` 접두사 (e.g., `handleSubmit`).
 - **커스텀 훅**: `use` 접두사 (e.g., `useTimerPageState`).
+- **요청 및 응답 형식**: `RequestType` 또는 `ResponseType` 접두사 (e.g., `GetDebateTableResponseType`).
 - **파일명**: 컴포넌트 PascalCase, 훅 camelCase(`use` prefix), 유틸 camelCase.
 
 ### III. TDD (Test-Driven Development)
@@ -100,5 +101,6 @@
 - 이 Constitution은 프로젝트의 모든 코드 작성 및 리뷰의 기준이 된다.
 - 아키텍처 결정이 불명확할 경우, 코드 작성 전 팀원과 논의한다.
 - Constitution 변경 시 팀 합의 및 문서 업데이트가 필요하다.
+- 작업 중 생성되는 설계서 등의 임시 문서의 생명 주기는 이 기능 개발 완료 시점까지이므로 Git에 포함할 필요가 없다. 따라서 `specs/` 디렉터리를 `.gitignore`에서 제외해서는 안 되며, 어떤 상황에서도 `specs/`는 원격 저장소에 푸시하지 않는다.
 
-**Version**: 2.0.0 | **Ratified**: 2026-02-13 | **Last Amended**: 2026-03-31
+**Version**: 2.0.0 | **Ratified**: 2026-02-13 | **Last Amended**: 2026-05-13

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
-import { socketManager, SocketOptions } from '../apis/sockets/SocketManager';
-import { SocketMessage } from '../apis/sockets/type';
+import { socketManager, SocketOptions } from '../../apis/sockets/SocketManager';
+import { SocketMessage } from '../../apis/sockets/type';
 
 /**
  * 소켓 연결을 돕는 React 훅입니다. 제공되는 함수는 아래와 같습니다:
@@ -15,7 +15,7 @@ import { SocketMessage } from '../apis/sockets/type';
  *
  * 특히, 구독 해제의 책임은 이 훅에 있으나, 연결 자체를 끊는 책임은 소켓을 호출한 페이지에 있다는 점을 유념해주세요.
  */
-export const useSocket = () => {
+export default function useSocket() {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
   const activeSubscriptions = useRef<Map<string, StompSubscription>>(new Map());
 
@@ -23,6 +23,8 @@ export const useSocket = () => {
   const subscriptionInfos = useRef<Map<string, (message: IMessage) => void>>(
     new Map(),
   );
+
+  const connectionListeners = useRef<Set<() => void>>(new Set());
 
   // 오류 안내를 위한 상태
   const [error, setError] = useState<Error | null>(null);
@@ -42,6 +44,14 @@ export const useSocket = () => {
    */
   const disconnect = useCallback(() => {
     socketManager.disconnect();
+  }, []);
+
+  const addConnectionListener = useCallback((listener: () => void) => {
+    connectionListeners.current.add(listener);
+
+    return () => {
+      connectionListeners.current.delete(listener);
+    };
   }, []);
 
   /**
@@ -111,6 +121,8 @@ export const useSocket = () => {
     // 소켓이 연결될 때마다 실행될 핸들러
     const handleConnect = () => {
       const recover = () => {
+        connectionListeners.current.forEach((listener) => listener());
+
         // 기존 활성화된 구독 리스트 초기화
         activeSubscriptions.current.clear();
 
@@ -173,6 +185,8 @@ export const useSocket = () => {
       activeSubscriptions.current.clear();
       // eslint-disable-next-line react-hooks/exhaustive-deps
       subscriptionInfos.current.clear();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      connectionListeners.current.clear();
     };
   }, []);
 
@@ -183,6 +197,7 @@ export const useSocket = () => {
     subscribe,
     unsubscribe,
     publish,
+    addConnectionListener,
     error,
   };
-};
+}

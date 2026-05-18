@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { socketManager } from './SocketManager';
 import type { IFrame, StompConfig } from '@stomp/stompjs';
 import { SocketMessage } from './type';
+import SockJS from 'sockjs-client';
 
 // ------------------------------------------------------------------
 // 1. 외부 라이브러리 Mocking
@@ -95,6 +96,27 @@ describe('SocketManager', () => {
 
       expect(clientInstances).toHaveLength(1);
       expect(getLatestClient().activate).toHaveBeenCalledOnce();
+    });
+
+    it('connect 옵션의 url을 SockJS 연결 주소로 사용해야 한다', () => {
+      socketManager.connect({ url: 'https://socket.example.com/ws' });
+      getLatestClient().config.webSocketFactory?.();
+
+      expect(SockJS).toHaveBeenCalledWith('https://socket.example.com/ws');
+    });
+
+    it('connect 옵션의 baseUrl을 /ws 경로와 조합해 SockJS 연결 주소로 사용해야 한다', () => {
+      socketManager.connect({ baseUrl: 'https://socket.example.com' });
+      getLatestClient().config.webSocketFactory?.();
+
+      expect(SockJS).toHaveBeenCalledWith('https://socket.example.com/ws');
+    });
+
+    it('connect 옵션에 url과 baseUrl이 없으면 환경 변수 기반 주소를 사용해야 한다', () => {
+      socketManager.connect();
+      getLatestClient().config.webSocketFactory?.();
+
+      expect(SockJS).toHaveBeenCalledWith('https://test.com/ws');
     });
 
     it('이미 연결된 상태에서 connect를 재호출하면 중복 연결을 방지해야 한다', () => {

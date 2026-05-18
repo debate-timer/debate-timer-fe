@@ -18,6 +18,7 @@ import DTShare from './Share';
 import DTExchange from './Exchange';
 import DTBell from './Bell';
 import DTVolume from './Volume';
+import DTShareLive from './ShareLive';
 
 const meta: Meta<typeof DTLogin> = {
   title: 'Design System/Icons',
@@ -266,6 +267,18 @@ export const OnVolume: Story = {
     <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
       <DTVolume className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">볼륨 조절</p>
+    </div>
+  ),
+};
+
+export const OnShareLive: Story = {
+  args: {
+    color: '#FECD4C',
+  },
+  render: (args) => (
+    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+      <DTShareLive className="size-16" {...args} />
+      <p className="mt-2 text-sm text-gray-600">라이브로 공유</p>
     </div>
   ),
 };
