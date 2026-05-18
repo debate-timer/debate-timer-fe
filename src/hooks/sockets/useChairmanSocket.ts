@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   SocketEventType,
   SocketMessage,
   TimerDataPayload,
 } from '../../apis/sockets/type';
 import { isTimerEventType } from '../../apis/sockets/util';
+import { chairmanTokenQueryKey } from '../query/useGetChairmanToken';
 import useSocket from './useSocket';
 
 /**
@@ -26,6 +28,7 @@ import useSocket from './useSocket';
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
 export default function useChairmanSocket(roomId: number) {
+  const queryClient = useQueryClient();
   const {
     connect,
     disconnect,
@@ -66,11 +69,18 @@ export default function useChairmanSocket(roomId: number) {
    * 현재 신호 메타데이터를 초기화한 뒤 사회자 소켓을 종료합니다.
    * 수동으로 연결을 해제할 때도 React 상태에 남아 있을 수 있는 세션 단위 신호
    * 상태를 제거하기 위해 `useSocket.disconnect`를 래핑합니다.
+   *
+   * 사용자가 명시적으로 이 함수를 호출한 경우, TanStack Query에 저장된
+   * 임시 액세스 토큰 캐시를 제거합니다.
    */
   const disconnectChairmanSocket = useCallback(() => {
     resetSignalState();
     disconnect();
-  }, [disconnect, resetSignalState]);
+    queryClient.removeQueries({
+      queryKey: chairmanTokenQueryKey(String(roomId)),
+      exact: true,
+    });
+  }, [disconnect, queryClient, resetSignalState, roomId]);
 
   useEffect(() => {
     return addConnectionListener(resetSignalState);

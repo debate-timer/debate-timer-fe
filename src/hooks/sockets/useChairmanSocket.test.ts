@@ -5,6 +5,13 @@ import type { TimerDataPayload } from '../../apis/sockets/type';
 import useChairmanSocket from './useChairmanSocket';
 
 const useSocketMock = vi.hoisted(() => vi.fn());
+const removeQueries = vi.hoisted(() => vi.fn());
+
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({
+    removeQueries,
+  }),
+}));
 
 vi.mock('./useSocket', () => ({
   default: useSocketMock,
@@ -114,6 +121,10 @@ describe('useChairmanSocket', () => {
     expect(result.current.signalCount).toBe(0);
     expect(result.current.lastSignalTime).toBeNull();
     expect(disconnect).toHaveBeenCalledOnce();
+    expect(removeQueries).toHaveBeenCalledWith({
+      queryKey: ['chairmanToken', '123'],
+      exact: true,
+    });
   });
 
   it('roomId가 변경되면 signalCount와 lastSignalTime을 초기화해야 한다', () => {
@@ -182,6 +193,7 @@ describe('useChairmanSocket', () => {
 
     expect(result.current.signalCount).toBe(0);
     expect(result.current.lastSignalTime).toBeNull();
+    expect(removeQueries).not.toHaveBeenCalled();
   });
 
   it('소켓 재연결 이벤트가 발생하면 signalCount와 lastSignalTime을 초기화해야 한다', () => {
@@ -211,6 +223,7 @@ describe('useChairmanSocket', () => {
 
     expect(result.current.signalCount).toBe(0);
     expect(result.current.lastSignalTime).toBeNull();
+    expect(removeQueries).not.toHaveBeenCalled();
   });
 
   it('sendDebateEvent 호출 시 payload와 Authorization 헤더를 함께 publish해야 한다', () => {
