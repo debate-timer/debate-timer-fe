@@ -30,8 +30,14 @@ export interface SocketOptions {
 }
 
 // 기본값 객체 선언 (onConnect를 제외한 모든 필수 속성 정의)
-type ResolvedSocketOptions = Required<Omit<SocketOptions, 'url' | 'baseUrl'>> &
-  Pick<SocketOptions, 'url' | 'baseUrl'>;
+type ResolvedSocketOptions = {
+  url?: string;
+  baseUrl?: string;
+  maxRetries: number;
+  baseRetryDelayMs: number;
+  heartbeatInMs: number;
+  heartbeatOutMs: number;
+};
 
 const DEFAULT_OPTIONS: ResolvedSocketOptions = {
   maxRetries: 3,
