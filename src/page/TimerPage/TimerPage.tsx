@@ -48,7 +48,7 @@ export default function TimerPage() {
     openModal: openLiveModal,
     ModalWrapper: LiveModalWrapper,
     isOpen: isLiveModalOpen,
-  } = useModal();
+  } = useModal({ isCloseButtonExist: true });
 
   const state = useTimerPageState(tableId);
   // timer_started, debate_completed, debate_abandoned 관련 추적 상태를 관리한다.

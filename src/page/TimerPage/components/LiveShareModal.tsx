@@ -1,9 +1,9 @@
 import { ComponentType, ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
-import LoadingIndicator from '../../../components/LoadingIndicator/LoadingIndicator';
 import useGetChairmanToken from '../../../hooks/query/useGetChairmanToken';
 import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 interface LiveShareModalProps {
   Wrapper: ComponentType<{ children: ReactNode }>;
@@ -75,7 +75,13 @@ export default function LiveShareModal({
     <Wrapper>
       <div className="flex h-[250px] w-[300px] flex-col items-center justify-between p-6">
         {isLoading ? (
-          <LoadingIndicator />
+          <div className="flex size-full items-center justify-center">
+            <LoadingSpinner
+              strokeWidth={2}
+              size={'size-24'}
+              color={'text-default-disabled/hover'}
+            />
+          </div>
         ) : (
           <>
             <h1 className="text-lg font-bold">
