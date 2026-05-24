@@ -28,6 +28,7 @@ export default function useSocket() {
 
   // 오류 안내를 위한 상태
   const [error, setError] = useState<Error | null>(null);
+  const [isConnected, setIsConnected] = useState(socketManager.isConnected());
 
   /**
    * 소켓 연결
@@ -44,6 +45,7 @@ export default function useSocket() {
    */
   const disconnect = useCallback(() => {
     socketManager.disconnect();
+    setIsConnected(false);
   }, []);
 
   const addConnectionListener = useCallback((listener: () => void) => {
@@ -120,6 +122,8 @@ export default function useSocket() {
   useEffect(() => {
     // 소켓이 연결될 때마다 실행될 핸들러
     const handleConnect = () => {
+      setIsConnected(true);
+
       const recover = () => {
         connectionListeners.current.forEach((listener) => listener());
 
@@ -198,6 +202,7 @@ export default function useSocket() {
     unsubscribe,
     publish,
     addConnectionListener,
+    isConnected,
     error,
   };
 }
