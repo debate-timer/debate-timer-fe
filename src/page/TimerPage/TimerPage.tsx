@@ -11,12 +11,15 @@ import RoundControlRow from './components/RoundControlRow';
 import TimerView from './components/TimerView';
 import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
+import LiveShareButton from './components/LiveShareButton';
+import LiveShareModal from './components/LiveShareModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
 import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import { useModal } from '../../hooks/useModal';
 import { isGuestFlow } from '../../util/sessionStorage';
 import useAnalytics from '../../hooks/useAnalytics';
 import { consumeTemplateOrigin } from '../../util/analytics/templateOrigin';
@@ -41,6 +44,11 @@ export default function TimerPage() {
     closeLoginAndStoreModal,
     openLoginAndStoreModalOrGoToDebateEndPage,
   } = useTimerPageModal(tableId);
+  const {
+    openModal: openLiveModal,
+    ModalWrapper: LiveModalWrapper,
+    isOpen: isLiveModalOpen,
+  } = useModal();
 
   const state = useTimerPageState(tableId);
   // timer_started, debate_completed, debate_abandoned 관련 추적 상태를 관리한다.
@@ -201,6 +209,10 @@ export default function TimerPage() {
               )}
             >
               {/* 타이머 두 개 + ENTER 버튼 */}
+              <div className="absolute right-4 top-4 z-10">
+                <LiveShareButton onClick={openLiveModal} />
+              </div>
+
               <TimerView state={state} />
               {/* Round control buttons on the bottom side */}
               {data && (
@@ -240,6 +252,12 @@ export default function TimerPage() {
       <LoginAndStoreModal
         Wrapper={LoginAndStoreModalWrapper}
         onClose={closeLoginAndStoreModal}
+      />
+
+      <LiveShareModal
+        Wrapper={LiveModalWrapper}
+        tableId={tableId}
+        isOpen={isLiveModalOpen}
       />
     </>
   );
