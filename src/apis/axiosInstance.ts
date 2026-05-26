@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as Sentry from '@sentry/react';
+import type { SeverityLevel } from '@sentry/react';
 import {
   getAccessToken,
   removeAccessToken,
@@ -21,6 +22,16 @@ const requestTimeoutMs = 5000;
 type SentryCapturedError = {
   __sentry_captured__?: boolean;
 };
+
+function resolveApiErrorLevel(status: number | undefined) {
+  // 400/409/422는 사용자 입력·요청 상태 충돌 성격이 커서 warning으로 분리
+  if (status === 400 || status === 409 || status === 422) {
+    return 'warning';
+  }
+
+  // 그 외(주로 5xx/네트워크 실패)는 운영 대응이 필요한 장애 신호로 처리
+  return 'error';
+}
 
 // Axios instance
 export const axiosInstance = axios.create({
@@ -54,12 +65,16 @@ function captureClientApiError(error: unknown) {
   const { response, config, code } = error;
   const status = response?.status;
 
-  // 401 재발급 흐름과 정상/리다이렉트 응답만 제외하고, 4xx/5xx/네트워크 실패/타임아웃은 수집
+  // 401은 토큰 재발급 후 원요청 재시도로 자동 복구되는 정상 인증 흐름이므로 수집에서 제외
+  // 정상/리다이렉트 응답(<400)도 제외하고, 그 외 4xx/5xx/네트워크 실패/타임아웃은 수집
   if (status === 401 || (status !== undefined && status < 400)) {
     return;
   }
 
+  const level: SeverityLevel = resolveApiErrorLevel(status);
+
   Sentry.captureException(error, {
+    level,
     tags: {
       errorType: 'api-error',
       httpStatus: status ? String(status) : 'network-error',
@@ -98,7 +113,7 @@ axiosInstance.interceptors.response.use(
           null,
         );
 
-        // **새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정**
+        // 새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정
         const headerAuth = refreshResponse.headers['authorization'] || '';
 
         // Authorization: Bearer <새토큰> 형태라면 "Bearer " 부분 제거
