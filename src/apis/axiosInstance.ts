@@ -23,6 +23,19 @@ type SentryCapturedError = {
   __sentry_captured__?: boolean;
 };
 
+function normalizeEndpoint(url?: string) {
+  if (!url) {
+    return 'unknown';
+  }
+
+  return url
+    .replace(/[0-9]+/g, ':id')
+    .replace(
+      /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi,
+      ':uuid',
+    );
+}
+
 function resolveApiErrorLevel(status: number | undefined) {
   // 400/409/422는 사용자 입력·요청 상태 충돌 성격이 커서 warning으로 분리
   if (status === 400 || status === 409 || status === 422) {
@@ -64,6 +77,8 @@ function captureClientApiError(error: unknown) {
 
   const { response, config, code } = error;
   const status = response?.status;
+  const normalizedUrl = normalizeEndpoint(config?.url);
+  const requestMethod = config?.method?.toUpperCase() ?? 'UNKNOWN';
 
   // 401은 토큰 재발급 후 원요청 재시도로 자동 복구되는 정상 인증 흐름이므로 수집에서 제외
   // 정상/리다이렉트 응답(<400)도 제외하고, 그 외 4xx/5xx/네트워크 실패/타임아웃은 수집
@@ -78,6 +93,7 @@ function captureClientApiError(error: unknown) {
     tags: {
       errorType: 'api-error',
       httpStatus: status ? String(status) : 'network-error',
+      endpoint: `${requestMethod} ${normalizedUrl}`,
     },
     extra: {
       pathname: window.location.pathname,
@@ -89,6 +105,11 @@ function captureClientApiError(error: unknown) {
       timeout: config?.timeout ?? requestTimeoutMs,
       errorCode: code,
     },
+    fingerprint: [
+      'api-error',
+      String(status ?? 'network-error'),
+      normalizedUrl,
+    ],
   });
 
   (error as SentryCapturedError).__sentry_captured__ = true;
