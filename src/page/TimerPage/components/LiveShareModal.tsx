@@ -30,10 +30,14 @@ export default function LiveShareModal({
     isConnected: isSocketConnected,
     error: socketError,
   } = useChairmanSocket(tableId);
-  const shareUrl = useMemo(
-    () => `${window.location.origin}/live/${tableId}`,
-    [tableId],
-  );
+  const shareUrl = useMemo(() => {
+    const baseUrl =
+      import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
+    const normalizedBaseUrl = baseUrl.endsWith('/')
+      ? baseUrl.slice(0, -1)
+      : baseUrl;
+    return `${normalizedBaseUrl}/live/${tableId}`;
+  }, [tableId]);
 
   useEffect(
     function connectLiveShareSocket() {
