@@ -52,5 +52,10 @@ if (import.meta.env.PROD && dsn) {
 
       return event;
     },
+    initialScope: {
+      tags: {
+        language: document.documentElement.lang || 'ko',
+      },
+    },
   });
 }
