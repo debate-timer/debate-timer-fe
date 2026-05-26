@@ -63,7 +63,7 @@ export default function LiveShareModal({
     isValidTableId &&
     !isTokenError &&
     !socketError &&
-    (isTokenPending || Boolean(chairmanToken) || hasConnectedRef.current) &&
+    (isTokenPending || Boolean(chairmanToken)) &&
     !isSocketConnected;
   const isError = !isValidTableId || isTokenError || Boolean(socketError);
   const errorMessage =
