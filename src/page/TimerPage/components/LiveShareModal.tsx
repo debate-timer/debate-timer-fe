@@ -53,10 +53,9 @@ export default function LiveShareModal({
 
   useEffect(
     function registerLiveShareSocketCleanup() {
-      return function disconnectLiveShareSocketOnUnmount() {
-        if (hasConnectedRef.current) {
-          disconnect();
-        }
+      return () => {
+        // 의도: 모달이 닫혀도(언마운트되어도) WS 연결을 유지하기 위해 disconnect()를 제거
+        // TODO: 향후 소켓 연결 로직을 부모 컴포넌트로 분리하여 메모리 누수를 방지해야 함
       };
     },
     [disconnect],
