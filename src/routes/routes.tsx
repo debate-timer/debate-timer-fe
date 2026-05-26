@@ -17,7 +17,7 @@ import VoteParticipationPage from '../page/VoteParticipationPage/VoteParticipati
 import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
 import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 import LanguageWrapper from './LanguageWrapper';
-import { Fragment } from 'react/jsx-runtime';
+import { Fragment } from 'react';
 
 const appRoutes = [
   {
