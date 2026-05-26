@@ -166,8 +166,13 @@ export default function useSocket() {
       }
     };
 
+    const handleClose = () => {
+      setIsConnected(false);
+    };
+
     // 이 핸들러 함수를 발행자(SocketManager)에 등록
     socketManager.onConnectEvent(handleConnect);
+    socketManager.onCloseEvent(handleClose);
 
     // 리스너 등록 이후 연결이 이미 되어 있는 게 확인되면, 핸들러 바로 실행
     if (socketManager.isConnected()) {
@@ -178,6 +183,7 @@ export default function useSocket() {
     return () => {
       // 먼저 발행자(SocketManager)에게 등록된 핸들러부터 제거
       socketManager.offConnectEvent(handleConnect);
+      socketManager.offCloseEvent(handleClose);
 
       // 활성화된 모든 구독 해제
       activeSubscriptions.current.forEach((subscription) =>

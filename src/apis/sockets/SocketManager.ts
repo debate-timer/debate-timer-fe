@@ -71,6 +71,7 @@ class SocketManager {
   // - 관찰자(observer)는 구독을 관리하는 useSocket 훅
   // - 발행자(publisher)는 재연결 여부를 알리는 이 클래스 (SocketManager)
   private connectListeners: Set<() => void> = new Set();
+  private closeListeners: Set<() => void> = new Set();
 
   /**
    * 관찰자를 등록하는 함수
@@ -86,6 +87,22 @@ class SocketManager {
    */
   public offConnectEvent(listener: () => void) {
     this.connectListeners.delete(listener);
+  }
+
+  /**
+   * 소켓 연결 종료 관찰자를 등록하는 함수
+   * @param listener - 연결 종료 시 실행할 콜백 함수
+   */
+  public onCloseEvent(listener: () => void) {
+    this.closeListeners.add(listener);
+  }
+
+  /**
+   * 소켓 연결 종료 관찰자를 제거하는 함수
+   * @param listener - 제거할 콜백 함수
+   */
+  public offCloseEvent(listener: () => void) {
+    this.closeListeners.delete(listener);
   }
 
   /**
@@ -165,6 +182,16 @@ class SocketManager {
         }
 
         console.log('⚠️ 웹 소켓 연결이 종료되었습니다.');
+        this.closeListeners.forEach((listener) => {
+          try {
+            listener();
+          } catch (error) {
+            console.error(
+              '종료 리스너 오류 발생. 다음 리스너로 진행합니다.',
+              error,
+            );
+          }
+        });
         this.handleReconnection();
       },
     });
@@ -187,6 +214,7 @@ class SocketManager {
       this.client = null;
       this.currentOptions = DEFAULT_OPTIONS;
       this.connectListeners.clear();
+      this.closeListeners.clear();
 
       console.log('🛑 웹 소켓 연결을 수동으로 해제했습니다.');
     }

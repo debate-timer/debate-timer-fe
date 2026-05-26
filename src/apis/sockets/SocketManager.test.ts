@@ -283,5 +283,28 @@ describe('SocketManager', () => {
 
       expect(listener).not.toHaveBeenCalled();
     });
+
+    it('onCloseEvent로 등록한 리스너가 onWebSocketClose 시 호출되어야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onCloseEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      client.config.onWebSocketClose?.({} as CloseEvent);
+
+      expect(listener).toHaveBeenCalledOnce();
+    });
+
+    it('offCloseEvent로 제거한 리스너는 onWebSocketClose 시 호출되지 않아야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onCloseEvent(listener);
+      socketManager.offCloseEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      client.config.onWebSocketClose?.({} as CloseEvent);
+
+      expect(listener).not.toHaveBeenCalled();
+    });
   });
 });
