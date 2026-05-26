@@ -100,7 +100,6 @@ function captureClientApiError(error: unknown) {
       search: window.location.search,
       url: config?.url,
       method: config?.method,
-      baseURL: config?.baseURL,
       params: config?.params,
       timeout: config?.timeout ?? requestTimeoutMs,
       errorCode: code,
