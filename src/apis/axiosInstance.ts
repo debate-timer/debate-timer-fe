@@ -107,6 +107,7 @@ function captureClientApiError(error: unknown) {
     fingerprint: [
       'api-error',
       String(status ?? 'network-error'),
+      requestMethod,
       normalizedUrl,
     ],
   });
