@@ -30,6 +30,7 @@ import {
 } from 'react-icons/ri';
 import DTVolume from '../../components/icons/Volume';
 import VolumeBar from '../../components/VolumeBar/VolumeBar';
+import { isLoggedIn } from '../../util/accessToken';
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
@@ -209,9 +210,11 @@ export default function TimerPage() {
               )}
             >
               {/* 타이머 두 개 + ENTER 버튼 */}
-              <div className="absolute right-4 top-4 z-10">
-                <LiveShareButton onClick={openLiveModal} />
-              </div>
+              {isLoggedIn() && (
+                <div className="absolute right-4 top-4 z-10">
+                  <LiveShareButton onClick={openLiveModal} />
+                </div>
+              )}
 
               <TimerView state={state} />
               {/* Round control buttons on the bottom side */}
