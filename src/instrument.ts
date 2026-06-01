@@ -47,6 +47,7 @@ if (import.meta.env.PROD && dsn) {
       if (event.extra && typeof event.extra === 'object') {
         const sanitizedExtra = { ...event.extra };
         delete sanitizedExtra.Authorization;
+        delete sanitizedExtra.authorization;
         event.extra = sanitizedExtra;
       }
 
