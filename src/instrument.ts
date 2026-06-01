@@ -22,7 +22,7 @@ if (import.meta.env.PROD && dsn) {
     // 에러가 발생한 세션은 모두 Replay로 남김
     replaysOnErrorSampleRate: 1.0,
     beforeSend(event, hint) {
-      const originalException = hint.originalException;
+      const originalException = hint?.originalException;
 
       // 정상 사용자 흐름(이동/언마운트)에서 자주 생기는 취소성 에러는 노이즈로 간주
       if (originalException instanceof Error) {
