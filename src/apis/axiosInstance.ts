@@ -23,17 +23,17 @@ type SentryCapturedError = {
   __sentry_captured__?: boolean;
 };
 
-function normalizeEndpoint(url?: string) {
+export function normalizeEndpoint(url?: string) {
   if (!url) {
     return 'unknown';
   }
 
   return url
-    .replace(/[0-9]+/g, ':id')
     .replace(
       /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi,
       ':uuid',
-    );
+    )
+    .replace(/[0-9]+/g, ':id');
 }
 
 function resolveApiErrorLevel(status: number | undefined) {
