@@ -1,120 +1,81 @@
-import { ComponentType, ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
-import useGetChairmanToken from '../../../hooks/query/useGetChairmanToken';
-import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import DTClose from '../../../components/icons/Close';
+import { LiveShareErrorType } from '../hooks/useLiveShare';
 
 interface LiveShareModalProps {
-  Wrapper: ComponentType<{ children: ReactNode }>;
-  tableId: number;
-  isOpen: boolean;
+  shareUrl: string;
+  isLoading: boolean;
+  isError: boolean;
+  errorType: LiveShareErrorType;
+  toggleModal: () => void;
 }
 
 export default function LiveShareModal({
-  Wrapper,
-  tableId,
-  isOpen,
+  shareUrl,
+  isLoading,
+  isError,
+  errorType,
+  toggleModal,
 }: LiveShareModalProps) {
   const { t } = useTranslation();
-  const hasConnectedRef = useRef(false);
-  const isValidTableId = Number.isFinite(tableId) && tableId > 0;
-  const {
-    data: chairmanToken,
-    isPending: isTokenPending,
-    isError: isTokenError,
-  } = useGetChairmanToken(String(tableId), isOpen && isValidTableId);
-  const {
-    connect,
-    disconnect,
-    isConnected: isSocketConnected,
-    error: socketError,
-  } = useChairmanSocket(tableId);
-  const shareUrl = useMemo(() => {
-    const baseUrl =
-      import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
-    const normalizedBaseUrl = baseUrl.endsWith('/')
-      ? baseUrl.slice(0, -1)
-      : baseUrl;
-    return `${normalizedBaseUrl}/live/${tableId}`;
-  }, [tableId]);
-
-  useEffect(
-    function connectLiveShareSocket() {
-      if (!isOpen || !chairmanToken || socketError || hasConnectedRef.current) {
-        return;
-      }
-
-      connect();
-      hasConnectedRef.current = true;
-    },
-    [chairmanToken, connect, isOpen, socketError],
-  );
-
-  useEffect(
-    function registerLiveShareSocketCleanup() {
-      return () => {
-        // 의도: 모달이 닫혀도(언마운트되어도) WS 연결을 유지하기 위해 disconnect()를 제거
-        // TODO: 향후 소켓 연결 로직을 부모 컴포넌트로 분리하여 메모리 누수를 방지해야 함
-      };
-    },
-    [disconnect],
-  );
-
-  const isLoading =
-    isOpen &&
-    isValidTableId &&
-    !isTokenError &&
-    !socketError &&
-    (isTokenPending || Boolean(chairmanToken)) &&
-    !isSocketConnected;
-  const isError = !isValidTableId || isTokenError || Boolean(socketError);
   const errorMessage =
-    !isValidTableId || isTokenError
+    errorType == 'token'
       ? t('사회자 인증 토큰 발급에 실패했어요...')
       : t('라이브 서버 연결에 실패했어요...');
 
   return (
-    <Wrapper>
-      <div className="flex h-[250px] w-[300px] flex-col items-center justify-between p-6">
-        {isLoading ? (
-          <div className="flex size-full items-center justify-center">
-            <LoadingSpinner
-              strokeWidth={2}
-              size={'size-24'}
-              color={'text-default-disabled/hover'}
-            />
-          </div>
-        ) : (
-          <>
+    <div className="flex h-[250px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover p-6">
+      {isLoading ? (
+        <div className="flex size-full items-center justify-center">
+          <LoadingSpinner
+            strokeWidth={2}
+            size={'size-24'}
+            color={'text-default-disabled/hover'}
+          />
+        </div>
+      ) : (
+        <>
+          <div className="relative flex w-full items-center justify-center">
             <h1 className="text-lg font-bold">
               {isError ? t('라이브 공유 불가') : t('토론 타이머 화면 공유')}
             </h1>
 
-            {!isError ? (
-              <>
-                <QRCodeSVG
-                  value={shareUrl}
-                  bgColor="#f6f5f4"
-                  className="size-[100px]"
-                />
+            <button
+              type="button"
+              onClick={toggleModal}
+              className={`absolute right-0 text-xl text-default-black`}
+              aria-label={t('모달 닫기')}
+              title={t('모달 닫기')}
+            >
+              <DTClose className="size-[16px]" />
+            </button>
+          </div>
 
-                <div className="flex flex-row items-center space-x-[10px]">
-                  <div className="h-[36px] w-[4px] bg-default-neutral" />
+          {!isError ? (
+            <>
+              <QRCodeSVG
+                value={shareUrl}
+                bgColor="#f6f5f4"
+                className="size-[100px]"
+              />
 
-                  <p className="text-[14px] font-medium text-default-black2">
-                    {t(
-                      '휴대폰 카메라로 QR 코드를 스캔하면 토론 타이머 화면이 자동으로 열립니다.',
-                    )}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <p className="text-[12px] text-default-neutral">{errorMessage}</p>
-            )}
-          </>
-        )}
-      </div>
-    </Wrapper>
+              <div className="flex flex-row items-center space-x-[10px]">
+                <div className="h-[36px] w-[4px] bg-default-neutral" />
+
+                <p className="text-[14px] font-medium text-default-black2">
+                  {t(
+                    '휴대폰 카메라로 QR 코드를 스캔하면 토론 타이머 화면이 자동으로 열립니다.',
+                  )}
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="text-[12px] text-default-neutral">{errorMessage}</p>
+          )}
+        </>
+      )}
+    </div>
   );
 }
