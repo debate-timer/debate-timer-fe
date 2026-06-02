@@ -101,6 +101,8 @@ export function useLiveShare(tableId: number) {
         disconnect();
 
         // 그리고 싱글톤 인스턴스 레벨에서 완전히 닫기
+        // 현재로서는 사회자가 소켓을 사용하는 기능이 이거 말고 없기 때문에
+        // 싱글톤 인스턴스도 여기서 닫아도 다른 기능에 방해를 주지 않음
         if (socketManager.isConnected()) {
           socketManager.disconnect();
         }
