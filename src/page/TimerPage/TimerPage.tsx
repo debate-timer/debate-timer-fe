@@ -89,8 +89,8 @@ export default function TimerPage() {
     toggleLiveShareModal,
     liveShareModalRef,
     issueEvent,
-    // connect, 나중에 명시적 재연결이 필요할 때를 대비하여 주석으로 남겨둠
-    disconnect,
+    // connect, 나중에 명시적 연결이 필요할 때를 대비하여 주석으로 남겨둠
+    // disconnect, 나중에 명시적 연결 종료가 필요할 때를 대비하여 주석으로 남겨둠
     isSocketConnected,
     shareUrl: liveShareUrl,
     isLoading: isSocketLoading,
@@ -116,11 +116,6 @@ export default function TimerPage() {
 
       // 이벤트 발행
       issueEvent(eventType, payload);
-
-      // 만약 이벤트가 토론 종료라면 소켓 연결도 종료
-      if (eventType === 'FINISHED') {
-        disconnect();
-      }
     }
   };
 
