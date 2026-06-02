@@ -1,4 +1,10 @@
 {
+  "토론 타이머 화면 공유": "Share Debate Timer Screen",
+  "라이브 공유 불가": "Live Sharing Unavailable",
+  "라이브 공유": "Live Sharing",
+  "휴대폰 카메라로 QR 코드를 스캔하면 토론 타이머 화면이 자동으로 열립니다.": "Scan the QR code with your phone to open the debate timer.",
+  "사회자 인증 토큰 발급에 실패했어요...": "Failed to issue moderator access token...",
+  "라이브 서버 연결에 실패했어요...": "Failed to connect to the live server...",
   "모달 닫기": "Close modal",
   "유효하지 않은 투표 링크입니다.": "Invalid vote link.",
   "승패투표": "Win/Loss Vote",

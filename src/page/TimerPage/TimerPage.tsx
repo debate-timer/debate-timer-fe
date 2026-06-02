@@ -11,6 +11,8 @@ import RoundControlRow from './components/RoundControlRow';
 import TimerView from './components/TimerView';
 import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
+import LiveShareButton from './components/LiveShareButton';
+import LiveShareModal from './components/LiveShareModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
 import DTHelp from '../../components/icons/Help';
@@ -27,6 +29,9 @@ import {
 } from 'react-icons/ri';
 import DTVolume from '../../components/icons/Volume';
 import VolumeBar from '../../components/VolumeBar/VolumeBar';
+import { isLoggedIn } from '../../util/accessToken';
+import { useLiveShare } from './hooks/useLiveShare';
+import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
@@ -48,7 +53,6 @@ export default function TimerPage() {
     useDebateTracking();
   const { trackEvent } = useAnalytics();
 
-  useTimerHotkey(state);
   const timerStartedRef = useRef(false);
   const isMuted = state.volume === 0;
   const {
@@ -67,7 +71,55 @@ export default function TimerPage() {
     setFullscreen,
     toggleFullscreen,
     volumeRef,
+    prosConsSelected,
+    timer1,
+    timer2,
+    normalTimer,
   } = state;
+  const timerType = data && data.table[index].boxType;
+  const remainingTime =
+    timerType === 'NORMAL'
+      ? normalTimer.timer
+      : prosConsSelected === 'PROS'
+        ? timer1.speakingTimer
+        : timer2.speakingTimer;
+
+  const {
+    isLiveShareModalOpen,
+    toggleLiveShareModal,
+    liveShareModalRef,
+    issueEvent,
+    // connect, 나중에 명시적 연결이 필요할 때를 대비하여 주석으로 남겨둠
+    // disconnect, 나중에 명시적 연결 종료가 필요할 때를 대비하여 주석으로 남겨둠
+    isSocketConnected,
+    shareUrl: liveShareUrl,
+    isLoading: isSocketLoading,
+    isError: isSocketError,
+    errorType: socketErrorType,
+  } = useLiveShare(tableId);
+
+  // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
+  const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
+    // 이벤트 실행
+    invoke();
+
+    // 만약 소켓 열려 있으면, 발송
+    if (isSocketConnected) {
+      // 타입에 따른 페이로드 준비
+      const innerPayload = {
+        currentTeam: prosConsSelected,
+        timerType: timerType,
+        remainingTime: remainingTime,
+        sequence: index,
+      } as TimerDataPayload;
+      const payload = eventType === 'FINISHED' ? null : innerPayload;
+
+      // 이벤트 발행
+      issueEvent(eventType, payload);
+    }
+  };
+
+  useTimerHotkey(state, handleTimerEvent);
 
   // timer_started 이벤트 발화 (데이터 로드 후 1회)
   useEffect(() => {
@@ -200,14 +252,39 @@ export default function TimerPage() {
                 bgColorMap[bg],
               )}
             >
+              {/* 라이브 공유 버튼 및 모달 */}
+              {isLoggedIn() && (
+                <div
+                  className="absolute right-4 top-4 flex"
+                  ref={liveShareModalRef}
+                >
+                  {!isLiveShareModalOpen && (
+                    <LiveShareButton onClick={toggleLiveShareModal} />
+                  )}
+
+                  {isLiveShareModalOpen && (
+                    <div className="absolute right-0">
+                      <LiveShareModal
+                        shareUrl={liveShareUrl}
+                        isLoading={isSocketLoading}
+                        isError={isSocketError}
+                        errorType={socketErrorType}
+                        toggleModal={toggleLiveShareModal}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* 타이머 두 개 + ENTER 버튼 */}
-              <TimerView state={state} />
+              <TimerView state={state} onEvent={handleTimerEvent} />
               {/* Round control buttons on the bottom side */}
               {data && (
                 <RoundControlRow
                   table={data.table}
                   index={index}
                   goToOtherItem={goToOtherItem}
+                  onEvent={handleTimerEvent}
                   openDoneModal={() => {
                     // 전체 화면 상태에서 토론을 끝낼 경우, 전체 화면을 비활성화
                     if (isFullscreen) {
