@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 import { http, HttpResponse, delay } from 'msw';
 import { ApiUrl } from '../../../apis/endpoints';
@@ -6,20 +6,13 @@ import { socketManager } from '../../../apis/sockets/SocketManager';
 import LiveShareModal from './LiveShareModal';
 import { StompSubscription } from '@stomp/stompjs';
 
-const ModalWrapper = ({ children }: { children: ReactNode }) => (
-  <div className="inline-block overflow-hidden rounded-[20px] bg-white shadow-xl ring-1 ring-black/5">
-    {children}
-  </div>
-);
-
 const meta: Meta<typeof LiveShareModal> = {
   title: 'page/TimerPage/components/LiveShareModal',
   component: LiveShareModal,
   tags: ['autodocs'],
   args: {
-    Wrapper: ModalWrapper,
-    tableId: 1,
-    isOpen: true,
+    shareUrl: '',
+    toggleModal: () => {},
   },
   parameters: {
     layout: 'centered',
@@ -31,6 +24,11 @@ export default meta;
 type Story = StoryObj<typeof LiveShareModal>;
 
 export const Default: Story = {
+  args: {
+    isLoading: false,
+    isError: false,
+    errorType: 'else',
+  },
   parameters: {
     msw: {
       handlers: [
@@ -66,7 +64,12 @@ export const Default: Story = {
           socketManager.connect = originalConnect;
           socketManager.disconnect = originalDisconnect;
         };
-      }, []);
+      }, [
+        originalConnect,
+        originalIsConnected,
+        originalSubscribe,
+        originalDisconnect,
+      ]);
 
       return <Story />;
     },
@@ -74,6 +77,11 @@ export const Default: Story = {
 };
 
 export const Failed: Story = {
+  args: {
+    isLoading: false,
+    isError: true,
+    errorType: 'token',
+  },
   parameters: {
     msw: {
       handlers: [
@@ -93,7 +101,7 @@ export const Failed: Story = {
         return () => {
           socketManager.connect = originalConnect;
         };
-      }, []);
+      }, [originalConnect]);
 
       return <Story />;
     },
@@ -101,6 +109,11 @@ export const Failed: Story = {
 };
 
 export const Loading: Story = {
+  args: {
+    isLoading: true,
+    isError: false,
+    errorType: 'else',
+  },
   parameters: {
     msw: {
       handlers: [
@@ -123,7 +136,7 @@ export const Loading: Story = {
         return () => {
           socketManager.connect = originalConnect;
         };
-      }, []);
+      }, [originalConnect]);
 
       return <Story />;
     },
