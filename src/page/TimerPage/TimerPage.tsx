@@ -259,14 +259,7 @@ export default function TimerPage() {
                   ref={liveShareModalRef}
                 >
                   {!isLiveShareModalOpen && (
-                    <button
-                      className="flex aspect-square h-full items-center justify-center p-[4px]"
-                      aria-label={t('라이브 공유 버튼')}
-                      title={t('라이브 공유 버튼')}
-                      onClick={() => {}}
-                    >
-                      <LiveShareButton onClick={toggleLiveShareModal} />
-                    </button>
+                    <LiveShareButton onClick={toggleLiveShareModal} />
                   )}
 
                   {isLiveShareModalOpen && (
