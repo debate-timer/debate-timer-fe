@@ -91,35 +91,35 @@ describe('SocketManager', () => {
 
   // --- [그룹 1] 연결 & 해제 ---
   describe('Connection & Disconnection', () => {
-    it('connect 호출 시 Client 인스턴스를 생성하고 activate를 실행해야 한다', () => {
+    it('소켓 연결 시도 시 클라이언트 인스턴스를 생성하고, 인스턴스 생성 여부를 검증해야 한다', () => {
       socketManager.connect();
 
       expect(clientInstances).toHaveLength(1);
       expect(getLatestClient().activate).toHaveBeenCalledOnce();
     });
 
-    it('connect 옵션의 url을 SockJS 연결 주소로 사용해야 한다', () => {
+    it('소켓 연결 시도 시 주어진 url을 SockJS의 연결 주소로 사용해야 한다', () => {
       socketManager.connect({ url: 'https://socket.example.com/ws' });
       getLatestClient().config.webSocketFactory?.();
 
       expect(SockJS).toHaveBeenCalledWith('https://socket.example.com/ws');
     });
 
-    it('connect 옵션의 baseUrl을 /ws 경로와 조합해 SockJS 연결 주소로 사용해야 한다', () => {
+    it('소켓 연결 시도 시 주어진 baseUrl을 /ws 경로와 조합해 SockJS 연결 주소로 사용해야 한다', () => {
       socketManager.connect({ baseUrl: 'https://socket.example.com' });
       getLatestClient().config.webSocketFactory?.();
 
       expect(SockJS).toHaveBeenCalledWith('https://socket.example.com/ws');
     });
 
-    it('connect 옵션에 url과 baseUrl이 없으면 환경 변수 기반 주소를 사용해야 한다', () => {
+    it('소켓 연결 시도 시 url과 baseUrl이 제공되지 않은 경우 환경 변수 기반 주소를 사용해야 한다', () => {
       socketManager.connect();
       getLatestClient().config.webSocketFactory?.();
 
       expect(SockJS).toHaveBeenCalledWith('https://test.com/ws');
     });
 
-    it('이미 연결된 상태에서 connect를 재호출하면 중복 연결을 방지해야 한다', () => {
+    it('이미 연결된 상태에서 소켓 연결을 다시 시도하면 중복 연결을 방지해야 한다', () => {
       socketManager.connect();
       socketManager.connect();
 
@@ -127,7 +127,7 @@ describe('SocketManager', () => {
       expect(clientInstances).toHaveLength(1);
     });
 
-    it('disconnect 호출 시 deactivate를 실행해야 한다', () => {
+    it('연결을 끊을 때, 클라이언트 인스턴스의 비활성화 여부를 검증해야 한다', () => {
       socketManager.connect();
       const client = getLatestClient();
 
@@ -136,7 +136,7 @@ describe('SocketManager', () => {
       expect(client.deactivate).toHaveBeenCalledOnce();
     });
 
-    it('disconnect 후 재연결하면 새 Client 인스턴스를 생성해야 한다', () => {
+    it('연결을 끊고 재연결하면, 새 클라이언트 인스턴스를 생성해야 한다', () => {
       socketManager.connect();
       socketManager.disconnect();
       socketManager.connect();
@@ -161,7 +161,7 @@ describe('SocketManager', () => {
      *   1번째 close:   calculateBackoffDelay(0) = floor(0.5 * 1000 * 2^0) = 500 + 10  → retryCount: 0 → 1
      *   2번째 close:   calculateBackoffDelay(1) = floor(0.5 * 1000 * 2^1) = 1000 + 10 → retryCount: 1 → 2
      */
-    it('onWebSocketClose 발생 시 지수 백오프 딜레이를 갱신해야 한다', () => {
+    it('웹 소켓 연결이 끊기면 재시도 전에 서버 부하를 방지하기 위해 지수 백오프 딜레이를 갱신해야 한다', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       socketManager.connect({ baseRetryDelayMs: 1000 });
 
@@ -179,7 +179,7 @@ describe('SocketManager', () => {
       expect(client.reconnectDelay).toBe(1000 + 10);
     });
 
-    it('최대 재시도 횟수(maxRetries) 초과 시 reconnectDelay를 0으로 설정하고 연결을 해제해야 한다', () => {
+    it('최대 재시도 횟수 초과 시 재시도 딜레이를 0으로 설정하고 연결을 해제해야 한다', () => {
       socketManager.connect({ maxRetries: 3 });
       const client = getLatestClient();
 
@@ -195,7 +195,7 @@ describe('SocketManager', () => {
       expect(client.deactivate).toHaveBeenCalledOnce();
     });
 
-    it('onConnect 실행 시 retryCount가 0으로 리셋되어야 한다', () => {
+    it('연결에 성공할 경우 재시도 횟수 카운터를 0으로 리셋해야 한다', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       socketManager.connect({ baseRetryDelayMs: 1000, maxRetries: 5 });
       const client = getLatestClient();
@@ -215,12 +215,12 @@ describe('SocketManager', () => {
 
   // --- [그룹 3] 구독 & 발행 ---
   describe('Subscribe & Publish', () => {
-    it('연결 전 subscribe 호출 시 null을 반환해야 한다', () => {
+    it('연결이 되지 않았는데 채널 구독 시, null을 반환해야 한다', () => {
       const result = socketManager.subscribe('/topic/test', vi.fn());
       expect(result).toBeNull();
     });
 
-    it('연결 후 subscribe 호출 시 client.subscribe를 실행해야 한다', () => {
+    it('연결이 성립된 후 채널 구독 시, 클라이언트의 구독 함수가 실행되어야 한다', () => {
       socketManager.connect();
       const client = getLatestClient();
       client.connected = true; // 연결 완료 상태 시뮬레이션
@@ -231,12 +231,12 @@ describe('SocketManager', () => {
       expect(client.subscribe).toHaveBeenCalledWith('/topic/test', callback);
     });
 
-    it('연결 전 publish 호출 시 메시지를 전송하지 않아야 한다', () => {
+    it('연결이 되지 않았는데 메시지를 발행할 시, 전송하지 않아야 한다', () => {
       socketManager.publish('/app/test', {} as SocketMessage);
       expect(clientInstances).toHaveLength(0);
     });
 
-    it('연결 후 publish 호출 시 JSON 직렬화된 body를 전송해야 한다', () => {
+    it('연결이 성립된 후 메시지를 발행할 시, 직렬화된 JSON 데이터를 전송해야 한다', () => {
       socketManager.connect();
       const client = getLatestClient();
       client.connected = true;
@@ -261,7 +261,7 @@ describe('SocketManager', () => {
   });
 
   describe('Connect Listeners (Observer Pattern)', () => {
-    it('onConnectEvent로 등록한 리스너가 onConnect 시 호출되어야 한다', () => {
+    it('소켓 연결 시 동작해야 할 함수 목록에 등록한 리스너는, 연결 시 호출되어야 한다', () => {
       const listener = vi.fn();
       socketManager.onConnectEvent(listener);
       socketManager.connect();
@@ -272,7 +272,7 @@ describe('SocketManager', () => {
       expect(listener).toHaveBeenCalledOnce();
     });
 
-    it('offConnectEvent로 제거한 리스너는 onConnect 시 호출되지 않아야 한다', () => {
+    it('소켓 연결 시 동작해야 할 함수 목록에서 삭제한 리스너는, 연결 시 호출되지 않아야 한다', () => {
       const listener = vi.fn();
       socketManager.onConnectEvent(listener);
       socketManager.offConnectEvent(listener);
@@ -284,7 +284,7 @@ describe('SocketManager', () => {
       expect(listener).not.toHaveBeenCalled();
     });
 
-    it('onCloseEvent로 등록한 리스너가 onWebSocketClose 시 호출되어야 한다', () => {
+    it('소켓 연결 종료 시 동작해야 할 함수 목록에 등록한 리스너는, 연결 종료 시 호출되어야 한다', () => {
       const listener = vi.fn();
       socketManager.onCloseEvent(listener);
       socketManager.connect();
@@ -295,7 +295,7 @@ describe('SocketManager', () => {
       expect(listener).toHaveBeenCalledOnce();
     });
 
-    it('offCloseEvent로 제거한 리스너는 onWebSocketClose 시 호출되지 않아야 한다', () => {
+    it('소켓 연결 종료 시 동작해야 할 함수 목록에서 삭제한 리스너는, 연결 종료 시 시 호출되지 않아야 한다', () => {
       const listener = vi.fn();
       socketManager.onCloseEvent(listener);
       socketManager.offCloseEvent(listener);
