@@ -99,6 +99,7 @@ export function useLiveShare(tableId: number) {
       return () => {
         // 훅 레벨에서 먼저 소켓 닫기
         disconnect();
+        hasConnectedRef.current = false;
 
         // 그리고 싱글톤 인스턴스 레벨에서 완전히 닫기
         // 현재로서는 사회자가 소켓을 사용하는 기능이 이거 말고 없기 때문에
@@ -129,6 +130,19 @@ export function useLiveShare(tableId: number) {
       hasConnectedRef.current = true;
     },
     [chairmanToken, connect, isLiveShareModalOpen, socketError],
+  );
+
+  /**
+   * 오류 발생 시 연결 해제 및 상태 초기화 (정리)
+   */
+  useEffect(
+    function cleanupOnError() {
+      if (isError) {
+        hasConnectedRef.current = false;
+        disconnect();
+      }
+    },
+    [isError, disconnect],
   );
 
   return {
