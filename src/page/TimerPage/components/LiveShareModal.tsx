@@ -21,7 +21,7 @@ export default function LiveShareModal({
 }: LiveShareModalProps) {
   const { t } = useTranslation();
   const errorMessage =
-    errorType == 'token'
+    errorType === 'token'
       ? t('사회자 인증 토큰 발급에 실패했어요...')
       : t('라이브 서버 연결에 실패했어요...');
 
