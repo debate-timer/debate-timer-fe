@@ -21,7 +21,7 @@ type TimeBasedTimerInstance = {
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: TimeBasedTimerInstance;
   isSelected: boolean;
-  onActivate?: () => void;
+  onActivate: () => void;
   prosCons: TimeBasedStance;
   teamName: string;
   item: TimeBoxInfo;
@@ -30,6 +30,7 @@ interface TimeBasedTimerProps {
 export default function TimeBasedTimer({
   timeBasedTimerInstance,
   isSelected,
+  onActivate,
   prosCons,
   teamName,
   item,
@@ -101,10 +102,11 @@ export default function TimeBasedTimer({
   return (
     <div
       data-testid="timer"
+      onClick={() => onActivate()}
       className={clsx(
         'flex w-[400px] flex-col items-center justify-center space-y-[12px] xl:min-w-[560px] xl:space-y-[20px]',
         {
-          'pointer-events-none opacity-50 grayscale': !isSelected,
+          'opacity-50 grayscale': !isSelected,
         },
       )}
     >

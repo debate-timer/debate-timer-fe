@@ -69,7 +69,11 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
           }}
           item={data.table[index]}
           isSelected={prosConsSelected === 'PROS'}
-          onActivate={() => handleActivateTeam('PROS')}
+          onActivate={() =>
+            handleActivateTeam('PROS', (invoke) =>
+              onEvent(invoke, 'TEAM_SWITCH'),
+            )
+          }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
         />
@@ -96,7 +100,11 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
           }}
           item={data.table[index]}
           isSelected={prosConsSelected === 'CONS'}
-          onActivate={() => handleActivateTeam('CONS')}
+          onActivate={() =>
+            handleActivateTeam('CONS', (invoke) =>
+              onEvent(invoke, 'TEAM_SWITCH'),
+            )
+          }
           prosCons="CONS"
           teamName={data.info.consTeamName}
         />
