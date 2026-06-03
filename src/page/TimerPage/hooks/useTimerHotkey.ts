@@ -6,8 +6,9 @@ import { SocketEventType } from '../../../apis/sockets/type';
  * 타이머 페이지에서 키보드 단축키(핫키) 기능을 제공하는 커스텀 훅입니다.
  * - Space: 타이머 시작/일시정지
  * - KeyR: 타이머 리셋
- * - KeyA/KeyL: 각각 찬/반 진영 타이머 활성화
  * - Enter, NumpadEnter: 진영 전환
+ *
+ * ('26. 6. 3. 부로 A키와 L키를 활용한 팀 전환은 비활성화)
  */
 export function useTimerHotkey(
   state: TimerPageLogics,
@@ -38,8 +39,8 @@ export function useTimerHotkey(
       const keysToDisable = new Set([
         'Space',
         'KeyR',
-        'KeyA',
-        'KeyL',
+        // 'KeyA',
+        // 'KeyL',
         'Enter',
         'NumpadEnter',
       ]);
@@ -92,6 +93,7 @@ export function useTimerHotkey(
           }
           break;
         case 'KeyA':
+          /*
           // 찬성 진영 선택 및 반대 타이머 정지
           if (prosConsSelected === 'CONS') {
             const handleSwitching = () => {
@@ -104,8 +106,10 @@ export function useTimerHotkey(
 
             onEvent(handleSwitching, 'TEAM_SWITCH');
           }
+          */
           break;
         case 'KeyL':
+          /*
           // 반대 진영 선택 및 찬성 타이머 정지
           if (prosConsSelected === 'PROS') {
             const handleSwitching = () => {
@@ -118,6 +122,7 @@ export function useTimerHotkey(
 
             onEvent(handleSwitching, 'TEAM_SWITCH');
           }
+          */
           break;
         case 'Enter':
         case 'NumpadEnter':

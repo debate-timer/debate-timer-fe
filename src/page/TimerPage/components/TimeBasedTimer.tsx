@@ -30,7 +30,6 @@ interface TimeBasedTimerProps {
 export default function TimeBasedTimer({
   timeBasedTimerInstance,
   isSelected,
-  onActivate,
   prosCons,
   teamName,
   item,
@@ -102,11 +101,15 @@ export default function TimeBasedTimer({
   return (
     <div
       data-testid="timer"
-      onClick={() => onActivate()}
+      onClick={() => {
+        // '26. 6. 3. 부로 마우스 클릭을 활용한 팀 전환은 비활성화
+        // onActivate()
+      }}
       className={clsx(
         'flex w-[400px] flex-col items-center justify-center space-y-[12px] xl:min-w-[560px] xl:space-y-[20px]',
         {
           'opacity-50 grayscale': !isSelected,
+          'pointer-events-none': !isSelected, // 마우스 클릭을 활용한 팀 전환 활성화 시에 이 태그를 지우세요.
         },
       )}
     >
