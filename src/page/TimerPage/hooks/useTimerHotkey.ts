@@ -93,7 +93,6 @@ export function useTimerHotkey(
           }
           break;
         case 'KeyA':
-          /*
           // 찬성 진영 선택 및 반대 타이머 정지
           if (prosConsSelected === 'CONS') {
             const handleSwitching = () => {
@@ -106,10 +105,9 @@ export function useTimerHotkey(
 
             onEvent(handleSwitching, 'TEAM_SWITCH');
           }
-          */
+          
           break;
         case 'KeyL':
-          /*
           // 반대 진영 선택 및 찬성 타이머 정지
           if (prosConsSelected === 'PROS') {
             const handleSwitching = () => {
@@ -122,7 +120,7 @@ export function useTimerHotkey(
 
             onEvent(handleSwitching, 'TEAM_SWITCH');
           }
-          */
+          
           break;
         case 'Enter':
         case 'NumpadEnter':
