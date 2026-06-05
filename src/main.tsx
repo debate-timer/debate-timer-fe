@@ -2,6 +2,7 @@ import './instrument';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 import { GlobalPortal } from './util/GlobalPortal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import router from './routes/routes.tsx';
@@ -13,8 +14,12 @@ import {
   getMemberId,
   removeMemberId,
 } from './util/accessToken';
-import { DEFAULT_LANG } from './util/languageRouting';
+import { DEFAULT_LANG, isSupportedLang } from './util/languageRouting';
 import i18n from './i18n';
+
+function resolveCurrentLang(lang?: string) {
+  return isSupportedLang(lang) ? lang : DEFAULT_LANG;
+}
 
 // Functions that calls msw mocking worker
 if (import.meta.env.VITE_MOCK_API === 'true') {
@@ -50,6 +55,10 @@ if (import.meta.env.VITE_MOCK_API === 'true') {
 // Function that initializes main React app
 function initializeApp() {
   setupAnalytics();
+  const currentLang = resolveCurrentLang(
+    i18n.resolvedLanguage ?? i18n.language,
+  );
+  Sentry.setTag('language', currentLang);
 
   // memberId 복원: accessToken + memberId 모두 존재 시 identity 설정
   const memberId = getMemberId();
@@ -57,7 +66,7 @@ function initializeApp() {
     analyticsManager.setUserId(memberId);
     analyticsManager.setUserProperties({
       user_type: 'member',
-      language: document.documentElement.lang || DEFAULT_LANG,
+      language: currentLang,
     });
   } else if (memberId) {
     // accessToken 없이 memberId만 있으면 비회원 처리
@@ -66,9 +75,11 @@ function initializeApp() {
 
   // 언어 변경 시 user property 업데이트
   i18n.on('languageChanged', (lng: string) => {
+    const changedLang = resolveCurrentLang(lng);
+    Sentry.setTag('language', changedLang);
     analyticsManager.setUserProperties({
       user_type: getAccessToken() ? 'member' : 'guest',
-      language: lng,
+      language: changedLang,
     });
   });
 
