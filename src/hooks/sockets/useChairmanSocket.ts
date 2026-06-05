@@ -36,6 +36,7 @@ export default function useChairmanSocket(roomId: number) {
     unsubscribe,
     publish,
     addConnectionListener,
+    isConnected,
     error,
   } = useSocket();
 
@@ -150,6 +151,7 @@ export default function useChairmanSocket(roomId: number) {
     connect: connectChairmanSocket,
     disconnect: disconnectChairmanSocket,
     sendDebateEvent,
+    isConnected,
     error,
   };
 }

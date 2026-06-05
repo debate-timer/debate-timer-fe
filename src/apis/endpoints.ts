@@ -12,5 +12,5 @@ export const ApiUrl = {
   customize: makeUrl('/table/customize'),
   poll: makeUrl('/polls'),
   organization: makeUrl('/organizations'),
-  share: makeUrl('/share'),
+  live: makeUrl('/live'),
 };

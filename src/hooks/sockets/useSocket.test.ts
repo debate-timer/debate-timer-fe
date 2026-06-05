@@ -11,6 +11,8 @@ const socketManagerMock = vi.hoisted(() => ({
   isConnected: vi.fn(),
   onConnectEvent: vi.fn(),
   offConnectEvent: vi.fn(),
+  onCloseEvent: vi.fn(),
+  offCloseEvent: vi.fn(),
 }));
 
 vi.mock('../../apis/sockets/SocketManager', () => ({
@@ -26,6 +28,10 @@ function createSubscription(): StompSubscription {
 
 function getConnectListener() {
   return socketManagerMock.onConnectEvent.mock.calls[0][0] as () => void;
+}
+
+function getCloseListener() {
+  return socketManagerMock.onCloseEvent.mock.calls[0][0] as () => void;
 }
 
 describe('useSocket', () => {
@@ -96,6 +102,23 @@ describe('useSocket', () => {
     expect(socketManagerMock.offConnectEvent).toHaveBeenCalledWith(
       getConnectListener(),
     );
+    expect(socketManagerMock.offCloseEvent).toHaveBeenCalledWith(
+      getCloseListener(),
+    );
+  });
+
+  it('소켓 종료 이벤트가 발생하면 연결 상태를 false로 갱신해야 한다', () => {
+    socketManagerMock.isConnected.mockReturnValue(true);
+
+    const { result } = renderHook(() => useSocket());
+
+    expect(result.current.isConnected).toBe(true);
+
+    act(() => {
+      getCloseListener()();
+    });
+
+    expect(result.current.isConnected).toBe(false);
   });
 
   it('재연결 이벤트가 발생하면 백업된 구독을 다시 등록해야 한다', () => {

@@ -21,6 +21,8 @@ import useFullscreen from '../../../hooks/useFullscreen';
 
 const VOLUME_SCALE = 10;
 
+type SwitchCampRunner = (invoke: () => void) => void;
+
 /**
  * 타이머 페이지의 상태(타이머, 라운드, 벨 등) 전반을 관리하는 커스텀 훅
  */
@@ -154,7 +156,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
    * - 현재 진영이 아닌 타이머를 클릭한 경우에만 동작
    */
   const handleActivateTeam = useCallback(
-    (team: TimeBasedStance) => {
+    (team: TimeBasedStance, runSwitchCamp: SwitchCampRunner) => {
       const clickedTimerStance = team === 'PROS' ? 'PROS' : 'CONS';
       const clickedTimer = clickedTimerStance === 'PROS' ? timer1 : timer2;
 
@@ -162,11 +164,15 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       if (prosConsSelected === clickedTimerStance) return;
 
       // 아니라면, 타이머 변경
-      if (clickedTimer.isDone) {
-        setProsConsSelected(clickedTimerStance);
-      } else {
-        switchCamp();
-      }
+      const handleSwitching = () => {
+        if (clickedTimer.isDone) {
+          setProsConsSelected(clickedTimerStance);
+        } else {
+          switchCamp();
+        }
+      };
+
+      runSwitchCamp(handleSwitching);
     },
     [prosConsSelected, switchCamp, timer1, timer2],
   );
@@ -325,7 +331,10 @@ export interface TimerPageLogics {
   setProsConsSelected: Dispatch<SetStateAction<TimeBasedStance>>;
   goToOtherItem: (isPrev: boolean) => void;
   switchCamp: () => void;
-  handleActivateTeam: (team: TimeBasedStance) => void;
+  handleActivateTeam: (
+    team: TimeBasedStance,
+    runSwitchCamp: SwitchCampRunner,
+  ) => void;
   tableId: number;
   isLoading: boolean;
   isError: boolean;

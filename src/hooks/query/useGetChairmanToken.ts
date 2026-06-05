@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getChairmanToken } from '../../apis/apis/share';
+import { getChairmanToken } from '../../apis/apis/live';
 
 export const chairmanTokenQueryKey = (tableId: string) =>
   ['chairmanToken', tableId] as const;

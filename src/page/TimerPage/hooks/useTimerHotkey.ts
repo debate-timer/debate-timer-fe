@@ -1,14 +1,19 @@
 import { useEffect } from 'react';
 import { TimerPageLogics } from './useTimerPageState';
+import { SocketEventType } from '../../../apis/sockets/type';
 
 /**
  * 타이머 페이지에서 키보드 단축키(핫키) 기능을 제공하는 커스텀 훅입니다.
  * - Space: 타이머 시작/일시정지
  * - KeyR: 타이머 리셋
- * - KeyA/KeyL: 각각 찬/반 진영 타이머 활성화
  * - Enter, NumpadEnter: 진영 전환
+ *
+ * ('26. 6. 3. 부로 A키와 L키를 활용한 팀 전환은 비활성화)
  */
-export function useTimerHotkey(state: TimerPageLogics) {
+export function useTimerHotkey(
+  state: TimerPageLogics,
+  onEvent: (invoke: () => void, eventType: SocketEventType) => void,
+) {
   const {
     data,
     index,
@@ -34,8 +39,8 @@ export function useTimerHotkey(state: TimerPageLogics) {
       const keysToDisable = new Set([
         'Space',
         'KeyR',
-        'KeyA',
-        'KeyL',
+        // 'KeyA',
+        // 'KeyL',
         'Enter',
         'NumpadEnter',
       ]);
@@ -52,9 +57,9 @@ export function useTimerHotkey(state: TimerPageLogics) {
       // 찬/반 타이머 토글 (시작/정지)
       const toggleTimer = (timer: typeof timer1 | typeof timer2) => {
         if (timer.isRunning) {
-          timer.pauseTimer();
+          onEvent(timer.pauseTimer, 'STOP');
         } else {
-          timer.startTimer();
+          onEvent(timer.startTimer, 'PLAY');
         }
       };
 
@@ -63,9 +68,9 @@ export function useTimerHotkey(state: TimerPageLogics) {
           // 일반 타이머/진영별 타이머 동작 제어
           if (boxType === 'NORMAL') {
             if (normalTimer.isRunning) {
-              normalTimer.pauseTimer();
+              onEvent(normalTimer.pauseTimer, 'STOP');
             } else {
-              normalTimer.startTimer();
+              onEvent(normalTimer.startTimer, 'PLAY');
             }
           } else {
             if (prosConsSelected === 'PROS') {
@@ -78,39 +83,49 @@ export function useTimerHotkey(state: TimerPageLogics) {
         case 'KeyR':
           // 타이머 리셋
           if (boxType === 'NORMAL') {
-            normalTimer.resetTimer();
+            onEvent(normalTimer.resetTimer, 'RESET');
           } else {
             if (prosConsSelected === 'PROS') {
-              timer1.resetCurrentTimer(timer2.isDone);
+              onEvent(() => timer1.resetCurrentTimer(timer2.isDone), 'RESET');
             } else {
-              timer2.resetCurrentTimer(timer1.isDone);
+              onEvent(() => timer2.resetCurrentTimer(timer1.isDone), 'RESET');
             }
           }
           break;
         case 'KeyA':
           // 찬성 진영 선택 및 반대 타이머 정지
           if (prosConsSelected === 'CONS') {
-            if (timer1.isDone) {
-              setProsConsSelected('PROS');
-            } else {
-              switchCamp();
-            }
+            const handleSwitching = () => {
+              if (timer1.isDone) {
+                setProsConsSelected('PROS');
+              } else {
+                switchCamp();
+              }
+            };
+
+            onEvent(handleSwitching, 'TEAM_SWITCH');
           }
+          
           break;
         case 'KeyL':
           // 반대 진영 선택 및 찬성 타이머 정지
           if (prosConsSelected === 'PROS') {
-            if (timer1.isDone) {
-              setProsConsSelected('CONS');
-            } else {
-              switchCamp();
-            }
+            const handleSwitching = () => {
+              if (timer1.isDone) {
+                setProsConsSelected('CONS');
+              } else {
+                switchCamp();
+              }
+            };
+
+            onEvent(handleSwitching, 'TEAM_SWITCH');
           }
+          
           break;
         case 'Enter':
         case 'NumpadEnter':
           // 진영 전환
-          switchCamp();
+          onEvent(switchCamp, 'TEAM_SWITCH');
           break;
       }
     };
@@ -129,5 +144,6 @@ export function useTimerHotkey(state: TimerPageLogics) {
     goToOtherItem,
     setProsConsSelected,
     switchCamp,
+    onEvent,
   ]);
 }
