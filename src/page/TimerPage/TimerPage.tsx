@@ -106,12 +106,27 @@ export default function TimerPage() {
     // 만약 소켓 열려 있으면, 발송
     if (isSocketConnected) {
       // 타입에 따른 페이로드 준비
-      const innerPayload = {
-        currentTeam: prosConsSelected,
-        timerType: timerType,
-        remainingTime: remainingTime,
-        sequence: index,
-      } as TimerDataPayload;
+      let innerPayload: TimerDataPayload;
+
+      if (timerType === 'NORMAL') {
+        innerPayload = {
+          currentTeam: prosConsSelected,
+          timerType: timerType,
+          remainingTime: remainingTime,
+          sequence: index,
+        } as TimerDataPayload;
+      } else if (timerType === 'TIME_BASED') {
+        innerPayload = {
+          timerType: timerType,
+          remainingTime: remainingTime,
+          sequence: index,
+        } as TimerDataPayload;
+      } else {
+        // 피드백 타이머 타입은 여기 올 수 없음
+        // 따라서 별도 작업 하지 않고 그냥 반환
+        return;
+      }
+
       const payload = eventType === 'FINISHED' ? null : innerPayload;
 
       // 이벤트 발행
