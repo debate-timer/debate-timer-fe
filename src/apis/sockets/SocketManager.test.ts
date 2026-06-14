@@ -166,6 +166,7 @@ describe('SocketManager', () => {
       socketManager.connect({ baseRetryDelayMs: 1000 });
 
       const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 연결 성공 상태로 만들기
 
       // 초기 딜레이: calculateBackoffDelay(0) = 500 + 10
       expect(client.reconnectDelay).toBe(500 + 10);
@@ -182,6 +183,7 @@ describe('SocketManager', () => {
     it('최대 재시도 횟수 초과 시 재시도 딜레이를 0으로 설정하고 연결을 해제해야 한다', () => {
       socketManager.connect({ maxRetries: 3 });
       const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 연결 성공 상태로 만들기
 
       // 3번까지는 아직 maxRetries 미초과 → deactivate 호출 안 됨
       for (let i = 0; i < 3; i++) {
@@ -199,6 +201,7 @@ describe('SocketManager', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       socketManager.connect({ baseRetryDelayMs: 1000, maxRetries: 5 });
       const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 처음 연결 성공 상태로 만들기
 
       // 끊김 2번 → retryCount = 2
       client.config.onWebSocketClose?.({} as CloseEvent);
@@ -304,6 +307,124 @@ describe('SocketManager', () => {
       const client = getLatestClient();
       client.config.onWebSocketClose?.({} as CloseEvent);
 
+      expect(listener).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Error Events & Publishing', () => {
+    it('오류 리스너가 등록되면 SocketError를 받고, 해제 후에는 호출되지 않아야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+
+      // trigger error by failing URL
+      socketManager.connect({ url: '', baseUrl: '' });
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_URL_UNAVAILABLE');
+
+      listener.mockClear();
+      socketManager.offErrorEvent(listener);
+      socketManager.connect({ url: '', baseUrl: '' });
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('연결 URL을 결정할 수 없는 경우 SOCKET_URL_UNAVAILABLE 코드와 기술 원인을 가진 오류를 한 번 발행해야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+
+      socketManager.connect({ url: '', baseUrl: '' });
+
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_URL_UNAVAILABLE');
+    });
+
+    it('STOMP onStompError 발생 시 SOCKET_STOMP_ERROR 코드와 frame의 message/body 상세를 가진 오류가 발행되어야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      client.config.onStompError?.({
+        headers: { message: 'stomp msg' },
+        body: 'body content',
+      } as unknown as IFrame);
+
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_STOMP_ERROR');
+      expect(error.message).toBe('stomp msg');
+      expect(error.detail).toEqual({
+        headers: { message: 'stomp msg' },
+        body: 'body content',
+      });
+    });
+
+    it('한 번도 연결 성공하지 못한 세션에서 WebSocket close가 발생하면 SOCKET_SERVER_REJECTED 오류가 발행되어야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      client.config.onWebSocketClose?.({} as CloseEvent);
+
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_SERVER_REJECTED');
+    });
+
+    it('연결 성공 후 close는 기존 재연결 횟수가 남아 있는 동안 오류를 발행하지 않고, 최대 재시도 소진 시 SOCKET_RETRY_EXHAUSTED 오류를 발행해야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+      socketManager.connect({ maxRetries: 2 });
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 연결 성공
+
+      // 1차 끊김: 오류 발행 안됨
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).not.toHaveBeenCalled();
+
+      // 2차 끊김: 오류 발행 안됨
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).not.toHaveBeenCalled();
+
+      // 3차 끊김: 재시도 초과 -> 오류 발행
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_RETRY_EXHAUSTED');
+    });
+
+    it('STOMP heartbeat 누락으로 onWebSocketClose가 발생한 경우에도 같은 재시도 정책을 따르고, 재시도 소진 후 SOCKET_RETRY_EXHAUSTED로 종료되어야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+      socketManager.connect({ maxRetries: 1 });
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 연결 성공
+
+      // 하트비트 누락에 의한 1차 끊김: 오류 발행 안됨
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).not.toHaveBeenCalled();
+
+      // 2차 끊김: 재시도 초과 -> 오류 발행
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_RETRY_EXHAUSTED');
+    });
+
+    it('명시적 disconnect 후에는 지연 이벤트가 오류를 발행하지 않아야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+      socketManager.connect();
+
+      const client = getLatestClient();
+      socketManager.disconnect();
+
+      // 과거 세션 이벤트
+      client.config.onWebSocketClose?.({} as CloseEvent);
       expect(listener).not.toHaveBeenCalled();
     });
   });

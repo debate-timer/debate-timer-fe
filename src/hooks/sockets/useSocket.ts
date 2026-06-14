@@ -36,6 +36,7 @@ export default function useSocket() {
    * @param options - (선택 옵션) 소켓 연결에 사용할 옵션. 상세 항목은 [SocketManager.ts](../apis/sockets/SocketManager.ts) 참고.
    */
   const connect = useCallback((options?: SocketOptions) => {
+    setError(null);
     socketManager.connect(options);
   }, []);
 
@@ -44,6 +45,7 @@ export default function useSocket() {
    * WS 연결을 끊음.
    */
   const disconnect = useCallback(() => {
+    setError(null);
     socketManager.disconnect();
     setIsConnected(false);
   }, []);
@@ -122,6 +124,7 @@ export default function useSocket() {
   useEffect(() => {
     // 소켓이 연결될 때마다 실행될 핸들러
     const handleConnect = () => {
+      setError(null);
       setIsConnected(true);
 
       const recover = () => {
@@ -170,9 +173,14 @@ export default function useSocket() {
       setIsConnected(false);
     };
 
+    const handleError = (err: Error) => {
+      setError(err);
+    };
+
     // 이 핸들러 함수를 발행자(SocketManager)에 등록
     socketManager.onConnectEvent(handleConnect);
     socketManager.onCloseEvent(handleClose);
+    socketManager.onErrorEvent(handleError);
 
     // 리스너 등록 이후 연결이 이미 되어 있는 게 확인되면, 핸들러 바로 실행
     if (socketManager.isConnected()) {
@@ -184,6 +192,7 @@ export default function useSocket() {
       // 먼저 발행자(SocketManager)에게 등록된 핸들러부터 제거
       socketManager.offConnectEvent(handleConnect);
       socketManager.offCloseEvent(handleClose);
+      socketManager.offErrorEvent(handleError);
 
       // 활성화된 모든 구독 해제
       activeSubscriptions.current.forEach((subscription) =>

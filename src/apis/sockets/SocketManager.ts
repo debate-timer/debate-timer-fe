@@ -1,6 +1,7 @@
 import { Client, IMessage, StompHeaders } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { SocketMessage } from './type';
+import { SocketError } from './error';
 
 /**
  * 소켓 설정을 정하는 인터페이스
@@ -72,6 +73,9 @@ class SocketManager {
   // - 발행자(publisher)는 재연결 여부를 알리는 이 클래스 (SocketManager)
   private connectListeners: Set<() => void> = new Set();
   private closeListeners: Set<() => void> = new Set();
+  private errorListeners: Set<(error: SocketError) => void> = new Set();
+
+  private hasConnected: boolean = false;
 
   /**
    * 관찰자를 등록하는 함수
@@ -105,6 +109,27 @@ class SocketManager {
     this.closeListeners.delete(listener);
   }
 
+  public onErrorEvent(listener: (error: SocketError) => void) {
+    this.errorListeners.add(listener);
+  }
+
+  public offErrorEvent(listener: (error: SocketError) => void) {
+    this.errorListeners.delete(listener);
+  }
+
+  private dispatchError(error: SocketError) {
+    this.errorListeners.forEach((listener) => {
+      try {
+        listener(error);
+      } catch (e) {
+        console.error(
+          '오류 리스너 실행 중 오류 발생. 다음 리스너로 진행합니다.',
+          e,
+        );
+      }
+    });
+  }
+
   /**
    * 연결 여부를 확인하는 함수
    * @returns 연결 여부
@@ -129,12 +154,19 @@ class SocketManager {
 
     // 사용자가 지정한 옵션이 있다면 덮어쓰기
     this.retryCount = 0;
+    this.hasConnected = false;
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
     const wsUrl = this.resolveWebSocketUrl(this.currentOptions);
     if (!wsUrl) {
       console.error(
         '웹소켓 연결 주소를 결정할 수 없습니다. url 또는 baseUrl 옵션, 혹은 VITE_API_BASE_URL 환경 변수를 확인해주세요.',
+      );
+      this.dispatchError(
+        new SocketError(
+          'SOCKET_URL_UNAVAILABLE',
+          '웹소켓 연결 주소를 결정할 수 없습니다.',
+        ),
       );
       return;
     }
@@ -158,6 +190,7 @@ class SocketManager {
       onConnect: () => {
         console.log('✅ 웹 소켓(STOMP) 연결 성공');
         this.retryCount = 0;
+        this.hasConnected = true;
 
         // 모든 관찰자에게 연결이 수립되었다고 알림
         this.connectListeners.forEach((listener) => {
@@ -172,6 +205,13 @@ class SocketManager {
       onStompError: (frame) => {
         console.error('❌ 브로커 에러 발생:', frame.headers['message']);
         console.error('상세 내용:', frame.body);
+        this.dispatchError(
+          new SocketError(
+            'SOCKET_STOMP_ERROR',
+            frame.headers['message'] || 'STOMP 오류 발생',
+            { headers: frame.headers, body: frame.body },
+          ),
+        );
       },
 
       onWebSocketClose: () => {
@@ -192,6 +232,24 @@ class SocketManager {
             );
           }
         });
+
+        if (!this.hasConnected) {
+          this.dispatchError(
+            new SocketError(
+              'SOCKET_SERVER_REJECTED',
+              '서버에 의해 웹소켓 연결이 거부되었거나 즉시 종료되었습니다.',
+            ),
+          );
+
+          if (this.client) {
+            this.client.reconnectDelay = 0;
+            const clientToDeactivate = this.client;
+            this.client = null;
+            clientToDeactivate.deactivate();
+          }
+          return;
+        }
+
         this.handleReconnection();
       },
     });
@@ -215,6 +273,7 @@ class SocketManager {
       this.currentOptions = DEFAULT_OPTIONS;
       this.connectListeners.clear();
       this.closeListeners.clear();
+      this.errorListeners.clear();
 
       console.log('🛑 웹 소켓 연결을 수동으로 해제했습니다.');
     }
@@ -270,6 +329,12 @@ class SocketManager {
     if (this.retryCount >= this.currentOptions.maxRetries) {
       console.error(
         '🚨 최대 재연결 시도 횟수를 초과했습니다. 연결을 포기합니다.',
+      );
+      this.dispatchError(
+        new SocketError(
+          'SOCKET_RETRY_EXHAUSTED',
+          '최대 재연결 시도 횟수를 초과했습니다.',
+        ),
       );
       this.client.reconnectDelay = 0;
 
