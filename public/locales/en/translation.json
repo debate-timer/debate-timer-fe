@@ -260,5 +260,19 @@
   "503 서비스가 일시적으로 중단됨": "503 Service Unavailable",
   "504 게이트웨이 시간 초과": "504 Gateway Timeout",
   "나의 토론 주제": "My Debate Topic",
-  "나의 시간표": "My Timetable"
+  "나의 시간표": "My Timetable",
+  "유효하지 않은 토론방 ID입니다.": "Invalid debate room ID.",
+  "실시간 연결 주소를 확인할 수 없어요.": "Could not verify live connection address.",
+  "토론방 연결이 거부되었어요.": "Connection to the debate room was rejected.",
+  "실시간 연결에서 서버 오류가 발생했어요.": "A server error occurred during live connection.",
+  "실시간 연결을 복구하지 못했어요.": "Failed to recover the live connection.",
+  "토론 상태를 오래 받지 못했어요.": "Did not receive debate status for a long time.",
+  "서버에서 토론 진행 오류를 전달했어요.": "The server reported a debate progress error.",
+  "알 수 없는 실시간 오류가 발생했어요.": "An unknown live error occurred.",
+  "토론 시작을 대기 중입니다.": "Waiting for the debate to start.",
+  "토론이 종료되었습니다.": "The debate has ended.",
+  "페이지 닫기": "Close page",
+  "남은 시간": "Time Remaining",
+  "현재 발언 중": "Currently speaking",
+  "발언 중": "Speaking"
 }
