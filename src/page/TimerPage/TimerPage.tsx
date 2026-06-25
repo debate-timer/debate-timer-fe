@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
@@ -23,8 +23,8 @@ import { isGuestFlow } from '../../util/sessionStorage';
 import useAnalytics from '../../hooks/useAnalytics';
 import { consumeTemplateOrigin } from '../../util/analytics/templateOrigin';
 import {
-  RiFullscreenFill,
   RiFullscreenExitFill,
+  RiFullscreenFill,
   RiVolumeMuteFill,
 } from 'react-icons/ri';
 import DTVolume from '../../components/icons/Volume';
@@ -32,10 +32,12 @@ import VolumeBar from '../../components/VolumeBar/VolumeBar';
 import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
+import AnswerTimeSetting from './components/AnswerTimeSetting';
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
   const { t } = useTranslation();
+  const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
   const {
@@ -97,6 +99,10 @@ export default function TimerPage() {
     isError: isSocketError,
     errorType: socketErrorType,
   } = useLiveShare(tableId);
+
+  const handleChangeAnswerTime = (time: number) => {
+    setAnswerTime(time);
+  };
 
   // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
   const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
@@ -204,6 +210,10 @@ export default function TimerPage() {
             )}
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right>
+            <AnswerTimeSetting
+              answerTime={answerTime}
+              onChangeAnswerTime={handleChangeAnswerTime}
+            />
             <button
               className="flex h-full items-center justify-center p-[4px]"
               aria-label={t('도움말')}
@@ -212,7 +222,6 @@ export default function TimerPage() {
             >
               <DTHelp className="h-full" />
             </button>
-
             <button
               className="flex aspect-square h-full items-center justify-center p-[4px]"
               title={t('전체 화면')}
@@ -224,7 +233,6 @@ export default function TimerPage() {
                 <RiFullscreenFill className="h-full w-full" />
               )}
             </button>
-
             <div className="relative flex h-full flex-col" ref={volumeRef}>
               <button
                 className="flex aspect-square h-full items-center justify-center p-[4px]"
