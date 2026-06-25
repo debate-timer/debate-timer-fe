@@ -33,6 +33,7 @@ import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
+import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
@@ -43,7 +44,9 @@ export default function TimerPage() {
   const {
     openUseTooltipModal,
     UseToolTipWrapper,
+    isAnswerTimeGuideOpen,
     closeUseTooltipModal,
+    closeAnswerTimeGuideModal,
     LoginAndStoreModalWrapper,
     closeLoginAndStoreModal,
     openLoginAndStoreModalOrGoToDebateEndPage,
@@ -335,6 +338,11 @@ export default function TimerPage() {
         Wrapper={UseToolTipWrapper}
         onClose={closeUseTooltipModal}
       />
+
+      {/* 토론 세션당 한 번 답변시간 타이머 사용법을 안내한다. */}
+      {isAnswerTimeGuideOpen && (
+        <AnswerTimeGuideModal onClose={closeAnswerTimeGuideModal} />
+      )}
 
       {/* 토론 종료 후 로그인 저장 여부를 묻는 모달이다. */}
       <LoginAndStoreModal
