@@ -162,6 +162,14 @@ export default function NormalTimer({
           </span>
         </CircularTimer>
 
+        {/* 답변시간 타이머 버튼 */}
+        <button
+          type="button"
+          className="flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]"
+        >
+          {t('답변시간 타이머 시작')}
+        </button>
+
         {/* 조작부 */}
         <TimerController
           isRunning={isRunning}
