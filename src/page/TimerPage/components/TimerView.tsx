@@ -44,9 +44,16 @@ export default function TimerView({
   const [answerTimerState, setAnswerTimerState] =
     useState<AnswerTimerState | null>(null);
 
-  const handleClickAnswerTimer = (owner: AnswerTimerOwner) => {
+  const handleClickAnswerTimer = (
+    owner: AnswerTimerOwner,
+    isMainTimerRunning: boolean,
+  ) => {
     setAnswerTimerState((currentState) => {
       if (currentState?.owner !== owner) {
+        if (!isMainTimerRunning) {
+          return currentState;
+        }
+
         return { owner, status: 'running', elapsedTime: 0 };
       }
 
@@ -89,13 +96,16 @@ export default function TimerView({
     return () => window.clearInterval(intervalId);
   }, [answerTime, answerTimerState?.status]);
 
-  const getAnswerTimer = (owner: AnswerTimerOwner) => {
+  const getAnswerTimer = (
+    owner: AnswerTimerOwner,
+    isMainTimerRunning: boolean,
+  ) => {
     if (answerTimerState?.owner === owner) {
       return (
         <AnswerTimeProgress
           answerTime={answerTime}
           elapsedTime={answerTimerState.elapsedTime}
-          onClick={() => handleClickAnswerTimer(owner)}
+          onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
         />
       );
     }
@@ -106,7 +116,8 @@ export default function TimerView({
         className={
           'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
         }
-        onClick={() => handleClickAnswerTimer(owner)}
+        aria-disabled={!isMainTimerRunning}
+        onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
       >
         {t('답변시간 타이머 시작')}
       </button>
@@ -130,7 +141,7 @@ export default function TimerView({
         }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
-        answerTimer={getAnswerTimer('NORMAL')}
+        answerTimer={getAnswerTimer('NORMAL', normalTimer.isRunning)}
         teamName={
           data.table[index].stance === 'NEUTRAL'
             ? null
@@ -166,7 +177,7 @@ export default function TimerView({
           }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
-          answerTimer={getAnswerTimer('PROS')}
+          answerTimer={getAnswerTimer('PROS', timer1.isRunning)}
         />
 
         {/* ENTER 버튼 */}
@@ -198,7 +209,7 @@ export default function TimerView({
           }
           prosCons="CONS"
           teamName={data.info.consTeamName}
-          answerTimer={getAnswerTimer('CONS')}
+          answerTimer={getAnswerTimer('CONS', timer2.isRunning)}
         />
       </div>
     );
