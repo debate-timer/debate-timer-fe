@@ -1,5 +1,5 @@
 // components/TimerView.tsx
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
@@ -43,6 +43,7 @@ export default function TimerView({
   } = state;
   const [answerTimerState, setAnswerTimerState] =
     useState<AnswerTimerState | null>(null);
+  const previousProsConsSelectedRef = useRef(prosConsSelected);
   const answerTimerOwner = answerTimerState?.owner;
   const isAnswerTimerMainTimerRunning =
     answerTimerOwner === 'NORMAL'
@@ -144,14 +145,14 @@ export default function TimerView({
   }, [answerTimerOwner, isAnswerTimerMainTimerRunning, resetAnswerTimer]);
 
   useEffect(() => {
-    setAnswerTimerState((currentState) => {
-      if (currentState?.owner !== 'PROS' && currentState?.owner !== 'CONS') {
-        return currentState;
-      }
+    if (previousProsConsSelectedRef.current === prosConsSelected) return;
 
-      return null;
-    });
-  }, [prosConsSelected]);
+    previousProsConsSelectedRef.current = prosConsSelected;
+
+    if (answerTimerOwner !== 'PROS' && answerTimerOwner !== 'CONS') return;
+
+    resetAnswerTimer();
+  }, [answerTimerOwner, prosConsSelected, resetAnswerTimer]);
 
   useEffect(() => {
     if (!data) return;
