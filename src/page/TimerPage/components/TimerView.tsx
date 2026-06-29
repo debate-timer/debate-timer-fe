@@ -9,7 +9,7 @@ import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
 
 type AnswerTimerOwner = 'NORMAL' | 'PROS' | 'CONS';
-type AnswerTimerStatus = 'running' | 'stopped';
+type AnswerTimerStatus = 'running' | 'stopped' | 'resetting';
 
 interface AnswerTimerState {
   owner: AnswerTimerOwner;
@@ -66,7 +66,11 @@ export default function TimerView({
   }, []);
 
   const resetAnswerTimer = useCallback(() => {
-    setAnswerTimerState(null);
+    setAnswerTimerState((currentState) => {
+      if (!currentState) return currentState;
+
+      return { ...currentState, status: 'resetting', elapsedTime: 0 };
+    });
   }, []);
 
   const handleClickAnswerTimer = useCallback(
@@ -118,6 +122,20 @@ export default function TimerView({
 
     return () => window.clearInterval(intervalId);
   }, [answerTime, answerTimerState?.status]);
+
+  useEffect(() => {
+    if (answerTimerState?.status !== 'resetting') return;
+
+    const timeoutId = window.setTimeout(() => {
+      setAnswerTimerState((currentState) => {
+        if (currentState?.status !== 'resetting') return currentState;
+
+        return null;
+      });
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [answerTimerState?.status]);
 
   useEffect(() => {
     if (!answerTimerOwner || isAnswerTimerMainTimerRunning) return;
@@ -185,6 +203,7 @@ export default function TimerView({
         <AnswerTimeProgress
           answerTime={answerTime}
           elapsedTime={answerTimerState.elapsedTime}
+          isResetting={answerTimerState.status === 'resetting'}
           onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
         />
       );

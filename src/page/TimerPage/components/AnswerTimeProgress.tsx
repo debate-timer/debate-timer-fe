@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 
 const ANSWER_TIME_STATUS_COLOR = {
   covered: '#4CAF51',
@@ -9,23 +11,39 @@ const ANSWER_TIME_STATUS_COLOR = {
 interface AnswerTimeProgressProps {
   answerTime: number;
   elapsedTime: number;
+  isResetting?: boolean;
   onClick: () => void;
 }
 
 export default function AnswerTimeProgress({
   answerTime,
   elapsedTime,
+  isResetting = false,
   onClick,
 }: AnswerTimeProgressProps) {
   const { t } = useTranslation();
+  const [isOpened, setIsOpened] = useState(false);
   const ratio = answerTime > 0 ? elapsedTime / answerTime : 0;
   const progress = Math.min(ratio * 100, 100);
   const statusColor = getAnswerTimeStatusColor(ratio);
 
+  useEffect(() => {
+    const animationFrameId = requestAnimationFrame(() => {
+      setIsOpened(true);
+    });
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
   return (
     <button
       type="button"
-      className="flex w-full max-w-full translate-y-0 items-center gap-[12px] opacity-100 transition-all duration-[350ms] ease-out"
+      className={clsx(
+        'flex w-full max-w-full items-center gap-[12px] transition-all duration-[350ms] ease-out',
+        isOpened && !isResetting
+          ? 'translate-y-0 opacity-100'
+          : 'translate-y-[4px] opacity-0',
+      )}
       onClick={onClick}
     >
       <span className="flex-shrink-0 font-bold text-default-black">
