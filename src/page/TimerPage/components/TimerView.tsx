@@ -43,6 +43,15 @@ export default function TimerView({
   } = state;
   const [answerTimerState, setAnswerTimerState] =
     useState<AnswerTimerState | null>(null);
+  const answerTimerOwner = answerTimerState?.owner;
+  const isAnswerTimerMainTimerRunning =
+    answerTimerOwner === 'NORMAL'
+      ? normalTimer.isRunning
+      : answerTimerOwner === 'PROS'
+        ? timer1.isRunning
+        : answerTimerOwner === 'CONS'
+          ? timer2.isRunning
+          : true;
 
   const handleClickAnswerTimer = (
     owner: AnswerTimerOwner,
@@ -95,6 +104,22 @@ export default function TimerView({
 
     return () => window.clearInterval(intervalId);
   }, [answerTime, answerTimerState?.status]);
+
+  useEffect(() => {
+    if (!answerTimerOwner || isAnswerTimerMainTimerRunning) return;
+
+    setAnswerTimerState(null);
+  }, [answerTimerOwner, isAnswerTimerMainTimerRunning]);
+
+  useEffect(() => {
+    setAnswerTimerState((currentState) => {
+      if (currentState?.owner !== 'PROS' && currentState?.owner !== 'CONS') {
+        return currentState;
+      }
+
+      return null;
+    });
+  }, [prosConsSelected]);
 
   const getAnswerTimer = (
     owner: AnswerTimerOwner,
