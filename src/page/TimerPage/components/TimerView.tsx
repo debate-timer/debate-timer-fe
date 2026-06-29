@@ -8,9 +8,14 @@ import TimeBasedTimer from './TimeBasedTimer';
 interface TimerViewProps {
   state: TimerPageLogics;
   onEvent: (invoke: () => void, eventType: SocketEventType) => void;
+  answerTime: number;
 }
 
-export default function TimerView({ state, onEvent }: TimerViewProps) {
+export default function TimerView({
+  state,
+  onEvent,
+  answerTime,
+}: TimerViewProps) {
   // 상태 풀기
   const {
     data,
@@ -41,6 +46,7 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
         }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
+        answerTime={answerTime}
         teamName={
           data.table[index].stance === 'NEUTRAL'
             ? null
@@ -76,6 +82,7 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
           }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
+          answerTime={answerTime}
         />
 
         {/* ENTER 버튼 */}
@@ -107,6 +114,7 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
           }
           prosCons="CONS"
           teamName={data.info.consTeamName}
+          answerTime={answerTime}
         />
       </div>
     );

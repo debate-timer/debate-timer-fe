@@ -303,7 +303,11 @@ export default function TimerPage() {
               )}
 
               {/* 타이머 두 개 + ENTER 버튼 */}
-              <TimerView state={state} onEvent={handleTimerEvent} />
+              <TimerView
+                state={state}
+                onEvent={handleTimerEvent}
+                answerTime={answerTime}
+              />
               {/* Round control buttons on the bottom side */}
               {data && (
                 <RoundControlRow

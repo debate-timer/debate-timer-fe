@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
@@ -8,6 +9,7 @@ import CompactTimeoutTimer from './CompactTimeoutTimer';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 import useBreakpoint from '../../../hooks/useBreakpoint';
 import { normalizeSpeechTypeKey } from '../../../util/speechType';
+import AnswerTimeProgress from './AnswerTimeProgress';
 
 type NormalTimerInstance = {
   timer: number | null;
@@ -26,6 +28,7 @@ interface NormalTimerProps {
   isAdditionalTimerAvailable: boolean;
   item: TimeBoxInfo;
   teamName: string | null;
+  answerTime?: number;
 }
 
 export default function NormalTimer({
@@ -33,8 +36,11 @@ export default function NormalTimer({
   isAdditionalTimerAvailable,
   item,
   teamName,
+  answerTime = 30,
 }: NormalTimerProps) {
   const { t } = useTranslation();
+  const [isAnswerTimeProgressVisible, setIsAnswerTimeProgressVisible] =
+    useState(false);
   const getSpeechTypeLabel = (value: string) => {
     const normalized = normalizeSpeechTypeKey(value);
     return normalized ? t(normalized) : value;
@@ -162,13 +168,21 @@ export default function NormalTimer({
           </span>
         </CircularTimer>
 
-        {/* 답변시간 타이머 버튼 */}
-        <button
-          type="button"
-          className="flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]"
-        >
-          {t('답변시간 타이머 시작')}
-        </button>
+        {isAnswerTimeProgressVisible ? (
+          <AnswerTimeProgress
+            answerTime={answerTime}
+            elapsedTime={answerTime}
+            onClick={() => setIsAnswerTimeProgressVisible(false)}
+          />
+        ) : (
+          <button
+            type="button"
+            className="flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]"
+            onClick={() => setIsAnswerTimeProgressVisible(true)}
+          >
+            {t('답변시간 타이머 시작')}
+          </button>
+        )}
 
         {/* 조작부 */}
         <TimerController
