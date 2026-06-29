@@ -1,5 +1,5 @@
 // components/TimerView.tsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
@@ -53,40 +53,40 @@ export default function TimerView({
           ? timer2.isRunning
           : true;
 
-  const startAnswerTimer = (owner: AnswerTimerOwner) => {
+  const startAnswerTimer = useCallback((owner: AnswerTimerOwner) => {
     setAnswerTimerState({ owner, status: 'running', elapsedTime: 0 });
-  };
+  }, []);
 
-  const stopAnswerTimer = () => {
+  const stopAnswerTimer = useCallback(() => {
     setAnswerTimerState((currentState) => {
       if (!currentState) return currentState;
 
       return { ...currentState, status: 'stopped' };
     });
-  };
+  }, []);
 
-  const resetAnswerTimer = () => {
+  const resetAnswerTimer = useCallback(() => {
     setAnswerTimerState(null);
-  };
+  }, []);
 
-  const handleClickAnswerTimer = (
-    owner: AnswerTimerOwner,
-    isMainTimerRunning: boolean,
-  ) => {
-    if (answerTimerState?.owner !== owner) {
-      if (!isMainTimerRunning) return;
+  const handleClickAnswerTimer = useCallback(
+    (owner: AnswerTimerOwner, isMainTimerRunning: boolean) => {
+      if (answerTimerState?.owner !== owner) {
+        if (!isMainTimerRunning) return;
 
-      startAnswerTimer(owner);
-      return;
-    }
+        startAnswerTimer(owner);
+        return;
+      }
 
-    if (answerTimerState.status === 'running') {
-      stopAnswerTimer();
-      return;
-    }
+      if (answerTimerState.status === 'running') {
+        stopAnswerTimer();
+        return;
+      }
 
-    resetAnswerTimer();
-  };
+      resetAnswerTimer();
+    },
+    [answerTimerState, resetAnswerTimer, startAnswerTimer, stopAnswerTimer],
+  );
 
   useEffect(() => {
     if (answerTimerState?.status !== 'running') return;
@@ -123,7 +123,7 @@ export default function TimerView({
     if (!answerTimerOwner || isAnswerTimerMainTimerRunning) return;
 
     resetAnswerTimer();
-  }, [answerTimerOwner, isAnswerTimerMainTimerRunning]);
+  }, [answerTimerOwner, isAnswerTimerMainTimerRunning, resetAnswerTimer]);
 
   useEffect(() => {
     setAnswerTimerState((currentState) => {
@@ -134,6 +134,47 @@ export default function TimerView({
       return null;
     });
   }, [prosConsSelected]);
+
+  useEffect(() => {
+    if (!data) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== 'ShiftLeft' && event.code !== 'ShiftRight') return;
+      if (event.repeat) return;
+
+      event.preventDefault();
+
+      if (event.target instanceof HTMLElement) {
+        event.target.blur();
+      }
+
+      const boxType = data.table[index].boxType;
+
+      if (boxType === 'NORMAL') {
+        handleClickAnswerTimer('NORMAL', normalTimer.isRunning);
+        return;
+      }
+
+      if (prosConsSelected === 'PROS') {
+        handleClickAnswerTimer('PROS', timer1.isRunning);
+        return;
+      }
+
+      handleClickAnswerTimer('CONS', timer2.isRunning);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    data,
+    handleClickAnswerTimer,
+    index,
+    normalTimer.isRunning,
+    prosConsSelected,
+    timer1.isRunning,
+    timer2.isRunning,
+  ]);
 
   const getAnswerTimer = (
     owner: AnswerTimerOwner,
