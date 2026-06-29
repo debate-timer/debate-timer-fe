@@ -1,9 +1,14 @@
 // components/TimerView.tsx
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
 import { TimerPageLogics } from '../hooks/useTimerPageState';
+import AnswerTimeProgress from './AnswerTimeProgress';
 import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
+
+type AnswerTimerOwner = 'NORMAL' | 'PROS' | 'CONS';
 
 interface TimerViewProps {
   state: TimerPageLogics;
@@ -16,6 +21,7 @@ export default function TimerView({
   onEvent,
   answerTime,
 }: TimerViewProps) {
+  const { t } = useTranslation();
   // 상태 풀기
   const {
     data,
@@ -28,6 +34,32 @@ export default function TimerView({
     handleActivateTeam,
     switchCamp,
   } = state;
+  const [answerTimerOwner, setAnswerTimerOwner] =
+    useState<AnswerTimerOwner | null>(null);
+
+  const getAnswerTimer = (owner: AnswerTimerOwner) => {
+    if (answerTimerOwner === owner) {
+      return (
+        <AnswerTimeProgress
+          answerTime={answerTime}
+          elapsedTime={answerTime}
+          onClick={() => setAnswerTimerOwner(null)}
+        />
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        className={
+          'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
+        }
+        onClick={() => setAnswerTimerOwner(owner)}
+      >
+        {t('답변시간 타이머 시작')}
+      </button>
+    );
+  };
 
   // 일반 타이머
   if (data && data.table[index].boxType === 'NORMAL') {
@@ -46,7 +78,7 @@ export default function TimerView({
         }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
-        answerTime={answerTime}
+        answerTimer={getAnswerTimer('NORMAL')}
         teamName={
           data.table[index].stance === 'NEUTRAL'
             ? null
@@ -82,7 +114,7 @@ export default function TimerView({
           }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
-          answerTime={answerTime}
+          answerTimer={getAnswerTimer('PROS')}
         />
 
         {/* ENTER 버튼 */}
@@ -114,7 +146,7 @@ export default function TimerView({
           }
           prosCons="CONS"
           teamName={data.info.consTeamName}
-          answerTime={answerTime}
+          answerTimer={getAnswerTimer('CONS')}
         />
       </div>
     );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -9,7 +9,6 @@ import CircularTimer from './CircularTimer';
 import clsx from 'clsx';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';
 import useBreakpoint from '../../../hooks/useBreakpoint';
-import AnswerTimeProgress from './AnswerTimeProgress';
 
 type TimeBasedTimerInstance = {
   totalTimer: number | null;
@@ -27,7 +26,7 @@ interface TimeBasedTimerProps {
   prosCons: TimeBasedStance;
   teamName: string;
   item: TimeBoxInfo;
-  answerTime?: number;
+  answerTimer?: ReactNode;
 }
 
 export default function TimeBasedTimer({
@@ -36,11 +35,9 @@ export default function TimeBasedTimer({
   prosCons,
   teamName,
   item,
-  answerTime = 30,
+  answerTimer = null,
 }: TimeBasedTimerProps) {
   const { t } = useTranslation();
-  const [isAnswerTimeProgressVisible, setIsAnswerTimeProgressVisible] =
-    useState(false);
   const {
     totalTimer,
     speakingTimer,
@@ -187,21 +184,7 @@ export default function TimeBasedTimer({
         )}
       </CircularTimer>
 
-      {isAnswerTimeProgressVisible ? (
-        <AnswerTimeProgress
-          answerTime={answerTime}
-          elapsedTime={answerTime}
-          onClick={() => setIsAnswerTimeProgressVisible(false)}
-        />
-      ) : (
-        <button
-          type="button"
-          className="flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]"
-          onClick={() => setIsAnswerTimeProgressVisible(true)}
-        >
-          {t('답변시간 타이머 시작')}
-        </button>
-      )}
+      {answerTimer}
 
       {/* 조작부 */}
       <TimerController
