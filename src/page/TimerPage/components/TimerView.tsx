@@ -1,5 +1,5 @@
 // components/TimerView.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
@@ -9,6 +9,13 @@ import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
 
 type AnswerTimerOwner = 'NORMAL' | 'PROS' | 'CONS';
+type AnswerTimerStatus = 'running' | 'stopped';
+
+interface AnswerTimerState {
+  owner: AnswerTimerOwner;
+  status: AnswerTimerStatus;
+  elapsedTime: number;
+}
 
 interface TimerViewProps {
   state: TimerPageLogics;
@@ -34,16 +41,61 @@ export default function TimerView({
     handleActivateTeam,
     switchCamp,
   } = state;
-  const [answerTimerOwner, setAnswerTimerOwner] =
-    useState<AnswerTimerOwner | null>(null);
+  const [answerTimerState, setAnswerTimerState] =
+    useState<AnswerTimerState | null>(null);
+
+  const handleClickAnswerTimer = (owner: AnswerTimerOwner) => {
+    setAnswerTimerState((currentState) => {
+      if (currentState?.owner !== owner) {
+        return { owner, status: 'running', elapsedTime: 0 };
+      }
+
+      if (currentState.status === 'running') {
+        return { ...currentState, status: 'stopped' };
+      }
+
+      return null;
+    });
+  };
+
+  useEffect(() => {
+    if (answerTimerState?.status !== 'running') return;
+
+    const intervalId = window.setInterval(() => {
+      setAnswerTimerState((currentState) => {
+        if (currentState?.status !== 'running') {
+          return currentState;
+        }
+
+        const nextElapsedTime = Number(
+          (currentState.elapsedTime + 0.1).toFixed(1),
+        );
+
+        if (nextElapsedTime >= answerTime) {
+          return {
+            ...currentState,
+            status: 'stopped',
+            elapsedTime: answerTime,
+          };
+        }
+
+        return {
+          ...currentState,
+          elapsedTime: nextElapsedTime,
+        };
+      });
+    }, 100);
+
+    return () => window.clearInterval(intervalId);
+  }, [answerTime, answerTimerState?.status]);
 
   const getAnswerTimer = (owner: AnswerTimerOwner) => {
-    if (answerTimerOwner === owner) {
+    if (answerTimerState?.owner === owner) {
       return (
         <AnswerTimeProgress
           answerTime={answerTime}
-          elapsedTime={answerTime}
-          onClick={() => setAnswerTimerOwner(null)}
+          elapsedTime={answerTimerState.elapsedTime}
+          onClick={() => handleClickAnswerTimer(owner)}
         />
       );
     }
@@ -54,7 +106,7 @@ export default function TimerView({
         className={
           'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
         }
-        onClick={() => setAnswerTimerOwner(owner)}
+        onClick={() => handleClickAnswerTimer(owner)}
       >
         {t('답변시간 타이머 시작')}
       </button>

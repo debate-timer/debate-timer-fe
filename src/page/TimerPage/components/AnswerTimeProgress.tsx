@@ -32,12 +32,10 @@ export default function AnswerTimeProgress({
         {t('답변')}
       </span>
 
-      <div
-        className="h-[12px] min-w-0 flex-1 overflow-hidden rounded-full border bg-default-white xl:h-[18px]"
-        style={{ borderColor: statusColor }}
-      >
+      <div className="relative h-[12px] min-w-0 flex-1 overflow-hidden rounded-full bg-default-disabled/hover xl:h-[18px]">
+        <div className="absolute inset-[1px] rounded-full bg-default-white" />
         <div
-          className="h-full"
+          className="absolute inset-y-0 left-0 rounded-full"
           style={{
             width: `${progress}%`,
             backgroundColor: statusColor,
