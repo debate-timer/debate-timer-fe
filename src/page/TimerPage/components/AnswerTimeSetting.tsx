@@ -111,8 +111,10 @@ export default function AnswerTimeSetting({
 
         <div className="mt-[14px] flex items-center gap-[8px] text-[11px] font-semibold text-default-black">
           <StatusLegend colorClassName="bg-[#4CAF51]" label={t('보장 중')} />
-          <StatusLegend colorClassName="bg-[#FECD4C]" label={t('임박')} />
-          <StatusLegend colorClassName="bg-[#FF8B87]" label={t('초과')} />
+          <StatusLegend
+            colorClassName="bg-default-black2"
+            label={t('보장됨')}
+          />
         </div>
       </div>
     </div>

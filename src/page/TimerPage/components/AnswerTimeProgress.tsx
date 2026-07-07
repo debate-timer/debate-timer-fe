@@ -2,12 +2,6 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
-const ANSWER_TIME_STATUS_COLOR = {
-  covered: '#4CAF51',
-  warning: '#FECD4C',
-  over: '#FF8B87',
-} as const;
-
 interface AnswerTimeProgressProps {
   answerTime: number;
   elapsedTime: number;
@@ -25,7 +19,7 @@ export default function AnswerTimeProgress({
   const [isOpened, setIsOpened] = useState(false);
   const ratio = answerTime > 0 ? elapsedTime / answerTime : 0;
   const progress = Math.min(ratio * 100, 100);
-  const statusColor = getAnswerTimeStatusColor(ratio);
+  const statusColorClassName = ratio < 1 ? 'bg-[#4CAF51]' : 'bg-default-black2';
 
   useEffect(() => {
     const animationFrameId = requestAnimationFrame(() => {
@@ -53,10 +47,12 @@ export default function AnswerTimeProgress({
       <div className="relative h-[12px] min-w-0 flex-1 overflow-hidden rounded-full bg-default-disabled/hover xl:h-[18px]">
         <div className="absolute inset-[1px] rounded-full bg-default-white" />
         <div
-          className="absolute inset-y-0 left-0 rounded-full"
+          className={clsx(
+            'absolute inset-y-0 left-0 rounded-full',
+            statusColorClassName,
+          )}
           style={{
             width: `${progress}%`,
-            backgroundColor: statusColor,
           }}
         />
       </div>
@@ -66,10 +62,4 @@ export default function AnswerTimeProgress({
       </span>
     </button>
   );
-}
-
-function getAnswerTimeStatusColor(ratio: number) {
-  if (ratio < 0.8) return ANSWER_TIME_STATUS_COLOR.covered;
-  if (ratio < 1) return ANSWER_TIME_STATUS_COLOR.warning;
-  return ANSWER_TIME_STATUS_COLOR.over;
 }
