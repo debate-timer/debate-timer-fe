@@ -201,26 +201,30 @@ export default function TimerView({
   ) => {
     if (answerTimerState?.owner === owner) {
       return (
-        <AnswerTimeProgress
-          answerTime={answerTime}
-          elapsedTime={answerTimerState.elapsedTime}
-          isResetting={answerTimerState.status === 'resetting'}
-          onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
-        />
+        <div className="flex h-[40px] w-full items-center justify-center">
+          <AnswerTimeProgress
+            answerTime={answerTime}
+            elapsedTime={answerTimerState.elapsedTime}
+            isResetting={answerTimerState.status === 'resetting'}
+            onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
+          />
+        </div>
       );
     }
 
     return (
-      <button
-        type="button"
-        className={
-          'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center self-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
-        }
-        aria-disabled={!isMainTimerRunning}
-        onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
-      >
-        {t('답변시간 타이머 시작')}
-      </button>
+      <div className="flex h-[40px] w-full items-center justify-center">
+        <button
+          type="button"
+          className={
+            'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
+          }
+          aria-disabled={!isMainTimerRunning}
+          onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
+        >
+          {t('답변시간 타이머 시작')}
+        </button>
+      </div>
     );
   };
 
