@@ -54,18 +54,6 @@ export default function TimerView({
           ? timer2.isRunning
           : true;
 
-  const startAnswerTimer = useCallback((owner: AnswerTimerOwner) => {
-    setAnswerTimerState({ owner, status: 'running', elapsedTime: 0 });
-  }, []);
-
-  const stopAnswerTimer = useCallback(() => {
-    setAnswerTimerState((currentState) => {
-      if (!currentState) return currentState;
-
-      return { ...currentState, status: 'stopped' };
-    });
-  }, []);
-
   const resetAnswerTimer = useCallback(() => {
     setAnswerTimerState((currentState) => {
       if (!currentState) return currentState;
@@ -76,21 +64,21 @@ export default function TimerView({
 
   const handleClickAnswerTimer = useCallback(
     (owner: AnswerTimerOwner, isMainTimerRunning: boolean) => {
-      if (answerTimerState?.owner !== owner) {
-        if (!isMainTimerRunning) return;
+      setAnswerTimerState((currentState) => {
+        if (currentState?.owner !== owner) {
+          if (!isMainTimerRunning) return currentState;
 
-        startAnswerTimer(owner);
-        return;
-      }
+          return { owner, status: 'running', elapsedTime: 0 };
+        }
 
-      if (answerTimerState.status === 'running') {
-        stopAnswerTimer();
-        return;
-      }
+        if (currentState.status === 'running') {
+          return { ...currentState, status: 'stopped' };
+        }
 
-      resetAnswerTimer();
+        return { ...currentState, status: 'resetting', elapsedTime: 0 };
+      });
     },
-    [answerTimerState, resetAnswerTimer, startAnswerTimer, stopAnswerTimer],
+    [],
   );
 
   useEffect(() => {
