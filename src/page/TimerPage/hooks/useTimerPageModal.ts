@@ -1,5 +1,5 @@
 // hooks/useTimerPageModal.ts
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from '../../../hooks/useModal';
 import { useNavigate } from 'react-router-dom';
 import { isGuestFlow } from '../../../util/sessionStorage';
@@ -33,12 +33,12 @@ export function useTimerPageModal(tableId: number) {
     isCloseButtonExist: false,
   });
 
-  const openAnswerTimeGuide = () => {
+  const openAnswerTimeGuide = useCallback(() => {
     if (hasOpenedAnswerTimeGuideRef.current) return;
 
     hasOpenedAnswerTimeGuideRef.current = true;
     setIsAnswerTimeGuideOpen(true);
-  };
+  }, []);
 
   // 로그인/저장 유도 모달
   const {
@@ -58,14 +58,14 @@ export function useTimerPageModal(tableId: number) {
     // eslint-disable-next-line
   }, []);
 
-  const closeUseTooltipModalAndOpenAnswerTimeGuide = () => {
+  const closeUseTooltipModalAndOpenAnswerTimeGuide = useCallback(() => {
     closeUseTooltipModal();
     openAnswerTimeGuide();
-  };
+  }, [closeUseTooltipModal, openAnswerTimeGuide]);
 
-  const closeAnswerTimeGuide = () => {
+  const closeAnswerTimeGuide = useCallback(() => {
     setIsAnswerTimeGuideOpen(false);
-  };
+  }, []);
 
   const openLoginAndStoreModalOrGoToDebateEndPage = () => {
     if (isGuestFlow()) {
