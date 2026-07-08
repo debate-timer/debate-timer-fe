@@ -207,7 +207,7 @@ export default function TimerView({
           className={
             'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
           }
-          aria-disabled={!isMainTimerRunning}
+          disabled={!isMainTimerRunning}
           onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
         >
           {t('답변시간 타이머 시작')}
