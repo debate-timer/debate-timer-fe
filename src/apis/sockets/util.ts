@@ -59,10 +59,17 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
 
     if (
       data.currentTeam !== undefined &&
+      data.currentTeam !== null &&
       data.currentTeam !== 'PROS' &&
       data.currentTeam !== 'CONS'
     ) {
       return false;
+    }
+
+    if (data.timerType === 'TIME_BASED') {
+      if (data.currentTeam !== 'PROS' && data.currentTeam !== 'CONS') {
+        return false;
+      }
     }
 
     return true;

@@ -35,6 +35,10 @@ export type AudienceShareState =
 
 const EVENT_TIMEOUT_MS = 600 * 1000;
 
+function getNextTeam(team: TimeBasedStance): TimeBasedStance {
+  return team === 'PROS' ? 'CONS' : 'PROS';
+}
+
 export function useAudienceShareState(roomId: number): AudienceShareState {
   const {
     connect,
@@ -146,30 +150,31 @@ export function useAudienceShareState(roomId: number): AudienceShareState {
         };
       }
 
-      if (data.timerType === 'TIME_BASED') {
-        if (data.currentTeam !== 'PROS' && data.currentTeam !== 'CONS') {
-          return prev;
-        }
-
-        const previousTimeBasedData =
-          prev?.timerType === 'TIME_BASED' ? prev : null;
-
-        return {
-          timerType: 'TIME_BASED',
-          currentTeam: data.currentTeam,
-          isRunning,
-          prosTime:
-            data.currentTeam === 'PROS'
-              ? data.remainingTime
-              : (previousTimeBasedData?.prosTime ?? null),
-          consTime:
-            data.currentTeam === 'CONS'
-              ? data.remainingTime
-              : (previousTimeBasedData?.consTime ?? null),
-        };
+      if (data.currentTeam !== 'PROS' && data.currentTeam !== 'CONS') {
+        return prev;
       }
 
-      return prev;
+      const previousTimeBasedData =
+        prev?.timerType === 'TIME_BASED' ? prev : null;
+      const receivedCurrentTeam = data.currentTeam;
+      const displayCurrentTeam =
+        eventType === 'TEAM_SWITCH'
+          ? getNextTeam(receivedCurrentTeam)
+          : receivedCurrentTeam;
+
+      return {
+        timerType: 'TIME_BASED',
+        currentTeam: displayCurrentTeam,
+        isRunning,
+        prosTime:
+          receivedCurrentTeam === 'PROS'
+            ? data.remainingTime
+            : (previousTimeBasedData?.prosTime ?? null),
+        consTime:
+          receivedCurrentTeam === 'CONS'
+            ? data.remainingTime
+            : (previousTimeBasedData?.consTime ?? null),
+      };
     });
   }, [isConnected, latestMessage, error, isFinished, cleanup]);
 

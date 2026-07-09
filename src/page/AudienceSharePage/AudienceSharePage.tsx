@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
+import { useAudienceCountdown } from './hooks/useAudienceCountdown';
 import { AudienceShareError, AudienceShareErrorCode } from './error';
 import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
@@ -28,6 +29,39 @@ export default function AudienceSharePage() {
   }
 
   const state = useAudienceShareState(tableId);
+  const audienceDisplayData =
+    state.status === 'displaying' ? state.displayData : null;
+
+  const normalCountdown = useAudienceCountdown({
+    receivedTime:
+      audienceDisplayData?.timerType === 'NORMAL'
+        ? audienceDisplayData.singleTime
+        : null,
+    isRunning:
+      audienceDisplayData?.timerType === 'NORMAL'
+        ? audienceDisplayData.isRunning
+        : false,
+  });
+  const prosCountdown = useAudienceCountdown({
+    receivedTime:
+      audienceDisplayData?.timerType === 'TIME_BASED'
+        ? audienceDisplayData.prosTime
+        : null,
+    isRunning:
+      audienceDisplayData?.timerType === 'TIME_BASED' &&
+      audienceDisplayData.isRunning &&
+      audienceDisplayData.currentTeam === 'PROS',
+  });
+  const consCountdown = useAudienceCountdown({
+    receivedTime:
+      audienceDisplayData?.timerType === 'TIME_BASED'
+        ? audienceDisplayData.consTime
+        : null,
+    isRunning:
+      audienceDisplayData?.timerType === 'TIME_BASED' &&
+      audienceDisplayData.isRunning &&
+      audienceDisplayData.currentTeam === 'CONS',
+  });
 
   const handleClosePage = () => {
     // 일단 페이지 닫기
@@ -57,6 +91,8 @@ export default function AudienceSharePage() {
   }
 
   const renderContent = () => {
+    console.log(`# Status = ${state.status}`);
+
     if (state.status === 'connecting') {
       return (
         <div className="flex h-full w-full items-center justify-center">
@@ -80,7 +116,11 @@ export default function AudienceSharePage() {
       if (displayData.timerType === 'NORMAL') {
         return (
           <div className="flex h-full w-full items-center justify-center">
-            <AudienceNormalTimer remainingTime={displayData.singleTime} />
+            <AudienceNormalTimer
+              remainingTime={
+                normalCountdown.currentSeconds ?? displayData.singleTime
+              }
+            />
           </div>
         );
       }
@@ -89,9 +129,9 @@ export default function AudienceSharePage() {
         return (
           <div className="flex h-full w-full items-center justify-center px-4 xl:px-12">
             <AudienceTimeBasedTimer
-              prosRemainingTime={displayData.prosTime}
-              consRemainingTime={displayData.consTime}
-              currentTeam={displayData.currentTeam}
+              prosRemainingTime={prosCountdown.currentSeconds}
+              consRemainingTime={consCountdown.currentSeconds}
+              currentTeam={displayData.currentTeam!}
             />
           </div>
         );

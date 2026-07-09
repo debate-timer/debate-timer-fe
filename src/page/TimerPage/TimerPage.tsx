@@ -110,13 +110,13 @@ export default function TimerPage() {
 
       if (timerType === 'NORMAL') {
         innerPayload = {
-          currentTeam: prosConsSelected,
           timerType: timerType,
           remainingTime: remainingTime,
           sequence: index,
         } as TimerDataPayload;
       } else if (timerType === 'TIME_BASED') {
         innerPayload = {
+          currentTeam: prosConsSelected,
           timerType: timerType,
           remainingTime: remainingTime,
           sequence: index,

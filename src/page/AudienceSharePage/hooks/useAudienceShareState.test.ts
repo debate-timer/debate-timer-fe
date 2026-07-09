@@ -153,6 +153,57 @@ describe('useAudienceShareState', () => {
     }
   });
 
+  it('TEAM_SWITCH는 수신 팀의 시간을 갱신하고 표시 팀은 반대 진영으로 전환한다.', () => {
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'TEAM_SWITCH',
+        data: {
+          timerType: 'TIME_BASED',
+          currentTeam: 'PROS',
+          sequence: 1,
+          remainingTime: 77,
+        },
+      },
+    });
+    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.currentTeam).toBe('CONS');
+      expect(result.current.displayData.prosTime).toBe(77);
+      expect(result.current.displayData.consTime).toBeNull();
+      expect(result.current.displayData.isRunning).toBe(false);
+    }
+
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'TEAM_SWITCH',
+        data: {
+          timerType: 'TIME_BASED',
+          currentTeam: 'CONS',
+          sequence: 2,
+          remainingTime: 55,
+        },
+      },
+    });
+    rerender();
+
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.currentTeam).toBe('PROS');
+      expect(result.current.displayData.prosTime).toBe(77);
+      expect(result.current.displayData.consTime).toBe(55);
+      expect(result.current.displayData.isRunning).toBe(false);
+    }
+  });
+
   it('시간 기반 이벤트에 현재 팀이 없으면 표시 상태를 만들지 않는다.', () => {
     setSocketState({
       isConnected: true,

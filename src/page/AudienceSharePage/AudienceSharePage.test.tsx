@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { act, render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { Component, ReactNode } from 'react';
@@ -66,6 +66,10 @@ describe('AudienceSharePage', () => {
       status: 'connecting',
       error: null,
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('ID Validation', () => {
@@ -137,6 +141,50 @@ describe('AudienceSharePage', () => {
       expect(screen.getByText('02:00')).toBeInTheDocument();
     });
 
+    it('PLAY 상태의 NORMAL 타이머는 화면에서 로컬 카운트다운을 진행한다', () => {
+      vi.useFakeTimers();
+      mockUseAudienceShareState.mockReturnValue({
+        status: 'displaying',
+        error: null,
+        displayData: {
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: true,
+          singleTime: 10,
+        },
+      });
+      renderPage('/live/123');
+
+      expect(screen.getByText('00:10')).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      expect(screen.getByText('00:08')).toBeInTheDocument();
+    });
+
+    it('정지 상태의 NORMAL 타이머는 수신된 시간을 유지한다', () => {
+      vi.useFakeTimers();
+      mockUseAudienceShareState.mockReturnValue({
+        status: 'displaying',
+        error: null,
+        displayData: {
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 10,
+        },
+      });
+      renderPage('/live/123');
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      expect(screen.getByText('00:10')).toBeInTheDocument();
+    });
+
     it('displaying 상태 (TIME_BASED)에서는 AudienceTimeBasedTimer에 올바른 props가 전달된다', () => {
       mockUseAudienceShareState.mockReturnValue({
         status: 'displaying',
@@ -155,6 +203,32 @@ describe('AudienceSharePage', () => {
       expect(screen.getByText('03:00')).toBeInTheDocument();
       expect(screen.getByText('반대')).toBeInTheDocument();
       expect(screen.getByText('02:30')).toBeInTheDocument();
+    });
+
+    it('PLAY 상태의 TIME_BASED 타이머는 현재 발언 팀만 로컬 카운트다운을 진행한다', () => {
+      vi.useFakeTimers();
+      mockUseAudienceShareState.mockReturnValue({
+        status: 'displaying',
+        error: null,
+        displayData: {
+          timerType: 'TIME_BASED',
+          currentTeam: 'PROS',
+          isRunning: true,
+          prosTime: 10,
+          consTime: 20,
+        },
+      });
+      renderPage('/live/123');
+
+      expect(screen.getByText('00:10')).toBeInTheDocument();
+      expect(screen.getByText('00:20')).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      expect(screen.getByText('00:08')).toBeInTheDocument();
+      expect(screen.getByText('00:20')).toBeInTheDocument();
     });
 
     it('finished 상태에서는 종료 문구와 페이지 닫기 버튼이 표시되며 클릭 시 window.close를 호출한다', async () => {
