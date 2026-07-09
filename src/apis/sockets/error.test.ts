@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { SocketError, isSocketError } from './error';
 
-describe('SocketError', () => {
+describe('SocketError 테스트', () => {
   it('SocketError 인스턴스는 지정된 코드와 상세 내용을 가져야 한다', () => {
     const error = new SocketError('SOCKET_URL_UNAVAILABLE', 'Message', {
       foo: 'bar',

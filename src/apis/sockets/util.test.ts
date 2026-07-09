@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { isSocketMessage } from './util';
 
-describe('isSocketMessage', () => {
+describe('소켓 메시지 여부 검증', () => {
   it('유효한 모든 타이머 이벤트 메시지는 런타임 검증을 통과한다', () => {
     expect(
       isSocketMessage({
