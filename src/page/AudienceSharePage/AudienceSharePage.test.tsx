@@ -77,8 +77,9 @@ describe('AudienceSharePage', () => {
     ])('유효하지 않은 ID(%s)는 번역된 Error를 throw한다', (route) => {
       let caughtError: Error | null = null;
 
-      const oldConsoleError = console.error;
-      console.error = vi.fn(); // Error boundary logging 숨김
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {}); // Error boundary logging 숨김
 
       renderPage(route, (err) => {
         caughtError = err;
@@ -87,7 +88,7 @@ describe('AudienceSharePage', () => {
       expect(caughtError).toBeInstanceOf(Error);
       expect(caughtError!.message).toBe('유효하지 않은 토론방 ID입니다.');
 
-      console.error = oldConsoleError;
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -128,8 +129,6 @@ describe('AudienceSharePage', () => {
           currentTeam: null,
           isRunning: true,
           singleTime: 120,
-          prosTime: null,
-          consTime: null,
         },
       });
       renderPage('/live/123');
@@ -146,7 +145,6 @@ describe('AudienceSharePage', () => {
           timerType: 'TIME_BASED',
           currentTeam: 'PROS',
           isRunning: true,
-          singleTime: null,
           prosTime: 180,
           consTime: 150,
         },
@@ -210,8 +208,9 @@ describe('AudienceSharePage', () => {
 
         let caughtError: AudienceShareDisplayError | null = null;
 
-        const oldConsoleError = console.error;
-        console.error = vi.fn(); // Error boundary logging 숨김
+        const consoleErrorSpy = vi
+          .spyOn(console, 'error')
+          .mockImplementation(() => {}); // Error boundary logging 숨김
 
         renderPage('/live/123', (err) => {
           caughtError = err as AudienceShareDisplayError;
@@ -222,7 +221,7 @@ describe('AudienceSharePage', () => {
         expect(caughtError!.message).toBe(expectedMessage);
         expect(caughtError!.sourceError).toBe(sourceError);
 
-        console.error = oldConsoleError;
+        consoleErrorSpy.mockRestore();
       },
     );
   });

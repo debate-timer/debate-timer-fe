@@ -312,6 +312,18 @@ describe('소켓 관리자 테스트', () => {
   });
 
   describe('오류 발생 및 이벤트 발행', () => {
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      consoleErrorSpy.mockRestore();
+    });
+
     it('오류 리스너를 등록하면 소켓 오류를 받고 해제 후에는 호출되지 않아야 한다', () => {
       const listener = vi.fn();
       socketManager.onErrorEvent(listener);
@@ -321,11 +333,26 @@ describe('소켓 관리자 테스트', () => {
       expect(listener).toHaveBeenCalledOnce();
       const error = listener.mock.calls[0][0];
       expect(error.code).toBe('SOCKET_URL_UNAVAILABLE');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[SocketManager] 소켓 오류 발생',
+        expect.objectContaining({
+          code: 'SOCKET_URL_UNAVAILABLE',
+          message: '웹소켓 연결 주소를 결정할 수 없습니다.',
+          detail: undefined,
+        }),
+      );
 
       listener.mockClear();
+      consoleErrorSpy.mockClear();
       socketManager.offErrorEvent(listener);
       socketManager.connect({ url: '', baseUrl: '' });
       expect(listener).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[SocketManager] 소켓 오류 발생',
+        expect.objectContaining({
+          code: 'SOCKET_URL_UNAVAILABLE',
+        }),
+      );
     });
 
     it('연결 주소를 결정할 수 없으면 주소 없음 오류를 한 번 발행해야 한다', () => {
@@ -337,6 +364,14 @@ describe('소켓 관리자 테스트', () => {
       expect(listener).toHaveBeenCalledOnce();
       const error = listener.mock.calls[0][0];
       expect(error.code).toBe('SOCKET_URL_UNAVAILABLE');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[SocketManager] 소켓 오류 발생',
+        expect.objectContaining({
+          code: 'SOCKET_URL_UNAVAILABLE',
+          message: '웹소켓 연결 주소를 결정할 수 없습니다.',
+          detail: undefined,
+        }),
+      );
     });
 
     it('실시간 통신 오류가 발생하면 오류 메시지와 본문 상세를 함께 발행해야 한다', () => {
@@ -358,6 +393,17 @@ describe('소켓 관리자 테스트', () => {
         headers: { message: 'stomp msg' },
         body: 'body content',
       });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[SocketManager] 소켓 오류 발생',
+        expect.objectContaining({
+          code: 'SOCKET_STOMP_ERROR',
+          message: 'stomp msg',
+          detail: {
+            headers: { message: 'stomp msg' },
+            body: 'body content',
+          },
+        }),
+      );
     });
 
     it('한 번도 연결에 성공하지 못한 채 종료되면 서버 거부 오류를 발행해야 한다', () => {
@@ -371,6 +417,15 @@ describe('소켓 관리자 테스트', () => {
       expect(listener).toHaveBeenCalledOnce();
       const error = listener.mock.calls[0][0];
       expect(error.code).toBe('SOCKET_SERVER_REJECTED');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[SocketManager] 소켓 오류 발생',
+        expect.objectContaining({
+          code: 'SOCKET_SERVER_REJECTED',
+          message:
+            '서버에 의해 웹소켓 연결이 거부되었거나 즉시 종료되었습니다.',
+          detail: undefined,
+        }),
+      );
     });
 
     it('연결 성공 후 종료되면 재시도 횟수가 남은 동안 오류 없이 재시도해야 한다', () => {
@@ -394,6 +449,14 @@ describe('소켓 관리자 테스트', () => {
       expect(listener).toHaveBeenCalledOnce();
       const error = listener.mock.calls[0][0];
       expect(error.code).toBe('SOCKET_RETRY_EXHAUSTED');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[SocketManager] 소켓 오류 발생',
+        expect.objectContaining({
+          code: 'SOCKET_RETRY_EXHAUSTED',
+          message: '최대 재연결 시도 횟수를 초과했습니다.',
+          detail: undefined,
+        }),
+      );
     });
 
     it('상태 확인 신호 누락으로 종료되어도 같은 재시도 정책을 따라야 한다', () => {

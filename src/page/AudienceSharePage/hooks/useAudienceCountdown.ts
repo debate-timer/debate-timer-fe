@@ -18,7 +18,7 @@ export function useAudienceCountdown({
   const [currentSeconds, setCurrentSeconds] = useState<number | null>(
     receivedTime,
   );
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const targetTimeRef = useRef<number | null>(null);
 
   useEffect(() => {

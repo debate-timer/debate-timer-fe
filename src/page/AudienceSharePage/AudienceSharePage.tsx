@@ -29,6 +29,16 @@ export default function AudienceSharePage() {
 
   const state = useAudienceShareState(tableId);
 
+  const handleClosePage = () => {
+    // 일단 페이지 닫기
+    window.close();
+
+    // 페이지를 못 닫을 경우 홈으로
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 100);
+  };
+
   if (state.error) {
     const errorMessages: Record<AudienceShareErrorCode, string> = {
       SOCKET_URL_UNAVAILABLE: '실시간 연결 주소를 확인할 수 없어요.',
@@ -70,7 +80,7 @@ export default function AudienceSharePage() {
       if (displayData.timerType === 'NORMAL') {
         return (
           <div className="flex h-full w-full items-center justify-center">
-            <AudienceNormalTimer remainingTime={displayData.singleTime!} />
+            <AudienceNormalTimer remainingTime={displayData.singleTime} />
           </div>
         );
       }
@@ -81,7 +91,7 @@ export default function AudienceSharePage() {
             <AudienceTimeBasedTimer
               prosRemainingTime={displayData.prosTime}
               consRemainingTime={displayData.consTime}
-              currentTeam={displayData.currentTeam!}
+              currentTeam={displayData.currentTeam}
             />
           </div>
         );
@@ -97,7 +107,7 @@ export default function AudienceSharePage() {
           <button
             type="button"
             className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            onClick={() => window.close()}
+            onClick={() => handleClosePage()}
           >
             {t('페이지 닫기')}
           </button>

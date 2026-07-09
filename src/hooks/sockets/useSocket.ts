@@ -146,19 +146,12 @@ export default function useSocket() {
       // 재시도 및 오류 복구 최초 1회
       try {
         recover();
-      } catch (error) {
-        console.warn('🚨 리스너 복구 1차 실패, 1초 후 재시도합니다.', error);
-
+      } catch {
         // 1초 후 2차 복구 시도
         setTimeout(() => {
           try {
             recover();
           } catch (retryError) {
-            console.error(
-              '🚨 재시도 실패! 복구 불가능한 상태입니다.',
-              retryError,
-            );
-            // 💡 훅이 자체적으로 에러 상태를 업데이트
             setError(
               retryError instanceof Error
                 ? retryError

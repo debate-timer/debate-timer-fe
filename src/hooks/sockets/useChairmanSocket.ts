@@ -108,9 +108,7 @@ export default function useChairmanSocket(roomId: number) {
       return;
     }
 
-    // TODO: Replace with Toast when a global Toast API is available.
     resetSignalState();
-    console.error('Chairman socket connection failed.', error);
   }, [error, resetSignalState]);
 
   // 사회자 권한으로 특정 제어 메시지를 발행하는 함수

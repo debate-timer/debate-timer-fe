@@ -43,14 +43,14 @@ describe('useAudienceShareState', () => {
     });
   };
 
-  it('@AC-027: 훅 마운트와 언마운트가 소켓 connect/disconnect 수명 주기를 각각 한 번 수행한다.', () => {
+  it('훅 마운트와 언마운트가 소켓 connect/disconnect 수명 주기를 각각 한 번 수행한다.', () => {
     const { unmount } = renderHook(() => useAudienceShareState(1));
     expect(mockConnect).toHaveBeenCalledTimes(1);
     unmount();
     expect(mockDisconnect).toHaveBeenCalledTimes(1);
   });
 
-  it('@AC-028: 연결 전에는 connecting, 연결 후 데이터 대기, 데이터 표시, 종료 상태가 입력에 따라 명확히 구분된다.', () => {
+  it('연결 전에는 connecting, 연결 후 데이터 대기, 데이터 표시, 종료 상태가 입력에 따라 명확히 구분된다.', () => {
     // 연결 전 connecting
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
     expect(result.current.status).toBe('connecting');
@@ -83,7 +83,7 @@ describe('useAudienceShareState', () => {
     expect(result.current.status).toBe('finished');
   });
 
-  it('@AC-029: 일반 타이머 이벤트는 단일 표시 시간을 서버 수신값으로 동기화한다.', () => {
+  it('일반 타이머 이벤트는 단일 표시 시간을 서버 수신값으로 동기화한다.', () => {
     setSocketState({
       isConnected: true,
       latestMessage: {
@@ -94,12 +94,15 @@ describe('useAudienceShareState', () => {
     const { result } = renderHook(() => useAudienceShareState(1));
 
     expect(result.current.status).toBe('displaying');
-    if (result.current.status === 'displaying') {
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
       expect(result.current.displayData.singleTime).toBe(60);
     }
   });
 
-  it('@AC-030: 시간 기반 이벤트는 현재 팀 시간만 갱신하고 상대 팀의 마지막 수신 시간 또는 null을 유지한다.', () => {
+  it('시간 기반 이벤트는 현재 팀 시간만 갱신하고 상대 팀의 마지막 수신 시간 또는 null을 유지한다.', () => {
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
 
     // 최초 메시지: 찬성 팀
@@ -117,7 +120,11 @@ describe('useAudienceShareState', () => {
     });
     rerender();
     expect(result.current.status).toBe('displaying');
-    if (result.current.status === 'displaying') {
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.currentTeam).toBe('PROS');
       expect(result.current.displayData.prosTime).toBe(120);
       expect(result.current.displayData.consTime).toBeNull(); // 최초 TIME_BASED에서 비활성 팀 null 유지
     }
@@ -136,13 +143,35 @@ describe('useAudienceShareState', () => {
       },
     });
     rerender();
-    if (result.current.status === 'displaying') {
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.currentTeam).toBe('CONS');
       expect(result.current.displayData.prosTime).toBe(120); // 찬성 시간 유지
       expect(result.current.displayData.consTime).toBe(90);
     }
   });
 
-  it('@AC-058: sequence는 내부 최신 payload에는 유지되지만 반환 UI 상태와 렌더링 props에는 노출되지 않는다.', () => {
+  it('시간 기반 이벤트에 현재 팀이 없으면 표시 상태를 만들지 않는다.', () => {
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'PLAY',
+        data: {
+          timerType: 'TIME_BASED',
+          sequence: 0,
+          remainingTime: 120,
+        },
+      },
+    });
+
+    const { result } = renderHook(() => useAudienceShareState(1));
+
+    expect(result.current.status).toBe('waiting');
+  });
+
+  it('sequence는 내부 최신 payload에는 유지되지만 반환 UI 상태와 렌더링 props에는 노출되지 않는다.', () => {
     setSocketState({
       isConnected: true,
       latestMessage: {
@@ -159,7 +188,7 @@ describe('useAudienceShareState', () => {
     }
   });
 
-  it('@AC-031: PLAY는 로컬 감소를 시작하고 STOP은 수신값에서 감소를 멈추며 새 이벤트는 표시값을 재동기화한다.', () => {
+  it('PLAY는 로컬 감소를 시작하고 STOP은 수신값에서 감소를 멈추며 새 이벤트는 표시값을 재동기화한다.', () => {
     // 이 부분은 useAudienceCountdown과 연동하여 테스트합니다. (Review notes 요구사항 포함)
     let latestMessage: SocketMessage = {
       eventType: 'PLAY',
@@ -185,9 +214,15 @@ describe('useAudienceShareState', () => {
         state.displayData.currentTeam === 'CONS';
 
       const prosTime =
-        state.status === 'displaying' ? state.displayData.prosTime : null;
+        state.status === 'displaying' &&
+        state.displayData.timerType === 'TIME_BASED'
+          ? state.displayData.prosTime
+          : null;
       const consTime =
-        state.status === 'displaying' ? state.displayData.consTime : null;
+        state.status === 'displaying' &&
+        state.displayData.timerType === 'TIME_BASED'
+          ? state.displayData.consTime
+          : null;
 
       const prosCountdown = useAudienceCountdown({
         receivedTime: prosTime,
@@ -236,7 +271,7 @@ describe('useAudienceShareState', () => {
     expect(result.current.prosCountdown.currentSeconds).toBe(8);
   });
 
-  it('@AC-032 & @AC-035: 유효한 토론 이벤트가 600초 동안 없으면 오류 상태가 생성되고 소켓 및 시간 자원이 정리된다.', () => {
+  it('유효한 토론 이벤트가 600초 동안 없으면 오류 상태가 생성되고 소켓 및 시간 자원이 정리된다.', () => {
     setSocketState({
       isConnected: true,
       latestMessage: {
@@ -260,7 +295,23 @@ describe('useAudienceShareState', () => {
     expect(mockDisconnect).toHaveBeenCalled();
   });
 
-  it('@AC-033 & @AC-059: ERROR 메시지와 소켓 오류 처리', () => {
+  it('소켓 연결 후 첫 이벤트가 600초 동안 없으면 EVENT_TIMEOUT 오류가 생성되고 소켓이 정리된다.', () => {
+    setSocketState({ isConnected: true, latestMessage: null });
+
+    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+    expect(result.current.status).toBe('waiting');
+
+    act(() => {
+      vi.advanceTimersByTime(600 * 1000);
+    });
+    rerender();
+
+    expect(result.current.status).toBe('waiting');
+    expect(result.current.error?.code).toBe('EVENT_TIMEOUT');
+    expect(mockDisconnect).toHaveBeenCalled();
+  });
+
+  it('ERROR 메시지와 소켓 오류 처리', () => {
     // 서버 ERROR 메시지
     setSocketState({
       isConnected: true,
@@ -293,7 +344,7 @@ describe('useAudienceShareState', () => {
     expect(mockDisconnect).toHaveBeenCalledTimes(1);
   });
 
-  it('@AC-034: 재연결 세션에서는 이전 최신 메시지와 표시 화면이 첫 데이터로 재사용되지 않는다.', () => {
+  it('재연결 세션에서는 이전 최신 메시지와 표시 화면이 첫 데이터로 재사용되지 않는다.', () => {
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
 
     setSocketState({

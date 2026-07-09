@@ -130,6 +130,15 @@ class SocketManager {
     });
   }
 
+  private reportSocketError(error: SocketError) {
+    console.error('[SocketManager] 소켓 오류 발생', {
+      code: error.code,
+      message: error.message,
+      detail: error.detail,
+    });
+    this.dispatchError(error);
+  }
+
   /**
    * 연결 여부를 확인하는 함수
    * @returns 연결 여부
@@ -159,10 +168,7 @@ class SocketManager {
 
     const wsUrl = this.resolveWebSocketUrl(this.currentOptions);
     if (!wsUrl) {
-      console.error(
-        '웹소켓 연결 주소를 결정할 수 없습니다. url 또는 baseUrl 옵션, 혹은 VITE_API_BASE_URL 환경 변수를 확인해주세요.',
-      );
-      this.dispatchError(
+      this.reportSocketError(
         new SocketError(
           'SOCKET_URL_UNAVAILABLE',
           '웹소켓 연결 주소를 결정할 수 없습니다.',
@@ -203,9 +209,7 @@ class SocketManager {
       },
 
       onStompError: (frame) => {
-        console.error('❌ 브로커 에러 발생:', frame.headers['message']);
-        console.error('상세 내용:', frame.body);
-        this.dispatchError(
+        this.reportSocketError(
           new SocketError(
             'SOCKET_STOMP_ERROR',
             frame.headers['message'] || 'STOMP 오류 발생',
@@ -234,7 +238,7 @@ class SocketManager {
         });
 
         if (!this.hasConnected) {
-          this.dispatchError(
+          this.reportSocketError(
             new SocketError(
               'SOCKET_SERVER_REJECTED',
               '서버에 의해 웹소켓 연결이 거부되었거나 즉시 종료되었습니다.',
@@ -327,10 +331,7 @@ class SocketManager {
 
     // 재시도 횟수를 초과했을 경우 연결을 즉시 종료
     if (this.retryCount >= this.currentOptions.maxRetries) {
-      console.error(
-        '🚨 최대 재연결 시도 횟수를 초과했습니다. 연결을 포기합니다.',
-      );
-      this.dispatchError(
+      this.reportSocketError(
         new SocketError(
           'SOCKET_RETRY_EXHAUSTED',
           '최대 재연결 시도 횟수를 초과했습니다.',
