@@ -131,7 +131,7 @@ export default function AudienceSharePage() {
             <AudienceTimeBasedTimer
               prosRemainingTime={prosCountdown.currentSeconds}
               consRemainingTime={consCountdown.currentSeconds}
-              currentTeam={displayData.currentTeam!}
+              currentTeam={displayData.currentTeam}
             />
           </div>
         );
