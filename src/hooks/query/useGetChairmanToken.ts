@@ -11,7 +11,7 @@ export default function useGetChairmanToken(
   return useQuery({
     queryKey: chairmanTokenQueryKey(tableId),
     queryFn: async () => {
-      const { data } = await getChairmanToken(tableId);
+      const data = await getChairmanToken(tableId);
       return data.chairmanToken;
     },
     enabled: enabled && Boolean(tableId),

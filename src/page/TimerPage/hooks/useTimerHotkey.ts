@@ -105,7 +105,7 @@ export function useTimerHotkey(
 
             onEvent(handleSwitching, 'TEAM_SWITCH');
           }
-          
+
           break;
         case 'KeyL':
           // 반대 진영 선택 및 찬성 타이머 정지
@@ -120,7 +120,7 @@ export function useTimerHotkey(
 
             onEvent(handleSwitching, 'TEAM_SWITCH');
           }
-          
+
           break;
         case 'Enter':
         case 'NumpadEnter':
