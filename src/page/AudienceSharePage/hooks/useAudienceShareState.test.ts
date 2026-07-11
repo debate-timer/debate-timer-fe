@@ -94,11 +94,11 @@ describe('useAudienceShareState', () => {
     const { result } = renderHook(() => useAudienceShareState(1));
 
     expect(result.current.status).toBe('displaying');
-    if (
-      result.current.status === 'displaying' &&
-      result.current.displayData.timerType === 'NORMAL'
-    ) {
-      expect(result.current.displayData.singleTime).toBe(60);
+    if (result.current.status === 'displaying') {
+      expect(result.current.displayData.timerType).toBe('NORMAL');
+      if (result.current.displayData.timerType === 'NORMAL') {
+        expect(result.current.displayData.singleTime).toBe(60);
+      }
     }
   });
 
@@ -120,13 +120,13 @@ describe('useAudienceShareState', () => {
     });
     rerender();
     expect(result.current.status).toBe('displaying');
-    if (
-      result.current.status === 'displaying' &&
-      result.current.displayData.timerType === 'TIME_BASED'
-    ) {
-      expect(result.current.displayData.currentTeam).toBe('PROS');
-      expect(result.current.displayData.prosTime).toBe(120);
-      expect(result.current.displayData.consTime).toBeNull(); // 최초 TIME_BASED에서 비활성 팀 null 유지
+    if (result.current.status === 'displaying') {
+      expect(result.current.displayData.timerType).toBe('TIME_BASED');
+      if (result.current.displayData.timerType === 'TIME_BASED') {
+        expect(result.current.displayData.currentTeam).toBe('PROS');
+        expect(result.current.displayData.prosTime).toBe(120);
+        expect(result.current.displayData.consTime).toBeNull(); // 최초 TIME_BASED에서 비활성 팀 null 유지
+      }
     }
 
     // 다음 메시지: 반대 팀으로 전환
@@ -143,13 +143,14 @@ describe('useAudienceShareState', () => {
       },
     });
     rerender();
-    if (
-      result.current.status === 'displaying' &&
-      result.current.displayData.timerType === 'TIME_BASED'
-    ) {
-      expect(result.current.displayData.currentTeam).toBe('CONS');
-      expect(result.current.displayData.prosTime).toBe(120); // 찬성 시간 유지
-      expect(result.current.displayData.consTime).toBe(90);
+    expect(result.current.status).toBe('displaying');
+    if (result.current.status === 'displaying') {
+      expect(result.current.displayData.timerType).toBe('TIME_BASED');
+      if (result.current.displayData.timerType === 'TIME_BASED') {
+        expect(result.current.displayData.currentTeam).toBe('CONS');
+        expect(result.current.displayData.prosTime).toBe(120); // 찬성 시간 유지
+        expect(result.current.displayData.consTime).toBe(90);
+      }
     }
   });
 
@@ -169,14 +170,14 @@ describe('useAudienceShareState', () => {
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
 
     expect(result.current.status).toBe('displaying');
-    if (
-      result.current.status === 'displaying' &&
-      result.current.displayData.timerType === 'TIME_BASED'
-    ) {
-      expect(result.current.displayData.currentTeam).toBe('CONS');
-      expect(result.current.displayData.prosTime).toBe(77);
-      expect(result.current.displayData.consTime).toBeNull();
-      expect(result.current.displayData.isRunning).toBe(false);
+    if (result.current.status === 'displaying') {
+      expect(result.current.displayData.timerType).toBe('TIME_BASED');
+      if (result.current.displayData.timerType === 'TIME_BASED') {
+        expect(result.current.displayData.currentTeam).toBe('CONS');
+        expect(result.current.displayData.prosTime).toBe(77);
+        expect(result.current.displayData.consTime).toBeNull();
+        expect(result.current.displayData.isRunning).toBe(false);
+      }
     }
 
     setSocketState({
@@ -193,14 +194,15 @@ describe('useAudienceShareState', () => {
     });
     rerender();
 
-    if (
-      result.current.status === 'displaying' &&
-      result.current.displayData.timerType === 'TIME_BASED'
-    ) {
-      expect(result.current.displayData.currentTeam).toBe('PROS');
-      expect(result.current.displayData.prosTime).toBe(77);
-      expect(result.current.displayData.consTime).toBe(55);
-      expect(result.current.displayData.isRunning).toBe(false);
+    expect(result.current.status).toBe('displaying');
+    if (result.current.status === 'displaying') {
+      expect(result.current.displayData.timerType).toBe('TIME_BASED');
+      if (result.current.displayData.timerType === 'TIME_BASED') {
+        expect(result.current.displayData.currentTeam).toBe('PROS');
+        expect(result.current.displayData.prosTime).toBe(77);
+        expect(result.current.displayData.consTime).toBe(55);
+        expect(result.current.displayData.isRunning).toBe(false);
+      }
     }
   });
 
@@ -232,6 +234,7 @@ describe('useAudienceShareState', () => {
     });
     const { result } = renderHook(() => useAudienceShareState(1));
 
+    expect(result.current.status).toBe('displaying');
     if (result.current.status === 'displaying') {
       expect(
         (result.current.displayData as Record<string, unknown>).sequence,
