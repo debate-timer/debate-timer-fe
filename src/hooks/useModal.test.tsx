@@ -1,6 +1,7 @@
 // useModal.test.tsx
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { useModal } from './useModal';
 import { GlobalPortal } from '../util/GlobalPortal';
 
@@ -9,6 +10,7 @@ function TestModal({
 }: {
   closeOnOverlayClick?: boolean;
 }) {
+  const [renderCount, setRenderCount] = useState(0);
   const { openModal, closeModal, ModalWrapper } = useModal({
     closeOnOverlayClick,
   });
@@ -19,10 +21,16 @@ function TestModal({
         <button data-testid="open-btn" onClick={openModal}>
           모달 열기
         </button>
+        <button onClick={() => setRenderCount((count) => count + 1)}>
+          부모 리렌더 {renderCount}
+        </button>
 
         {/* 모달 렌더링 */}
         <ModalWrapper>
-          <div data-testid="modal-content">Hello Modal</div>
+          <div data-testid="modal-content">
+            Hello Modal
+            <input aria-label="모달 입력" />
+          </div>
         </ModalWrapper>
 
         {/* 모달 닫기 (직접 호출 테스트용) */}
@@ -121,5 +129,24 @@ describe('useModal Hook 테스트', () => {
     await user.click(overlay);
     // 여전히 모달이 열린 상태
     expect(screen.getByTestId('modal-content')).toBeInTheDocument();
+  });
+
+  test('부모가 리렌더되어도 열린 모달의 내부 상태를 유지한다.', async () => {
+    const user = userEvent.setup();
+    render(<TestModal />);
+
+    await user.click(screen.getByTestId('open-btn'));
+    const inputBeforeRerender = screen.getByRole('textbox', {
+      name: '모달 입력',
+    });
+    await user.type(inputBeforeRerender, '입력값');
+
+    await user.click(screen.getByRole('button', { name: '부모 리렌더 0' }));
+
+    const inputAfterRerender = screen.getByRole('textbox', {
+      name: '모달 입력',
+    });
+    expect(inputAfterRerender).toBe(inputBeforeRerender);
+    expect(inputAfterRerender).toHaveValue('입력값');
   });
 });
