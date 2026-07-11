@@ -9,4 +9,10 @@ export const Formatting = {
   formatTwoDigits: (num: number): string => {
     return num.toString().padStart(2, '0');
   },
+  formatSecondsToMMSS: (time: number): string => {
+    const clampedTime = Math.max(0, time);
+    const minutes = Math.floor(clampedTime / 60);
+    const seconds = clampedTime % 60;
+    return `${Formatting.formatTwoDigits(minutes)}:${Formatting.formatTwoDigits(seconds)}`;
+  },
 };

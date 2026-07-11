@@ -17,7 +17,7 @@ import VoteParticipationPage from '../page/VoteParticipationPage/VoteParticipati
 import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
 import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 import LanguageWrapper from './LanguageWrapper';
-import { Fragment } from 'react';
+import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
 
 const appRoutes = [
   {
@@ -87,7 +87,7 @@ const appRoutes = [
   },
   {
     path: 'live/:id',
-    element: <Fragment />,
+    element: <AudienceSharePage />,
     requiresAuth: false,
   },
   {

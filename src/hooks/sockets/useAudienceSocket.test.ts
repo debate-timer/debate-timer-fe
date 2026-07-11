@@ -1,6 +1,14 @@
 import { act, renderHook } from '@testing-library/react';
 import type { IMessage } from '@stomp/stompjs';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  MockInstance,
+} from 'vitest';
 import type { SocketMessage } from '../../apis/sockets/type';
 import useAudienceSocket from './useAudienceSocket';
 
@@ -17,9 +25,13 @@ describe('useAudienceSocket', () => {
   const unsubscribe = vi.fn();
   const addConnectionListener = vi.fn();
 
+  let consoleLogSpy: MockInstance;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+    consoleLogSpy = vi
+      .spyOn(console, 'log')
+      .mockImplementation(() => undefined);
     addConnectionListener.mockImplementation(() => vi.fn());
     useSocketMock.mockReturnValue({
       connect,
@@ -27,6 +39,7 @@ describe('useAudienceSocket', () => {
       subscribe,
       unsubscribe,
       addConnectionListener,
+      isConnected: true,
       error: null,
     });
   });
@@ -41,7 +54,7 @@ describe('useAudienceSocket', () => {
     expect(subscribe).toHaveBeenCalledWith('/room/123', expect.any(Function));
   });
 
-  it('메시지를 수신하면 messages 상태를 업데이트해야 한다', () => {
+  it('유효한 메시지를 수신하면 latestMessage 상태를 업데이트해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',
       data: null,
@@ -59,10 +72,103 @@ describe('useAudienceSocket', () => {
       handleMessage({ body: JSON.stringify(message) } as IMessage);
     });
 
-    expect(result.current.messages).toEqual([message]);
+    expect(result.current.latestMessage).toEqual(message);
   });
 
-  it('connect 호출 전에 기존 messages 상태를 초기화해야 한다', () => {
+  it('유효한 메시지를 여러 번 수신하면 가장 최근 메시지만 노출해야 한다', () => {
+    const message1: SocketMessage = {
+      eventType: 'FINISHED',
+      data: null,
+    };
+    const message2: SocketMessage = {
+      eventType: 'ERROR',
+      data: null,
+    };
+    let handleMessage: (message: IMessage) => void = () => undefined;
+    subscribe.mockImplementation(
+      (_destination: string, callback: (message: IMessage) => void) => {
+        handleMessage = callback;
+      },
+    );
+
+    const { result } = renderHook(() => useAudienceSocket(123));
+
+    act(() => {
+      handleMessage({ body: JSON.stringify(message1) } as IMessage);
+    });
+
+    expect(result.current.latestMessage).toEqual(message1);
+
+    act(() => {
+      handleMessage({ body: JSON.stringify(message2) } as IMessage);
+    });
+
+    expect(result.current.latestMessage).toEqual(message2);
+  });
+
+  it('잘못된 JSON을 수신하면 console.log를 호출하고 마지막 정상 메시지를 유지해야 한다', () => {
+    const validMessage: SocketMessage = {
+      eventType: 'FINISHED',
+      data: null,
+    };
+    let handleMessage: (message: IMessage) => void = () => undefined;
+    subscribe.mockImplementation(
+      (_destination: string, callback: (message: IMessage) => void) => {
+        handleMessage = callback;
+      },
+    );
+
+    const { result } = renderHook(() => useAudienceSocket(123));
+
+    act(() => {
+      handleMessage({ body: JSON.stringify(validMessage) } as IMessage);
+    });
+
+    act(() => {
+      handleMessage({ body: '{ invalid_json }' } as IMessage);
+    });
+
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '메시지 파싱 오류:',
+      expect.any(Error),
+    );
+    expect(result.current.latestMessage).toEqual(validMessage);
+  });
+
+  it('계약 불일치 메시지(타입 가드 실패)를 수신하면 console.log를 호출하고 마지막 정상 메시지를 유지해야 한다', () => {
+    const validMessage: SocketMessage = {
+      eventType: 'FINISHED',
+      data: null,
+    };
+    const invalidMessage = {
+      eventType: 'UNKNOWN_EVENT',
+      data: { some: 'data' },
+    };
+    let handleMessage: (message: IMessage) => void = () => undefined;
+    subscribe.mockImplementation(
+      (_destination: string, callback: (message: IMessage) => void) => {
+        handleMessage = callback;
+      },
+    );
+
+    const { result } = renderHook(() => useAudienceSocket(123));
+
+    act(() => {
+      handleMessage({ body: JSON.stringify(validMessage) } as IMessage);
+    });
+
+    act(() => {
+      handleMessage({ body: JSON.stringify(invalidMessage) } as IMessage);
+    });
+
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '잘못된 소켓 메시지 형식입니다:',
+      invalidMessage,
+    );
+    expect(result.current.latestMessage).toEqual(validMessage);
+  });
+
+  it('connect 호출 전에 기존 latestMessage 상태를 초기화해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',
       data: null,
@@ -85,11 +191,11 @@ describe('useAudienceSocket', () => {
       result.current.connect(options);
     });
 
-    expect(result.current.messages).toEqual([]);
+    expect(result.current.latestMessage).toBeNull();
     expect(connect).toHaveBeenCalledWith(options);
   });
 
-  it('disconnect 호출 시 messages 상태를 초기화해야 한다', () => {
+  it('disconnect 호출 시 latestMessage 상태를 초기화해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',
       data: null,
@@ -111,11 +217,11 @@ describe('useAudienceSocket', () => {
       result.current.disconnect();
     });
 
-    expect(result.current.messages).toEqual([]);
+    expect(result.current.latestMessage).toBeNull();
     expect(disconnect).toHaveBeenCalledOnce();
   });
 
-  it('roomId가 변경되면 기존 messages 상태를 초기화해야 한다', () => {
+  it('roomId가 변경되면 기존 latestMessage 상태를 초기화해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',
       data: null,
@@ -142,12 +248,12 @@ describe('useAudienceSocket', () => {
       rerender({ roomId: 456 });
     });
 
-    expect(result.current.messages).toEqual([]);
+    expect(result.current.latestMessage).toBeNull();
     expect(unsubscribe).toHaveBeenCalledWith('/room/123');
     expect(subscribe).toHaveBeenCalledWith('/room/456', expect.any(Function));
   });
 
-  it('소켓 재연결 이벤트가 발생하면 messages 상태를 초기화해야 한다', () => {
+  it('소켓 재연결 이벤트가 발생하면 latestMessage 상태를 초기화해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',
       data: null,
@@ -174,10 +280,10 @@ describe('useAudienceSocket', () => {
       handleConnection();
     });
 
-    expect(result.current.messages).toEqual([]);
+    expect(result.current.latestMessage).toBeNull();
   });
 
-  it('error가 발생하면 alert를 호출하고 소켓 연결을 해제해야 한다', () => {
+  it('에러가 발생해도 기존 부수 효과 없이 error 객체 자체와 isConnected 상태를 그대로 노출해야 한다', () => {
     const error = new Error('socket failure');
     useSocketMock.mockReturnValue({
       connect,
@@ -185,12 +291,13 @@ describe('useAudienceSocket', () => {
       subscribe,
       unsubscribe,
       addConnectionListener,
+      isConnected: false,
       error,
     });
 
-    renderHook(() => useAudienceSocket(123));
+    const { result } = renderHook(() => useAudienceSocket(123));
 
-    expect(window.alert).toHaveBeenCalledWith('socket failure');
-    expect(disconnect).toHaveBeenCalledOnce();
+    expect(result.current.error).toBe(error);
+    expect(result.current.isConnected).toBe(false);
   });
 });

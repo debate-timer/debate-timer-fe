@@ -13,6 +13,8 @@ const socketManagerMock = vi.hoisted(() => ({
   offConnectEvent: vi.fn(),
   onCloseEvent: vi.fn(),
   offCloseEvent: vi.fn(),
+  onErrorEvent: vi.fn(),
+  offErrorEvent: vi.fn(),
 }));
 
 vi.mock('../../apis/sockets/SocketManager', () => ({
@@ -32,6 +34,12 @@ function getConnectListener() {
 
 function getCloseListener() {
   return socketManagerMock.onCloseEvent.mock.calls[0][0] as () => void;
+}
+
+function getErrorListener() {
+  return socketManagerMock.onErrorEvent.mock.calls[0][0] as (
+    error: unknown,
+  ) => void;
 }
 
 describe('useSocket', () => {
@@ -104,6 +112,9 @@ describe('useSocket', () => {
     );
     expect(socketManagerMock.offCloseEvent).toHaveBeenCalledWith(
       getCloseListener(),
+    );
+    expect(socketManagerMock.offErrorEvent).toHaveBeenCalledWith(
+      getErrorListener(),
     );
   });
 
@@ -195,5 +206,66 @@ describe('useSocket', () => {
     });
 
     expect(result.current.error).toBeInstanceOf(Error);
+  });
+
+  it('SocketManager의 SocketError가 발생하면 error 상태에 반영된다', () => {
+    const { result } = renderHook(() => useSocket());
+    const mockError = new Error('test error');
+
+    act(() => {
+      getErrorListener()(mockError);
+    });
+
+    expect(result.current.error).toBe(mockError);
+  });
+
+  it('새 연결을 시도하면 이전 error 상태가 초기화된다', () => {
+    const { result } = renderHook(() => useSocket());
+    const mockError = new Error('test error');
+
+    act(() => {
+      getErrorListener()(mockError);
+    });
+
+    expect(result.current.error).toBe(mockError);
+
+    act(() => {
+      result.current.connect({ baseUrl: 'https://example.com' });
+    });
+
+    expect(result.current.error).toBeNull();
+  });
+
+  it('연결이 성공하면 이전 error 상태가 초기화된다', () => {
+    const { result } = renderHook(() => useSocket());
+    const mockError = new Error('test error');
+
+    act(() => {
+      getErrorListener()(mockError);
+    });
+
+    expect(result.current.error).toBe(mockError);
+
+    act(() => {
+      getConnectListener()();
+    });
+
+    expect(result.current.error).toBeNull();
+  });
+
+  it('disconnect 호출 시 isConnected가 false가 되고 error 상태가 초기화된다', () => {
+    const { result } = renderHook(() => useSocket());
+    const mockError = new Error('test error');
+
+    act(() => {
+      getErrorListener()(mockError);
+    });
+
+    act(() => {
+      result.current.disconnect();
+    });
+
+    expect(result.current.isConnected).toBe(false);
+    expect(result.current.error).toBeNull();
   });
 });

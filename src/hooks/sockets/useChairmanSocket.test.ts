@@ -164,7 +164,6 @@ describe('useChairmanSocket', () => {
     const error = new Error('socket failure');
     let handleMessage: (message: IMessage) => void = () => undefined;
     vi.spyOn(Date, 'now').mockReturnValue(now);
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     subscribe.mockImplementation(
       (_destination: string, callback: (message: IMessage) => void) => {
         handleMessage = callback;
@@ -248,29 +247,6 @@ describe('useChairmanSocket', () => {
         data: payload,
       },
       { Authorization: authToken },
-    );
-  });
-
-  it('error가 발생하면 Toast 대체 console 알림을 호출해야 한다', () => {
-    const error = new Error('socket failure');
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => undefined);
-    useSocketMock.mockReturnValue({
-      connect,
-      disconnect,
-      subscribe,
-      unsubscribe,
-      publish,
-      addConnectionListener,
-      error,
-    });
-
-    renderHook(() => useChairmanSocket(123));
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Chairman socket connection failed.',
-      error,
     );
   });
 });
