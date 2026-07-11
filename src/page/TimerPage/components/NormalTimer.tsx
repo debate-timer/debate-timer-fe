@@ -27,7 +27,7 @@ interface NormalTimerProps {
   isAdditionalTimerAvailable: boolean;
   item: TimeBoxInfo;
   teamName: string | null;
-  answerTimer?: ReactNode;
+  answerTimer: ReactNode;
 }
 
 export default function NormalTimer({
@@ -35,7 +35,7 @@ export default function NormalTimer({
   isAdditionalTimerAvailable,
   item,
   teamName,
-  answerTimer = null,
+  answerTimer,
 }: NormalTimerProps) {
   const { t } = useTranslation();
   const getSpeechTypeLabel = (value: string) => {

@@ -26,7 +26,7 @@ interface TimeBasedTimerProps {
   prosCons: TimeBasedStance;
   teamName: string;
   item: TimeBoxInfo;
-  answerTimer?: ReactNode;
+  answerTimer: ReactNode;
 }
 
 export default function TimeBasedTimer({
@@ -35,7 +35,7 @@ export default function TimeBasedTimer({
   prosCons,
   teamName,
   item,
-  answerTimer = null,
+  answerTimer,
 }: TimeBasedTimerProps) {
   const { t } = useTranslation();
   const {
