@@ -1,9 +1,8 @@
-import { useTranslation } from 'react-i18next';
 import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
-import { AnswerTimerOwner, useAnswerTimer } from '../hooks/useAnswerTimer';
+import { useAnswerTimer } from '../hooks/useAnswerTimer';
 import { TimerPageLogics } from '../hooks/useTimerPageState';
-import AnswerTimeProgress from './AnswerTimeProgress';
+import AnswerTimeTimer from './AnswerTimeTimer';
 import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
 
@@ -18,7 +17,6 @@ export default function TimerView({
   onEvent,
   answerTime,
 }: TimerViewProps) {
-  const { t } = useTranslation();
   // 상태 풀기
   const {
     data,
@@ -42,39 +40,6 @@ export default function TimerView({
     timer2,
   });
 
-  const getAnswerTimer = (
-    owner: AnswerTimerOwner,
-    isMainTimerRunning: boolean,
-  ) => {
-    if (answerTimerState?.owner === owner) {
-      return (
-        <div className="flex h-[40px] w-full items-center justify-center">
-          <AnswerTimeProgress
-            answerTime={answerTime}
-            elapsedTime={answerTimerState.elapsedTime}
-            isResetting={answerTimerState.status === 'resetting'}
-            onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex h-[40px] w-full items-center justify-center">
-        <button
-          type="button"
-          className={
-            'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
-          }
-          disabled={!isMainTimerRunning}
-          onClick={() => handleClickAnswerTimer(owner, isMainTimerRunning)}
-        >
-          {t('답변시간 타이머 시작')}
-        </button>
-      </div>
-    );
-  };
-
   // 일반 타이머
   if (data && data.table[index].boxType === 'NORMAL') {
     return (
@@ -92,7 +57,15 @@ export default function TimerView({
         }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
-        answerTimer={getAnswerTimer('NORMAL', normalTimer.isRunning)}
+        answerTimer={
+          <AnswerTimeTimer
+            owner="NORMAL"
+            answerTime={answerTime}
+            answerTimerState={answerTimerState}
+            isMainTimerRunning={normalTimer.isRunning}
+            onClick={handleClickAnswerTimer}
+          />
+        }
         teamName={
           data.table[index].stance === 'NEUTRAL'
             ? null
@@ -128,7 +101,15 @@ export default function TimerView({
           }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
-          answerTimer={getAnswerTimer('PROS', timer1.isRunning)}
+          answerTimer={
+            <AnswerTimeTimer
+              owner="PROS"
+              answerTime={answerTime}
+              answerTimerState={answerTimerState}
+              isMainTimerRunning={timer1.isRunning}
+              onClick={handleClickAnswerTimer}
+            />
+          }
         />
 
         {/* ENTER 버튼 */}
@@ -160,7 +141,15 @@ export default function TimerView({
           }
           prosCons="CONS"
           teamName={data.info.consTeamName}
-          answerTimer={getAnswerTimer('CONS', timer2.isRunning)}
+          answerTimer={
+            <AnswerTimeTimer
+              owner="CONS"
+              answerTime={answerTime}
+              answerTimerState={answerTimerState}
+              isMainTimerRunning={timer2.isRunning}
+              onClick={handleClickAnswerTimer}
+            />
+          }
         />
       </div>
     );
