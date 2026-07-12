@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
-import { TimeBasedStance } from '../../../type/type';
+import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
 import { isSocketError } from '../../../apis/sockets/error';
+import { TimerDataPayload, TimerEventTypes } from '../../../apis/sockets/type';
 
 type AudienceNormalDisplayData = {
   timerType: 'NORMAL';
   currentTeam: null;
   isRunning: boolean;
   singleTime: number;
+  sequence: number;
 };
 
 type AudienceTimeBasedDisplayData = {
@@ -35,18 +37,156 @@ export type AudienceShareState =
 
 const EVENT_TIMEOUT_MS = 600 * 1000;
 
+interface UseAudienceShareStateOptions {
+  enabled?: boolean;
+  table?: TimeBoxInfo[];
+}
+
 function getNextTeam(team: TimeBasedStance): TimeBasedStance {
   return team === 'PROS' ? 'CONS' : 'PROS';
 }
 
-export function useAudienceShareState(roomId: number): AudienceShareState {
+function getNormalTotalTime(
+  table: TimeBoxInfo[] | undefined,
+  sequence: number,
+  fallbackTime: number,
+) {
+  const timeBox = table?.[sequence];
+
+  if (
+    timeBox?.boxType === 'NORMAL' &&
+    timeBox.time !== null &&
+    timeBox.time > 0
+  ) {
+    return timeBox.time;
+  }
+
+  return fallbackTime;
+}
+
+function createDisplayData(
+  data: TimerDataPayload,
+  previousDisplayData: AudienceDisplayData | null,
+  options: {
+    isRunning: boolean;
+    normalSequence?: number;
+    normalTime?: number;
+    shouldSwitchTeam?: boolean;
+  },
+): AudienceDisplayData | null {
+  const {
+    isRunning,
+    normalSequence = data.sequence,
+    normalTime = data.remainingTime,
+    shouldSwitchTeam = false,
+  } = options;
+
+  if (data.timerType === 'NORMAL') {
+    return {
+      timerType: 'NORMAL',
+      currentTeam: null,
+      isRunning,
+      singleTime: normalTime,
+      sequence: normalSequence,
+    };
+  }
+
+  if (data.currentTeam !== 'PROS' && data.currentTeam !== 'CONS') {
+    return previousDisplayData;
+  }
+
+  const previousTimeBasedData =
+    previousDisplayData?.timerType === 'TIME_BASED'
+      ? previousDisplayData
+      : null;
+  const receivedCurrentTeam = data.currentTeam;
+
+  return {
+    timerType: 'TIME_BASED',
+    currentTeam: shouldSwitchTeam
+      ? getNextTeam(receivedCurrentTeam)
+      : receivedCurrentTeam,
+    isRunning,
+    prosTime:
+      receivedCurrentTeam === 'PROS'
+        ? data.remainingTime
+        : (previousTimeBasedData?.prosTime ?? null),
+    consTime:
+      receivedCurrentTeam === 'CONS'
+        ? data.remainingTime
+        : (previousTimeBasedData?.consTime ?? null),
+  };
+}
+
+function getDisplayDataByEvent(
+  eventType: TimerEventTypes,
+  data: TimerDataPayload,
+  previousDisplayData: AudienceDisplayData | null,
+  table: TimeBoxInfo[] | undefined,
+): AudienceDisplayData | null {
+  switch (eventType) {
+    case 'PLAY':
+      return createDisplayData(data, previousDisplayData, {
+        isRunning: true,
+      });
+
+    case 'STOP':
+      return createDisplayData(data, previousDisplayData, {
+        isRunning: false,
+      });
+
+    case 'RESET':
+      return createDisplayData(data, previousDisplayData, {
+        isRunning: false,
+        normalTime: getNormalTotalTime(
+          table,
+          data.sequence,
+          data.remainingTime,
+        ),
+      });
+
+    case 'BEFORE': {
+      const previousSequence = data.sequence - 1;
+      return createDisplayData(data, previousDisplayData, {
+        isRunning: false,
+        normalSequence: previousSequence,
+        normalTime: getNormalTotalTime(
+          table,
+          previousSequence,
+          data.remainingTime,
+        ),
+      });
+    }
+
+    case 'NEXT': {
+      const nextSequence = data.sequence + 1;
+      return createDisplayData(data, previousDisplayData, {
+        isRunning: false,
+        normalSequence: nextSequence,
+        normalTime: getNormalTotalTime(table, nextSequence, data.remainingTime),
+      });
+    }
+
+    case 'TEAM_SWITCH':
+      return createDisplayData(data, previousDisplayData, {
+        isRunning: false,
+        shouldSwitchTeam: true,
+      });
+  }
+}
+
+export function useAudienceShareState(
+  roomId: number,
+  options: UseAudienceShareStateOptions = {},
+): AudienceShareState {
+  const { enabled = true, table } = options;
   const {
     connect,
     disconnect,
     latestMessage,
     isConnected,
     error: socketError,
-  } = useAudienceSocket(roomId);
+  } = useAudienceSocket(roomId, { enabled });
 
   const [error, setError] = useState<AudienceShareError | null>(null);
   const [isFinished, setIsFinished] = useState<boolean>(false);
@@ -67,15 +207,19 @@ export function useAudienceShareState(roomId: number): AudienceShareState {
 
   // Mount/Unmount
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     connect();
     return () => {
       cleanup();
     };
-  }, [connect, cleanup]);
+  }, [connect, cleanup, enabled]);
 
   // Handle Socket Error
   useEffect(() => {
-    if (socketError) {
+    if (enabled && socketError) {
       cleanup();
       let code: AudienceShareErrorCode = 'UNKNOWN';
       if (isSocketError(socketError)) {
@@ -90,11 +234,11 @@ export function useAudienceShareState(roomId: number): AudienceShareState {
         ),
       );
     }
-  }, [socketError, cleanup]);
+  }, [enabled, socketError, cleanup]);
 
   // Handle Messages and Disconnects
   useEffect(() => {
-    if (error || isFinished) return; // Ignore if already failed or finished
+    if (!enabled || error || isFinished) return; // Ignore if inactive, already failed or finished
 
     if (!isConnected) {
       if (timeoutRef.current) {
@@ -138,48 +282,15 @@ export function useAudienceShareState(roomId: number): AudienceShareState {
     const { eventType, data } = latestMessage;
     if (!data) return;
 
-    const isRunning = eventType === 'PLAY';
-
-    setDisplayData((prev) => {
-      if (data.timerType === 'NORMAL') {
-        return {
-          timerType: 'NORMAL',
-          currentTeam: null,
-          isRunning,
-          singleTime: data.remainingTime,
-        };
-      }
-
-      if (data.currentTeam !== 'PROS' && data.currentTeam !== 'CONS') {
-        return prev;
-      }
-
-      const previousTimeBasedData =
-        prev?.timerType === 'TIME_BASED' ? prev : null;
-      const receivedCurrentTeam = data.currentTeam;
-      const displayCurrentTeam =
-        eventType === 'TEAM_SWITCH'
-          ? getNextTeam(receivedCurrentTeam)
-          : receivedCurrentTeam;
-
-      return {
-        timerType: 'TIME_BASED',
-        currentTeam: displayCurrentTeam,
-        isRunning,
-        prosTime:
-          receivedCurrentTeam === 'PROS'
-            ? data.remainingTime
-            : (previousTimeBasedData?.prosTime ?? null),
-        consTime:
-          receivedCurrentTeam === 'CONS'
-            ? data.remainingTime
-            : (previousTimeBasedData?.consTime ?? null),
-      };
-    });
-  }, [isConnected, latestMessage, error, isFinished, cleanup]);
+    setDisplayData((previousDisplayData) =>
+      getDisplayDataByEvent(eventType, data, previousDisplayData, table),
+    );
+  }, [enabled, isConnected, latestMessage, error, isFinished, cleanup, table]);
 
   let status: AudienceShareState['status'] = 'connecting';
-  if (isFinished) {
+  if (!enabled) {
+    status = 'connecting';
+  } else if (isFinished) {
     status = 'finished';
   } else if (!isConnected) {
     status = 'connecting';

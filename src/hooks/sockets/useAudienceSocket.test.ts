@@ -54,6 +54,25 @@ describe('useAudienceSocket', () => {
     expect(subscribe).toHaveBeenCalledWith('/room/123', expect.any(Function));
   });
 
+  it('비활성 상태에서는 roomId 기반 채널을 구독하지 않는다', () => {
+    renderHook(() => useAudienceSocket(123, { enabled: false }));
+
+    expect(subscribe).not.toHaveBeenCalled();
+  });
+
+  it('활성 상태로 전환되면 roomId 기반 채널을 구독한다', () => {
+    const { rerender } = renderHook(
+      ({ enabled }) => useAudienceSocket(123, { enabled }),
+      { initialProps: { enabled: false } },
+    );
+
+    expect(subscribe).not.toHaveBeenCalled();
+
+    rerender({ enabled: true });
+
+    expect(subscribe).toHaveBeenCalledWith('/room/123', expect.any(Function));
+  });
+
   it('유효한 메시지를 수신하면 latestMessage 상태를 업데이트해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',

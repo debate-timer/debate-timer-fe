@@ -8,12 +8,13 @@ import { isSocketMessage } from '../../apis/sockets/util';
  * 청중 전용 웹소켓 훅입니다.
  * 토론 이벤트 채널을 구독하여 실시간 토론 정보를 수령합니다.
  *
- * * ⚠️ 주의: 이 훅을 컴포넌트에서 호출하여 페이지가 마운트(렌더링)되는 순간,
+ * * ⚠️ 주의: 기본적으로 이 훅을 컴포넌트에서 호출하여 페이지가 마운트(렌더링)되는 순간,
  * 내부의 `useEffect`가 실행되어 즉시 `/room/{roomId}` 채널에 대한 구독(Subscribe)을 요청합니다.
- * 컴포넌트가 언마운트되면 해당 채널의 구독은 자동으로 해제됩니다.
+ * `enabled`가 false이면 구독하지 않으며, 컴포넌트가 언마운트되면 활성 구독은 자동으로 해제됩니다.
  * * 청중은 토론 데이터를 수신만 하며, 송신(Publish) 권한은 제공되지 않습니다.
  *
  * @param {number} roomId - 입장한 토론방의 고유 ID
+ * @param {UseAudienceSocketOptions} options - 소켓 채널 구독 활성화 옵션
  * @returns {Object} 청중 소켓 상태와 제어 함수를 반환합니다.
  * @returns {SocketMessage | null} returns.latestMessage - 검증된 가장 최근의 수신 메시지입니다.
  * @returns {boolean} returns.isConnected - 소켓 연결 상태입니다.
@@ -21,7 +22,15 @@ import { isSocketMessage } from '../../apis/sockets/util';
  * @returns {Function} returns.disconnect - `useSocket.disconnect`에 위임하기 전에 현재 메시지를 초기화합니다.
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
-export default function useAudienceSocket(roomId: number) {
+interface UseAudienceSocketOptions {
+  enabled?: boolean;
+}
+
+export default function useAudienceSocket(
+  roomId: number,
+  options: UseAudienceSocketOptions = {},
+) {
+  const { enabled = true } = options;
   const {
     connect,
     disconnect,
@@ -72,6 +81,10 @@ export default function useAudienceSocket(roomId: number) {
   }, [addConnectionListener, resetMessage]);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     const destination = `/room/${roomId}`;
 
     resetMessage();
@@ -94,7 +107,7 @@ export default function useAudienceSocket(roomId: number) {
     return () => {
       unsubscribe(destination);
     };
-  }, [roomId, resetMessage, subscribe, unsubscribe]);
+  }, [enabled, roomId, resetMessage, subscribe, unsubscribe]);
 
   return {
     latestMessage,

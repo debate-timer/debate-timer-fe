@@ -66,7 +66,7 @@ describe('useAudienceCountdown', () => {
     expect(result.current.currentSeconds).toBe(14);
   });
 
-  it('0 아래로 내려가지 않음', () => {
+  it('0 아래에서도 음수로 카운트다운을 계속한다', () => {
     const { result } = renderHook(() =>
       useAudienceCountdown({ receivedTime: 1, isRunning: true }),
     );
@@ -75,8 +75,8 @@ describe('useAudienceCountdown', () => {
       vi.advanceTimersByTime(2000);
     });
 
-    expect(result.current.currentSeconds).toBe(0);
-    expect(result.current.formattedTime).toBe('00:00');
+    expect(result.current.currentSeconds).toBe(-1);
+    expect(result.current.formattedTime).toBe('-00:01');
   });
 
   it('입력 변경과 언마운트 시 interval 정리', () => {

@@ -36,10 +36,7 @@ export function useAudienceCountdown({
       intervalRef.current = setInterval(() => {
         if (targetTimeRef.current === null) return;
         const now = Date.now();
-        const remainingTime = Math.max(
-          0,
-          Math.ceil((targetTimeRef.current - now) / 1000),
-        );
+        const remainingTime = Math.ceil((targetTimeRef.current - now) / 1000);
         setCurrentSeconds(remainingTime);
       }, 200);
     }
@@ -54,7 +51,9 @@ export function useAudienceCountdown({
 
   const formattedTime =
     currentSeconds !== null
-      ? Formatting.formatSecondsToMMSS(currentSeconds)
+      ? `${currentSeconds < 0 ? '-' : ''}${Formatting.formatSecondsToMMSS(
+          Math.abs(currentSeconds),
+        )}`
       : '00:00';
 
   return { currentSeconds, formattedTime };
