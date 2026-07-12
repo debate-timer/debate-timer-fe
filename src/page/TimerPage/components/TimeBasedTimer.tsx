@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -25,6 +26,7 @@ interface TimeBasedTimerProps {
   prosCons: TimeBasedStance;
   teamName: string;
   item: TimeBoxInfo;
+  answerTimer: ReactNode;
 }
 
 export default function TimeBasedTimer({
@@ -33,6 +35,7 @@ export default function TimeBasedTimer({
   prosCons,
   teamName,
   item,
+  answerTimer,
 }: TimeBasedTimerProps) {
   const { t } = useTranslation();
   const {
@@ -180,6 +183,8 @@ export default function TimeBasedTimer({
           </span>
         )}
       </CircularTimer>
+
+      {answerTimer}
 
       {/* 조작부 */}
       <TimerController

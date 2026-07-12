@@ -1,16 +1,22 @@
-// components/TimerView.tsx
 import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
+import { useAnswerTimer } from '../hooks/useAnswerTimer';
 import { TimerPageLogics } from '../hooks/useTimerPageState';
+import AnswerTimeTimer from './AnswerTimeTimer';
 import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
 
 interface TimerViewProps {
   state: TimerPageLogics;
   onEvent: (invoke: () => void, eventType: SocketEventType) => void;
+  answerTime: number;
 }
 
-export default function TimerView({ state, onEvent }: TimerViewProps) {
+export default function TimerView({
+  state,
+  onEvent,
+  answerTime,
+}: TimerViewProps) {
   // 상태 풀기
   const {
     data,
@@ -23,6 +29,16 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
     handleActivateTeam,
     switchCamp,
   } = state;
+
+  const { answerTimerState, handleClickAnswerTimer } = useAnswerTimer({
+    answerTime,
+    data,
+    index,
+    normalTimer,
+    prosConsSelected,
+    timer1,
+    timer2,
+  });
 
   // 일반 타이머
   if (data && data.table[index].boxType === 'NORMAL') {
@@ -41,6 +57,15 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
         }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
+        answerTimer={
+          <AnswerTimeTimer
+            owner="NORMAL"
+            answerTime={answerTime}
+            answerTimerState={answerTimerState}
+            isMainTimerRunning={normalTimer.isRunning}
+            onClick={handleClickAnswerTimer}
+          />
+        }
         teamName={
           data.table[index].stance === 'NEUTRAL'
             ? null
@@ -76,6 +101,15 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
           }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
+          answerTimer={
+            <AnswerTimeTimer
+              owner="PROS"
+              answerTime={answerTime}
+              answerTimerState={answerTimerState}
+              isMainTimerRunning={timer1.isRunning}
+              onClick={handleClickAnswerTimer}
+            />
+          }
         />
 
         {/* ENTER 버튼 */}
@@ -107,6 +141,15 @@ export default function TimerView({ state, onEvent }: TimerViewProps) {
           }
           prosCons="CONS"
           teamName={data.info.consTeamName}
+          answerTimer={
+            <AnswerTimeTimer
+              owner="CONS"
+              answerTime={answerTime}
+              answerTimerState={answerTimerState}
+              isMainTimerRunning={timer2.isRunning}
+              onClick={handleClickAnswerTimer}
+            />
+          }
         />
       </div>
     );

@@ -38,6 +38,7 @@ function renderNormalTimer(
       isAdditionalTimerAvailable={false}
       item={item}
       teamName={teamName}
+      answerTimer={null}
     />,
   );
 }
