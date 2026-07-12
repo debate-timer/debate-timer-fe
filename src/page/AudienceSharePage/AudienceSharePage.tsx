@@ -1,21 +1,83 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { MdErrorOutline } from 'react-icons/md';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
 import { useAudienceCountdown } from './hooks/useAudienceCountdown';
-import { AudienceShareError, AudienceShareErrorCode } from './error';
 import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
+import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
+import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';
+import { DebateInfo, TimeBoxInfo } from '../../type/type';
 
-export class AudienceShareDisplayError extends Error {
-  public readonly sourceError: AudienceShareError;
+interface ErrorContentProps {
+  message: string;
+  onReload: () => void;
+}
 
-  constructor(message: string, sourceError: AudienceShareError) {
-    super(message);
-    this.name = 'AudienceShareDisplayError';
-    this.sourceError = sourceError;
+function LoadingContent() {
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <LoadingSpinner size="h-12 w-12" color="text-gray-500" />
+    </div>
+  );
+}
+
+function ErrorContent({ message, onReload }: ErrorContentProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div
+      className="flex h-full w-full flex-col items-center justify-center gap-6 text-center"
+      role="alert"
+    >
+      <MdErrorOutline
+        className="h-20 w-20 text-red-500"
+        data-testid="audience-share-error-icon"
+        aria-hidden="true"
+      />
+      <p className="text-xl font-semibold text-gray-800 xl:text-2xl">
+        {message}
+      </p>
+      <button
+        type="button"
+        className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        onClick={onReload}
+      >
+        {t('새로고침')}
+      </button>
+    </div>
+  );
+}
+
+type ValidNormalTimeBox = TimeBoxInfo & {
+  boxType: 'NORMAL';
+  time: number;
+};
+
+function isValidNormalTimeBox(
+  timeBox: TimeBoxInfo | undefined,
+): timeBox is ValidNormalTimeBox {
+  return (
+    timeBox?.boxType === 'NORMAL' && timeBox.time !== null && timeBox.time > 0
+  );
+}
+
+function getNormalTimerTeamName(
+  stance: TimeBoxInfo['stance'],
+  info: DebateInfo,
+) {
+  if (stance === 'PROS') {
+    return info.prosTeamName;
   }
+
+  if (stance === 'CONS') {
+    return info.consTeamName;
+  }
+
+  return '';
 }
 
 export default function AudienceSharePage() {
@@ -23,14 +85,29 @@ export default function AudienceSharePage() {
   const { t } = useTranslation();
 
   const tableId = Number(id);
+  const isValidTableId =
+    !!id && !isNaN(tableId) && tableId > 0 && Number.isInteger(tableId);
+  const debateTableQuery = useGetDebateTableDataForShare(
+    isValidTableId ? tableId : undefined,
+  );
+  const state = useAudienceShareState(tableId, {
+    enabled: isValidTableId && debateTableQuery.isSuccess,
+    table: debateTableQuery.data?.table,
+  });
 
-  if (!id || isNaN(tableId) || tableId <= 0 || !Number.isInteger(tableId)) {
+  if (!isValidTableId) {
     throw new Error(t('유효하지 않은 토론방 ID입니다.'));
   }
 
-  const state = useAudienceShareState(tableId);
   const audienceDisplayData =
     state.status === 'displaying' ? state.displayData : null;
+  const normalDisplayData =
+    audienceDisplayData?.timerType === 'NORMAL' ? audienceDisplayData : null;
+  const normalTimeBox = normalDisplayData
+    ? debateTableQuery.data?.table[normalDisplayData.sequence]
+    : undefined;
+  const hasInvalidNormalTimeBox =
+    normalDisplayData !== null && !isValidNormalTimeBox(normalTimeBox);
 
   const normalCountdown = useAudienceCountdown({
     receivedTime:
@@ -73,32 +150,44 @@ export default function AudienceSharePage() {
     }, 100);
   };
 
-  if (state.error) {
-    const errorMessages: Record<AudienceShareErrorCode, string> = {
-      SOCKET_URL_UNAVAILABLE: '실시간 연결 주소를 확인할 수 없어요.',
-      SOCKET_SERVER_REJECTED: '토론방 연결이 거부되었어요.',
-      SOCKET_STOMP_ERROR: '실시간 연결에서 서버 오류가 발생했어요.',
-      SOCKET_RETRY_EXHAUSTED: '실시간 연결을 복구하지 못했어요.',
-      EVENT_TIMEOUT: '토론 상태를 오래 받지 못했어요.',
-      SERVER_ERROR: '서버에서 토론 진행 오류를 전달했어요.',
-      UNKNOWN: '알 수 없는 실시간 오류가 발생했어요.',
-    };
-
-    throw new AudienceShareDisplayError(
-      t(errorMessages[state.error.code]),
-      state.error,
-    );
-  }
+  const handleReload = () => {
+    window.location.reload();
+  };
 
   const renderContent = () => {
-    console.log(`# Status = ${state.status}`);
-
-    if (state.status === 'connecting') {
+    if (state.error) {
       return (
-        <div className="flex h-full w-full items-center justify-center">
-          <LoadingSpinner size="h-12 w-12" />
-        </div>
+        <ErrorContent
+          message={t('서버 연결에 실패했어요.')}
+          onReload={handleReload}
+        />
       );
+    }
+
+    if (debateTableQuery.isError) {
+      return (
+        <ErrorContent
+          message={t('필요한 데이터를 불러오지 못했어요. 다시 시도해보세요.')}
+          onReload={handleReload}
+        />
+      );
+    }
+
+    if (hasInvalidNormalTimeBox) {
+      return (
+        <ErrorContent
+          message={t('서버 연결에 실패했어요.')}
+          onReload={handleReload}
+        />
+      );
+    }
+
+    if (
+      debateTableQuery.isLoading ||
+      !debateTableQuery.data ||
+      state.status === 'connecting'
+    ) {
+      return <LoadingContent />;
     }
 
     if (state.status === 'waiting') {
@@ -114,12 +203,25 @@ export default function AudienceSharePage() {
     if (state.status === 'displaying') {
       const { displayData } = state;
       if (displayData.timerType === 'NORMAL') {
+        if (!isValidNormalTimeBox(normalTimeBox)) {
+          return null;
+        }
+
         return (
           <div className="flex h-full w-full items-center justify-center">
             <AudienceNormalTimer
               remainingTime={
                 normalCountdown.currentSeconds ?? displayData.singleTime
               }
+              totalTime={normalTimeBox.time}
+              speechType={normalTimeBox.speechType}
+              stance={normalTimeBox.stance}
+              teamName={getNormalTimerTeamName(
+                normalTimeBox.stance,
+                debateTableQuery.data.info,
+              )}
+              speaker={normalTimeBox.speaker}
+              isRunning={displayData.isRunning}
             />
           </div>
         );
@@ -158,8 +260,38 @@ export default function AudienceSharePage() {
     return null;
   };
 
+  const isReady =
+    debateTableQuery.isSuccess &&
+    !!debateTableQuery.data &&
+    !state.error &&
+    !hasInvalidNormalTimeBox &&
+    state.status !== 'connecting';
+
   return (
     <DefaultLayout>
+      {isReady ? (
+        <DefaultLayout.Header>
+          <DefaultLayout.Header.Left>
+            <HeaderTableInfo
+              name={
+                debateTableQuery.data.info.name.trim() === ''
+                  ? t('테이블 이름 없음')
+                  : t(debateTableQuery.data.info.name)
+              }
+            />
+          </DefaultLayout.Header.Left>
+          <DefaultLayout.Header.Center>
+            <HeaderTitle
+              title={
+                debateTableQuery.data.info.agenda.trim() === ''
+                  ? t('주제 없음')
+                  : t(debateTableQuery.data.info.agenda)
+              }
+            />
+          </DefaultLayout.Header.Center>
+          <DefaultLayout.Header.Right />
+        </DefaultLayout.Header>
+      ) : null}
       <DefaultLayout.ContentContainer>
         <div className="relative flex h-full w-full flex-col">
           {renderContent()}
