@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
 import { useAudienceCountdown } from './hooks/useAudienceCountdown';
+import { useAudienceTimeBasedCountdown } from './hooks/useAudienceTimeBasedCountdown';
 import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
@@ -57,11 +58,28 @@ type ValidNormalTimeBox = TimeBoxInfo & {
   time: number;
 };
 
+type ValidTimeBasedTimeBox = TimeBoxInfo & {
+  boxType: 'TIME_BASED';
+  timePerTeam: number;
+  timePerSpeaking: number | null;
+};
+
 function isValidNormalTimeBox(
   timeBox: TimeBoxInfo | undefined,
 ): timeBox is ValidNormalTimeBox {
   return (
     timeBox?.boxType === 'NORMAL' && timeBox.time !== null && timeBox.time > 0
+  );
+}
+
+function isValidTimeBasedTimeBox(
+  timeBox: TimeBoxInfo | undefined,
+): timeBox is ValidTimeBasedTimeBox {
+  return (
+    timeBox?.boxType === 'TIME_BASED' &&
+    timeBox.timePerTeam !== null &&
+    timeBox.timePerTeam > 0 &&
+    (timeBox.timePerSpeaking === null || timeBox.timePerSpeaking > 0)
   );
 }
 
@@ -103,11 +121,20 @@ export default function AudienceSharePage() {
     state.status === 'displaying' ? state.displayData : null;
   const normalDisplayData =
     audienceDisplayData?.timerType === 'NORMAL' ? audienceDisplayData : null;
+  const timeBasedDisplayData =
+    audienceDisplayData?.timerType === 'TIME_BASED'
+      ? audienceDisplayData
+      : null;
   const normalTimeBox = normalDisplayData
     ? debateTableQuery.data?.table[normalDisplayData.sequence]
     : undefined;
   const hasInvalidNormalTimeBox =
     normalDisplayData !== null && !isValidNormalTimeBox(normalTimeBox);
+  const timeBasedTimeBox = timeBasedDisplayData
+    ? debateTableQuery.data?.table[timeBasedDisplayData.sequence]
+    : undefined;
+  const hasInvalidTimeBasedTimeBox =
+    timeBasedDisplayData !== null && !isValidTimeBasedTimeBox(timeBasedTimeBox);
 
   const normalCountdown = useAudienceCountdown({
     receivedTime:
@@ -119,25 +146,14 @@ export default function AudienceSharePage() {
         ? audienceDisplayData.isRunning
         : false,
   });
-  const prosCountdown = useAudienceCountdown({
-    receivedTime:
-      audienceDisplayData?.timerType === 'TIME_BASED'
-        ? audienceDisplayData.prosTime
-        : null,
-    isRunning:
-      audienceDisplayData?.timerType === 'TIME_BASED' &&
-      audienceDisplayData.isRunning &&
-      audienceDisplayData.currentTeam === 'PROS',
-  });
-  const consCountdown = useAudienceCountdown({
-    receivedTime:
-      audienceDisplayData?.timerType === 'TIME_BASED'
-        ? audienceDisplayData.consTime
-        : null,
-    isRunning:
-      audienceDisplayData?.timerType === 'TIME_BASED' &&
-      audienceDisplayData.isRunning &&
-      audienceDisplayData.currentTeam === 'CONS',
+  const timeBasedCountdown = useAudienceTimeBasedCountdown({
+    displayData: timeBasedDisplayData,
+    timePerTeam: isValidTimeBasedTimeBox(timeBasedTimeBox)
+      ? timeBasedTimeBox.timePerTeam
+      : null,
+    timePerSpeaking: isValidTimeBasedTimeBox(timeBasedTimeBox)
+      ? timeBasedTimeBox.timePerSpeaking
+      : null,
   });
 
   const handleClosePage = () => {
@@ -173,7 +189,7 @@ export default function AudienceSharePage() {
       );
     }
 
-    if (hasInvalidNormalTimeBox) {
+    if (hasInvalidNormalTimeBox || hasInvalidTimeBasedTimeBox) {
       return (
         <ErrorContent
           message={t('서버 연결에 실패했어요.')}
@@ -228,12 +244,48 @@ export default function AudienceSharePage() {
       }
 
       if (displayData.timerType === 'TIME_BASED') {
+        if (!isValidTimeBasedTimeBox(timeBasedTimeBox)) {
+          return null;
+        }
+
+        const prosTotalRemainingTime =
+          timeBasedCountdown.pros.totalRemainingTime ??
+          timeBasedTimeBox.timePerTeam;
+        const consTotalRemainingTime =
+          timeBasedCountdown.cons.totalRemainingTime ??
+          timeBasedTimeBox.timePerTeam;
+        const prosCurrentSpeakingRemainingTime =
+          timeBasedTimeBox.timePerSpeaking === null
+            ? null
+            : (timeBasedCountdown.pros.currentSpeakingRemainingTime ??
+              timeBasedTimeBox.timePerSpeaking);
+        const consCurrentSpeakingRemainingTime =
+          timeBasedTimeBox.timePerSpeaking === null
+            ? null
+            : (timeBasedCountdown.cons.currentSpeakingRemainingTime ??
+              timeBasedTimeBox.timePerSpeaking);
+
         return (
           <div className="flex h-full w-full items-center justify-center px-4 xl:px-12">
             <AudienceTimeBasedTimer
-              prosRemainingTime={prosCountdown.currentSeconds}
-              consRemainingTime={consCountdown.currentSeconds}
+              prosTeamName={debateTableQuery.data.info.prosTeamName}
+              consTeamName={debateTableQuery.data.info.consTeamName}
+              timePerTeam={timeBasedTimeBox.timePerTeam}
+              timePerSpeaking={timeBasedTimeBox.timePerSpeaking}
+              prosTotalRemainingTime={prosTotalRemainingTime}
+              consTotalRemainingTime={consTotalRemainingTime}
+              prosCurrentSpeakingRemainingTime={
+                prosCurrentSpeakingRemainingTime
+              }
+              consCurrentSpeakingRemainingTime={
+                consCurrentSpeakingRemainingTime
+              }
               currentTeam={displayData.currentTeam}
+              isRunning={
+                displayData.currentTeam === 'PROS'
+                  ? timeBasedCountdown.pros.isRunning
+                  : timeBasedCountdown.cons.isRunning
+              }
             />
           </div>
         );
@@ -265,6 +317,7 @@ export default function AudienceSharePage() {
     !!debateTableQuery.data &&
     !state.error &&
     !hasInvalidNormalTimeBox &&
+    !hasInvalidTimeBasedTimeBox &&
     state.status !== 'connecting';
 
   return (

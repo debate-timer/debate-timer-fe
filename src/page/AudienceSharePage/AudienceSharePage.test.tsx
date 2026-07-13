@@ -63,6 +63,16 @@ const mockDebateTableData: GetDebateTableDataForShareResponseType = {
       timePerSpeaking: null,
       speaker: '이토론',
     },
+    {
+      stance: 'NEUTRAL',
+      speechType: '자유토론',
+      bell: null,
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 180,
+      timePerSpeaking: 30,
+      speaker: null,
+    },
   ],
 };
 
@@ -366,16 +376,25 @@ describe('AudienceSharePage', () => {
           timerType: 'TIME_BASED',
           currentTeam: 'PROS',
           isRunning: true,
-          prosTime: 180,
-          consTime: 150,
+          prosTime: 20,
+          consTime: null,
+          sequence: 2,
+          eventType: 'PLAY',
+          revision: 1,
         },
       });
       renderPage('/live/123');
 
-      expect(screen.getByText('찬성')).toBeInTheDocument();
-      expect(screen.getByText('03:00')).toBeInTheDocument();
-      expect(screen.getByText('반대')).toBeInTheDocument();
-      expect(screen.getByText('02:30')).toBeInTheDocument();
+      expect(screen.getByText('찬성 팀')).toBeInTheDocument();
+      expect(screen.getByText('반대 팀')).toBeInTheDocument();
+      expect(screen.getByTestId('pros-total-timer')).toHaveAttribute(
+        'aria-label',
+        '03 : 00',
+      );
+      expect(screen.getByTestId('pros-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 20',
+      );
     });
 
     it('PLAY 상태의 TIME_BASED 타이머는 현재 발언 팀만 로컬 카운트다운을 진행한다', () => {
@@ -389,19 +408,34 @@ describe('AudienceSharePage', () => {
           isRunning: true,
           prosTime: 10,
           consTime: 20,
+          sequence: 2,
+          eventType: 'PLAY',
+          revision: 1,
         },
       });
       renderPage('/live/123');
 
-      expect(screen.getByText('00:10')).toBeInTheDocument();
-      expect(screen.getByText('00:20')).toBeInTheDocument();
+      expect(screen.getByTestId('pros-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 10',
+      );
+      expect(screen.getByTestId('cons-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 30',
+      );
 
       act(() => {
         vi.advanceTimersByTime(2000);
       });
 
-      expect(screen.getByText('00:08')).toBeInTheDocument();
-      expect(screen.getByText('00:20')).toBeInTheDocument();
+      expect(screen.getByTestId('pros-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 08',
+      );
+      expect(screen.getByTestId('cons-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 30',
+      );
     });
 
     it('finished 상태에서는 종료 문구와 페이지 닫기 버튼이 표시되며 클릭 시 window.close를 호출한다', async () => {
@@ -508,7 +542,7 @@ describe('AudienceSharePage', () => {
 
       renderPage('/live/123');
 
-      expect(screen.getByText('팀명 없음')).toBeInTheDocument();
+      expect(screen.queryByTestId('participant-row')).not.toBeInTheDocument();
       expect(screen.getByTestId('timer-progress-fill')).toHaveClass(
         'bg-default-neutral',
       );
