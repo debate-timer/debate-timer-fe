@@ -30,7 +30,7 @@ describe('AudienceNormalTimer', () => {
     expect(timerValue).toHaveClass(
       'mt-[64px]',
       'grid-cols-[2ch_1ch_2ch]',
-      'gap-x-[1ch]',
+      'gap-x-[0.33ch]',
     );
     expect(timerValue).toHaveAttribute('aria-label', '01 : 05');
     expect(screen.getByText('01')).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('AudienceNormalTimer', () => {
     );
   });
 
-  it('빈 팀명과 토론자명에는 접미사 없는 대체 문구를 표시한다', () => {
+  it('NEUTRAL 진영은 팀명과 토론자 정보를 표시하지 않는다', () => {
     render(
       <AudienceNormalTimer
         remainingTime={60}
@@ -78,10 +78,9 @@ describe('AudienceNormalTimer', () => {
       />,
     );
 
-    expect(screen.getByText('팀명 없음')).toBeInTheDocument();
-    expect(screen.getByText('토론자 없음')).toBeInTheDocument();
-    expect(screen.queryByText('팀명 없음 팀')).not.toBeInTheDocument();
-    expect(screen.queryByText('토론자 없음 토론자')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('participant-row')).not.toBeInTheDocument();
+    expect(screen.queryByText('팀명 없음')).not.toBeInTheDocument();
+    expect(screen.queryByText('토론자 없음')).not.toBeInTheDocument();
     expect(screen.getByTestId('timer-progress-fill')).toHaveClass(
       'bg-default-neutral',
     );
