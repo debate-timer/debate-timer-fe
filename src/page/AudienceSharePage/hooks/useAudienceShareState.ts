@@ -5,7 +5,7 @@ import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
 import { isSocketError } from '../../../apis/sockets/error';
 import { TimerDataPayload, TimerEventTypes } from '../../../apis/sockets/type';
 
-type AudienceNormalDisplayData = {
+export type AudienceNormalDisplayData = {
   timerType: 'NORMAL';
   currentTeam: null;
   isRunning: boolean;
@@ -13,12 +13,15 @@ type AudienceNormalDisplayData = {
   sequence: number;
 };
 
-type AudienceTimeBasedDisplayData = {
+export type AudienceTimeBasedDisplayData = {
   timerType: 'TIME_BASED';
   currentTeam: TimeBasedStance;
   isRunning: boolean;
   prosTime: number | null;
   consTime: number | null;
+  sequence: number;
+  eventType: TimerEventTypes;
+  revision: number;
 };
 
 type AudienceDisplayData =
@@ -68,15 +71,17 @@ function createDisplayData(
   data: TimerDataPayload,
   previousDisplayData: AudienceDisplayData | null,
   options: {
+    eventType: TimerEventTypes;
     isRunning: boolean;
-    normalSequence?: number;
+    sequence?: number;
     normalTime?: number;
     shouldSwitchTeam?: boolean;
   },
 ): AudienceDisplayData | null {
   const {
+    eventType,
     isRunning,
-    normalSequence = data.sequence,
+    sequence = data.sequence,
     normalTime = data.remainingTime,
     shouldSwitchTeam = false,
   } = options;
@@ -87,7 +92,7 @@ function createDisplayData(
       currentTeam: null,
       isRunning,
       singleTime: normalTime,
-      sequence: normalSequence,
+      sequence,
     };
   }
 
@@ -115,7 +120,64 @@ function createDisplayData(
       receivedCurrentTeam === 'CONS'
         ? data.remainingTime
         : (previousTimeBasedData?.consTime ?? null),
+    sequence,
+    eventType,
+    revision: (previousTimeBasedData?.revision ?? 0) + 1,
   };
+}
+
+function createNavigationDisplayData(
+  eventType: 'BEFORE' | 'NEXT',
+  data: TimerDataPayload,
+  previousDisplayData: AudienceDisplayData | null,
+  table: TimeBoxInfo[] | undefined,
+  sequence: number,
+) {
+  const targetTimeBox = table?.[sequence];
+
+  if (
+    targetTimeBox?.boxType === 'NORMAL' &&
+    targetTimeBox.time !== null &&
+    targetTimeBox.time > 0
+  ) {
+    return {
+      timerType: 'NORMAL' as const,
+      currentTeam: null,
+      isRunning: false,
+      singleTime: targetTimeBox.time,
+      sequence,
+    };
+  }
+
+  if (
+    targetTimeBox?.boxType === 'TIME_BASED' &&
+    targetTimeBox.timePerTeam !== null &&
+    targetTimeBox.timePerTeam > 0
+  ) {
+    const previousTimeBasedData =
+      previousDisplayData?.timerType === 'TIME_BASED'
+        ? previousDisplayData
+        : null;
+    const currentTeam =
+      data.currentTeam === 'PROS' || data.currentTeam === 'CONS'
+        ? data.currentTeam
+        : (previousTimeBasedData?.currentTeam ?? 'PROS');
+    const initialCurrentTime =
+      targetTimeBox.timePerSpeaking ?? targetTimeBox.timePerTeam;
+
+    return {
+      timerType: 'TIME_BASED' as const,
+      currentTeam,
+      isRunning: false,
+      prosTime: currentTeam === 'PROS' ? initialCurrentTime : null,
+      consTime: currentTeam === 'CONS' ? initialCurrentTime : null,
+      sequence,
+      eventType,
+      revision: (previousTimeBasedData?.revision ?? 0) + 1,
+    };
+  }
+
+  return null;
 }
 
 function getDisplayDataByEvent(
@@ -127,16 +189,19 @@ function getDisplayDataByEvent(
   switch (eventType) {
     case 'PLAY':
       return createDisplayData(data, previousDisplayData, {
+        eventType,
         isRunning: true,
       });
 
     case 'STOP':
       return createDisplayData(data, previousDisplayData, {
+        eventType,
         isRunning: false,
       });
 
     case 'RESET':
       return createDisplayData(data, previousDisplayData, {
+        eventType,
         isRunning: false,
         normalTime: getNormalTotalTime(
           table,
@@ -147,9 +212,22 @@ function getDisplayDataByEvent(
 
     case 'BEFORE': {
       const previousSequence = data.sequence - 1;
+      const navigationDisplayData = createNavigationDisplayData(
+        eventType,
+        data,
+        previousDisplayData,
+        table,
+        previousSequence,
+      );
+
+      if (navigationDisplayData) {
+        return navigationDisplayData;
+      }
+
       return createDisplayData(data, previousDisplayData, {
+        eventType,
         isRunning: false,
-        normalSequence: previousSequence,
+        sequence: previousSequence,
         normalTime: getNormalTotalTime(
           table,
           previousSequence,
@@ -160,16 +238,33 @@ function getDisplayDataByEvent(
 
     case 'NEXT': {
       const nextSequence = data.sequence + 1;
+      const navigationDisplayData = createNavigationDisplayData(
+        eventType,
+        data,
+        previousDisplayData,
+        table,
+        nextSequence,
+      );
+
+      if (navigationDisplayData) {
+        return navigationDisplayData;
+      }
+
       return createDisplayData(data, previousDisplayData, {
+        eventType,
         isRunning: false,
-        normalSequence: nextSequence,
+        sequence: nextSequence,
         normalTime: getNormalTotalTime(table, nextSequence, data.remainingTime),
       });
     }
 
     case 'TEAM_SWITCH':
       return createDisplayData(data, previousDisplayData, {
-        isRunning: false,
+        eventType,
+        isRunning:
+          previousDisplayData?.timerType === 'TIME_BASED'
+            ? previousDisplayData.isRunning
+            : false,
         shouldSwitchTeam: true,
       });
   }

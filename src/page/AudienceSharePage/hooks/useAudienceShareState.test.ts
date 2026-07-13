@@ -324,6 +324,9 @@ describe('useAudienceShareState', () => {
         expect(result.current.displayData.prosTime).toBe(77);
         expect(result.current.displayData.consTime).toBeNull();
         expect(result.current.displayData.isRunning).toBe(false);
+        expect(result.current.displayData.sequence).toBe(1);
+        expect(result.current.displayData.eventType).toBe('TEAM_SWITCH');
+        expect(result.current.displayData.revision).toBe(1);
       }
     }
 
@@ -349,7 +352,121 @@ describe('useAudienceShareState', () => {
         expect(result.current.displayData.prosTime).toBe(77);
         expect(result.current.displayData.consTime).toBe(55);
         expect(result.current.displayData.isRunning).toBe(false);
+        expect(result.current.displayData.sequence).toBe(2);
+        expect(result.current.displayData.revision).toBe(2);
       }
+    }
+  });
+
+  it('실행 중 TEAM_SWITCH는 새 팀에서도 실행 상태를 유지한다.', () => {
+    let latestMessage: SocketMessage = {
+      eventType: 'PLAY',
+      data: {
+        timerType: 'TIME_BASED',
+        currentTeam: 'PROS',
+        sequence: 0,
+        remainingTime: 30,
+      },
+    };
+    setSocketState({ isConnected: true, latestMessage });
+
+    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+    latestMessage = {
+      eventType: 'TEAM_SWITCH',
+      data: {
+        timerType: 'TIME_BASED',
+        currentTeam: 'PROS',
+        sequence: 0,
+        remainingTime: 25,
+      },
+    };
+    setSocketState({ isConnected: true, latestMessage });
+    rerender();
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.currentTeam).toBe('CONS');
+      expect(result.current.displayData.isRunning).toBe(true);
+      expect(result.current.displayData.eventType).toBe('TEAM_SWITCH');
+      expect(result.current.displayData.revision).toBe(2);
+    }
+  });
+
+  it.each([
+    { eventType: 'BEFORE' as const, sequence: 2, expectedSequence: 1 },
+    { eventType: 'NEXT' as const, sequence: 0, expectedSequence: 1 },
+  ])(
+    'TIME_BASED $eventType는 실제 이동 대상 sequence를 보존한다.',
+    ({ eventType, sequence, expectedSequence }) => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: {
+          eventType,
+          data: {
+            timerType: 'TIME_BASED',
+            currentTeam: 'PROS',
+            sequence,
+            remainingTime: 30,
+          },
+        },
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.status).toBe('displaying');
+      if (
+        result.current.status === 'displaying' &&
+        result.current.displayData.timerType === 'TIME_BASED'
+      ) {
+        expect(result.current.displayData.sequence).toBe(expectedSequence);
+        expect(result.current.displayData.eventType).toBe(eventType);
+      }
+    },
+  );
+
+  it('NORMAL에서 TIME_BASED 순서로 이동하면 API 설정으로 시간 기반 표시 상태를 만든다.', () => {
+    const mixedTable: TimeBoxInfo[] = [
+      normalTable[0],
+      {
+        stance: 'NEUTRAL',
+        speechType: '자유토론',
+        bell: null,
+        boxType: 'TIME_BASED',
+        time: null,
+        timePerTeam: 120,
+        timePerSpeaking: 30,
+        speaker: null,
+      },
+    ];
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'NEXT',
+        data: {
+          timerType: 'NORMAL',
+          sequence: 0,
+          remainingTime: 20,
+        },
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAudienceShareState(1, { table: mixedTable }),
+    );
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.sequence).toBe(1);
+      expect(result.current.displayData.currentTeam).toBe('PROS');
+      expect(result.current.displayData.prosTime).toBe(30);
+      expect(result.current.displayData.eventType).toBe('NEXT');
     }
   });
 
