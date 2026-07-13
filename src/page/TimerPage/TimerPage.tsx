@@ -35,6 +35,9 @@ import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 
+// 피처 플래그
+const IS_LIVE_SHARE_ENABLED = false;
+
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
   const { t } = useTranslation();
@@ -279,7 +282,7 @@ export default function TimerPage() {
               )}
             >
               {/* 라이브 공유 버튼 및 모달 */}
-              {isLoggedIn() && (
+              {IS_LIVE_SHARE_ENABLED && isLoggedIn() && (
                 <div
                   className="absolute right-4 top-4 flex"
                   ref={liveShareModalRef}
