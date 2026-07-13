@@ -34,6 +34,7 @@ import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
+import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
@@ -82,12 +83,13 @@ export default function TimerPage() {
     normalTimer,
   } = state;
   const timerType = data && data.table[index].boxType;
-  const remainingTime =
-    timerType === 'NORMAL'
-      ? normalTimer.timer
-      : prosConsSelected === 'PROS'
-        ? timer1.speakingTimer
-        : timer2.speakingTimer;
+  const remainingTime = getRemainingTimeForShare({
+    timerType,
+    normalTimer: normalTimer.timer,
+    currentTeam: prosConsSelected,
+    prosTimer: timer1,
+    consTimer: timer2,
+  });
 
   const {
     isLiveShareModalOpen,
@@ -114,6 +116,15 @@ export default function TimerPage() {
 
     // 만약 소켓 열려 있으면, 발송
     if (isSocketConnected) {
+      if (eventType === 'FINISHED') {
+        issueEvent(eventType, null);
+        return;
+      }
+
+      if (remainingTime === null) {
+        return;
+      }
+
       // 타입에 따른 페이로드 준비
       let innerPayload: TimerDataPayload;
 
@@ -122,24 +133,22 @@ export default function TimerPage() {
           timerType: timerType,
           remainingTime: remainingTime,
           sequence: index,
-        } as TimerDataPayload;
+        };
       } else if (timerType === 'TIME_BASED') {
         innerPayload = {
           currentTeam: prosConsSelected,
           timerType: timerType,
           remainingTime: remainingTime,
           sequence: index,
-        } as TimerDataPayload;
+        };
       } else {
         // 피드백 타이머 타입은 여기 올 수 없음
         // 따라서 별도 작업 하지 않고 그냥 반환
         return;
       }
 
-      const payload = eventType === 'FINISHED' ? null : innerPayload;
-
       // 이벤트 발행
-      issueEvent(eventType, payload);
+      issueEvent(eventType, innerPayload);
     }
   };
 
