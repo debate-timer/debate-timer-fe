@@ -18,10 +18,16 @@ interface AudienceTimeBasedTimerDisplayProps {
 interface TimerValueProps {
   seconds: number;
   testId: string;
+  isDisabled: boolean;
   className?: string;
 }
 
-function TimerValue({ seconds, testId, className }: TimerValueProps) {
+function TimerValue({
+  seconds,
+  testId,
+  isDisabled,
+  className,
+}: TimerValueProps) {
   const normalizedSeconds = Math.max(0, seconds);
   const [minutes, remainingSeconds] =
     Formatting.formatSecondsToMMSS(normalizedSeconds).split(':');
@@ -29,7 +35,8 @@ function TimerValue({ seconds, testId, className }: TimerValueProps) {
   return (
     <span
       className={clsx(
-        'grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] font-bold tabular-nums text-default-black',
+        'grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] font-bold tabular-nums',
+        isDisabled ? 'text-default-disabled/hover' : 'text-default-black',
         className,
       )}
       data-testid={testId}
@@ -66,13 +73,12 @@ export default function AudienceTimeBasedTimerDisplay({
       ? totalRemainingTime
       : (currentSpeakingRemainingTime ?? timePerSpeaking);
   const progress = ((progressBase - progressRemaining) / progressBase) * 100;
+  const activeCurrentBadgeClass =
+    team === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
 
   return (
     <section
-      className={clsx(
-        'flex h-full min-w-0 flex-1 flex-col items-center justify-center rounded-[16px] px-6 py-8',
-        !isCurrentTeam && 'bg-gray-100 opacity-50 grayscale',
-      )}
+      className="flex h-full min-w-0 flex-1 flex-col items-center justify-center rounded-[16px] px-6 py-8"
       data-testid={`${teamId}-timer-display`}
       aria-current={isCurrentTeam ? 'step' : undefined}
     >
@@ -82,7 +88,12 @@ export default function AudienceTimeBasedTimerDisplay({
         </span>
       ) : null}
 
-      <h1 className="text-center text-[52px] font-bold xl:text-[68px]">
+      <h1
+        className={clsx(
+          'text-center text-[52px] font-bold xl:text-[68px]',
+          !isCurrentTeam && 'text-default-disabled/hover',
+        )}
+      >
         {teamLabel}
       </h1>
 
@@ -91,29 +102,38 @@ export default function AudienceTimeBasedTimerDisplay({
           <TimerValue
             seconds={totalRemainingTime}
             testId={`${teamId}-total-timer`}
+            isDisabled={!isCurrentTeam}
             className="mt-[64px] text-[70px] xl:text-[110px]"
           />
           <TimerProgressBar
             progress={progress}
-            team={team}
+            team={isCurrentTeam ? team : 'DISABLED'}
             isRunning={isRunning}
             className="mt-[108px] max-w-[560px]"
           />
         </>
       ) : (
         <>
-          <span className="mt-[36px] flex h-[48px] w-[144px] items-center justify-center rounded-[8px] bg-default-black text-[24px] text-default-white">
+          <span
+            className={clsx(
+              'mt-[36px] flex h-[48px] w-[144px] items-center justify-center rounded-[8px] text-[24px] text-default-white',
+              isCurrentTeam ? 'bg-default-black' : 'bg-default-disabled/hover',
+            )}
+          >
             {t('전체 시간')}
           </span>
           <TimerValue
             seconds={totalRemainingTime}
             testId={`${teamId}-total-timer`}
+            isDisabled={!isCurrentTeam}
             className="mt-[12px] text-[108px]"
           />
           <span
             className={clsx(
               'mt-[28px] flex h-[64px] w-[200px] items-center justify-center rounded-[8px] text-[32px] text-default-white',
-              team === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red',
+              isCurrentTeam
+                ? activeCurrentBadgeClass
+                : 'bg-default-disabled/hover',
             )}
           >
             {t('현재 시간')}
@@ -121,11 +141,12 @@ export default function AudienceTimeBasedTimerDisplay({
           <TimerValue
             seconds={currentSpeakingRemainingTime ?? 0}
             testId={`${teamId}-current-timer`}
+            isDisabled={!isCurrentTeam}
             className="mt-[12px] text-[70px] xl:text-[110px]"
           />
           <TimerProgressBar
             progress={progress}
-            team={team}
+            team={isCurrentTeam ? team : 'DISABLED'}
             isRunning={isRunning}
             className="mt-[64px] max-w-[560px]"
           />

@@ -79,24 +79,42 @@ describe('AudienceTimeBasedTimerDisplay', () => {
     );
   });
 
-  it('빈 팀 이름은 폴백을 표시하고 비활성 팀은 흐리게 표시한다', () => {
+  it('빈 팀 이름은 폴백을 표시하고 비활성 팀의 모든 요소를 무채색으로 표시한다', () => {
     render(
       <AudienceTimeBasedTimerDisplay
         team="CONS"
         teamName="  "
         timePerTeam={60}
-        timePerSpeaking={null}
+        timePerSpeaking={30}
         totalRemainingTime={60}
-        currentSpeakingRemainingTime={null}
+        currentSpeakingRemainingTime={30}
         isCurrentTeam={false}
         isRunning={false}
       />,
     );
 
-    expect(screen.getByText('팀명 없음')).toBeInTheDocument();
-    expect(screen.getByTestId('cons-timer-display')).toHaveClass(
+    expect(screen.getByText('팀명 없음')).toHaveClass(
+      'text-default-disabled/hover',
+    );
+    expect(screen.getByTestId('cons-timer-display')).not.toHaveClass(
       'bg-gray-100',
       'opacity-50',
+      'grayscale',
+    );
+    expect(screen.getByText('전체 시간')).toHaveClass(
+      'bg-default-disabled/hover',
+    );
+    expect(screen.getByText('현재 시간')).toHaveClass(
+      'bg-default-disabled/hover',
+    );
+    expect(screen.getByTestId('cons-total-timer')).toHaveClass(
+      'text-default-disabled/hover',
+    );
+    expect(screen.getByTestId('cons-current-timer')).toHaveClass(
+      'text-default-disabled/hover',
+    );
+    expect(screen.getByTestId('timer-progress-fill')).toHaveClass(
+      'bg-default-neutral',
     );
     expect(
       screen.queryByTestId('cons-speaking-status'),
