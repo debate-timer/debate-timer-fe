@@ -279,6 +279,7 @@ export default function TimerPage() {
               )}
             >
               {/* 라이브 공유 버튼 및 모달 */}
+              {/* - '26. 7. 13. 현 시점 임시 비활성화 및 추후 후속 PR 병합 이후 공개 예정
               {isLoggedIn() && (
                 <div
                   className="absolute right-4 top-4 flex"
@@ -301,6 +302,7 @@ export default function TimerPage() {
                   )}
                 </div>
               )}
+              */}
 
               {/* 타이머 두 개 + ENTER 버튼 */}
               <TimerView
