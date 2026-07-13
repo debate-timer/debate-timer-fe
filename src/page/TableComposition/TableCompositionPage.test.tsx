@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -71,11 +71,15 @@ describe('TableComposition', () => {
     );
 
     // Check header title is exist to verify whether TablenameAndType is correctly rendered
-    expect(screen.findByRole('heading', { name: '토론 정보를 설정해주세요' }));
+    expect(
+      await screen.findByRole('heading', { name: '토론 정보를 설정해주세요' }),
+    ).toBeInTheDocument();
 
     // Go to next step - TimeBoxStep
     await userEvent.click(await screen.findByRole('button', { name: '다음' }));
-    expect(screen.findByRole('heading', { name: '주제 없음' }));
+    expect(
+      await screen.findByRole('heading', { name: '주제 없음' }),
+    ).toBeInTheDocument();
 
     // Check whether finish button is disabled
     const finishButton = await screen.findByRole('button', {
@@ -90,11 +94,15 @@ describe('TableComposition', () => {
     await userEvent.click(
       await screen.findByRole('button', { name: '설정 완료' }),
     );
-    expect(screen.getByTestId('timebox')).toBeInTheDocument();
+    expect(await screen.findByTestId('timebox')).toBeInTheDocument();
 
     // Finish creation flow
-    await userEvent.click(finishButton);
-    expect(screen.getByTestId('overview-page')).toBeInTheDocument();
+    const enabledFinishButton = await screen.findByRole('button', {
+      name: '추가하기',
+    });
+    await waitFor(() => expect(enabledFinishButton).toBeEnabled());
+    await userEvent.click(enabledFinishButton);
+    expect(await screen.findByTestId('overview-page')).toBeInTheDocument();
   });
 
   it('Modification flow test', async () => {
@@ -107,7 +115,9 @@ describe('TableComposition', () => {
     );
 
     // Check whether user sees TimeBoxStep not TableNameAndType
-    expect(screen.findByRole('button', { name: '토론 정보 수정하기' }));
+    expect(
+      await screen.findByRole('button', { name: '토론 정보 수정하기' }),
+    ).toBeInTheDocument();
 
     // Check whether timeboxes are correctly displayed
     const timeboxItems = await screen.findAllByTestId('timebox');
@@ -117,6 +127,10 @@ describe('TableComposition', () => {
     await userEvent.click(
       await screen.findByRole('button', { name: '토론 정보 수정하기' }),
     );
-    expect(screen.getByText('토론 정보를 수정해주세요')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', {
+        name: '토론 정보를 수정해주세요',
+      }),
+    ).toBeInTheDocument();
   });
 });

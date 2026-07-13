@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
@@ -21,10 +22,11 @@ type TimeBasedTimerInstance = {
 interface TimeBasedTimerProps {
   timeBasedTimerInstance: TimeBasedTimerInstance;
   isSelected: boolean;
-  onActivate?: () => void;
+  onActivate: () => void;
   prosCons: TimeBasedStance;
   teamName: string;
   item: TimeBoxInfo;
+  answerTimer: ReactNode;
 }
 
 export default function TimeBasedTimer({
@@ -33,6 +35,7 @@ export default function TimeBasedTimer({
   prosCons,
   teamName,
   item,
+  answerTimer,
 }: TimeBasedTimerProps) {
   const { t } = useTranslation();
   const {
@@ -101,10 +104,15 @@ export default function TimeBasedTimer({
   return (
     <div
       data-testid="timer"
+      onClick={() => {
+        // '26. 6. 3. 부로 마우스 클릭을 활용한 팀 전환은 비활성화
+        // onActivate()
+      }}
       className={clsx(
         'flex w-[400px] flex-col items-center justify-center space-y-[12px] xl:min-w-[560px] xl:space-y-[20px]',
         {
-          'pointer-events-none opacity-50 grayscale': !isSelected,
+          'opacity-50 grayscale': !isSelected,
+          'pointer-events-none': !isSelected, // 마우스 클릭을 활용한 팀 전환 활성화 시에 이 태그를 지우세요.
         },
       )}
     >
@@ -175,6 +183,8 @@ export default function TimeBasedTimer({
           </span>
         )}
       </CircularTimer>
+
+      {answerTimer}
 
       {/* 조작부 */}
       <TimerController

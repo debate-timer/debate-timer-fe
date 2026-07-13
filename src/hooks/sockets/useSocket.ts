@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
-import { socketManager, SocketOptions } from '../apis/sockets/SocketManager';
-import { SocketMessage } from '../apis/sockets/type';
+import { socketManager, SocketOptions } from '../../apis/sockets/SocketManager';
+import { SocketMessage } from '../../apis/sockets/type';
 
 /**
  * 소켓 연결을 돕는 React 훅입니다. 제공되는 함수는 아래와 같습니다:
@@ -15,7 +15,7 @@ import { SocketMessage } from '../apis/sockets/type';
  *
  * 특히, 구독 해제의 책임은 이 훅에 있으나, 연결 자체를 끊는 책임은 소켓을 호출한 페이지에 있다는 점을 유념해주세요.
  */
-export const useSocket = () => {
+export default function useSocket() {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
   const activeSubscriptions = useRef<Map<string, StompSubscription>>(new Map());
 
@@ -24,8 +24,11 @@ export const useSocket = () => {
     new Map(),
   );
 
+  const connectionListeners = useRef<Set<() => void>>(new Set());
+
   // 오류 안내를 위한 상태
   const [error, setError] = useState<Error | null>(null);
+  const [isConnected, setIsConnected] = useState(socketManager.isConnected());
 
   /**
    * 소켓 연결
@@ -33,6 +36,7 @@ export const useSocket = () => {
    * @param options - (선택 옵션) 소켓 연결에 사용할 옵션. 상세 항목은 [SocketManager.ts](../apis/sockets/SocketManager.ts) 참고.
    */
   const connect = useCallback((options?: SocketOptions) => {
+    setError(null);
     socketManager.connect(options);
   }, []);
 
@@ -41,7 +45,17 @@ export const useSocket = () => {
    * WS 연결을 끊음.
    */
   const disconnect = useCallback(() => {
+    setError(null);
     socketManager.disconnect();
+    setIsConnected(false);
+  }, []);
+
+  const addConnectionListener = useCallback((listener: () => void) => {
+    connectionListeners.current.add(listener);
+
+    return () => {
+      connectionListeners.current.delete(listener);
+    };
   }, []);
 
   /**
@@ -110,7 +124,12 @@ export const useSocket = () => {
   useEffect(() => {
     // 소켓이 연결될 때마다 실행될 핸들러
     const handleConnect = () => {
+      setError(null);
+      setIsConnected(true);
+
       const recover = () => {
+        connectionListeners.current.forEach((listener) => listener());
+
         // 기존 활성화된 구독 리스트 초기화
         activeSubscriptions.current.clear();
 
@@ -127,19 +146,12 @@ export const useSocket = () => {
       // 재시도 및 오류 복구 최초 1회
       try {
         recover();
-      } catch (error) {
-        console.warn('🚨 리스너 복구 1차 실패, 1초 후 재시도합니다.', error);
-
+      } catch {
         // 1초 후 2차 복구 시도
         setTimeout(() => {
           try {
             recover();
           } catch (retryError) {
-            console.error(
-              '🚨 재시도 실패! 복구 불가능한 상태입니다.',
-              retryError,
-            );
-            // 💡 훅이 자체적으로 에러 상태를 업데이트
             setError(
               retryError instanceof Error
                 ? retryError
@@ -150,8 +162,18 @@ export const useSocket = () => {
       }
     };
 
+    const handleClose = () => {
+      setIsConnected(false);
+    };
+
+    const handleError = (err: Error) => {
+      setError(err);
+    };
+
     // 이 핸들러 함수를 발행자(SocketManager)에 등록
     socketManager.onConnectEvent(handleConnect);
+    socketManager.onCloseEvent(handleClose);
+    socketManager.onErrorEvent(handleError);
 
     // 리스너 등록 이후 연결이 이미 되어 있는 게 확인되면, 핸들러 바로 실행
     if (socketManager.isConnected()) {
@@ -162,6 +184,8 @@ export const useSocket = () => {
     return () => {
       // 먼저 발행자(SocketManager)에게 등록된 핸들러부터 제거
       socketManager.offConnectEvent(handleConnect);
+      socketManager.offCloseEvent(handleClose);
+      socketManager.offErrorEvent(handleError);
 
       // 활성화된 모든 구독 해제
       activeSubscriptions.current.forEach((subscription) =>
@@ -173,6 +197,8 @@ export const useSocket = () => {
       activeSubscriptions.current.clear();
       // eslint-disable-next-line react-hooks/exhaustive-deps
       subscriptionInfos.current.clear();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      connectionListeners.current.clear();
     };
   }, []);
 
@@ -183,6 +209,8 @@ export const useSocket = () => {
     subscribe,
     unsubscribe,
     publish,
+    addConnectionListener,
+    isConnected,
     error,
   };
-};
+}

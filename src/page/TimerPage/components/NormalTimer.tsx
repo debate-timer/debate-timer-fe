@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TimeBoxInfo } from '../../../type/type';
 import TimerController from './TimerController';
@@ -26,6 +27,7 @@ interface NormalTimerProps {
   isAdditionalTimerAvailable: boolean;
   item: TimeBoxInfo;
   teamName: string | null;
+  answerTimer: ReactNode;
 }
 
 export default function NormalTimer({
@@ -33,6 +35,7 @@ export default function NormalTimer({
   isAdditionalTimerAvailable,
   item,
   teamName,
+  answerTimer,
 }: NormalTimerProps) {
   const { t } = useTranslation();
   const getSpeechTypeLabel = (value: string) => {
@@ -161,6 +164,8 @@ export default function NormalTimer({
             <p className="flex flex-1 items-center justify-center">{second}</p>
           </span>
         </CircularTimer>
+
+        {answerTimer}
 
         {/* 조작부 */}
         <TimerController

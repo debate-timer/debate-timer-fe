@@ -81,7 +81,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
 
         <LanguageSelector />
 
-        <div className="w-[1px] self-stretch bg-neutral-500" />
+        <div className="w-[1px] min-w-[1px] self-stretch bg-neutral-500" />
 
         {/* props으로 들어오는 버튼들 */}
         {buttons}

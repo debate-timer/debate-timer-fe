@@ -1,6 +1,7 @@
 import { Client, IMessage, StompHeaders } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { SocketMessage } from './type';
+import { SocketError } from './error';
 
 /**
  * 소켓 설정을 정하는 인터페이스
@@ -10,6 +11,12 @@ import { SocketMessage } from './type';
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
  */
 export interface SocketOptions {
+  /** SockJS 연결에 사용할 전체 URL. 지정하면 baseUrl보다 우선합니다. */
+  url?: string;
+
+  /** SockJS 연결에 사용할 API base URL. 지정하면 `${baseUrl}/ws`로 연결합니다. */
+  baseUrl?: string;
+
   /** 최대 재시도 횟수 (기본값: 3) */
   maxRetries?: number;
 
@@ -24,7 +31,16 @@ export interface SocketOptions {
 }
 
 // 기본값 객체 선언 (onConnect를 제외한 모든 필수 속성 정의)
-const DEFAULT_OPTIONS: Required<SocketOptions> = {
+type ResolvedSocketOptions = {
+  url?: string;
+  baseUrl?: string;
+  maxRetries: number;
+  baseRetryDelayMs: number;
+  heartbeatInMs: number;
+  heartbeatOutMs: number;
+};
+
+const DEFAULT_OPTIONS: ResolvedSocketOptions = {
   maxRetries: 3,
   baseRetryDelayMs: 1000,
   heartbeatInMs: 10000,
@@ -36,7 +52,7 @@ class SocketManager {
   // 변수
   private client: Client | null = null;
   private static instance: SocketManager;
-  private currentOptions = DEFAULT_OPTIONS; // 소켓 설정을 저장하는 변수
+  private currentOptions: ResolvedSocketOptions = DEFAULT_OPTIONS; // 소켓 설정을 저장하는 변수
   private retryCount: number = 0;
 
   // 싱글톤 패턴 적용
@@ -56,6 +72,10 @@ class SocketManager {
   // - 관찰자(observer)는 구독을 관리하는 useSocket 훅
   // - 발행자(publisher)는 재연결 여부를 알리는 이 클래스 (SocketManager)
   private connectListeners: Set<() => void> = new Set();
+  private closeListeners: Set<() => void> = new Set();
+  private errorListeners: Set<(error: SocketError) => void> = new Set();
+
+  private hasConnected: boolean = false;
 
   /**
    * 관찰자를 등록하는 함수
@@ -71,6 +91,52 @@ class SocketManager {
    */
   public offConnectEvent(listener: () => void) {
     this.connectListeners.delete(listener);
+  }
+
+  /**
+   * 소켓 연결 종료 관찰자를 등록하는 함수
+   * @param listener - 연결 종료 시 실행할 콜백 함수
+   */
+  public onCloseEvent(listener: () => void) {
+    this.closeListeners.add(listener);
+  }
+
+  /**
+   * 소켓 연결 종료 관찰자를 제거하는 함수
+   * @param listener - 제거할 콜백 함수
+   */
+  public offCloseEvent(listener: () => void) {
+    this.closeListeners.delete(listener);
+  }
+
+  public onErrorEvent(listener: (error: SocketError) => void) {
+    this.errorListeners.add(listener);
+  }
+
+  public offErrorEvent(listener: (error: SocketError) => void) {
+    this.errorListeners.delete(listener);
+  }
+
+  private dispatchError(error: SocketError) {
+    this.errorListeners.forEach((listener) => {
+      try {
+        listener(error);
+      } catch (e) {
+        console.error(
+          '오류 리스너 실행 중 오류 발생. 다음 리스너로 진행합니다.',
+          e,
+        );
+      }
+    });
+  }
+
+  private reportSocketError(error: SocketError) {
+    console.error('[SocketManager] 소켓 오류 발생', {
+      code: error.code,
+      message: error.message,
+      detail: error.detail,
+    });
+    this.dispatchError(error);
   }
 
   /**
@@ -97,15 +163,19 @@ class SocketManager {
 
     // 사용자가 지정한 옵션이 있다면 덮어쓰기
     this.retryCount = 0;
+    this.hasConnected = false;
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
-    // 환경 변수에서 URL 로드
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    if (!baseUrl) {
-      console.error('VITE_API_BASE_URL 환경 변수가 설정되지 않았습니다.');
+    const wsUrl = this.resolveWebSocketUrl(this.currentOptions);
+    if (!wsUrl) {
+      this.reportSocketError(
+        new SocketError(
+          'SOCKET_URL_UNAVAILABLE',
+          '웹소켓 연결 주소를 결정할 수 없습니다.',
+        ),
+      );
       return;
     }
-    const wsUrl = baseUrl + '/ws';
 
     const newClient = new Client({
       // wss:// 대신 https:// 주소를 SockJS 팩토리에 주입
@@ -126,6 +196,7 @@ class SocketManager {
       onConnect: () => {
         console.log('✅ 웹 소켓(STOMP) 연결 성공');
         this.retryCount = 0;
+        this.hasConnected = true;
 
         // 모든 관찰자에게 연결이 수립되었다고 알림
         this.connectListeners.forEach((listener) => {
@@ -138,8 +209,13 @@ class SocketManager {
       },
 
       onStompError: (frame) => {
-        console.error('❌ 브로커 에러 발생:', frame.headers['message']);
-        console.error('상세 내용:', frame.body);
+        this.reportSocketError(
+          new SocketError(
+            'SOCKET_STOMP_ERROR',
+            frame.headers['message'] || 'STOMP 오류 발생',
+            { headers: frame.headers, body: frame.body },
+          ),
+        );
       },
 
       onWebSocketClose: () => {
@@ -150,6 +226,34 @@ class SocketManager {
         }
 
         console.log('⚠️ 웹 소켓 연결이 종료되었습니다.');
+        this.closeListeners.forEach((listener) => {
+          try {
+            listener();
+          } catch (error) {
+            console.error(
+              '종료 리스너 오류 발생. 다음 리스너로 진행합니다.',
+              error,
+            );
+          }
+        });
+
+        if (!this.hasConnected) {
+          this.reportSocketError(
+            new SocketError(
+              'SOCKET_SERVER_REJECTED',
+              '서버에 의해 웹소켓 연결이 거부되었거나 즉시 종료되었습니다.',
+            ),
+          );
+
+          if (this.client) {
+            this.client.reconnectDelay = 0;
+            const clientToDeactivate = this.client;
+            this.client = null;
+            clientToDeactivate.deactivate();
+          }
+          return;
+        }
+
         this.handleReconnection();
       },
     });
@@ -172,6 +276,8 @@ class SocketManager {
       this.client = null;
       this.currentOptions = DEFAULT_OPTIONS;
       this.connectListeners.clear();
+      this.closeListeners.clear();
+      this.errorListeners.clear();
 
       console.log('🛑 웹 소켓 연결을 수동으로 해제했습니다.');
     }
@@ -225,8 +331,11 @@ class SocketManager {
 
     // 재시도 횟수를 초과했을 경우 연결을 즉시 종료
     if (this.retryCount >= this.currentOptions.maxRetries) {
-      console.error(
-        '🚨 최대 재연결 시도 횟수를 초과했습니다. 연결을 포기합니다.',
+      this.reportSocketError(
+        new SocketError(
+          'SOCKET_RETRY_EXHAUSTED',
+          '최대 재연결 시도 횟수를 초과했습니다.',
+        ),
       );
       this.client.reconnectDelay = 0;
 
@@ -264,6 +373,20 @@ class SocketManager {
     // 난수가 0이 될 경우 STOMP가 재연결 비활성화로 파악하는 것을 막기 위해
     // 계산한 값에 10 ms를 추가
     return Math.floor(Math.random() * maxExponentialDelay) + 10;
+  }
+
+  private resolveWebSocketUrl(options: SocketOptions): string | null {
+    if (options.url) {
+      return options.url;
+    }
+
+    const baseUrl = options.baseUrl ?? import.meta.env.VITE_API_BASE_URL;
+    if (!baseUrl) {
+      return null;
+    }
+
+    const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+    return `${normalizedBaseUrl}/ws`;
   }
 }
 

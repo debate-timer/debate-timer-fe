@@ -1,9 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import {
-  RouterProvider,
-  createMemoryRouter,
-  Outlet,
-} from 'react-router-dom';
+import { RouterProvider, createMemoryRouter, Outlet } from 'react-router-dom';
 import type { PropsWithChildren, ReactNode } from 'react';
 import usePageTracking from './usePageTracking';
 import { analyticsManager } from '../util/analytics';

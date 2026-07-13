@@ -1,5 +1,5 @@
 // hooks/useTimerPageModal.ts
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from '../../../hooks/useModal';
 import { useNavigate } from 'react-router-dom';
 import { isGuestFlow } from '../../../util/sessionStorage';
@@ -17,6 +17,8 @@ export function useTimerPageModal(tableId: number) {
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const IS_VISITED = 'isVisited';
   const TRUE = 'true';
+  const [isAnswerTimeGuideOpen, setIsAnswerTimeGuideOpen] = useState(false);
+  const hasOpenedAnswerTimeGuideRef = useRef(false);
 
   // 툴팁(처음 사용 안내) 모달
   const {
@@ -31,6 +33,13 @@ export function useTimerPageModal(tableId: number) {
     isCloseButtonExist: false,
   });
 
+  const openAnswerTimeGuide = useCallback(() => {
+    if (hasOpenedAnswerTimeGuideRef.current) return;
+
+    hasOpenedAnswerTimeGuideRef.current = true;
+    setIsAnswerTimeGuideOpen(true);
+  }, []);
+
   // 로그인/저장 유도 모달
   const {
     openModal: openLoginAndStoreModal,
@@ -43,8 +52,19 @@ export function useTimerPageModal(tableId: number) {
     const isVisited = localStorage.getItem(IS_VISITED);
     if (isVisited === null || isVisited !== TRUE) {
       openUseTooltipModal();
+      return;
     }
+    openAnswerTimeGuide();
     // eslint-disable-next-line
+  }, []);
+
+  const closeUseTooltipModalAndOpenAnswerTimeGuide = useCallback(() => {
+    closeUseTooltipModal();
+    openAnswerTimeGuide();
+  }, [closeUseTooltipModal, openAnswerTimeGuide]);
+
+  const closeAnswerTimeGuide = useCallback(() => {
+    setIsAnswerTimeGuideOpen(false);
   }, []);
 
   const openLoginAndStoreModalOrGoToDebateEndPage = () => {
@@ -57,11 +77,13 @@ export function useTimerPageModal(tableId: number) {
 
   return {
     isUseTooltipOpen,
+    isAnswerTimeGuideOpen,
     isLoginAndStoreOpen,
     UseToolTipWrapper,
     LoginAndStoreModalWrapper,
     openUseTooltipModal,
-    closeUseTooltipModal,
+    closeUseTooltipModal: closeUseTooltipModalAndOpenAnswerTimeGuide,
+    closeAnswerTimeGuideModal: closeAnswerTimeGuide,
     openLoginAndStoreModal,
     closeLoginAndStoreModal,
     openLoginAndStoreModalOrGoToDebateEndPage,

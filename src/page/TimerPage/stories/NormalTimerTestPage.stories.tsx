@@ -49,6 +49,7 @@ function NormalTimerTestPage() {
             item={item}
             teamName="찬성"
             isAdditionalTimerAvailable={false}
+            answerTimer={null}
           />
 
           {/* NEXT 버튼만 하단에 표시 */}

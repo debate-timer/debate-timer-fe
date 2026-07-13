@@ -27,7 +27,7 @@ export interface TimerDataPayload {
   sequence: number;
 
   /** 현재 발언하고 있는 팀의 진영 */
-  currentTeam: Stance;
+  currentTeam?: Stance;
 
   /** 남은 시간 (초 단위) */
   remainingTime: number;

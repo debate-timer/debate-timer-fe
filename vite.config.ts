@@ -42,6 +42,10 @@ const viteConfig = defineViteConfig(({ mode }) => {
       },
       port: 3000,
     },
+    define: {
+      // global을 window로 정의하여 sockjs-client의 참조 오류 해결
+      global: 'window',
+    },
   };
 });
 

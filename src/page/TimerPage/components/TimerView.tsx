@@ -1,10 +1,23 @@
-// components/TimerView.tsx
+import { SocketEventType } from '../../../apis/sockets/type';
 import DTExchange from '../../../components/icons/Exchange';
+import { useAnswerTimer } from '../hooks/useAnswerTimer';
 import { TimerPageLogics } from '../hooks/useTimerPageState';
+import AnswerTimeTimer from './AnswerTimeTimer';
 import NormalTimer from './NormalTimer';
 import TimeBasedTimer from './TimeBasedTimer';
 
-export default function TimerView({ state }: { state: TimerPageLogics }) {
+interface TimerViewProps {
+  state: TimerPageLogics;
+  onEvent: (invoke: () => void, eventType: SocketEventType) => void;
+  answerTime: number;
+}
+
+export default function TimerView({
+  state,
+  onEvent,
+  answerTime,
+}: TimerViewProps) {
+  // 상태 풀기
   const {
     data,
     normalTimer,
@@ -16,6 +29,18 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
     handleActivateTeam,
     switchCamp,
   } = state;
+
+  const { answerTimerState, handleClickAnswerTimer } = useAnswerTimer({
+    answerTime,
+    data,
+    index,
+    normalTimer,
+    prosConsSelected,
+    timer1,
+    timer2,
+  });
+
+  // 일반 타이머
   if (data && data.table[index].boxType === 'NORMAL') {
     return (
       <NormalTimer
@@ -25,13 +50,22 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
           isRunning: normalTimer.isRunning,
           handleChangeAdditionalTimer: normalTimer.handleChangeAdditionalTimer,
           handleCloseAdditionalTimer: normalTimer.handleCloseAdditionalTimer,
-          startTimer: normalTimer.startTimer,
-          pauseTimer: normalTimer.pauseTimer,
-          resetTimer: normalTimer.resetTimer,
+          startTimer: () => onEvent(normalTimer.startTimer, 'PLAY'),
+          pauseTimer: () => onEvent(normalTimer.pauseTimer, 'STOP'),
+          resetTimer: () => onEvent(normalTimer.resetTimer, 'RESET'),
           setTimer: normalTimer.setTimer,
         }}
         isAdditionalTimerAvailable={isAdditionalTimerAvailable}
         item={data.table[index]}
+        answerTimer={
+          <AnswerTimeTimer
+            owner="NORMAL"
+            answerTime={answerTime}
+            answerTimerState={answerTimerState}
+            isMainTimerRunning={normalTimer.isRunning}
+            onClick={handleClickAnswerTimer}
+          />
+        }
         teamName={
           data.table[index].stance === 'NEUTRAL'
             ? null
@@ -42,6 +76,8 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
       />
     );
   }
+
+  // 자유 토론 타이머
   if (data && data.table[index].boxType === 'TIME_BASED') {
     return (
       <div className="flex flex-row items-center justify-center space-x-[30px]">
@@ -51,20 +87,34 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             totalTimer: timer1.totalTimer,
             speakingTimer: timer1.speakingTimer,
             isRunning: timer1.isRunning,
-            startTimer: timer1.startTimer,
-            pauseTimer: timer1.pauseTimer,
-            resetCurrentTimer: () => timer1.resetCurrentTimer(timer2.isDone),
+            startTimer: () => onEvent(timer1.startTimer, 'PLAY'),
+            pauseTimer: () => onEvent(timer1.pauseTimer, 'STOP'),
+            resetCurrentTimer: () =>
+              onEvent(() => timer1.resetCurrentTimer(timer2.isDone), 'RESET'),
           }}
           item={data.table[index]}
           isSelected={prosConsSelected === 'PROS'}
-          onActivate={() => handleActivateTeam('PROS')}
+          onActivate={() =>
+            handleActivateTeam('PROS', (invoke) =>
+              onEvent(invoke, 'TEAM_SWITCH'),
+            )
+          }
           prosCons="PROS"
           teamName={data.info.prosTeamName}
+          answerTimer={
+            <AnswerTimeTimer
+              owner="PROS"
+              answerTime={answerTime}
+              answerTimerState={answerTimerState}
+              isMainTimerRunning={timer1.isRunning}
+              onClick={handleClickAnswerTimer}
+            />
+          }
         />
 
         {/* ENTER 버튼 */}
         <button
-          onClick={switchCamp}
+          onClick={() => onEvent(switchCamp, 'TEAM_SWITCH')}
           className="flex flex-col items-center justify-center rounded-[14px] bg-default-black2 px-[16px] py-[8px] text-default-white shadow-xl xl:px-[32px]"
         >
           <DTExchange className="size-[48px] xl:size-[64px]" />
@@ -77,18 +127,33 @@ export default function TimerView({ state }: { state: TimerPageLogics }) {
             totalTimer: timer2.totalTimer,
             speakingTimer: timer2.speakingTimer,
             isRunning: timer2.isRunning,
-            startTimer: timer2.startTimer,
-            pauseTimer: timer2.pauseTimer,
-            resetCurrentTimer: () => timer2.resetCurrentTimer(timer1.isDone),
+            startTimer: () => onEvent(timer2.startTimer, 'PLAY'),
+            pauseTimer: () => onEvent(timer2.pauseTimer, 'STOP'),
+            resetCurrentTimer: () =>
+              onEvent(() => timer2.resetCurrentTimer(timer1.isDone), 'RESET'),
           }}
           item={data.table[index]}
           isSelected={prosConsSelected === 'CONS'}
-          onActivate={() => handleActivateTeam('CONS')}
+          onActivate={() =>
+            handleActivateTeam('CONS', (invoke) =>
+              onEvent(invoke, 'TEAM_SWITCH'),
+            )
+          }
           prosCons="CONS"
           teamName={data.info.consTeamName}
+          answerTimer={
+            <AnswerTimeTimer
+              owner="CONS"
+              answerTime={answerTime}
+              answerTimerState={answerTimerState}
+              isMainTimerRunning={timer2.isRunning}
+              onClick={handleClickAnswerTimer}
+            />
+          }
         />
       </div>
     );
   }
+
   return null;
 }
