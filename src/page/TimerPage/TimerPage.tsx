@@ -11,6 +11,8 @@ import RoundControlRow from './components/RoundControlRow';
 import TimerView from './components/TimerView';
 import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
+import LiveShareButton from './components/LiveShareButton';
+import LiveShareModal from './components/LiveShareModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../type/type';
 import DTHelp from '../../components/icons/Help';
@@ -27,15 +29,14 @@ import {
 } from 'react-icons/ri';
 import DTVolume from '../../components/icons/Volume';
 import VolumeBar from '../../components/VolumeBar/VolumeBar';
-import { SocketEventType /* TimerDataPayload*/ } from '../../apis/sockets/type';
-import AnswerTimeSetting from './components/AnswerTimeSetting';
-import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
-/*
-import LiveShareButton from './components/LiveShareButton';
-import LiveShareModal from './components/LiveShareModal';
 import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
-*/
+import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
+import AnswerTimeSetting from './components/AnswerTimeSetting';
+import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
+
+// 피처 플래그
+const IS_LIVE_SHARE_ENABLED = false;
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
@@ -78,22 +79,19 @@ export default function TimerPage() {
     setFullscreen,
     toggleFullscreen,
     volumeRef,
-    // prosConsSelected,
-    // timer1,
-    // timer2,
-    // normalTimer,
+    prosConsSelected,
+    timer1,
+    timer2,
+    normalTimer,
   } = state;
-  // const timerType = data && data.table[index].boxType;
-  /*
+  const timerType = data && data.table[index].boxType;
   const remainingTime =
     timerType === 'NORMAL'
       ? normalTimer.timer
       : prosConsSelected === 'PROS'
         ? timer1.speakingTimer
         : timer2.speakingTimer;
- */
 
-  /*
   const {
     isLiveShareModalOpen,
     toggleLiveShareModal,
@@ -107,7 +105,6 @@ export default function TimerPage() {
     isError: isSocketError,
     errorType: socketErrorType,
   } = useLiveShare(tableId);
-   */
 
   const handleChangeAnswerTime = (time: number) => {
     setAnswerTime(time);
@@ -117,9 +114,7 @@ export default function TimerPage() {
   const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
     // 이벤트 실행
     invoke();
-    console.log(eventType);
 
-    /*
     // 만약 소켓 열려 있으면, 발송
     if (isSocketConnected) {
       // 타입에 따른 페이로드 준비
@@ -149,7 +144,6 @@ export default function TimerPage() {
       // 이벤트 발행
       issueEvent(eventType, payload);
     }
-      */
   };
 
   useTimerHotkey(state, handleTimerEvent);
@@ -288,8 +282,7 @@ export default function TimerPage() {
               )}
             >
               {/* 라이브 공유 버튼 및 모달 */}
-              {/* - '26. 7. 13. 현 시점 임시 비활성화 및 추후 후속 PR 병합 이후 공개 예정
-              {isLoggedIn() && (
+              {IS_LIVE_SHARE_ENABLED && isLoggedIn() && (
                 <div
                   className="absolute right-4 top-4 flex"
                   ref={liveShareModalRef}
@@ -311,7 +304,6 @@ export default function TimerPage() {
                   )}
                 </div>
               )}
-              */}
 
               {/* 타이머 두 개 + ENTER 버튼 */}
               <TimerView
