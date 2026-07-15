@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useModal } from '../../hooks/useModal';
 import UpdateModal from './UpdateModal';
 import { LATEST_PATCH_NOTE } from '../../constants/patch_note';
@@ -14,6 +15,8 @@ interface StoredStatus {
 }
 
 export default function UpdateModalWrapper() {
+  const { t } = useTranslation();
+
   // 상태 관리, 환경 변수 및 기타 변수 선언
   const [isChecked, setIsChecked] = useState(false);
   const isCheckedRef = useRef(isChecked);
@@ -43,7 +46,7 @@ export default function UpdateModalWrapper() {
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     } else {
-      alert('패치 노트 링크를 읽는 중 오류가 발생했습니다.');
+      alert(t('패치 노트 링크를 읽는 중 오류가 발생했습니다.'));
     }
 
     closeModal();
