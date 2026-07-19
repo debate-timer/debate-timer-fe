@@ -6,11 +6,13 @@ import {
   PatchNoteData,
 } from '../../constants/patch_note';
 import { DEFAULT_LANG, isSupportedLang } from '../../util/languageRouting';
+import DTClose from '../icons/Close';
 
 interface UpdateModalProps {
   data: PatchNoteData;
   isChecked: boolean;
   onChecked: (value: boolean) => void;
+  onClose: () => void;
   onClickDetailButton: () => void;
 }
 
@@ -18,11 +20,13 @@ export default function UpdateModal({
   data,
   isChecked,
   onChecked,
+  onClose,
   onClickDetailButton,
 }: UpdateModalProps) {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
-  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const primaryLang = currentLang?.split(/[-_]/)[0];
+  const lang = isSupportedLang(primaryLang) ? primaryLang : DEFAULT_LANG;
   const isEnglish = lang === 'en';
   const patchNoteImage = isEnglish ? data.imageEn : data.imageKo;
 
@@ -90,6 +94,17 @@ export default function UpdateModal({
         </>
       ) : (
         <div className="flex min-h-0 w-full flex-1 flex-col">
+          <div className="flex w-full shrink-0 justify-end px-[1%] pt-[0.8%]">
+            <button
+              type="button"
+              className="m-1 size-[clamp(16px,1.25vw,20px)] bg-transparent"
+              onClick={onClose}
+              aria-label={t('모달 닫기')}
+            >
+              <DTClose aria-hidden="true" className="size-full text-black" />
+            </button>
+          </div>
+
           {/* 이미지 컨텐츠 */}
           <div className="min-h-0 w-full flex-1 overflow-hidden">
             <img

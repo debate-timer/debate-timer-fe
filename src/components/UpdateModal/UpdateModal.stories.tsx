@@ -31,6 +31,7 @@ export const Default: Story = {
     } as PredefinedPatchNoteData,
     isChecked: false,
     onChecked: () => {},
+    onClose: () => {},
     onClickDetailButton: () => {},
   },
 };

@@ -23,6 +23,7 @@ export default function UpdateModalWrapper() {
 
   // 모달 훅 사용
   const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
     onClose: () => {
       // 모달 닫을 때 '일주일 간 보지 않기'가 체크되어 있으면, 현재 시간과 패치 노트 버전을 로컬 저장소에 기록
       if (isCheckedRef.current) {
@@ -38,6 +39,10 @@ export default function UpdateModalWrapper() {
   const handleCheckedChange = (checked: boolean) => {
     setIsChecked(checked);
     isCheckedRef.current = checked;
+  };
+
+  const handleCloseModal = () => {
+    closeModal();
   };
 
   const handleClickDetailButton = () => {
@@ -105,6 +110,7 @@ export default function UpdateModalWrapper() {
           data={LATEST_PATCH_NOTE}
           isChecked={isChecked}
           onChecked={handleCheckedChange}
+          onClose={handleCloseModal}
           onClickDetailButton={handleClickDetailButton}
         />
       </ModalWrapper>

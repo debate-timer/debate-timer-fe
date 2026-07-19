@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import {
@@ -66,6 +67,7 @@ async function renderUpdateModal(
         data={data}
         isChecked={false}
         onChecked={vi.fn()}
+        onClose={vi.fn()}
         onClickDetailButton={vi.fn()}
       />
     </I18nextProvider>,
@@ -172,5 +174,68 @@ describe('UpdateModal', () => {
     expect(checkboxLabel?.parentElement?.nextElementSibling).toBe(detailButton);
     expect(checkboxLabel).not.toHaveClass('absolute');
     expect(detailButton).toHaveClass('h-[8.8%]', 'shrink-0');
+  });
+
+  test('image-only 모드에만 닫기 버튼을 표시한다', async () => {
+    const { unmount } = await renderUpdateModal(imageOnlyPatchNote, 'ko');
+
+    expect(
+      screen.getByRole('button', { name: '모달 닫기' }),
+    ).toBeInTheDocument();
+
+    unmount();
+    await renderUpdateModal(predefinedPatchNote, 'ko');
+
+    expect(
+      screen.queryByRole('button', { name: '모달 닫기' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('image-only 모드의 닫기 버튼은 체크박스와 크기가 같고 이미지 위의 별도 영역에 배치된다', async () => {
+    await renderUpdateModal(imageOnlyPatchNote, 'ko');
+
+    const closeButton = screen.getByRole('button', { name: '모달 닫기' });
+    const image = screen.getByRole('img', { name: '업데이트 이미지' });
+    const checkbox = screen.getByRole('checkbox', {
+      name: '일주일 간 보지 않기',
+    });
+
+    expect(closeButton.parentElement?.nextElementSibling).toBe(
+      image.parentElement,
+    );
+    expect(closeButton).toHaveClass(
+      'size-[clamp(16px,1.25vw,20px)]',
+      'bg-transparent',
+    );
+    expect(checkbox).toHaveClass('size-[clamp(16px,1.25vw,20px)]');
+    expect(closeButton.firstElementChild).toHaveClass('text-black');
+  });
+
+  test('image-only 모드의 닫기 버튼을 누르면 onClose를 호출한다', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const i18n = createInstance();
+    await i18n.init({
+      lng: 'ko',
+      fallbackLng: 'ko',
+      supportedLngs: ['ko', 'en'],
+      resources: translations,
+    });
+
+    render(
+      <I18nextProvider i18n={i18n}>
+        <UpdateModal
+          data={imageOnlyPatchNote}
+          isChecked={false}
+          onChecked={vi.fn()}
+          onClose={onClose}
+          onClickDetailButton={vi.fn()}
+        />
+      </I18nextProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: '모달 닫기' }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

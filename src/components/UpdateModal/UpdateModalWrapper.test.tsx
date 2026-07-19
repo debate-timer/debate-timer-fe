@@ -70,4 +70,41 @@ describe('UpdateModalWrapper', () => {
       'An error occurred while loading the patch note link.',
     );
   });
+
+  test('image-only 모달의 닫기 버튼만 표시하고 클릭하면 모달을 닫는다', async () => {
+    const user = userEvent.setup();
+    await renderUpdateModalWrapper();
+
+    const closeButtons = await screen.findAllByRole('button', {
+      name: 'Close modal',
+    });
+
+    expect(closeButtons).toHaveLength(1);
+
+    await user.click(closeButtons[0]);
+
+    expect(
+      screen.queryByRole('button', { name: 'Close modal' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('일주일 숨김을 선택한 뒤 닫기 버튼을 누르면 숨김 상태를 저장한다', async () => {
+    const user = userEvent.setup();
+    await renderUpdateModalWrapper();
+
+    await user.click(
+      await screen.findByRole('checkbox', {
+        name: "Don't show again for a week",
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Close modal' }));
+
+    const storedStatus = JSON.parse(
+      localStorage.getItem('update_notification_status') ?? '{}',
+    );
+    expect(storedStatus).toEqual({
+      version: 'test',
+      dismissedAt: expect.any(String),
+    });
+  });
 });
