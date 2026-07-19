@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useModal } from '../../hooks/useModal';
 import UpdateModal from './UpdateModal';
 import { LATEST_PATCH_NOTE } from '../../constants/patch_note';
@@ -14,12 +15,15 @@ interface StoredStatus {
 }
 
 export default function UpdateModalWrapper() {
+  const { t } = useTranslation();
+
   // 상태 관리, 환경 변수 및 기타 변수 선언
   const [isChecked, setIsChecked] = useState(false);
   const isCheckedRef = useRef(isChecked);
 
   // 모달 훅 사용
   const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
     onClose: () => {
       // 모달 닫을 때 '일주일 간 보지 않기'가 체크되어 있으면, 현재 시간과 패치 노트 버전을 로컬 저장소에 기록
       if (isCheckedRef.current) {
@@ -37,13 +41,17 @@ export default function UpdateModalWrapper() {
     isCheckedRef.current = checked;
   };
 
+  const handleCloseModal = () => {
+    closeModal();
+  };
+
   const handleClickDetailButton = () => {
     const link = LATEST_PATCH_NOTE.link;
 
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     } else {
-      alert('패치 노트 링크를 읽는 중 오류가 발생했습니다.');
+      alert(t('패치 노트 링크를 읽는 중 오류가 발생했습니다.'));
     }
 
     closeModal();
@@ -102,6 +110,7 @@ export default function UpdateModalWrapper() {
           data={LATEST_PATCH_NOTE}
           isChecked={isChecked}
           onChecked={handleCheckedChange}
+          onClose={handleCloseModal}
           onClickDetailButton={handleClickDetailButton}
         />
       </ModalWrapper>

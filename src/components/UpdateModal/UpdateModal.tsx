@@ -1,15 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import MegaphoneAsset from './MegaphoneAsset';
 import NoticeAsset from './NoticeAsset';
 import {
-  ImageOnlyPatchNoteData,
   isPredefinedPatchNote,
   PatchNoteData,
 } from '../../constants/patch_note';
+import { DEFAULT_LANG, isSupportedLang } from '../../util/languageRouting';
+import DTClose from '../icons/Close';
 
 interface UpdateModalProps {
   data: PatchNoteData;
   isChecked: boolean;
   onChecked: (value: boolean) => void;
+  onClose: () => void;
   onClickDetailButton: () => void;
 }
 
@@ -17,8 +20,16 @@ export default function UpdateModal({
   data,
   isChecked,
   onChecked,
+  onClose,
   onClickDetailButton,
 }: UpdateModalProps) {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const primaryLang = currentLang?.split(/[-_]/)[0];
+  const lang = isSupportedLang(primaryLang) ? primaryLang : DEFAULT_LANG;
+  const isEnglish = lang === 'en';
+  const patchNoteImage = isEnglish ? data.imageEn : data.imageKo;
+
   return (
     <div className="flex aspect-square w-[clamp(600px,min(47.5vw,90vh),780px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
       {isPredefinedPatchNote(data) ? (
@@ -32,7 +43,7 @@ export default function UpdateModal({
 
               <div className="flex w-full flex-col space-y-[clamp(15px,1.25vw,20px)]">
                 <p className="text-[clamp(12px,0.875vw,14px)] leading-none text-default-black">
-                  디베이트 타이머에 새로운 기능이 생겼어요!
+                  {t('디베이트 타이머에 새로운 기능이 생겼어요!')}
                 </p>
 
                 <div className="w-[37.3%] shrink-0">
@@ -42,13 +53,11 @@ export default function UpdateModal({
             </div>
 
             <div className="flex w-full flex-1 overflow-hidden">
-              {data.image && (
-                <img
-                  src={data.image}
-                  alt="업데이트 이미지"
-                  className="h-full w-full rounded-[0.8%] object-contain"
-                />
-              )}
+              <img
+                src={patchNoteImage}
+                alt={t('업데이트 이미지')}
+                className="h-full w-full rounded-[0.8%] object-contain"
+              />
             </div>
           </div>
 
@@ -57,11 +66,11 @@ export default function UpdateModal({
             {/* 타이틀 및 내용 */}
             <div className="flex h-full flex-col items-center justify-center">
               <p className="text-[clamp(26px,2.1vw,34px)] font-bold text-brand">
-                {data.title}
+                {isEnglish ? data.titleEn : data.titleKo}
               </p>
               <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] bg-brand" />
               <p className="text-center text-[clamp(14px,1.1vw,18px)]">
-                {data.description}
+                {isEnglish ? data.descriptionEn : data.descriptionKo}
               </p>
             </div>
 
@@ -78,26 +87,37 @@ export default function UpdateModal({
                 onChange={(e) => onChecked(e.target.checked)}
               />
               <p className="text-[clamp(10px,0.75vw,12px)]">
-                일주일 간 보지 않기
+                {t('일주일 간 보지 않기')}
               </p>
             </label>
           </div>
         </>
       ) : (
-        <div className="relative flex h-full w-full flex-1">
+        <div className="flex min-h-0 w-full flex-1 flex-col">
+          <div className="flex w-full shrink-0 justify-end px-[1%] pt-[0.8%]">
+            <button
+              type="button"
+              className="m-1 size-[clamp(16px,1.25vw,20px)] bg-transparent"
+              onClick={onClose}
+              aria-label={t('모달 닫기')}
+            >
+              <DTClose aria-hidden="true" className="size-full text-black" />
+            </button>
+          </div>
+
           {/* 이미지 컨텐츠 */}
-          {(data as ImageOnlyPatchNoteData).image && (
+          <div className="min-h-0 w-full flex-1 overflow-hidden">
             <img
-              src={data.image}
-              alt="업데이트 이미지"
+              src={patchNoteImage}
+              alt={t('업데이트 이미지')}
               className="h-full w-full rounded-t-[0.8%] object-contain"
             />
-          )}
+          </div>
 
           {/* '일주일 간 보지 않기' 체크박스 */}
           <label
             htmlFor="update-modal-hide-for-week-image-only"
-            className="absolute bottom-[1%] start-[1%] flex w-full flex-row items-center gap-[0.8%]"
+            className="flex w-full shrink-0 flex-row items-center gap-[0.8%] px-[1%] py-[0.8%]"
           >
             <input
               id="update-modal-hide-for-week-image-only"
@@ -107,7 +127,7 @@ export default function UpdateModal({
               onChange={(e) => onChecked(e.target.checked)}
             />
             <p className="text-[clamp(10px,0.75vw,12px)]">
-              일주일 간 보지 않기
+              {t('일주일 간 보지 않기')}
             </p>
           </label>
         </div>
@@ -115,11 +135,11 @@ export default function UpdateModal({
 
       {/* 버튼 영역 */}
       <button
-        className="flex h-[8.8%] flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
+        className="flex h-[8.8%] shrink-0 flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
         onClick={onClickDetailButton}
       >
         <p className="text-[clamp(16px,1.375vw,22px)] font-semibold">
-          자세히 보기
+          {t('자세히 보기')}
         </p>
       </button>
     </div>
