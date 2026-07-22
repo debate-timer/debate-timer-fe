@@ -1,6 +1,10 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
 import ErrorPage from './ErrorPage';
+import {
+  isSentryCaptured,
+  resolveFeatureFromPathname,
+} from '../../util/sentry';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -14,10 +18,6 @@ interface ErrorBoundaryState {
 
 const defaultError = new Error('알 수 없는 오류');
 const defaultStack = '스택 정보 없음';
-
-type SentryCapturedError = {
-  __sentry_captured__?: boolean;
-};
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -37,16 +37,23 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // 이미 API 인터셉터 등에서 캡처된 에러가 아니라면 전송
-    if (!(error as SentryCapturedError).__sentry_captured__) {
-      Sentry.captureException(error, {
-        tags: {
+    if (!isSentryCaptured(error)) {
+      const feature = resolveFeatureFromPathname(window.location.pathname);
+
+      Sentry.withScope((scope) => {
+        scope.setLevel('fatal');
+        scope.setTags({
           errorType: 'render-error',
-        },
-        extra: {
+          feature,
+        });
+        scope.setContext('render', {
           pathname: window.location.pathname,
           search: window.location.search,
           componentStack: errorInfo.componentStack,
-        },
+        });
+        scope.setFingerprint(['render-error', feature]);
+
+        Sentry.captureException(error);
       });
     }
 
