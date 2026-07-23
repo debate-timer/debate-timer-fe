@@ -184,6 +184,15 @@ export function createSentryApiError(
   return sentryError;
 }
 
+export function createSentryRenderError(error: Error, feature: DebateFeature) {
+  const sentryError = new Error(error.message);
+  sentryError.name = `fatal · render-error · ${feature} · ${error.name}: ${error.message}`;
+  sentryError.stack = error.stack;
+  (sentryError as SentryCapturedError).__sentry_captured__ = true;
+
+  return sentryError;
+}
+
 export function markSentryCaptured(error: unknown) {
   if (typeof error === 'object' && error !== null) {
     (error as SentryCapturedError).__sentry_captured__ = true;

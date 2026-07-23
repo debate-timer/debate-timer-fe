@@ -2,6 +2,7 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import {
   buildSentryApiErrorMetadata,
   createSentryApiError,
+  createSentryRenderError,
   normalizeEndpoint,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
@@ -155,6 +156,16 @@ describe('sentry 유틸', () => {
 
     expect(sentryError.name).toBe(
       'error · api-error · live-share · [network-error] POST /api/live/:id',
+    );
+  });
+
+  it('렌더링 에러 알림 제목도 level, error type, feature, 원본 에러 순서로 구성한다', () => {
+    const error = new TypeError('Cannot read properties of undefined');
+
+    const sentryError = createSentryRenderError(error, 'timer');
+
+    expect(sentryError.name).toBe(
+      'fatal · render-error · timer · TypeError: Cannot read properties of undefined',
     );
   });
 });

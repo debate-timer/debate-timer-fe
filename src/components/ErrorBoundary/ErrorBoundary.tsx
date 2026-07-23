@@ -2,6 +2,7 @@ import { Component, ErrorInfo, ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
 import ErrorPage from './ErrorPage';
 import {
+  createSentryRenderError,
   isSentryCaptured,
   resolveFeatureFromPathname,
   sanitizeSentrySearch,
@@ -40,6 +41,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     // 이미 API 인터셉터 등에서 캡처된 에러가 아니라면 전송
     if (!isSentryCaptured(error)) {
       const feature = resolveFeatureFromPathname(window.location.pathname);
+      const sentryError = createSentryRenderError(error, feature);
 
       Sentry.withScope((scope) => {
         scope.setLevel('fatal');
@@ -50,11 +52,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         scope.setContext('render', {
           pathname: window.location.pathname,
           search: sanitizeSentrySearch(window.location.search),
+          errorName: error.name,
+          errorMessage: error.message,
           componentStack: errorInfo.componentStack,
         });
         scope.setFingerprint(['render-error', feature]);
 
-        Sentry.captureException(error);
+        Sentry.captureException(sentryError);
       });
     }
 
