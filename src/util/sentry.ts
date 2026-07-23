@@ -15,6 +15,22 @@ export type DebateFeature =
   | 'unknown';
 
 const criticalFeatures: DebateFeature[] = ['timer', 'vote', 'live-share'];
+const filteredValue = '[Filtered]';
+const sensitiveKeys = [
+  'authorization',
+  'access_token',
+  'accessToken',
+  'refresh_token',
+  'refreshToken',
+  'token',
+  'id_token',
+  'idToken',
+  'code',
+  'state',
+  'email',
+  'password',
+  'inviteCode',
+];
 
 type SentryCapturedError = {
   __sentry_captured__?: boolean;
@@ -170,6 +186,40 @@ export function isSentryCaptured(error: unknown) {
   );
 }
 
+export function sanitizeSentrySearch(search: string) {
+  if (!search) {
+    return '';
+  }
+
+  const params = new URLSearchParams(search);
+  params.forEach((_, key) => {
+    if (isSensitiveKey(key)) {
+      params.set(key, filteredValue);
+    }
+  });
+
+  const sanitizedSearch = params.toString();
+
+  return sanitizedSearch ? `?${sanitizedSearch}` : '';
+}
+
+export function sanitizeSentryContext(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(sanitizeSentryContext);
+  }
+
+  if (typeof value !== 'object' || value === null) {
+    return value;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, nestedValue]) => [
+      key,
+      isSensitiveKey(key) ? filteredValue : sanitizeSentryContext(nestedValue),
+    ]),
+  );
+}
+
 function resolveUrlPath(url: string) {
   try {
     return new URL(url, window.location.origin).pathname;
@@ -189,5 +239,11 @@ function isOfflineNetworkError(code?: string) {
     typeof navigator !== 'undefined' &&
     navigator.onLine === false &&
     (code === 'ERR_NETWORK' || code === 'ECONNABORTED' || code === 'ETIMEDOUT')
+  );
+}
+
+function isSensitiveKey(key: string) {
+  return sensitiveKeys.some(
+    (sensitiveKey) => sensitiveKey.toLowerCase() === key.toLowerCase(),
   );
 }

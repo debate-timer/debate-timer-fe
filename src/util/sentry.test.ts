@@ -5,6 +5,8 @@ import {
   normalizeEndpoint,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
+  sanitizeSentryContext,
+  sanitizeSentrySearch,
   shouldSkipApiError,
 } from './sentry';
 
@@ -78,6 +80,38 @@ describe('sentry 유틸', () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
 
     expect(shouldSkipApiError(onlineNetworkError)).toBe(false);
+  });
+
+  it('Sentry context에 원본 요청/응답 데이터가 그대로 전송되지 않도록 민감 필드를 마스킹한다', () => {
+    expect(
+      sanitizeSentryContext({
+        email: 'user@example.com',
+        inviteCode: 'SECRET',
+        page: 1,
+        nested: {
+          token: 'TOKEN',
+          tableId: 12,
+        },
+      }),
+    ).toEqual({
+      email: '[Filtered]',
+      inviteCode: '[Filtered]',
+      page: 1,
+      nested: {
+        token: '[Filtered]',
+        tableId: 12,
+      },
+    });
+  });
+
+  it('Sentry context에 남길 query string에서 OAuth와 인증 관련 값을 마스킹한다', () => {
+    expect(
+      sanitizeSentrySearch(
+        '?code=AUTH_CODE&state=STATE&access_token=TOKEN&page=1',
+      ),
+    ).toBe(
+      '?code=%5BFiltered%5D&state=%5BFiltered%5D&access_token=%5BFiltered%5D&page=1',
+    );
   });
 
   it('알림 제목을 level, error type, feature, status, endpoint 순서로 구성해 대응 판단 흐름을 만든다', () => {

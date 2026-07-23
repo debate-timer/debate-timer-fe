@@ -17,6 +17,8 @@ import {
   buildSentryApiErrorMetadata,
   createSentryApiError,
   markSentryCaptured,
+  sanitizeSentryContext,
+  sanitizeSentrySearch,
   shouldSkipApiError,
 } from '../util/sentry';
 
@@ -70,16 +72,16 @@ function captureClientApiError(error: unknown) {
     });
     scope.setContext('request', {
       pathname: metadata.pathname,
-      search: window.location.search,
+      search: sanitizeSentrySearch(window.location.search),
       url: error.config?.url,
       method: error.config?.method,
-      params: error.config?.params,
+      params: sanitizeSentryContext(error.config?.params),
       timeout: error.config?.timeout ?? requestTimeoutMs,
       errorCode: error.code,
     });
     scope.setContext('response', {
       status: metadata.status,
-      data: error.response?.data,
+      data: sanitizeSentryContext(error.response?.data),
     });
     scope.setFingerprint([
       'api-error',

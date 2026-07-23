@@ -4,6 +4,7 @@ import ErrorPage from './ErrorPage';
 import {
   isSentryCaptured,
   resolveFeatureFromPathname,
+  sanitizeSentrySearch,
 } from '../../util/sentry';
 
 interface ErrorBoundaryProps {
@@ -48,7 +49,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         });
         scope.setContext('render', {
           pathname: window.location.pathname,
-          search: window.location.search,
+          search: sanitizeSentrySearch(window.location.search),
           componentStack: errorInfo.componentStack,
         });
         scope.setFingerprint(['render-error', feature]);
