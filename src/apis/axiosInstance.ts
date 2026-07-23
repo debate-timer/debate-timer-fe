@@ -19,6 +19,7 @@ import {
   markSentryCaptured,
   sanitizeSentryContext,
   sanitizeSentrySearch,
+  sanitizeSentryUrl,
   shouldSkipApiError,
 } from '../util/sentry';
 
@@ -73,7 +74,7 @@ function captureClientApiError(error: unknown) {
     scope.setContext('request', {
       pathname: metadata.pathname,
       search: sanitizeSentrySearch(window.location.search),
-      url: error.config?.url,
+      url: sanitizeSentryUrl(error.config?.url),
       method: error.config?.method,
       params: sanitizeSentryContext(error.config?.params),
       timeout: error.config?.timeout ?? requestTimeoutMs,

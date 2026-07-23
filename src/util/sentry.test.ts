@@ -7,6 +7,7 @@ import {
   resolveFeatureFromPathname,
   sanitizeSentryContext,
   sanitizeSentrySearch,
+  sanitizeSentryUrl,
   shouldSkipApiError,
 } from './sentry';
 
@@ -126,6 +127,19 @@ describe('sentry 유틸', () => {
       ),
     ).toBe(
       '?code=%5BFiltered%5D&state=%5BFiltered%5D&access_token=%5BFiltered%5D&page=1',
+    );
+  });
+
+  it('Sentry context에 남길 요청 URL은 경로와 비민감 query를 유지하고 민감 query만 마스킹한다', () => {
+    expect(sanitizeSentryUrl('/api/member?email=user@example.com&page=1')).toBe(
+      '/api/member?email=%5BFiltered%5D&page=1',
+    );
+    expect(
+      sanitizeSentryUrl(
+        'https://api.example.com/oauth?code=AUTH_CODE&redirect=/home',
+      ),
+    ).toBe(
+      'https://api.example.com/oauth?code=%5BFiltered%5D&redirect=%2Fhome',
     );
   });
 

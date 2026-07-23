@@ -215,6 +215,26 @@ export function sanitizeSentrySearch(search: string) {
   return sanitizedSearch ? `?${sanitizedSearch}` : '';
 }
 
+export function sanitizeSentryUrl(url?: string) {
+  if (!url) {
+    return url;
+  }
+
+  try {
+    const isAbsoluteUrl = /^[a-z][a-z\d+\-.]*:\/\//i.test(url);
+    const parsedUrl = new URL(url, window.location.origin);
+    const sanitizedSearch = sanitizeSentrySearch(parsedUrl.search);
+    const sanitizedPath = `${parsedUrl.pathname}${sanitizedSearch}${parsedUrl.hash}`;
+
+    return isAbsoluteUrl
+      ? `${parsedUrl.origin}${sanitizedPath}`
+      : sanitizedPath;
+  } catch {
+    const [pathname, search = ''] = url.split('?');
+    return `${pathname}${sanitizeSentrySearch(search ? `?${search}` : '')}`;
+  }
+}
+
 export function sanitizeSentryContext(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map(sanitizeSentryContext);
