@@ -80,7 +80,7 @@ describe('sentry 유틸', () => {
     expect(shouldSkipApiError(onlineNetworkError)).toBe(false);
   });
 
-  it('알림 제목만 보고 실패한 요청을 파악할 수 있도록 상태 코드, method, endpoint를 담는다', () => {
+  it('알림 제목을 level, error type, feature, status, endpoint 순서로 구성해 대응 판단 흐름을 만든다', () => {
     const error = new AxiosError('Request failed', undefined, {
       method: 'post',
       url: '/api/live/123',
@@ -90,6 +90,8 @@ describe('sentry 유틸', () => {
 
     const sentryError = createSentryApiError(error, metadata);
 
-    expect(sentryError.name).toBe('[network-error] POST /api/live/:id');
+    expect(sentryError.name).toBe(
+      'error · api-error · live-share · [network-error] POST /api/live/:id',
+    );
   });
 });

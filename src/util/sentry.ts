@@ -149,7 +149,7 @@ export function createSentryApiError(
   metadata: SentryApiErrorMetadata,
 ) {
   const sentryError = new Error(error.message);
-  sentryError.name = `[${metadata.statusLabel}] ${metadata.method} ${metadata.endpoint}`;
+  sentryError.name = `${metadata.level} · api-error · ${metadata.feature} · [${metadata.statusLabel}] ${metadata.method} ${metadata.endpoint}`;
   sentryError.stack = error.stack;
   (sentryError as SentryCapturedError).__sentry_captured__ = true;
 
