@@ -25,6 +25,12 @@ describe('sentry 유틸', () => {
   it('알림만 보고 사용자에게 영향받은 기능을 판단할 수 있도록 pathname을 기능 단위로 분류한다', () => {
     expect(resolveFeatureFromPathname('/ko/home')).toBe('landing');
     expect(resolveFeatureFromPathname('/en/table/customize/1')).toBe('timer');
+    expect(resolveFeatureFromPathname('/composition')).toBe(
+      'table-composition',
+    );
+    expect(resolveFeatureFromPathname('/overview/customize/1')).toBe(
+      'table-overview',
+    );
     expect(resolveFeatureFromPathname('/table/customize/1/end')).toBe(
       'debate-end',
     );
@@ -33,6 +39,15 @@ describe('sentry 유틸', () => {
     );
     expect(resolveFeatureFromPathname('/live/1')).toBe('live-share');
     expect(resolveFeatureFromPathname('/oauth')).toBe('auth');
+  });
+
+  it('유사 접두사 경로가 실제 기능 경로로 오분류되지 않도록 세그먼트 경계를 검사한다', () => {
+    expect(resolveFeatureFromPathname('/livechat')).toBe('unknown');
+    expect(resolveFeatureFromPathname('/sharepoint')).toBe('unknown');
+    expect(resolveFeatureFromPathname('/overviewer')).toBe('unknown');
+    expect(resolveFeatureFromPathname('/vote-result')).toBe('unknown');
+    expect(resolveFeatureFromPathname('/oauth-callback')).toBe('unknown');
+    expect(resolveFeatureFromPathname('/table/customizer/1')).toBe('unknown');
   });
 
   it('타이머, 투표, 실시간 공유의 5xx는 핵심 흐름 장애로 보고 즉시 대응 대상으로 분류한다', () => {

@@ -72,39 +72,51 @@ export function resolveFeatureFromPathname(pathname: string): DebateFeature {
     return 'table-list';
   }
 
-  if (path.startsWith('/composition')) {
+  if (matchesPathPrefix(path, '/composition')) {
     return 'table-composition';
   }
 
-  if (path.startsWith('/overview')) {
+  if (matchesPathPrefix(path, '/overview')) {
     return 'table-overview';
   }
 
-  if (path.includes('/end/vote') || path.startsWith('/vote')) {
+  if (
+    matchesPathPrefix(path, '/vote') ||
+    (matchesPathPrefix(path, '/table/customize') &&
+      hasPathSegment(path, 'end') &&
+      hasPathSegment(path, 'vote'))
+  ) {
     return 'vote';
   }
 
-  if (path.includes('/end/feedback')) {
+  if (
+    matchesPathPrefix(path, '/table/customize') &&
+    hasPathSegment(path, 'end') &&
+    hasPathSegment(path, 'feedback')
+  ) {
     return 'timer';
   }
 
-  if (path.includes('/end')) {
+  if (
+    matchesPathPrefix(path, '/table/customize') &&
+    hasPathSegment(path, 'end')
+  ) {
     return 'debate-end';
   }
 
-  if (path.startsWith('/table/customize')) {
+  if (matchesPathPrefix(path, '/table/customize')) {
     return 'timer';
   }
 
-  if (path.startsWith('/oauth')) {
+  if (matchesPathPrefix(path, '/oauth')) {
     return 'auth';
   }
 
-  if (path.startsWith('/share')) {
+  if (matchesPathPrefix(path, '/share')) {
     return 'share';
   }
 
-  if (path.startsWith('/live')) {
+  if (matchesPathPrefix(path, '/live')) {
     return 'live-share';
   }
 
@@ -232,6 +244,14 @@ function removeLanguagePrefix(pathname: string) {
   const path = pathname.replace(/^\/(ko|en)(?=\/|$)/, '');
 
   return path === '' ? '/' : path;
+}
+
+function matchesPathPrefix(path: string, prefix: string) {
+  return path === prefix || path.startsWith(`${prefix}/`);
+}
+
+function hasPathSegment(path: string, segment: string) {
+  return path.split('/').includes(segment);
 }
 
 function isOfflineNetworkError(code?: string) {
