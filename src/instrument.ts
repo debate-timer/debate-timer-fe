@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import { isSentryCaptured } from './util/sentry';
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 const isSentryEnabled =
@@ -25,6 +26,11 @@ if (isSentryEnabled && dsn) {
     replaysOnErrorSampleRate: 1.0,
     beforeSend(event, hint) {
       const originalException = hint?.originalException;
+
+      // API 인터셉터에서 이미 커스텀 이벤트로 전송한 에러는 전역 캡처에서 중복 수집하지 않는다.
+      if (isSentryCaptured(originalException)) {
+        return null;
+      }
 
       // 정상 사용자 흐름(이동/언마운트)에서 자주 생기는 취소성 에러는 노이즈로 간주
       if (originalException instanceof Error) {
