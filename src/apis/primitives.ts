@@ -55,6 +55,8 @@ export async function request<T>(
         error.response?.status || 500,
         responseData,
       );
+      // Axios 인터셉터에서 이미 보낸 에러는 APIError로 감싼 뒤에도
+      // ErrorBoundary/전역 핸들러에서 중복 수집되지 않도록 캡처 상태를 전달한다.
       if (isSentryCaptured(error)) {
         markSentryCaptured(apiError);
       }

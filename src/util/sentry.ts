@@ -36,6 +36,7 @@ type SentryCapturedError = {
   __debate_timer_sentry_captured__?: boolean;
 };
 
+// API 에러 알림 메타데이터
 export type SentryApiErrorMetadata = {
   status: number | undefined;
   statusLabel: string;
@@ -46,6 +47,7 @@ export type SentryApiErrorMetadata = {
   pathname: string;
 };
 
+// 엔드포인트 그룹핑
 export function normalizeEndpoint(url?: string) {
   if (!url) {
     return 'unknown';
@@ -61,6 +63,7 @@ export function normalizeEndpoint(url?: string) {
     .replace(/\/[0-9]+(?=\/|$)/g, '/:id');
 }
 
+// 기능 태그
 export function resolveFeatureFromPathname(pathname: string): DebateFeature {
   const path = removeLanguagePrefix(pathname);
 
@@ -123,6 +126,7 @@ export function resolveFeatureFromPathname(pathname: string): DebateFeature {
   return 'unknown';
 }
 
+// API 에러 심각도
 export function resolveApiErrorLevel(
   status: number | undefined,
   feature: DebateFeature,
@@ -142,6 +146,7 @@ export function resolveApiErrorLevel(
   return 'error';
 }
 
+// API 에러 수집 제외
 export function shouldSkipApiError(error: AxiosError) {
   const status = error.response?.status;
 
@@ -152,6 +157,7 @@ export function shouldSkipApiError(error: AxiosError) {
   return isOfflineNetworkError(error.code);
 }
 
+// API 에러 메타데이터
 export function buildSentryApiErrorMetadata(
   error: AxiosError,
   pathname: string,
@@ -172,6 +178,7 @@ export function buildSentryApiErrorMetadata(
   };
 }
 
+// API 이슈 제목
 export function createSentryApiError(
   error: AxiosError,
   metadata: SentryApiErrorMetadata,
@@ -183,6 +190,7 @@ export function createSentryApiError(
   return sentryError;
 }
 
+// 렌더링 이슈 제목
 export function createSentryRenderError(error: Error, feature: DebateFeature) {
   const sentryError = new Error(error.message);
   sentryError.name = `fatal · render-error · ${feature} · ${error.name}: ${error.message}`;
@@ -191,6 +199,7 @@ export function createSentryRenderError(error: Error, feature: DebateFeature) {
   return sentryError;
 }
 
+// 중복 캡처 표시
 export function markSentryCaptured(error: unknown) {
   if (typeof error === 'object' && error !== null) {
     (error as SentryCapturedError).__debate_timer_sentry_captured__ = true;
@@ -205,6 +214,23 @@ export function isSentryCaptured(error: unknown) {
   );
 }
 
+// 전역 이벤트 필터
+export function shouldSkipSentryEvent(
+  originalException: unknown,
+  exceptionValue?: string,
+) {
+  if (isSentryCaptured(originalException)) {
+    return true;
+  }
+
+  if (isCanceledError(originalException)) {
+    return true;
+  }
+
+  return exceptionValue === 'Script error.';
+}
+
+// 컨텍스트 마스킹
 export function sanitizeSentrySearch(search: string) {
   if (!search) {
     return '';
@@ -222,6 +248,7 @@ export function sanitizeSentrySearch(search: string) {
   return sanitizedSearch ? `?${sanitizedSearch}` : '';
 }
 
+// 요청 URL 마스킹
 export function sanitizeSentryUrl(url?: string) {
   if (!url) {
     return url;
@@ -242,6 +269,7 @@ export function sanitizeSentryUrl(url?: string) {
   }
 }
 
+// 요청/응답 데이터 마스킹
 export function sanitizeSentryContext(value: unknown): unknown {
   if (Array.isArray(value)) {
     return value.map(sanitizeSentryContext);
@@ -259,6 +287,7 @@ export function sanitizeSentryContext(value: unknown): unknown {
   );
 }
 
+// URL 파싱
 function resolveUrlPath(url: string) {
   try {
     return new URL(url, window.location.origin).pathname;
@@ -267,20 +296,45 @@ function resolveUrlPath(url: string) {
   }
 }
 
+// 라우트 정규화
 function removeLanguagePrefix(pathname: string) {
   const path = pathname.replace(/^\/(ko|en)(?=\/|$)/, '');
 
   return path === '' ? '/' : path;
 }
 
+// 라우트 접두사 매칭
 function matchesPathPrefix(path: string, prefix: string) {
   return path === prefix || path.startsWith(`${prefix}/`);
 }
 
+// 라우트 세그먼트 매칭
 function hasPathSegment(path: string, segment: string) {
   return path.split('/').includes(segment);
 }
 
+// 취소성 에러 판별
+function isCanceledError(originalException: unknown) {
+  if (typeof originalException !== 'object' || originalException === null) {
+    return false;
+  }
+
+  const { name, message } = originalException as {
+    name?: unknown;
+    message?: unknown;
+  };
+  const normalizedMessage =
+    typeof message === 'string' ? message.toLowerCase() : '';
+
+  return (
+    normalizedMessage.includes('cancel') ||
+    normalizedMessage.includes('aborted') ||
+    name === 'AbortError' ||
+    name === 'CanceledError'
+  );
+}
+
+// 오프라인 네트워크 에러 판별
 function isOfflineNetworkError(code?: string) {
   return (
     typeof navigator !== 'undefined' &&
@@ -289,6 +343,7 @@ function isOfflineNetworkError(code?: string) {
   );
 }
 
+// 민감 필드 판별
 function isSensitiveKey(key: string) {
   return sensitiveKeys.some(
     (sensitiveKey) => sensitiveKey.toLowerCase() === key.toLowerCase(),

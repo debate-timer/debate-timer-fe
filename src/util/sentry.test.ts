@@ -11,6 +11,7 @@ import {
   sanitizeSentryContext,
   sanitizeSentrySearch,
   sanitizeSentryUrl,
+  shouldSkipSentryEvent,
   shouldSkipApiError,
 } from './sentry';
 
@@ -117,6 +118,22 @@ describe('sentry 유틸', () => {
     markSentryCaptured(originalError);
 
     expect(isSentryCaptured(originalError)).toBe(true);
+  });
+
+  it('이미 커스텀 이벤트로 전송한 에러는 전역 Sentry 이벤트에서 제외한다', () => {
+    const error = new Error('already captured');
+
+    markSentryCaptured(error);
+
+    expect(shouldSkipSentryEvent(error)).toBe(true);
+  });
+
+  it('운영 액션 가능성이 낮은 취소성 에러와 Script error는 Sentry 이벤트에서 제외한다', () => {
+    expect(shouldSkipSentryEvent(new Error('Request aborted'))).toBe(true);
+    expect(shouldSkipSentryEvent(new DOMException('', 'AbortError'))).toBe(
+      true,
+    );
+    expect(shouldSkipSentryEvent(undefined, 'Script error.')).toBe(true);
   });
 
   it('Sentry context에 원본 요청/응답 데이터가 그대로 전송되지 않도록 민감 필드를 마스킹한다', () => {

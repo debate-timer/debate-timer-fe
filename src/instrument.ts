@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { isSentryCaptured } from './util/sentry';
+import { shouldSkipSentryEvent } from './util/sentry';
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 const isSentryEnabled =
@@ -27,27 +27,13 @@ if (isSentryEnabled && dsn) {
     beforeSend(event, hint) {
       const originalException = hint?.originalException;
 
-      // API 인터셉터에서 이미 커스텀 이벤트로 전송한 에러는 전역 캡처에서 중복 수집하지 않는다.
-      if (isSentryCaptured(originalException)) {
-        return null;
-      }
-
-      // 정상 사용자 흐름(이동/언마운트)에서 자주 생기는 취소성 에러는 노이즈로 간주
-      if (originalException instanceof Error) {
-        const normalizedMessage = originalException.message.toLowerCase();
-        const isCanceledRequest =
-          normalizedMessage.includes('cancel') ||
-          normalizedMessage.includes('aborted') ||
-          originalException.name === 'AbortError' ||
-          originalException.name === 'CanceledError';
-
-        if (isCanceledRequest) {
-          return null;
-        }
-      }
-
-      // 크로스 오리진 스크립트 에러는 재현 단서가 부족해 운영 액션 가능성이 낮음
-      if (event.exception?.values?.[0]?.value === 'Script error.') {
+      // 이미 수집한 API 에러, 취소성 에러, 원인 추적이 어려운 Script error는 전송하지 않음
+      if (
+        shouldSkipSentryEvent(
+          originalException,
+          event.exception?.values?.[0]?.value,
+        )
+      ) {
         return null;
       }
 

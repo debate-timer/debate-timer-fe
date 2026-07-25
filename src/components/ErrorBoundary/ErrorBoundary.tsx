@@ -38,7 +38,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // 이미 API 인터셉터 등에서 캡처된 에러가 아니라면 전송
+    // API 인터셉터에서 이미 커스텀 이벤트로 전송한 에러는 전역 beforeSend에서도 drop된다.
+    // ErrorBoundary에서는 아직 수집되지 않은 렌더링 에러만 render-error로 전송한다.
     if (!isSentryCaptured(error)) {
       const feature = resolveFeatureFromPathname(window.location.pathname);
       const sentryError = createSentryRenderError(error, feature);
