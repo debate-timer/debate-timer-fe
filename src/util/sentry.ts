@@ -33,7 +33,7 @@ const sensitiveKeys = [
 ];
 
 type SentryCapturedError = {
-  __sentry_captured__?: boolean;
+  __debate_timer_sentry_captured__?: boolean;
 };
 
 export type SentryApiErrorMetadata = {
@@ -179,7 +179,6 @@ export function createSentryApiError(
   const sentryError = new Error(error.message);
   sentryError.name = `${metadata.level} · api-error · ${metadata.feature} · [${metadata.statusLabel}] ${metadata.method} ${metadata.endpoint}`;
   sentryError.stack = error.stack;
-  (sentryError as SentryCapturedError).__sentry_captured__ = true;
 
   return sentryError;
 }
@@ -188,14 +187,13 @@ export function createSentryRenderError(error: Error, feature: DebateFeature) {
   const sentryError = new Error(error.message);
   sentryError.name = `fatal · render-error · ${feature} · ${error.name}: ${error.message}`;
   sentryError.stack = error.stack;
-  (sentryError as SentryCapturedError).__sentry_captured__ = true;
 
   return sentryError;
 }
 
 export function markSentryCaptured(error: unknown) {
   if (typeof error === 'object' && error !== null) {
-    (error as SentryCapturedError).__sentry_captured__ = true;
+    (error as SentryCapturedError).__debate_timer_sentry_captured__ = true;
   }
 }
 
@@ -203,7 +201,7 @@ export function isSentryCaptured(error: unknown) {
   return (
     typeof error === 'object' &&
     error !== null &&
-    (error as SentryCapturedError).__sentry_captured__ === true
+    (error as SentryCapturedError).__debate_timer_sentry_captured__ === true
   );
 }
 

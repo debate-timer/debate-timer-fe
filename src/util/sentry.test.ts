@@ -3,6 +3,8 @@ import {
   buildSentryApiErrorMetadata,
   createSentryApiError,
   createSentryRenderError,
+  isSentryCaptured,
+  markSentryCaptured,
   normalizeEndpoint,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
@@ -99,6 +101,24 @@ describe('sentry 유틸', () => {
     expect(shouldSkipApiError(onlineNetworkError)).toBe(false);
   });
 
+  it('SDK 내부 플래그와 앱 전용 플래그를 분리해 중복 캡처를 판단한다', () => {
+    const originalError = new AxiosError('Request failed', undefined, {
+      method: 'get',
+      url: '/api/polls/123/votes',
+      headers: new AxiosHeaders(),
+    });
+    const metadata = buildSentryApiErrorMetadata(originalError, '/vote/123');
+
+    const sentryError = createSentryApiError(originalError, metadata);
+
+    expect('__sentry_captured__' in sentryError).toBe(false);
+    expect(isSentryCaptured(sentryError)).toBe(false);
+
+    markSentryCaptured(originalError);
+
+    expect(isSentryCaptured(originalError)).toBe(true);
+  });
+
   it('Sentry context에 원본 요청/응답 데이터가 그대로 전송되지 않도록 민감 필드를 마스킹한다', () => {
     expect(
       sanitizeSentryContext({
@@ -144,7 +164,7 @@ describe('sentry 유틸', () => {
     );
   });
 
-  it('알림 제목을 level, error type, feature, status, endpoint 순서로 구성해 대응 판단 흐름을 만든다', () => {
+  it('API 에러 알림 제목은 level, error type, feature, status, endpoint 순서로 구성한다', () => {
     const error = new AxiosError('Request failed', undefined, {
       method: 'post',
       url: '/api/live/123',
@@ -159,7 +179,7 @@ describe('sentry 유틸', () => {
     );
   });
 
-  it('렌더링 에러 알림 제목도 level, error type, feature, 원본 에러 순서로 구성한다', () => {
+  it('렌더링 에러 알림 제목은 level, error type, feature, 원본 에러 순서로 구성한다', () => {
     const error = new TypeError('Cannot read properties of undefined');
 
     const sentryError = createSentryRenderError(error, 'timer');

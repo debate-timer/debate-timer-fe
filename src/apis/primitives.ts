@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
-import { isSentryCaptured } from '../util/sentry';
+import { isSentryCaptured, markSentryCaptured } from '../util/sentry';
 
 // HTTP request methods
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -10,7 +10,6 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export class APIError extends Error {
   public readonly status: number;
   public readonly data: unknown;
-  public __sentry_captured__?: boolean;
 
   constructor(message: string, status: number, data: unknown) {
     super(message);
@@ -56,7 +55,9 @@ export async function request<T>(
         error.response?.status || 500,
         responseData,
       );
-      apiError.__sentry_captured__ = isSentryCaptured(error);
+      if (isSentryCaptured(error)) {
+        markSentryCaptured(apiError);
+      }
       throw apiError;
     }
 
