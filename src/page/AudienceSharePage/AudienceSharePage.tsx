@@ -327,6 +327,7 @@ export default function AudienceSharePage() {
           <DefaultLayout.Header.Left>
             <HeaderTableInfo
               name={
+                !debateTableQuery.data.info.name ||
                 debateTableQuery.data.info.name.trim() === ''
                   ? t('테이블 이름 없음')
                   : t(debateTableQuery.data.info.name)
@@ -336,6 +337,7 @@ export default function AudienceSharePage() {
           <DefaultLayout.Header.Center>
             <HeaderTitle
               title={
+                !debateTableQuery.data.info.agenda ||
                 debateTableQuery.data.info.agenda.trim() === ''
                   ? t('주제 없음')
                   : t(debateTableQuery.data.info.agenda)

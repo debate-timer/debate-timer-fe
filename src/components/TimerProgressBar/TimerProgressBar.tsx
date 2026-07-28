@@ -30,7 +30,7 @@ export default function TimerProgressBar({
   className,
 }: TimerProgressBarProps) {
   const normalizedProgress = clamp(0, 100, progress);
-  const progressMotionValue = useMotionValue(0);
+  const progressMotionValue = useMotionValue(normalizedProgress);
   const width = useTransform(
     progressMotionValue,
     (currentProgress) => `${currentProgress}%`,

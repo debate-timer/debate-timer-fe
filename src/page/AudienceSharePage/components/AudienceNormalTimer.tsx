@@ -36,7 +36,7 @@ export default function AudienceNormalTimer({
     ? t(normalizedSpeechType)
     : speechType;
   const teamLabel =
-    teamName.trim() === ''
+    !teamName || teamName.trim() === ''
       ? t('팀명 없음')
       : t('{{team}} 팀', { team: t(teamName) });
   const speakerLabel =

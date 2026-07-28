@@ -64,7 +64,7 @@ export default function AudienceTimeBasedTimerDisplay({
   const { t } = useTranslation();
   const teamId = team.toLowerCase();
   const teamLabel =
-    teamName.trim() === ''
+    !teamName || teamName.trim() === ''
       ? t('팀명 없음')
       : t('{{team}} 팀', { team: t(teamName) });
   const progressBase = timePerSpeaking === null ? timePerTeam : timePerSpeaking;
