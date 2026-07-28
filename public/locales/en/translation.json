@@ -270,6 +270,7 @@
   "나의 토론 주제": "My Debate Topic",
   "나의 시간표": "My Timetable",
   "유효하지 않은 토론방 ID입니다.": "Invalid debate room ID.",
+  "시간표 설정에 오류가 발생했어요.": "An error occurred in timetable settings.",
   "실시간 연결 주소를 확인할 수 없어요.": "Could not verify live connection address.",
   "토론방 연결이 거부되었어요.": "Connection to the debate room was rejected.",
   "실시간 연결에서 서버 오류가 발생했어요.": "A server error occurred during live connection.",

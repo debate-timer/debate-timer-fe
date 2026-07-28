@@ -192,7 +192,7 @@ export default function AudienceSharePage() {
     if (hasInvalidNormalTimeBox || hasInvalidTimeBasedTimeBox) {
       return (
         <ErrorContent
-          message={t('서버 연결에 실패했어요.')}
+          message={t('시간표 설정에 오류가 발생했어요.')}
           onReload={handleReload}
         />
       );

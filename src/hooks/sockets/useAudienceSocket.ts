@@ -82,6 +82,7 @@ export default function useAudienceSocket(
 
   useEffect(() => {
     if (!enabled) {
+      resetMessage();
       return;
     }
 
@@ -105,6 +106,7 @@ export default function useAudienceSocket(
 
     // 컴포넌트 언마운트 또는 roomId 변경 시 해당 채널 구독 해제
     return () => {
+      resetMessage();
       unsubscribe(destination);
     };
   }, [enabled, roomId, resetMessage, subscribe, unsubscribe]);

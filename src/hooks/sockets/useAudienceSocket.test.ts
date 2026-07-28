@@ -73,6 +73,37 @@ describe('useAudienceSocket', () => {
     expect(subscribe).toHaveBeenCalledWith('/room/123', expect.any(Function));
   });
 
+  it('enabled가 true에서 false로 전환되면 latestMessage를 null로 초기화하고 unsubscribe를 호출해야 한다', () => {
+    const message: SocketMessage = {
+      eventType: 'FINISHED',
+      data: null,
+    };
+    let handleMessage: (message: IMessage) => void = () => undefined;
+    subscribe.mockImplementation(
+      (_destination: string, callback: (message: IMessage) => void) => {
+        handleMessage = callback;
+      },
+    );
+
+    const { result, rerender } = renderHook(
+      ({ enabled }) => useAudienceSocket(123, { enabled }),
+      { initialProps: { enabled: true } },
+    );
+
+    act(() => {
+      handleMessage({ body: JSON.stringify(message) } as IMessage);
+    });
+
+    expect(result.current.latestMessage).toEqual(message);
+
+    act(() => {
+      rerender({ enabled: false });
+    });
+
+    expect(result.current.latestMessage).toBeNull();
+    expect(unsubscribe).toHaveBeenCalledWith('/room/123');
+  });
+
   it('유효한 메시지를 수신하면 latestMessage 상태를 업데이트해야 한다', () => {
     const message: SocketMessage = {
       eventType: 'FINISHED',
