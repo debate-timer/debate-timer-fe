@@ -34,6 +34,8 @@ import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
+import MaintenanceEndModal from './components/MaintenanceEndModal';
+import { isMaintenanceModeEnabled } from '../../util/maintenanceMode';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = false;
@@ -41,6 +43,7 @@ const IS_LIVE_SHARE_ENABLED = false;
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
   const { t } = useTranslation();
+  const isMaintenanceMode = isMaintenanceModeEnabled();
   const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
   const tableId = Number(pathParams.id);
@@ -351,11 +354,17 @@ export default function TimerPage() {
         <AnswerTimeGuideModal onClose={closeAnswerTimeGuideModal} />
       )}
 
-      {/* 토론 종료 후 로그인 저장 여부를 묻는 모달이다. */}
-      <LoginAndStoreModal
-        Wrapper={LoginAndStoreModalWrapper}
-        onClose={closeLoginAndStoreModal}
-      />
+      {isMaintenanceMode ? (
+        <MaintenanceEndModal
+          Wrapper={LoginAndStoreModalWrapper}
+          onClose={closeLoginAndStoreModal}
+        />
+      ) : (
+        <LoginAndStoreModal
+          Wrapper={LoginAndStoreModalWrapper}
+          onClose={closeLoginAndStoreModal}
+        />
+      )}
     </>
   );
 }

@@ -26,6 +26,7 @@ import {
   isSupportedLang,
 } from '../../util/languageRouting';
 import useAnalytics from '../../hooks/useAnalytics';
+import { isMaintenanceModeEnabled } from '../../util/maintenanceMode';
 
 // 토론 개요를 보여주고 공유, 수정, 시작 액션을 제공하는 페이지다.
 export default function TableOverviewPage() {
@@ -38,6 +39,7 @@ export default function TableOverviewPage() {
   const { trackEvent } = useAnalytics();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const isMaintenanceMode = isMaintenanceModeEnabled();
 
   // 팀 선정 모달을 초기 상태로 열어준다.
   const handleOpenModal = () => {
@@ -182,22 +184,25 @@ export default function TableOverviewPage() {
 
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
-            <button
-              className={clsx('flex aspect-square rounded-full p-[20px]', {
-                'button disabled': isLoading,
-                'button enabled neutral': !isLoading,
-              })}
-              disabled={isLoading}
-              onClick={() => {
-                // 공유 버튼 클릭 시 table_shared 이벤트를 기록한다.
-                trackEvent('table_shared', {
-                  table_id: isGuestFlow() ? 'guest' : tableId,
-                });
-                openShareModal();
-              }}
-            >
-              <DTShare className="h-full" />
-            </button>
+            {!isMaintenanceMode ? (
+              <button
+                className={clsx('flex aspect-square rounded-full p-[20px]', {
+                  'button disabled': isLoading,
+                  'button enabled neutral': !isLoading,
+                })}
+                disabled={isLoading}
+                onClick={() => {
+                  // 공유 버튼 클릭 시 table_shared 이벤트를 기록한다.
+                  trackEvent('table_shared', {
+                    table_id: isGuestFlow() ? 'guest' : tableId,
+                  });
+                  openShareModal();
+                }}
+                aria-label={t('공유하기')}
+              >
+                <DTShare className="h-full" />
+              </button>
+            ) : null}
             <button
               className={clsx('flex aspect-square rounded-full p-[20px]', {
                 'button disabled': isLoading,
@@ -244,7 +249,7 @@ export default function TableOverviewPage() {
         </DefaultLayout.StickyFooterWrapper>
       </DefaultLayout>
 
-      <TableShareModal />
+      {!isMaintenanceMode ? <TableShareModal /> : null}
       <ModalWrapper closeButtonColor="text-neutral-1000">
         <TeamSelectionModal
           onClose={closeModal}

@@ -19,6 +19,7 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../../util/languageRouting';
+import { isMaintenanceModeEnabled } from '../../../util/maintenanceMode';
 
 type HeaderIcons = 'home' | 'auth';
 
@@ -62,7 +63,10 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const { mutate: logoutMutate } = useLogout(() => navigate(homePath));
   const { openModal, closeModal, ModalWrapper } = useModal({});
   const { isFullscreen, setFullscreen } = useFullscreen();
-  const defaultIcons: HeaderIcons[] = ['home', 'auth'];
+  const isMaintenanceMode = isMaintenanceModeEnabled();
+  const defaultIcons: HeaderIcons[] = isMaintenanceMode
+    ? ['home']
+    : ['home', 'auth'];
 
   const handleLoginStart = (keepData: boolean) => {
     sessionStorage.setItem('keepGuestTable', String(keepData));
@@ -101,7 +105,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
                       setFullscreen(false);
                     }
 
-                    if (isGuestFlow()) {
+                    if (isGuestFlow() && !isMaintenanceMode) {
                       deleteSessionCustomizeTableData();
                     }
                     navigate(homePath);
