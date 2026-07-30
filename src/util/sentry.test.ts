@@ -128,12 +128,22 @@ describe('sentry 유틸', () => {
     expect(shouldSkipSentryEvent(error)).toBe(true);
   });
 
-  it('운영 액션 가능성이 낮은 취소성 에러와 Script error는 Sentry 이벤트에서 제외한다', () => {
-    expect(shouldSkipSentryEvent(new Error('Request aborted'))).toBe(true);
+  it('사용자 이동이나 요청 취소로 발생한 에러와 Script error는 Sentry 이벤트에서 제외한다', () => {
     expect(shouldSkipSentryEvent(new DOMException('', 'AbortError'))).toBe(
       true,
     );
+    expect(shouldSkipSentryEvent({ name: 'CanceledError' })).toBe(true);
+    expect(shouldSkipSentryEvent({ code: 'ERR_CANCELED' })).toBe(true);
     expect(shouldSkipSentryEvent(undefined, 'Script error.')).toBe(true);
+  });
+
+  it('서비스 에러 메시지에 cancel이나 aborted가 포함되어도 취소성 에러로 오분류하지 않는다', () => {
+    expect(
+      shouldSkipSentryEvent(new Error('Debate live session was cancelled')),
+    ).toBe(false);
+    expect(shouldSkipSentryEvent(new Error('Request was aborted by server'))).toBe(
+      false,
+    );
   });
 
   it('Sentry context에 원본 요청/응답 데이터가 그대로 전송되지 않도록 민감 필드를 마스킹한다', () => {

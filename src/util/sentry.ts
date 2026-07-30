@@ -319,18 +319,13 @@ function isCanceledError(originalException: unknown) {
     return false;
   }
 
-  const { name, message } = originalException as {
+  const { name, code } = originalException as {
     name?: unknown;
-    message?: unknown;
+    code?: unknown;
   };
-  const normalizedMessage =
-    typeof message === 'string' ? message.toLowerCase() : '';
 
   return (
-    normalizedMessage.includes('cancel') ||
-    normalizedMessage.includes('aborted') ||
-    name === 'AbortError' ||
-    name === 'CanceledError'
+    name === 'AbortError' || name === 'CanceledError' || code === 'ERR_CANCELED'
   );
 }
 
