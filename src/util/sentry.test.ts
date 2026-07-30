@@ -111,13 +111,19 @@ describe('sentry 유틸', () => {
     const metadata = buildSentryApiErrorMetadata(originalError, '/vote/123');
 
     const sentryError = createSentryApiError(originalError, metadata);
+    const sdkCapturedError = Object.assign(new Error('sdk captured'), {
+      __sentry_captured__: true,
+    });
 
     expect('__sentry_captured__' in sentryError).toBe(false);
     expect(isSentryCaptured(sentryError)).toBe(false);
+    expect(isSentryCaptured(sdkCapturedError)).toBe(false);
 
     markSentryCaptured(originalError);
+    markSentryCaptured(sdkCapturedError);
 
     expect(isSentryCaptured(originalError)).toBe(true);
+    expect(isSentryCaptured(sdkCapturedError)).toBe(true);
   });
 
   it('이미 커스텀 이벤트로 전송한 에러는 전역 Sentry 이벤트에서 제외한다', () => {
