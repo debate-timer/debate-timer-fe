@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { InputHTMLAttributes } from 'react';
 import { IoMdCloseCircle } from 'react-icons/io';
+import { useTranslation } from 'react-i18next';
 
 interface ClearableInputProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string;
@@ -21,6 +22,7 @@ export default function ClearableInput({
   className,
   ...rest
 }: ClearableInputProps) {
+  const { t } = useTranslation();
   const hasCounter = typeof maxCount === 'number';
   const isOverLimit = hasCounter && value.length > maxCount;
 
@@ -59,7 +61,10 @@ export default function ClearableInput({
               : 'text-default-neutral',
           )}
         >
-          {value.length}/{maxCount}
+          {t('{{current}}/{{max}}', {
+            current: value.length,
+            max: maxCount,
+          })}
         </span>
       )}
     </div>
