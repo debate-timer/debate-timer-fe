@@ -3,6 +3,14 @@ import ClearableInput from '../../../../components/ClearableInput/ClearableInput
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import { DebateInfo, StanceToString } from '../../../../type/type';
+import useDebounce from '../../../../hooks/useDebounce';
+import {
+  TABLE_FIELD_LIMITS,
+  VALIDATION_DEBOUNCE_MS,
+  validateAgenda,
+  validateTableName,
+  validateTeamName,
+} from '../../../../util/tableValidation';
 
 interface TableNameAndTypeProps {
   info: DebateInfo;
@@ -21,6 +29,26 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
     isLoading,
     onButtonClick,
   } = props;
+
+  // 입력이 멈췄다고 판단(디바운스)되면 각 필드를 검증해 붉은 테두리로 노출한다.
+  const debouncedName = useDebounce(info.name ?? '', VALIDATION_DEBOUNCE_MS);
+  const debouncedAgenda = useDebounce(
+    info.agenda ?? '',
+    VALIDATION_DEBOUNCE_MS,
+  );
+  const debouncedProsTeamName = useDebounce(
+    info.prosTeamName ?? '',
+    VALIDATION_DEBOUNCE_MS,
+  );
+  const debouncedConsTeamName = useDebounce(
+    info.consTeamName ?? '',
+    VALIDATION_DEBOUNCE_MS,
+  );
+
+  const nameError = validateTableName(debouncedName) !== null;
+  const agendaError = validateAgenda(debouncedAgenda) !== null;
+  const prosTeamNameError = validateTeamName(debouncedProsTeamName) !== null;
+  const consTeamNameError = validateTeamName(debouncedConsTeamName) !== null;
 
   const handleFieldChange = <K extends keyof DebateInfo>(
     field: K,
@@ -71,6 +99,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             onClear={() => clearField('name')}
             placeholder={t('시간표 1')}
             disabled={isLoading}
+            isError={nameError}
+            maxCount={TABLE_FIELD_LIMITS.name}
           />
 
           <label className="flex items-center text-base font-semibold md:text-2xl">
@@ -82,6 +112,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             onClear={() => clearField('agenda')}
             placeholder={t('토론 주제를 입력해주세요')}
             disabled={isLoading}
+            isError={agendaError}
+            maxCount={TABLE_FIELD_LIMITS.agenda}
           />
 
           <>
@@ -100,6 +132,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 onClear={() => clearTeamNameField('prosTeamName')}
                 placeholder={t(StanceToString['PROS'])}
                 disabled={isLoading}
+                isError={prosTeamNameError}
+                maxCount={TABLE_FIELD_LIMITS.teamName}
               />
 
               <span>vs.</span>
@@ -114,6 +148,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 onClear={() => clearTeamNameField('consTeamName')}
                 placeholder={t(StanceToString['CONS'])}
                 disabled={isLoading}
+                isError={consTeamNameError}
+                maxCount={TABLE_FIELD_LIMITS.teamName}
               />
             </div>
           </>
