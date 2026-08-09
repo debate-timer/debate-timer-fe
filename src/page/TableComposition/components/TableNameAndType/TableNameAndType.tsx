@@ -161,13 +161,15 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           <button
             disabled={isLoading}
             onClick={() => {
-              const pros = info.prosTeamName || '';
-              const cons = info.consTeamName || '';
+              // 제출 시점에 현재값(디바운스 미반영분 포함)으로 전체 필드를 재검증한다.
+              // 위반이 있으면 진행을 막고, 사유는 붉은 테두리·카운터로 표시된다.
+              const hasInvalidField =
+                validateTableName(info.name ?? '') !== null ||
+                validateAgenda(info.agenda ?? '') !== null ||
+                validateTeamName(info.prosTeamName ?? '') !== null ||
+                validateTeamName(info.consTeamName ?? '') !== null;
 
-              const isTooLong = pros.length > 15 || cons.length > 15;
-
-              if (isTooLong) {
-                alert(t('팀명은 최대 15자까지 입력할 수 있습니다.'));
+              if (hasInvalidField) {
                 return;
               }
 
