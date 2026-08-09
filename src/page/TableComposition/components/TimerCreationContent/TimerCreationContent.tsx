@@ -30,6 +30,12 @@ import DTBell from '../../../../components/icons/Bell';
 import DTAdd from '../../../../components/icons/Add';
 import NotificationBadge from '../../../../components/NotificationBadge/NotificationBadge';
 import DTExpand from '../../../../components/icons/Expand';
+import useDebounce from '../../../../hooks/useDebounce';
+import {
+  TABLE_FIELD_LIMITS,
+  VALIDATION_DEBOUNCE_MS,
+  validateSpeechType,
+} from '../../../../util/tableValidation';
 
 type TimerCreationOption =
   | 'TIMER_TYPE'
@@ -271,6 +277,14 @@ export default function TimerCreationContent({
   ];
 
   const options = isNormalTimer ? NORMAL_OPTIONS : TIME_BASED_OPTIONS;
+
+  // 입력이 멈췄다고 판단(디바운스)되면 검증해 붉은 테두리로 노출한다.
+  // 발언자(speaker)는 maxLength+slice 로 하드캡되어 초과가 불가능하므로 검증/카운터를 두지 않는다.
+  const debouncedSpeechType = useDebounce(
+    speechTypeTextValue,
+    VALIDATION_DEBOUNCE_MS,
+  );
+  const speechTypeError = validateSpeechType(debouncedSpeechType) !== null;
 
   const handleSubmit = useCallback(() => {
     const totalTime = minutes * 60 + seconds;
@@ -675,6 +689,8 @@ export default function TimerCreationContent({
                       onChange={(e) => setSpeechTypeTextValue(e.target.value)}
                       onClear={() => setSpeechTypeTextValue('')}
                       placeholder={t('주도권 토론 등')}
+                      isError={speechTypeError}
+                      maxCount={TABLE_FIELD_LIMITS.speechType}
                     />
                   </TimerCreationContentItem>
                 );
@@ -706,6 +722,8 @@ export default function TimerCreationContent({
                           }
                           onClear={() => setSpeechTypeTextValue('')}
                           placeholder={t('입론, 반론, 작전 시간 등')}
+                          isError={speechTypeError}
+                          maxCount={TABLE_FIELD_LIMITS.speechType}
                         />
                       )}
                     </span>
