@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import section501 from '../../../assets/landing/section5-1.png';
 import { LANDING_URLS } from '../../../constants/urls';
+import FillButton from '../../../components/FillButton/FillButton';
 
 export default function TemplateApplicationSection() {
   const { t } = useTranslation();
@@ -13,7 +14,9 @@ export default function TemplateApplicationSection() {
         <p className="text-[min(max(0.875rem,1.25vw),1.2rem)] text-neutral-400">
           {t('새로운 템플릿도 신청해 볼까요?')}
         </p>
-        <button
+        <FillButton
+          variant="secondary"
+          size="md"
           onClick={() =>
             window.open(
               LANDING_URLS.TEMPLATE_REGISTER_URL,
@@ -21,10 +24,9 @@ export default function TemplateApplicationSection() {
               'noopener,noreferrer',
             )
           }
-          className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-brand"
         >
           {t('신청하기')}
-        </button>
+        </FillButton>
       </div>
       <img src={section501} alt="section501" className="w-[30%]" />
     </section>

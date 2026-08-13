@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import section301 from '../../../assets/landing/debate_info_setting.png';
 import section302 from '../../../assets/landing/table_list.png';
+import FillButton from '../../../components/FillButton/FillButton';
 
 interface TableSectionProps {
   onLogin: () => void;
@@ -46,12 +47,9 @@ export default function TableSection({ onLogin }: TableSectionProps) {
         <p className="whitespace-pre-line">
           {t('시간표를 저장하려면,\n디베이트 타이머에 로그인해 보세요!')}
         </p>
-        <button
-          className="mt-14 rounded-full border border-neutral-300 bg-brand px-5 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-semantic-table hover:text-default-white"
-          onClick={onLogin}
-        >
-          {t('3초 로그인')}
-        </button>
+        <div className="mt-14">
+          <FillButton onClick={onLogin}>{t('3초 로그인')}</FillButton>
+        </div>
       </div>
     </section>
   );

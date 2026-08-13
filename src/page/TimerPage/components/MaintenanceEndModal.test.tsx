@@ -93,9 +93,13 @@ describe('점검 중 타이머 종료 모달', () => {
     expect(sessionStorage.getItem('DebateTableData')).not.toBeNull();
   });
 
-  test.each(['close-button', 'overlay', 'escape'] as const)(
-    '%s 닫기는 현재 타이머 상태를 유지한다',
-    async (closeType) => {
+  test.each([
+    { closeType: 'close-button', label: '닫기 버튼' },
+    { closeType: 'overlay', label: '오버레이' },
+    { closeType: 'escape', label: '이스케이프 키' },
+  ] as const)(
+    '$label 닫기는 현재 타이머 상태를 유지한다',
+    async ({ closeType }) => {
       const user = userEvent.setup();
       await renderMaintenanceEndModal();
       await user.click(screen.getByRole('button', { name: '타이머 변경' }));

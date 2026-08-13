@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import section501 from '../../../assets/landing/section5-1.png';
 import { LANDING_URLS } from '../../../constants/urls';
+import FillButton from '../../../components/FillButton/FillButton';
 
 export default function ReportSection() {
   const { t } = useTranslation();
@@ -14,7 +15,9 @@ export default function ReportSection() {
           <p className="text-[min(max(0.875rem,1.25vw),1.2rem)] text-neutral-400">
             {t('디베이트 타이머 사용 중 불편함을 느끼셨나요?')}
           </p>
-          <button
+          <FillButton
+            variant="secondary"
+            size="md"
             onClick={() =>
               window.open(
                 LANDING_URLS.REPORT_FORM_URL,
@@ -22,10 +25,9 @@ export default function ReportSection() {
                 'noopener,noreferrer',
               )
             }
-            className="rounded-full border border-neutral-300 bg-neutral-200 px-9 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-brand"
           >
             {t('접수하기')}
-          </button>
+          </FillButton>
         </div>
         <img src={section501} alt="section501" className="w-[30%]" />
       </div>

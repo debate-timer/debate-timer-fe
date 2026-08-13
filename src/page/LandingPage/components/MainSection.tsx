@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import preview from '../../../assets/landing/preview.webm';
 import { isLoggedIn } from '../../../util/accessToken';
-import StartButton from '../../../components/StartButton/StartButton';
+import FillButton from '../../../components/FillButton/FillButton';
 
 interface MainSectionProps {
   onStartWithoutLogin: () => void;
@@ -24,11 +24,11 @@ export default function MainSection({
       <h1 className="text-[min(max(1.5rem,3.5vw),3rem)] font-bold">
         {t('토론 진행을 더 쉽고 빠르게')}
       </h1>
-      <StartButton
+      <FillButton
         onClick={isLoggedIn() ? onDashboardButtonClicked : onStartWithoutLogin}
       >
         {isLoggedIn() ? t('대시보드로 이동') : t('비회원으로 시작하기')}
-      </StartButton>
+      </FillButton>
     </section>
   );
 }

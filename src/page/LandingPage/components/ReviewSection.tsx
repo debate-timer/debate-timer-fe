@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import ReviewCard from './ReviewCard';
 import { REVIEWS } from '../../../constants/reviews';
+import FillButton from '../../../components/FillButton/FillButton';
 
 interface ReviewSectionProps {
   onStartWithoutLogin: () => void;
@@ -28,12 +29,9 @@ export default function ReviewSection({
         ))}
       </div>
       <div className="flex w-full justify-center">
-        <button
-          className="rounded-full border border-neutral-300 bg-brand px-20 py-2 text-[min(max(0.875rem,1.25vw),1.2rem)] font-medium text-default-black transition-all duration-100 hover:bg-semantic-table hover:text-default-white"
-          onClick={onStartWithoutLogin}
-        >
+        <FillButton size="lg" onClick={onStartWithoutLogin}>
           {t('비회원으로 시작하기')}
-        </button>
+        </FillButton>
       </div>
     </section>
   );

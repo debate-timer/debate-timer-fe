@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import StartButton from '../../components/StartButton/StartButton';
+import FillButton from '../../components/FillButton/FillButton';
 import { SAMPLE_TABLE_DATA } from '../../constants/sample_table';
 import {
   isGuestFlow,
@@ -51,7 +51,7 @@ export default function MaintenancePage() {
         <p className="sm:text-lg sm:leading-8 mb-10 mt-5 max-w-xl break-keep text-base leading-7 text-neutral-700">
           {t(MAINTENANCE_DESCRIPTION, { action: actionLabel })}
         </p>
-        <StartButton onClick={handleStartOffline}>{actionLabel}</StartButton>
+        <FillButton onClick={handleStartOffline}>{actionLabel}</FillButton>
       </section>
     </main>
   );
