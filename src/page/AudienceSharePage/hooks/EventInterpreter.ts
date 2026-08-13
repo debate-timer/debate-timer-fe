@@ -218,7 +218,7 @@ export function getDisplayDataByEvent(
     case 'NEXT': {
       const nextSequence = Math.max(
         0,
-        Math.min(data.sequence + 1, (table?.length ?? 1) - 1),
+        Math.min(data.sequence + 1, (table?.length ?? Infinity) - 1),
       );
       const navigationDisplayData = createNavigationDisplayData(
         eventType,
