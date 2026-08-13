@@ -449,6 +449,26 @@ describe('eventInterpreter 순수 함수', () => {
           revision: 1,
         });
       });
+
+      it('빈 table에서는 sequence가 음수가 되지 않는다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'NORMAL',
+          remainingTime: 30,
+          sequence: 0,
+          currentTeam: 'PROS',
+        };
+
+        const result = getDisplayDataByEvent('NEXT', payload, null, []);
+
+        expect(result?.sequence).toBeGreaterThanOrEqual(0);
+        expect(result).toEqual({
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 30,
+          sequence: 0,
+        });
+      });
     });
 
     describe('TEAM_SWITCH 이벤트', () => {
