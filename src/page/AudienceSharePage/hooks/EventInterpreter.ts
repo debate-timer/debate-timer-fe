@@ -190,7 +190,7 @@ export function getDisplayDataByEvent(
       });
 
     case 'BEFORE': {
-      const previousSequence = data.sequence - 1;
+      const previousSequence = Math.max(data.sequence - 1, 0);
       const navigationDisplayData = createNavigationDisplayData(
         eventType,
         data,
@@ -216,7 +216,10 @@ export function getDisplayDataByEvent(
     }
 
     case 'NEXT': {
-      const nextSequence = data.sequence + 1;
+      const nextSequence = Math.min(
+        data.sequence + 1,
+        (table?.length ?? 1) - 1,
+      );
       const navigationDisplayData = createNavigationDisplayData(
         eventType,
         data,

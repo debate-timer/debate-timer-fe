@@ -8,7 +8,7 @@ import {
 } from './AudienceScreenState';
 import { AudienceShareError } from '../error';
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
-import { AudienceShareState } from '../hooks/useAudienceShareState';
+import { AudienceShareState } from './useAudienceShareState';
 
 const t = (key: string) => key;
 

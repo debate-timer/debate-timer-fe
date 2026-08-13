@@ -1,9 +1,9 @@
 import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
 import {
   AudienceNormalDisplayData,
-  AudienceShareState,
   AudienceTimeBasedDisplayData,
-} from '../hooks/useAudienceShareState';
+} from './EventInterpreter';
+import { AudienceShareState } from './useAudienceShareState';
 
 export type ValidNormalTimeBox = TimeBoxInfo & {
   boxType: 'NORMAL';

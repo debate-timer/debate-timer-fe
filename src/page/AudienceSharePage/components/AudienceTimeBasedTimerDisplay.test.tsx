@@ -98,7 +98,11 @@ describe('AudienceTimeBasedTimerDisplay', () => {
     );
     expect(screen.getByTestId('cons-timer-display')).not.toHaveClass(
       'bg-gray-100',
+    );
+    expect(screen.getByTestId('cons-timer-display')).not.toHaveClass(
       'opacity-50',
+    );
+    expect(screen.getByTestId('cons-timer-display')).not.toHaveClass(
       'grayscale',
     );
     expect(screen.getByText('전체 시간')).toHaveClass(

@@ -5,16 +5,8 @@ import { TimeBoxInfo } from '../../../type/type';
 import { isSocketError } from '../../../apis/sockets/error';
 import {
   getDisplayDataByEvent,
-  AudienceNormalDisplayData,
-  AudienceTimeBasedDisplayData,
   AudienceDisplayData,
-} from '../domain/EventInterpreter';
-
-export type {
-  AudienceNormalDisplayData,
-  AudienceTimeBasedDisplayData,
-  AudienceDisplayData,
-};
+} from './EventInterpreter';
 
 export type AudienceShareState =
   | { status: 'connecting'; error: AudienceShareError | null }

@@ -383,6 +383,28 @@ describe('eventInterpreter 순수 함수', () => {
           sequence: 0,
         });
       });
+
+      it('첫 sequence(0)에서는 0으로 고정되어 범위를 벗어나지 않는다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'NORMAL',
+          remainingTime: 100,
+          sequence: 0,
+        };
+
+        const result = getDisplayDataByEvent(
+          'BEFORE',
+          payload,
+          null,
+          mockTable,
+        );
+        expect(result).toEqual({
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 180,
+          sequence: 0,
+        });
+      });
     });
 
     describe('NEXT 이벤트', () => {
@@ -402,6 +424,27 @@ describe('eventInterpreter 순수 함수', () => {
           prosTime: 60,
           consTime: null,
           sequence: 1,
+          eventType: 'NEXT',
+          revision: 1,
+        });
+      });
+
+      it('마지막 sequence(table.length - 1)에서는 더 넘어가지 않고 고정된다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'TIME_BASED',
+          remainingTime: 60,
+          sequence: mockTable.length - 1,
+          currentTeam: 'PROS',
+        };
+
+        const result = getDisplayDataByEvent('NEXT', payload, null, mockTable);
+        expect(result).toEqual({
+          timerType: 'TIME_BASED',
+          currentTeam: 'PROS',
+          isRunning: false,
+          prosTime: 60,
+          consTime: null,
+          sequence: mockTable.length - 1,
           eventType: 'NEXT',
           revision: 1,
         });

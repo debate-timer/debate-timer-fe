@@ -3,7 +3,7 @@ import {
   getNextSpeakingTime,
   useAudienceTimeBasedCountdown,
 } from './useAudienceTimeBasedCountdown';
-import { AudienceTimeBasedDisplayData } from './useAudienceShareState';
+import { AudienceTimeBasedDisplayData } from './EventInterpreter';
 
 function createDisplayData(
   overrides: Partial<AudienceTimeBasedDisplayData> = {},

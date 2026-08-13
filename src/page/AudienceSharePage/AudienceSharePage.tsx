@@ -11,7 +11,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';
-import { resolveAudienceScreenState } from './domain/AudienceScreenState';
+import { resolveAudienceScreenState } from './hooks/AudienceScreenState';
 
 interface ErrorContentProps {
   message: string;
@@ -68,10 +68,6 @@ export default function AudienceSharePage() {
     table: debateTableQuery.data?.table,
   });
 
-  if (!isValidTableId) {
-    throw new Error(t('유효하지 않은 토론방 ID입니다.'));
-  }
-
   const viewState = resolveAudienceScreenState(
     state,
     {
@@ -104,6 +100,10 @@ export default function AudienceSharePage() {
         ? viewState.timeBox.timePerSpeaking
         : null,
   });
+
+  if (!isValidTableId) {
+    throw new Error(t('유효하지 않은 토론방 ID입니다.'));
+  }
 
   const handleClosePage = () => {
     // 일단 페이지 닫기

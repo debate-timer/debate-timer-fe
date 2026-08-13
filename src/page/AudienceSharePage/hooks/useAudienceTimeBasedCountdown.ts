@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TimeBasedStance } from '../../../type/type';
 import { useAudienceCountdown } from './useAudienceCountdown';
-import { AudienceTimeBasedDisplayData } from './useAudienceShareState';
+import { AudienceTimeBasedDisplayData } from './EventInterpreter';
 
 interface TeamCountdownInput {
   totalTime: number | null;
