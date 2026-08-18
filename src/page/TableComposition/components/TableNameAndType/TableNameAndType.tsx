@@ -162,14 +162,45 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             disabled={isLoading}
             onClick={() => {
               // 제출 시점에 현재값(디바운스 미반영분 포함)으로 전체 필드를 재검증한다.
-              // 위반이 있으면 진행을 막고, 사유는 붉은 테두리·카운터로 표시된다.
-              const hasInvalidField =
-                validateTableName(info.name ?? '') !== null ||
-                validateAgenda(info.agenda ?? '') !== null ||
-                validateTeamName(info.prosTeamName ?? '') !== null ||
-                validateTeamName(info.consTeamName ?? '') !== null;
+              // 위반이 있으면 진행을 막고, 붉은 테두리·카운터에 더해 무엇이 잘못됐는지
+              // 사유별 메시지로 알려준다.
+              const errors: string[] = [];
 
-              if (hasInvalidField) {
+              const nameReason = validateTableName(info.name ?? '');
+              if (nameReason === 'LENGTH') {
+                errors.push(
+                  t('시간표 이름은 최대 {{val0}}자까지 입력할 수 있습니다.', {
+                    val0: TABLE_FIELD_LIMITS.name,
+                  }),
+                );
+              } else if (nameReason === 'FORM') {
+                errors.push(
+                  t('시간표 이름에 사용할 수 없는 문자가 포함되어 있습니다.'),
+                );
+              }
+
+              const agendaReason = validateAgenda(info.agenda ?? '');
+              if (agendaReason === 'LENGTH') {
+                errors.push(
+                  t('토론 주제는 최대 {{val0}}자까지 입력할 수 있습니다.', {
+                    val0: TABLE_FIELD_LIMITS.agenda,
+                  }),
+                );
+              }
+
+              const prosReason = validateTeamName(info.prosTeamName ?? '');
+              const consReason = validateTeamName(info.consTeamName ?? '');
+              if (prosReason === 'LENGTH' || consReason === 'LENGTH') {
+                errors.push(t('팀명은 최대 15자까지 입력할 수 있습니다.'));
+              }
+              if (prosReason === 'FORM' || consReason === 'FORM') {
+                errors.push(
+                  t('팀명에 사용할 수 없는 문자가 포함되어 있습니다.'),
+                );
+              }
+
+              if (errors.length > 0) {
+                alert(errors.join('\n'));
                 return;
               }
 
