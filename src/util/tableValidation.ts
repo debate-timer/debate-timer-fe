@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 /**
  * 토론 테이블 입력값 검증 규칙.
  * 값은 debate-timer-be 의 도메인 제약과 동일하게 유지해야 한다.
@@ -58,5 +60,43 @@ export const validateSpeechType = (value: string): FieldError => {
 export const validateSpeaker = (value: string): FieldError => {
   const v = value ?? '';
   if (v.trim().length > TABLE_FIELD_LIMITS.speaker) return 'LENGTH';
+  return null;
+};
+
+/**
+ * 필드 사유(FieldError)를 사용자 노출 메시지로 변환한다.
+ * 입력창 아래 인라인 노출과 제출 차단이 동일 매핑을 공유하도록 헬퍼로 둔다.
+ */
+export const getTableNameErrorMessage = (
+  reason: FieldError,
+  t: TFunction,
+): string | null => {
+  if (reason === 'LENGTH')
+    return t('시간표 이름은 최대 {{val0}}자까지 입력할 수 있습니다.', {
+      val0: TABLE_FIELD_LIMITS.name,
+    });
+  if (reason === 'FORM')
+    return t('시간표 이름에 사용할 수 없는 문자가 포함되어 있습니다.');
+  return null;
+};
+
+export const getAgendaErrorMessage = (
+  reason: FieldError,
+  t: TFunction,
+): string | null => {
+  if (reason === 'LENGTH')
+    return t('토론 주제는 최대 {{val0}}자까지 입력할 수 있습니다.', {
+      val0: TABLE_FIELD_LIMITS.agenda,
+    });
+  return null;
+};
+
+export const getTeamNameErrorMessage = (
+  reason: FieldError,
+  t: TFunction,
+): string | null => {
+  if (reason === 'LENGTH') return t('팀명은 최대 15자까지 입력할 수 있습니다.');
+  if (reason === 'FORM')
+    return t('팀명에 사용할 수 없는 문자가 포함되어 있습니다.');
   return null;
 };

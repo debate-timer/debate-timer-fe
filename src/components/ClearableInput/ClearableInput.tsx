@@ -11,6 +11,8 @@ interface ClearableInputProps extends InputHTMLAttributes<HTMLInputElement> {
   isError?: boolean;
   /** 설정 시 입력창 경계 바로 아래에 `현재/최대` 글자 수 카운터를 노출한다. */
   maxCount?: number;
+  /** 설정 시 입력창 경계 바로 아래(왼쪽)에 붉은 에러 메시지를 노출한다. */
+  errorMessage?: string;
 }
 
 export default function ClearableInput({
@@ -19,20 +21,25 @@ export default function ClearableInput({
   disabled = false,
   isError = false,
   maxCount,
+  errorMessage,
   className,
+  id,
   ...rest
 }: ClearableInputProps) {
   const { t } = useTranslation();
   const hasCounter = typeof maxCount === 'number';
   const isOverLimit = hasCounter && value.length > maxCount;
+  const errorId = errorMessage && id ? `${id}-error` : undefined;
 
   return (
     <div className={clsx('relative w-full', className)}>
       <input
         {...rest}
+        id={id}
         value={value}
         disabled={disabled}
         aria-invalid={isError || undefined}
+        aria-describedby={errorId}
         className={clsx(
           'text-body h-[48px] w-full appearance-none rounded-[4px] p-[12px] text-default-black placeholder-default-border focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
           // box-border 기준이라 테두리를 굵혀도 외곽 크기(48px)는 유지 → 레이아웃 밀림 없음
@@ -65,6 +72,17 @@ export default function ClearableInput({
             current: value.length,
             max: maxCount,
           })}
+        </span>
+      )}
+      {errorMessage && (
+        // 카운터(우하단)와 겹치지 않도록 우측 여백을 두고 좌하단에 절대배치한다.
+        <span
+          id={errorId}
+          role="alert"
+          aria-live="polite"
+          className="absolute left-1 top-full mt-[2px] pr-14 text-[12px] font-semibold leading-none text-semantic-error"
+        >
+          {errorMessage}
         </span>
       )}
     </div>
