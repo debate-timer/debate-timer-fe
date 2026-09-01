@@ -4,6 +4,9 @@ import { Formatting } from '../../../util/formatting';
 export interface UseAudienceCountdownParams {
   receivedTime: number | null;
   isRunning: boolean;
+  minimumTime?: number;
+  shouldResetOnRunStateChange?: boolean;
+  syncKey?: number;
 }
 
 export interface UseAudienceCountdownReturn {
@@ -14,34 +17,85 @@ export interface UseAudienceCountdownReturn {
 export function useAudienceCountdown({
   receivedTime,
   isRunning,
+  minimumTime,
+  shouldResetOnRunStateChange = true,
+  syncKey,
 }: UseAudienceCountdownParams): UseAudienceCountdownReturn {
   const [currentSeconds, setCurrentSeconds] = useState<number | null>(
     receivedTime,
   );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const targetTimeRef = useRef<number | null>(null);
+  const currentSecondsRef = useRef<number | null>(receivedTime);
+  const previousReceivedTimeRef = useRef<number | null | undefined>(undefined);
+  const previousSyncKeyRef = useRef<number | undefined>(undefined);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    // cleanup previous interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
 
-    setCurrentSeconds(receivedTime);
+    const hasReceivedTimeChanged =
+      previousReceivedTimeRef.current !== receivedTime;
+    const hasSyncKeyChanged = previousSyncKeyRef.current !== syncKey;
+    const shouldSynchronize =
+      !isInitializedRef.current ||
+      hasReceivedTimeChanged ||
+      hasSyncKeyChanged ||
+      shouldResetOnRunStateChange;
+    const normalizedReceivedTime =
+      receivedTime === null || minimumTime === undefined
+        ? receivedTime
+        : Math.max(minimumTime, receivedTime);
+    const startingSeconds = shouldSynchronize
+      ? normalizedReceivedTime
+      : currentSecondsRef.current;
 
-    if (isRunning && receivedTime !== null) {
-      targetTimeRef.current = Date.now() + receivedTime * 1000;
+    if (shouldSynchronize) {
+      currentSecondsRef.current = normalizedReceivedTime;
+      setCurrentSeconds(normalizedReceivedTime);
+    }
+
+    previousReceivedTimeRef.current = receivedTime;
+    previousSyncKeyRef.current = syncKey;
+    isInitializedRef.current = true;
+
+    const hasReachedMinimum =
+      minimumTime !== undefined &&
+      startingSeconds !== null &&
+      startingSeconds <= minimumTime;
+
+    if (isRunning && startingSeconds !== null && !hasReachedMinimum) {
+      targetTimeRef.current = Date.now() + startingSeconds * 1000;
 
       intervalRef.current = setInterval(() => {
         if (targetTimeRef.current === null) return;
         const now = Date.now();
-        const remainingTime = Math.max(
-          0,
-          Math.ceil((targetTimeRef.current - now) / 1000),
+        const rawRemainingTime = Math.ceil(
+          (targetTimeRef.current - now) / 1000,
         );
+        const remainingTime =
+          minimumTime === undefined
+            ? rawRemainingTime
+            : Math.max(minimumTime, rawRemainingTime);
+
+        currentSecondsRef.current = remainingTime;
         setCurrentSeconds(remainingTime);
+
+        if (
+          minimumTime !== undefined &&
+          rawRemainingTime <= minimumTime &&
+          intervalRef.current
+        ) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          targetTimeRef.current = null;
+        }
       }, 200);
+    } else {
+      targetTimeRef.current = null;
     }
 
     return () => {
@@ -50,11 +104,19 @@ export function useAudienceCountdown({
         intervalRef.current = null;
       }
     };
-  }, [receivedTime, isRunning]);
+  }, [
+    isRunning,
+    minimumTime,
+    receivedTime,
+    shouldResetOnRunStateChange,
+    syncKey,
+  ]);
 
   const formattedTime =
     currentSeconds !== null
-      ? Formatting.formatSecondsToMMSS(currentSeconds)
+      ? `${currentSeconds < 0 ? '-' : ''}${Formatting.formatSecondsToMMSS(
+          Math.abs(currentSeconds),
+        )}`
       : '00:00';
 
   return { currentSeconds, formattedTime };

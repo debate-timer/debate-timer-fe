@@ -3,12 +3,15 @@ import {
   buildSentryApiErrorMetadata,
   createSentryApiError,
   createSentryRenderError,
+  isSentryCaptured,
+  markSentryCaptured,
   normalizeEndpoint,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
   sanitizeSentryContext,
   sanitizeSentrySearch,
   sanitizeSentryUrl,
+  shouldSkipSentryEvent,
   shouldSkipApiError,
 } from './sentry';
 
@@ -99,6 +102,56 @@ describe('sentry 유틸', () => {
     expect(shouldSkipApiError(onlineNetworkError)).toBe(false);
   });
 
+  it('SDK 내부 플래그와 앱 전용 플래그를 분리해 중복 캡처를 판단한다', () => {
+    const originalError = new AxiosError('Request failed', undefined, {
+      method: 'get',
+      url: '/api/polls/123/votes',
+      headers: new AxiosHeaders(),
+    });
+    const metadata = buildSentryApiErrorMetadata(originalError, '/vote/123');
+
+    const sentryError = createSentryApiError(originalError, metadata);
+    const sdkCapturedError = Object.assign(new Error('sdk captured'), {
+      __sentry_captured__: true,
+    });
+
+    expect('__sentry_captured__' in sentryError).toBe(false);
+    expect(isSentryCaptured(sentryError)).toBe(false);
+    expect(isSentryCaptured(sdkCapturedError)).toBe(false);
+
+    markSentryCaptured(originalError);
+    markSentryCaptured(sdkCapturedError);
+
+    expect(isSentryCaptured(originalError)).toBe(true);
+    expect(isSentryCaptured(sdkCapturedError)).toBe(true);
+  });
+
+  it('이미 커스텀 이벤트로 전송한 에러는 전역 Sentry 이벤트에서 제외한다', () => {
+    const error = new Error('already captured');
+
+    markSentryCaptured(error);
+
+    expect(shouldSkipSentryEvent(error)).toBe(true);
+  });
+
+  it('사용자 이동이나 요청 취소로 발생한 에러와 Script error는 Sentry 이벤트에서 제외한다', () => {
+    expect(shouldSkipSentryEvent(new DOMException('', 'AbortError'))).toBe(
+      true,
+    );
+    expect(shouldSkipSentryEvent({ name: 'CanceledError' })).toBe(true);
+    expect(shouldSkipSentryEvent({ code: 'ERR_CANCELED' })).toBe(true);
+    expect(shouldSkipSentryEvent(undefined, 'Script error.')).toBe(true);
+  });
+
+  it('서비스 에러 메시지에 cancel이나 aborted가 포함되어도 취소성 에러로 오분류하지 않는다', () => {
+    expect(
+      shouldSkipSentryEvent(new Error('Debate live session was cancelled')),
+    ).toBe(false);
+    expect(shouldSkipSentryEvent(new Error('Request was aborted by server'))).toBe(
+      false,
+    );
+  });
+
   it('Sentry context에 원본 요청/응답 데이터가 그대로 전송되지 않도록 민감 필드를 마스킹한다', () => {
     expect(
       sanitizeSentryContext({
@@ -144,7 +197,7 @@ describe('sentry 유틸', () => {
     );
   });
 
-  it('알림 제목을 level, error type, feature, status, endpoint 순서로 구성해 대응 판단 흐름을 만든다', () => {
+  it('API 에러 알림 제목은 level, error type, feature, status, endpoint 순서로 구성한다', () => {
     const error = new AxiosError('Request failed', undefined, {
       method: 'post',
       url: '/api/live/123',
@@ -159,7 +212,7 @@ describe('sentry 유틸', () => {
     );
   });
 
-  it('렌더링 에러 알림 제목도 level, error type, feature, 원본 에러 순서로 구성한다', () => {
+  it('렌더링 에러 알림 제목은 level, error type, feature, 원본 에러 순서로 구성한다', () => {
     const error = new TypeError('Cannot read properties of undefined');
 
     const sentryError = createSentryRenderError(error, 'timer');

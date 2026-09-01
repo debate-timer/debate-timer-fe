@@ -4,12 +4,35 @@ import { useAudienceCountdown } from './useAudienceCountdown';
 import * as useAudienceSocketModule from '../../../hooks/sockets/useAudienceSocket';
 import { SocketMessage } from '../../../apis/sockets/type';
 import { SocketError } from '../../../apis/sockets/error';
+import { TimeBoxInfo } from '../../../type/type';
 
 vi.mock('../../../hooks/sockets/useAudienceSocket');
 
 describe('useAudienceShareState', () => {
   let mockConnect: ReturnType<typeof vi.fn>;
   let mockDisconnect: ReturnType<typeof vi.fn>;
+  const normalTable: TimeBoxInfo[] = [
+    {
+      stance: 'PROS',
+      speechType: '입론',
+      bell: null,
+      boxType: 'NORMAL',
+      time: 180,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: null,
+    },
+    {
+      stance: 'CONS',
+      speechType: '반론',
+      bell: null,
+      boxType: 'NORMAL',
+      time: 90,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: null,
+    },
+  ];
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -47,6 +70,36 @@ describe('useAudienceShareState', () => {
     const { unmount } = renderHook(() => useAudienceShareState(1));
     expect(mockConnect).toHaveBeenCalledTimes(1);
     unmount();
+    expect(mockDisconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it('연결이 비활성화되면 소켓에 연결하거나 연결 해제를 시도하지 않는다.', () => {
+    const { result, unmount } = renderHook(() =>
+      useAudienceShareState(1, { enabled: false }),
+    );
+
+    expect(result.current.status).toBe('connecting');
+    expect(mockConnect).not.toHaveBeenCalled();
+
+    unmount();
+
+    expect(mockDisconnect).not.toHaveBeenCalled();
+  });
+
+  it('연결이 활성화되는 시점에 소켓 연결을 한 번 시작하고 언마운트 시 정리한다.', () => {
+    const { rerender, unmount } = renderHook(
+      ({ enabled }) => useAudienceShareState(1, { enabled }),
+      { initialProps: { enabled: false } },
+    );
+
+    expect(mockConnect).not.toHaveBeenCalled();
+
+    rerender({ enabled: true });
+
+    expect(mockConnect).toHaveBeenCalledTimes(1);
+
+    unmount();
+
     expect(mockDisconnect).toHaveBeenCalledTimes(1);
   });
 
@@ -98,9 +151,103 @@ describe('useAudienceShareState', () => {
       expect(result.current.displayData.timerType).toBe('NORMAL');
       if (result.current.displayData.timerType === 'NORMAL') {
         expect(result.current.displayData.singleTime).toBe(60);
+        expect(result.current.displayData.sequence).toBe(1);
       }
     }
   });
+
+  it.each([
+    { eventType: 'PLAY' as const, isRunning: true },
+    { eventType: 'STOP' as const, isRunning: false },
+  ])('$eventType 이벤트를 독립적으로 처리한다', ({ eventType, isRunning }) => {
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType,
+        data: { timerType: 'NORMAL', sequence: 0, remainingTime: 75 },
+      },
+    });
+
+    const { result } = renderHook(() => useAudienceShareState(1));
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
+      expect(result.current.displayData.isRunning).toBe(isRunning);
+      expect(result.current.displayData.singleTime).toBe(75);
+      expect(result.current.displayData.sequence).toBe(0);
+    }
+  });
+
+  it('RESET 이벤트는 현재 순서의 전체 시간으로 되돌린다', () => {
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'RESET',
+        data: { timerType: 'NORMAL', sequence: 1, remainingTime: 12 },
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAudienceShareState(1, { table: normalTable }),
+    );
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
+      expect(result.current.displayData.isRunning).toBe(false);
+      expect(result.current.displayData.sequence).toBe(1);
+      expect(result.current.displayData.singleTime).toBe(90);
+    }
+  });
+
+  it.each([
+    {
+      eventType: 'BEFORE' as const,
+      receivedSequence: 1,
+      expectedSequence: 0,
+      expectedTime: 180,
+    },
+    {
+      eventType: 'NEXT' as const,
+      receivedSequence: 0,
+      expectedSequence: 1,
+      expectedTime: 90,
+    },
+  ])(
+    '$eventType 이벤트는 sequence를 이동하고 목표 순서의 전체 시간을 표시한다',
+    ({ eventType, receivedSequence, expectedSequence, expectedTime }) => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: {
+          eventType,
+          data: {
+            timerType: 'NORMAL',
+            sequence: receivedSequence,
+            remainingTime: 12,
+          },
+        },
+      });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      expect(result.current.status).toBe('displaying');
+      if (
+        result.current.status === 'displaying' &&
+        result.current.displayData.timerType === 'NORMAL'
+      ) {
+        expect(result.current.displayData.isRunning).toBe(false);
+        expect(result.current.displayData.sequence).toBe(expectedSequence);
+        expect(result.current.displayData.singleTime).toBe(expectedTime);
+      }
+    },
+  );
 
   it('시간 기반 이벤트는 현재 팀 시간만 갱신하고 상대 팀의 마지막 수신 시간 또는 null을 유지한다.', () => {
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
@@ -177,6 +324,9 @@ describe('useAudienceShareState', () => {
         expect(result.current.displayData.prosTime).toBe(77);
         expect(result.current.displayData.consTime).toBeNull();
         expect(result.current.displayData.isRunning).toBe(false);
+        expect(result.current.displayData.sequence).toBe(1);
+        expect(result.current.displayData.eventType).toBe('TEAM_SWITCH');
+        expect(result.current.displayData.revision).toBe(1);
       }
     }
 
@@ -202,7 +352,121 @@ describe('useAudienceShareState', () => {
         expect(result.current.displayData.prosTime).toBe(77);
         expect(result.current.displayData.consTime).toBe(55);
         expect(result.current.displayData.isRunning).toBe(false);
+        expect(result.current.displayData.sequence).toBe(2);
+        expect(result.current.displayData.revision).toBe(2);
       }
+    }
+  });
+
+  it('실행 중 TEAM_SWITCH는 새 팀에서도 실행 상태를 유지한다.', () => {
+    let latestMessage: SocketMessage = {
+      eventType: 'PLAY',
+      data: {
+        timerType: 'TIME_BASED',
+        currentTeam: 'PROS',
+        sequence: 0,
+        remainingTime: 30,
+      },
+    };
+    setSocketState({ isConnected: true, latestMessage });
+
+    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+    latestMessage = {
+      eventType: 'TEAM_SWITCH',
+      data: {
+        timerType: 'TIME_BASED',
+        currentTeam: 'PROS',
+        sequence: 0,
+        remainingTime: 25,
+      },
+    };
+    setSocketState({ isConnected: true, latestMessage });
+    rerender();
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.currentTeam).toBe('CONS');
+      expect(result.current.displayData.isRunning).toBe(true);
+      expect(result.current.displayData.eventType).toBe('TEAM_SWITCH');
+      expect(result.current.displayData.revision).toBe(2);
+    }
+  });
+
+  it.each([
+    { eventType: 'BEFORE' as const, sequence: 2, expectedSequence: 1 },
+    { eventType: 'NEXT' as const, sequence: 0, expectedSequence: 1 },
+  ])(
+    'TIME_BASED $eventType는 실제 이동 대상 sequence를 보존한다.',
+    ({ eventType, sequence, expectedSequence }) => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: {
+          eventType,
+          data: {
+            timerType: 'TIME_BASED',
+            currentTeam: 'PROS',
+            sequence,
+            remainingTime: 30,
+          },
+        },
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.status).toBe('displaying');
+      if (
+        result.current.status === 'displaying' &&
+        result.current.displayData.timerType === 'TIME_BASED'
+      ) {
+        expect(result.current.displayData.sequence).toBe(expectedSequence);
+        expect(result.current.displayData.eventType).toBe(eventType);
+      }
+    },
+  );
+
+  it('NORMAL에서 TIME_BASED 순서로 이동하면 API 설정으로 시간 기반 표시 상태를 만든다.', () => {
+    const mixedTable: TimeBoxInfo[] = [
+      normalTable[0],
+      {
+        stance: 'NEUTRAL',
+        speechType: '자유토론',
+        bell: null,
+        boxType: 'TIME_BASED',
+        time: null,
+        timePerTeam: 120,
+        timePerSpeaking: 30,
+        speaker: null,
+      },
+    ];
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'NEXT',
+        data: {
+          timerType: 'NORMAL',
+          sequence: 0,
+          remainingTime: 20,
+        },
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAudienceShareState(1, { table: mixedTable }),
+    );
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'TIME_BASED'
+    ) {
+      expect(result.current.displayData.sequence).toBe(1);
+      expect(result.current.displayData.currentTeam).toBe('PROS');
+      expect(result.current.displayData.prosTime).toBe(30);
+      expect(result.current.displayData.eventType).toBe('NEXT');
     }
   });
 
@@ -224,7 +488,7 @@ describe('useAudienceShareState', () => {
     expect(result.current.status).toBe('waiting');
   });
 
-  it('sequence는 내부 최신 payload에는 유지되지만 반환 UI 상태와 렌더링 props에는 노출되지 않는다.', () => {
+  it('NORMAL 이벤트의 sequence를 표시 상태에 보존한다.', () => {
     setSocketState({
       isConnected: true,
       latestMessage: {
@@ -236,9 +500,10 @@ describe('useAudienceShareState', () => {
 
     expect(result.current.status).toBe('displaying');
     if (result.current.status === 'displaying') {
-      expect(
-        (result.current.displayData as Record<string, unknown>).sequence,
-      ).toBeUndefined();
+      expect(result.current.displayData.timerType).toBe('NORMAL');
+      if (result.current.displayData.timerType === 'NORMAL') {
+        expect(result.current.displayData.sequence).toBe(5);
+      }
     }
   });
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
 import axiosInstance from './axiosInstance';
-import { isSentryCaptured } from '../util/sentry';
+import { isSentryCaptured, markSentryCaptured } from '../util/sentry';
 
 // HTTP request methods
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -10,7 +10,6 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export class APIError extends Error {
   public readonly status: number;
   public readonly data: unknown;
-  public __sentry_captured__?: boolean;
 
   constructor(message: string, status: number, data: unknown) {
     super(message);
@@ -56,7 +55,11 @@ export async function request<T>(
         error.response?.status || 500,
         responseData,
       );
-      apiError.__sentry_captured__ = isSentryCaptured(error);
+      // Axios 인터셉터에서 이미 보낸 에러는 APIError로 감싼 뒤에도
+      // ErrorBoundary/전역 핸들러에서 중복 수집되지 않도록 캡처 상태를 전달한다.
+      if (isSentryCaptured(error)) {
+        markSentryCaptured(apiError);
+      }
       throw apiError;
     }
 
