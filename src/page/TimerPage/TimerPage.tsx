@@ -20,6 +20,7 @@ import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import { isGuestFlow } from '../../util/sessionStorage';
+import { useEnsureGuestTable } from '../../hooks/useEnsureGuestTable';
 import useAnalytics from '../../hooks/useAnalytics';
 import { consumeTemplateOrigin } from '../../util/analytics/templateOrigin';
 import {
@@ -44,6 +45,7 @@ export default function TimerPage() {
   const { t } = useTranslation();
   const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
+  useEnsureGuestTable(pathParams.id);
   const tableId = Number(pathParams.id);
   const {
     openUseTooltipModal,
