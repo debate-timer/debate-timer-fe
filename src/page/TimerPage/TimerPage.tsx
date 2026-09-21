@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
@@ -122,21 +122,42 @@ export default function TimerPage() {
   };
 
   // 현재 타이머 상태로 청중 공유용 페이로드 생성
-  const buildTimerPayload = (eventType: TimerEventTypes) => {
-    const currentTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
+  const isNormalTimerRunning = normalTimer.isRunning;
+  const isProsTimerRunning = timer1.isRunning;
+  const isConsTimerRunning = timer2.isRunning;
+  const prosTotalTime = timer1.totalTimer;
+  const consTotalTime = timer2.totalTimer;
+  const buildTimerPayload = useCallback(
+    (eventType: TimerEventTypes) => {
+      const isTimeBasedTimerRunning =
+        prosConsSelected === 'PROS' ? isProsTimerRunning : isConsTimerRunning;
 
-    return buildTimerPayloadForShare({
-      eventType,
-      timerType,
-      sequence: index,
-      currentTeam: prosConsSelected,
+      return buildTimerPayloadForShare({
+        eventType,
+        timerType,
+        sequence: index,
+        currentTeam: prosConsSelected,
+        remainingTime,
+        isCurrentTimerRunning:
+          timerType === 'NORMAL'
+            ? isNormalTimerRunning
+            : isTimeBasedTimerRunning,
+        prosTotalTime,
+        consTotalTime,
+      });
+    },
+    [
+      consTotalTime,
+      index,
+      isConsTimerRunning,
+      isNormalTimerRunning,
+      isProsTimerRunning,
+      prosConsSelected,
+      prosTotalTime,
       remainingTime,
-      isCurrentTimerRunning:
-        timerType === 'NORMAL' ? normalTimer.isRunning : currentTimer.isRunning,
-      prosTotalTime: timer1.totalTimer,
-      consTotalTime: timer2.totalTimer,
-    });
-  };
+      timerType,
+    ],
+  );
 
   // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
   const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
@@ -166,19 +187,22 @@ export default function TimerPage() {
   };
 
   // 서버의 상태 공유 요청 시 현재 상태를 SYNC로 발행 (이미 종료했다면 FINISHED)
-  syncRequestHandlerRef.current = () => {
-    if (isDebateFinishedRef.current) {
-      issueEvent('FINISHED', null);
-      return;
-    }
+  // 폐기된 렌더의 상태를 캡처하지 않도록 커밋 이후에 핸들러를 갱신
+  useEffect(() => {
+    syncRequestHandlerRef.current = () => {
+      if (isDebateFinishedRef.current) {
+        issueEvent('FINISHED', null);
+        return;
+      }
 
-    const payload = buildTimerPayload('SYNC');
-    if (payload === null) {
-      return;
-    }
+      const payload = buildTimerPayload('SYNC');
+      if (payload === null) {
+        return;
+      }
 
-    issueEvent('SYNC', payload);
-  };
+      issueEvent('SYNC', payload);
+    };
+  }, [buildTimerPayload, issueEvent]);
 
   useTimerHotkey(state, handleTimerEvent);
 

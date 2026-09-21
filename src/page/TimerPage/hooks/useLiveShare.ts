@@ -71,12 +71,12 @@ export function useLiveShare(
     !isValidTableId || isTokenError ? 'token' : 'else';
 
   // 토큰을 첨부하여 토론 이벤트를 전송하는 함수
-  const issueEvent = (
-    eventType: SocketEventType,
-    payload: TimerDataPayload | null,
-  ) => {
-    sendDebateEvent(eventType, payload, chairmanToken ?? '');
-  };
+  const issueEvent = useCallback(
+    (eventType: SocketEventType, payload: TimerDataPayload | null) => {
+      sendDebateEvent(eventType, payload, chairmanToken ?? '');
+    },
+    [chairmanToken, sendDebateEvent],
+  );
 
   /**
    * 토론 공유 모달 바깥 클릭을 처리하는 부수 효과

@@ -55,7 +55,9 @@ export default function useChairmanSocket(
 
   // 구독을 다시 맺지 않고도 최신 콜백을 호출하기 위해 ref로 보관
   const onSyncRequestRef = useRef(onSyncRequest);
-  onSyncRequestRef.current = onSyncRequest;
+  useEffect(() => {
+    onSyncRequestRef.current = onSyncRequest;
+  }, [onSyncRequest]);
 
   // 마지막으로 발행한 이벤트의 version
   const versionRef = useRef(0);
