@@ -15,6 +15,8 @@ export type AudienceTimeBasedDisplayData = {
   isRunning: boolean;
   prosTime: number | null;
   consTime: number | null;
+  /** 양 팀의 총 남은 시간 (SYNC 이벤트에서만 존재) */
+  teamTotalTimes?: { pros: number; cons: number };
   sequence: number;
   eventType: TimerEventTypes;
   revision: number;
@@ -55,6 +57,7 @@ export function createDisplayData(
     sequence?: number;
     normalTime?: number;
     shouldSwitchTeam?: boolean;
+    teamTotalTimes?: { pros: number; cons: number };
   },
 ): AudienceDisplayData | null {
   const {
@@ -63,6 +66,7 @@ export function createDisplayData(
     sequence = data.sequence,
     normalTime = data.remainingTime,
     shouldSwitchTeam = false,
+    teamTotalTimes,
   } = options;
 
   if (data.timerType === 'NORMAL') {
@@ -99,10 +103,28 @@ export function createDisplayData(
       receivedCurrentTeam === 'CONS'
         ? data.remainingTime
         : (previousTimeBasedData?.consTime ?? null),
+    ...(teamTotalTimes && { teamTotalTimes }),
     sequence,
     eventType,
     revision: (previousTimeBasedData?.revision ?? 0) + 1,
   };
+}
+
+/**
+ * 자유토론 SYNC 페이로드에서 양 팀의 총 남은 시간을 꺼냅니다.
+ * 둘 중 하나라도 없으면 `undefined`를 반환합니다.
+ */
+function getTeamTotalTimes(
+  data: TimerDataPayload,
+): { pros: number; cons: number } | undefined {
+  if (
+    data.prosRemainingTime === undefined ||
+    data.consRemainingTime === undefined
+  ) {
+    return undefined;
+  }
+
+  return { pros: data.prosRemainingTime, cons: data.consRemainingTime };
 }
 
 export function createNavigationDisplayData(
@@ -250,8 +272,12 @@ export function getDisplayDataByEvent(
         shouldSwitchTeam: true,
       });
 
-    // SYNC 해석은 청중 화면 작업에서 추가하며, 그 전까지는 현재 화면을 유지
+    // 중도 입장 등으로 요청된 현재 상태 스냅샷: 순서 이동 등의 부수 효과 없이 그대로 덮어씀
     case 'SYNC':
-      return previousDisplayData;
+      return createDisplayData(data, previousDisplayData, {
+        eventType,
+        isRunning: data.isRunning ?? false,
+        teamTotalTimes: getTeamTotalTimes(data),
+      });
   }
 }

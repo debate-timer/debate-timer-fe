@@ -510,5 +510,85 @@ describe('eventInterpreter 순수 함수', () => {
         });
       });
     });
+
+    describe('SYNC 이벤트', () => {
+      it('일반 타이머는 받은 남은 시간과 재생 여부를 그대로 반영한다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'NORMAL',
+          remainingTime: 142,
+          sequence: 0,
+          isRunning: true,
+        };
+
+        expect(getDisplayDataByEvent('SYNC', payload, null, mockTable)).toEqual(
+          {
+            timerType: 'NORMAL',
+            currentTeam: null,
+            isRunning: true,
+            singleTime: 142,
+            sequence: 0,
+          },
+        );
+      });
+
+      it('isRunning이 false이면 정지 상태로 반영한다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'NORMAL',
+          remainingTime: 100,
+          sequence: 0,
+          isRunning: false,
+        };
+
+        expect(
+          getDisplayDataByEvent('SYNC', payload, null, mockTable)?.isRunning,
+        ).toBe(false);
+      });
+
+      it('이전 화면과 무관하게 받은 sequence로 덮어쓴다', () => {
+        const prevData: AudienceNormalDisplayData = {
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 10,
+          sequence: 3,
+        };
+        const payload: TimerDataPayload = {
+          timerType: 'NORMAL',
+          remainingTime: 100,
+          sequence: 0,
+          isRunning: false,
+        };
+
+        expect(
+          getDisplayDataByEvent('SYNC', payload, prevData, mockTable)?.sequence,
+        ).toBe(0);
+      });
+
+      it('자유토론은 현재 팀 시간과 양 팀 총 남은 시간을 함께 반영한다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'TIME_BASED',
+          remainingTime: 20,
+          sequence: 1,
+          currentTeam: 'CONS',
+          isRunning: true,
+          prosRemainingTime: 120,
+          consRemainingTime: 90,
+        };
+
+        expect(getDisplayDataByEvent('SYNC', payload, null, mockTable)).toEqual(
+          {
+            timerType: 'TIME_BASED',
+            currentTeam: 'CONS',
+            isRunning: true,
+            prosTime: null,
+            consTime: 20,
+            teamTotalTimes: { pros: 120, cons: 90 },
+            sequence: 1,
+            eventType: 'SYNC',
+            revision: 1,
+          },
+        );
+      });
+    });
   });
 });

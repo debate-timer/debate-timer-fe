@@ -167,6 +167,8 @@ export function useAudienceTimeBasedCountdown({
   const displayCurrentTeam = displayData?.currentTeam ?? null;
   const displayProsTime = displayData?.prosTime ?? null;
   const displayConsTime = displayData?.consTime ?? null;
+  const displayProsTotalTime = displayData?.teamTotalTimes?.pros ?? null;
+  const displayConsTotalTime = displayData?.teamTotalTimes?.cons ?? null;
 
   latestValuesRef.current = {
     prosTotal,
@@ -208,7 +210,7 @@ export function useAudienceTimeBasedCountdown({
       configurationKeyRef.current !== configurationKey;
     configurationKeyRef.current = configurationKey;
 
-    if (hasConfigurationChanged) {
+    if (hasConfigurationChanged || displayEventType === 'SYNC') {
       setIsProsLocallyStopped(false);
       setIsConsLocallyStopped(false);
     } else if (
@@ -264,6 +266,45 @@ export function useAudienceTimeBasedCountdown({
 
       if (displayEventType === 'BEFORE' || displayEventType === 'NEXT') {
         return nextInputs;
+      }
+
+      // 현재 상태 스냅샷: 양 팀 총 시간과 현재 팀 발언 시간을 받은 값으로 덮어씀
+      if (
+        displayEventType === 'SYNC' &&
+        displayProsTotalTime !== null &&
+        displayConsTotalTime !== null
+      ) {
+        const syncedTotal = getTeamValue(
+          currentTeam,
+          displayProsTotalTime,
+          displayConsTotalTime,
+        );
+        const syncedOpponentTotal = getTeamValue(
+          opponentTeam,
+          displayProsTotalTime,
+          displayConsTotalTime,
+        );
+        const currentSpeakingTime =
+          timePerSpeaking === null
+            ? null
+            : (receivedCurrentTime ??
+              getNextSpeakingTime({
+                totalRemainingTime: syncedTotal,
+                timePerSpeaking,
+                isOpponentTotalDone: syncedOpponentTotal === 0,
+              }));
+        const opponentSpeakingTime = getNextSpeakingTime({
+          totalRemainingTime: syncedOpponentTotal,
+          timePerSpeaking,
+          isOpponentTotalDone: syncedTotal === 0,
+        });
+
+        nextInputs = updateTeamInput(nextInputs, currentTeam, (input) =>
+          createTeamInput(syncedTotal, currentSpeakingTime, input),
+        );
+        return updateTeamInput(nextInputs, opponentTeam, (input) =>
+          createTeamInput(syncedOpponentTotal, opponentSpeakingTime, input),
+        );
       }
 
       if (displayEventType === 'RESET') {
@@ -344,9 +385,11 @@ export function useAudienceTimeBasedCountdown({
     });
   }, [
     displayConsTime,
+    displayConsTotalTime,
     displayCurrentTeam,
     displayEventType,
     displayProsTime,
+    displayProsTotalTime,
     displayRevision,
     displaySequence,
     timePerSpeaking,
