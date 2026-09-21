@@ -6,7 +6,16 @@ import { SocketEventType, TimerDataPayload } from '../../../apis/sockets/type';
 
 export type LiveShareErrorType = 'token' | 'else';
 
-export function useLiveShare(tableId: number) {
+interface UseLiveShareOptions {
+  /** 서버가 현재 타이머 상태 공유를 요청했을 때 호출됩니다. */
+  onSyncRequest?: () => void;
+}
+
+export function useLiveShare(
+  tableId: number,
+  options: UseLiveShareOptions = {},
+) {
+  const { onSyncRequest } = options;
   // 테이블 ID 검증
   const isValidTableId = Number.isFinite(tableId) && tableId > 0;
 
@@ -34,7 +43,7 @@ export function useLiveShare(tableId: number) {
     isConnected: isSocketConnected,
     sendDebateEvent,
     error: socketError,
-  } = useChairmanSocket(tableId);
+  } = useChairmanSocket(tableId, { onSyncRequest });
 
   // 공유용 URL
   const shareUrl = useMemo(() => {

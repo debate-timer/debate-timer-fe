@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   SocketEventType,
@@ -19,6 +19,7 @@ import useSocket from './useSocket';
  * 특정 제어 메시지를 지정된 채널로 송신(Publish)할 수 있습니다.
  *
  * @param {number} roomId - 관리할 토론방의 고유 ID
+ * @param {UseChairmanSocketOptions} options - 서버의 상태 공유 요청을 처리할 콜백 옵션
  * @returns {Object} 사회자 소켓 상태와 제어 함수를 반환합니다.
  * @returns {number} returns.signalCount - 현재 소켓 세션에서 수신한 신호 수입니다.
  * @returns {number | null} returns.lastSignalTime - 현재 소켓 세션에서 마지막으로 신호를 수신한 시각의 타임스탬프입니다.
@@ -27,7 +28,16 @@ import useSocket from './useSocket';
  * @returns {Function} returns.sendDebateEvent - 현재 방으로 사회자 토론 이벤트를 발행합니다.
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
-export default function useChairmanSocket(roomId: number) {
+interface UseChairmanSocketOptions {
+  /** 서버가 `/chairman/{roomId}`로 현재 상태 공유를 요청했을 때 호출됩니다. */
+  onSyncRequest?: () => void;
+}
+
+export default function useChairmanSocket(
+  roomId: number,
+  options: UseChairmanSocketOptions = {},
+) {
+  const { onSyncRequest } = options;
   const queryClient = useQueryClient();
   const {
     connect,
@@ -42,6 +52,13 @@ export default function useChairmanSocket(roomId: number) {
 
   const [signalCount, setSignalCount] = useState<number>(0);
   const [lastSignalTime, setLastSignalTime] = useState<number | null>(null);
+
+  // 구독을 다시 맺지 않고도 최신 콜백을 호출하기 위해 ref로 보관
+  const onSyncRequestRef = useRef(onSyncRequest);
+  onSyncRequestRef.current = onSyncRequest;
+
+  // 마지막으로 발행한 이벤트의 version
+  const versionRef = useRef(0);
 
   /**
    * 현재 사회자 소켓 세션에서 누적된 신호 메타데이터를 초기화합니다.
@@ -96,6 +113,7 @@ export default function useChairmanSocket(roomId: number) {
     subscribe(destination, () => {
       setSignalCount((prev) => prev + 1);
       setLastSignalTime(Date.now());
+      onSyncRequestRef.current?.();
     });
 
     return () => {
@@ -121,6 +139,9 @@ export default function useChairmanSocket(roomId: number) {
       const destination = `/app/event/${roomId}`;
       let body: SocketMessage;
 
+      // 사회자가 새로고침해도 이전보다 큰 값이 되도록 현재 시각을 기준으로 증가
+      const version = Math.max(versionRef.current + 1, Date.now());
+
       if (isTimerEventType(eventType)) {
         if (payload === null) {
           console.error('No payload for timer event.');
@@ -129,15 +150,18 @@ export default function useChairmanSocket(roomId: number) {
           body = {
             eventType,
             data: payload,
+            version,
           };
         }
       } else {
         body = {
           eventType,
           data: null,
+          version,
         };
       }
 
+      versionRef.current = version;
       publish(destination, body, { Authorization: authToken });
     },
     [roomId, publish],
