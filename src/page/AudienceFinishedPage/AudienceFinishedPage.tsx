@@ -1,18 +1,27 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import CheckBox from '../../components/icons/CheckBox';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 // 라이브 공유 토론이 끝난 뒤 청중에게 보여주는 종료 안내 페이지다.
 export default function AudienceFinishedPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const handleClosePage = () => {
     // 일단 페이지 닫기
     window.close();
 
-    // 페이지를 못 닫을 경우 홈으로
+    // 페이지를 못 닫을 경우 현재 언어의 홈으로
     setTimeout(() => {
-      window.location.href = '/';
+      navigate(buildLangPath('/home', lang), { replace: true });
     }, 100);
   };
 
