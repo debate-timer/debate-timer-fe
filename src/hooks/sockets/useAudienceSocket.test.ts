@@ -350,4 +350,75 @@ describe('useAudienceSocket', () => {
     expect(result.current.error).toBe(error);
     expect(result.current.isConnected).toBe(false);
   });
+
+  describe('version 기반 순서 보장', () => {
+    const createMessage = (
+      version?: number,
+      eventType: 'STOP' | 'PLAY' = 'STOP',
+    ): SocketMessage => ({
+      eventType,
+      data: { timerType: 'NORMAL', sequence: 1, remainingTime: 30 },
+      ...(version !== undefined && { version }),
+    });
+
+    const setup = () => {
+      let handleMessage: (message: IMessage) => void = () => undefined;
+      let handleConnection: () => void = () => undefined;
+      subscribe.mockImplementation(
+        (_destination: string, callback: (message: IMessage) => void) => {
+          handleMessage = callback;
+        },
+      );
+      addConnectionListener.mockImplementation((listener: () => void) => {
+        handleConnection = listener;
+        return vi.fn();
+      });
+
+      const hook = renderHook(() => useAudienceSocket(123));
+      const receive = (message: SocketMessage) =>
+        act(() => {
+          handleMessage({ body: JSON.stringify(message) } as IMessage);
+        });
+
+      return { ...hook, receive, reconnect: () => act(handleConnection) };
+    };
+
+    it('이전에 받은 version보다 작거나 같은 메시지는 무시해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(9, 'PLAY'));
+      receive(createMessage(10, 'PLAY'));
+
+      expect(result.current.latestMessage).toEqual(createMessage(10));
+    });
+
+    it('더 큰 version의 메시지는 반영해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(11, 'PLAY'));
+
+      expect(result.current.latestMessage?.eventType).toBe('PLAY');
+    });
+
+    it('version이 없는 메시지는 하위 호환을 위해 반영해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(undefined, 'PLAY'));
+
+      expect(result.current.latestMessage?.eventType).toBe('PLAY');
+    });
+
+    it('재연결되면 version 기준을 초기화해야 한다', () => {
+      const { result, receive, reconnect } = setup();
+
+      receive(createMessage(10));
+      reconnect();
+      receive(createMessage(5, 'PLAY'));
+
+      expect(result.current.latestMessage?.eventType).toBe('PLAY');
+    });
+  });
 });
