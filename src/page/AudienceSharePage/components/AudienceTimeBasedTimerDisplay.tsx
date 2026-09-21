@@ -35,7 +35,7 @@ function TimerValue({
   return (
     <span
       className={clsx(
-        'grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] font-bold tabular-nums',
+        'grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] font-bold tabular-nums leading-none md:leading-normal short:leading-none',
         isDisabled ? 'text-default-disabled/hover' : 'text-default-black',
         className,
       )}
@@ -78,7 +78,7 @@ export default function AudienceTimeBasedTimerDisplay({
 
   return (
     <section
-      className="flex h-full min-w-0 flex-1 flex-col items-center justify-center rounded-[16px] px-6 py-8"
+      className="flex h-full min-w-0 flex-1 flex-col items-center justify-center rounded-[16px] px-1 py-4 [justify-content:safe_center] md:px-6 md:py-8 short:py-2"
       data-testid={`${teamId}-timer-display`}
       aria-current={isCurrentTeam ? 'step' : undefined}
     >
@@ -90,7 +90,7 @@ export default function AudienceTimeBasedTimerDisplay({
 
       <h1
         className={clsx(
-          'text-center text-[52px] font-bold xl:text-[68px]',
+          'w-full break-keep text-center text-[22px] font-bold md:text-[52px] xl:text-[68px] short:text-[22px]',
           !isCurrentTeam && 'text-default-disabled/hover',
         )}
       >
@@ -103,20 +103,21 @@ export default function AudienceTimeBasedTimerDisplay({
             seconds={totalRemainingTime}
             testId={`${teamId}-total-timer`}
             isDisabled={!isCurrentTeam}
-            className="mt-[64px] text-[70px] xl:text-[110px]"
+            className="mt-[24px] text-[length:min(11vw,64px)] md:mt-[64px] md:text-[70px] xl:text-[110px] short:mt-[8px] short:text-[length:min(22vh,96px)]"
           />
           <TimerProgressBar
             progress={progress}
             team={isCurrentTeam ? team : 'DISABLED'}
             isRunning={isRunning}
-            className="mt-[108px] max-w-[560px]"
+            className="mt-[32px] max-w-[560px] md:mt-[108px] short:mt-[16px] short:h-[12px] short:max-w-[280px]"
           />
         </>
       ) : (
         <>
+          {/* 모바일(세로·가로)에서는 배지를 화면에서 숨기고 글자 크기 차이로 전체/현재 시간을 구분 */}
           <span
             className={clsx(
-              'mt-[36px] flex h-[48px] w-[144px] items-center justify-center rounded-[8px] text-[24px] text-default-white',
+              'sr-only md:not-sr-only md:mt-[36px] md:flex md:h-[48px] md:w-[144px] md:items-center md:justify-center md:whitespace-nowrap md:rounded-[8px] md:text-[24px] md:text-default-white short:sr-only',
               isCurrentTeam ? 'bg-default-black' : 'bg-default-disabled/hover',
             )}
           >
@@ -126,11 +127,11 @@ export default function AudienceTimeBasedTimerDisplay({
             seconds={totalRemainingTime}
             testId={`${teamId}-total-timer`}
             isDisabled={!isCurrentTeam}
-            className="mt-[12px] text-[108px]"
+            className="mt-[16px] text-[length:min(7.7vw,45px)] md:mt-[12px] md:text-[48px] lg:text-[56px] xl:text-[72px] short:mt-[8px] short:text-[length:min(14vh,45px)]"
           />
           <span
             className={clsx(
-              'mt-[28px] flex h-[64px] w-[200px] items-center justify-center rounded-[8px] text-[32px] text-default-white',
+              'sr-only md:not-sr-only md:mt-[28px] md:flex md:h-[64px] md:w-[200px] md:items-center md:justify-center md:whitespace-nowrap md:rounded-[8px] md:text-[32px] md:text-default-white short:sr-only',
               isCurrentTeam
                 ? activeCurrentBadgeClass
                 : 'bg-default-disabled/hover',
@@ -142,13 +143,13 @@ export default function AudienceTimeBasedTimerDisplay({
             seconds={currentSpeakingRemainingTime ?? 0}
             testId={`${teamId}-current-timer`}
             isDisabled={!isCurrentTeam}
-            className="mt-[12px] text-[70px] xl:text-[110px]"
+            className="mt-[20px] text-[length:min(11vw,64px)] md:mt-[12px] md:text-[70px] lg:text-[80px] xl:text-[110px] short:mt-[18px] short:text-[length:min(20vh,64px)]"
           />
           <TimerProgressBar
             progress={progress}
             team={isCurrentTeam ? team : 'DISABLED'}
             isRunning={isRunning}
-            className="mt-[64px] max-w-[560px]"
+            className="mt-[24px] max-w-[560px] md:mt-[64px] short:mt-[20px] short:h-[12px] short:max-w-[280px]"
           />
         </>
       )}

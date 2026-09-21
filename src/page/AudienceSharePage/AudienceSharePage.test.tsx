@@ -223,7 +223,9 @@ describe('AudienceSharePage', () => {
         await screen.findByText('토론 시작을 대기 중입니다.'),
       ).toBeInTheDocument();
       expect(screen.getByText('공유 토론 테이블')).toBeInTheDocument();
-      expect(screen.getByText('공유 토론 주제')).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: '공유 토론 주제' }),
+      ).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: '언어 선택' }),
       ).toBeInTheDocument();
@@ -259,7 +261,25 @@ describe('AudienceSharePage', () => {
       renderPage('/live/123');
 
       expect(await screen.findByText('테이블 이름 없음')).toBeInTheDocument();
-      expect(screen.getByText('주제 없음')).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: '주제 없음' }),
+      ).toBeInTheDocument();
+    });
+
+    it('모바일에서는 헤더 대신 본문 상단에 주제를 표시한다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        status: 'waiting',
+        error: null,
+      });
+      renderPage('/live/123');
+
+      const mobileAgenda = await screen.findByTestId('mobile-agenda');
+
+      expect(mobileAgenda).toHaveTextContent('공유 토론 주제');
+      expect(mobileAgenda).toHaveClass('md:hidden');
+      expect(
+        screen.getByRole('heading', { name: '공유 토론 주제' }).parentElement,
+      ).toHaveClass('hidden', 'md:flex');
     });
 
     it('displaying 상태 (NORMAL)에서는 AudienceNormalTimer에 올바른 props가 전달된다', async () => {

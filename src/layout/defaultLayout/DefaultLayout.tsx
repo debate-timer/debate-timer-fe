@@ -6,7 +6,11 @@ import ContentContainer from '../components/main/ContentContainer';
 function DefaultLayout(props: PropsWithChildren) {
   const { children } = props;
 
-  return <div className="flex h-screen flex-col">{children}</div>;
+  return (
+    <div className="flex h-screen flex-col supports-[height:100dvh]:h-dvh">
+      {children}
+    </div>
+  );
 }
 
 DefaultLayout.Header = StickyTriSectionHeader;

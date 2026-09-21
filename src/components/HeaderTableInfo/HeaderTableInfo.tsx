@@ -17,8 +17,8 @@ export default function HeaderTableInfo(props: HeaderTitleProps) {
         </div>
       )}
       {!isLoading && (
-        <div className="flex flex-col space-y-[4px]">
-          <h1 className="text-2xl">{name}</h1>
+        <div className="flex min-w-0 flex-col space-y-[4px]">
+          <h1 className="truncate text-lg md:text-2xl">{name}</h1>
         </div>
       )}
     </>

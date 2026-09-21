@@ -45,7 +45,7 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
         data-testid="audience-share-error-icon"
         aria-hidden="true"
       />
-      <p className="text-xl font-semibold text-gray-800 xl:text-2xl">
+      <p className="break-keep px-4 text-xl font-semibold text-gray-800 xl:text-2xl">
         {message}
       </p>
       <button
@@ -136,7 +136,7 @@ export default function AudienceSharePage() {
       case 'WAITING':
         return (
           <div className="flex h-full w-full flex-col items-center justify-center space-y-[20px]">
-            <h1 className="text-center text-2xl font-bold text-gray-800 xl:text-4xl">
+            <h1 className="break-keep px-4 text-center text-2xl font-bold text-gray-800 xl:text-4xl">
               {viewState.message}
             </h1>
           </div>
@@ -144,7 +144,7 @@ export default function AudienceSharePage() {
 
       case 'NORMAL_TIMER':
         return (
-          <div className="flex h-full w-full items-center justify-center">
+          <div className="flex h-full w-full items-center justify-center [align-items:safe_center]">
             <AudienceNormalTimer
               remainingTime={
                 normalCountdown.currentSeconds ??
@@ -179,7 +179,7 @@ export default function AudienceSharePage() {
               viewState.timeBox.timePerSpeaking);
 
         return (
-          <div className="flex h-full w-full items-center justify-center px-4 xl:px-12">
+          <div className="flex h-full w-full items-center justify-center [align-items:safe_center] md:px-4 xl:px-12">
             <AudienceTimeBasedTimer
               prosTeamName={viewState.prosTeamName}
               consTeamName={viewState.consTeamName}
@@ -220,36 +220,42 @@ export default function AudienceSharePage() {
     viewState.type === 'NORMAL_TIMER' ||
     viewState.type === 'TIME_BASED_TIMER';
 
+  const tableInfo = debateTableQuery.data?.info;
+  const tableNameLabel =
+    !tableInfo?.name || tableInfo.name.trim() === ''
+      ? t('테이블 이름 없음')
+      : t(tableInfo.name);
+  const agendaLabel =
+    !tableInfo?.agenda || tableInfo.agenda.trim() === ''
+      ? t('주제 없음')
+      : t(tableInfo.agenda);
+  const shouldShowHeader = isHeaderVisible && !!tableInfo;
+
   return (
     <DefaultLayout>
-      {isHeaderVisible && debateTableQuery.data ? (
+      {shouldShowHeader ? (
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <HeaderTableInfo
-              name={
-                !debateTableQuery.data.info.name ||
-                debateTableQuery.data.info.name.trim() === ''
-                  ? t('테이블 이름 없음')
-                  : t(debateTableQuery.data.info.name)
-              }
-            />
+            <HeaderTableInfo name={tableNameLabel} />
           </DefaultLayout.Header.Left>
-          <DefaultLayout.Header.Center>
-            <HeaderTitle
-              title={
-                !debateTableQuery.data.info.agenda ||
-                debateTableQuery.data.info.agenda.trim() === ''
-                  ? t('주제 없음')
-                  : t(debateTableQuery.data.info.agenda)
-              }
-            />
+          {/* 세로 모드 모바일에서는 헤더 공간이 좁아 주제를 본문 상단에 표시 */}
+          <DefaultLayout.Header.Center className="hidden md:flex short:flex">
+            <HeaderTitle title={agendaLabel} />
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
       ) : null}
       <DefaultLayout.ContentContainer>
         <div className="relative flex h-full w-full flex-col">
-          {renderContent()}
+          {shouldShowHeader ? (
+            <p
+              data-testid="mobile-agenda"
+              className="line-clamp-2 flex-shrink-0 break-keep pb-2 text-center text-lg font-semibold text-default-black md:hidden short:hidden"
+            >
+              {agendaLabel}
+            </p>
+          ) : null}
+          <div className="min-h-0 w-full flex-1">{renderContent()}</div>
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>

@@ -48,7 +48,7 @@ export default function TimerProgressBar({
   return (
     <div
       className={clsx(
-        'h-[24px] w-full overflow-hidden rounded-full bg-default-disabled/hover',
+        'h-[24px] w-full flex-shrink-0 overflow-hidden rounded-full bg-default-disabled/hover',
         className,
       )}
       role="progressbar"
