@@ -38,7 +38,7 @@ import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 
 // 피처 플래그
-const IS_LIVE_SHARE_ENABLED = false;
+const IS_LIVE_SHARE_ENABLED = true;
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
