@@ -100,12 +100,16 @@ export default function useAudienceSocket(
         const parsedData = JSON.parse(message.body);
         if (isSocketMessage(parsedData)) {
           const { version } = parsedData;
+          const lastVersion = lastVersionRef.current;
+          const hasVersion = version !== undefined && version !== null;
 
-          if (version !== undefined && version !== null) {
-            if (
-              lastVersionRef.current !== null &&
-              version <= lastVersionRef.current
-            ) {
+          // version 없는 메시지는 기준이 생기기 전(하위 호환, 종료된 룸 입장 등)에만 반영
+          if (!hasVersion && lastVersion !== null) {
+            return;
+          }
+
+          if (hasVersion) {
+            if (lastVersion !== null && version <= lastVersion) {
               return;
             }
             lastVersionRef.current = version;

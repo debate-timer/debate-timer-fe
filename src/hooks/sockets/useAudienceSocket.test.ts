@@ -402,19 +402,18 @@ describe('useAudienceSocket', () => {
       expect(result.current.latestMessage?.eventType).toBe('PLAY');
     });
 
-    it('version이 없는 메시지는 하위 호환을 위해 반영해야 한다', () => {
+    it('version이 있는 메시지를 받기 전에는 version 없는 메시지도 반영해야 한다', () => {
       const { result, receive } = setup();
 
-      receive(createMessage(10));
       receive(createMessage(undefined, 'PLAY'));
+      receive(createMessage(undefined, 'STOP'));
 
-      expect(result.current.latestMessage?.eventType).toBe('PLAY');
+      expect(result.current.latestMessage?.eventType).toBe('STOP');
     });
 
-    it('version이 null인 메시지는 하위 호환과 같이 반영해야 한다', () => {
+    it('version이 null인 메시지도 기준이 없을 때는 반영해야 한다', () => {
       const { result, receive } = setup();
 
-      receive(createMessage(10));
       receive({
         eventType: 'FINISHED',
         data: null,
@@ -422,6 +421,20 @@ describe('useAudienceSocket', () => {
       } as unknown as SocketMessage);
 
       expect(result.current.latestMessage?.eventType).toBe('FINISHED');
+    });
+
+    it('version이 있는 메시지를 받은 뒤에는 version 없는 메시지를 무시해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(undefined, 'PLAY'));
+      receive({
+        eventType: 'FINISHED',
+        data: null,
+        version: null,
+      } as unknown as SocketMessage);
+
+      expect(result.current.latestMessage).toEqual(createMessage(10));
     });
 
     it('재연결되면 version 기준을 초기화해야 한다', () => {
