@@ -3,7 +3,11 @@ import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
 import { TimeBoxInfo } from '../../../type/type';
 import { isSocketError } from '../../../apis/sockets/error';
-import { getDisplayDataByEvent, AudienceDisplayData } from './EventInterpreter';
+import {
+  getDisplayDataByEvent,
+  createInitialDisplayData,
+  AudienceDisplayData,
+} from './EventInterpreter';
 
 export type AudienceShareState =
   | { status: 'connecting'; error: AudienceShareError | null }
@@ -16,6 +20,9 @@ export type AudienceShareState =
   | { status: 'finished'; error: AudienceShareError | null };
 
 const EVENT_TIMEOUT_MS = 600 * 1000;
+
+// 연결 후 이 시간 동안 메시지가 없으면 첫 순서 타이머를 정지 상태로 먼저 표시
+const INITIAL_DISPLAY_DELAY_MS = 1000;
 
 interface UseAudienceShareStateOptions {
   enabled?: boolean;
@@ -133,6 +140,27 @@ export function useAudienceShareState(
       getDisplayDataByEvent(eventType, data, previousDisplayData, table),
     );
   }, [enabled, isConnected, latestMessage, error, isFinished, cleanup, table]);
+
+  // 사회자 응답을 기다리는 동안 빈 화면 대신 첫 순서 타이머를 정지 상태로 표시
+  // 이후 SYNC 등 메시지를 받으면 받은 상태로 바뀐다
+  const isWaitingFirstMessage =
+    enabled && isConnected && !error && !isFinished && displayData === null;
+  useEffect(() => {
+    if (!isWaitingFirstMessage) {
+      return;
+    }
+
+    const initialDisplayTimeout = setTimeout(() => {
+      setDisplayData(
+        (previousDisplayData) =>
+          previousDisplayData ?? createInitialDisplayData(table),
+      );
+    }, INITIAL_DISPLAY_DELAY_MS);
+
+    return () => {
+      clearTimeout(initialDisplayTimeout);
+    };
+  }, [isWaitingFirstMessage, table]);
 
   let status: AudienceShareState['status'] = 'connecting';
   if (!enabled) {

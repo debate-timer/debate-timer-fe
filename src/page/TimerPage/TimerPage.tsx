@@ -143,9 +143,8 @@ export default function TimerPage() {
     // 이벤트 실행
     invoke();
 
-    if (eventType === 'FINISHED') {
-      isDebateFinishedRef.current = true;
-    }
+    // 종료 후 다른 이벤트를 발행하면 토론이 다시 진행 중인 것으로 본다
+    isDebateFinishedRef.current = eventType === 'FINISHED';
 
     // 만약 소켓 열려 있으면, 발송
     if (!isSocketConnected) {

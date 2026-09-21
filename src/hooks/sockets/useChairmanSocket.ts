@@ -29,7 +29,7 @@ import useSocket from './useSocket';
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
 interface UseChairmanSocketOptions {
-  /** 서버가 `/chairman/{roomId}`로 현재 상태 공유를 요청했을 때 호출됩니다. */
+  /** 소켓이 연결(재연결 포함)되거나, 서버가 `/chairman/{roomId}`로 현재 상태 공유를 요청했을 때 호출됩니다. */
   onSyncRequest?: () => void;
 }
 
@@ -100,8 +100,14 @@ export default function useChairmanSocket(
     });
   }, [disconnect, queryClient, resetSignalState, roomId]);
 
+  // 연결(재연결 포함) 시 이전 세션의 신호 상태를 초기화하고,
+  // 서버 요청을 기다리지 않고 현재 상태를 먼저 공유한다.
+  // 사회자보다 먼저 입장한 청중이 곧바로 타이머를 받고, 종료됐던 룸도 다시 열린다.
   useEffect(() => {
-    return addConnectionListener(resetSignalState);
+    return addConnectionListener(() => {
+      resetSignalState();
+      onSyncRequestRef.current?.();
+    });
   }, [addConnectionListener, resetSignalState]);
 
   // 서버로부터 토론 이벤트를 갱신해달라는 요청을 받게 될 채널 구독

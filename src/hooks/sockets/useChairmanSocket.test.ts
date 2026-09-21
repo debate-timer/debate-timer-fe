@@ -324,4 +324,21 @@ describe('useChairmanSocket', () => {
     expect(firstCallback).not.toHaveBeenCalled();
     expect(latestCallback).toHaveBeenCalledTimes(1);
   });
+
+  it('소켓이 연결(재연결 포함)되면 onSyncRequest를 호출해 현재 상태를 먼저 공유해야 한다', () => {
+    const connectionListeners: Array<() => void> = [];
+    addConnectionListener.mockImplementation((listener: () => void) => {
+      connectionListeners.push(listener);
+      return vi.fn();
+    });
+    const onSyncRequest = vi.fn();
+
+    renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+
+    act(() => {
+      connectionListeners.forEach((listener) => listener());
+    });
+
+    expect(onSyncRequest).toHaveBeenCalledTimes(1);
+  });
 });
