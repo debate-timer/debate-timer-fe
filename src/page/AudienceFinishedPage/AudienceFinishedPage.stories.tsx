@@ -16,7 +16,7 @@ type Story = StoryObj<typeof AudienceFinishedPage>;
 
 export const Default: Story = {
   render: () => (
-    <div style={{ height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <div className="h-screen w-screen overflow-hidden">
       <AudienceFinishedPage />
     </div>
   ),
