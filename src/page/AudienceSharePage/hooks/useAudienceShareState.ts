@@ -3,10 +3,7 @@ import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
 import { TimeBoxInfo } from '../../../type/type';
 import { isSocketError } from '../../../apis/sockets/error';
-import {
-  getDisplayDataByEvent,
-  AudienceDisplayData,
-} from './EventInterpreter';
+import { getDisplayDataByEvent, AudienceDisplayData } from './EventInterpreter';
 
 export type AudienceShareState =
   | { status: 'connecting'; error: AudienceShareError | null }

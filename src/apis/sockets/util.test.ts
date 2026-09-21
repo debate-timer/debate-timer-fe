@@ -247,6 +247,55 @@ describe('소켓 메시지 여부 검증', () => {
   });
 
   describe('부가 필드 검증', () => {
+    it('서버가 채운 null 부가 필드는 값이 없는 것으로 보고 통과한다', () => {
+      expect(
+        isSocketMessage({
+          eventType: 'PLAY',
+          version: 2000,
+          data: {
+            timerType: 'NORMAL',
+            currentTeam: null,
+            sequence: 0,
+            remainingTime: 100,
+            isRunning: true,
+            prosRemainingTime: null,
+            consRemainingTime: null,
+          },
+        }),
+      ).toBe(true);
+    });
+
+    it('SYNC의 isRunning이 null이면 거부된다', () => {
+      expect(
+        isSocketMessage({
+          eventType: 'SYNC',
+          data: {
+            timerType: 'NORMAL',
+            sequence: 0,
+            remainingTime: 100,
+            isRunning: null,
+          },
+        }),
+      ).toBe(false);
+    });
+
+    it('자유토론 SYNC의 팀 시간이 null이면 거부된다', () => {
+      expect(
+        isSocketMessage({
+          eventType: 'SYNC',
+          data: {
+            timerType: 'TIME_BASED',
+            currentTeam: 'PROS',
+            sequence: 0,
+            remainingTime: 10,
+            isRunning: false,
+            prosRemainingTime: 10,
+            consRemainingTime: null,
+          },
+        }),
+      ).toBe(false);
+    });
+
     it('SYNC 외 이벤트는 isRunning과 팀별 남은 시간이 없어도 통과한다', () => {
       expect(
         isSocketMessage({
@@ -293,6 +342,12 @@ describe('소켓 메시지 여부 검증', () => {
 
     it('version이 없으면 하위 호환을 위해 통과한다', () => {
       expect(isSocketMessage({ eventType: 'FINISHED', data: null })).toBe(true);
+    });
+
+    it('서버가 보낸 version: null은 값이 없는 것으로 보고 통과한다', () => {
+      expect(
+        isSocketMessage({ eventType: 'FINISHED', data: null, version: null }),
+      ).toBe(true);
     });
 
     it('version이 숫자가 아니거나 유한하지 않으면 거부된다', () => {

@@ -101,7 +101,7 @@ export default function useAudienceSocket(
         if (isSocketMessage(parsedData)) {
           const { version } = parsedData;
 
-          if (version !== undefined) {
+          if (version !== undefined && version !== null) {
             if (
               lastVersionRef.current !== null &&
               version <= lastVersionRef.current

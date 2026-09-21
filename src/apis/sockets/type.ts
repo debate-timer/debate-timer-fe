@@ -36,17 +36,17 @@ export interface TimerDataPayload {
   /** 타이머 재생 여부
    * - `SYNC` 이벤트에서는 필수
    */
-  isRunning?: boolean;
+  isRunning?: boolean | null;
 
   /** 찬성 팀의 총 남은 시간 (초 단위)
    * - 자유토론 `SYNC` 이벤트에서는 필수
    */
-  prosRemainingTime?: number;
+  prosRemainingTime?: number | null;
 
   /** 반대 팀의 총 남은 시간 (초 단위)
    * - 자유토론 `SYNC` 이벤트에서는 필수
    */
-  consRemainingTime?: number;
+  consRemainingTime?: number | null;
 }
 
 // 공통 메시지 구조
@@ -56,10 +56,10 @@ export type SocketMessage =
   | {
       eventType: TimerEventTypes;
       data: TimerDataPayload;
-      version?: number;
+      version?: number | null;
     }
   | {
       eventType: NonTimerEventType;
       data: null;
-      version?: number;
+      version?: number | null;
     };

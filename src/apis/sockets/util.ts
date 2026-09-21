@@ -33,11 +33,12 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
+// 서버는 값이 없는 선택 필드를 null로 채워 보내므로 undefined와 null 모두 허용
 function isOptional<T>(
   value: unknown,
   guard: (value: unknown) => value is T,
 ): boolean {
-  return value === undefined || guard(value);
+  return value === undefined || value === null || guard(value);
 }
 
 function isBoolean(value: unknown): value is boolean {

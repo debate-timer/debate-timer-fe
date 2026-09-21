@@ -119,7 +119,9 @@ function getTeamTotalTimes(
 ): { pros: number; cons: number } | undefined {
   if (
     data.prosRemainingTime === undefined ||
-    data.consRemainingTime === undefined
+    data.prosRemainingTime === null ||
+    data.consRemainingTime === undefined ||
+    data.consRemainingTime === null
   ) {
     return undefined;
   }

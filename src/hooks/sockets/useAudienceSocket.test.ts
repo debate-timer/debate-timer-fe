@@ -411,6 +411,19 @@ describe('useAudienceSocket', () => {
       expect(result.current.latestMessage?.eventType).toBe('PLAY');
     });
 
+    it('version이 null인 메시지는 하위 호환과 같이 반영해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive({
+        eventType: 'FINISHED',
+        data: null,
+        version: null,
+      } as unknown as SocketMessage);
+
+      expect(result.current.latestMessage?.eventType).toBe('FINISHED');
+    });
+
     it('재연결되면 version 기준을 초기화해야 한다', () => {
       const { result, receive, reconnect } = setup();
 
