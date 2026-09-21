@@ -259,4 +259,118 @@ describe('useAudienceTimeBasedCountdown', () => {
     expect(result.current.pros.totalRemainingTime).toBe(0);
     expect(result.current.pros.isRunning).toBe(false);
   });
+
+  describe('SYNC', () => {
+    it('중도 입장 시 양 팀 총 시간과 현재 팀 발언 시간으로 초기화하고 재생을 이어간다', () => {
+      const { result } = renderHook(() =>
+        useAudienceTimeBasedCountdown({
+          displayData: createDisplayData({
+            currentTeam: 'CONS',
+            isRunning: true,
+            eventType: 'SYNC',
+            prosTime: null,
+            consTime: 20,
+            teamTotalTimes: { pros: 90, cons: 70 },
+          }),
+          timePerTeam: 120,
+          timePerSpeaking: 30,
+        }),
+      );
+
+      expect(result.current.pros.totalRemainingTime).toBe(90);
+      expect(result.current.pros.currentSpeakingRemainingTime).toBe(30);
+      expect(result.current.cons.totalRemainingTime).toBe(70);
+      expect(result.current.cons.currentSpeakingRemainingTime).toBe(20);
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      expect(result.current.cons.totalRemainingTime).toBe(68);
+      expect(result.current.cons.currentSpeakingRemainingTime).toBe(18);
+      expect(result.current.pros.totalRemainingTime).toBe(90);
+    });
+
+    it('정지 상태 SYNC는 받은 시간으로 멈춰 있는다', () => {
+      const { result } = renderHook(() =>
+        useAudienceTimeBasedCountdown({
+          displayData: createDisplayData({
+            currentTeam: 'PROS',
+            isRunning: false,
+            eventType: 'SYNC',
+            prosTime: 15,
+            consTime: null,
+            teamTotalTimes: { pros: 50, cons: 60 },
+          }),
+          timePerTeam: 120,
+          timePerSpeaking: 30,
+        }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      expect(result.current.pros.totalRemainingTime).toBe(50);
+      expect(result.current.pros.currentSpeakingRemainingTime).toBe(15);
+      expect(result.current.pros.isRunning).toBe(false);
+    });
+
+    it('1회당 발언 시간이 없으면 양 팀 총 시간만 반영한다', () => {
+      const { result } = renderHook(() =>
+        useAudienceTimeBasedCountdown({
+          displayData: createDisplayData({
+            currentTeam: 'CONS',
+            isRunning: false,
+            eventType: 'SYNC',
+            prosTime: null,
+            consTime: 70,
+            teamTotalTimes: { pros: 90, cons: 70 },
+          }),
+          timePerTeam: 120,
+          timePerSpeaking: null,
+        }),
+      );
+
+      expect(result.current.pros.totalRemainingTime).toBe(90);
+      expect(result.current.cons.totalRemainingTime).toBe(70);
+      expect(result.current.cons.currentSpeakingRemainingTime).toBeNull();
+    });
+
+    it('진행 중인 화면도 SYNC 값으로 보정한다', () => {
+      const { result, rerender } = renderHook(
+        ({ displayData }) =>
+          useAudienceTimeBasedCountdown({
+            displayData,
+            timePerTeam: 120,
+            timePerSpeaking: 30,
+          }),
+        {
+          initialProps: {
+            displayData: createDisplayData({
+              isRunning: true,
+              eventType: 'PLAY',
+              revision: 1,
+            }),
+          },
+        },
+      );
+
+      rerender({
+        displayData: createDisplayData({
+          currentTeam: 'PROS',
+          isRunning: true,
+          eventType: 'SYNC',
+          prosTime: 10,
+          consTime: null,
+          teamTotalTimes: { pros: 40, cons: 100 },
+          revision: 2,
+        }),
+      });
+
+      expect(result.current.pros.totalRemainingTime).toBe(40);
+      expect(result.current.pros.currentSpeakingRemainingTime).toBe(10);
+      expect(result.current.cons.totalRemainingTime).toBe(100);
+    });
+  });
 });

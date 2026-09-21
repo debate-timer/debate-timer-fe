@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
@@ -31,13 +31,14 @@ import DTVolume from '../../components/icons/Volume';
 import VolumeBar from '../../components/VolumeBar/VolumeBar';
 import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
-import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
+import { SocketEventType, TimerEventTypes } from '../../apis/sockets/type';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
+import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 
 // 피처 플래그
-const IS_LIVE_SHARE_ENABLED = false;
+const IS_LIVE_SHARE_ENABLED = true;
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
 export default function TimerPage() {
@@ -94,6 +95,12 @@ export default function TimerPage() {
     consTimer: timer2,
   });
 
+  // 토론 종료 이벤트를 발행했는지 여부 (이후 상태 공유 요청에는 FINISHED로 응답)
+  const isDebateFinishedRef = useRef(false);
+
+  // 서버의 상태 공유 요청을 처리할 최신 핸들러 (소켓 훅보다 뒤에서 정의되므로 ref로 연결)
+  const syncRequestHandlerRef = useRef<() => void>(() => {});
+
   const {
     isLiveShareModalOpen,
     toggleLiveShareModal,
@@ -106,54 +113,96 @@ export default function TimerPage() {
     isLoading: isSocketLoading,
     isError: isSocketError,
     errorType: socketErrorType,
-  } = useLiveShare(tableId);
+  } = useLiveShare(tableId, {
+    onSyncRequest: () => syncRequestHandlerRef.current(),
+  });
 
   const handleChangeAnswerTime = (time: number) => {
     setAnswerTime(time);
   };
+
+  // 현재 타이머 상태로 청중 공유용 페이로드 생성
+  const isNormalTimerRunning = normalTimer.isRunning;
+  const isProsTimerRunning = timer1.isRunning;
+  const isConsTimerRunning = timer2.isRunning;
+  const prosTotalTime = timer1.totalTimer;
+  const consTotalTime = timer2.totalTimer;
+  const buildTimerPayload = useCallback(
+    (eventType: TimerEventTypes) => {
+      const isTimeBasedTimerRunning =
+        prosConsSelected === 'PROS' ? isProsTimerRunning : isConsTimerRunning;
+
+      return buildTimerPayloadForShare({
+        eventType,
+        timerType,
+        sequence: index,
+        currentTeam: prosConsSelected,
+        remainingTime,
+        isCurrentTimerRunning:
+          timerType === 'NORMAL'
+            ? isNormalTimerRunning
+            : isTimeBasedTimerRunning,
+        prosTotalTime,
+        consTotalTime,
+      });
+    },
+    [
+      consTotalTime,
+      index,
+      isConsTimerRunning,
+      isNormalTimerRunning,
+      isProsTimerRunning,
+      prosConsSelected,
+      prosTotalTime,
+      remainingTime,
+      timerType,
+    ],
+  );
 
   // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
   const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
     // 이벤트 실행
     invoke();
 
+    // 종료 후 다른 이벤트를 발행하면 토론이 다시 진행 중인 것으로 본다
+    isDebateFinishedRef.current = eventType === 'FINISHED';
+
     // 만약 소켓 열려 있으면, 발송
-    if (isSocketConnected) {
-      if (eventType === 'FINISHED') {
-        issueEvent(eventType, null);
-        return;
-      }
-
-      if (remainingTime === null) {
-        return;
-      }
-
-      // 타입에 따른 페이로드 준비
-      let innerPayload: TimerDataPayload;
-
-      if (timerType === 'NORMAL') {
-        innerPayload = {
-          timerType: timerType,
-          remainingTime: remainingTime,
-          sequence: index,
-        };
-      } else if (timerType === 'TIME_BASED') {
-        innerPayload = {
-          currentTeam: prosConsSelected,
-          timerType: timerType,
-          remainingTime: remainingTime,
-          sequence: index,
-        };
-      } else {
-        // 피드백 타이머 타입은 여기 올 수 없음
-        // 따라서 별도 작업 하지 않고 그냥 반환
-        return;
-      }
-
-      // 이벤트 발행
-      issueEvent(eventType, innerPayload);
+    if (!isSocketConnected) {
+      return;
     }
+
+    if (eventType === 'FINISHED' || eventType === 'ERROR') {
+      issueEvent(eventType, null);
+      return;
+    }
+
+    const payload = buildTimerPayload(eventType);
+    if (payload === null) {
+      return;
+    }
+
+    // 이벤트 발행
+    issueEvent(eventType, payload);
   };
+
+  // 서버의 상태 공유 요청 시 현재 상태를 SYNC로 발행 (이미 종료했다면 FINISHED)
+  // 폐기된 렌더의 상태를 캡처하지 않도록 커밋 이후에 핸들러를 갱신
+  useEffect(() => {
+    syncRequestHandlerRef.current = () => {
+      if (isDebateFinishedRef.current) {
+        issueEvent('FINISHED', null);
+        return;
+      }
+
+      const payload = buildTimerPayload('SYNC');
+      if (payload === null) {
+        return;
+      }
+
+      issueEvent('SYNC', payload);
+    };
+  }, [buildTimerPayload, issueEvent]);
 
   useTimerHotkey(state, handleTimerEvent);
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { IMessage } from '@stomp/stompjs';
 import useSocket from './useSocket';
 import { SocketMessage } from '../../apis/sockets/type';
@@ -44,13 +44,17 @@ export default function useAudienceSocket(
     null,
   );
 
+  // 마지막으로 반영한 메시지의 version (이보다 작거나 같은 메시지는 오래된 것으로 간주)
+  const lastVersionRef = useRef<number | null>(null);
+
   /**
-   * 수신한 최신 청중 메시지를 초기화합니다.
+   * 수신한 최신 청중 메시지와 version 기준을 초기화합니다.
    * 세션 간에 오래된 메시지가 남지 않도록, 래핑된 connect 및 disconnect
    * 제어 함수에서 사용하는 초기화 동작을 한곳에 모읍니다.
    */
   const resetMessage = useCallback(() => {
     setLatestMessage(null);
+    lastVersionRef.current = null;
   }, []);
 
   /**
@@ -95,6 +99,22 @@ export default function useAudienceSocket(
       try {
         const parsedData = JSON.parse(message.body);
         if (isSocketMessage(parsedData)) {
+          const { version } = parsedData;
+          const lastVersion = lastVersionRef.current;
+          const hasVersion = version !== undefined && version !== null;
+
+          // version 없는 메시지는 기준이 생기기 전(하위 호환, 종료된 룸 입장 등)에만 반영
+          if (!hasVersion && lastVersion !== null) {
+            return;
+          }
+
+          if (hasVersion) {
+            if (lastVersion !== null && version <= lastVersion) {
+              return;
+            }
+            lastVersionRef.current = version;
+          }
+
           setLatestMessage(parsedData);
         } else {
           console.log('잘못된 소켓 메시지 형식입니다:', parsedData);

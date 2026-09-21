@@ -684,4 +684,141 @@ describe('useAudienceShareState', () => {
     rerender();
     expect(result.current.status).toBe('waiting');
   });
+
+  describe('첫 메시지 대기 중 초기 화면', () => {
+    it('연결 후 1초 동안 메시지가 없으면 첫 순서 타이머를 정지 상태로 표시한다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+      expect(result.current.status).toBe('waiting');
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.displayData).toEqual({
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 180,
+          sequence: 0,
+        });
+      }
+    });
+
+    it('첫 순서가 자유토론이면 자유토론 타이머를 정지 상태로 표시한다', () => {
+      const timeBasedTable: TimeBoxInfo[] = [
+        {
+          stance: 'NEUTRAL',
+          speechType: '자유토론',
+          bell: null,
+          boxType: 'TIME_BASED',
+          time: null,
+          timePerTeam: 90,
+          timePerSpeaking: 30,
+          speaker: null,
+        },
+      ];
+      setSocketState({ isConnected: true, latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: timeBasedTable }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.displayData).toMatchObject({
+          timerType: 'TIME_BASED',
+          currentTeam: 'PROS',
+          isRunning: false,
+          sequence: 0,
+        });
+      }
+    });
+
+    it('1초 안에 메시지를 받으면 초기 화면으로 덮어쓰지 않는다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+      const { result, rerender } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      setSocketState({
+        isConnected: true,
+        latestMessage: {
+          eventType: 'SYNC',
+          data: {
+            timerType: 'NORMAL',
+            sequence: 1,
+            remainingTime: 42,
+            isRunning: true,
+          },
+        },
+      });
+      rerender();
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.displayData).toMatchObject({
+          sequence: 1,
+          singleTime: 42,
+          isRunning: true,
+        });
+      }
+    });
+
+    it('초기 화면 표시 후 SYNC를 받으면 받은 상태로 바뀐다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+      const { result, rerender } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      setSocketState({
+        isConnected: true,
+        latestMessage: {
+          eventType: 'SYNC',
+          data: {
+            timerType: 'NORMAL',
+            sequence: 1,
+            remainingTime: 42,
+            isRunning: true,
+          },
+        },
+      });
+      rerender();
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.displayData).toMatchObject({
+          sequence: 1,
+          singleTime: 42,
+          isRunning: true,
+        });
+      }
+    });
+
+    it('테이블 정보가 없으면 대기 상태를 유지한다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(result.current.status).toBe('waiting');
+    });
+  });
 });

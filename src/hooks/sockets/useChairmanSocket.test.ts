@@ -233,6 +233,7 @@ describe('useChairmanSocket', () => {
       sequence: 1,
     };
     const authToken = 'temporary-chairman-token';
+    vi.spyOn(Date, 'now').mockReturnValue(1710000000000);
 
     const { result } = renderHook(() => useChairmanSocket(123));
 
@@ -245,8 +246,99 @@ describe('useChairmanSocket', () => {
       {
         eventType: 'NEXT',
         data: payload,
+        version: 1710000000000,
       },
       { Authorization: authToken },
     );
+  });
+
+  it('같은 시각에 연속 발행해도 version은 단조 증가해야 한다', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+
+    const { result } = renderHook(() => useChairmanSocket(123));
+
+    act(() => {
+      result.current.sendDebateEvent('FINISHED', null, 'token');
+      result.current.sendDebateEvent('FINISHED', null, 'token');
+    });
+
+    expect(publish.mock.calls[0][1].version).toBe(1000);
+    expect(publish.mock.calls[1][1].version).toBe(1001);
+  });
+
+  it('시각이 앞서 있으면 version은 현재 시각을 따른다', () => {
+    const dateNow = vi.spyOn(Date, 'now').mockReturnValue(1000);
+
+    const { result } = renderHook(() => useChairmanSocket(123));
+
+    act(() => {
+      result.current.sendDebateEvent('FINISHED', null, 'token');
+    });
+    dateNow.mockReturnValue(5000);
+    act(() => {
+      result.current.sendDebateEvent('FINISHED', null, 'token');
+    });
+
+    expect(publish.mock.calls[1][1].version).toBe(5000);
+  });
+
+  it('서버의 상태 공유 신호를 수신하면 onSyncRequest를 호출해야 한다', () => {
+    let handleMessage: (message: IMessage) => void = () => undefined;
+    subscribe.mockImplementation(
+      (_destination: string, callback: (message: IMessage) => void) => {
+        handleMessage = callback;
+      },
+    );
+    const onSyncRequest = vi.fn();
+
+    renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+
+    act(() => {
+      handleMessage({ body: '' } as IMessage);
+    });
+
+    expect(onSyncRequest).toHaveBeenCalledTimes(1);
+  });
+
+  it('onSyncRequest가 바뀌어도 재구독 없이 최신 콜백을 호출해야 한다', () => {
+    let handleMessage: (message: IMessage) => void = () => undefined;
+    subscribe.mockImplementation(
+      (_destination: string, callback: (message: IMessage) => void) => {
+        handleMessage = callback;
+      },
+    );
+    const firstCallback = vi.fn();
+    const latestCallback = vi.fn();
+
+    const { rerender } = renderHook(
+      ({ onSyncRequest }) => useChairmanSocket(123, { onSyncRequest }),
+      { initialProps: { onSyncRequest: firstCallback } },
+    );
+    rerender({ onSyncRequest: latestCallback });
+
+    act(() => {
+      handleMessage({ body: '' } as IMessage);
+    });
+
+    expect(subscribe).toHaveBeenCalledTimes(1);
+    expect(firstCallback).not.toHaveBeenCalled();
+    expect(latestCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it('소켓이 연결(재연결 포함)되면 onSyncRequest를 호출해 현재 상태를 먼저 공유해야 한다', () => {
+    const connectionListeners: Array<() => void> = [];
+    addConnectionListener.mockImplementation((listener: () => void) => {
+      connectionListeners.push(listener);
+      return vi.fn();
+    });
+    const onSyncRequest = vi.fn();
+
+    renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+
+    act(() => {
+      connectionListeners.forEach((listener) => listener());
+    });
+
+    expect(onSyncRequest).toHaveBeenCalledTimes(1);
   });
 });

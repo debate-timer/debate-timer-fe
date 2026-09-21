@@ -1,4 +1,5 @@
-import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
@@ -12,6 +13,11 @@ import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';
 import { resolveAudienceScreenState } from './hooks/AudienceScreenState';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 interface ErrorContentProps {
   message: string;
@@ -55,7 +61,10 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
 
 export default function AudienceSharePage() {
   const { id } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const tableId = Number(id);
   const isValidTableId =
@@ -101,19 +110,19 @@ export default function AudienceSharePage() {
         : null,
   });
 
+  // 토론이 종료되면 종료 안내 페이지로 이동 (뒤로 가기로 돌아오지 않도록 replace)
+  const isFinished = viewState.type === 'FINISHED';
+  useEffect(() => {
+    if (!isFinished) {
+      return;
+    }
+
+    navigate(buildLangPath(`/live/${tableId}/end`, lang), { replace: true });
+  }, [isFinished, lang, navigate, tableId]);
+
   if (!isValidTableId) {
     throw new Error(t('유효하지 않은 토론방 ID입니다.'));
   }
-
-  const handleClosePage = () => {
-    // 일단 페이지 닫기
-    window.close();
-
-    // 페이지를 못 닫을 경우 홈으로
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 100);
-  };
 
   const handleReload = () => {
     window.location.reload();
@@ -196,20 +205,7 @@ export default function AudienceSharePage() {
       }
 
       case 'FINISHED':
-        return (
-          <div className="flex h-full w-full flex-col items-center justify-center space-y-8">
-            <h1 className="text-center text-3xl font-bold text-gray-800 xl:text-5xl">
-              {viewState.message}
-            </h1>
-            <button
-              type="button"
-              className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-              onClick={handleClosePage}
-            >
-              {t('페이지 닫기')}
-            </button>
-          </div>
-        );
+        return <LoadingContent />;
 
       case 'ERROR':
       case 'CONFIG_ERROR':
@@ -222,8 +218,7 @@ export default function AudienceSharePage() {
   const isHeaderVisible =
     viewState.type === 'WAITING' ||
     viewState.type === 'NORMAL_TIMER' ||
-    viewState.type === 'TIME_BASED_TIMER' ||
-    viewState.type === 'FINISHED';
+    viewState.type === 'TIME_BASED_TIMER';
 
   return (
     <DefaultLayout>
