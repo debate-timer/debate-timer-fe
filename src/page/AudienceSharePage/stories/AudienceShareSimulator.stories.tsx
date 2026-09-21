@@ -1,5 +1,6 @@
 // AudienceShareSimulator.stories.tsx
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Meta, StoryObj } from '@storybook/react';
 import { IMessage, StompSubscription } from '@stomp/stompjs';
 import { Route, Routes, useNavigate } from 'react-router-dom';
@@ -125,6 +126,10 @@ function installFakeSocket(): FakeSocket {
   };
 }
 
+// 로그에는 번역 키를 저장하고 표시할 때 번역
+const NOTE_NOT_DELIVERED = '구독 없음 (전달 안 됨)';
+const NOTE_STALE_VERSION = '오래된 version: 무시되어야 함';
+
 interface SentLog {
   id: number;
   eventType: SocketMessage['eventType'];
@@ -150,6 +155,7 @@ function ControlButton({ label, onClick }: ControlButtonProps) {
 }
 
 function AudienceShareSimulator() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // 자식(청중 페이지)의 effect가 소켓을 쓰기 전에 설치되어야 하므로 렌더 중 1회 설치
@@ -168,7 +174,7 @@ function AudienceShareSimulator() {
         id: prev.length + 1,
         eventType: message.eventType,
         version: message.version ?? 0,
-        note: isDelivered ? note : '구독 없음 (전달 안 됨)',
+        note: isDelivered ? note : NOTE_NOT_DELIVERED,
       },
       ...prev,
     ]);
@@ -199,7 +205,7 @@ function AudienceShareSimulator() {
     }
     send(
       { ...lastMessage, version: (lastMessage.version ?? 1) - 1 },
-      '오래된 version: 무시되어야 함',
+      NOTE_STALE_VERSION,
     );
   };
 
@@ -220,21 +226,23 @@ function AudienceShareSimulator() {
 
       <aside className="flex w-full flex-col gap-4 overflow-auto bg-neutral-50 p-4 md:w-80">
         <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-bold text-gray-600">SYNC (중도 입장)</h2>
+          <h2 className="text-sm font-bold text-gray-600">
+            {t('SYNC (중도 입장)')}
+          </h2>
           <ControlButton
-            label="일반 · 재생 중"
+            label={t('일반 · 재생 중')}
             onClick={() =>
               sendTimerEvent('SYNC', { ...NORMAL_BASE, isRunning: true })
             }
           />
           <ControlButton
-            label="일반 · 정지"
+            label={t('일반 · 정지')}
             onClick={() =>
               sendTimerEvent('SYNC', { ...NORMAL_BASE, isRunning: false })
             }
           />
           <ControlButton
-            label="자유토론 · 재생 중"
+            label={t('자유토론 · 재생 중')}
             onClick={() =>
               sendTimerEvent('SYNC', { ...TIME_BASED_BASE, isRunning: true })
             }
@@ -243,7 +251,7 @@ function AudienceShareSimulator() {
 
         <section className="flex flex-col gap-2">
           <h2 className="text-sm font-bold text-gray-600">
-            타이머 이벤트 (마지막 데이터 기준)
+            {t('타이머 이벤트 (마지막 데이터 기준)')}
           </h2>
           <div className="grid grid-cols-3 gap-2">
             {(
@@ -266,26 +274,30 @@ function AudienceShareSimulator() {
         </section>
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-bold text-gray-600">순서 · 종료</h2>
+          <h2 className="text-sm font-bold text-gray-600">
+            {t('순서 · 종료')}
+          </h2>
           <ControlButton
-            label="오래된 version으로 재전송"
+            label={t('오래된 version으로 재전송')}
             onClick={handleResendStale}
           />
           <ControlButton
             label="FINISHED"
             onClick={() => sendNew({ eventType: 'FINISHED', data: null })}
           />
-          <ControlButton label="처음부터 다시" onClick={handleRestart} />
+          <ControlButton label={t('처음부터 다시')} onClick={handleRestart} />
         </section>
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-bold text-gray-600">보낸 메시지</h2>
+          <h2 className="text-sm font-bold text-gray-600">
+            {t('보낸 메시지')}
+          </h2>
           <ol className="flex flex-col gap-1 text-xs text-gray-700">
             {logs.map((log) => (
               <li key={log.id} className="rounded bg-white px-2 py-1">
                 #{log.id} {log.eventType} · v{log.version}
                 {log.note && (
-                  <span className="block text-gray-500">{log.note}</span>
+                  <span className="block text-gray-500">{t(log.note)}</span>
                 )}
               </li>
             ))}
