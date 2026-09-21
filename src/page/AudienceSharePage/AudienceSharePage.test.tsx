@@ -1,7 +1,6 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import userEvent from '@testing-library/user-event';
 import { Component, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse, delay } from 'msw';
@@ -119,6 +118,10 @@ describe('AudienceSharePage', () => {
           <TestErrorBoundary onError={onError}>
             <Routes>
               <Route path="/live/:id" element={<AudienceSharePage />} />
+              <Route
+                path="/live/:id/end"
+                element={<div>종료 안내 페이지</div>}
+              />
             </Routes>
           </TestErrorBoundary>
         </MemoryRouter>
@@ -453,31 +456,18 @@ describe('AudienceSharePage', () => {
       );
     });
 
-    it('finished 상태에서는 종료 문구와 페이지 닫기 버튼이 표시되며 클릭 시 window.close를 호출한다', async () => {
+    it('finished 상태가 되면 종료 안내 페이지로 이동한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         status: 'finished',
         error: null,
       });
 
-      const windowCloseSpy = vi
-        .spyOn(window, 'close')
-        .mockImplementation(() => {});
-      const user = userEvent.setup();
-
       renderPage('/live/123');
 
+      expect(await screen.findByText('종료 안내 페이지')).toBeInTheDocument();
       expect(
-        await screen.findByText('토론이 종료되었습니다.'),
-      ).toBeInTheDocument();
-
-      const closeButton = screen.getByRole('button', { name: '페이지 닫기' });
-      expect(closeButton).toBeInTheDocument();
-
-      await user.click(closeButton);
-
-      expect(windowCloseSpy).toHaveBeenCalled();
-
-      expect(screen.getByText('토론이 종료되었습니다.')).toBeInTheDocument();
+        screen.queryByText('토론이 종료되었습니다.'),
+      ).not.toBeInTheDocument();
     });
 
     it.each([
