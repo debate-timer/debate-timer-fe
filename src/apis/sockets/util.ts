@@ -12,6 +12,7 @@ const TIMER_EVENT_TYPES: TimerEventTypes[] = [
   'PLAY',
   'RESET',
   'TEAM_SWITCH',
+  'SYNC',
 ];
 
 const NON_TIMER_EVENT_TYPES: NonTimerEventType[] = ['FINISHED', 'ERROR'];
@@ -28,6 +29,21 @@ export function isNonTimerEventType(
   return NON_TIMER_EVENT_TYPES.includes(event as NonTimerEventType);
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isOptional<T>(
+  value: unknown,
+  guard: (value: unknown) => value is T,
+): boolean {
+  return value === undefined || guard(value);
+}
+
+function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}
+
 export function isSocketMessage(value: unknown): value is SocketMessage {
   if (typeof value !== 'object' || value === null) {
     return false;
@@ -35,6 +51,10 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
 
   const obj = value as Record<string, unknown>;
   const eventType = obj.eventType as SocketEventType;
+
+  if (!isOptional(obj.version, isFiniteNumber)) {
+    return false;
+  }
 
   if (isTimerEventType(eventType)) {
     const data = obj.data as Record<string, unknown>;
@@ -68,6 +88,28 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
 
     if (data.timerType === 'TIME_BASED') {
       if (data.currentTeam !== 'PROS' && data.currentTeam !== 'CONS') {
+        return false;
+      }
+    }
+
+    if (
+      !isOptional(data.isRunning, isBoolean) ||
+      !isOptional(data.prosRemainingTime, isFiniteNumber) ||
+      !isOptional(data.consRemainingTime, isFiniteNumber)
+    ) {
+      return false;
+    }
+
+    if (eventType === 'SYNC') {
+      if (!isBoolean(data.isRunning)) {
+        return false;
+      }
+
+      if (
+        data.timerType === 'TIME_BASED' &&
+        (!isFiniteNumber(data.prosRemainingTime) ||
+          !isFiniteNumber(data.consRemainingTime))
+      ) {
         return false;
       }
     }

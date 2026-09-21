@@ -249,5 +249,9 @@ export function getDisplayDataByEvent(
             : false,
         shouldSwitchTeam: true,
       });
+
+    // SYNC 해석은 청중 화면 작업에서 추가하며, 그 전까지는 현재 화면을 유지
+    case 'SYNC':
+      return previousDisplayData;
   }
 }

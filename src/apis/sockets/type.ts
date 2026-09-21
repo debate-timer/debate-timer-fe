@@ -7,7 +7,8 @@ export type TimerEventTypes =
   | 'BEFORE'
   | 'PLAY'
   | 'RESET'
-  | 'TEAM_SWITCH';
+  | 'TEAM_SWITCH'
+  | 'SYNC';
 
 // 데이터가 없는 이벤트
 export type NonTimerEventType = 'FINISHED' | 'ERROR';
@@ -31,16 +32,34 @@ export interface TimerDataPayload {
 
   /** 남은 시간 (초 단위) */
   remainingTime: number;
+
+  /** 타이머 재생 여부
+   * - `SYNC` 이벤트에서는 필수
+   */
+  isRunning?: boolean;
+
+  /** 찬성 팀의 총 남은 시간 (초 단위)
+   * - 자유토론 `SYNC` 이벤트에서는 필수
+   */
+  prosRemainingTime?: number;
+
+  /** 반대 팀의 총 남은 시간 (초 단위)
+   * - 자유토론 `SYNC` 이벤트에서는 필수
+   */
+  consRemainingTime?: number;
 }
 
 // 공통 메시지 구조
 // 데이터가 null인 이벤트와 그렇지 않은 이벤트를 명확히 구분
+// version은 사회자가 발행 순서대로 증가시키는 값으로, 오래된 메시지를 걸러내는 데 사용
 export type SocketMessage =
   | {
       eventType: TimerEventTypes;
       data: TimerDataPayload;
+      version?: number;
     }
   | {
       eventType: NonTimerEventType;
       data: null;
+      version?: number;
     };
