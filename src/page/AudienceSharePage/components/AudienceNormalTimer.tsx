@@ -50,18 +50,18 @@ export default function AudienceNormalTimer({
   const isOvertime = remainingTime < 0;
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center px-4">
-      <h1 className="text-center text-[52px] font-bold xl:text-[68px]">
+    <div className="flex h-full w-full flex-col items-center justify-center [justify-content:safe_center] md:px-4">
+      <h1 className="break-keep text-center text-[36px] font-bold md:text-[52px] xl:text-[68px] short:text-[28px]">
         {speechTypeLabel}
       </h1>
 
       {stance !== 'NEUTRAL' && (
         <div
-          className="mt-[24px] flex max-w-full items-center justify-center gap-4 text-[34px]"
+          className="mt-[12px] flex max-w-full items-center justify-center gap-2 text-[20px] md:mt-[24px] md:gap-4 md:text-[34px] short:mt-[4px] short:text-[18px]"
           data-testid="participant-row"
         >
           <DTDebate
-            className="h-[34px] flex-shrink-0"
+            className="h-[20px] flex-shrink-0 md:h-[34px] short:h-[18px]"
             data-testid="debate-icon"
             aria-hidden="true"
           />
@@ -72,7 +72,7 @@ export default function AudienceNormalTimer({
       )}
 
       <span
-        className="relative mt-[64px] grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] text-[70px] font-bold tabular-nums text-default-black xl:text-[110px]"
+        className="relative mt-[32px] grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] text-[length:min(20vw,96px)] font-bold tabular-nums leading-none text-default-black md:mt-[64px] md:text-[70px] md:leading-normal xl:text-[110px] short:mt-[8px] short:text-[length:min(22vh,96px)] short:leading-none"
         data-testid="timer-value"
         aria-label={`${isOvertime ? '- ' : ''}${minutes} : ${seconds}`}
       >
@@ -96,7 +96,7 @@ export default function AudienceNormalTimer({
         progress={progress}
         team={getProgressBarTeam(stance)}
         isRunning={isRunning}
-        className="mt-[108px] max-w-[1280px]"
+        className="mt-[48px] max-w-[1280px] md:mt-[108px] short:mt-[16px] short:h-[12px] short:max-w-[480px]"
       />
     </div>
   );

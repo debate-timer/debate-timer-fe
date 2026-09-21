@@ -216,8 +216,9 @@ function AudienceShareSimulator() {
   };
 
   return (
-    <div className="flex h-screen flex-col md:flex-row">
-      <div className="relative h-[60vh] flex-1 overflow-hidden border-b border-neutral-300 md:h-full md:border-b-0 md:border-r">
+    // 모바일에서는 청중 화면을 실제 크기로 먼저 보여주고, 컨트롤 패널은 아래로 스크롤해 사용
+    <div className="flex flex-col md:h-screen md:flex-row">
+      <div className="relative h-screen flex-none overflow-hidden border-b border-neutral-300 supports-[height:100dvh]:h-dvh md:h-full md:flex-1 md:border-b-0 md:border-r">
         <Routes>
           <Route path="/live/:id" element={<AudienceSharePage />} />
           <Route path="/live/:id/end" element={<AudienceFinishedPage />} />

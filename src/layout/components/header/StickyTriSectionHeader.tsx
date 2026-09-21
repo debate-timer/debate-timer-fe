@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { PropsWithChildren } from 'react';
+import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
 import { isLoggedIn } from '../../../util/accessToken';
@@ -26,27 +27,41 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
   return (
-    <header className="sticky top-0 z-30 h-[80px] flex-shrink-0 border-b-[3px] border-default-disabled/hover">
-      <div className="relative flex h-full items-center justify-between p-[16px]">
+    <header className="sticky top-0 z-30 h-[56px] flex-shrink-0 border-b-[3px] border-default-disabled/hover md:h-[80px] short:h-[56px]">
+      <div className="relative flex h-full items-center justify-between p-[8px] md:p-[16px] short:p-[8px]">
         {children}
       </div>
     </header>
   );
 }
 
-StickyTriSectionHeader.Left = function Left(props: PropsWithChildren) {
-  const { children } = props;
+interface SectionProps extends PropsWithChildren {
+  className?: string;
+}
+
+StickyTriSectionHeader.Left = function Left(props: SectionProps) {
+  const { children, className } = props;
   return (
-    <div className="flex h-full flex-1 items-center justify-start text-start">
+    <div
+      className={clsx(
+        'flex h-full min-w-0 flex-1 items-center justify-start text-start',
+        className,
+      )}
+    >
       {children}
     </div>
   );
 };
 
-StickyTriSectionHeader.Center = function Center(props: PropsWithChildren) {
-  const { children } = props;
+StickyTriSectionHeader.Center = function Center(props: SectionProps) {
+  const { children, className } = props;
   return (
-    <div className="flex h-full flex-1 items-center justify-center text-center">
+    <div
+      className={clsx(
+        'flex h-full min-w-0 flex-1 items-center justify-center text-center',
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -72,7 +87,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
 
   return (
     <>
-      <div className="flex h-full flex-1 items-center justify-end gap-[12px] text-right">
+      <div className="flex h-full flex-1 items-center justify-end gap-[8px] text-right md:gap-[12px]">
         {isGuestFlow() && (
           <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
             {t('비회원 모드')}

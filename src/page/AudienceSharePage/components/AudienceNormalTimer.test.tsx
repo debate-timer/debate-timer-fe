@@ -23,12 +23,12 @@ describe('AudienceNormalTimer', () => {
     const timerValue = screen.getByTestId('timer-value');
 
     expect(debateIcon).toHaveAttribute('aria-hidden', 'true');
-    expect(debateIcon).toHaveClass('h-[34px]');
-    expect(participantRow).toHaveClass('mt-[24px]', 'text-[34px]');
+    expect(debateIcon).toHaveClass('h-[20px]', 'md:h-[34px]');
+    expect(participantRow).toHaveClass('md:mt-[24px]', 'md:text-[34px]');
     expect(screen.getByText('찬성 팀')).toBeInTheDocument();
     expect(screen.getByText('김토론 토론자')).toBeInTheDocument();
     expect(timerValue).toHaveClass(
-      'mt-[64px]',
+      'md:mt-[64px]',
       'grid-cols-[2ch_1ch_2ch]',
       'gap-x-[0.33ch]',
     );
@@ -40,7 +40,7 @@ describe('AudienceNormalTimer', () => {
       'aria-valuenow',
       '50',
     );
-    expect(screen.getByRole('progressbar')).toHaveClass('mt-[108px]');
+    expect(screen.getByRole('progressbar')).toHaveClass('md:mt-[108px]');
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
