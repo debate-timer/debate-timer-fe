@@ -43,6 +43,7 @@ describe('useAudienceShareState', () => {
       connect: mockConnect as unknown as (options?: unknown) => void,
       disconnect: mockDisconnect as unknown as () => void,
       latestMessage: null,
+      lastReceivedAt: null,
       isConnected: false,
       error: null,
     });
@@ -60,6 +61,7 @@ describe('useAudienceShareState', () => {
       connect: mockConnect as unknown as (options?: unknown) => void,
       disconnect: mockDisconnect as unknown as () => void,
       latestMessage: null,
+      lastReceivedAt: null,
       isConnected: true,
       error: null,
       ...state,
