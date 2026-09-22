@@ -236,6 +236,7 @@ describe('audienceScreenState', () => {
     it('displaying 상태에서 일반 타이머 유효시 NORMAL_TIMER 상태를 반환한다', () => {
       const socketState: AudienceShareState = {
         status: 'displaying',
+        syncedAt: null,
         error: null,
         displayData: {
           timerType: 'NORMAL',
@@ -262,6 +263,7 @@ describe('audienceScreenState', () => {
     it('displaying 상태에서 일반 타이머가 유효하지 않으면 CONFIG_ERROR 상태를 반환한다', () => {
       const socketState: AudienceShareState = {
         status: 'displaying',
+        syncedAt: null,
         error: null,
         displayData: {
           timerType: 'NORMAL',
@@ -285,6 +287,7 @@ describe('audienceScreenState', () => {
     it('displaying 상태에서 자유토론 타이머 유효시 TIME_BASED_TIMER 상태를 반환한다', () => {
       const socketState: AudienceShareState = {
         status: 'displaying',
+        syncedAt: null,
         error: null,
         displayData: {
           timerType: 'TIME_BASED',
@@ -315,6 +318,7 @@ describe('audienceScreenState', () => {
     it('displaying 상태에서 자유토론 타이머가 유효하지 않으면 CONFIG_ERROR 상태를 반환한다', () => {
       const socketState: AudienceShareState = {
         status: 'displaying',
+        syncedAt: null,
         error: null,
         displayData: {
           timerType: 'TIME_BASED',

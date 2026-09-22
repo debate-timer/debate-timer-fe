@@ -17,6 +17,7 @@ import { isSocketMessage } from '../../apis/sockets/util';
  * @param {UseAudienceSocketOptions} options - 소켓 채널 구독 활성화 옵션
  * @returns {Object} 청중 소켓 상태와 제어 함수를 반환합니다.
  * @returns {SocketMessage | null} returns.latestMessage - 검증된 가장 최근의 수신 메시지입니다.
+ * @returns {number | null} returns.latestMessageReceivedAt - `latestMessage`를 수신한 시각입니다. 네트워크 지연 보정의 기준으로 사용합니다.
  * @returns {number | null} returns.lastReceivedAt - 형식이 올바른 메시지를 마지막으로 수신한 시각입니다. version이 오래되어 반영하지 않은 메시지도 포함합니다.
  * @returns {boolean} returns.isConnected - 소켓 연결 상태입니다.
  * @returns {Function} returns.connect - `useSocket.connect`에 위임하기 전에 현재 메시지를 초기화합니다.
@@ -45,6 +46,11 @@ export default function useAudienceSocket(
     null,
   );
 
+  // latestMessage를 수신한 시각 (네트워크 지연 보정 기준)
+  const [latestMessageReceivedAt, setLatestMessageReceivedAt] = useState<
+    number | null
+  >(null);
+
   // 형식이 올바른 메시지를 마지막으로 수신한 시각 (사회자 연결 여부 판단에 사용)
   const [lastReceivedAt, setLastReceivedAt] = useState<number | null>(null);
 
@@ -58,6 +64,7 @@ export default function useAudienceSocket(
    */
   const resetMessage = useCallback(() => {
     setLatestMessage(null);
+    setLatestMessageReceivedAt(null);
     setLastReceivedAt(null);
     lastVersionRef.current = null;
   }, []);
@@ -105,7 +112,8 @@ export default function useAudienceSocket(
         const parsedData = JSON.parse(message.body);
         if (isSocketMessage(parsedData)) {
           // 오래된 version이라 반영하지 않더라도 사회자가 메시지를 보내고 있다는 신호로 본다
-          setLastReceivedAt(Date.now());
+          const receivedAt = Date.now();
+          setLastReceivedAt(receivedAt);
 
           const { version } = parsedData;
           const lastVersion = lastVersionRef.current;
@@ -124,6 +132,7 @@ export default function useAudienceSocket(
           }
 
           setLatestMessage(parsedData);
+          setLatestMessageReceivedAt(receivedAt);
         } else {
           console.log('잘못된 소켓 메시지 형식입니다:', parsedData);
         }
@@ -141,6 +150,7 @@ export default function useAudienceSocket(
 
   return {
     latestMessage,
+    latestMessageReceivedAt,
     lastReceivedAt,
     isConnected,
     error,

@@ -8,6 +8,7 @@ import {
   createInitialDisplayData,
   AudienceDisplayData,
 } from './EventInterpreter';
+import { getNetworkDelayMs } from './getNetworkDelayMs';
 
 export type AudienceShareState =
   | { status: 'connecting'; error: AudienceShareError | null }
@@ -16,6 +17,12 @@ export type AudienceShareState =
       status: 'displaying';
       error: AudienceShareError | null;
       displayData: AudienceDisplayData;
+      /**
+       * 표시 중인 남은 시간이 유효했던 시각(기기 시계 기준, epoch ms)
+       * - 수신 시각에서 서버 중계 이후 흐른 네트워크 지연을 뺀 값
+       * - 메시지 없이 만든 초기 화면이면 `null`
+       */
+      syncedAt: number | null;
     }
   | { status: 'finished'; error: AudienceShareError | null };
 
@@ -47,6 +54,7 @@ export function useAudienceShareState(
     connect,
     disconnect,
     latestMessage,
+    latestMessageReceivedAt,
     lastReceivedAt,
     isConnected,
     error: socketError,
@@ -58,6 +66,7 @@ export function useAudienceShareState(
   const [displayData, setDisplayData] = useState<AudienceDisplayData | null>(
     null,
   );
+  const [syncedAt, setSyncedAt] = useState<number | null>(null);
 
   const [isChairmanAbsent, setIsChairmanAbsent] = useState<boolean>(false);
 
@@ -102,6 +111,7 @@ export function useAudienceShareState(
 
     if (!isConnected || !latestMessage) {
       setDisplayData(null);
+      setSyncedAt(null);
       return;
     }
 
@@ -123,7 +133,22 @@ export function useAudienceShareState(
     setDisplayData((previousDisplayData) =>
       getDisplayDataByEvent(eventType, data, previousDisplayData, table),
     );
-  }, [enabled, isConnected, latestMessage, error, isFinished, cleanup, table]);
+    setSyncedAt(
+      latestMessageReceivedAt === null
+        ? null
+        : latestMessageReceivedAt -
+            getNetworkDelayMs(latestMessage.serverTime, latestMessageReceivedAt),
+    );
+  }, [
+    enabled,
+    isConnected,
+    latestMessage,
+    latestMessageReceivedAt,
+    error,
+    isFinished,
+    cleanup,
+    table,
+  ]);
 
   // 마지막 수신 후 일정 시간 동안 메시지가 없으면 사회자 연결이 끊긴 것으로 판단
   useEffect(() => {
@@ -192,6 +217,7 @@ export function useAudienceShareState(
       status,
       error,
       displayData: displayData!,
+      syncedAt,
       chairmanPresence,
     };
   }

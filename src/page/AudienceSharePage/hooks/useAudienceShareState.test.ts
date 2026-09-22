@@ -43,6 +43,7 @@ describe('useAudienceShareState', () => {
       connect: mockConnect as unknown as (options?: unknown) => void,
       disconnect: mockDisconnect as unknown as () => void,
       latestMessage: null,
+      latestMessageReceivedAt: null,
       lastReceivedAt: null,
       isConnected: false,
       error: null,
@@ -61,6 +62,7 @@ describe('useAudienceShareState', () => {
       connect: mockConnect as unknown as (options?: unknown) => void,
       disconnect: mockDisconnect as unknown as () => void,
       latestMessage: null,
+      latestMessageReceivedAt: null,
       lastReceivedAt: null,
       isConnected: true,
       error: null,
@@ -816,6 +818,72 @@ describe('useAudienceShareState', () => {
     });
     rerender();
     expect(result.current.status).toBe('waiting');
+  });
+
+  describe('네트워크 지연 보정 기준 시각(syncedAt)', () => {
+    const RECEIVED_AT = 1_790_000_000_000;
+    const playMessage = (serverTime?: number | null): SocketMessage => ({
+      eventType: 'PLAY',
+      data: { timerType: 'NORMAL', sequence: 0, remainingTime: 75 },
+      version: 1,
+      serverTime,
+    });
+
+    it('수신 시각에서 서버 중계 이후 흐른 시간을 뺀 시각을 syncedAt으로 노출한다', () => {
+      setSocketState({
+        latestMessage: playMessage(RECEIVED_AT - 200),
+        latestMessageReceivedAt: RECEIVED_AT,
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBe(RECEIVED_AT - 200);
+      }
+    });
+
+    it('서버 중계 시각이 없으면 수신 시각을 syncedAt으로 노출한다', () => {
+      setSocketState({
+        latestMessage: playMessage(null),
+        latestMessageReceivedAt: RECEIVED_AT,
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBe(RECEIVED_AT);
+      }
+    });
+
+    it('기기 시계가 어긋나 지연이 비정상이면 수신 시각을 syncedAt으로 노출한다', () => {
+      setSocketState({
+        latestMessage: playMessage(RECEIVED_AT + 5000),
+        latestMessageReceivedAt: RECEIVED_AT,
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBe(RECEIVED_AT);
+      }
+    });
+
+    it('메시지 없이 표시한 초기 화면은 syncedAt이 null이다', () => {
+      setSocketState({ latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBeNull();
+      }
+    });
   });
 
   describe('첫 메시지 대기 중 초기 화면', () => {
