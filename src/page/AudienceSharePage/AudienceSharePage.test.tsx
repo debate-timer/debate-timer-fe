@@ -112,7 +112,7 @@ describe('AudienceSharePage', () => {
       },
     });
 
-    return render(
+    const createPage = () => (
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[initialRoute]}>
           <TestErrorBoundary onError={onError}>
@@ -125,8 +125,14 @@ describe('AudienceSharePage', () => {
             </Routes>
           </TestErrorBoundary>
         </MemoryRouter>
-      </QueryClientProvider>,
+      </QueryClientProvider>
     );
+    const result = render(createPage());
+
+    return {
+      ...result,
+      rerenderPage: () => result.rerender(createPage()),
+    };
   };
 
   beforeEach(() => {
@@ -589,6 +595,130 @@ describe('AudienceSharePage', () => {
         'bg-default-neutral',
       );
       expect(screen.queryByTestId('participant-row')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('사회자 연결 상태 안내', () => {
+    const WAITING_MESSAGE = '사회자 연결을 기다리는 중이에요.';
+    const ABSENT_MESSAGE =
+      '사회자 연결이 끊겼어요. 재접속을 기다리는 중이에요.';
+
+    const normalDisplayData = {
+      timerType: 'NORMAL' as const,
+      currentTeam: null,
+      isRunning: true,
+      singleTime: 10,
+      sequence: 0,
+    };
+
+    const timeBasedDisplayData = {
+      timerType: 'TIME_BASED' as const,
+      currentTeam: 'PROS' as const,
+      isRunning: true,
+      prosTime: 10,
+      consTime: 20,
+      sequence: 2,
+      eventType: 'PLAY' as const,
+      revision: 1,
+    };
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('사회자 메시지를 기다리는 중이면 타이머와 함께 대기 안내를 표시한다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'waiting',
+        status: 'displaying',
+        error: null,
+        displayData: { ...normalDisplayData, isRunning: false },
+      });
+      renderPage('/live/123');
+
+      expect(await screen.findByText(WAITING_MESSAGE)).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent(WAITING_MESSAGE);
+      expect(screen.getByTestId('timer-value')).toBeInTheDocument();
+    });
+
+    it('사회자가 연결되어 있으면 안내를 표시하지 않는다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
+        status: 'displaying',
+        error: null,
+        displayData: normalDisplayData,
+      });
+      renderPage('/live/123');
+
+      expect(await screen.findByTestId('timer-value')).toBeInTheDocument();
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('사회자 연결이 끊기면 끊김 안내를 표시하고 NORMAL 카운트다운을 현재 값에서 멈춘다', async () => {
+      vi.useFakeTimers();
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
+        status: 'displaying',
+        error: null,
+        displayData: normalDisplayData,
+      });
+      const { rerenderPage } = renderPage('/live/123');
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2000);
+      });
+      expect(screen.getByTestId('timer-value')).toHaveAttribute(
+        'aria-label',
+        '00 : 08',
+      );
+
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'absent',
+        status: 'displaying',
+        error: null,
+        displayData: normalDisplayData,
+      });
+      rerenderPage();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(3000);
+      });
+
+      expect(screen.getByRole('status')).toHaveTextContent(ABSENT_MESSAGE);
+      expect(screen.getByTestId('timer-value')).toHaveAttribute(
+        'aria-label',
+        '00 : 08',
+      );
+    });
+
+    it('사회자 연결이 끊기면 TIME_BASED 카운트다운을 멈춘다', async () => {
+      vi.useFakeTimers();
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'absent',
+        status: 'displaying',
+        error: null,
+        displayData: timeBasedDisplayData,
+      });
+      renderPage('/live/123');
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(screen.getByTestId('pros-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 10',
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(3000);
+      });
+
+      expect(screen.getByRole('status')).toHaveTextContent(ABSENT_MESSAGE);
+      expect(screen.getByTestId('pros-current-timer')).toHaveAttribute(
+        'aria-label',
+        '00 : 10',
+      );
     });
   });
 

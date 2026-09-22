@@ -7,6 +7,7 @@ import { useAudienceCountdown } from './hooks/useAudienceCountdown';
 import { useAudienceTimeBasedCountdown } from './hooks/useAudienceTimeBasedCountdown';
 import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
+import ChairmanStatusNotice from './components/ChairmanStatusNotice';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
@@ -87,6 +88,9 @@ export default function AudienceSharePage() {
     t,
   );
 
+  // 사회자 연결이 끊기면 마지막으로 보던 시간에서 카운트다운을 멈춘다
+  const isChairmanAbsent = state.chairmanPresence === 'absent';
+
   const normalCountdown = useAudienceCountdown({
     receivedTime:
       viewState.type === 'NORMAL_TIMER'
@@ -94,12 +98,18 @@ export default function AudienceSharePage() {
         : null,
     isRunning:
       viewState.type === 'NORMAL_TIMER'
-        ? viewState.displayData.isRunning
+        ? viewState.displayData.isRunning && !isChairmanAbsent
         : false,
+    // 끊김으로 멈출 때는 마지막 수신 시간으로 되돌리지 않고 현재 값을 유지
+    shouldResetOnRunStateChange: !isChairmanAbsent,
   });
   const timeBasedCountdown = useAudienceTimeBasedCountdown({
     displayData:
-      viewState.type === 'TIME_BASED_TIMER' ? viewState.displayData : null,
+      viewState.type === 'TIME_BASED_TIMER'
+        ? isChairmanAbsent
+          ? { ...viewState.displayData, isRunning: false }
+          : viewState.displayData
+        : null,
     timePerTeam:
       viewState.type === 'TIME_BASED_TIMER'
         ? viewState.timeBox.timePerTeam
@@ -215,6 +225,12 @@ export default function AudienceSharePage() {
     }
   };
 
+  const isTimerVisible =
+    viewState.type === 'NORMAL_TIMER' || viewState.type === 'TIME_BASED_TIMER';
+  const shouldShowWaitingNotice =
+    isTimerVisible && state.chairmanPresence === 'waiting';
+  const shouldShowAbsentNotice = isTimerVisible && isChairmanAbsent;
+
   const isHeaderVisible =
     viewState.type === 'WAITING' ||
     viewState.type === 'NORMAL_TIMER' ||
@@ -255,7 +271,17 @@ export default function AudienceSharePage() {
               {agendaLabel}
             </p>
           ) : null}
-          <div className="min-h-0 w-full flex-1">{renderContent()}</div>
+          {shouldShowWaitingNotice ? (
+            <div className="flex-shrink-0 pb-2">
+              <ChairmanStatusNotice variant="waiting" />
+            </div>
+          ) : null}
+          <div className="relative min-h-0 w-full flex-1">
+            {renderContent()}
+            {shouldShowAbsentNotice ? (
+              <ChairmanStatusNotice variant="absent" />
+            ) : null}
+          </div>
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>
