@@ -137,6 +137,7 @@ describe('AudienceSharePage', () => {
       }),
     );
     mockUseAudienceShareState.mockReturnValue({
+      chairmanPresence: 'present',
       status: 'connecting',
       error: null,
     });
@@ -193,6 +194,7 @@ describe('AudienceSharePage', () => {
 
     it('connecting 상태에서는 LoadingSpinner만 표시되고 타이머 조작 요소가 없다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'connecting',
         error: null,
       });
@@ -214,6 +216,7 @@ describe('AudienceSharePage', () => {
 
     it('waiting 상태에서는 서버 데이터 대기 번역 문구가 표시된다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'waiting',
         error: null,
       });
@@ -254,6 +257,7 @@ describe('AudienceSharePage', () => {
         }),
       );
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'waiting',
         error: null,
       });
@@ -268,6 +272,7 @@ describe('AudienceSharePage', () => {
 
     it('모바일에서는 헤더 대신 본문 상단에 주제를 표시한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'waiting',
         error: null,
       });
@@ -284,6 +289,7 @@ describe('AudienceSharePage', () => {
 
     it('displaying 상태 (NORMAL)에서는 AudienceNormalTimer에 올바른 props가 전달된다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -311,6 +317,7 @@ describe('AudienceSharePage', () => {
 
     it('NORMAL sequence의 CONS 항목에 반대 팀 정보를 연결한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -335,6 +342,7 @@ describe('AudienceSharePage', () => {
     it('PLAY 상태의 NORMAL 타이머는 화면에서 로컬 카운트다운을 진행한다', async () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -369,6 +377,7 @@ describe('AudienceSharePage', () => {
     it('정지 상태의 NORMAL 타이머는 수신된 시간을 유지한다', async () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -402,6 +411,7 @@ describe('AudienceSharePage', () => {
 
     it('displaying 상태 (TIME_BASED)에서는 AudienceTimeBasedTimer에 올바른 props가 전달된다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -434,6 +444,7 @@ describe('AudienceSharePage', () => {
     it('PLAY 상태의 TIME_BASED 타이머는 현재 발언 팀만 로컬 카운트다운을 진행한다', async () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -478,6 +489,7 @@ describe('AudienceSharePage', () => {
 
     it('finished 상태가 되면 종료 안내 페이지로 이동한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'finished',
         error: null,
       });
@@ -522,6 +534,7 @@ describe('AudienceSharePage', () => {
           }),
         );
         mockUseAudienceShareState.mockReturnValue({
+          chairmanPresence: 'present',
           status: 'displaying',
           error: null,
           displayData: {
@@ -558,6 +571,7 @@ describe('AudienceSharePage', () => {
         }),
       );
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'displaying',
         error: null,
         displayData: {
@@ -604,6 +618,7 @@ describe('AudienceSharePage', () => {
 
     it('소켓 연결에 실패하면 페이지 중앙에 서버 연결 오류를 표시한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -625,6 +640,7 @@ describe('AudienceSharePage', () => {
         }),
       );
       mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
