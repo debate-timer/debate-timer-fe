@@ -184,6 +184,8 @@ export function useAudienceTimeBasedCountdown({
     consSpeaking,
   };
 
+  // 0초 도달 시 로컬 정지는 표시용이며, 종료 확정은 사회자 이벤트(STOP/SYNC)로 한다
+  // (docs/live-share-timer-sync.md 참고)
   useEffect(() => {
     if (prosTotal === 0 || prosSpeaking === 0) {
       setIsProsLocallyStopped(true);
