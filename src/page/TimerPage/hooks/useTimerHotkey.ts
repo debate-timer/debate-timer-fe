@@ -49,6 +49,11 @@ export function useTimerHotkey(
       if (keysToDisable.has(event.code)) {
         event.preventDefault();
       }
+
+      // 키를 길게 눌러 반복 입력되면 재생/정지·진영 전환 이벤트가 연속 발행되므로 무시
+      if (event.repeat) {
+        return;
+      }
       // 입력 포커스 해제(특히 input/select 사용 중일 때)
       if (event.target instanceof HTMLElement) {
         event.target.blur();

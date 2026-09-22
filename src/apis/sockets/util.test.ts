@@ -363,4 +363,44 @@ describe('소켓 메시지 여부 검증', () => {
       ).toBe(false);
     });
   });
+
+  describe('serverTime 검증', () => {
+    it('serverTime이 유한한 숫자이면 통과한다', () => {
+      expect(
+        isSocketMessage({
+          eventType: 'PLAY',
+          data: { timerType: 'NORMAL', sequence: 1, remainingTime: 10 },
+          serverTime: 1790000000000,
+        }),
+      ).toBe(true);
+    });
+
+    it('serverTime이 없거나 null이면 하위 호환을 위해 통과한다', () => {
+      expect(isSocketMessage({ eventType: 'FINISHED', data: null })).toBe(true);
+      expect(
+        isSocketMessage({
+          eventType: 'FINISHED',
+          data: null,
+          serverTime: null,
+        }),
+      ).toBe(true);
+    });
+
+    it('serverTime이 숫자가 아니거나 유한하지 않으면 거부된다', () => {
+      expect(
+        isSocketMessage({
+          eventType: 'FINISHED',
+          data: null,
+          serverTime: '1790000000000',
+        }),
+      ).toBe(false);
+      expect(
+        isSocketMessage({
+          eventType: 'FINISHED',
+          data: null,
+          serverTime: Number.NaN,
+        }),
+      ).toBe(false);
+    });
+  });
 });

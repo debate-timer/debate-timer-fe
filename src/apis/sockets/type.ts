@@ -52,14 +52,17 @@ export interface TimerDataPayload {
 // 공통 메시지 구조
 // 데이터가 null인 이벤트와 그렇지 않은 이벤트를 명확히 구분
 // version은 사회자가 발행 순서대로 증가시키는 값으로, 오래된 메시지를 걸러내는 데 사용
+// serverTime은 서버가 메시지를 중계한 시각(epoch ms)으로, 청중이 수신까지 흐른 시간을 보정하는 데 사용 (서버만 채움)
 export type SocketMessage =
   | {
       eventType: TimerEventTypes;
       data: TimerDataPayload;
       version?: number | null;
+      serverTime?: number | null;
     }
   | {
       eventType: NonTimerEventType;
       data: null;
       version?: number | null;
+      serverTime?: number | null;
     };

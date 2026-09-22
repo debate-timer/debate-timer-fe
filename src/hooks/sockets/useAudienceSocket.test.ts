@@ -528,6 +528,35 @@ describe('useAudienceSocket', () => {
       expect(result.current.lastReceivedAt).toBeNull();
     });
 
+    it('반영한 메시지의 수신 시각을 latestMessageReceivedAt으로 노출해야 한다', () => {
+      const { result, receive } = setup();
+      const receivedAt = Date.now();
+
+      receive(JSON.stringify(createMessage(10)));
+
+      expect(result.current.latestMessageReceivedAt).toBe(receivedAt);
+    });
+
+    it('version이 오래되어 무시된 메시지는 latestMessageReceivedAt을 바꾸지 않아야 한다', () => {
+      const { result, receive } = setup();
+      const receivedAt = Date.now();
+
+      receive(JSON.stringify(createMessage(10)));
+      vi.advanceTimersByTime(5000);
+      receive(JSON.stringify(createMessage(9)));
+
+      expect(result.current.latestMessageReceivedAt).toBe(receivedAt);
+    });
+
+    it('재연결되면 latestMessageReceivedAt을 초기화해야 한다', () => {
+      const { result, receive, reconnect } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      reconnect();
+
+      expect(result.current.latestMessageReceivedAt).toBeNull();
+    });
+
     it('재연결되면 lastReceivedAt을 초기화해야 한다', () => {
       const { result, receive, reconnect } = setup();
 

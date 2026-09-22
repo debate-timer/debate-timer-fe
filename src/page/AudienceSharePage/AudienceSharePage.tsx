@@ -91,6 +91,9 @@ export default function AudienceSharePage() {
   // 사회자 연결이 끊기면 마지막으로 보던 시간에서 카운트다운을 멈춘다
   const isChairmanAbsent = state.chairmanPresence === 'absent';
 
+  // 네트워크 지연 보정 기준 시각
+  const syncedAt = state.status === 'displaying' ? state.syncedAt : null;
+
   const normalCountdown = useAudienceCountdown({
     receivedTime:
       viewState.type === 'NORMAL_TIMER'
@@ -102,6 +105,7 @@ export default function AudienceSharePage() {
         : false,
     // 끊김으로 멈출 때는 마지막 수신 시간으로 되돌리지 않고 현재 값을 유지
     shouldResetOnRunStateChange: !isChairmanAbsent,
+    syncedAt,
   });
   const timeBasedCountdown = useAudienceTimeBasedCountdown({
     displayData:
@@ -118,6 +122,7 @@ export default function AudienceSharePage() {
       viewState.type === 'TIME_BASED_TIMER'
         ? viewState.timeBox.timePerSpeaking
         : null,
+    syncedAt,
   });
 
   // 토론이 종료되면 종료 안내 페이지로 이동 (뒤로 가기로 돌아오지 않도록 replace)
