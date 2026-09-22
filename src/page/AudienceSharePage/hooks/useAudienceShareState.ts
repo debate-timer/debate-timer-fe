@@ -137,7 +137,10 @@ export function useAudienceShareState(
       latestMessageReceivedAt === null
         ? null
         : latestMessageReceivedAt -
-            getNetworkDelayMs(latestMessage.serverTime, latestMessageReceivedAt),
+            getNetworkDelayMs(
+              latestMessage.serverTime,
+              latestMessageReceivedAt,
+            ),
     );
   }, [
     enabled,

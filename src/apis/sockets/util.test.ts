@@ -378,7 +378,11 @@ describe('소켓 메시지 여부 검증', () => {
     it('serverTime이 없거나 null이면 하위 호환을 위해 통과한다', () => {
       expect(isSocketMessage({ eventType: 'FINISHED', data: null })).toBe(true);
       expect(
-        isSocketMessage({ eventType: 'FINISHED', data: null, serverTime: null }),
+        isSocketMessage({
+          eventType: 'FINISHED',
+          data: null,
+          serverTime: null,
+        }),
       ).toBe(true);
     });
 

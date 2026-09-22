@@ -7,8 +7,8 @@
 
 ```ts
 {
-  eventType: 'NEXT' | 'BEFORE' | 'PLAY' | 'STOP' | 'RESET' | 'TEAM_SWITCH' | 'SYNC' | 'FINISHED';
-  data: TimerDataPayload | null; // FINISHED는 null
+  eventType: 'NEXT' | 'BEFORE' | 'PLAY' | 'STOP' | 'RESET' | 'TEAM_SWITCH' | 'SYNC' | 'FINISHED' | 'ERROR';
+  data: TimerDataPayload | null; // FINISHED와 ERROR는 null
   version?: number | null;       // 사회자가 채움
   serverTime?: number | null;    // 서버가 채움
 }
