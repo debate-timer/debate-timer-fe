@@ -308,4 +308,89 @@ describe('useAudienceCountdown', () => {
       expect(result.current.currentSeconds).toBe(8);
     });
   });
+
+  describe('실행 중 재동기화 튐 억제', () => {
+    beforeEach(() => {
+      vi.setSystemTime(new Date('2026-09-23T00:00:00Z'));
+    });
+
+    const setupRunning = () =>
+      renderHook((props) => useAudienceCountdown(props), {
+        initialProps: {
+          receivedTime: 10,
+          isRunning: true,
+          syncedAt: Date.now() as number | null,
+        },
+      });
+
+    it('올림된 정수 초로 인한 1초 미만 차이는 기존 목표 시각을 유지한다', () => {
+      const { result, rerender } = setupRunning();
+
+      act(() => {
+        vi.advanceTimersByTime(5300);
+      });
+      expect(result.current.currentSeconds).toBe(5);
+
+      // 사회자 실제 잔여 4.7초 → 올림한 5초를 전송
+      rerender({ receivedTime: 5, isRunning: true, syncedAt: Date.now() });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+
+      // 새 값으로 다시 맞췄다면 4.2초가 남아 5로 표시된다
+      expect(result.current.currentSeconds).toBe(4);
+    });
+
+    it('1초 이상 어긋나면 받은 값으로 다시 맞춘다', () => {
+      const { result, rerender } = setupRunning();
+
+      act(() => {
+        vi.advanceTimersByTime(5300);
+      });
+
+      rerender({ receivedTime: 7, isRunning: true, syncedAt: Date.now() });
+
+      expect(result.current.currentSeconds).toBe(7);
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+      expect(result.current.currentSeconds).toBe(7);
+    });
+
+    it('오차 범위 안에서 받은 값이 더 이르면 더 이른 목표 시각을 택한다', () => {
+      const { result, rerender } = setupRunning();
+
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      // 수신값이 600ms 전 기준 7초 → 목표 시각이 기존보다 600ms 이르다
+      rerender({
+        receivedTime: 7,
+        isRunning: true,
+        syncedAt: Date.now() - 600,
+      });
+      act(() => {
+        vi.advanceTimersByTime(1400);
+      });
+
+      // 기존 목표 시각을 유지했다면 5.6초가 남아 6으로 표시된다
+      expect(result.current.currentSeconds).toBe(5);
+    });
+
+    it('정지 후 재생은 오차 범위 안이어도 받은 값으로 시작한다', () => {
+      const { result, rerender } = setupRunning();
+
+      act(() => {
+        vi.advanceTimersByTime(5300);
+      });
+      rerender({ receivedTime: 5, isRunning: false, syncedAt: Date.now() });
+      rerender({ receivedTime: 5, isRunning: true, syncedAt: Date.now() });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+
+      expect(result.current.currentSeconds).toBe(5);
+    });
+  });
 });

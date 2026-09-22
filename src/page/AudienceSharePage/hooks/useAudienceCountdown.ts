@@ -6,6 +6,9 @@ import { MAX_NETWORK_DELAY_MS } from './getNetworkDelayMs';
 // (네트워크 지연 상한 + 렌더링 여유)
 const MAX_SYNC_ELAPSED_MS = MAX_NETWORK_DELAY_MS + 1000;
 
+// 실행 중 재동기화할 때 기존 목표 시각과의 차이가 이보다 작으면 기존 목표 시각을 유지
+const RESYNC_TOLERANCE_MS = 1000;
+
 /**
  * 수신값이 유효했던 시각(`syncedAt`)부터 지금까지 흐른 시간(ms)을 구합니다.
  * 기준 시각이 없거나, 미래이거나, 너무 오래되었으면 0을 반환합니다.
@@ -87,11 +90,7 @@ export function useAudienceCountdown({
     const startingSeconds = shouldSynchronize
       ? normalizedReceivedTime
       : currentSecondsRef.current;
-
-    if (shouldSynchronize) {
-      currentSecondsRef.current = normalizedReceivedTime;
-      setCurrentSeconds(normalizedReceivedTime);
-    }
+    const previousTargetTime = targetTimeRef.current;
 
     previousReceivedTimeRef.current = receivedTime;
     previousSyncKeyRef.current = syncKey;
@@ -101,14 +100,39 @@ export function useAudienceCountdown({
       minimumTime !== undefined &&
       startingSeconds !== null &&
       startingSeconds <= minimumTime;
+    const shouldRun =
+      isRunning && startingSeconds !== null && !hasReachedMinimum;
 
-    if (isRunning && startingSeconds !== null && !hasReachedMinimum) {
+    let nextTargetTime: number | null = null;
+    let shouldKeepTarget = false;
+    if (shouldRun) {
       const now = Date.now();
       // 정지했던 값에서 재개할 때는 수신 이후 흐른 시간이 이미 반영되어 있으므로 보정하지 않음
       const elapsedMs = shouldSynchronize
         ? getSyncElapsedMs(syncedAtRef.current, now)
         : 0;
-      targetTimeRef.current = now + startingSeconds * 1000 - elapsedMs;
+      const candidateTargetTime = now + startingSeconds * 1000 - elapsedMs;
+
+      // 사회자는 남은 시간을 올림한 정수 초로 보내므로, 실행 중 재동기화 값은 실제보다 최대 1초 크다.
+      // 오차 범위 안이면 더 이른(실제에 가까운) 목표 시각을 택해, 주기적인 SYNC마다 표시가 튀지 않게 한다.
+      shouldKeepTarget =
+        shouldSynchronize &&
+        previousTargetTime !== null &&
+        Math.abs(candidateTargetTime - previousTargetTime) <
+          RESYNC_TOLERANCE_MS;
+      nextTargetTime =
+        shouldKeepTarget && previousTargetTime !== null
+          ? Math.min(previousTargetTime, candidateTargetTime)
+          : candidateTargetTime;
+    }
+
+    if (shouldSynchronize && !shouldKeepTarget) {
+      currentSecondsRef.current = normalizedReceivedTime;
+      setCurrentSeconds(normalizedReceivedTime);
+    }
+
+    if (shouldRun) {
+      targetTimeRef.current = nextTargetTime;
 
       intervalRef.current = setInterval(() => {
         if (targetTimeRef.current === null) return;
