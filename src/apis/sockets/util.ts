@@ -53,7 +53,10 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
   const obj = value as Record<string, unknown>;
   const eventType = obj.eventType as SocketEventType;
 
-  if (!isOptional(obj.version, isFiniteNumber)) {
+  if (
+    !isOptional(obj.version, isFiniteNumber) ||
+    !isOptional(obj.serverTime, isFiniteNumber)
+  ) {
     return false;
   }
 
