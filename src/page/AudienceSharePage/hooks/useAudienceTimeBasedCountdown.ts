@@ -28,6 +28,8 @@ export interface UseAudienceTimeBasedCountdownParams {
   displayData: AudienceTimeBasedDisplayData | null;
   timePerTeam: number | null;
   timePerSpeaking: number | null;
+  /** 표시 중인 시간이 유효했던 시각 (네트워크 지연 보정 기준, `useAudienceCountdown` 참고) */
+  syncedAt?: number | null;
 }
 
 export interface UseAudienceTimeBasedCountdownReturn {
@@ -107,6 +109,7 @@ export function useAudienceTimeBasedCountdown({
   displayData,
   timePerTeam,
   timePerSpeaking,
+  syncedAt,
 }: UseAudienceTimeBasedCountdownParams): UseAudienceTimeBasedCountdownReturn {
   const [inputs, setInputs] = useState<CountdownInputs>(createInitialInputs);
   const [isProsLocallyStopped, setIsProsLocallyStopped] = useState(false);
@@ -134,6 +137,7 @@ export function useAudienceTimeBasedCountdown({
     minimumTime: 0,
     shouldResetOnRunStateChange: false,
     syncKey: inputs.pros.totalSyncKey,
+    syncedAt,
   });
   const prosSpeakingCountdown = useAudienceCountdown({
     receivedTime: inputs.pros.speakingTime,
@@ -141,6 +145,7 @@ export function useAudienceTimeBasedCountdown({
     minimumTime: 0,
     shouldResetOnRunStateChange: false,
     syncKey: inputs.pros.speakingSyncKey,
+    syncedAt,
   });
   const consTotalCountdown = useAudienceCountdown({
     receivedTime: inputs.cons.totalTime,
@@ -148,6 +153,7 @@ export function useAudienceTimeBasedCountdown({
     minimumTime: 0,
     shouldResetOnRunStateChange: false,
     syncKey: inputs.cons.totalSyncKey,
+    syncedAt,
   });
   const consSpeakingCountdown = useAudienceCountdown({
     receivedTime: inputs.cons.speakingTime,
@@ -155,6 +161,7 @@ export function useAudienceTimeBasedCountdown({
     minimumTime: 0,
     shouldResetOnRunStateChange: false,
     syncKey: inputs.cons.speakingSyncKey,
+    syncedAt,
   });
 
   const prosTotal = prosTotalCountdown.currentSeconds;

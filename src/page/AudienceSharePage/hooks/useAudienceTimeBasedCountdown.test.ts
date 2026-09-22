@@ -291,6 +291,35 @@ describe('useAudienceTimeBasedCountdown', () => {
       expect(result.current.pros.totalRemainingTime).toBe(90);
     });
 
+    it('실행 중 SYNC는 수신값이 유효했던 시각(syncedAt)부터 흐른 시간을 빼고 이어간다', () => {
+      vi.setSystemTime(new Date('2026-09-23T00:00:00Z'));
+      const syncedAt = Date.now() - 600;
+      const { result } = renderHook(() =>
+        useAudienceTimeBasedCountdown({
+          displayData: createDisplayData({
+            currentTeam: 'CONS',
+            isRunning: true,
+            eventType: 'SYNC',
+            prosTime: null,
+            consTime: 20,
+            teamTotalTimes: { pros: 90, cons: 70 },
+          }),
+          timePerTeam: 120,
+          timePerSpeaking: 30,
+          syncedAt,
+        }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+
+      // 보정하지 않으면 69.6초·19.6초가 남아 70·20으로 표시된다
+      expect(result.current.cons.totalRemainingTime).toBe(69);
+      expect(result.current.cons.currentSpeakingRemainingTime).toBe(19);
+      expect(result.current.pros.totalRemainingTime).toBe(90);
+    });
+
     it('정지 상태 SYNC는 받은 시간으로 멈춰 있는다', () => {
       const { result } = renderHook(() =>
         useAudienceTimeBasedCountdown({
