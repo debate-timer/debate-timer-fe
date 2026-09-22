@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { MdWifiOff } from 'react-icons/md';
+import { motion } from 'framer-motion';
 
 export type ChairmanStatusNoticeVariant = 'waiting' | 'absent';
 
@@ -23,8 +24,10 @@ export default function ChairmanStatusNotice({
         role="status"
         className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 xl:text-base"
       >
-        <span
-          className="h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-gray-500"
+        <motion.span
+          className="h-2 w-2 flex-shrink-0 rounded-full bg-gray-500"
+          animate={{ opacity: [1, 0.4, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
         />
         <span className="break-keep">
