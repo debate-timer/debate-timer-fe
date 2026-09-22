@@ -39,10 +39,8 @@ export default function AudienceNormalTimer({
     !teamName || teamName.trim() === ''
       ? t('팀명 없음')
       : t('{{team}} 팀', { team: t(teamName) });
-  const speakerLabel =
-    !speaker || speaker.trim() === ''
-      ? t('토론자 없음')
-      : t('{{speaker}} 토론자', { speaker: t(speaker) });
+  // 토론자가 없으면 메인 타이머 화면처럼 토론자 표시를 생략
+  const hasSpeaker = !!speaker && speaker.trim() !== '';
   const progress = ((totalTime - remainingTime) / totalTime) * 100;
   const [minutes, seconds] = Formatting.formatSecondsToMMSS(
     Math.abs(remainingTime),
@@ -66,8 +64,14 @@ export default function AudienceNormalTimer({
             aria-hidden="true"
           />
           <p className="min-w-0 truncate">{teamLabel}</p>
-          <p aria-hidden="true">|</p>
-          <p className="min-w-0 truncate">{speakerLabel}</p>
+          {hasSpeaker && (
+            <>
+              <p aria-hidden="true">|</p>
+              <p className="min-w-0 truncate">
+                {t('{{speaker}} 토론자', { speaker: t(speaker) })}
+              </p>
+            </>
+          )}
         </div>
       )}
 

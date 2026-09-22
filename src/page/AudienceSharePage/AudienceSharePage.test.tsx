@@ -311,7 +311,7 @@ describe('AudienceSharePage', () => {
 
       expect(await screen.findByText('입론')).toBeInTheDocument();
       expect(screen.getByText('찬성 팀')).toBeInTheDocument();
-      expect(screen.getByText('토론자 없음')).toBeInTheDocument();
+      expect(screen.queryByText('토론자 없음')).not.toBeInTheDocument();
       expect(screen.getByTestId('timer-value')).toHaveAttribute(
         'aria-label',
         '02 : 00',

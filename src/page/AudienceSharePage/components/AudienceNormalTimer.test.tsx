@@ -86,6 +86,29 @@ describe('AudienceNormalTimer', () => {
     );
   });
 
+  it.each([null, '', '   '])(
+    '토론자가 없으면(%j) 토론자와 구분선 없이 팀명만 표시한다',
+    (speaker) => {
+      render(
+        <AudienceNormalTimer
+          remainingTime={60}
+          totalTime={60}
+          speechType="입론"
+          stance="PROS"
+          teamName="찬성"
+          speaker={speaker}
+          isRunning={false}
+        />,
+      );
+
+      const participantRow = screen.getByTestId('participant-row');
+      expect(screen.getByText('찬성 팀')).toBeInTheDocument();
+      expect(screen.queryByText('토론자 없음')).not.toBeInTheDocument();
+      expect(participantRow).not.toHaveTextContent('|');
+      expect(participantRow).not.toHaveTextContent('토론자');
+    },
+  );
+
   it.each([
     { remainingTime: 80, expectedProgress: 0 },
     { remainingTime: -20, expectedProgress: 100 },
