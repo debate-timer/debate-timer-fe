@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
 import { TimeBoxInfo } from '../../../type/type';
@@ -19,7 +19,16 @@ export type AudienceShareState =
     }
   | { status: 'finished'; error: AudienceShareError | null };
 
-const EVENT_TIMEOUT_MS = 600 * 1000;
+/**
+ * 사회자 연결 상태
+ * - `waiting`: 연결 후 사회자 메시지를 아직 한 번도 받지 못함
+ * - `present`: 최근 `CHAIRMAN_ABSENT_TIMEOUT_MS` 안에 사회자 메시지를 받음
+ * - `absent`: 사회자 메시지를 받은 적은 있으나 `CHAIRMAN_ABSENT_TIMEOUT_MS` 동안 수신이 없음
+ */
+export type ChairmanPresence = 'waiting' | 'present' | 'absent';
+
+// 사회자 heartbeat(5초) 3회를 놓치면 사회자 연결이 끊긴 것으로 판단
+export const CHAIRMAN_ABSENT_TIMEOUT_MS = 15 * 1000;
 
 // 연결 후 이 시간 동안 메시지가 없으면 첫 순서 타이머를 정지 상태로 먼저 표시
 const INITIAL_DISPLAY_DELAY_MS = 1000;
@@ -32,12 +41,13 @@ interface UseAudienceShareStateOptions {
 export function useAudienceShareState(
   roomId: number,
   options: UseAudienceShareStateOptions = {},
-): AudienceShareState {
+): AudienceShareState & { chairmanPresence: ChairmanPresence } {
   const { enabled = true, table } = options;
   const {
     connect,
     disconnect,
     latestMessage,
+    lastReceivedAt,
     isConnected,
     error: socketError,
   } = useAudienceSocket(roomId, { enabled });
@@ -49,13 +59,9 @@ export function useAudienceShareState(
     null,
   );
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isChairmanAbsent, setIsChairmanAbsent] = useState<boolean>(false);
 
   const cleanup = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
     disconnect();
   }, [disconnect]);
 
@@ -94,32 +100,10 @@ export function useAudienceShareState(
   useEffect(() => {
     if (!enabled || error || isFinished) return; // Ignore if inactive, already failed or finished
 
-    if (!isConnected) {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+    if (!isConnected || !latestMessage) {
       setDisplayData(null);
       return;
     }
-
-    const resetEventTimeout = () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        cleanup();
-        setError(new AudienceShareError('EVENT_TIMEOUT'));
-      }, EVENT_TIMEOUT_MS);
-    };
-
-    if (!latestMessage) {
-      resetEventTimeout();
-      setDisplayData(null);
-      return;
-    }
-
-    resetEventTimeout();
 
     if (latestMessage.eventType === 'ERROR') {
       cleanup();
@@ -140,6 +124,34 @@ export function useAudienceShareState(
       getDisplayDataByEvent(eventType, data, previousDisplayData, table),
     );
   }, [enabled, isConnected, latestMessage, error, isFinished, cleanup, table]);
+
+  // 마지막 수신 후 일정 시간 동안 메시지가 없으면 사회자 연결이 끊긴 것으로 판단
+  useEffect(() => {
+    setIsChairmanAbsent(false);
+
+    if (lastReceivedAt === null) {
+      return;
+    }
+
+    const elapsed = Date.now() - lastReceivedAt;
+    const absentTimeout = setTimeout(
+      () => {
+        setIsChairmanAbsent(true);
+      },
+      Math.max(CHAIRMAN_ABSENT_TIMEOUT_MS - elapsed, 0),
+    );
+
+    return () => {
+      clearTimeout(absentTimeout);
+    };
+  }, [lastReceivedAt]);
+
+  let chairmanPresence: ChairmanPresence = 'present';
+  if (lastReceivedAt === null) {
+    chairmanPresence = 'waiting';
+  } else if (isChairmanAbsent) {
+    chairmanPresence = 'absent';
+  }
 
   // 사회자 응답을 기다리는 동안 빈 화면 대신 첫 순서 타이머를 정지 상태로 표시
   // 이후 SYNC 등 메시지를 받으면 받은 상태로 바뀐다
@@ -180,11 +192,13 @@ export function useAudienceShareState(
       status,
       error,
       displayData: displayData!,
+      chairmanPresence,
     };
   }
 
   return {
     status,
     error,
+    chairmanPresence,
   };
 }

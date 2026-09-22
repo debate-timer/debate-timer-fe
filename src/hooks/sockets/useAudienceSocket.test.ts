@@ -447,4 +447,94 @@ describe('useAudienceSocket', () => {
       expect(result.current.latestMessage?.eventType).toBe('PLAY');
     });
   });
+
+  describe('마지막 수신 시각', () => {
+    const createMessage = (version: number): SocketMessage => ({
+      eventType: 'SYNC',
+      data: {
+        timerType: 'NORMAL',
+        sequence: 0,
+        remainingTime: 30,
+        isRunning: true,
+      },
+      version,
+    });
+
+    const setup = () => {
+      let handleMessage: (message: IMessage) => void = () => undefined;
+      let handleConnection: () => void = () => undefined;
+      subscribe.mockImplementation(
+        (_destination: string, callback: (message: IMessage) => void) => {
+          handleMessage = callback;
+        },
+      );
+      addConnectionListener.mockImplementation((listener: () => void) => {
+        handleConnection = listener;
+        return vi.fn();
+      });
+
+      const hook = renderHook(() => useAudienceSocket(123));
+      const receive = (body: string) =>
+        act(() => {
+          handleMessage({ body } as IMessage);
+        });
+
+      return { ...hook, receive, reconnect: () => act(handleConnection) };
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-22T00:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('메시지를 받기 전에는 lastReceivedAt이 null이어야 한다', () => {
+      const { result } = setup();
+
+      expect(result.current.lastReceivedAt).toBeNull();
+    });
+
+    it('유효한 메시지를 받으면 수신 시각으로 lastReceivedAt을 갱신해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      expect(result.current.lastReceivedAt).toBe(Date.now());
+
+      vi.advanceTimersByTime(5000);
+      receive(JSON.stringify(createMessage(11)));
+      expect(result.current.lastReceivedAt).toBe(Date.now());
+    });
+
+    it('version이 오래되어 무시된 메시지도 수신 시각은 갱신해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      vi.advanceTimersByTime(5000);
+      receive(JSON.stringify(createMessage(9)));
+
+      expect(result.current.latestMessage).toEqual(createMessage(10));
+      expect(result.current.lastReceivedAt).toBe(Date.now());
+    });
+
+    it('형식이 잘못된 메시지는 수신 시각을 갱신하지 않아야 한다', () => {
+      const { result, receive } = setup();
+
+      receive('invalid-json');
+      receive(JSON.stringify({ eventType: 'UNKNOWN', data: null }));
+
+      expect(result.current.lastReceivedAt).toBeNull();
+    });
+
+    it('재연결되면 lastReceivedAt을 초기화해야 한다', () => {
+      const { result, receive, reconnect } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      reconnect();
+
+      expect(result.current.lastReceivedAt).toBeNull();
+    });
+  });
 });

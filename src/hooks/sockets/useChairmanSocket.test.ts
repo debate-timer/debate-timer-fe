@@ -341,4 +341,100 @@ describe('useChairmanSocket', () => {
 
     expect(onSyncRequest).toHaveBeenCalledTimes(1);
   });
+
+  describe('heartbeat', () => {
+    const setConnected = (isConnected: boolean) => {
+      useSocketMock.mockReturnValue({
+        connect,
+        disconnect,
+        subscribe,
+        unsubscribe,
+        publish,
+        addConnectionListener,
+        isConnected,
+        error: null,
+      });
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('연결된 동안 5초마다 onSyncRequest를 호출해야 한다', () => {
+      setConnected(true);
+      const onSyncRequest = vi.fn();
+
+      renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+
+      act(() => {
+        vi.advanceTimersByTime(4999);
+      });
+      expect(onSyncRequest).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(onSyncRequest).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        vi.advanceTimersByTime(10000);
+      });
+      expect(onSyncRequest).toHaveBeenCalledTimes(3);
+    });
+
+    it('연결되지 않은 상태에서는 onSyncRequest를 주기적으로 호출하지 않아야 한다', () => {
+      setConnected(false);
+      const onSyncRequest = vi.fn();
+
+      renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+
+      act(() => {
+        vi.advanceTimersByTime(20000);
+      });
+
+      expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+
+    it('연결이 끊기면 주기 호출을 멈춰야 한다', () => {
+      setConnected(true);
+      const onSyncRequest = vi.fn();
+
+      const { rerender } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(onSyncRequest).toHaveBeenCalledTimes(1);
+
+      setConnected(false);
+      rerender();
+
+      act(() => {
+        vi.advanceTimersByTime(20000);
+      });
+      expect(onSyncRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('언마운트되면 주기 호출을 멈춰야 한다', () => {
+      setConnected(true);
+      const onSyncRequest = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+      unmount();
+
+      act(() => {
+        vi.advanceTimersByTime(20000);
+      });
+
+      expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+  });
 });

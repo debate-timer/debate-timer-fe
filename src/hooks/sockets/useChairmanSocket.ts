@@ -9,6 +9,9 @@ import { isTimerEventType } from '../../apis/sockets/util';
 import { chairmanTokenQueryKey } from '../query/useGetChairmanToken';
 import useSocket from './useSocket';
 
+// 청중이 사회자 연결 여부를 판단할 수 있도록 현재 상태를 주기적으로 공유하는 간격
+export const CHAIRMAN_HEARTBEAT_INTERVAL_MS = 5000;
+
 /**
  * 사회자 전용 웹소켓 훅입니다.
  *
@@ -29,7 +32,10 @@ import useSocket from './useSocket';
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
 interface UseChairmanSocketOptions {
-  /** 소켓이 연결(재연결 포함)되거나, 서버가 `/chairman/{roomId}`로 현재 상태 공유를 요청했을 때 호출됩니다. */
+  /**
+   * 소켓이 연결(재연결 포함)되거나, 서버가 `/chairman/{roomId}`로 현재 상태 공유를 요청했을 때 호출됩니다.
+   * 연결된 동안에는 heartbeat로 `CHAIRMAN_HEARTBEAT_INTERVAL_MS`마다 호출됩니다.
+   */
   onSyncRequest?: () => void;
 }
 
@@ -128,6 +134,21 @@ export default function useChairmanSocket(
       unsubscribe(destination);
     };
   }, [roomId, resetSignalState, subscribe, unsubscribe]);
+
+  // 연결된 동안 현재 상태를 주기적으로 공유해 청중이 사회자 연결 끊김을 감지할 수 있게 한다
+  useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
+
+    const heartbeat = setInterval(() => {
+      onSyncRequestRef.current?.();
+    }, CHAIRMAN_HEARTBEAT_INTERVAL_MS);
+
+    return () => {
+      clearInterval(heartbeat);
+    };
+  }, [isConnected]);
 
   useEffect(() => {
     if (!error) {
