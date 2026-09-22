@@ -283,6 +283,8 @@
   "서버에서 토론 진행 오류를 전달했어요.": "The server reported a debate progress error.",
   "알 수 없는 실시간 오류가 발생했어요.": "An unknown live error occurred.",
   "토론 시작을 대기 중입니다.": "Waiting for the debate to start.",
+  "사회자 연결을 기다리는 중이에요.": "Waiting for the moderator to connect.",
+  "사회자 연결이 끊겼어요. 재접속을 기다리는 중이에요.": "The moderator has disconnected. Waiting for them to reconnect.",
   "토론이 종료되었습니다.": "The debate has ended.",
   "페이지 닫기": "Close page",
   "참여해 주셔서 감사합니다.": "Thank you for joining.",
