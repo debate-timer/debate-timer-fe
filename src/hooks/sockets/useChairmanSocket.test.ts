@@ -49,6 +49,7 @@ describe('useChairmanSocket', () => {
     expect(subscribe).toHaveBeenCalledWith(
       '/chairman/123',
       expect.any(Function),
+      expect.any(Function),
     );
   });
 
@@ -156,6 +157,7 @@ describe('useChairmanSocket', () => {
     expect(subscribe).toHaveBeenCalledWith(
       '/chairman/456',
       expect.any(Function),
+      expect.any(Function),
     );
   });
 
@@ -248,7 +250,10 @@ describe('useChairmanSocket', () => {
         data: payload,
         version: 1710000000000,
       },
-      { Authorization: authToken },
+      {
+        Authorization: authToken,
+        'X-Chairman-Session': expect.any(String),
+      },
     );
   });
 
@@ -340,6 +345,125 @@ describe('useChairmanSocket', () => {
     });
 
     expect(onSyncRequest).toHaveBeenCalledTimes(1);
+  });
+
+  describe('사회자 세션', () => {
+    function captureChairmanChannel() {
+      let handleMessage: (message: IMessage) => void = () => undefined;
+      let resolveHeaders: () => Record<string, string> = () => ({});
+      subscribe.mockImplementation(
+        (
+          _destination: string,
+          callback: (message: IMessage) => void,
+          headers: () => Record<string, string>,
+        ) => {
+          handleMessage = callback;
+          resolveHeaders = headers;
+        },
+      );
+      return {
+        send: (body: unknown) =>
+          handleMessage({ body: JSON.stringify(body) } as IMessage),
+        sessionId: () => resolveHeaders()['X-Chairman-Session'],
+      };
+    }
+
+    it('사회자 채널 구독과 이벤트 발행에 같은 사회자 세션 식별자를 첨부해야 한다', () => {
+      const channel = captureChairmanChannel();
+
+      const { result } = renderHook(() => useChairmanSocket(123));
+      act(() => {
+        result.current.sendDebateEvent('FINISHED', null, 'token');
+      });
+
+      expect(channel.sessionId()).toEqual(expect.any(String));
+      expect(publish.mock.calls[0][2]['X-Chairman-Session']).toBe(
+        channel.sessionId(),
+      );
+    });
+
+    it('공유를 새로 시작하면 새 사회자 세션 식별자를 사용해야 한다', () => {
+      const channel = captureChairmanChannel();
+
+      const { result } = renderHook(() => useChairmanSocket(123));
+      const previousSessionId = channel.sessionId();
+      act(() => {
+        result.current.connect();
+      });
+
+      expect(channel.sessionId()).not.toBe(previousSessionId);
+    });
+
+    it('다른 사회자 세션이 활성 사회자가 되면 밀려난 상태로 바꾸고 연결을 끊어야 한다', () => {
+      const channel = captureChairmanChannel();
+      const onSyncRequest = vi.fn();
+
+      const { result } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+      act(() => {
+        channel.send({
+          type: 'REPLACED',
+          roomId: 123,
+          activeSessionId: 'other',
+        });
+      });
+
+      expect(result.current.isReplaced).toBe(true);
+      expect(disconnect).toHaveBeenCalledTimes(1);
+      expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+
+    it('자신이 활성 사회자라는 교체 알림은 무시해야 한다', () => {
+      const channel = captureChairmanChannel();
+      const onSyncRequest = vi.fn();
+
+      const { result } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+      act(() => {
+        channel.send({
+          type: 'REPLACED',
+          roomId: 123,
+          activeSessionId: channel.sessionId(),
+        });
+      });
+
+      expect(result.current.isReplaced).toBe(false);
+      expect(disconnect).not.toHaveBeenCalled();
+      expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+
+    it('상태 공유 요청 알림을 받으면 onSyncRequest를 호출해야 한다', () => {
+      const channel = captureChairmanChannel();
+      const onSyncRequest = vi.fn();
+
+      renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+      act(() => {
+        channel.send({ type: 'SYNC_REQUEST', roomId: 123 });
+      });
+
+      expect(onSyncRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('밀려난 뒤 공유를 다시 시작하면 밀려난 상태를 해제해야 한다', () => {
+      const channel = captureChairmanChannel();
+
+      const { result } = renderHook(() => useChairmanSocket(123));
+      act(() => {
+        channel.send({
+          type: 'REPLACED',
+          roomId: 123,
+          activeSessionId: 'other',
+        });
+      });
+      act(() => {
+        result.current.connect();
+      });
+
+      expect(result.current.isReplaced).toBe(false);
+      expect(connect).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('heartbeat', () => {

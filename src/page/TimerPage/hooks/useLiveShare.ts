@@ -3,8 +3,18 @@ import { socketManager } from '../../../apis/sockets/SocketManager';
 import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
 import useGetChairmanToken from '../../../hooks/query/useGetChairmanToken';
 import { SocketEventType, TimerDataPayload } from '../../../apis/sockets/type';
+import { getJwtExpiresAt } from '../../../util/jwt';
 
-export type LiveShareErrorType = 'token' | 'else';
+// 사회자 토큰이 만료되기 이 시간 전에 새 토큰을 받아 발행이 끊기지 않게 한다
+export const CHAIRMAN_TOKEN_REFRESH_BEFORE_MS = 60 * 1000;
+
+/**
+ * 라이브 공유 오류 유형
+ * - `token`: 사회자 토큰 발급 실패 또는 잘못된 테이블
+ * - `replaced`: 다른 탭/기기에서 공유를 시작해 이 화면의 공유가 멈춤
+ * - `else`: 그 밖의 소켓 연결 오류
+ */
+export type LiveShareErrorType = 'token' | 'replaced' | 'else';
 
 interface UseLiveShareOptions {
   /** 서버가 현재 타이머 상태 공유를 요청했을 때 호출됩니다. */
@@ -31,6 +41,7 @@ export function useLiveShare(
     data: chairmanToken,
     isPending: isTokenPending,
     isError: isTokenError,
+    refetch: refetchChairmanToken,
   } = useGetChairmanToken(
     String(tableId),
     isLiveShareModalOpen && isValidTableId,
@@ -41,6 +52,7 @@ export function useLiveShare(
     connect,
     disconnect,
     isConnected: isSocketConnected,
+    isReplaced,
     sendDebateEvent,
     error: socketError,
   } = useChairmanSocket(tableId, { onSyncRequest });
@@ -64,18 +76,60 @@ export function useLiveShare(
     isValidTableId &&
     !isTokenError &&
     !socketError &&
+    !isReplaced &&
     (isTokenPending || Boolean(chairmanToken)) &&
     !isSocketConnected;
-  const isError = !isValidTableId || isTokenError || Boolean(socketError);
-  const errorType: LiveShareErrorType =
-    !isValidTableId || isTokenError ? 'token' : 'else';
+  const isError =
+    !isValidTableId || isTokenError || Boolean(socketError) || isReplaced;
+  let errorType: LiveShareErrorType = 'else';
+  if (!isValidTableId || isTokenError) {
+    errorType = 'token';
+  } else if (isReplaced) {
+    errorType = 'replaced';
+  }
 
   // 토큰을 첨부하여 토론 이벤트를 전송하는 함수
+  // 기기가 절전 상태였다가 깨어나는 등 갱신 시점을 놓쳐 토큰이 만료됐다면 곧바로 새 토큰을 요청한다
+  // (이번 이벤트는 거부될 수 있지만, 새 토큰을 받은 뒤 heartbeat가 현재 상태를 다시 공유한다)
   const issueEvent = useCallback(
     (eventType: SocketEventType, payload: TimerDataPayload | null) => {
+      const expiresAt = chairmanToken ? getJwtExpiresAt(chairmanToken) : null;
+      if (expiresAt !== null && expiresAt <= Date.now()) {
+        void refetchChairmanToken();
+      }
+
       sendDebateEvent(eventType, payload, chairmanToken ?? '');
     },
-    [chairmanToken, sendDebateEvent],
+    [chairmanToken, refetchChairmanToken, sendDebateEvent],
+  );
+
+  /**
+   * 공유 중에는 사회자 토큰이 만료되기 전에 새 토큰을 받아둔다
+   * 토론이 예상보다 길어져 토큰 유효시간을 넘겨도 발행이 끊기지 않게 한다
+   */
+  useEffect(
+    function refreshChairmanTokenBeforeExpiry() {
+      if (!isSocketConnected || !chairmanToken) {
+        return;
+      }
+
+      const expiresAt = getJwtExpiresAt(chairmanToken);
+      if (expiresAt === null) {
+        return;
+      }
+
+      const refreshTimeout = setTimeout(
+        () => {
+          void refetchChairmanToken();
+        },
+        Math.max(expiresAt - CHAIRMAN_TOKEN_REFRESH_BEFORE_MS - Date.now(), 0),
+      );
+
+      return () => {
+        clearTimeout(refreshTimeout);
+      };
+    },
+    [chairmanToken, isSocketConnected, refetchChairmanToken],
   );
 
   /**
@@ -123,6 +177,7 @@ export function useLiveShare(
 
   /**
    * 모달이 열렸을 시, 소켓 연결을 시도하는 부수 효과
+   * 다른 탭/기기에 밀려난 상태에서는 발행 권한을 다시 뺏어오지 않도록 자동으로 연결하지 않는다
    */
   useEffect(
     function connectLiveShareSocket() {
@@ -130,6 +185,7 @@ export function useLiveShare(
         !isLiveShareModalOpen ||
         !chairmanToken ||
         socketError ||
+        isReplaced ||
         hasConnectedRef.current
       ) {
         return;
@@ -138,20 +194,53 @@ export function useLiveShare(
       connect();
       hasConnectedRef.current = true;
     },
-    [chairmanToken, connect, isLiveShareModalOpen, socketError],
+    [chairmanToken, connect, isLiveShareModalOpen, isReplaced, socketError],
   );
+
+  /**
+   * 다른 탭/기기에 밀려나면 사용자가 알 수 있도록 공유 모달을 연다
+   */
+  useEffect(
+    function openModalOnReplaced() {
+      if (isReplaced) {
+        setIsLiveShareModalOpen(true);
+      }
+    },
+    [isReplaced],
+  );
+
+  /**
+   * 밀려난 뒤 사용자가 이 화면에서 공유를 다시 시작한다
+   * 새 사회자 세션으로 연결하므로 이 화면이 다시 최신 사회자가 된다
+   */
+  const restartLiveShare = useCallback(() => {
+    if (!chairmanToken) {
+      return;
+    }
+
+    connect();
+    hasConnectedRef.current = true;
+  }, [chairmanToken, connect]);
 
   /**
    * 오류 발생 시 연결 해제 및 상태 초기화 (정리)
    */
   useEffect(
     function cleanupOnError() {
-      if (isError) {
-        hasConnectedRef.current = false;
-        disconnect();
+      if (!isError) {
+        return;
       }
+
+      hasConnectedRef.current = false;
+
+      // 밀려난 경우 이미 연결을 끊었고, 이 화면에서 다시 공유할 수 있도록 토큰은 유지한다
+      if (isReplaced) {
+        return;
+      }
+
+      disconnect();
     },
-    [isError, disconnect],
+    [isError, isReplaced, disconnect],
   );
 
   return {
@@ -166,5 +255,6 @@ export function useLiveShare(
     isError,
     errorType,
     isSocketConnected,
+    restartLiveShare,
   };
 }

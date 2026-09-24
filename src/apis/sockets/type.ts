@@ -13,6 +13,10 @@ export type TimerEventTypes =
 // 데이터가 없는 이벤트
 export type NonTimerEventType = 'FINISHED' | 'ERROR';
 
+// 서버만 보내는 데이터가 없는 이벤트 (사회자는 발행할 수 없음)
+// - `CHAIRMAN_ABSENT`: 룸에 활성 사회자가 없음을 청중에게 알림
+export type ServerEventType = 'CHAIRMAN_ABSENT';
+
 // 데이터가 반드시 포함되는 이벤트
 export type SocketEventType = TimerEventTypes | NonTimerEventType;
 
@@ -61,8 +65,24 @@ export type SocketMessage =
       serverTime?: number | null;
     }
   | {
-      eventType: NonTimerEventType;
+      eventType: NonTimerEventType | ServerEventType;
       data: null;
       version?: number | null;
       serverTime?: number | null;
     };
+
+/** 사회자 세션 식별자를 담는 STOMP 헤더 이름 */
+export const CHAIRMAN_SESSION_HEADER = 'X-Chairman-Session';
+
+/**
+ * 서버가 사회자 채널(`/chairman/{roomId}`)로 보내는 알림 유형
+ * - `SYNC_REQUEST`: 새 청중이 입장해 현재 상태 공유가 필요함
+ * - `REPLACED`: 다른 사회자 세션이 활성 사회자가 됨 (`activeSessionId`가 자신이 아니면 발행 권한을 잃음)
+ */
+export type ChairmanNoticeType = 'SYNC_REQUEST' | 'REPLACED';
+
+export interface ChairmanNotice {
+  type: ChairmanNoticeType;
+  roomId: number;
+  activeSessionId?: string | null;
+}

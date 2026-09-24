@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isSocketMessage } from './util';
+import { isChairmanNotice, isSocketMessage } from './util';
 
 describe('소켓 메시지 여부 검증', () => {
   it('유효한 모든 타이머 이벤트 메시지는 런타임 검증을 통과한다', () => {
@@ -402,5 +402,60 @@ describe('소켓 메시지 여부 검증', () => {
         }),
       ).toBe(false);
     });
+  });
+});
+
+describe('사회자 부재 이벤트 검증', () => {
+  it('CHAIRMAN_ABSENT는 data가 null일 때만 런타임 검증을 통과한다', () => {
+    expect(
+      isSocketMessage({
+        eventType: 'CHAIRMAN_ABSENT',
+        data: null,
+        version: null,
+        serverTime: null,
+      }),
+    ).toBe(true);
+    expect(
+      isSocketMessage({
+        eventType: 'CHAIRMAN_ABSENT',
+        data: { timerType: 'NORMAL', sequence: 0, remainingTime: 10 },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('사회자 채널 알림 검증', () => {
+  it('상태 공유 요청 알림을 통과시킨다', () => {
+    expect(
+      isChairmanNotice({
+        type: 'SYNC_REQUEST',
+        roomId: 1,
+        activeSessionId: null,
+      }),
+    ).toBe(true);
+  });
+
+  it('활성 사회자 교체 알림을 통과시킨다', () => {
+    expect(
+      isChairmanNotice({
+        type: 'REPLACED',
+        roomId: 1,
+        activeSessionId: 'tab-b',
+      }),
+    ).toBe(true);
+  });
+
+  it('알 수 없는 유형이나 잘못된 필드는 거부한다', () => {
+    expect(isChairmanNotice({ type: 'UNKNOWN', roomId: 1 })).toBe(false);
+    expect(isChairmanNotice({ type: 'REPLACED', roomId: '1' })).toBe(false);
+    expect(
+      isChairmanNotice({ type: 'REPLACED', roomId: 1, activeSessionId: 3 }),
+    ).toBe(false);
+    expect(isChairmanNotice(null)).toBe(false);
+    expect(isChairmanNotice('')).toBe(false);
+  });
+
+  it('구버전 서버의 roomId만 있는 알림은 거부한다', () => {
+    expect(isChairmanNotice({ roomId: 1 })).toBe(false);
   });
 });

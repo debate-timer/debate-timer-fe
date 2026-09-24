@@ -1,5 +1,7 @@
 import {
+  ChairmanNotice,
   NonTimerEventType,
+  ServerEventType,
   SocketEventType,
   TimerEventTypes,
   SocketMessage,
@@ -16,6 +18,8 @@ const TIMER_EVENT_TYPES: TimerEventTypes[] = [
 ];
 
 const NON_TIMER_EVENT_TYPES: NonTimerEventType[] = ['FINISHED', 'ERROR'];
+
+const SERVER_EVENT_TYPES: ServerEventType[] = ['CHAIRMAN_ABSENT'];
 
 export function isTimerEventType(
   event: SocketEventType,
@@ -121,9 +125,33 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
     return true;
   }
 
-  if (isNonTimerEventType(eventType)) {
+  if (
+    isNonTimerEventType(eventType) ||
+    SERVER_EVENT_TYPES.includes(eventType as ServerEventType)
+  ) {
     return obj.data === null;
   }
 
   return false;
+}
+
+export function isChairmanNotice(value: unknown): value is ChairmanNotice {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const obj = value as Record<string, unknown>;
+  if (obj.type !== 'SYNC_REQUEST' && obj.type !== 'REPLACED') {
+    return false;
+  }
+
+  if (!isFiniteNumber(obj.roomId)) {
+    return false;
+  }
+
+  return (
+    obj.activeSessionId === undefined ||
+    obj.activeSessionId === null ||
+    typeof obj.activeSessionId === 'string'
+  );
 }

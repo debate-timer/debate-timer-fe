@@ -92,4 +92,43 @@ describe('LiveShareModal', () => {
     expect(screen.getByText(LIVE_SERVER_ERROR_MESSAGE)).toBeInTheDocument();
     expect(screen.queryByLabelText('qr-code')).not.toBeInTheDocument();
   });
+
+  test('다른 곳에서 공유를 시작해 밀려난 상태를 보여준다', () => {
+    renderLiveShareModal({ isError: true, errorType: 'replaced' });
+
+    expect(
+      screen.getByRole('heading', { name: '다른 곳에서 공유 중' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        '다른 탭이나 기기에서 라이브 공유를 시작해서 이 화면의 공유를 멈췄어요.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText('qr-code')).not.toBeInTheDocument();
+  });
+
+  test('밀려난 상태에서 다시 공유하기 버튼을 클릭하면 onRestart를 호출한다', async () => {
+    const user = userEvent.setup();
+    const onRestart = vi.fn();
+
+    renderLiveShareModal({ isError: true, errorType: 'replaced', onRestart });
+
+    await user.click(
+      screen.getByRole('button', { name: '이 화면에서 다시 공유하기' }),
+    );
+
+    expect(onRestart).toHaveBeenCalledTimes(1);
+  });
+
+  test('밀려난 상태가 아닌 오류에서는 다시 공유하기 버튼을 보여주지 않는다', () => {
+    renderLiveShareModal({
+      isError: true,
+      errorType: 'else',
+      onRestart: vi.fn(),
+    });
+
+    expect(
+      screen.queryByRole('button', { name: '이 화면에서 다시 공유하기' }),
+    ).not.toBeInTheDocument();
+  });
 });

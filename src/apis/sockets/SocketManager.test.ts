@@ -218,6 +218,19 @@ describe('소켓 관리자 테스트', () => {
 
   // --- [그룹 3] 구독 & 발행 ---
   describe('구독 및 메시지 발행', () => {
+    it('구독 헤더를 클라이언트 구독 함수에 전달해야 한다', () => {
+      socketManager.connect();
+      const client = getLatestClient();
+      client.connected = true;
+
+      const callback = vi.fn();
+      socketManager.subscribe('/topic/test', callback, { 'X-Test': 'a' });
+
+      expect(client.subscribe).toHaveBeenCalledWith('/topic/test', callback, {
+        'X-Test': 'a',
+      });
+    });
+
     it('연결 전 채널 구독은 빈 결과를 반환해야 한다', () => {
       const result = socketManager.subscribe('/topic/test', vi.fn());
       expect(result).toBeNull();
@@ -231,7 +244,11 @@ describe('소켓 관리자 테스트', () => {
       const callback = () => console.log('test');
       socketManager.subscribe('/topic/test', callback);
 
-      expect(client.subscribe).toHaveBeenCalledWith('/topic/test', callback);
+      expect(client.subscribe).toHaveBeenCalledWith(
+        '/topic/test',
+        callback,
+        undefined,
+      );
     });
 
     it('연결이 되지 않았는데 메시지를 발행할 시, 전송하지 않아야 한다', () => {
@@ -264,6 +281,20 @@ describe('소켓 관리자 테스트', () => {
   });
 
   describe('연결 이벤트 리스너', () => {
+    it('수동으로 연결을 해제한 뒤 다시 연결해도 등록된 연결 리스너가 호출되어야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onConnectEvent(listener);
+      socketManager.connect();
+      socketManager.disconnect();
+
+      socketManager.connect();
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame);
+
+      expect(listener).toHaveBeenCalledOnce();
+      socketManager.offConnectEvent(listener);
+    });
+
     it('연결 리스너를 등록하면 연결 시 호출되어야 한다', () => {
       const listener = vi.fn();
       socketManager.onConnectEvent(listener);

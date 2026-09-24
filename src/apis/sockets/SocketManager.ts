@@ -275,9 +275,8 @@ class SocketManager {
       this.retryCount = 0;
       this.client = null;
       this.currentOptions = DEFAULT_OPTIONS;
-      this.connectListeners.clear();
-      this.closeListeners.clear();
-      this.errorListeners.clear();
+      // 리스너는 등록한 훅이 언마운트될 때 직접 제거하므로 유지한다
+      // (여기서 지우면 같은 화면에서 다시 연결했을 때 연결 상태를 전달받지 못함)
 
       console.log('🛑 웹 소켓 연결을 수동으로 해제했습니다.');
     }
@@ -287,14 +286,19 @@ class SocketManager {
    * 특정 채널 구독 (수신)
    * @param destination - 구독할 채널 (e.g., '/chairman/{roomId})
    * @param callback - 메시지를 받을 때마다 해당 메시지에 대해 실행할 콜백 함수
+   * @param headers - 구독 요청에 첨부할 STOMP 헤더 (선택 사항)
    */
-  public subscribe(destination: string, callback: (message: IMessage) => void) {
+  public subscribe(
+    destination: string,
+    callback: (message: IMessage) => void,
+    headers?: StompHeaders,
+  ) {
     if (!this.client || !this.client.connected) {
       console.warn('소켓이 연결되어 있지 않아 구독할 수 없습니다.');
       return null;
     }
     // 구독 객체 반환 (나중에 unsubscribe 할 때 필요함)
-    return this.client.subscribe(destination, callback);
+    return this.client.subscribe(destination, callback, headers);
   }
 
   /**

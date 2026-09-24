@@ -10,6 +10,8 @@ interface LiveShareModalProps {
   isError: boolean;
   errorType: LiveShareErrorType;
   toggleModal: () => void;
+  /** 다른 탭/기기에 밀려난 뒤 이 화면에서 공유를 다시 시작합니다. */
+  onRestart?: () => void;
 }
 
 export default function LiveShareModal({
@@ -18,12 +20,20 @@ export default function LiveShareModal({
   isError,
   errorType,
   toggleModal,
+  onRestart,
 }: LiveShareModalProps) {
   const { t } = useTranslation();
-  const errorMessage =
-    errorType === 'token'
-      ? t('사회자 인증 토큰 발급에 실패했어요...')
-      : t('라이브 서버 연결에 실패했어요...');
+  const isReplaced = errorType === 'replaced';
+  const errorTitle = isReplaced
+    ? t('다른 곳에서 공유 중')
+    : t('라이브 공유 불가');
+  const errorMessage = {
+    token: t('사회자 인증 토큰 발급에 실패했어요...'),
+    replaced: t(
+      '다른 탭이나 기기에서 라이브 공유를 시작해서 이 화면의 공유를 멈췄어요.',
+    ),
+    else: t('라이브 서버 연결에 실패했어요...'),
+  }[errorType];
 
   return (
     <div className="flex h-[250px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover p-6">
@@ -39,7 +49,7 @@ export default function LiveShareModal({
         <>
           <div className="relative flex w-full items-center justify-center">
             <h1 className="text-lg font-bold">
-              {isError ? t('라이브 공유 불가') : t('토론 타이머 화면 공유')}
+              {isError ? errorTitle : t('토론 타이머 화면 공유')}
             </h1>
 
             <button
@@ -72,7 +82,19 @@ export default function LiveShareModal({
               </div>
             </>
           ) : (
-            <p className="text-[12px] text-default-neutral">{errorMessage}</p>
+            <>
+              <p className="text-[12px] text-default-neutral">{errorMessage}</p>
+
+              {isReplaced && onRestart && (
+                <button
+                  type="button"
+                  onClick={onRestart}
+                  className="w-full rounded-full bg-brand px-4 py-2 text-[14px] font-semibold text-default-black transition-colors hover:bg-brand-hover"
+                >
+                  {t('이 화면에서 다시 공유하기')}
+                </button>
+              )}
+            </>
           )}
         </>
       )}
