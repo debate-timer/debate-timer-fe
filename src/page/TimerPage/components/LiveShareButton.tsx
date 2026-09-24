@@ -30,7 +30,7 @@ export default function LiveShareButton({
           <span
             data-testid="live-share-pulse"
             aria-hidden="true"
-            className="absolute right-[6px] top-[6px] flex size-[14px]"
+            className="absolute bottom-[8px] left-1/2 flex size-[12px] -translate-x-1/2"
           >
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-semantic-error opacity-75" />
             <span className="relative inline-flex size-full rounded-full border-2 border-default-white bg-semantic-error" />
