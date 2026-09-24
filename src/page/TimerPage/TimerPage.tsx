@@ -113,6 +113,7 @@ export default function TimerPage() {
     isLoading: isSocketLoading,
     isError: isSocketError,
     errorType: socketErrorType,
+    restartLiveShare,
   } = useLiveShare(tableId, {
     onSyncRequest: () => syncRequestHandlerRef.current(),
   });
@@ -346,7 +347,10 @@ export default function TimerPage() {
                   ref={liveShareModalRef}
                 >
                   {!isLiveShareModalOpen && (
-                    <LiveShareButton onClick={toggleLiveShareModal} />
+                    <LiveShareButton
+                      onClick={toggleLiveShareModal}
+                      isSharing={isSocketConnected}
+                    />
                   )}
 
                   {isLiveShareModalOpen && (
@@ -357,6 +361,7 @@ export default function TimerPage() {
                         isError={isSocketError}
                         errorType={socketErrorType}
                         toggleModal={toggleLiveShareModal}
+                        onRestart={restartLiveShare}
                       />
                     </div>
                   )}
