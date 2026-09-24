@@ -47,6 +47,13 @@ export function useLiveShare(
     isLiveShareModalOpen && isValidTableId,
   );
 
+  // 사회자 채널을 (재)구독할 때 최신 사회자 토큰을 첨부하기 위해 ref로 보관
+  const chairmanTokenRef = useRef(chairmanToken);
+  useEffect(() => {
+    chairmanTokenRef.current = chairmanToken;
+  }, [chairmanToken]);
+  const getAuthToken = useCallback(() => chairmanTokenRef.current, []);
+
   // 소켓 훅
   const {
     connect,
@@ -55,7 +62,7 @@ export function useLiveShare(
     isReplaced,
     sendDebateEvent,
     error: socketError,
-  } = useChairmanSocket(tableId, { onSyncRequest });
+  } = useChairmanSocket(tableId, { onSyncRequest, getAuthToken });
 
   // 공유용 URL
   const shareUrl = useMemo(() => {

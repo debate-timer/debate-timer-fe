@@ -62,13 +62,20 @@ interface UseChairmanSocketOptions {
    * 연결된 동안에는 heartbeat로 `CHAIRMAN_HEARTBEAT_INTERVAL_MS`마다 호출됩니다.
    */
   onSyncRequest?: () => void;
+
+  /**
+   * 사회자 채널을 구독할 때 첨부할 사회자 토큰을 반환합니다.
+   * 서버는 유효한 사회자 토큰을 가진 테이블 소유자의 구독만 허용합니다.
+   * 재연결 후 다시 구독할 때마다 호출되므로 갱신된 토큰이 첨부됩니다.
+   */
+  getAuthToken?: () => string | null | undefined;
 }
 
 export default function useChairmanSocket(
   roomId: number,
   options: UseChairmanSocketOptions = {},
 ) {
-  const { onSyncRequest } = options;
+  const { onSyncRequest, getAuthToken } = options;
   const queryClient = useQueryClient();
   const {
     connect,
@@ -96,6 +103,11 @@ export default function useChairmanSocket(
   useEffect(() => {
     onSyncRequestRef.current = onSyncRequest;
   }, [onSyncRequest]);
+
+  const getAuthTokenRef = useRef(getAuthToken);
+  useEffect(() => {
+    getAuthTokenRef.current = getAuthToken;
+  }, [getAuthToken]);
 
   // 마지막으로 발행한 이벤트의 version
   const versionRef = useRef(0);
@@ -148,7 +160,11 @@ export default function useChairmanSocket(
   useEffect(() => {
     return addConnectionListener(() => {
       resetSignalState();
-      onSyncRequestRef.current?.();
+      // 연결 리스너는 채널 재구독보다 먼저 실행되므로, 사회자 채널 구독(활성 사회자 등록)이
+      // 서버에 먼저 도착하도록 재구독이 끝난 뒤에 현재 상태를 공유한다
+      queueMicrotask(() => {
+        onSyncRequestRef.current?.();
+      });
     });
   }, [addConnectionListener, resetSignalState]);
 
@@ -183,7 +199,13 @@ export default function useChairmanSocket(
         setLastSignalTime(Date.now());
         onSyncRequestRef.current?.();
       },
-      () => ({ [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current }),
+      () => {
+        const authToken = getAuthTokenRef.current?.();
+        return {
+          [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current,
+          ...(authToken ? { Authorization: authToken } : {}),
+        };
+      },
     );
 
     return () => {
