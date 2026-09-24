@@ -8,8 +8,30 @@ import {
   TimeBasedStance,
   TimerBGState,
 } from '../../../type/type';
-import { getTimerStatusByTime } from '../../../util/timerBackground';
 
+const TIME_THRESHOLDS = {
+  WARNING_MAX: 30,
+  DANGER_MAX: 10,
+  DANGER_MIN: 0,
+} as const;
+
+/**
+ * 타이머 상태(색상)를 계산한다.
+ * isRunning이 false면 항상 'default' 반환.
+ */
+function getTimerStatusByTime(
+  time: number | null,
+  isRunning: boolean,
+): TimerBGState {
+  if (!isRunning) return 'default';
+  if (typeof time !== 'number') return 'default';
+  if (time > TIME_THRESHOLDS.DANGER_MAX && time <= TIME_THRESHOLDS.WARNING_MAX)
+    return 'warning';
+  if (time >= TIME_THRESHOLDS.DANGER_MIN && time <= TIME_THRESHOLDS.DANGER_MAX)
+    return 'danger';
+  if (time < TIME_THRESHOLDS.DANGER_MIN) return 'expired';
+  return 'default';
+}
 interface UseTimerBackgroundProps {
   timer1: TimeBasedTimerLogics;
   timer2: TimeBasedTimerLogics;
