@@ -330,7 +330,7 @@ describe('useChairmanSocket', () => {
     expect(latestCallback).toHaveBeenCalledTimes(1);
   });
 
-  it('소켓이 연결(재연결 포함)되면 onSyncRequest를 호출해 현재 상태를 먼저 공유해야 한다', () => {
+  it('소켓이 연결(재연결 포함)되면 채널 재구독이 끝난 뒤 onSyncRequest를 호출해 현재 상태를 먼저 공유해야 한다', async () => {
     const connectionListeners: Array<() => void> = [];
     addConnectionListener.mockImplementation((listener: () => void) => {
       connectionListeners.push(listener);
@@ -342,6 +342,13 @@ describe('useChairmanSocket', () => {
 
     act(() => {
       connectionListeners.forEach((listener) => listener());
+    });
+
+    // 연결 리스너 실행 시점(재구독 전)에는 아직 공유하지 않는다
+    expect(onSyncRequest).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await Promise.resolve();
     });
 
     expect(onSyncRequest).toHaveBeenCalledTimes(1);
@@ -367,6 +374,44 @@ describe('useChairmanSocket', () => {
         sessionId: () => resolveHeaders()['X-Chairman-Session'],
       };
     }
+
+    it('사회자 채널을 구독할 때 최신 사회자 토큰을 첨부해야 한다', () => {
+      let resolveHeaders: () => Record<string, string> = () => ({});
+      subscribe.mockImplementation(
+        (
+          _destination: string,
+          _callback: (message: IMessage) => void,
+          headers: () => Record<string, string>,
+        ) => {
+          resolveHeaders = headers;
+        },
+      );
+      let token = 'first-token';
+
+      renderHook(() => useChairmanSocket(123, { getAuthToken: () => token }));
+
+      expect(resolveHeaders().Authorization).toBe('first-token');
+
+      token = 'refreshed-token';
+      expect(resolveHeaders().Authorization).toBe('refreshed-token');
+    });
+
+    it('사회자 토큰이 없으면 Authorization 헤더를 첨부하지 않아야 한다', () => {
+      let resolveHeaders: () => Record<string, string> = () => ({});
+      subscribe.mockImplementation(
+        (
+          _destination: string,
+          _callback: (message: IMessage) => void,
+          headers: () => Record<string, string>,
+        ) => {
+          resolveHeaders = headers;
+        },
+      );
+
+      renderHook(() => useChairmanSocket(123, { getAuthToken: () => null }));
+
+      expect(resolveHeaders()).not.toHaveProperty('Authorization');
+    });
 
     it('사회자 채널 구독과 이벤트 발행에 같은 사회자 세션 식별자를 첨부해야 한다', () => {
       const channel = captureChairmanChannel();
