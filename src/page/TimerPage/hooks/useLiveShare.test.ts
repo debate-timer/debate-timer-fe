@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLiveShare } from './useLiveShare';
 
 const useChairmanSocketMock = vi.hoisted(() => vi.fn());
@@ -20,10 +20,27 @@ vi.mock('../../../apis/sockets/SocketManager', () => ({
   },
 }));
 
+function createToken(expiresAtMs: number) {
+  const payload = btoa(
+    JSON.stringify({ sub: 'a', exp: Math.floor(expiresAtMs / 1000) }),
+  );
+  return `header.${payload}.signature`;
+}
+
 describe('useLiveShare', () => {
   const connect = vi.fn();
   const disconnect = vi.fn();
   const sendDebateEvent = vi.fn();
+  const refetch = vi.fn();
+
+  function mockChairmanToken(token: string) {
+    useGetChairmanTokenMock.mockReturnValue({
+      data: token,
+      isPending: false,
+      isError: false,
+      refetch,
+    });
+  }
 
   function mockChairmanSocket(
     overrides: Partial<{ isConnected: boolean; isReplaced: boolean }> = {},
@@ -41,12 +58,12 @@ describe('useLiveShare', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useGetChairmanTokenMock.mockReturnValue({
-      data: 'chairman-token',
-      isPending: false,
-      isError: false,
-    });
+    mockChairmanToken('chairman-token');
     mockChairmanSocket();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('모달을 열면 사회자 토큰으로 소켓 연결을 시작한다', () => {
@@ -96,6 +113,65 @@ describe('useLiveShare', () => {
       });
 
       expect(connect).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('사회자 토큰 갱신', () => {
+    const NOW = new Date('2026-09-25T00:00:00Z').getTime();
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(NOW);
+    });
+
+    it('공유 중이면 토큰 만료 1분 전에 새 토큰을 요청한다', () => {
+      mockChairmanToken(createToken(NOW + 10 * 60 * 1000));
+      mockChairmanSocket({ isConnected: true });
+
+      renderHook(() => useLiveShare(1));
+
+      vi.advanceTimersByTime(9 * 60 * 1000 - 1);
+      expect(refetch).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1);
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('공유 중이 아니면 토큰을 갱신하지 않는다', () => {
+      mockChairmanToken(createToken(NOW + 2 * 60 * 1000));
+
+      renderHook(() => useLiveShare(1));
+      vi.advanceTimersByTime(10 * 60 * 1000);
+
+      expect(refetch).not.toHaveBeenCalled();
+    });
+
+    it('이미 만료된 토큰으로 이벤트를 보내면 새 토큰을 요청하고 이벤트는 그대로 보낸다', () => {
+      const expiredToken = createToken(NOW - 1000);
+      mockChairmanToken(expiredToken);
+      const { result } = renderHook(() => useLiveShare(1));
+
+      act(() => {
+        result.current.issueEvent('FINISHED', null);
+      });
+
+      expect(refetch).toHaveBeenCalledTimes(1);
+      expect(sendDebateEvent).toHaveBeenCalledWith(
+        'FINISHED',
+        null,
+        expiredToken,
+      );
+    });
+
+    it('유효한 토큰으로 이벤트를 보내면 토큰을 다시 요청하지 않는다', () => {
+      mockChairmanToken(createToken(NOW + 10 * 60 * 1000));
+      const { result } = renderHook(() => useLiveShare(1));
+
+      act(() => {
+        result.current.issueEvent('FINISHED', null);
+      });
+
+      expect(refetch).not.toHaveBeenCalled();
     });
   });
 });
