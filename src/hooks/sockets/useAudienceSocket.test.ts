@@ -565,5 +565,43 @@ describe('useAudienceSocket', () => {
 
       expect(result.current.lastReceivedAt).toBeNull();
     });
+
+    describe('사회자 부재 알림', () => {
+      const absentMessage = JSON.stringify({
+        eventType: 'CHAIRMAN_ABSENT',
+        data: null,
+        version: null,
+        serverTime: 1,
+      });
+
+      it('사회자 부재 알림을 받으면 수신 시각을 chairmanAbsentAt으로 노출해야 한다', () => {
+        const { result, receive } = setup();
+
+        receive(absentMessage);
+
+        expect(result.current.chairmanAbsentAt).toBe(Date.now());
+      });
+
+      it('사회자 부재 알림은 사회자 메시지 수신 기록과 최신 메시지에 반영하지 않아야 한다', () => {
+        const { result, receive } = setup();
+
+        receive(JSON.stringify(createMessage(10)));
+        const lastReceivedAt = result.current.lastReceivedAt;
+        vi.advanceTimersByTime(1000);
+        receive(absentMessage);
+
+        expect(result.current.lastReceivedAt).toBe(lastReceivedAt);
+        expect(result.current.latestMessage?.eventType).toBe('SYNC');
+      });
+
+      it('재연결되면 chairmanAbsentAt을 초기화해야 한다', () => {
+        const { result, receive, reconnect } = setup();
+
+        receive(absentMessage);
+        reconnect();
+
+        expect(result.current.chairmanAbsentAt).toBeNull();
+      });
+    });
   });
 });

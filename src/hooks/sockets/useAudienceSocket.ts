@@ -18,7 +18,8 @@ import { isSocketMessage } from '../../apis/sockets/util';
  * @returns {Object} 청중 소켓 상태와 제어 함수를 반환합니다.
  * @returns {SocketMessage | null} returns.latestMessage - 검증된 가장 최근의 수신 메시지입니다.
  * @returns {number | null} returns.latestMessageReceivedAt - `latestMessage`를 수신한 시각입니다. 네트워크 지연 보정의 기준으로 사용합니다.
- * @returns {number | null} returns.lastReceivedAt - 형식이 올바른 메시지를 마지막으로 수신한 시각입니다. version이 오래되어 반영하지 않은 메시지도 포함합니다.
+ * @returns {number | null} returns.lastReceivedAt - 형식이 올바른 사회자 메시지를 마지막으로 수신한 시각입니다. version이 오래되어 반영하지 않은 메시지도 포함합니다.
+ * @returns {number | null} returns.chairmanAbsentAt - 서버로부터 활성 사회자가 없다는 알림(`CHAIRMAN_ABSENT`)을 마지막으로 받은 시각입니다.
  * @returns {boolean} returns.isConnected - 소켓 연결 상태입니다.
  * @returns {Function} returns.connect - `useSocket.connect`에 위임하기 전에 현재 메시지를 초기화합니다.
  * @returns {Function} returns.disconnect - `useSocket.disconnect`에 위임하기 전에 현재 메시지를 초기화합니다.
@@ -54,6 +55,9 @@ export default function useAudienceSocket(
   // 형식이 올바른 메시지를 마지막으로 수신한 시각 (사회자 연결 여부 판단에 사용)
   const [lastReceivedAt, setLastReceivedAt] = useState<number | null>(null);
 
+  // 서버가 활성 사회자가 없다고 알린 시각 (사회자 메시지가 아니므로 lastReceivedAt과 따로 관리)
+  const [chairmanAbsentAt, setChairmanAbsentAt] = useState<number | null>(null);
+
   // 마지막으로 반영한 메시지의 version (이보다 작거나 같은 메시지는 오래된 것으로 간주)
   const lastVersionRef = useRef<number | null>(null);
 
@@ -66,6 +70,7 @@ export default function useAudienceSocket(
     setLatestMessage(null);
     setLatestMessageReceivedAt(null);
     setLastReceivedAt(null);
+    setChairmanAbsentAt(null);
     lastVersionRef.current = null;
   }, []);
 
@@ -111,6 +116,12 @@ export default function useAudienceSocket(
       try {
         const parsedData = JSON.parse(message.body);
         if (isSocketMessage(parsedData)) {
+          // 사회자 부재 알림은 서버가 보낸 것이므로 사회자 메시지 수신 기록과 version 기준에 반영하지 않는다
+          if (parsedData.eventType === 'CHAIRMAN_ABSENT') {
+            setChairmanAbsentAt(Date.now());
+            return;
+          }
+
           // 오래된 version이라 반영하지 않더라도 사회자가 메시지를 보내고 있다는 신호로 본다
           const receivedAt = Date.now();
           setLastReceivedAt(receivedAt);
@@ -152,6 +163,7 @@ export default function useAudienceSocket(
     latestMessage,
     latestMessageReceivedAt,
     lastReceivedAt,
+    chairmanAbsentAt,
     isConnected,
     error,
     connect: connectAudienceSocket,

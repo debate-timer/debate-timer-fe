@@ -79,6 +79,7 @@ describe('useSocket', () => {
     expect(socketManagerMock.subscribe).toHaveBeenCalledWith(
       '/topic/test',
       callback,
+      undefined,
     );
 
     act(() => {
@@ -152,6 +153,52 @@ describe('useSocket', () => {
     expect(socketManagerMock.subscribe).toHaveBeenCalledWith(
       '/topic/recover',
       callback,
+      undefined,
+    );
+  });
+
+  it('구독 헤더를 함께 전달해야 한다', () => {
+    const callback = vi.fn();
+    socketManagerMock.isConnected.mockReturnValue(true);
+    socketManagerMock.subscribe.mockReturnValue(createSubscription());
+
+    const { result } = renderHook(() => useSocket());
+
+    act(() => {
+      result.current.subscribe('/topic/header', callback, { 'X-Test': 'a' });
+    });
+
+    expect(socketManagerMock.subscribe).toHaveBeenCalledWith(
+      '/topic/header',
+      callback,
+      { 'X-Test': 'a' },
+    );
+  });
+
+  it('구독 헤더를 함수로 전달하면 재구독할 때마다 최신 값을 첨부해야 한다', () => {
+    const callback = vi.fn();
+    let headerValue = 'first';
+    socketManagerMock.subscribe.mockReturnValue(createSubscription());
+
+    const { result } = renderHook(() => useSocket());
+
+    act(() => {
+      result.current.subscribe('/topic/header', callback, () => ({
+        'X-Test': headerValue,
+      }));
+    });
+
+    headerValue = 'second';
+    socketManagerMock.subscribe.mockClear();
+
+    act(() => {
+      getConnectListener()();
+    });
+
+    expect(socketManagerMock.subscribe).toHaveBeenCalledWith(
+      '/topic/header',
+      callback,
+      { 'X-Test': 'second' },
     );
   });
 
@@ -178,6 +225,7 @@ describe('useSocket', () => {
     expect(socketManagerMock.subscribe).toHaveBeenCalledWith(
       '/topic/recover',
       recoverCallback,
+      undefined,
     );
     expect(connectionListener.mock.invocationCallOrder[0]).toBeLessThan(
       socketManagerMock.subscribe.mock.invocationCallOrder[0],

@@ -1,16 +1,40 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { IMessage } from '@stomp/stompjs';
 import {
+  CHAIRMAN_SESSION_HEADER,
   SocketEventType,
   SocketMessage,
   TimerDataPayload,
 } from '../../apis/sockets/type';
-import { isTimerEventType } from '../../apis/sockets/util';
+import { isChairmanNotice, isTimerEventType } from '../../apis/sockets/util';
 import { chairmanTokenQueryKey } from '../query/useGetChairmanToken';
 import useSocket from './useSocket';
 
 // 청중이 사회자 연결 여부를 판단할 수 있도록 현재 상태를 주기적으로 공유하는 간격
 export const CHAIRMAN_HEARTBEAT_INTERVAL_MS = 5000;
+
+/**
+ * 공유를 시작할 때마다 새 사회자 세션 식별자를 만든다.
+ * `crypto.randomUUID`는 보안 컨텍스트(HTTPS)에서만 제공되므로 없으면 시각과 난수로 대신한다.
+ */
+export function createChairmanSessionId(): string {
+  if (
+    typeof crypto !== 'undefined' &&
+    typeof crypto.randomUUID === 'function'
+  ) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function parseMessageBody(message: IMessage): unknown {
+  try {
+    return JSON.parse(message.body);
+  } catch {
+    return null;
+  }
+}
 
 /**
  * 사회자 전용 웹소켓 훅입니다.
@@ -29,6 +53,7 @@ export const CHAIRMAN_HEARTBEAT_INTERVAL_MS = 5000;
  * @returns {Function} returns.connect - `useSocket.connect`에 위임하기 전에 현재 신호 상태를 초기화합니다.
  * @returns {Function} returns.disconnect - `useSocket.disconnect`에 위임하기 전에 현재 신호 상태를 초기화합니다.
  * @returns {Function} returns.sendDebateEvent - 현재 방으로 사회자 토론 이벤트를 발행합니다.
+ * @returns {boolean} returns.isReplaced - 다른 탭/기기에서 공유를 시작해 이 세션이 발행 권한을 잃었는지 여부입니다.
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
 interface UseChairmanSocketOptions {
@@ -59,6 +84,13 @@ export default function useChairmanSocket(
   const [signalCount, setSignalCount] = useState<number>(0);
   const [lastSignalTime, setLastSignalTime] = useState<number | null>(null);
 
+  // 다른 사회자 세션이 활성 사회자가 되어 이 세션이 밀려났는지 여부
+  const [isReplaced, setIsReplaced] = useState<boolean>(false);
+
+  // 서버가 룸의 활성 사회자를 구분하는 식별자
+  // 공유를 시작(connect)할 때마다 새로 만들고, 같은 공유 중 자동 재연결에서는 유지한다
+  const chairmanSessionIdRef = useRef<string>(createChairmanSessionId());
+
   // 구독을 다시 맺지 않고도 최신 콜백을 호출하기 위해 ref로 보관
   const onSyncRequestRef = useRef(onSyncRequest);
   useEffect(() => {
@@ -86,6 +118,8 @@ export default function useChairmanSocket(
   const connectChairmanSocket = useCallback(
     (options?: Parameters<typeof connect>[0]) => {
       resetSignalState();
+      chairmanSessionIdRef.current = createChairmanSessionId();
+      setIsReplaced(false);
       connect(options);
     },
     [connect, resetSignalState],
@@ -118,22 +152,44 @@ export default function useChairmanSocket(
     });
   }, [addConnectionListener, resetSignalState]);
 
-  // 서버로부터 토론 이벤트를 갱신해달라는 요청을 받게 될 채널 구독
+  /**
+   * 다른 사회자 세션에 밀려나면 발행을 멈추고 연결을 끊는다.
+   * 자동 재연결로 발행 권한을 되찾으려 하지 않도록 수동 해제와 같은 방식으로 끊는다.
+   */
+  const handleReplaced = useCallback(() => {
+    setIsReplaced(true);
+    resetSignalState();
+    disconnect();
+  }, [disconnect, resetSignalState]);
+
+  // 서버로부터 토론 이벤트를 갱신해달라는 요청과 활성 사회자 교체 알림을 받게 될 채널 구독
   useEffect(() => {
     const destination = `/chairman/${roomId}`;
 
     resetSignalState();
 
-    subscribe(destination, () => {
-      setSignalCount((prev) => prev + 1);
-      setLastSignalTime(Date.now());
-      onSyncRequestRef.current?.();
-    });
+    subscribe(
+      destination,
+      (message: IMessage) => {
+        const notice = parseMessageBody(message);
+        if (isChairmanNotice(notice) && notice.type === 'REPLACED') {
+          if (notice.activeSessionId !== chairmanSessionIdRef.current) {
+            handleReplaced();
+          }
+          return;
+        }
+
+        setSignalCount((prev) => prev + 1);
+        setLastSignalTime(Date.now());
+        onSyncRequestRef.current?.();
+      },
+      () => ({ [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current }),
+    );
 
     return () => {
       unsubscribe(destination);
     };
-  }, [roomId, resetSignalState, subscribe, unsubscribe]);
+  }, [roomId, handleReplaced, resetSignalState, subscribe, unsubscribe]);
 
   // 연결된 동안 현재 상태를 주기적으로 공유해 청중이 사회자 연결 끊김을 감지할 수 있게 한다
   useEffect(() => {
@@ -191,7 +247,10 @@ export default function useChairmanSocket(
       }
 
       versionRef.current = version;
-      publish(destination, body, { Authorization: authToken });
+      publish(destination, body, {
+        Authorization: authToken,
+        [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current,
+      });
     },
     [roomId, publish],
   );
@@ -203,6 +262,7 @@ export default function useChairmanSocket(
     disconnect: disconnectChairmanSocket,
     sendDebateEvent,
     isConnected,
+    isReplaced,
     error,
   };
 }
