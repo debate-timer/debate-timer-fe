@@ -45,6 +45,7 @@ describe('useAudienceShareState', () => {
       latestMessage: null,
       latestMessageReceivedAt: null,
       lastReceivedAt: null,
+      chairmanAbsentAt: null,
       isConnected: false,
       error: null,
     });
@@ -64,6 +65,7 @@ describe('useAudienceShareState', () => {
       latestMessage: null,
       latestMessageReceivedAt: null,
       lastReceivedAt: null,
+      chairmanAbsentAt: null,
       isConnected: true,
       error: null,
       ...state,
@@ -644,7 +646,7 @@ describe('useAudienceShareState', () => {
       version: 1,
     };
 
-    it('연결 후 사회자 메시지를 한 번도 받지 못하면 waiting이다', () => {
+    it('연결 후 사회자 메시지를 아직 받지 못하면 waiting이다', () => {
       setSocketState({ isConnected: true, latestMessage: null });
 
       const { result } = renderHook(() =>
@@ -652,10 +654,96 @@ describe('useAudienceShareState', () => {
       );
 
       act(() => {
+        vi.advanceTimersByTime(14999);
+      });
+
+      expect(result.current.chairmanPresence).toBe('waiting');
+    });
+
+    it('연결 후 15초 동안 사회자 메시지를 한 번도 받지 못하면 absent가 된다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(15000);
+      });
+
+      expect(result.current.chairmanPresence).toBe('absent');
+    });
+
+    it('연결되지 않은 동안에는 첫 메시지 대기 시간을 재지 않는다', () => {
+      setSocketState({ isConnected: false, latestMessage: null });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
         vi.advanceTimersByTime(60 * 1000);
       });
 
       expect(result.current.chairmanPresence).toBe('waiting');
+    });
+
+    it('서버가 사회자 부재를 알리면 바로 absent가 된다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: Date.now(),
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.chairmanPresence).toBe('absent');
+    });
+
+    it('사회자 부재 알림 이후 사회자 메시지를 받으면 present로 바뀐다', () => {
+      const absentAt = Date.now();
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: absentAt,
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+        chairmanAbsentAt: absentAt,
+      });
+      rerender();
+
+      expect(result.current.chairmanPresence).toBe('present');
+    });
+
+    it('사회자 메시지 이후 사회자 부재 알림을 받으면 absent가 된다', () => {
+      const receivedAt = Date.now();
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: receivedAt,
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: receivedAt,
+        chairmanAbsentAt: Date.now(),
+      });
+      rerender();
+
+      expect(result.current.chairmanPresence).toBe('absent');
     });
 
     it('사회자 메시지를 받으면 present이다', () => {

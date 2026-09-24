@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import clsx from 'clsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
@@ -19,6 +20,8 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import { getTimerStatusByTime } from '../../util/timerBackground';
+import { bgColorMap, TimerBGState } from '../../type/type';
 
 interface ErrorContentProps {
   message: string;
@@ -230,6 +233,26 @@ export default function AudienceSharePage() {
     }
   };
 
+  // 사회자 화면과 같은 기준으로 남은 시간에 따라 배경색을 바꾼다
+  // (30초 이하 노란색, 10초 이하 붉은색, 0초 미만 회색, 정지 중이면 기본색)
+  let timerBgState: TimerBGState = 'default';
+  if (viewState.type === 'NORMAL_TIMER') {
+    timerBgState = getTimerStatusByTime(
+      normalCountdown.currentSeconds ?? viewState.displayData.singleTime,
+      viewState.displayData.isRunning && !isChairmanAbsent,
+    );
+  } else if (viewState.type === 'TIME_BASED_TIMER') {
+    const currentTeamCountdown =
+      viewState.displayData.currentTeam === 'PROS'
+        ? timeBasedCountdown.pros
+        : timeBasedCountdown.cons;
+    timerBgState = getTimerStatusByTime(
+      currentTeamCountdown.currentSpeakingRemainingTime ??
+        currentTeamCountdown.totalRemainingTime,
+      currentTeamCountdown.isRunning,
+    );
+  }
+
   const isTimerVisible =
     viewState.type === 'NORMAL_TIMER' || viewState.type === 'TIME_BASED_TIMER';
   const shouldShowWaitingNotice =
@@ -266,8 +289,15 @@ export default function AudienceSharePage() {
           <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
       ) : null}
-      <DefaultLayout.ContentContainer>
-        <div className="relative flex h-full w-full flex-col">
+      <DefaultLayout.ContentContainer noPadding>
+        <div
+          data-testid="audience-content"
+          data-timer-bg={timerBgState}
+          className={clsx(
+            'relative flex h-full w-full flex-col px-4 py-4 transition-colors duration-300 md:px-8',
+            bgColorMap[timerBgState],
+          )}
+        >
           {shouldShowHeader ? (
             <p
               data-testid="mobile-agenda"

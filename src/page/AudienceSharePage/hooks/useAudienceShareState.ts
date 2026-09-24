@@ -28,9 +28,12 @@ export type AudienceShareState =
 
 /**
  * 사회자 연결 상태
- * - `waiting`: 연결 후 사회자 메시지를 아직 한 번도 받지 못함
+ * - `waiting`: 연결 후 `CHAIRMAN_ABSENT_TIMEOUT_MS`가 지나기 전이며 사회자 메시지를 아직 받지 못함
  * - `present`: 최근 `CHAIRMAN_ABSENT_TIMEOUT_MS` 안에 사회자 메시지를 받음
- * - `absent`: 사회자 메시지를 받은 적은 있으나 `CHAIRMAN_ABSENT_TIMEOUT_MS` 동안 수신이 없음
+ * - `absent`: 다음 중 하나
+ *   - 서버가 활성 사회자가 없다고 알린 뒤 사회자 메시지를 받지 못함
+ *   - 연결 후 `CHAIRMAN_ABSENT_TIMEOUT_MS` 동안 사회자 메시지를 한 번도 받지 못함
+ *   - 마지막 사회자 메시지 이후 `CHAIRMAN_ABSENT_TIMEOUT_MS` 동안 수신이 없음
  */
 export type ChairmanPresence = 'waiting' | 'present' | 'absent';
 
@@ -56,6 +59,7 @@ export function useAudienceShareState(
     latestMessage,
     latestMessageReceivedAt,
     lastReceivedAt,
+    chairmanAbsentAt,
     isConnected,
     error: socketError,
   } = useAudienceSocket(roomId, { enabled });
@@ -69,6 +73,8 @@ export function useAudienceShareState(
   const [syncedAt, setSyncedAt] = useState<number | null>(null);
 
   const [isChairmanAbsent, setIsChairmanAbsent] = useState<boolean>(false);
+  const [isFirstMessageTimedOut, setIsFirstMessageTimedOut] =
+    useState<boolean>(false);
 
   const cleanup = useCallback(() => {
     disconnect();
@@ -174,9 +180,34 @@ export function useAudienceShareState(
     };
   }, [lastReceivedAt]);
 
+  // 연결 후 일정 시간 동안 사회자 메시지를 한 번도 받지 못하면 사회자가 없는 것으로 판단
+  // (서버의 상태 공유 요청에 사회자가 응답하지 않는 경우)
+  useEffect(() => {
+    setIsFirstMessageTimedOut(false);
+
+    if (!enabled || !isConnected || lastReceivedAt !== null) {
+      return;
+    }
+
+    const firstMessageTimeout = setTimeout(() => {
+      setIsFirstMessageTimedOut(true);
+    }, CHAIRMAN_ABSENT_TIMEOUT_MS);
+
+    return () => {
+      clearTimeout(firstMessageTimeout);
+    };
+  }, [enabled, isConnected, lastReceivedAt]);
+
+  // 서버의 사회자 부재 알림 이후 사회자 메시지를 받지 못했다면 사회자가 없는 것으로 판단
+  const isChairmanAbsentNotified =
+    chairmanAbsentAt !== null &&
+    (lastReceivedAt === null || chairmanAbsentAt >= lastReceivedAt);
+
   let chairmanPresence: ChairmanPresence = 'present';
-  if (lastReceivedAt === null) {
-    chairmanPresence = 'waiting';
+  if (isChairmanAbsentNotified) {
+    chairmanPresence = 'absent';
+  } else if (lastReceivedAt === null) {
+    chairmanPresence = isFirstMessageTimedOut ? 'absent' : 'waiting';
   } else if (isChairmanAbsent) {
     chairmanPresence = 'absent';
   }
