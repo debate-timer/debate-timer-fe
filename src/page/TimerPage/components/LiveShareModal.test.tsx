@@ -204,6 +204,40 @@ describe('LiveShareModal', () => {
     ).toBeInTheDocument();
   });
 
+  test('먼저 누른 복사가 늦게 끝나도 마지막 복사 결과를 보여준다', async () => {
+    const user = userEvent.setup();
+    let rejectFirstCopy: (reason: Error) => void = () => {};
+    vi.spyOn(navigator.clipboard, 'writeText')
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_, reject) => {
+            rejectFirstCopy = reject;
+          }),
+      )
+      .mockResolvedValueOnce(undefined);
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(false),
+    });
+
+    renderLiveShareModal();
+
+    const copyButton = screen.getByRole('button', { name: COPY_LINK_LABEL });
+    await user.click(copyButton);
+    await user.click(copyButton);
+    expect(
+      screen.getByRole('button', { name: COPIED_LABEL }),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      rejectFirstCopy(new Error('denied'));
+    });
+
+    expect(
+      screen.getByRole('button', { name: COPIED_LABEL }),
+    ).toBeInTheDocument();
+  });
+
   test('오류 상태에서는 링크 공유 버튼을 보여주지 않는다', () => {
     renderLiveShareModal({ isError: true, errorType: 'else' });
 

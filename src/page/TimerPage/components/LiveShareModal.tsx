@@ -32,16 +32,23 @@ export default function LiveShareModal({
   const { t } = useTranslation();
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
   const copyFeedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const copyRequestIdRef = useRef(0);
 
   useEffect(() => {
     return () => clearTimeout(copyFeedbackTimerRef.current);
   }, []);
 
   const handleCopyLink = async () => {
+    // 연속 클릭 시 늦게 끝난 이전 복사 결과가 최신 결과를 덮어쓰지 않도록 합니다.
+    const requestId = ++copyRequestIdRef.current;
+    clearTimeout(copyFeedbackTimerRef.current);
+
     const isCopied = await copyToClipboard(shareUrl);
+    if (requestId !== copyRequestIdRef.current) {
+      return;
+    }
     setCopyStatus(isCopied ? 'copied' : 'failed');
 
-    clearTimeout(copyFeedbackTimerRef.current);
     copyFeedbackTimerRef.current = setTimeout(() => {
       setCopyStatus('idle');
     }, COPY_FEEDBACK_DURATION_MS);
