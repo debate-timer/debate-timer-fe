@@ -901,4 +901,52 @@ describe('AudienceSharePage', () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  describe('테이블 재조회 실패', () => {
+    it('이미 받아둔 테이블 정보가 있으면 소켓을 계속 유지한다', async () => {
+      let shouldFail = false;
+      server.use(
+        http.get(`${ApiUrl.live}/table/customize/:tableId`, () => {
+          if (shouldFail) {
+            return new HttpResponse(null, { status: 500 });
+          }
+          return HttpResponse.json(mockDebateTableData);
+        }),
+      );
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
+        connectionStatus: 'connected',
+        status: 'displaying',
+        syncedAt: null,
+        error: null,
+        displayData: {
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 30,
+          sequence: 0,
+        },
+      });
+
+      const { rerenderPage } = renderPage('/live/123');
+      await waitFor(() => {
+        expect(mockUseAudienceShareState).toHaveBeenCalledWith(123, {
+          enabled: true,
+          table: mockDebateTableData.table,
+        });
+      });
+
+      shouldFail = true;
+      mockUseAudienceShareState.mockClear();
+      rerenderPage();
+
+      await waitFor(() => {
+        expect(mockUseAudienceShareState).toHaveBeenCalledWith(123, {
+          enabled: true,
+          table: mockDebateTableData.table,
+        });
+      });
+      expect(await screen.findByTestId('timer-value')).toBeInTheDocument();
+    });
+  });
 });

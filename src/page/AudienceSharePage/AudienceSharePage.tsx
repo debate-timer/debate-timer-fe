@@ -74,8 +74,10 @@ export default function AudienceSharePage() {
   const debateTableQuery = useGetDebateTableDataForShare(
     isValidTableId ? tableId : undefined,
   );
+  // 테이블 정보를 한 번이라도 받았으면 소켓을 유지한다.
+  // 재조회에 실패했다고 소켓까지 내리면, 서버가 내려갔을 때 재연결과 연결 끊김 안내가 사라진다.
   const state = useAudienceShareState(tableId, {
-    enabled: isValidTableId && debateTableQuery.isSuccess,
+    enabled: isValidTableId && !!debateTableQuery.data,
     table: debateTableQuery.data?.table,
   });
 
