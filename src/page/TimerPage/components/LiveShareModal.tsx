@@ -24,14 +24,19 @@ export default function LiveShareModal({
 }: LiveShareModalProps) {
   const { t } = useTranslation();
   const isReplaced = errorType === 'replaced';
-  const errorTitle = isReplaced
-    ? t('다른 곳에서 공유 중')
-    : t('라이브 공유 불가');
+  const isDisconnected = errorType === 'disconnected';
+  let errorTitle = t('라이브 공유 불가');
+  if (isReplaced) {
+    errorTitle = t('다른 곳에서 공유 중');
+  } else if (isDisconnected) {
+    errorTitle = t('라이브 연결 끊김');
+  }
   const errorMessage = {
     token: t('사회자 인증 토큰 발급에 실패했어요...'),
     replaced: t(
       '다른 탭이나 기기에서 라이브 공유를 시작해서 이 화면의 공유를 멈췄어요.',
     ),
+    disconnected: t('라이브 서버와 연결이 끊겼어요. 새로고침 해주세요.'),
     else: t('라이브 서버 연결에 실패했어요...'),
   }[errorType];
 

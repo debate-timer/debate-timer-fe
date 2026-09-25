@@ -3,6 +3,7 @@ import { socketManager } from '../../../apis/sockets/SocketManager';
 import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
 import useGetChairmanToken from '../../../hooks/query/useGetChairmanToken';
 import { SocketEventType, TimerDataPayload } from '../../../apis/sockets/type';
+import { isSocketError } from '../../../apis/sockets/error';
 import { getJwtExpiresAt } from '../../../util/jwt';
 
 // 사회자 토큰이 만료되기 이 시간 전에 새 토큰을 받아 발행이 끊기지 않게 한다
@@ -12,9 +13,10 @@ export const CHAIRMAN_TOKEN_REFRESH_BEFORE_MS = 60 * 1000;
  * 라이브 공유 오류 유형
  * - `token`: 사회자 토큰 발급 실패 또는 잘못된 테이블
  * - `replaced`: 다른 탭/기기에서 공유를 시작해 이 화면의 공유가 멈춤
+ * - `disconnected`: 재연결 시도를 모두 소진해 자동으로 복구되지 않음 (새로고침 필요)
  * - `else`: 그 밖의 소켓 연결 오류
  */
-export type LiveShareErrorType = 'token' | 'replaced' | 'else';
+export type LiveShareErrorType = 'token' | 'replaced' | 'disconnected' | 'else';
 
 interface UseLiveShareOptions {
   /** 서버가 현재 타이머 상태 공유를 요청했을 때 호출됩니다. */
@@ -93,6 +95,11 @@ export function useLiveShare(
     errorType = 'token';
   } else if (isReplaced) {
     errorType = 'replaced';
+  } else if (
+    isSocketError(socketError) &&
+    socketError.code === 'SOCKET_RETRY_EXHAUSTED'
+  ) {
+    errorType = 'disconnected';
   }
 
   // 토큰을 첨부하여 토론 이벤트를 전송하는 함수

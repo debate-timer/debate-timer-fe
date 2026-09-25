@@ -170,8 +170,32 @@ describe('audienceScreenState', () => {
       const result = resolveAudienceScreenState(socketState, queryState, t);
       expect(result).toEqual({
         type: 'ERROR',
-        message: '필요한 데이터를 불러오지 못했어요. 다시 시도해보세요.',
+        message: '필요한 데이터를 불러오지 못했어요.\n다시 시도해보세요.',
       });
+    });
+
+    it('이미 받아둔 테이블 정보가 있으면 재조회에 실패해도 보던 화면을 유지한다', () => {
+      const socketState: AudienceShareState = {
+        status: 'displaying',
+        error: null,
+        syncedAt: null,
+        displayData: {
+          timerType: 'NORMAL',
+          currentTeam: null,
+          isRunning: false,
+          singleTime: 30,
+          sequence: 0,
+        },
+      };
+      const queryState: AudienceQueryState = {
+        data: mockTableData,
+        isLoading: false,
+        isError: true,
+      };
+
+      const result = resolveAudienceScreenState(socketState, queryState, t);
+
+      expect(result.type).toBe('NORMAL_TIMER');
     });
 
     it('쿼리가 로딩 중이면 LOADING 상태를 반환한다', () => {

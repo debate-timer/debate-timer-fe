@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SocketError } from '../../../apis/sockets/error';
 import { useLiveShare } from './useLiveShare';
 
 const useChairmanSocketMock = vi.hoisted(() => vi.fn());
@@ -43,7 +44,11 @@ describe('useLiveShare', () => {
   }
 
   function mockChairmanSocket(
-    overrides: Partial<{ isConnected: boolean; isReplaced: boolean }> = {},
+    overrides: Partial<{
+      isConnected: boolean;
+      isReplaced: boolean;
+      error: Error | null;
+    }> = {},
   ) {
     useChairmanSocketMock.mockReturnValue({
       connect,
@@ -172,6 +177,29 @@ describe('useLiveShare', () => {
       });
 
       expect(refetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('재연결 시도를 모두 소진했을 때', () => {
+    it('새로고침을 안내하는 오류 유형으로 알린다', () => {
+      mockChairmanSocket({
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+
+      const { result } = renderHook(() => useLiveShare(1));
+
+      expect(result.current.isError).toBe(true);
+      expect(result.current.errorType).toBe('disconnected');
+    });
+
+    it('그 밖의 소켓 오류는 기존 오류 유형을 유지한다', () => {
+      mockChairmanSocket({
+        error: new SocketError('SOCKET_STOMP_ERROR', 'STOMP 오류'),
+      });
+
+      const { result } = renderHook(() => useLiveShare(1));
+
+      expect(result.current.errorType).toBe('else');
     });
   });
 });

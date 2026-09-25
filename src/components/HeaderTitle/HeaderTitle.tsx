@@ -16,7 +16,7 @@ export default function HeaderTitle(props: HeaderTitleProps) {
         </div>
       )}
       {!isLoading && (
-        <h1 className="w-full max-w-[50vw] overflow-hidden text-ellipsis whitespace-nowrap text-xl md:text-3xl">
+        <h1 className="w-full max-w-[50vw] overflow-hidden text-ellipsis whitespace-nowrap text-xl leading-tight md:text-3xl short:text-xl">
           {title}
         </h1>
       )}

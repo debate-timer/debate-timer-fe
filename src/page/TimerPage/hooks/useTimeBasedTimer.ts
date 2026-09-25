@@ -38,6 +38,16 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
   const targetTimeRef = useRef<number | null>(null);
   const speakingTargetTimeRef = useRef<number | null>(null);
 
+  // 콜백에서 최신 남은 시간을 읽기 위한 레퍼런스
+  const totalTimerRef = useRef<number | null>(null);
+  const speakingTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    totalTimerRef.current = totalTimer;
+  }, [totalTimer]);
+  useEffect(() => {
+    speakingTimerRef.current = speakingTimer;
+  }, [speakingTimer]);
+
   /**
    * 타이머 시작을 위해 사용하는 저수준 함수
    */
@@ -260,6 +270,41 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     intervalRef.current = null;
   }, [pauseTimer]);
 
+  /**
+   * 남은 시간을 실제 시각 기준으로 즉시 다시 계산합니다.
+   * 백그라운드 탭에서는 브라우저가 인터벌을 억제해 표시가 밀리므로,
+   * 탭이 돌아왔을 때 다음 인터벌을 기다리지 않고 맞추는 데 사용합니다.
+   * @returns 보정된 전체/발언 남은 시간 (정지 상태면 현재 값 그대로)
+   */
+  const catchUpToClock = useCallback((): CaughtUpTimes => {
+    if (intervalRef.current === null || targetTimeRef.current === null) {
+      return {
+        totalTimer: totalTimerRef.current,
+        speakingTimer: speakingTimerRef.current,
+      };
+    }
+
+    const now = Date.now();
+    const remainingTotal = Math.max(
+      0,
+      Math.ceil((targetTimeRef.current - now) / 1000),
+    );
+    totalTimerRef.current = remainingTotal;
+    setTotalTimer(remainingTotal);
+
+    if (speakingTargetTimeRef.current === null) {
+      return { totalTimer: remainingTotal, speakingTimer: null };
+    }
+
+    const remainingSpeaking = Math.max(
+      0,
+      Math.ceil((speakingTargetTimeRef.current - now) / 1000),
+    );
+    speakingTimerRef.current = remainingSpeaking;
+    setSpeakingTimer(remainingSpeaking);
+    return { totalTimer: remainingTotal, speakingTimer: remainingSpeaking };
+  }, []);
+
   useEffect(() => () => pauseTimer(), [pauseTimer]);
 
   return {
@@ -278,7 +323,13 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     setDefaultTime,
     setIsDone,
     clearTimer,
+    catchUpToClock,
   };
+}
+
+export interface CaughtUpTimes {
+  totalTimer: number | null;
+  speakingTimer: number | null;
 }
 
 export interface TimeBasedTimerLogics {
@@ -305,4 +356,5 @@ export interface TimeBasedTimerLogics {
   >;
   setIsDone: Dispatch<SetStateAction<boolean>>;
   clearTimer: () => void;
+  catchUpToClock: () => CaughtUpTimes;
 }

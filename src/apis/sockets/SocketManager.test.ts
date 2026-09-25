@@ -509,6 +509,85 @@ describe('소켓 관리자 테스트', () => {
       expect(error.code).toBe('SOCKET_RETRY_EXHAUSTED');
     });
 
+    it('재시도 횟수 제한이 없으면 끊겨도 오류를 발행하지 않고 계속 재시도해야 한다', () => {
+      const listener = vi.fn();
+      socketManager.onErrorEvent(listener);
+      socketManager.connect({ maxRetries: null });
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 연결 성공
+
+      for (let attempt = 0; attempt < 10; attempt++) {
+        client.config.onWebSocketClose?.({} as CloseEvent);
+      }
+
+      expect(listener).not.toHaveBeenCalled();
+      expect(client.deactivate).not.toHaveBeenCalled();
+    });
+
+    it('제한 시간이 지나면 횟수가 남아 있어도 재시도를 멈춰야 한다', () => {
+      const listener = vi.fn();
+      const nowSpy = vi.spyOn(Date, 'now');
+      nowSpy.mockReturnValue(1_000_000);
+      socketManager.onErrorEvent(listener);
+      socketManager.connect({ maxRetries: null, retryDeadlineMs: 120000 });
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame); // 연결 성공
+
+      // 첫 끊김: 제한 시간 기준이 시작된다
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).not.toHaveBeenCalled();
+
+      // 제한 시간 직전: 아직 재시도한다
+      nowSpy.mockReturnValue(1_000_000 + 119_999);
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).not.toHaveBeenCalled();
+
+      // 제한 시간 경과: 포기한다
+      nowSpy.mockReturnValue(1_000_000 + 120_000);
+      client.config.onWebSocketClose?.({} as CloseEvent);
+      expect(listener).toHaveBeenCalledOnce();
+      const error = listener.mock.calls[0][0];
+      expect(error.code).toBe('SOCKET_RETRY_EXHAUSTED');
+      expect(error.message).toBe('재연결 제한 시간을 초과했습니다.');
+    });
+
+    it('재연결에 성공하면 제한 시간 기준을 다시 시작해야 한다', () => {
+      const listener = vi.fn();
+      const nowSpy = vi.spyOn(Date, 'now');
+      nowSpy.mockReturnValue(1_000_000);
+      socketManager.onErrorEvent(listener);
+      socketManager.connect({ maxRetries: null, retryDeadlineMs: 120000 });
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame);
+      client.config.onWebSocketClose?.({} as CloseEvent);
+
+      // 재연결 성공 후 한참 뒤에 다시 끊겨도 곧바로 포기하지 않는다
+      nowSpy.mockReturnValue(1_000_000 + 200_000);
+      client.config.onConnect?.({} as IFrame);
+      client.config.onWebSocketClose?.({} as CloseEvent);
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('재시도 대기 시간은 상한을 넘지 않아야 한다', () => {
+      socketManager.connect({
+        maxRetries: null,
+        baseRetryDelayMs: 1000,
+        maxRetryDelayMs: 5000,
+      });
+
+      const client = getLatestClient();
+      client.config.onConnect?.({} as IFrame);
+
+      for (let attempt = 0; attempt < 10; attempt++) {
+        client.config.onWebSocketClose?.({} as CloseEvent);
+        expect(client.reconnectDelay).toBeLessThanOrEqual(5000 + 10);
+      }
+    });
+
     it('명시적으로 연결을 끊은 뒤에는 늦게 도착한 이벤트가 오류를 발행하지 않아야 한다', () => {
       const listener = vi.fn();
       socketManager.onErrorEvent(listener);

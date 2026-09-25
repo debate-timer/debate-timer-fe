@@ -22,16 +22,18 @@ describe('LiveShareButton', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  test('공유 중이 아니면 펄스 점을 표시하지 않는다', () => {
+  test('공유 중이 아니면 깜빡이지 않는 회색 점을 표시한다', () => {
     render(<LiveShareButton onClick={vi.fn()} />);
 
     expect(screen.queryByTestId('live-share-pulse')).not.toBeInTheDocument();
+    expect(screen.getByTestId('live-share-idle-dot')).toBeInTheDocument();
   });
 
   test('공유 중이면 펄스 점을 표시하고 공유 중임을 알린다', () => {
     render(<LiveShareButton onClick={vi.fn()} isSharing />);
 
     expect(screen.getByTestId('live-share-pulse')).toBeInTheDocument();
+    expect(screen.queryByTestId('live-share-idle-dot')).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: '라이브 공유 중' }),
     ).toBeInTheDocument();

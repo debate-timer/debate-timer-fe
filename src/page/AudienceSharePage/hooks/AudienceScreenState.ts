@@ -106,10 +106,12 @@ export function resolveAudienceScreenState(
     };
   }
 
-  if (queryState.isError) {
+  // 이미 받아둔 테이블 정보가 있으면 재조회 실패로 보던 화면을 버리지 않는다
+  // (서버가 내려가면 소켓과 함께 재조회도 실패하는데, 이때 연결 끊김 안내가 가려지면 안 된다)
+  if (queryState.isError && !queryState.data) {
     return {
       type: 'ERROR',
-      message: t('필요한 데이터를 불러오지 못했어요. 다시 시도해보세요.'),
+      message: `${t('필요한 데이터를 불러오지 못했어요.')}\n${t('다시 시도해보세요.')}`,
     };
   }
 

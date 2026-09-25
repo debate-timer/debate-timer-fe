@@ -10,6 +10,7 @@ import {
   MockInstance,
 } from 'vitest';
 import type { SocketMessage } from '../../apis/sockets/type';
+import { socketManager } from '../../apis/sockets/SocketManager';
 import useAudienceSocket from './useAudienceSocket';
 
 const useSocketMock = vi.hoisted(() => vi.fn());
@@ -602,6 +603,80 @@ describe('useAudienceSocket', () => {
 
         expect(result.current.chairmanAbsentAt).toBeNull();
       });
+    });
+  });
+
+  describe('탭 복귀', () => {
+    const setVisibilityState = (state: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => state,
+      });
+    };
+
+    const returnToForeground = () => {
+      act(() => {
+        setVisibilityState('visible');
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-25T10:00:00Z'));
+      setVisibilityState('visible');
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('연결이 살아 있으면 복귀 시 채널을 다시 구독해 재동기화를 요청해야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+
+      renderHook(() => useAudienceSocket(123));
+      subscribe.mockClear();
+
+      returnToForeground();
+
+      expect(unsubscribe).toHaveBeenCalledWith('/room/123');
+      expect(subscribe).toHaveBeenCalledWith('/room/123', expect.any(Function));
+    });
+
+    it('연결이 끊겼으면 복귀 시 다시 연결해야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(false);
+
+      renderHook(() => useAudienceSocket(123));
+      subscribe.mockClear();
+
+      returnToForeground();
+
+      expect(connect).toHaveBeenCalledTimes(1);
+      expect(subscribe).not.toHaveBeenCalled();
+    });
+
+    it('짧은 간격으로 복귀를 반복해도 한 번만 재동기화를 요청해야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+
+      renderHook(() => useAudienceSocket(123));
+      subscribe.mockClear();
+
+      returnToForeground();
+      returnToForeground();
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+    });
+
+    it('비활성 상태에서는 복귀해도 재동기화하지 않아야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+
+      renderHook(() => useAudienceSocket(123, { enabled: false }));
+      subscribe.mockClear();
+
+      returnToForeground();
+
+      expect(subscribe).not.toHaveBeenCalled();
+      expect(connect).not.toHaveBeenCalled();
     });
   });
 });
