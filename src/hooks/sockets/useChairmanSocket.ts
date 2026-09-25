@@ -7,12 +7,17 @@ import {
   SocketMessage,
   TimerDataPayload,
 } from '../../apis/sockets/type';
+import { socketManager } from '../../apis/sockets/SocketManager';
 import { isChairmanNotice, isTimerEventType } from '../../apis/sockets/util';
+import useDocumentVisibility from '../useDocumentVisibility';
 import { chairmanTokenQueryKey } from '../query/useGetChairmanToken';
 import useSocket from './useSocket';
 
 // 청중이 사회자 연결 여부를 판단할 수 있도록 현재 상태를 주기적으로 공유하는 간격
 export const CHAIRMAN_HEARTBEAT_INTERVAL_MS = 5000;
+
+// 탭이 돌아왔을 때 상태 공유를 다시 시도하는 최소 간격
+const VISIBILITY_SYNC_THROTTLE_MS = 1000;
 
 /**
  * 공유를 시작할 때마다 새 사회자 세션 식별자를 만든다.
@@ -112,6 +117,9 @@ export default function useChairmanSocket(
   // 마지막으로 발행한 이벤트의 version
   const versionRef = useRef(0);
 
+  // 사용자가 공유를 시작했는지 여부 (탭 복귀 시 자동 재연결 여부를 가른다)
+  const hasStartedSharingRef = useRef(false);
+
   /**
    * 현재 사회자 소켓 세션에서 누적된 신호 메타데이터를 초기화합니다.
    * 세션 간에 오래된 신호 수나 타임스탬프가 남지 않도록, 래핑된 connect 및
@@ -132,6 +140,7 @@ export default function useChairmanSocket(
       resetSignalState();
       chairmanSessionIdRef.current = createChairmanSessionId();
       setIsReplaced(false);
+      hasStartedSharingRef.current = true;
       connect(options);
     },
     [connect, resetSignalState],
@@ -147,6 +156,7 @@ export default function useChairmanSocket(
    */
   const disconnectChairmanSocket = useCallback(() => {
     resetSignalState();
+    hasStartedSharingRef.current = false;
     disconnect();
     queryClient.removeQueries({
       queryKey: chairmanTokenQueryKey(String(roomId)),
@@ -175,8 +185,31 @@ export default function useChairmanSocket(
   const handleReplaced = useCallback(() => {
     setIsReplaced(true);
     resetSignalState();
+    hasStartedSharingRef.current = false;
     disconnect();
   }, [disconnect, resetSignalState]);
+
+  /**
+   * 백그라운드 탭에서 돌아오면 억제됐던 heartbeat를 기다리지 않고 곧바로 현재 상태를 공유한다.
+   * 청중은 사회자 메시지가 끊기면 연결이 끊긴 것으로 보기 때문에, 복귀 즉시 알려야 오해가 풀린다.
+   * 돌아왔을 때 연결이 이미 끊겨 있었다면 공유를 다시 시작한다.
+   */
+  const handleVisible = useCallback(() => {
+    if (!hasStartedSharingRef.current) {
+      return;
+    }
+
+    if (!socketManager.isConnected()) {
+      connectChairmanSocket();
+      return;
+    }
+
+    onSyncRequestRef.current?.();
+  }, [connectChairmanSocket]);
+
+  useDocumentVisibility(handleVisible, {
+    throttleMs: VISIBILITY_SYNC_THROTTLE_MS,
+  });
 
   // 서버로부터 토론 이벤트를 갱신해달라는 요청과 활성 사회자 교체 알림을 받게 될 채널 구독
   useEffect(() => {

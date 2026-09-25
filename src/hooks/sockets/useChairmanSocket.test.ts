@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import type { IMessage } from '@stomp/stompjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TimerDataPayload } from '../../apis/sockets/type';
+import { socketManager } from '../../apis/sockets/SocketManager';
 import useChairmanSocket from './useChairmanSocket';
 
 const useSocketMock = vi.hoisted(() => vi.fn());
@@ -604,6 +605,114 @@ describe('useChairmanSocket', () => {
       });
 
       expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('탭 복귀', () => {
+    const setConnected = (isConnected: boolean) => {
+      useSocketMock.mockReturnValue({
+        connect,
+        disconnect,
+        subscribe,
+        unsubscribe,
+        publish,
+        addConnectionListener,
+        isConnected,
+        error: null,
+      });
+    };
+
+    const setVisibilityState = (state: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => state,
+      });
+    };
+
+    const returnToForeground = () => {
+      act(() => {
+        setVisibilityState('visible');
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-25T10:00:00Z'));
+      setVisibilityState('visible');
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('공유를 시작하지 않았으면 복귀해도 아무것도 하지 않아야 한다', () => {
+      setConnected(false);
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(false);
+      const onSyncRequest = vi.fn();
+
+      renderHook(() => useChairmanSocket(123, { onSyncRequest }));
+      returnToForeground();
+
+      expect(connect).not.toHaveBeenCalled();
+      expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+
+    it('공유 중 연결이 살아 있으면 복귀 시 즉시 상태를 공유해야 한다', () => {
+      setConnected(true);
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+      const onSyncRequest = vi.fn();
+
+      const { result } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+      act(() => {
+        result.current.connect();
+      });
+      onSyncRequest.mockClear();
+
+      returnToForeground();
+
+      expect(onSyncRequest).toHaveBeenCalledTimes(1);
+      expect(connect).toHaveBeenCalledTimes(1);
+    });
+
+    it('공유 중 연결이 끊겼으면 복귀 시 다시 연결해야 한다', () => {
+      setConnected(false);
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(false);
+      const onSyncRequest = vi.fn();
+
+      const { result } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+      act(() => {
+        result.current.connect();
+      });
+      onSyncRequest.mockClear();
+
+      returnToForeground();
+
+      expect(connect).toHaveBeenCalledTimes(2);
+      expect(onSyncRequest).not.toHaveBeenCalled();
+    });
+
+    it('짧은 간격으로 복귀를 반복해도 한 번만 상태를 공유해야 한다', () => {
+      setConnected(true);
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+      const onSyncRequest = vi.fn();
+
+      const { result } = renderHook(() =>
+        useChairmanSocket(123, { onSyncRequest }),
+      );
+      act(() => {
+        result.current.connect();
+      });
+      onSyncRequest.mockClear();
+
+      returnToForeground();
+      returnToForeground();
+
+      expect(onSyncRequest).toHaveBeenCalledTimes(1);
     });
   });
 });
