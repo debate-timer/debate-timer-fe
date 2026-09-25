@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { vi } from 'vitest';
@@ -22,6 +22,9 @@ const ERROR_TITLE = '라이브 공유 불가';
 const TOKEN_ERROR_MESSAGE = '사회자 인증 토큰 발급에 실패했어요...';
 const LIVE_SERVER_ERROR_MESSAGE = '라이브 서버 연결에 실패했어요...';
 const CLOSE_LABEL = '모달 닫기';
+const COPY_LINK_LABEL = '링크 공유';
+const COPIED_LABEL = '링크 복사됨';
+const COPY_FAILED_LABEL = '링크 복사 실패';
 const QR_DESCRIPTION =
   '휴대폰 카메라로 QR 코드를 스캔하면 토론 타이머 화면이 자동으로 열립니다.';
 
@@ -139,5 +142,107 @@ describe('LiveShareModal', () => {
     expect(
       screen.getByText('라이브 서버와 연결이 끊겼어요. 새로고침 해주세요.'),
     ).toBeInTheDocument();
+  });
+
+  test('링크 공유 버튼을 클릭하면 QR 코드와 같은 URL을 클립보드에 복사한다', async () => {
+    const user = userEvent.setup();
+
+    renderLiveShareModal();
+
+    await user.click(screen.getByRole('button', { name: COPY_LINK_LABEL }));
+
+    expect(screen.getByLabelText('qr-code')).toHaveAttribute(
+      'data-value',
+      SHARE_URL,
+    );
+    await expect(navigator.clipboard.readText()).resolves.toBe(SHARE_URL);
+    expect(
+      screen.getByRole('button', { name: COPIED_LABEL }),
+    ).toBeInTheDocument();
+  });
+
+  test('복사 완료 표시는 잠시 후 원래 버튼 문구로 돌아간다', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+    try {
+      renderLiveShareModal();
+
+      await user.click(screen.getByRole('button', { name: COPY_LINK_LABEL }));
+      expect(
+        screen.getByRole('button', { name: COPIED_LABEL }),
+      ).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      expect(
+        screen.getByRole('button', { name: COPY_LINK_LABEL }),
+      ).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('클립보드 복사에 실패하면 실패 문구를 보여준다', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(
+      new Error('denied'),
+    );
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(false),
+    });
+
+    renderLiveShareModal();
+
+    await user.click(screen.getByRole('button', { name: COPY_LINK_LABEL }));
+
+    expect(
+      screen.getByRole('button', { name: COPY_FAILED_LABEL }),
+    ).toBeInTheDocument();
+  });
+
+  test('먼저 누른 복사가 늦게 끝나도 마지막 복사 결과를 보여준다', async () => {
+    const user = userEvent.setup();
+    let rejectFirstCopy: (reason: Error) => void = () => {};
+    vi.spyOn(navigator.clipboard, 'writeText')
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_, reject) => {
+            rejectFirstCopy = reject;
+          }),
+      )
+      .mockResolvedValueOnce(undefined);
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(false),
+    });
+
+    renderLiveShareModal();
+
+    const copyButton = screen.getByRole('button', { name: COPY_LINK_LABEL });
+    await user.click(copyButton);
+    await user.click(copyButton);
+    expect(
+      screen.getByRole('button', { name: COPIED_LABEL }),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      rejectFirstCopy(new Error('denied'));
+    });
+
+    expect(
+      screen.getByRole('button', { name: COPIED_LABEL }),
+    ).toBeInTheDocument();
+  });
+
+  test('오류 상태에서는 링크 공유 버튼을 보여주지 않는다', () => {
+    renderLiveShareModal({ isError: true, errorType: 'else' });
+
+    expect(
+      screen.queryByRole('button', { name: COPY_LINK_LABEL }),
+    ).not.toBeInTheDocument();
   });
 });
