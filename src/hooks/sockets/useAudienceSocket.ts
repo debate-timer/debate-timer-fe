@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IMessage } from '@stomp/stompjs';
 import useSocket from './useSocket';
+import { socketManager } from '../../apis/sockets/SocketManager';
 import { SocketMessage } from '../../apis/sockets/type';
 import { isSocketMessage } from '../../apis/sockets/util';
+import useDocumentVisibility from '../useDocumentVisibility';
+
+// 탭이 돌아왔을 때 재동기화를 다시 시도하는 최소 간격
+// 서버도 룸별로 상태 공유 요청 간격을 제한하지만, 불필요한 구독 왕복을 먼저 줄인다
+const VISIBILITY_RESYNC_THROTTLE_MS = 3000;
 
 /**
  * 청중 전용 웹소켓 훅입니다.
@@ -101,18 +107,8 @@ export default function useAudienceSocket(
     return addConnectionListener(resetMessage);
   }, [addConnectionListener, resetMessage]);
 
-  useEffect(() => {
-    if (!enabled) {
-      resetMessage();
-      return;
-    }
-
-    const destination = `/room/${roomId}`;
-
-    resetMessage();
-
-    // 토론 이벤트를 발행하는 채널 구독 및 메시지 수신 시 상태 업데이트
-    subscribe(destination, (message: IMessage) => {
+  const handleRoomMessage = useCallback(
+    (message: IMessage) => {
       try {
         const parsedData = JSON.parse(message.body);
         if (isSocketMessage(parsedData)) {
@@ -150,14 +146,64 @@ export default function useAudienceSocket(
       } catch (e) {
         console.log('메시지 파싱 오류:', e);
       }
-    });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!enabled) {
+      resetMessage();
+      return;
+    }
+
+    const destination = `/room/${roomId}`;
+
+    resetMessage();
+
+    // 토론 이벤트를 발행하는 채널 구독 및 메시지 수신 시 상태 업데이트
+    subscribe(destination, handleRoomMessage);
 
     // 컴포넌트 언마운트 또는 roomId 변경 시 해당 채널 구독 해제
     return () => {
       resetMessage();
       unsubscribe(destination);
     };
-  }, [enabled, roomId, resetMessage, subscribe, unsubscribe]);
+  }, [enabled, roomId, handleRoomMessage, resetMessage, subscribe, unsubscribe]);
+
+  /**
+   * 백그라운드 탭에서 돌아오면 현재 상태를 다시 받아온다.
+   * 연결이 살아 있으면 룸 채널을 다시 구독한다. 서버는 청중이 구독할 때 사회자에게
+   * 상태 공유를 요청하므로, 재구독이 곧 재동기화 요청이 된다.
+   * 연결이 끊긴 채로 돌아왔다면 다시 연결한다.
+   */
+  const handleVisible = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
+
+    if (!socketManager.isConnected()) {
+      connectAudienceSocket();
+      return;
+    }
+
+    const destination = `/room/${roomId}`;
+    unsubscribe(destination);
+    resetMessage();
+    subscribe(destination, handleRoomMessage);
+  }, [
+    connectAudienceSocket,
+    enabled,
+    handleRoomMessage,
+    resetMessage,
+    roomId,
+    subscribe,
+    unsubscribe,
+  ]);
+
+  useDocumentVisibility(handleVisible, {
+    throttleMs: VISIBILITY_RESYNC_THROTTLE_MS,
+    enabled,
+  });
 
   return {
     latestMessage,
