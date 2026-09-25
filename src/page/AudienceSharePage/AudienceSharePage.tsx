@@ -47,7 +47,7 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
         data-testid="audience-share-error-icon"
         aria-hidden="true"
       />
-      <p className="break-keep px-4 text-xl font-semibold text-gray-800 xl:text-2xl">
+      <p className="whitespace-pre-line break-keep px-4 text-center text-xl font-semibold text-gray-800 xl:text-2xl">
         {message}
       </p>
       <button
