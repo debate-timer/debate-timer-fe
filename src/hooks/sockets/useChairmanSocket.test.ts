@@ -97,7 +97,7 @@ describe('useChairmanSocket', () => {
 
     expect(result.current.signalCount).toBe(0);
     expect(result.current.lastSignalTime).toBeNull();
-    expect(connect).toHaveBeenCalledWith(options);
+    expect(connect).toHaveBeenCalledWith(expect.objectContaining(options));
   });
 
   it('disconnect 호출 시 signalCount와 lastSignalTime을 초기화해야 한다', () => {
@@ -606,6 +606,18 @@ describe('useChairmanSocket', () => {
 
       expect(onSyncRequest).not.toHaveBeenCalled();
     });
+  });
+
+  it('공유를 시작하면 횟수 제한 없는 재연결 정책으로 연결해야 한다', () => {
+    const { result } = renderHook(() => useChairmanSocket(123));
+
+    act(() => {
+      result.current.connect();
+    });
+
+    expect(connect).toHaveBeenCalledWith(
+      expect.objectContaining({ maxRetries: null, maxRetryDelayMs: 30000 }),
+    );
   });
 
   describe('탭 복귀', () => {

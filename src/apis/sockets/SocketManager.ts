@@ -5,8 +5,9 @@ import { SocketError } from './error';
 
 /**
  * 소켓 설정을 정하는 인터페이스
- * - `maxRetries` 최대 재시도 횟수 (기본값 3회)
+ * - `maxRetries` 최대 재시도 횟수 (기본값 3회, `null`이면 제한 없음)
  * - `baseRetryDelayMs` 기본 재시도 대기 시간 (기본값 1000 ms)
+ * - `maxRetryDelayMs` 재시도 대기 시간 상한 (기본값 30000 ms)
  * - `heartbeatInMs` 수신 하트비트 주기 (기본값 10000 ms)
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
  */
@@ -17,11 +18,14 @@ export interface SocketOptions {
   /** SockJS 연결에 사용할 API base URL. 지정하면 `${baseUrl}/ws`로 연결합니다. */
   baseUrl?: string;
 
-  /** 최대 재시도 횟수 (기본값: 3) */
-  maxRetries?: number;
+  /** 최대 재시도 횟수 (기본값: 3). `null`이면 횟수 제한 없이 계속 재연결합니다. */
+  maxRetries?: number | null;
 
   /** 지수 백오프 계산의 기준이 되는 초기 지연 시간 (기본값: 1000ms) */
   baseRetryDelayMs?: number;
+
+  /** 재시도 대기 시간의 상한 (기본값: 30000ms) */
+  maxRetryDelayMs?: number;
 
   /** 수신 하트비트 주기 (기본값: 10000ms) */
   heartbeatInMs?: number;
@@ -34,8 +38,9 @@ export interface SocketOptions {
 type ResolvedSocketOptions = {
   url?: string;
   baseUrl?: string;
-  maxRetries: number;
+  maxRetries: number | null;
   baseRetryDelayMs: number;
+  maxRetryDelayMs: number;
   heartbeatInMs: number;
   heartbeatOutMs: number;
 };
@@ -43,6 +48,7 @@ type ResolvedSocketOptions = {
 const DEFAULT_OPTIONS: ResolvedSocketOptions = {
   maxRetries: 3,
   baseRetryDelayMs: 1000,
+  maxRetryDelayMs: 30000,
   heartbeatInMs: 10000,
   heartbeatOutMs: 10000,
 };
@@ -152,7 +158,7 @@ class SocketManager {
    * HTTPS에서 WS로 업그레이드 시 청중과 사회자 모두 무인증으로 연결합니다.
    *
    * @param options - 소켓 클라이언트 동작을 제어하는 선택적 설정 객체
-   * @param options.maxRetries - 최대 재연결 시도 횟수 (기본값: 3)
+   * @param options.maxRetries - 최대 재연결 시도 횟수 (기본값: 3, `null`이면 제한 없음)
    * @param options.baseRetryDelayMs - 지수 백오프 계산의 기준이 되는 초기 지연 시간 (기본값: 1000)
    * @param options.heartbeatInMs - 서버 > 클라이언트 수신 하트비트 주기(ms) (기본값: 10000)
    * @param options.heartbeatOutMs - 클라이언트 > 서버 발신 하트비트 주기(ms) (기본값: 10000)
@@ -333,8 +339,9 @@ class SocketManager {
       return;
     }
 
-    // 재시도 횟수를 초과했을 경우 연결을 즉시 종료
-    if (this.retryCount >= this.currentOptions.maxRetries) {
+    // 재시도 횟수를 초과했을 경우 연결을 즉시 종료 (횟수 제한이 없으면 건너뛴다)
+    const { maxRetries } = this.currentOptions;
+    if (maxRetries !== null && this.retryCount >= maxRetries) {
       this.reportSocketError(
         new SocketError(
           'SOCKET_RETRY_EXHAUSTED',
@@ -356,8 +363,12 @@ class SocketManager {
     this.client.reconnectDelay = nextDelay;
     this.retryCount++;
 
+    const attemptLabel =
+      maxRetries === null
+        ? `${this.retryCount}회째`
+        : `${this.retryCount}/${maxRetries}`;
     console.log(
-      `🔄 재연결 시도 대기 중... (${this.retryCount}/${this.currentOptions.maxRetries}) - ${nextDelay}ms 후 시도`,
+      `🔄 재연결 시도 대기 중... (${attemptLabel}) - ${nextDelay}ms 후 시도`,
     );
   }
 
@@ -370,9 +381,11 @@ class SocketManager {
    * @returns 재연결 요청까지 필요한 딜레이 시간
    */
   private calculateBackoffDelay(currentRetryCount: number): number {
-    // 최대 지터 상한선 계산
-    const maxExponentialDelay =
-      this.currentOptions.baseRetryDelayMs * Math.pow(2, currentRetryCount);
+    // 최대 지터 상한선 계산 (상한을 넘지 않도록 자른다)
+    const maxExponentialDelay = Math.min(
+      this.currentOptions.baseRetryDelayMs * Math.pow(2, currentRetryCount),
+      this.currentOptions.maxRetryDelayMs,
+    );
 
     // 난수가 0이 될 경우 STOMP가 재연결 비활성화로 파악하는 것을 막기 위해
     // 계산한 값에 10 ms를 추가

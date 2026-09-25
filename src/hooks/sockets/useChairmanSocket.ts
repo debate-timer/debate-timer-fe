@@ -20,6 +20,17 @@ export const CHAIRMAN_HEARTBEAT_INTERVAL_MS = 5000;
 const VISIBILITY_SYNC_THROTTLE_MS = 1000;
 
 /**
+ * 사회자 소켓의 재연결 정책
+ * 서버는 활성 사회자 등록을 메모리로만 들고 있어, 사회자 연결이 끊긴 채 남으면 청중이
+ * 새로고침해도 복구되지 않는다. 룸당 사회자는 한 명뿐이라 계속 재시도해도 서버 부담이 작으므로,
+ * 횟수를 제한하지 않고 대기 시간만 상한을 둔다.
+ */
+const CHAIRMAN_SOCKET_OPTIONS = {
+  maxRetries: null,
+  maxRetryDelayMs: 30000,
+} as const;
+
+/**
  * 공유를 시작할 때마다 새 사회자 세션 식별자를 만든다.
  * `crypto.randomUUID`는 보안 컨텍스트(HTTPS)에서만 제공되므로 없으면 시각과 난수로 대신한다.
  */
@@ -141,7 +152,7 @@ export default function useChairmanSocket(
       chairmanSessionIdRef.current = createChairmanSessionId();
       setIsReplaced(false);
       hasStartedSharingRef.current = true;
-      connect(options);
+      connect({ ...CHAIRMAN_SOCKET_OPTIONS, ...options });
     },
     [connect, resetSignalState],
   );
