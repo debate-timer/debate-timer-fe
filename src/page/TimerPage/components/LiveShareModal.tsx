@@ -1,8 +1,15 @@
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
+import { IoLinkOutline } from 'react-icons/io5';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import DTClose from '../../../components/icons/Close';
 import { LiveShareErrorType } from '../hooks/useLiveShare';
+import { copyToClipboard } from '../../../util/clipboard';
+
+const COPY_FEEDBACK_DURATION_MS = 2000;
+
+type CopyStatus = 'idle' | 'copied' | 'failed';
 
 interface LiveShareModalProps {
   shareUrl: string;
@@ -23,6 +30,29 @@ export default function LiveShareModal({
   onRestart,
 }: LiveShareModalProps) {
   const { t } = useTranslation();
+  const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
+  const copyFeedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => clearTimeout(copyFeedbackTimerRef.current);
+  }, []);
+
+  const handleCopyLink = async () => {
+    const isCopied = await copyToClipboard(shareUrl);
+    setCopyStatus(isCopied ? 'copied' : 'failed');
+
+    clearTimeout(copyFeedbackTimerRef.current);
+    copyFeedbackTimerRef.current = setTimeout(() => {
+      setCopyStatus('idle');
+    }, COPY_FEEDBACK_DURATION_MS);
+  };
+
+  const copyButtonLabel = {
+    idle: t('링크 공유'),
+    copied: t('링크 복사됨'),
+    failed: t('링크 복사 실패'),
+  }[copyStatus];
+
   const isReplaced = errorType === 'replaced';
   const isDisconnected = errorType === 'disconnected';
   let errorTitle = t('라이브 공유 불가');
@@ -41,7 +71,7 @@ export default function LiveShareModal({
   }[errorType];
 
   return (
-    <div className="flex h-[250px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover p-6">
+    <div className="flex h-[300px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover p-6">
       {isLoading ? (
         <div className="flex size-full items-center justify-center">
           <LoadingSpinner
@@ -85,6 +115,16 @@ export default function LiveShareModal({
                   )}
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                aria-live="polite"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-[14px] font-semibold text-default-black transition-colors hover:bg-brand-hover"
+              >
+                <IoLinkOutline className="size-[18px]" aria-hidden />
+                {copyButtonLabel}
+              </button>
             </>
           ) : (
             <>
