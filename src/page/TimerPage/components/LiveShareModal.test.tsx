@@ -131,4 +131,13 @@ describe('LiveShareModal', () => {
       screen.queryByRole('button', { name: '이 화면에서 다시 공유하기' }),
     ).not.toBeInTheDocument();
   });
+
+  test('연결이 끊긴 오류에서는 새로고침 안내를 보여준다', () => {
+    renderLiveShareModal({ isError: true, errorType: 'disconnected' });
+
+    expect(screen.getByText('라이브 연결 끊김')).toBeInTheDocument();
+    expect(
+      screen.getByText('라이브 서버와 연결이 끊겼어요. 새로고침 해주세요.'),
+    ).toBeInTheDocument();
+  });
 });
