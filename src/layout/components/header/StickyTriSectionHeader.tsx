@@ -27,7 +27,7 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
   return (
-    <header className="sticky top-0 z-30 h-[56px] flex-shrink-0 border-b-[3px] border-default-disabled/hover md:h-[80px] short:h-[56px]">
+    <header className="sticky top-0 z-30 h-[56px] flex-shrink-0 overflow-hidden border-b-[3px] border-default-disabled/hover md:h-[80px] short:h-[56px]">
       <div className="relative flex h-full items-center justify-between p-[8px] md:p-[16px] short:p-[8px]">
         {children}
       </div>
