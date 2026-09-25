@@ -187,6 +187,55 @@ export default function TimerPage() {
     issueEvent(eventType, payload);
   };
 
+  // 상태 공유용 남은 시간을 실제 시각 기준으로 보정해 만든다.
+  // 사회자 탭이 백그라운드에 있는 동안 브라우저가 인터벌을 억제하면 화면의 남은 시간이
+  // 밀려 있으므로, 그대로 공유하면 청중이 지난 시간을 다시 보게 된다.
+  const buildSyncPayload = useCallback(() => {
+    const caughtUpNormalTime = normalTimer.catchUpToClock();
+    const caughtUpProsTimes = timer1.catchUpToClock();
+    const caughtUpConsTimes = timer2.catchUpToClock();
+
+    const caughtUpRemainingTime = getRemainingTimeForShare({
+      timerType,
+      normalTimer: caughtUpNormalTime,
+      currentTeam: prosConsSelected,
+      prosTimer: {
+        ...caughtUpProsTimes,
+        isSpeakingTimerAvailable: timer1.isSpeakingTimerAvailable,
+      },
+      consTimer: {
+        ...caughtUpConsTimes,
+        isSpeakingTimerAvailable: timer2.isSpeakingTimerAvailable,
+      },
+    });
+
+    return buildTimerPayloadForShare({
+      eventType: 'SYNC',
+      timerType,
+      sequence: index,
+      currentTeam: prosConsSelected,
+      remainingTime: caughtUpRemainingTime,
+      isCurrentTimerRunning:
+        timerType === 'NORMAL'
+          ? isNormalTimerRunning
+          : prosConsSelected === 'PROS'
+            ? isProsTimerRunning
+            : isConsTimerRunning,
+      prosTotalTime: caughtUpProsTimes.totalTimer,
+      consTotalTime: caughtUpConsTimes.totalTimer,
+    });
+  }, [
+    index,
+    isConsTimerRunning,
+    isNormalTimerRunning,
+    isProsTimerRunning,
+    normalTimer,
+    prosConsSelected,
+    timer1,
+    timer2,
+    timerType,
+  ]);
+
   // 서버의 상태 공유 요청 시 현재 상태를 SYNC로 발행 (이미 종료했다면 FINISHED)
   // 폐기된 렌더의 상태를 캡처하지 않도록 커밋 이후에 핸들러를 갱신
   useEffect(() => {
@@ -196,14 +245,14 @@ export default function TimerPage() {
         return;
       }
 
-      const payload = buildTimerPayload('SYNC');
+      const payload = buildSyncPayload();
       if (payload === null) {
         return;
       }
 
       issueEvent('SYNC', payload);
     };
-  }, [buildTimerPayload, issueEvent]);
+  }, [buildSyncPayload, issueEvent]);
 
   useTimerHotkey(state, handleTimerEvent);
 
