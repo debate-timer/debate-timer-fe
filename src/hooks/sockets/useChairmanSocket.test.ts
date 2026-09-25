@@ -616,7 +616,11 @@ describe('useChairmanSocket', () => {
     });
 
     expect(connect).toHaveBeenCalledWith(
-      expect.objectContaining({ maxRetries: null, maxRetryDelayMs: 30000 }),
+      expect.objectContaining({
+        maxRetries: null,
+        maxRetryDelayMs: 30000,
+        retryDeadlineMs: 120000,
+      }),
     );
   });
 

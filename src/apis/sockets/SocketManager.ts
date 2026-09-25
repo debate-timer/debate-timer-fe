@@ -8,6 +8,7 @@ import { SocketError } from './error';
  * - `maxRetries` 최대 재시도 횟수 (기본값 3회, `null`이면 제한 없음)
  * - `baseRetryDelayMs` 기본 재시도 대기 시간 (기본값 1000 ms)
  * - `maxRetryDelayMs` 재시도 대기 시간 상한 (기본값 30000 ms)
+ * - `retryDeadlineMs` 재시도를 포기하기까지의 제한 시간 (기본값 없음)
  * - `heartbeatInMs` 수신 하트비트 주기 (기본값 10000 ms)
  * - `heartbeatOutMs` 발신 하트비트 주기 (기본값 10000 ms)
  */
@@ -27,6 +28,12 @@ export interface SocketOptions {
   /** 재시도 대기 시간의 상한 (기본값: 30000ms) */
   maxRetryDelayMs?: number;
 
+  /**
+   * 재시도를 포기하기까지의 제한 시간 (기본값: `null`, 제한 없음)
+   * 첫 끊김 이후 이 시간이 지나면 횟수가 남아 있어도 재연결을 멈춘다.
+   */
+  retryDeadlineMs?: number | null;
+
   /** 수신 하트비트 주기 (기본값: 10000ms) */
   heartbeatInMs?: number;
 
@@ -41,6 +48,7 @@ type ResolvedSocketOptions = {
   maxRetries: number | null;
   baseRetryDelayMs: number;
   maxRetryDelayMs: number;
+  retryDeadlineMs: number | null;
   heartbeatInMs: number;
   heartbeatOutMs: number;
 };
@@ -49,6 +57,7 @@ const DEFAULT_OPTIONS: ResolvedSocketOptions = {
   maxRetries: 3,
   baseRetryDelayMs: 1000,
   maxRetryDelayMs: 30000,
+  retryDeadlineMs: null,
   heartbeatInMs: 10000,
   heartbeatOutMs: 10000,
 };
@@ -60,6 +69,9 @@ class SocketManager {
   private static instance: SocketManager;
   private currentOptions: ResolvedSocketOptions = DEFAULT_OPTIONS; // 소켓 설정을 저장하는 변수
   private retryCount: number = 0;
+
+  // 현재 끊김 구간에서 처음 재시도를 시작한 시각 (제한 시간 판단 기준)
+  private retryStartedAt: number | null = null;
 
   // 싱글톤 패턴 적용
   // - 생성자를 차단하여 외부에서의 객체 생성을 막음
@@ -169,6 +181,7 @@ class SocketManager {
 
     // 사용자가 지정한 옵션이 있다면 덮어쓰기
     this.retryCount = 0;
+    this.retryStartedAt = null;
     this.hasConnected = false;
     this.currentOptions = { ...DEFAULT_OPTIONS, ...options };
 
@@ -202,6 +215,7 @@ class SocketManager {
       onConnect: () => {
         console.log('✅ 웹 소켓(STOMP) 연결 성공');
         this.retryCount = 0;
+        this.retryStartedAt = null;
         this.hasConnected = true;
 
         // 모든 관찰자에게 연결이 수립되었다고 알림
@@ -279,6 +293,7 @@ class SocketManager {
 
       // 각종 설정 초기화
       this.retryCount = 0;
+      this.retryStartedAt = null;
       this.client = null;
       this.currentOptions = DEFAULT_OPTIONS;
       // 리스너는 등록한 훅이 언마운트될 때 직접 제거하므로 유지한다
@@ -339,13 +354,24 @@ class SocketManager {
       return;
     }
 
-    // 재시도 횟수를 초과했을 경우 연결을 즉시 종료 (횟수 제한이 없으면 건너뛴다)
-    const { maxRetries } = this.currentOptions;
-    if (maxRetries !== null && this.retryCount >= maxRetries) {
+    const now = Date.now();
+    if (this.retryStartedAt === null) {
+      this.retryStartedAt = now;
+    }
+
+    // 횟수를 초과했거나 제한 시간이 지났으면 연결을 즉시 종료
+    const { maxRetries, retryDeadlineMs } = this.currentOptions;
+    const hasExceededCount =
+      maxRetries !== null && this.retryCount >= maxRetries;
+    const hasExceededDeadline =
+      retryDeadlineMs !== null && now - this.retryStartedAt >= retryDeadlineMs;
+    if (hasExceededCount || hasExceededDeadline) {
       this.reportSocketError(
         new SocketError(
           'SOCKET_RETRY_EXHAUSTED',
-          '최대 재연결 시도 횟수를 초과했습니다.',
+          hasExceededDeadline
+            ? '재연결 제한 시간을 초과했습니다.'
+            : '최대 재연결 시도 횟수를 초과했습니다.',
         ),
       );
       this.client.reconnectDelay = 0;
