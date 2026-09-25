@@ -136,9 +136,9 @@ export function useAudienceShareState(
     // 연결이 끊긴 채로 남은 화면은 마지막 상태 그대로 둔다
     if (isConnectionLost) return;
 
+    // 연결이 끊기거나 재연결로 메시지 기준이 초기화돼도 마지막으로 받은 화면은 지우지 않는다.
+    // 재연결에 성공하면 곧 도착할 SYNC가 덮어쓰고, 끝내 실패하면 이 화면 위에 새로고침을 안내한다.
     if (!isConnected || !latestMessage) {
-      setDisplayData(null);
-      setSyncedAt(null);
       return;
     }
 
@@ -264,7 +264,8 @@ export function useAudienceShareState(
     status = 'connecting';
   } else if (isFinished) {
     status = 'finished';
-  } else if (!isConnected && !isConnectionLost) {
+  } else if (!isConnected && !isConnectionLost && !displayData) {
+    // 한 번이라도 화면을 띄운 뒤라면, 재연결하는 동안에도 마지막 화면을 계속 보여준다
     status = 'connecting';
   } else if (!displayData) {
     status = 'waiting';

@@ -886,7 +886,7 @@ describe('useAudienceShareState', () => {
     expect(mockDisconnect).toHaveBeenCalledTimes(1);
   });
 
-  it('재연결 세션에서는 이전 최신 메시지와 표시 화면이 첫 데이터로 재사용되지 않는다.', () => {
+  it('재연결로 메시지 기준이 초기화돼도 마지막 화면을 유지하고 새 메시지로 덮어쓴다.', () => {
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
 
     setSocketState({
@@ -899,13 +899,68 @@ describe('useAudienceShareState', () => {
     rerender();
     expect(result.current.status).toBe('displaying');
 
-    // 끊김 후 재연결, 메시지 null
+    // 끊김 후 재연결, 메시지 기준 초기화
     setSocketState({
       isConnected: true,
       latestMessage: null,
     });
     rerender();
-    expect(result.current.status).toBe('waiting');
+
+    // 빈 화면으로 되돌아가지 않는다
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
+      expect(result.current.displayData.singleTime).toBe(60);
+    }
+
+    // 재연결 후 도착한 SYNC가 화면을 덮어쓴다
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'SYNC',
+        data: {
+          timerType: 'NORMAL',
+          sequence: 0,
+          remainingTime: 30,
+          isRunning: false,
+        },
+      },
+    });
+    rerender();
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
+      expect(result.current.displayData.singleTime).toBe(30);
+    }
+  });
+
+  it('재연결을 시도하는 동안에도 마지막 화면을 유지한다.', () => {
+    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'PLAY',
+        data: { timerType: 'NORMAL', sequence: 0, remainingTime: 60 },
+      },
+    });
+    rerender();
+    expect(result.current.status).toBe('displaying');
+
+    // 연결이 끊겨 재시도하는 구간
+    setSocketState({
+      isConnected: false,
+      latestMessage: null,
+    });
+    rerender();
+
+    expect(result.current.status).toBe('displaying');
+    expect(result.current.connectionStatus).toBe('connected');
   });
 
   describe('네트워크 지연 보정 기준 시각(syncedAt)', () => {
