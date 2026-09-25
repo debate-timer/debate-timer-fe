@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Component, ReactNode } from 'react';
@@ -144,6 +145,7 @@ describe('AudienceSharePage', () => {
     );
     mockUseAudienceShareState.mockReturnValue({
       chairmanPresence: 'present',
+      connectionStatus: 'connected',
       status: 'connecting',
       error: null,
     });
@@ -201,6 +203,7 @@ describe('AudienceSharePage', () => {
     it('connecting 상태에서는 LoadingSpinner만 표시되고 타이머 조작 요소가 없다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'connecting',
         error: null,
       });
@@ -223,6 +226,7 @@ describe('AudienceSharePage', () => {
     it('waiting 상태에서는 서버 데이터 대기 번역 문구가 표시된다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'waiting',
         error: null,
       });
@@ -264,6 +268,7 @@ describe('AudienceSharePage', () => {
       );
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'waiting',
         error: null,
       });
@@ -279,6 +284,7 @@ describe('AudienceSharePage', () => {
     it('모바일에서는 헤더 대신 본문 상단에 주제를 표시한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'waiting',
         error: null,
       });
@@ -296,6 +302,7 @@ describe('AudienceSharePage', () => {
     it('displaying 상태 (NORMAL)에서는 AudienceNormalTimer에 올바른 props가 전달된다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -325,6 +332,7 @@ describe('AudienceSharePage', () => {
     it('NORMAL sequence의 CONS 항목에 반대 팀 정보를 연결한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -351,6 +359,7 @@ describe('AudienceSharePage', () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -387,6 +396,7 @@ describe('AudienceSharePage', () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -422,6 +432,7 @@ describe('AudienceSharePage', () => {
     it('displaying 상태 (TIME_BASED)에서는 AudienceTimeBasedTimer에 올바른 props가 전달된다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -456,6 +467,7 @@ describe('AudienceSharePage', () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -502,6 +514,7 @@ describe('AudienceSharePage', () => {
     it('finished 상태가 되면 종료 안내 페이지로 이동한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'finished',
         error: null,
       });
@@ -547,6 +560,7 @@ describe('AudienceSharePage', () => {
         );
         mockUseAudienceShareState.mockReturnValue({
           chairmanPresence: 'present',
+          connectionStatus: 'connected',
           status: 'displaying',
           syncedAt: null,
           error: null,
@@ -585,6 +599,7 @@ describe('AudienceSharePage', () => {
       );
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -637,6 +652,7 @@ describe('AudienceSharePage', () => {
     it('사회자 메시지를 기다리는 중이면 타이머와 함께 대기 안내를 표시한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'waiting',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -652,6 +668,7 @@ describe('AudienceSharePage', () => {
     it('사회자가 연결되어 있으면 안내를 표시하지 않는다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -667,6 +684,7 @@ describe('AudienceSharePage', () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -687,6 +705,7 @@ describe('AudienceSharePage', () => {
 
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -708,6 +727,7 @@ describe('AudienceSharePage', () => {
       vi.useFakeTimers();
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
+        connectionStatus: 'connected',
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -762,6 +782,7 @@ describe('AudienceSharePage', () => {
     it('소켓 연결에 실패하면 페이지 중앙에 서버 연결 오류를 표시한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -784,6 +805,7 @@ describe('AudienceSharePage', () => {
       );
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
+        connectionStatus: 'connected',
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -796,6 +818,85 @@ describe('AudienceSharePage', () => {
       expect(
         screen.queryByText(
           '필요한 데이터를 불러오지 못했어요. 다시 시도해보세요.',
+        ),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('서버 연결 끊김 안내', () => {
+    const CONNECTION_LOST_MESSAGE = '서버 연결이 끊겼어요. 새로고침 해주세요.';
+
+    const normalDisplayData = {
+      timerType: 'NORMAL' as const,
+      currentTeam: null,
+      isRunning: true,
+      singleTime: 10,
+      sequence: 0,
+    };
+
+    it('연결이 끊기면 타이머를 남긴 채 새로고침 안내를 표시한다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
+        connectionStatus: 'lost',
+        status: 'displaying',
+        syncedAt: null,
+        error: null,
+        displayData: normalDisplayData,
+      });
+
+      renderPage('/live/123');
+
+      expect(
+        await screen.findByText(CONNECTION_LOST_MESSAGE),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('timer-value')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: '새로고침' }),
+      ).toBeInTheDocument();
+    });
+
+    it('새로고침 버튼을 누르면 페이지를 다시 불러온다', async () => {
+      const reload = vi.fn();
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { ...window.location, reload },
+      });
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'present',
+        connectionStatus: 'lost',
+        status: 'displaying',
+        syncedAt: null,
+        error: null,
+        displayData: normalDisplayData,
+      });
+
+      renderPage('/live/123');
+      const reloadButton = await screen.findByRole('button', {
+        name: '새로고침',
+      });
+      await userEvent.click(reloadButton);
+
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('연결이 끊기면 사회자 부재 안내는 표시하지 않는다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'absent',
+        connectionStatus: 'lost',
+        status: 'displaying',
+        syncedAt: null,
+        error: null,
+        displayData: normalDisplayData,
+      });
+
+      renderPage('/live/123');
+
+      expect(
+        await screen.findByText(CONNECTION_LOST_MESSAGE),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText(
+          '사회자 연결이 끊겼어요. 재접속을 기다리는 중이에요.',
         ),
       ).not.toBeInTheDocument();
     });

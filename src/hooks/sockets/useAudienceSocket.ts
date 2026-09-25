@@ -107,48 +107,45 @@ export default function useAudienceSocket(
     return addConnectionListener(resetMessage);
   }, [addConnectionListener, resetMessage]);
 
-  const handleRoomMessage = useCallback(
-    (message: IMessage) => {
-      try {
-        const parsedData = JSON.parse(message.body);
-        if (isSocketMessage(parsedData)) {
-          // 사회자 부재 알림은 서버가 보낸 것이므로 사회자 메시지 수신 기록과 version 기준에 반영하지 않는다
-          if (parsedData.eventType === 'CHAIRMAN_ABSENT') {
-            setChairmanAbsentAt(Date.now());
-            return;
-          }
-
-          // 오래된 version이라 반영하지 않더라도 사회자가 메시지를 보내고 있다는 신호로 본다
-          const receivedAt = Date.now();
-          setLastReceivedAt(receivedAt);
-
-          const { version } = parsedData;
-          const lastVersion = lastVersionRef.current;
-          const hasVersion = version !== undefined && version !== null;
-
-          // version 없는 메시지는 기준이 생기기 전(하위 호환, 종료된 룸 입장 등)에만 반영
-          if (!hasVersion && lastVersion !== null) {
-            return;
-          }
-
-          if (hasVersion) {
-            if (lastVersion !== null && version <= lastVersion) {
-              return;
-            }
-            lastVersionRef.current = version;
-          }
-
-          setLatestMessage(parsedData);
-          setLatestMessageReceivedAt(receivedAt);
-        } else {
-          console.log('잘못된 소켓 메시지 형식입니다:', parsedData);
+  const handleRoomMessage = useCallback((message: IMessage) => {
+    try {
+      const parsedData = JSON.parse(message.body);
+      if (isSocketMessage(parsedData)) {
+        // 사회자 부재 알림은 서버가 보낸 것이므로 사회자 메시지 수신 기록과 version 기준에 반영하지 않는다
+        if (parsedData.eventType === 'CHAIRMAN_ABSENT') {
+          setChairmanAbsentAt(Date.now());
+          return;
         }
-      } catch (e) {
-        console.log('메시지 파싱 오류:', e);
+
+        // 오래된 version이라 반영하지 않더라도 사회자가 메시지를 보내고 있다는 신호로 본다
+        const receivedAt = Date.now();
+        setLastReceivedAt(receivedAt);
+
+        const { version } = parsedData;
+        const lastVersion = lastVersionRef.current;
+        const hasVersion = version !== undefined && version !== null;
+
+        // version 없는 메시지는 기준이 생기기 전(하위 호환, 종료된 룸 입장 등)에만 반영
+        if (!hasVersion && lastVersion !== null) {
+          return;
+        }
+
+        if (hasVersion) {
+          if (lastVersion !== null && version <= lastVersion) {
+            return;
+          }
+          lastVersionRef.current = version;
+        }
+
+        setLatestMessage(parsedData);
+        setLatestMessageReceivedAt(receivedAt);
+      } else {
+        console.log('잘못된 소켓 메시지 형식입니다:', parsedData);
       }
-    },
-    [],
-  );
+    } catch (e) {
+      console.log('메시지 파싱 오류:', e);
+    }
+  }, []);
 
   useEffect(() => {
     if (!enabled) {
@@ -168,7 +165,14 @@ export default function useAudienceSocket(
       resetMessage();
       unsubscribe(destination);
     };
-  }, [enabled, roomId, handleRoomMessage, resetMessage, subscribe, unsubscribe]);
+  }, [
+    enabled,
+    roomId,
+    handleRoomMessage,
+    resetMessage,
+    subscribe,
+    unsubscribe,
+  ]);
 
   /**
    * 백그라운드 탭에서 돌아오면 현재 상태를 다시 받아온다.

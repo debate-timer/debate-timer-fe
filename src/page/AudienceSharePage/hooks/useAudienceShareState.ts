@@ -10,6 +10,13 @@ import {
 } from './EventInterpreter';
 import { getNetworkDelayMs } from './getNetworkDelayMs';
 
+/**
+ * 서버 연결 상태
+ * - `connected`: 연결되어 있거나 자동 재연결을 시도하는 중
+ * - `lost`: 재연결 시도를 모두 소진해 스스로 복구할 수 없음 (새로고침이 필요)
+ */
+export type AudienceConnectionStatus = 'connected' | 'lost';
+
 export type AudienceShareState =
   | { status: 'connecting'; error: AudienceShareError | null }
   | { status: 'waiting'; error: AudienceShareError | null }
@@ -51,7 +58,10 @@ interface UseAudienceShareStateOptions {
 export function useAudienceShareState(
   roomId: number,
   options: UseAudienceShareStateOptions = {},
-): AudienceShareState & { chairmanPresence: ChairmanPresence } {
+): AudienceShareState & {
+  chairmanPresence: ChairmanPresence;
+  connectionStatus: AudienceConnectionStatus;
+} {
   const { enabled = true, table } = options;
   const {
     connect,
@@ -64,6 +74,10 @@ export function useAudienceShareState(
     error: socketError,
   } = useAudienceSocket(roomId, { enabled });
 
+  // 재연결 시도를 모두 소진하면 자동으로 복구되지 않는다
+  const isRetryExhausted =
+    isSocketError(socketError) && socketError.code === 'SOCKET_RETRY_EXHAUSTED';
+
   const [error, setError] = useState<AudienceShareError | null>(null);
   const [isFinished, setIsFinished] = useState<boolean>(false);
 
@@ -71,6 +85,9 @@ export function useAudienceShareState(
     null,
   );
   const [syncedAt, setSyncedAt] = useState<number | null>(null);
+
+  // 보여주던 화면이 있는 상태에서 재연결이 소진되면, 화면을 지우는 대신 새로고침을 안내한다
+  const isConnectionLost = isRetryExhausted && displayData !== null;
 
   const [isChairmanAbsent, setIsChairmanAbsent] = useState<boolean>(false);
   const [isFirstMessageTimedOut, setIsFirstMessageTimedOut] =
@@ -93,8 +110,9 @@ export function useAudienceShareState(
   }, [connect, cleanup, enabled]);
 
   // Handle Socket Error
+  // 재연결 소진은 이미 보여주던 화면이 있으면 오류로 넘기지 않고, 그 화면을 유지한 채 새로고침을 안내한다
   useEffect(() => {
-    if (enabled && socketError) {
+    if (enabled && socketError && !isConnectionLost) {
       cleanup();
       let code: AudienceShareErrorCode = 'UNKNOWN';
       if (isSocketError(socketError)) {
@@ -109,11 +127,14 @@ export function useAudienceShareState(
         ),
       );
     }
-  }, [enabled, socketError, cleanup]);
+  }, [enabled, socketError, isConnectionLost, cleanup]);
 
   // Handle Messages and Disconnects
   useEffect(() => {
     if (!enabled || error || isFinished) return; // Ignore if inactive, already failed or finished
+
+    // 연결이 끊긴 채로 남은 화면은 마지막 상태 그대로 둔다
+    if (isConnectionLost) return;
 
     if (!isConnected || !latestMessage) {
       setDisplayData(null);
@@ -151,6 +172,7 @@ export function useAudienceShareState(
   }, [
     enabled,
     isConnected,
+    isConnectionLost,
     latestMessage,
     latestMessageReceivedAt,
     error,
@@ -233,12 +255,16 @@ export function useAudienceShareState(
     };
   }, [isWaitingFirstMessage, table]);
 
+  const connectionStatus: AudienceConnectionStatus = isConnectionLost
+    ? 'lost'
+    : 'connected';
+
   let status: AudienceShareState['status'] = 'connecting';
   if (!enabled) {
     status = 'connecting';
   } else if (isFinished) {
     status = 'finished';
-  } else if (!isConnected) {
+  } else if (!isConnected && !isConnectionLost) {
     status = 'connecting';
   } else if (!displayData) {
     status = 'waiting';
@@ -253,6 +279,7 @@ export function useAudienceShareState(
       displayData: displayData!,
       syncedAt,
       chairmanPresence,
+      connectionStatus,
     };
   }
 
@@ -260,5 +287,6 @@ export function useAudienceShareState(
     status,
     error,
     chairmanPresence,
+    connectionStatus,
   };
 }

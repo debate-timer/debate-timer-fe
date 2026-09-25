@@ -1110,4 +1110,93 @@ describe('useAudienceShareState', () => {
       expect(result.current.status).toBe('waiting');
     });
   });
+
+  describe('재연결 소진', () => {
+    const playMessage: SocketMessage = {
+      eventType: 'PLAY',
+      data: { timerType: 'NORMAL', sequence: 0, remainingTime: 60 },
+    };
+
+    it('보여주던 화면이 있으면 오류 대신 연결 끊김으로 표시하고 화면을 유지한다.', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+        lastReceivedAt: Date.now(),
+      });
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+      expect(result.current.status).toBe('displaying');
+
+      setSocketState({
+        isConnected: false,
+        latestMessage: playMessage,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+      rerender();
+
+      expect(result.current.status).toBe('displaying');
+      expect(result.current.connectionStatus).toBe('lost');
+      expect(result.current.error).toBeNull();
+    });
+
+    it('연결 끊김 상태에서는 소켓을 다시 끊지 않는다.', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+      });
+      const { rerender } = renderHook(() => useAudienceShareState(1));
+      mockDisconnect.mockClear();
+
+      setSocketState({
+        isConnected: false,
+        latestMessage: playMessage,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+      rerender();
+
+      expect(mockDisconnect).not.toHaveBeenCalled();
+    });
+
+    it('보여주던 화면이 없으면 기존처럼 오류로 처리한다.', () => {
+      setSocketState({
+        isConnected: false,
+        latestMessage: null,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.error).not.toBeNull();
+      expect(result.current.connectionStatus).toBe('connected');
+    });
+
+    it('다시 연결되면 연결 끊김 표시를 해제한다.', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+      });
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      setSocketState({
+        isConnected: false,
+        latestMessage: playMessage,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+      rerender();
+      expect(result.current.connectionStatus).toBe('lost');
+
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+        error: null,
+      });
+      rerender();
+
+      expect(result.current.connectionStatus).toBe('connected');
+      expect(result.current.status).toBe('displaying');
+    });
+  });
 });

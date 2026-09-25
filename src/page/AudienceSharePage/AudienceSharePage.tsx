@@ -8,6 +8,7 @@ import { useAudienceTimeBasedCountdown } from './hooks/useAudienceTimeBasedCount
 import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
 import ChairmanStatusNotice from './components/ChairmanStatusNotice';
+import ConnectionLostNotice from './components/ConnectionLostNotice';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
@@ -88,8 +89,12 @@ export default function AudienceSharePage() {
     t,
   );
 
-  // 사회자 연결이 끊기면 마지막으로 보던 시간에서 카운트다운을 멈춘다
-  const isChairmanAbsent = state.chairmanPresence === 'absent';
+  // 서버와의 연결이 끊겨 스스로 복구할 수 없는 상태 (새로고침이 필요)
+  const isConnectionLost = state.connectionStatus === 'lost';
+
+  // 사회자 연결이 끊기거나 서버 연결이 끊기면 마지막으로 보던 시간에서 카운트다운을 멈춘다
+  const isChairmanAbsent =
+    state.chairmanPresence === 'absent' || isConnectionLost;
 
   // 네트워크 지연 보정 기준 시각
   const syncedAt = state.status === 'displaying' ? state.syncedAt : null;
@@ -233,8 +238,10 @@ export default function AudienceSharePage() {
   const isTimerVisible =
     viewState.type === 'NORMAL_TIMER' || viewState.type === 'TIME_BASED_TIMER';
   const shouldShowWaitingNotice =
-    isTimerVisible && state.chairmanPresence === 'waiting';
-  const shouldShowAbsentNotice = isTimerVisible && isChairmanAbsent;
+    isTimerVisible && state.chairmanPresence === 'waiting' && !isConnectionLost;
+  const shouldShowConnectionLostNotice = isTimerVisible && isConnectionLost;
+  const shouldShowAbsentNotice =
+    isTimerVisible && isChairmanAbsent && !isConnectionLost;
 
   const isHeaderVisible =
     viewState.type === 'WAITING' ||
@@ -285,6 +292,9 @@ export default function AudienceSharePage() {
             {renderContent()}
             {shouldShowAbsentNotice ? (
               <ChairmanStatusNotice variant="absent" />
+            ) : null}
+            {shouldShowConnectionLostNotice ? (
+              <ConnectionLostNotice onReload={handleReload} />
             ) : null}
           </div>
         </div>
