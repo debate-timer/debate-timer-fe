@@ -20,6 +20,10 @@ const SAND_GRAINS = [
 ];
 const GRAIN_FALL_DURATION_S = 1.08;
 
+// 모래시계(가로 10~54, 세로 4~76)를 중심(32, 40)에서 돌려도 모서리가 잘리지 않도록
+// 중심에서 가장 먼 모서리까지의 거리(약 42)보다 넉넉한 정사각형 영역을 잡는다
+const HOURGLASS_VIEW_BOX = '-12 -4 88 88';
+
 // 위, 아래 유리 안쪽 모양. 모래는 이 모양으로 잘라 유리 밖으로 넘치지 않게 한다
 // 두 모양이 중심(32, 40)에 대해 대칭이라, 뒤집은 직후 아래 모래가 곧바로 다음 주기의 위 모래와 겹친다
 const TOP_BULB_PATH = 'M17 10 C17 23 30 31 31 39 L33 39 C34 31 47 23 47 10 Z';
@@ -52,8 +56,8 @@ export default function DebateWaitingNotice({
     >
       <svg
         data-testid="audience-waiting-icon"
-        viewBox="0 0 64 80"
-        className="h-20 w-16 xl:h-24 xl:w-20"
+        viewBox={HOURGLASS_VIEW_BOX}
+        className="size-[88px] xl:size-[106px]"
         aria-hidden="true"
       >
         <defs>
