@@ -78,7 +78,10 @@ export default function LiveShareModal({
   }[errorType];
 
   return (
-    <div className="flex h-[300px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover p-6">
+    <div
+      data-testid="live-share-modal"
+      className="flex h-[300px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover bg-default-white p-6 shadow-lg"
+    >
       {isLoading ? (
         <div className="flex size-full items-center justify-center">
           <LoadingSpinner
