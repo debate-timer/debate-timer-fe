@@ -271,10 +271,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
   useEffect(() => {
     const selectedTimer = prosConsSelected === 'PROS' ? timer1 : timer2;
 
-    const isDone =
-      selectedTimer.speakingTimer === null
-        ? selectedTimer.totalTimer === 0
-        : selectedTimer.speakingTimer === 0;
+    const isDone = selectedTimer.isSpeakingTimerAvailable
+      ? selectedTimer.speakingTimer === 0
+      : selectedTimer.totalTimer === 0;
 
     if (isDone) {
       selectedTimer.setIsDone(true);

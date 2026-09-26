@@ -17,6 +17,10 @@ describe('useTimeBasedTimer', () => {
       const { result } = renderHook(() => useTimeBasedTimer());
 
       act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 300,
+          defaultSpeakingTimer: 60,
+        });
         result.current.setTimers(300, 60);
       });
       act(() => {
@@ -39,6 +43,10 @@ describe('useTimeBasedTimer', () => {
       const { result } = renderHook(() => useTimeBasedTimer());
 
       act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 30,
+          defaultSpeakingTimer: 10,
+        });
         result.current.setTimers(30, 10);
       });
       act(() => {
@@ -58,6 +66,10 @@ describe('useTimeBasedTimer', () => {
       const { result } = renderHook(() => useTimeBasedTimer());
 
       act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 300,
+          defaultSpeakingTimer: 60,
+        });
         result.current.setTimers(300, 60);
       });
 
@@ -73,6 +85,86 @@ describe('useTimeBasedTimer', () => {
 
       expect(caughtUp).toEqual({ totalTimer: 300, speakingTimer: 60 });
       expect(result.current.totalTimer).toBe(300);
+    });
+  });
+
+  describe('1회당 발언 시간이 없는 순서', () => {
+    it('앞 순서에서 발언 시간을 썼어도 전체 시간만 진행한다', () => {
+      const { result } = renderHook(() => useTimeBasedTimer());
+
+      // 앞 순서: 전체 2분 + 1회 발언 30초
+      act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 120,
+          defaultSpeakingTimer: 30,
+        });
+        result.current.setTimers(120, 30);
+      });
+      act(() => {
+        result.current.startTimer();
+      });
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      // 다음 순서: 전체 1분만
+      act(() => {
+        result.current.clearTimer();
+        result.current.setDefaultTime({
+          defaultTotalTimer: 60,
+          defaultSpeakingTimer: null,
+        });
+        result.current.setTimers(60, null);
+      });
+      act(() => {
+        result.current.startTimer();
+      });
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      let caughtUp: {
+        totalTimer: number | null;
+        speakingTimer: number | null;
+      } = { totalTimer: null, speakingTimer: null };
+      act(() => {
+        caughtUp = result.current.catchUpToClock();
+      });
+      act(() => {
+        result.current.pauseTimer();
+      });
+
+      expect(caughtUp).toEqual({ totalTimer: 58, speakingTimer: null });
+      expect(result.current.totalTimer).toBe(58);
+      expect(result.current.speakingTimer).toBeNull();
+      expect(result.current.isSpeakingTimerAvailable).toBe(false);
+    });
+
+    it('초기화하면 턴을 시작했던 전체 시간으로 되돌린다', () => {
+      const { result } = renderHook(() => useTimeBasedTimer());
+
+      act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 60,
+          defaultSpeakingTimer: null,
+        });
+        result.current.setTimers(45, null);
+      });
+      act(() => {
+        result.current.resetTimerForNextPhase(false);
+      });
+      act(() => {
+        result.current.startTimer();
+      });
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      act(() => {
+        result.current.resetCurrentTimer();
+      });
+
+      expect(result.current.totalTimer).toBe(45);
+      expect(result.current.speakingTimer).toBeNull();
     });
   });
 

@@ -17,13 +17,16 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
 
   // 발언당 시간 타이머(=각 phase별 제한시간, 모드 전환 가능)
   const [speakingTimer, setSpeakingTimer] = useState<number | null>(null);
-  const isSpeakingTimerAvailable = speakingTimer !== null;
 
   // 기본(초기) 시간값 (reset 등에서 참조)
   const [defaultTime, setDefaultTime] = useState<{
     defaultTotalTimer: number | null;
     defaultSpeakingTimer: number | null;
   }>({ defaultTotalTimer: 0, defaultSpeakingTimer: null });
+
+  // 1회당 발언 시간 사용 여부는 순서 설정값으로 판단
+  // (남은 발언 시간 값으로 판단하면 이전 순서의 값이 섞였을 때 모드가 바뀜)
+  const isSpeakingTimerAvailable = defaultTime.defaultSpeakingTimer !== null;
 
   // 현재 타이머 동작중 여부
   const [isRunning, setIsRunning] = useState(false);
@@ -112,9 +115,10 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     // 해당 시간을 목표 시간으로 두는 식임
     const startTime = Date.now();
     targetTimeRef.current = startTime + totalTimer * 1000;
-    if (isSpeakingTimerAvailable) {
-      speakingTargetTimeRef.current = startTime + speakingTimer * 1000;
-    }
+    speakingTargetTimeRef.current =
+      isSpeakingTimerAvailable && speakingTimer !== null
+        ? startTime + speakingTimer * 1000
+        : null;
 
     // 타이머 인터벌 시작
     setTimerInterval();
@@ -224,9 +228,9 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
       // 해당 시간을 목표 시간으로 두는 식임
       const startTime = Date.now();
       targetTimeRef.current = startTime + totalTimer * 1000;
-      if (isSpeakingTimerAvailable) {
-        speakingTargetTimeRef.current = startTime + newTime * 1000;
-      }
+      speakingTargetTimeRef.current = isSpeakingTimerAvailable
+        ? startTime + newTime * 1000
+        : null;
 
       // 타이머 인터벌 시작
       setTimerInterval();
@@ -268,6 +272,8 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     setSpeakingTimer(null);
     setIsDone(false);
     turnStartTimesRef.current = { totalTimer: null, speakingTimer: null };
+    targetTimeRef.current = null;
+    speakingTargetTimeRef.current = null;
     intervalRef.current = null;
   }, [pauseTimer]);
 
