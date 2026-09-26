@@ -113,6 +113,9 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     [index, data],
   );
 
+  // 상대 팀이 시간을 모두 소진했다면 차례를 넘기지 않음
+  const canSwitchCamp = !(prosConsSelected === 'PROS' ? timer2 : timer1).isDone;
+
   /**
    * 발언 진영 전환(ENTER 키/버튼)
    * - pros → cons, cons → pros로 타이머/상태 전환
@@ -124,7 +127,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     const nextTeam = prosConsSelected === 'PROS' ? 'CONS' : 'PROS';
 
     // 2. 상대 팀이 시간을 모두 소진했을 경우, 차례를 넘기지 않고 반환
-    if (nextTimer.isDone) {
+    if (!canSwitchCamp) {
       return;
     }
 
@@ -148,7 +151,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
       // 7-1. 만약 타이머가 멈춰 있었다면, 다음 타이머 초기화만 진행
       nextTimer.resetTimerForNextPhase(isOpponentDone);
     }
-  }, [prosConsSelected, timer1, timer2]);
+  }, [canSwitchCamp, prosConsSelected, timer1, timer2]);
 
   /**
    * 특정 진영(팀)을 활성화하는 함수
@@ -300,6 +303,7 @@ export function useTimerPageState(tableId: number): TimerPageLogics {
     setProsConsSelected,
     goToOtherItem,
     switchCamp,
+    canSwitchCamp,
     handleActivateTeam,
     tableId,
     isLoading,
@@ -330,6 +334,7 @@ export interface TimerPageLogics {
   setProsConsSelected: Dispatch<SetStateAction<TimeBasedStance>>;
   goToOtherItem: (isPrev: boolean) => void;
   switchCamp: () => void;
+  canSwitchCamp: boolean;
   handleActivateTeam: (
     team: TimeBasedStance,
     runSwitchCamp: SwitchCampRunner,

@@ -28,6 +28,7 @@ export default function TimerView({
     isAdditionalTimerAvailable,
     handleActivateTeam,
     switchCamp,
+    canSwitchCamp,
   } = state;
 
   const { answerTimerState, handleClickAnswerTimer } = useAnswerTimer({
@@ -114,7 +115,12 @@ export default function TimerView({
 
         {/* ENTER 버튼 */}
         <button
-          onClick={() => onEvent(switchCamp, 'TEAM_SWITCH')}
+          onClick={() => {
+            // 사회자 화면에서 전환되지 않으면 청중에게도 발행하지 않음
+            if (canSwitchCamp) {
+              onEvent(switchCamp, 'TEAM_SWITCH');
+            }
+          }}
           className="flex flex-col items-center justify-center rounded-[14px] bg-default-black2 px-[16px] py-[8px] text-default-white shadow-xl xl:px-[32px]"
         >
           <DTExchange className="size-[48px] xl:size-[64px]" />

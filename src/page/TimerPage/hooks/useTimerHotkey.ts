@@ -24,6 +24,7 @@ export function useTimerHotkey(
     goToOtherItem,
     setProsConsSelected,
     switchCamp,
+    canSwitchCamp,
   } = state;
 
   useEffect(() => {
@@ -116,7 +117,7 @@ export function useTimerHotkey(
           // 반대 진영 선택 및 찬성 타이머 정지
           if (prosConsSelected === 'PROS') {
             const handleSwitching = () => {
-              if (timer1.isDone) {
+              if (timer2.isDone) {
                 setProsConsSelected('CONS');
               } else {
                 switchCamp();
@@ -129,8 +130,10 @@ export function useTimerHotkey(
           break;
         case 'Enter':
         case 'NumpadEnter':
-          // 진영 전환
-          onEvent(switchCamp, 'TEAM_SWITCH');
+          // 진영 전환 (사회자 화면에서 전환되지 않으면 청중에게도 발행하지 않음)
+          if (canSwitchCamp) {
+            onEvent(switchCamp, 'TEAM_SWITCH');
+          }
           break;
       }
     };
@@ -149,6 +152,7 @@ export function useTimerHotkey(
     goToOtherItem,
     setProsConsSelected,
     switchCamp,
+    canSwitchCamp,
     onEvent,
   ]);
 }
