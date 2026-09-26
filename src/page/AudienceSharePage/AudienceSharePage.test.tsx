@@ -253,6 +253,43 @@ describe('AudienceSharePage', () => {
       ).not.toBeInTheDocument();
     });
 
+    it('waiting 상태에서는 대기 중임을 알리는 아이콘을 함께 표시한다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'waiting',
+        connectionStatus: 'connected',
+        status: 'waiting',
+        error: null,
+      });
+      renderPage('/live/123');
+
+      expect(
+        await screen.findByTestId('audience-waiting-icon'),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent(
+        '토론 시작을 대기 중입니다.',
+      );
+    });
+
+    it('사회자 메시지 전에 사회자 부재 알림을 받아도 끊김 안내 대신 대기 화면을 표시한다', async () => {
+      mockUseAudienceShareState.mockReturnValue({
+        chairmanPresence: 'absent',
+        connectionStatus: 'connected',
+        status: 'waiting',
+        error: null,
+      });
+      renderPage('/live/123');
+
+      expect(
+        await screen.findByText('토론 시작을 대기 중입니다.'),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('audience-waiting-icon')).toBeInTheDocument();
+      expect(
+        screen.queryByText(
+          '사회자 연결이 끊겼어요. 재접속을 기다리는 중이에요.',
+        ),
+      ).not.toBeInTheDocument();
+    });
+
     it('테이블 이름과 주제가 공백이면 TimerPage와 같은 대체 문구를 표시한다', async () => {
       server.use(
         http.get(`${ApiUrl.live}/table/customize/:tableId`, () => {

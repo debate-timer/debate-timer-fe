@@ -183,30 +183,6 @@ export function createNavigationDisplayData(
   return null;
 }
 
-/**
- * 첫 메시지를 받기 전 보여줄 초기 화면(첫 순서 타이머, 정지 상태)을 만듭니다.
- * 표시할 수 없는 테이블이면 `null`을 반환합니다.
- */
-export function createInitialDisplayData(
-  table: TimeBoxInfo[] | undefined,
-): AudienceDisplayData | null {
-  const firstTimeBox = table?.[0];
-  if (
-    !firstTimeBox ||
-    (firstTimeBox.boxType !== 'NORMAL' && firstTimeBox.boxType !== 'TIME_BASED')
-  ) {
-    return null;
-  }
-
-  return createNavigationDisplayData(
-    'NEXT',
-    { timerType: firstTimeBox.boxType, sequence: 0, remainingTime: 0 },
-    null,
-    table,
-    0,
-  );
-}
-
 export function getDisplayDataByEvent(
   eventType: TimerEventTypes,
   data: TimerDataPayload,

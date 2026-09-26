@@ -389,10 +389,10 @@ export default function TimerPage() {
                 bgColorMap[bg],
               )}
             >
-              {/* 라이브 공유 버튼 및 모달 */}
+              {/* 라이브 공유 버튼 및 모달 (화면이 작아져도 타이머와 라운드 버튼 위에 보이고 클릭되도록 레이어를 올린다) */}
               {IS_LIVE_SHARE_ENABLED && isLoggedIn() && (
                 <div
-                  className="absolute right-4 top-4 flex"
+                  className="absolute right-4 top-4 z-20 flex"
                   ref={liveShareModalRef}
                 >
                   {!isLiveShareModalOpen && (

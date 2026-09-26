@@ -9,6 +9,7 @@ import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
 import ChairmanStatusNotice from './components/ChairmanStatusNotice';
 import ConnectionLostNotice from './components/ConnectionLostNotice';
+import DebateWaitingNotice from './components/DebateWaitingNotice';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
@@ -156,13 +157,7 @@ export default function AudienceSharePage() {
         return <LoadingContent />;
 
       case 'WAITING':
-        return (
-          <div className="flex h-full w-full flex-col items-center justify-center space-y-[20px]">
-            <h1 className="break-keep px-4 text-center text-2xl font-bold text-gray-800 xl:text-4xl">
-              {viewState.message}
-            </h1>
-          </div>
-        );
+        return <DebateWaitingNotice message={viewState.message} />;
 
       case 'NORMAL_TIMER':
         return (
