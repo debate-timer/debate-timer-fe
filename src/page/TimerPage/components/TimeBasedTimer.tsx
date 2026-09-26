@@ -59,8 +59,11 @@ export default function TimeBasedTimer({
     Math.abs((speakingTimer ?? 0) % 60),
   );
 
+  // 1회당 발언 시간 사용 여부는 순서 설정값으로 판단
+  const isSpeakingTimerMode = item.timePerSpeaking !== null;
+
   const initRawProgress = (): number => {
-    if (speakingTimer === null) {
+    if (!isSpeakingTimerMode) {
       // 1회당 발언 시간 X일 때...
       if (item.timePerTeam && totalTimer && item.timePerTeam > 0) {
         // 팀당 발언 시간 타이머가 정상 동작 중이고 남은 시간이 있을 경우, 진행도를 계산
@@ -136,7 +139,7 @@ export default function TimeBasedTimer({
         className="size-[400px] xl:size-[560px]"
       >
         {/* 1회당 발언 시간 X */}
-        {speakingTimer === null && (
+        {!isSpeakingTimerMode && (
           <span className="flex w-full flex-row items-center justify-center p-[16px] text-[90px] font-bold tabular-nums text-default-black xl:text-[110px]">
             <p className="flex flex-1 items-center justify-center">{minute}</p>
             <p className="flex items-center justify-center">:</p>
@@ -145,7 +148,7 @@ export default function TimeBasedTimer({
         )}
 
         {/* 1회당 발언 시간 O */}
-        {speakingTimer !== null && (
+        {isSpeakingTimerMode && (
           <span className="flex w-full flex-col items-center justify-center p-[8px] xl:p-[16px]">
             <h1 className="w-[88px] rounded-[8px] bg-default-black py-[6px] text-center text-[16px] text-default-white xl:w-[112px] xl:text-[20px]">
               {t('전체 시간')}

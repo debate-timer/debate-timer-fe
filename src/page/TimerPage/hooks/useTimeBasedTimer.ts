@@ -17,13 +17,16 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
 
   // 발언당 시간 타이머(=각 phase별 제한시간, 모드 전환 가능)
   const [speakingTimer, setSpeakingTimer] = useState<number | null>(null);
-  const isSpeakingTimerAvailable = speakingTimer !== null;
 
   // 기본(초기) 시간값 (reset 등에서 참조)
   const [defaultTime, setDefaultTime] = useState<{
     defaultTotalTimer: number | null;
     defaultSpeakingTimer: number | null;
   }>({ defaultTotalTimer: 0, defaultSpeakingTimer: null });
+
+  // 1회당 발언 시간 사용 여부는 순서 설정값으로 판단
+  // (남은 발언 시간 값으로 판단하면 이전 순서의 값이 섞였을 때 모드가 바뀜)
+  const isSpeakingTimerAvailable = defaultTime.defaultSpeakingTimer !== null;
 
   // 현재 타이머 동작중 여부
   const [isRunning, setIsRunning] = useState(false);
@@ -47,6 +50,13 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
   useEffect(() => {
     speakingTimerRef.current = speakingTimer;
   }, [speakingTimer]);
+
+  // 현재 턴을 시작했던 전체/발언 시간 (초기화 시 이 값으로 되돌림)
+  // - 순서 진입(setTimers)과 팀 전환(resetTimerForNextPhase) 시점에 기록
+  const turnStartTimesRef = useRef<CaughtUpTimes>({
+    totalTimer: null,
+    speakingTimer: null,
+  });
 
   /**
    * 타이머 시작을 위해 사용하는 저수준 함수
@@ -105,9 +115,10 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     // 해당 시간을 목표 시간으로 두는 식임
     const startTime = Date.now();
     targetTimeRef.current = startTime + totalTimer * 1000;
-    if (isSpeakingTimerAvailable) {
-      speakingTargetTimeRef.current = startTime + speakingTimer * 1000;
-    }
+    speakingTargetTimeRef.current =
+      isSpeakingTimerAvailable && speakingTimer !== null
+        ? startTime + speakingTimer * 1000
+        : null;
 
     // 타이머 인터벌 시작
     setTimerInterval();
@@ -132,43 +143,27 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
   }, []);
 
   /**
-   * 최근 저장된 시간(savedTime)으로 복원
+   * 현재 턴을 시작했던 시간으로 복원
    */
-  const resetCurrentTimer = useCallback(
-    (isOpponentDone: boolean) => {
-      // 초기화를 위해 타이머 정지
-      pauseTimer();
+  const resetCurrentTimer = useCallback(() => {
+    // 초기화를 위해 타이머 정지
+    pauseTimer();
 
-      // 타이머가 초기화되었으니 이제부터는 당연히 다시 동작 가능하기 때문에,
-      // isDone을 false로 설정
-      setIsDone(false);
+    // 타이머가 초기화되었으니 이제부터는 당연히 다시 동작 가능하기 때문에,
+    // isDone을 false로 설정
+    setIsDone(false);
 
-      // 전체 발언 시간 복원
-      setTotalTimer(defaultTime.defaultTotalTimer);
+    setTotalTimer(turnStartTimesRef.current.totalTimer);
+    setSpeakingTimer(turnStartTimesRef.current.speakingTimer);
+  }, [pauseTimer]);
 
-      // 1회당 발언 시간 사용하는지 여부와 유효성 확인
-      if (
-        !isSpeakingTimerAvailable ||
-        defaultTime.defaultSpeakingTimer === null ||
-        totalTimer === null
-      ) {
-        return;
-      }
-
-      // 상대편 발언 종료 여부에 따라 1회당 발언 시간 다르게 계산
-      if (isOpponentDone) {
-        setSpeakingTimer(defaultTime.defaultTotalTimer);
-      } else {
-        setSpeakingTimer(defaultTime.defaultSpeakingTimer);
-      }
-    },
-    [
-      isSpeakingTimerAvailable,
-      defaultTime.defaultSpeakingTimer,
-      defaultTime.defaultTotalTimer,
-      totalTimer,
-      pauseTimer,
-    ],
+  /**
+   * 현재 턴을 시작했던 전체/발언 시간
+   * - 초기화 직후 상태를 청중에게 공유할 때 사용
+   */
+  const getTurnStartTimes = useCallback(
+    (): CaughtUpTimes => turnStartTimesRef.current,
+    [],
   );
 
   /**
@@ -194,11 +189,16 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
 
         // 계산한 시간을 1회당 발언 시간으로 설정
         setSpeakingTimer(nextSpeakingTime);
+        turnStartTimesRef.current = {
+          totalTimer,
+          speakingTimer: nextSpeakingTime,
+        };
         return nextSpeakingTime;
       } else {
         // # 1회당 발언 시간을 사용하지 않을 경우
 
         // 전체 발언 시간 타이머는 초기값으로 리셋
+        turnStartTimesRef.current = { totalTimer, speakingTimer: null };
         if (totalTimer === 0 || totalTimer === null) {
           return 0;
         }
@@ -228,9 +228,9 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
       // 해당 시간을 목표 시간으로 두는 식임
       const startTime = Date.now();
       targetTimeRef.current = startTime + totalTimer * 1000;
-      if (isSpeakingTimerAvailable) {
-        speakingTargetTimeRef.current = startTime + newTime * 1000;
-      }
+      speakingTargetTimeRef.current = isSpeakingTimerAvailable
+        ? startTime + newTime * 1000
+        : null;
 
       // 타이머 인터벌 시작
       setTimerInterval();
@@ -253,6 +253,10 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
       pauseTimer();
       setTotalTimer(total);
       setSpeakingTimer(speaking);
+      turnStartTimesRef.current = {
+        totalTimer: total,
+        speakingTimer: speaking,
+      };
     },
     [pauseTimer],
   );
@@ -267,6 +271,9 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     setTotalTimer(null);
     setSpeakingTimer(null);
     setIsDone(false);
+    turnStartTimesRef.current = { totalTimer: null, speakingTimer: null };
+    targetTimeRef.current = null;
+    speakingTargetTimeRef.current = null;
     intervalRef.current = null;
   }, [pauseTimer]);
 
@@ -319,6 +326,7 @@ export function useTimeBasedTimer(): TimeBasedTimerLogics {
     resetTimerForNextPhase,
     resetAndStartTimer,
     resetCurrentTimer,
+    getTurnStartTimes,
     setTimers,
     setDefaultTime,
     setIsDone,
@@ -346,7 +354,8 @@ export interface TimeBasedTimerLogics {
   pauseTimer: () => void;
   resetTimerForNextPhase: (isOpponentDone: boolean) => number;
   resetAndStartTimer: (isOpponentDone: boolean) => void;
-  resetCurrentTimer: (isOpponentDone: boolean) => void;
+  resetCurrentTimer: () => void;
+  getTurnStartTimes: () => CaughtUpTimes;
   setTimers: (total: number | null, speaking?: number | null) => void;
   setDefaultTime: Dispatch<
     SetStateAction<{
