@@ -90,7 +90,7 @@ export default function TimerView({
             startTimer: () => onEvent(timer1.startTimer, 'PLAY'),
             pauseTimer: () => onEvent(timer1.pauseTimer, 'STOP'),
             resetCurrentTimer: () =>
-              onEvent(() => timer1.resetCurrentTimer(timer2.isDone), 'RESET'),
+              onEvent(() => timer1.resetCurrentTimer(), 'RESET'),
           }}
           item={data.table[index]}
           isSelected={prosConsSelected === 'PROS'}
@@ -130,7 +130,7 @@ export default function TimerView({
             startTimer: () => onEvent(timer2.startTimer, 'PLAY'),
             pauseTimer: () => onEvent(timer2.pauseTimer, 'STOP'),
             resetCurrentTimer: () =>
-              onEvent(() => timer2.resetCurrentTimer(timer1.isDone), 'RESET'),
+              onEvent(() => timer2.resetCurrentTimer(), 'RESET'),
           }}
           item={data.table[index]}
           isSelected={prosConsSelected === 'CONS'}

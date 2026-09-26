@@ -75,4 +75,92 @@ describe('useTimeBasedTimer', () => {
       expect(result.current.totalTimer).toBe(300);
     });
   });
+
+  describe('resetCurrentTimer', () => {
+    function renderTimerWithTurnStartedAt(
+      totalTimer: number,
+      isOpponentDone = false,
+    ) {
+      const { result } = renderHook(() => useTimeBasedTimer());
+
+      act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 120,
+          defaultSpeakingTimer: 30,
+        });
+        result.current.setTimers(totalTimer, 3);
+      });
+      act(() => {
+        result.current.resetTimerForNextPhase(isOpponentDone);
+      });
+
+      return result;
+    }
+
+    it('진행 중 초기화하면 현재 턴을 시작했던 전체/발언 시간으로 되돌린다', () => {
+      const result = renderTimerWithTurnStartedAt(94);
+
+      act(() => {
+        result.current.startTimer();
+      });
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(result.current.totalTimer).toBe(89);
+      expect(result.current.speakingTimer).toBe(25);
+
+      act(() => {
+        result.current.resetCurrentTimer();
+      });
+
+      expect(result.current.totalTimer).toBe(94);
+      expect(result.current.speakingTimer).toBe(30);
+      expect(result.current.isRunning).toBe(false);
+      expect(result.current.getTurnStartTimes()).toEqual({
+        totalTimer: 94,
+        speakingTimer: 30,
+      });
+    });
+
+    it('상대 팀 시간이 끝난 턴이면 남은 전체 시간을 발언 시간으로 되돌린다', () => {
+      const result = renderTimerWithTurnStartedAt(94, true);
+
+      act(() => {
+        result.current.startTimer();
+      });
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      act(() => {
+        result.current.resetCurrentTimer();
+      });
+
+      expect(result.current.totalTimer).toBe(94);
+      expect(result.current.speakingTimer).toBe(94);
+    });
+
+    it('순서에 들어온 뒤 팀 전환 없이 초기화하면 설정값으로 되돌린다', () => {
+      const { result } = renderHook(() => useTimeBasedTimer());
+
+      act(() => {
+        result.current.setDefaultTime({
+          defaultTotalTimer: 120,
+          defaultSpeakingTimer: 30,
+        });
+        result.current.setTimers(120, 30);
+      });
+      act(() => {
+        result.current.startTimer();
+      });
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      act(() => {
+        result.current.resetCurrentTimer();
+      });
+
+      expect(result.current.totalTimer).toBe(120);
+      expect(result.current.speakingTimer).toBe(30);
+    });
+  });
 });

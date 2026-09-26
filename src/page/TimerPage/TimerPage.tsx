@@ -41,6 +41,12 @@ import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 const IS_LIVE_SHARE_ENABLED = true;
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
+interface SharedTimes {
+  remainingTime: number | null;
+  prosTotalTime: number | null;
+  consTotalTime: number | null;
+}
+
 export default function TimerPage() {
   const { t } = useTranslation();
   const [answerTime, setAnswerTime] = useState(30);
@@ -129,7 +135,7 @@ export default function TimerPage() {
   const prosTotalTime = timer1.totalTimer;
   const consTotalTime = timer2.totalTimer;
   const buildTimerPayload = useCallback(
-    (eventType: TimerEventTypes) => {
+    (eventType: TimerEventTypes, sharedTimes?: SharedTimes) => {
       const isTimeBasedTimerRunning =
         prosConsSelected === 'PROS' ? isProsTimerRunning : isConsTimerRunning;
 
@@ -138,13 +144,13 @@ export default function TimerPage() {
         timerType,
         sequence: index,
         currentTeam: prosConsSelected,
-        remainingTime,
+        remainingTime: sharedTimes ? sharedTimes.remainingTime : remainingTime,
         isCurrentTimerRunning:
           timerType === 'NORMAL'
             ? isNormalTimerRunning
             : isTimeBasedTimerRunning,
-        prosTotalTime,
-        consTotalTime,
+        prosTotalTime: sharedTimes ? sharedTimes.prosTotalTime : prosTotalTime,
+        consTotalTime: sharedTimes ? sharedTimes.consTotalTime : consTotalTime,
       });
     },
     [
@@ -159,6 +165,39 @@ export default function TimerPage() {
       timerType,
     ],
   );
+
+  // 자유토론 초기화 직후 공유할 시간을 만든다.
+  // 이벤트 발행 시점에는 React 상태가 아직 초기화 전 값이므로, 현재 팀은 턴 시작 시간을 직접 읽는다.
+  const getResetSharedTimes = (): SharedTimes | undefined => {
+    if (timerType !== 'TIME_BASED') {
+      return undefined;
+    }
+
+    const prosTimes =
+      prosConsSelected === 'PROS' ? timer1.getTurnStartTimes() : timer1;
+    const consTimes =
+      prosConsSelected === 'CONS' ? timer2.getTurnStartTimes() : timer2;
+
+    return {
+      remainingTime: getRemainingTimeForShare({
+        timerType,
+        normalTimer: normalTimer.timer,
+        currentTeam: prosConsSelected,
+        prosTimer: {
+          totalTimer: prosTimes.totalTimer,
+          speakingTimer: prosTimes.speakingTimer,
+          isSpeakingTimerAvailable: timer1.isSpeakingTimerAvailable,
+        },
+        consTimer: {
+          totalTimer: consTimes.totalTimer,
+          speakingTimer: consTimes.speakingTimer,
+          isSpeakingTimerAvailable: timer2.isSpeakingTimerAvailable,
+        },
+      }),
+      prosTotalTime: prosTimes.totalTimer,
+      consTotalTime: consTimes.totalTimer,
+    };
+  };
 
   // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
   const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
@@ -178,7 +217,10 @@ export default function TimerPage() {
       return;
     }
 
-    const payload = buildTimerPayload(eventType);
+    const payload = buildTimerPayload(
+      eventType,
+      eventType === 'RESET' ? getResetSharedTimes() : undefined,
+    );
     if (payload === null) {
       return;
     }

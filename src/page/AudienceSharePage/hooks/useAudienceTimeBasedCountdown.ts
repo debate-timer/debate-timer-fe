@@ -373,6 +373,22 @@ export function useAudienceTimeBasedCountdown({
       }
 
       if (displayEventType === 'RESET') {
+        // 사회자는 현재 턴을 시작했던 시간으로 되돌린 값을 양 팀 전체 시간과 함께 보냄
+        if (displayProsTotalTime !== null && displayConsTotalTime !== null) {
+          const turnStartTotal = getTeamValue(
+            currentTeam,
+            displayProsTotalTime,
+            displayConsTotalTime,
+          );
+          const turnStartSpeakingTime =
+            timePerSpeaking === null ? null : receivedCurrentTime;
+
+          return updateTeamInput(nextInputs, currentTeam, (input) =>
+            createTeamInput(turnStartTotal, turnStartSpeakingTime, input),
+          );
+        }
+
+        // 양 팀 전체 시간이 없는 이전 버전 사회자는 설정값으로 초기화
         const opponentTotal = getLatestTotal(opponentTeam);
         const resetSpeakingTime = getNextSpeakingTime({
           totalRemainingTime: timePerTeam,

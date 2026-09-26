@@ -91,9 +91,9 @@ export function useTimerHotkey(
             onEvent(normalTimer.resetTimer, 'RESET');
           } else {
             if (prosConsSelected === 'PROS') {
-              onEvent(() => timer1.resetCurrentTimer(timer2.isDone), 'RESET');
+              onEvent(() => timer1.resetCurrentTimer(), 'RESET');
             } else {
-              onEvent(() => timer2.resetCurrentTimer(timer1.isDone), 'RESET');
+              onEvent(() => timer2.resetCurrentTimer(), 'RESET');
             }
           }
           break;

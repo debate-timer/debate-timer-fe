@@ -358,6 +358,26 @@ describe('eventInterpreter 순수 함수', () => {
           sequence: 0,
         });
       });
+
+      it('TIME_BASED는 초기화된 현재 팀 시간과 양 팀 전체 시간을 담는다', () => {
+        const payload: TimerDataPayload = {
+          timerType: 'TIME_BASED',
+          remainingTime: 30,
+          sequence: 1,
+          currentTeam: 'CONS',
+          prosRemainingTime: 80,
+          consRemainingTime: 94,
+        };
+
+        const result = getDisplayDataByEvent('RESET', payload, null, mockTable);
+        expect(result).toMatchObject({
+          timerType: 'TIME_BASED',
+          currentTeam: 'CONS',
+          isRunning: false,
+          consTime: 30,
+          teamTotalTimes: { pros: 80, cons: 94 },
+        });
+      });
     });
 
     describe('BEFORE 이벤트', () => {

@@ -111,7 +111,7 @@ export function createDisplayData(
 }
 
 /**
- * 자유토론 SYNC 페이로드에서 양 팀의 총 남은 시간을 꺼냅니다.
+ * 자유토론 SYNC/RESET 페이로드에서 양 팀의 총 남은 시간을 꺼냅니다.
  * 둘 중 하나라도 없으면 `undefined`를 반환합니다.
  */
 function getTeamTotalTimes(
@@ -211,6 +211,8 @@ export function getDisplayDataByEvent(
           data.sequence,
           data.remainingTime,
         ),
+        // 자유토론은 사회자가 현재 턴 시작 시간으로 되돌린 값을 보냄
+        teamTotalTimes: getTeamTotalTimes(data),
       });
 
     case 'BEFORE': {

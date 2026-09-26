@@ -301,6 +301,89 @@ describe('useAudienceTimeBasedCountdown', () => {
     expect(result.current.pros.isRunning).toBe(false);
   });
 
+  it('RESET은 받은 턴 시작 시간으로 현재 팀을 되돌린다', () => {
+    const { result, rerender } = renderHook(
+      ({ displayData }) =>
+        useAudienceTimeBasedCountdown({
+          displayData,
+          timePerTeam: 120,
+          timePerSpeaking: 30,
+        }),
+      {
+        initialProps: {
+          displayData: createDisplayData({
+            currentTeam: 'CONS',
+            isRunning: true,
+            eventType: 'SYNC',
+            prosTime: null,
+            consTime: 30,
+            teamTotalTimes: { pros: 80, cons: 94 },
+            revision: 1,
+          }),
+        },
+      },
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(result.current.cons.totalRemainingTime).toBe(89);
+
+    rerender({
+      displayData: createDisplayData({
+        currentTeam: 'CONS',
+        isRunning: false,
+        eventType: 'RESET',
+        prosTime: null,
+        consTime: 30,
+        teamTotalTimes: { pros: 80, cons: 94 },
+        revision: 2,
+      }),
+    });
+
+    expect(result.current.cons.totalRemainingTime).toBe(94);
+    expect(result.current.cons.currentSpeakingRemainingTime).toBe(30);
+    expect(result.current.pros.totalRemainingTime).toBe(80);
+    expect(result.current.cons.isRunning).toBe(false);
+  });
+
+  it('전체 시간만 쓰는 RESET은 받은 턴 시작 전체 시간으로 되돌린다', () => {
+    const { result, rerender } = renderHook(
+      ({ displayData }) =>
+        useAudienceTimeBasedCountdown({
+          displayData,
+          timePerTeam: 120,
+          timePerSpeaking: null,
+        }),
+      {
+        initialProps: {
+          displayData: createDisplayData({
+            isRunning: true,
+            eventType: 'PLAY',
+            prosTime: 94,
+            revision: 1,
+          }),
+        },
+      },
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    rerender({
+      displayData: createDisplayData({
+        isRunning: false,
+        eventType: 'RESET',
+        prosTime: 94,
+        teamTotalTimes: { pros: 94, cons: 120 },
+        revision: 2,
+      }),
+    });
+
+    expect(result.current.pros.totalRemainingTime).toBe(94);
+  });
+
   it('전체 시간 또는 현재 시간이 끝나면 0초에서 함께 정지한다', () => {
     const { result } = renderHook(() =>
       useAudienceTimeBasedCountdown({
