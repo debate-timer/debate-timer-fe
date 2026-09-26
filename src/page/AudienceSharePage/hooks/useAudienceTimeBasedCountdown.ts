@@ -305,13 +305,18 @@ export function useAudienceTimeBasedCountdown({
           }
         : previousInputs;
 
+      // 설정이 막 바뀌었다면 표시 중인 값은 이전 순서의 것이므로 새 설정값을 사용
+      const getLatestTotal = (team: TimeBasedStance) =>
+        hasConfigurationChanged
+          ? timePerTeam
+          : getTeamValue(
+              team,
+              latestValuesRef.current.prosTotal,
+              latestValuesRef.current.consTotal,
+            );
       const currentTeam = displayCurrentTeam;
       const opponentTeam = currentTeam === 'PROS' ? 'CONS' : 'PROS';
-      const latestCurrentTotal = getTeamValue(
-        currentTeam,
-        latestValuesRef.current.prosTotal,
-        latestValuesRef.current.consTotal,
-      );
+      const latestCurrentTotal = getLatestTotal(currentTeam);
       const currentInput = getTeamValue(
         currentTeam,
         nextInputs.pros,
@@ -368,11 +373,7 @@ export function useAudienceTimeBasedCountdown({
       }
 
       if (displayEventType === 'RESET') {
-        const opponentTotal = getTeamValue(
-          opponentTeam,
-          latestValuesRef.current.prosTotal,
-          latestValuesRef.current.consTotal,
-        );
+        const opponentTotal = getLatestTotal(opponentTeam);
         const resetSpeakingTime = getNextSpeakingTime({
           totalRemainingTime: timePerTeam,
           timePerSpeaking,
@@ -391,11 +392,7 @@ export function useAudienceTimeBasedCountdown({
           displayProsTime,
           displayConsTime,
         );
-        const previousTeamTotal = getTeamValue(
-          previousTeam,
-          latestValuesRef.current.prosTotal,
-          latestValuesRef.current.consTotal,
-        );
+        const previousTeamTotal = getLatestTotal(previousTeam);
         const newSpeakingTime = getNextSpeakingTime({
           totalRemainingTime: currentTotal,
           timePerSpeaking,

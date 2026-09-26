@@ -220,6 +220,51 @@ describe('useAudienceTimeBasedCountdown', () => {
     expect(result.current.cons.currentSpeakingRemainingTime).toBe(29);
   });
 
+  it('설정 변경과 TEAM_SWITCH가 겹치면 새 팀 전체 시간을 새 설정값으로 표시한다', () => {
+    const { result, rerender } = renderHook(
+      ({ displayData, timePerTeam }) =>
+        useAudienceTimeBasedCountdown({
+          displayData,
+          timePerTeam,
+          timePerSpeaking: 30,
+        }),
+      {
+        initialProps: {
+          displayData: createDisplayData({
+            currentTeam: 'CONS',
+            isRunning: true,
+            eventType: 'PLAY',
+            prosTime: null,
+            consTime: 30,
+            revision: 1,
+          }),
+          timePerTeam: 120,
+        },
+      },
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(result.current.cons.totalRemainingTime).toBe(118);
+
+    rerender({
+      displayData: createDisplayData({
+        currentTeam: 'CONS',
+        isRunning: true,
+        eventType: 'TEAM_SWITCH',
+        prosTime: 30,
+        consTime: null,
+        sequence: 1,
+        revision: 2,
+      }),
+      timePerTeam: 200,
+    });
+
+    expect(result.current.cons.totalRemainingTime).toBe(200);
+    expect(result.current.cons.currentSpeakingRemainingTime).toBe(30);
+  });
+
   it('RESET은 현재 팀의 전체/현재 시간을 API 설정값으로 초기화한다', () => {
     const { result, rerender } = renderHook(
       ({ displayData }) =>
