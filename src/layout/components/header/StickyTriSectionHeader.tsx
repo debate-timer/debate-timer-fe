@@ -27,7 +27,8 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
   const { children } = props;
 
   return (
-    <header className="sticky top-0 z-30 h-[56px] flex-shrink-0 overflow-hidden border-b-[3px] border-default-disabled/hover md:h-[80px] short:h-[56px]">
+    // 언어 선택 등 헤더 아래로 펼쳐지는 메뉴가 잘리지 않도록 넘침은 제목 영역에서만 숨김
+    <header className="sticky top-0 z-30 h-[56px] flex-shrink-0 border-b-[3px] border-default-disabled/hover md:h-[80px] short:h-[56px]">
       <div className="relative flex h-full items-center justify-between p-[8px] md:p-[16px] short:p-[8px]">
         {children}
       </div>
@@ -44,7 +45,7 @@ StickyTriSectionHeader.Left = function Left(props: SectionProps) {
   return (
     <div
       className={clsx(
-        'flex h-full min-w-0 flex-1 items-center justify-start text-start',
+        'flex h-full min-w-0 flex-1 items-center justify-start overflow-hidden text-start',
         className,
       )}
     >
@@ -58,7 +59,7 @@ StickyTriSectionHeader.Center = function Center(props: SectionProps) {
   return (
     <div
       className={clsx(
-        'flex h-full min-w-0 flex-1 items-center justify-center text-center',
+        'flex h-full min-w-0 flex-1 items-center justify-center overflow-hidden text-center',
         className,
       )}
     >
