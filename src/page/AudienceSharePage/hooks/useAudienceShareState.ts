@@ -5,7 +5,6 @@ import { TimeBoxInfo } from '../../../type/type';
 import { isSocketError } from '../../../apis/sockets/error';
 import {
   getDisplayDataByEvent,
-  createInitialDisplayData,
   AudienceDisplayData,
 } from './EventInterpreter';
 import { getNetworkDelayMs } from './getNetworkDelayMs';
@@ -27,7 +26,7 @@ export type AudienceShareState =
       /**
        * 표시 중인 남은 시간이 유효했던 시각(기기 시계 기준, epoch ms)
        * - 수신 시각에서 서버 중계 이후 흐른 네트워크 지연을 뺀 값
-       * - 메시지 없이 만든 초기 화면이면 `null`
+       * - 수신 시각을 알 수 없으면 `null`
        */
       syncedAt: number | null;
     }
@@ -46,9 +45,6 @@ export type ChairmanPresence = 'waiting' | 'present' | 'absent';
 
 // 사회자 heartbeat(5초) 3회를 놓치면 사회자 연결이 끊긴 것으로 판단
 export const CHAIRMAN_ABSENT_TIMEOUT_MS = 15 * 1000;
-
-// 연결 후 이 시간 동안 메시지가 없으면 첫 순서 타이머를 정지 상태로 먼저 표시
-const INITIAL_DISPLAY_DELAY_MS = 1000;
 
 interface UseAudienceShareStateOptions {
   enabled?: boolean;
@@ -234,27 +230,6 @@ export function useAudienceShareState(
     chairmanPresence = 'absent';
   }
 
-  // 사회자 응답을 기다리는 동안 빈 화면 대신 첫 순서 타이머를 정지 상태로 표시
-  // 이후 SYNC 등 메시지를 받으면 받은 상태로 바뀐다
-  const isWaitingFirstMessage =
-    enabled && isConnected && !error && !isFinished && displayData === null;
-  useEffect(() => {
-    if (!isWaitingFirstMessage) {
-      return;
-    }
-
-    const initialDisplayTimeout = setTimeout(() => {
-      setDisplayData(
-        (previousDisplayData) =>
-          previousDisplayData ?? createInitialDisplayData(table),
-      );
-    }, INITIAL_DISPLAY_DELAY_MS);
-
-    return () => {
-      clearTimeout(initialDisplayTimeout);
-    };
-  }, [isWaitingFirstMessage, table]);
-
   const connectionStatus: AudienceConnectionStatus = isConnectionLost
     ? 'lost'
     : 'connected';
@@ -268,6 +243,7 @@ export function useAudienceShareState(
     // 한 번이라도 화면을 띄운 뒤라면, 재연결하는 동안에도 마지막 화면을 계속 보여준다
     status = 'connecting';
   } else if (!displayData) {
+    // 사회자 메시지를 한 번도 받지 못했다면 사회자 부재 알림을 받아도 토론 시작을 기다린다
     status = 'waiting';
   } else {
     status = 'displaying';

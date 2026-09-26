@@ -1,5 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
-import { useAudienceShareState } from './useAudienceShareState';
+import {
+  CHAIRMAN_ABSENT_TIMEOUT_MS,
+  useAudienceShareState,
+} from './useAudienceShareState';
 import { useAudienceCountdown } from './useAudienceCountdown';
 import * as useAudienceSocketModule from '../../../hooks/sockets/useAudienceSocket';
 import { SocketMessage } from '../../../apis/sockets/type';
@@ -629,7 +632,7 @@ describe('useAudienceShareState', () => {
       vi.advanceTimersByTime(600 * 1000);
     });
 
-    expect(result.current.status).toBe('displaying');
+    expect(result.current.status).toBe('waiting');
     expect(result.current.error).toBeNull();
     expect(mockDisconnect).not.toHaveBeenCalled();
   });
@@ -1011,26 +1014,20 @@ describe('useAudienceShareState', () => {
         expect(result.current.syncedAt).toBe(RECEIVED_AT);
       }
     });
-
-    it('메시지 없이 표시한 초기 화면은 syncedAt이 null이다', () => {
-      setSocketState({ latestMessage: null });
-
-      const { result } = renderHook(() =>
-        useAudienceShareState(1, { table: normalTable }),
-      );
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-
-      expect(result.current.status).toBe('displaying');
-      if (result.current.status === 'displaying') {
-        expect(result.current.syncedAt).toBeNull();
-      }
-    });
   });
 
-  describe('첫 메시지 대기 중 초기 화면', () => {
-    it('연결 후 1초 동안 메시지가 없으면 첫 순서 타이머를 정지 상태로 표시한다', () => {
+  describe('사회자 첫 메시지 대기', () => {
+    const syncMessage: SocketMessage = {
+      eventType: 'SYNC',
+      data: {
+        timerType: 'NORMAL',
+        sequence: 1,
+        remainingTime: 42,
+        isRunning: true,
+      },
+    };
+
+    it('연결 후 사회자 메시지가 없으면 시간이 지나도 대기 상태를 유지한다', () => {
       setSocketState({ isConnected: true, latestMessage: null });
 
       const { result } = renderHook(() =>
@@ -1039,130 +1036,61 @@ describe('useAudienceShareState', () => {
       expect(result.current.status).toBe('waiting');
 
       act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-
-      expect(result.current.status).toBe('displaying');
-      if (result.current.status === 'displaying') {
-        expect(result.current.displayData).toEqual({
-          timerType: 'NORMAL',
-          currentTeam: null,
-          isRunning: false,
-          singleTime: 180,
-          sequence: 0,
-        });
-      }
-    });
-
-    it('첫 순서가 자유토론이면 자유토론 타이머를 정지 상태로 표시한다', () => {
-      const timeBasedTable: TimeBoxInfo[] = [
-        {
-          stance: 'NEUTRAL',
-          speechType: '자유토론',
-          bell: null,
-          boxType: 'TIME_BASED',
-          time: null,
-          timePerTeam: 90,
-          timePerSpeaking: 30,
-          speaker: null,
-        },
-      ];
-      setSocketState({ isConnected: true, latestMessage: null });
-
-      const { result } = renderHook(() =>
-        useAudienceShareState(1, { table: timeBasedTable }),
-      );
-
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-
-      expect(result.current.status).toBe('displaying');
-      if (result.current.status === 'displaying') {
-        expect(result.current.displayData).toMatchObject({
-          timerType: 'TIME_BASED',
-          currentTeam: 'PROS',
-          isRunning: false,
-          sequence: 0,
-        });
-      }
-    });
-
-    it('1초 안에 메시지를 받으면 초기 화면으로 덮어쓰지 않는다', () => {
-      setSocketState({ isConnected: true, latestMessage: null });
-      const { result, rerender } = renderHook(() =>
-        useAudienceShareState(1, { table: normalTable }),
-      );
-
-      setSocketState({
-        isConnected: true,
-        latestMessage: {
-          eventType: 'SYNC',
-          data: {
-            timerType: 'NORMAL',
-            sequence: 1,
-            remainingTime: 42,
-            isRunning: true,
-          },
-        },
-      });
-      rerender();
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-
-      expect(result.current.status).toBe('displaying');
-      if (result.current.status === 'displaying') {
-        expect(result.current.displayData).toMatchObject({
-          sequence: 1,
-          singleTime: 42,
-          isRunning: true,
-        });
-      }
-    });
-
-    it('초기 화면 표시 후 SYNC를 받으면 받은 상태로 바뀐다', () => {
-      setSocketState({ isConnected: true, latestMessage: null });
-      const { result, rerender } = renderHook(() =>
-        useAudienceShareState(1, { table: normalTable }),
-      );
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-
-      setSocketState({
-        isConnected: true,
-        latestMessage: {
-          eventType: 'SYNC',
-          data: {
-            timerType: 'NORMAL',
-            sequence: 1,
-            remainingTime: 42,
-            isRunning: true,
-          },
-        },
-      });
-      rerender();
-
-      expect(result.current.status).toBe('displaying');
-      if (result.current.status === 'displaying') {
-        expect(result.current.displayData).toMatchObject({
-          sequence: 1,
-          singleTime: 42,
-          isRunning: true,
-        });
-      }
-    });
-
-    it('테이블 정보가 없으면 대기 상태를 유지한다', () => {
-      setSocketState({ isConnected: true, latestMessage: null });
-      const { result } = renderHook(() => useAudienceShareState(1));
-
-      act(() => {
-        vi.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(CHAIRMAN_ABSENT_TIMEOUT_MS + 5000);
       });
 
       expect(result.current.status).toBe('waiting');
+    });
+
+    it('사회자 메시지 전에 사회자 부재 알림을 받아도 대기 상태를 유지한다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: Date.now(),
+      });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+      act(() => {
+        vi.advanceTimersByTime(CHAIRMAN_ABSENT_TIMEOUT_MS + 5000);
+      });
+
+      expect(result.current.status).toBe('waiting');
+    });
+
+    it('대기 중 사회자 SYNC를 받으면 받은 상태로 표시한다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: Date.now(),
+      });
+      const { result, rerender } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+      const receivedAt = Date.now();
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        latestMessageReceivedAt: receivedAt,
+        lastReceivedAt: receivedAt,
+        chairmanAbsentAt: receivedAt - 3000,
+      });
+      rerender();
+
+      expect(result.current.status).toBe('displaying');
+      expect(result.current.chairmanPresence).toBe('present');
+      if (result.current.status === 'displaying') {
+        expect(result.current.displayData).toMatchObject({
+          sequence: 1,
+          singleTime: 42,
+          isRunning: true,
+        });
+      }
     });
   });
 
