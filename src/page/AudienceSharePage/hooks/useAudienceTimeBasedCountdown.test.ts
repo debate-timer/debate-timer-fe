@@ -127,6 +127,54 @@ describe('useAudienceTimeBasedCountdown', () => {
     expect(result.current.pros.currentSpeakingRemainingTime).toBe(27);
   });
 
+  it('네트워크 지연이 있는 재생에서도 전체 시간과 현재 시간이 같은 순간에 감소한다', () => {
+    vi.setSystemTime(new Date('2026-09-27T00:00:00Z'));
+    const { result, rerender } = renderHook(
+      ({ displayData, syncedAt }) =>
+        useAudienceTimeBasedCountdown({
+          displayData,
+          timePerTeam: 120,
+          timePerSpeaking: 30,
+          syncedAt,
+        }),
+      {
+        initialProps: {
+          displayData: createDisplayData({
+            isRunning: false,
+            eventType: 'STOP',
+            prosTime: 30,
+            revision: 1,
+          }),
+          syncedAt: Date.now() as number | null,
+        },
+      },
+    );
+
+    rerender({
+      displayData: createDisplayData({
+        isRunning: true,
+        eventType: 'PLAY',
+        prosTime: 30,
+        revision: 2,
+      }),
+      syncedAt: Date.now() - 400,
+    });
+
+    for (let step = 0; step < 30; step += 1) {
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+
+      expect(
+        (result.current.pros.totalRemainingTime ?? 0) -
+          (result.current.pros.currentSpeakingRemainingTime ?? 0),
+      ).toBe(90);
+    }
+
+    expect(result.current.pros.currentSpeakingRemainingTime).toBe(27);
+    expect(result.current.pros.totalRemainingTime).toBe(117);
+  });
+
   it('TEAM_SWITCH는 새 팀 현재 시간을 초기화하고 실행 상태를 유지한다', () => {
     const { result, rerender } = renderHook(
       ({ displayData }) =>

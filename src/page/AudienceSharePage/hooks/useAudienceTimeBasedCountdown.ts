@@ -8,6 +8,12 @@ interface TeamCountdownInput {
   speakingTime: number | null;
   totalSyncKey: number;
   speakingSyncKey: number;
+  /**
+   * 1회당 발언 시간 모드에서 `전체 시간 - 발언 시간` (정수 초)
+   * - 사회자는 두 시간을 같이 시작·정지하므로 실행 중 차이가 일정하다.
+   * - 전체 시간을 발언 카운트다운에서 파생해 두 값이 같은 틱에 바뀌게 한다.
+   */
+  totalOffset: number | null;
 }
 
 interface CountdownInputs {
@@ -48,6 +54,7 @@ const EMPTY_TEAM_INPUT: TeamCountdownInput = {
   speakingTime: null,
   totalSyncKey: 0,
   speakingSyncKey: 0,
+  totalOffset: null,
 };
 
 function createInitialInputs(): CountdownInputs {
@@ -70,7 +77,41 @@ function createTeamInput(
     speakingTime,
     totalSyncKey: previousInput.totalSyncKey + 1,
     speakingSyncKey: previousInput.speakingSyncKey + 1,
+    totalOffset: speakingTime === null ? null : totalTime - speakingTime,
   };
+}
+
+/**
+ * 발언 시간만 받았을 때의 오프셋
+ * - 설정이 막 바뀌어 전체 시간이 아직 흐르지 않았다면 받은 발언 시간 기준으로 다시 계산
+ * - 그 외에는 두 시간이 함께 흘렀으므로 기존 오프셋 유지
+ */
+function getSpeakingOnlyTotalOffset(
+  input: TeamCountdownInput,
+  receivedSpeakingTime: number | null,
+  hasConfigurationChanged: boolean,
+) {
+  if (
+    !hasConfigurationChanged ||
+    receivedSpeakingTime === null ||
+    input.totalTime === null
+  ) {
+    return input.totalOffset;
+  }
+
+  return input.totalTime - receivedSpeakingTime;
+}
+
+function getDerivedTotalTime(
+  countdownTotal: number | null,
+  speaking: number | null,
+  totalOffset: number | null,
+) {
+  if (speaking === null || totalOffset === null) {
+    return countdownTotal;
+  }
+
+  return Math.max(0, speaking + totalOffset);
 }
 
 function getTeamValue<T>(team: TimeBasedStance, prosValue: T, consValue: T) {
@@ -131,9 +172,10 @@ export function useAudienceTimeBasedCountdown({
     displayData.currentTeam === 'CONS' &&
     !isConsLocallyStopped;
 
+  // 1회당 발언 시간 모드에서는 전체 시간을 발언 카운트다운에서 파생하므로 돌리지 않음
   const prosTotalCountdown = useAudienceCountdown({
     receivedTime: inputs.pros.totalTime,
-    isRunning: isProsRequestedToRun,
+    isRunning: isProsRequestedToRun && timePerSpeaking === null,
     minimumTime: 0,
     shouldResetOnRunStateChange: false,
     syncKey: inputs.pros.totalSyncKey,
@@ -147,9 +189,10 @@ export function useAudienceTimeBasedCountdown({
     syncKey: inputs.pros.speakingSyncKey,
     syncedAt,
   });
+  // 1회당 발언 시간 모드에서는 전체 시간을 발언 카운트다운에서 파생하므로 돌리지 않음
   const consTotalCountdown = useAudienceCountdown({
     receivedTime: inputs.cons.totalTime,
-    isRunning: isConsRequestedToRun,
+    isRunning: isConsRequestedToRun && timePerSpeaking === null,
     minimumTime: 0,
     shouldResetOnRunStateChange: false,
     syncKey: inputs.cons.totalSyncKey,
@@ -164,10 +207,18 @@ export function useAudienceTimeBasedCountdown({
     syncedAt,
   });
 
-  const prosTotal = prosTotalCountdown.currentSeconds;
   const prosSpeaking = prosSpeakingCountdown.currentSeconds;
-  const consTotal = consTotalCountdown.currentSeconds;
   const consSpeaking = consSpeakingCountdown.currentSeconds;
+  const prosTotal = getDerivedTotalTime(
+    prosTotalCountdown.currentSeconds,
+    prosSpeaking,
+    inputs.pros.totalOffset,
+  );
+  const consTotal = getDerivedTotalTime(
+    consTotalCountdown.currentSeconds,
+    consSpeaking,
+    inputs.cons.totalOffset,
+  );
   const displaySequence = displayData?.sequence ?? null;
   const displayRevision = displayData?.revision ?? 0;
   const displayEventType = displayData?.eventType ?? null;
@@ -358,7 +409,14 @@ export function useAudienceTimeBasedCountdown({
           ...input,
           ...(timePerSpeaking === null
             ? { totalTime: receivedPreviousTime ?? input.totalTime }
-            : { speakingTime: receivedPreviousTime ?? input.speakingTime }),
+            : {
+                speakingTime: receivedPreviousTime ?? input.speakingTime,
+                totalOffset: getSpeakingOnlyTotalOffset(
+                  input,
+                  receivedPreviousTime,
+                  hasConfigurationChanged,
+                ),
+              }),
           totalSyncKey:
             timePerSpeaking === null
               ? input.totalSyncKey + 1
@@ -372,6 +430,8 @@ export function useAudienceTimeBasedCountdown({
           ...input,
           speakingTime: newSpeakingTime,
           speakingSyncKey: input.speakingSyncKey + 1,
+          totalOffset:
+            newSpeakingTime === null ? null : currentTotal - newSpeakingTime,
         }));
 
         return nextInputs;
@@ -381,7 +441,14 @@ export function useAudienceTimeBasedCountdown({
         ...input,
         ...(timePerSpeaking === null
           ? { totalTime: receivedCurrentTime ?? input.totalTime }
-          : { speakingTime: receivedCurrentTime ?? input.speakingTime }),
+          : {
+              speakingTime: receivedCurrentTime ?? input.speakingTime,
+              totalOffset: getSpeakingOnlyTotalOffset(
+                input,
+                receivedCurrentTime,
+                hasConfigurationChanged,
+              ),
+            }),
         totalSyncKey:
           timePerSpeaking === null
             ? input.totalSyncKey + 1
