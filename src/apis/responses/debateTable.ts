@@ -1,4 +1,4 @@
-import { DebateTableData } from '../../type/type';
+import { DebateTableData } from '../../types/type';
 
 // POST /api/table/customize
 export interface PostDebateTableResponseType extends DebateTableData {

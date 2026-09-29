@@ -1,4 +1,4 @@
-import { Organization } from '../../type/type';
+import { Organization } from '../../types/type';
 
 export interface GetOrganizationTemplatesResponseType {
   organizations: Organization[];

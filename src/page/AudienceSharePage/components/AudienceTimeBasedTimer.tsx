@@ -1,4 +1,4 @@
-import { TimeBasedStance } from '../../../type/type';
+import { TimeBasedStance } from '../../../types/type';
 import AudienceTimeBasedTimerDisplay from './AudienceTimeBasedTimerDisplay';
 
 export interface AudienceTimeBasedTimerProps {

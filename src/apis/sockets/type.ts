@@ -1,4 +1,4 @@
-import { Stance, TimeBoxType } from '../../type/type';
+import { Stance, TimeBoxType } from '../../types/type';
 
 // WS 사용을 위한 이벤트 타입
 export type TimerEventTypes =

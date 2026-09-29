@@ -7,7 +7,7 @@ import {
 } from '../../../util/languageRouting';
 import { useDeleteDebateTable } from '../../../hooks/mutations/useDeleteDebateTable';
 import { useGetDebateTableList } from '../../../hooks/query/useGetDebateTableList';
-import { DebateTable } from '../../../type/type';
+import { DebateTable } from '../../../types/type';
 import Table from './Table';
 
 export default function TableListPageContent() {

@@ -14,7 +14,7 @@ import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import LiveShareButton from './components/LiveShareButton';
 import LiveShareModal from './components/LiveShareModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
-import { bgColorMap } from '../../type/type';
+import { bgColorMap } from '../../types/type';
 import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';

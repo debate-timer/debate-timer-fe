@@ -7,7 +7,7 @@ import {
   DebateTableData,
   TimeBasedStance,
   TimerBGState,
-} from '../../../type/type';
+} from '../../../types/type';
 
 const TIME_THRESHOLDS = {
   WARNING_MAX: 30,

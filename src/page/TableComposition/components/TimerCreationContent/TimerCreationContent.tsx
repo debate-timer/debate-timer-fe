@@ -6,7 +6,7 @@ import {
   TimeBoxType,
   BellType,
   BellConfig,
-} from '../../../../type/type';
+} from '../../../../types/type';
 import { Formatting } from '../../../../util/formatting';
 import {
   SPEECH_TYPE_RECORD,

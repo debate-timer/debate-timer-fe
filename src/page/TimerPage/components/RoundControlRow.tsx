@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 import { SocketEventType } from '../../../apis/sockets/type';
 import useThrottle from '../../../hooks/useThrottle';
 

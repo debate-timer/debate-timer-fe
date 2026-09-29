@@ -1,4 +1,4 @@
-import { DebateTableData } from '../type/type';
+import { DebateTableData } from '../types/type';
 
 export const SAMPLE_TABLE_DATA: DebateTableData = {
   info: {

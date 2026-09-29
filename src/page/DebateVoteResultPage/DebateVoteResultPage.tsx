@@ -7,7 +7,7 @@ import { useModal } from '../../hooks/useModal';
 import VoteDetailResult from './components/VoteDetailResult';
 import { useGetPollInfo } from '../../hooks/query/useGetPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
-import { TeamKey } from '../../type/type';
+import { TeamKey } from '../../types/type';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import DialogModal from '../../components/DialogModal/DialogModal';
 import {

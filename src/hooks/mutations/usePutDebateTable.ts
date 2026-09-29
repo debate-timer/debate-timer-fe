@@ -1,4 +1,4 @@
-import { DebateTableData } from '../../type/type';
+import { DebateTableData } from '../../types/type';
 import { PutDebateTableResponseType } from '../../apis/responses/debateTable';
 import { getRepository } from '../../repositories/DebateTableRepository';
 import { usePreventDuplicateMutation } from './usePreventDuplicateMutation';

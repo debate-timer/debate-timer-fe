@@ -1,4 +1,4 @@
-import { DebateTable } from '../../type/type';
+import { DebateTable } from '../../types/type';
 
 // POST "/api/member"
 export interface PostUserResponseType {

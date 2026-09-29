@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Formatting } from '../../../util/formatting';
-import { Stance } from '../../../type/type';
+import { Stance } from '../../../types/type';
 import DTDebate from '../../../components/icons/Debate';
 import TimerProgressBar, {
   TimerProgressBarTeam,
