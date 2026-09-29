@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DebateTableData, TimeBasedStance } from '../../../type/type';
+import { DebateTableData, TimeBasedStance } from '../../../types/type';
 import { NormalTimerLogics } from './useNormalTimer';
 import { TimeBasedTimerLogics } from './useTimeBasedTimer';
 

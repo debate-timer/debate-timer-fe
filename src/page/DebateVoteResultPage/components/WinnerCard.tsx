@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import crown from '../../../assets/debateEnd/crown.svg';
-import { TEAM_STYLE, TeamKey } from '../../../type/type';
+import { TEAM_STYLE, TeamKey } from '../../../types/type';
 import clsx from 'clsx';
 
 interface WinnerCardProps {

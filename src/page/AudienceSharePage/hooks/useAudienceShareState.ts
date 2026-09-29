@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 import { isSocketError } from '../../../apis/sockets/error';
-import {
-  getDisplayDataByEvent,
-  AudienceDisplayData,
-} from './EventInterpreter';
+import { getDisplayDataByEvent, AudienceDisplayData } from './EventInterpreter';
 import { getNetworkDelayMs } from './getNetworkDelayMs';
 
 /**

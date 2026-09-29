@@ -15,7 +15,7 @@ import {
   DebateTableData,
   TimeBasedStance,
   TimerBGState,
-} from '../../../type/type';
+} from '../../../types/type';
 import { useTimerBackground } from './useTimerBackground';
 import useFullscreen from '../../../hooks/useFullscreen';
 

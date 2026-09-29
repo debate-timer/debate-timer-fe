@@ -1,4 +1,4 @@
-import { Organization } from '../../../type/type';
+import { Organization } from '../../../types/type';
 import TemplateCard from './TemplateCard';
 
 interface TemplateListProps {

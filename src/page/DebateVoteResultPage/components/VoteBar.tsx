@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import AnimatedCounter from './AnimatedCounter';
-import { TEAM_STYLE, TeamKey } from '../../../type/type';
+import { TEAM_STYLE, TeamKey } from '../../../types/type';
 
 type VoteBarProps = {
   teamKey: TeamKey; // "PROS" | "CONS"

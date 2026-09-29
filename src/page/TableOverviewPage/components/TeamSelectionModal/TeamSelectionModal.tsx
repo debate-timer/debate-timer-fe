@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Cointoss from '../../../../assets/teamSelection/cointoss.png';
 import CoinFront from '../../../../assets/teamSelection/coinfront.png';
 import CoinBack from '../../../../assets/teamSelection/coinback.png';
-import { CoinState } from '../../../../type/type';
+import { CoinState } from '../../../../types/type';
 
 interface TeamSelectionModalProps {
   onClose: () => void;

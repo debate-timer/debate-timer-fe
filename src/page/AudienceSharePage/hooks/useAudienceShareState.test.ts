@@ -7,7 +7,7 @@ import { useAudienceCountdown } from './useAudienceCountdown';
 import * as useAudienceSocketModule from '../../../hooks/sockets/useAudienceSocket';
 import { SocketMessage } from '../../../apis/sockets/type';
 import { SocketError } from '../../../apis/sockets/error';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 
 vi.mock('../../../hooks/sockets/useAudienceSocket');
 

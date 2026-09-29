@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Organization } from '../../../type/type';
+import { Organization } from '../../../types/type';
 import clsx from 'clsx';
 import { createTableShareUrlFromEncodedData } from '../../../util/arrayEncoding';
 import useAnalytics from '../../../hooks/useAnalytics';

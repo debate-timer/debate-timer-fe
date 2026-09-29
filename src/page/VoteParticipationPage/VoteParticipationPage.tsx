@@ -11,7 +11,7 @@ import { useGetVoterPollInfo } from '../../hooks/query/useGetVoterPollInfo';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import usePostVoterPollInfo from '../../hooks/mutations/usePostVoterPollInfo';
-import { TeamKey } from '../../type/type';
+import { TeamKey } from '../../types/type';
 import {
   buildLangPath,
   DEFAULT_LANG,

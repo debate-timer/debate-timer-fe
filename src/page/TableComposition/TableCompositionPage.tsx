@@ -6,7 +6,7 @@ import useTableFrom from './hook/useTableFrom';
 import TimeBoxStep from './components/TimeBoxStep/TimeBoxStep';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
-import { DebateInfo, TimeBoxInfo } from '../../type/type';
+import { DebateInfo, TimeBoxInfo } from '../../types/type';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { isGuestFlow } from '../../util/sessionStorage';

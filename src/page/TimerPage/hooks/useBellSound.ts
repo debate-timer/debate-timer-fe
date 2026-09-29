@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NormalTimerLogics } from './useNormalTimer';
-import { BellConfig } from '../../../type/type';
+import { BellConfig } from '../../../types/type';
 
 interface UseBellSoundProps {
   normalTimer: NormalTimerLogics;

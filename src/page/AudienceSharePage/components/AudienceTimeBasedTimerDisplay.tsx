@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import TimerProgressBar from '../../../components/TimerProgressBar/TimerProgressBar';
-import { TimeBasedStance } from '../../../type/type';
+import { TimeBasedStance } from '../../../types/type';
 import { Formatting } from '../../../util/formatting';
 
 interface AudienceTimeBasedTimerDisplayProps {

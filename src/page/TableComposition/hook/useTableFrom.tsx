@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useNavigationType } from 'react-router-dom';
 import { TableCompositionStep } from '../TableCompositionPage';
 import useBrowserStorage from '../../../hooks/useBrowserStorage';
-import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
+import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../types/type';
 import useAddDebateTable from '../../../hooks/mutations/useAddDebateTable';
 import { usePutDebateTable } from '../../../hooks/mutations/usePutDebateTable';
 import { isGuestFlow } from '../../../util/sessionStorage';

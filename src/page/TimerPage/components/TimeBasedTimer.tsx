@@ -4,7 +4,7 @@ import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import KeyboardKeyA from '../../../assets/keyboard/keyboard_key_A.png';
 import KeyboardKeyL from '../../../assets/keyboard/keyboard_key_l.png';
-import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
+import { TimeBasedStance, TimeBoxInfo } from '../../../types/type';
 import CircularTimer from './CircularTimer';
 import clsx from 'clsx';
 import useCircularTimerAnimation from '../hooks/useCircularTimerAnimation';

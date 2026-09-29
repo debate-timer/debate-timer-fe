@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { TEAM_STYLE, TeamKey } from '../../../type/type';
+import { TEAM_STYLE, TeamKey } from '../../../types/type';
 
 interface VoteTeamButtonProps {
   label: string;

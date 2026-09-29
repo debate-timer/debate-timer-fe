@@ -1,5 +1,5 @@
 import { TimerDataPayload, TimerEventTypes } from '../../apis/sockets/type';
-import { TimeBasedStance, TimeBoxType } from '../../type/type';
+import { TimeBasedStance, TimeBoxType } from '../../types/type';
 
 interface BuildTimerPayloadForShareParams {
   eventType: TimerEventTypes;

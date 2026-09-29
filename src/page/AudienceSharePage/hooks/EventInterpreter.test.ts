@@ -8,7 +8,7 @@ import {
   AudienceNormalDisplayData,
   AudienceTimeBasedDisplayData,
 } from './EventInterpreter';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 import { TimerDataPayload } from '../../../apis/sockets/type';
 
 describe('eventInterpreter 순수 함수', () => {

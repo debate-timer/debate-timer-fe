@@ -1,4 +1,4 @@
-import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../type/type';
+import { DebateInfo, DebateTableData, TimeBoxInfo } from '../../../types/type';
 import {
   AudienceNormalDisplayData,
   AudienceTimeBasedDisplayData,

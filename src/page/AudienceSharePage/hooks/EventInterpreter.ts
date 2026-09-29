@@ -1,4 +1,4 @@
-import { TimeBasedStance, TimeBoxInfo } from '../../../type/type';
+import { TimeBasedStance, TimeBoxInfo } from '../../../types/type';
 import { TimerDataPayload, TimerEventTypes } from '../../../apis/sockets/type';
 
 export type AudienceNormalDisplayData = {

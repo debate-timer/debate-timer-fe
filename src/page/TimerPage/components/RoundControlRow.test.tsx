@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import RoundControlRow, { ROUND_CONTROL_COOLDOWN_MS } from './RoundControlRow';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 
 function createTimeBox(): TimeBoxInfo {
   return {

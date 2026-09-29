@@ -10,7 +10,7 @@ import {
   PostDebateTableResponseType,
   PutDebateTableResponseType,
 } from '../apis/responses/debateTable';
-import { DebateTableData } from '../type/type';
+import { DebateTableData } from '../types/type';
 import { DebateTableRepository } from './DebateTableRepository';
 
 class ApiDebateTableRepository implements DebateTableRepository {
