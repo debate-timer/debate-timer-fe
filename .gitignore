@@ -25,3 +25,7 @@ yarn-error.log*
 
 *storybook.log
 
+# 로컬 리뷰 보고서와 PR 초안
+/review-report-????-??-??.md
+/PR.md
+

@@ -48,5 +48,5 @@
 
 ## 📖 문서
 
-- [아키텍처 소개](/docs/README.md)
-- [헌법](/docs/CONSTITUTION.md)
+- [아키텍처 소개](docs/README.md)
+- [헌법](docs/CONSTITUTION.md)
