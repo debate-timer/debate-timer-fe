@@ -8,7 +8,7 @@ import TableOverviewPage from './TableOverviewPage';
 import TableSharingPage from '../TableSharingPage/TableSharingPage';
 import { encodeDebateTableData } from '../../util/arrayEncoding';
 import { server } from '../../mocks/server';
-import { DebateTableData } from '../../type/type';
+import { DebateTableData } from '../../types/type';
 import { SAMPLE_TABLE_DATA } from '../../constants/sample_table';
 
 const sharedTable: DebateTableData = {
