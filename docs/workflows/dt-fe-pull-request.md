@@ -46,6 +46,22 @@ PR 작성 전에 **`dt-fe-code-review` 스킬을 먼저 호출**하고
 
 ## PR 본문과 생성
 
+PR 제목은 `[{label}] {title}` 형식으로 작성함. `{label}`은 현재 브랜치 이름의
+첫 `/` 앞 접두어에서 우선 파싱함. 접두어가 아래 GitHub 레이블 목록에 없거나
+접두어가 없으면, 해당 목록에서 PR 변경의
+주된 목적에 맞는 레이블을 선택함. 레이블 이름의 대소문자는 목록과 일치시킴.
+`{title}`은 PR에 포함된 전체 변경을 종합해 에이전트가 결정함. 예를 들어 문서 변경을 포함한
+`docs/#514-add-new-skills` 브랜치는 `[docs] PR 생성 및 리뷰 스킬 추가`로 작성함.
+
+2026-10-01에 [저장소 레이블](https://github.com/debate-timer/debate-timer-fe/labels)을
+조회한 목록임.
+
+- `feat`: 기능 개발, `fix`: 버그 수정, `hotfix`: 긴급 수정임.
+- `design`: UI 변경, `docs`: 문서 작업, `test`: 테스트 코드 작업임.
+- `refactor`: 기능 변경 없는 코드 변경, `style`: 코드 컨벤션 변경임.
+- `config`: 외부 라이브러리 추가·설정, `chore`: 파일 이동·이름 변경·삭제임.
+- `deploy`: `develop → main` 배포이며 이 일반 PR 스킬의 대상에서 제외함.
+
 루트 [PR 템플릿](../../.github/PULL_REQUEST_TEMPLATE.md)의 `연관 이슈`,
 `작업 내용`, 선택적 `스크린샷`, `리뷰 요구사항` 형식으로 루트 `PR.md`를 작성함.
 변경 배경, 사용 예시·정책·처리 흐름, 실제 검증 결과, 미실행 검증, 리뷰 관점과
@@ -55,6 +71,7 @@ PR 작성 전에 **`dt-fe-code-review` 스킬을 먼저 호출**하고
 push 직전에 실제 브랜치, upstream, 커밋과 diff, push 대상·범위, staging 및
 제외 파일을 사용자에게 보여주고 **별도 승인**을 받음. 승인 전에는 push와 PR
 생성을 진행하지 않음. 승인 후 확인한 범위만 push하고
-`gh pr create --base develop --head <branch> --body-file PR.md`로 PR을 생성함.
+`gh pr create --base develop --head <branch> --title "[{label}] {title}" --body-file PR.md`로
+PR을 생성함.
 명령이 중단되거나 실패하면 원격 브랜치·기존 PR 상태를 확인하고 중복 생성하지
 않음. 생성된 PR 링크와 검증·리뷰 결과를 보고함.
