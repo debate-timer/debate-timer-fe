@@ -101,6 +101,19 @@ describe('비회원 테이블 개요 페이지 - 세션 데이터 유실', () =>
     expect(requestedUrls.filter((url) => url.includes('NaN'))).toEqual([]);
   });
 
+  it('같은 페이지에서 회원 테이블 id가 게스트로 바뀌어도 샘플 테이블로 복구한다', async () => {
+    const router = renderWithRouter('/overview/customize/1');
+    await screen.findByText('나의 자유토론 테이블');
+
+    await act(async () => {
+      await router.navigate('/overview/customize/guest');
+    });
+
+    await screen.findByText(SAMPLE_TABLE_DATA.info.name);
+    expect(sessionStorage.getItem('DebateTableData')).not.toBeNull();
+    expect(requestedUrls.filter((url) => url.includes('NaN'))).toEqual([]);
+  });
+
   it('세션에 게스트 데이터가 있으면 덮어쓰지 않는다', async () => {
     sessionStorage.setItem(
       'DebateTableData',
