@@ -17,7 +17,7 @@
 [AGENTS.md](../AGENTS.md)는 에이전트의 실행 절차, 루트
 [README.md](../README.md)는 공개 안내를 소유함. `docs/workflows/`는
 저장소 전용 스킬의 실행 흐름과 중단·검증 절차를 소유함. 스킬 진입점은
-`.agents/skills/`에 둠.
+`.agents/skills/`와 `.claude/skills/`에 둠.
 
 ## 2. 현재 기술과 계층 지도
 
