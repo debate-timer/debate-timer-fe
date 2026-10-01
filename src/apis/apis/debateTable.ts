@@ -1,4 +1,4 @@
-import { DebateTableData } from '../../type/type';
+import { DebateTableData } from '../../types/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
 import { PutDebateTableRequestType } from '../requests/debateTable';

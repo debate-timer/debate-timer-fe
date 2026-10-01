@@ -2,7 +2,6 @@ import { SocketErrorCode } from '../../apis/sockets/error';
 
 export type AudienceShareErrorCode =
   | SocketErrorCode
-  | 'EVENT_TIMEOUT'
   | 'SERVER_ERROR'
   | 'UNKNOWN';
 

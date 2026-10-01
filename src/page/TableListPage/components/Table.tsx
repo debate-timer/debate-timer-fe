@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { DebateTable } from '../../../type/type';
+import { DebateTable } from '../../../types/type';
 import { IoArrowForward } from 'react-icons/io5';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';

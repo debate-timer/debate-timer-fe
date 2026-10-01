@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { GlobalPortal } from '../../../../util/GlobalPortal';
-import { DebateInfo } from '../../../../type/type';
+import { DebateInfo } from '../../../../types/type';
 import TableNameAndType from './TableNameAndType';
 
 // ------------------

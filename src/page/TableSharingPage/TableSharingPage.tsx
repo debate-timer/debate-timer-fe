@@ -5,7 +5,7 @@ import { useModal } from '../../hooks/useModal';
 import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
 import { decodeDebateTableData } from '../../util/arrayEncoding';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { DebateTableData } from '../../type/type';
+import { DebateTableData } from '../../types/type';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
 import { isLoggedIn } from '../../util/accessToken';

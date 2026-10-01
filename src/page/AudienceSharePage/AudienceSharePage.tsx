@@ -1,4 +1,5 @@
-import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
@@ -6,12 +7,20 @@ import { useAudienceCountdown } from './hooks/useAudienceCountdown';
 import { useAudienceTimeBasedCountdown } from './hooks/useAudienceTimeBasedCountdown';
 import AudienceNormalTimer from './components/AudienceNormalTimer';
 import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
+import ChairmanStatusNotice from './components/ChairmanStatusNotice';
+import ConnectionLostNotice from './components/ConnectionLostNotice';
+import DebateWaitingNotice from './components/DebateWaitingNotice';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';
 import { resolveAudienceScreenState } from './hooks/AudienceScreenState';
+import {
+  buildLangPath,
+  DEFAULT_LANG,
+  isSupportedLang,
+} from '../../util/languageRouting';
 
 interface ErrorContentProps {
   message: string;
@@ -39,7 +48,7 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
         data-testid="audience-share-error-icon"
         aria-hidden="true"
       />
-      <p className="text-xl font-semibold text-gray-800 xl:text-2xl">
+      <p className="whitespace-pre-line break-keep px-4 text-center text-xl font-semibold text-gray-800 xl:text-2xl">
         {message}
       </p>
       <button
@@ -55,7 +64,10 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
 
 export default function AudienceSharePage() {
   const { id } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const tableId = Number(id);
   const isValidTableId =
@@ -63,8 +75,10 @@ export default function AudienceSharePage() {
   const debateTableQuery = useGetDebateTableDataForShare(
     isValidTableId ? tableId : undefined,
   );
+  // 테이블 정보를 한 번이라도 받았으면 소켓을 유지한다.
+  // 재조회에 실패했다고 소켓까지 내리면, 서버가 내려갔을 때 재연결과 연결 끊김 안내가 사라진다.
   const state = useAudienceShareState(tableId, {
-    enabled: isValidTableId && debateTableQuery.isSuccess,
+    enabled: isValidTableId && !!debateTableQuery.data,
     table: debateTableQuery.data?.table,
   });
 
@@ -78,6 +92,16 @@ export default function AudienceSharePage() {
     t,
   );
 
+  // 서버와의 연결이 끊겨 스스로 복구할 수 없는 상태 (새로고침이 필요)
+  const isConnectionLost = state.connectionStatus === 'lost';
+
+  // 사회자 연결이 끊기거나 서버 연결이 끊기면 마지막으로 보던 시간에서 카운트다운을 멈춘다
+  const isChairmanAbsent =
+    state.chairmanPresence === 'absent' || isConnectionLost;
+
+  // 네트워크 지연 보정 기준 시각
+  const syncedAt = state.status === 'displaying' ? state.syncedAt : null;
+
   const normalCountdown = useAudienceCountdown({
     receivedTime:
       viewState.type === 'NORMAL_TIMER'
@@ -85,12 +109,19 @@ export default function AudienceSharePage() {
         : null,
     isRunning:
       viewState.type === 'NORMAL_TIMER'
-        ? viewState.displayData.isRunning
+        ? viewState.displayData.isRunning && !isChairmanAbsent
         : false,
+    // 끊김으로 멈출 때는 마지막 수신 시간으로 되돌리지 않고 현재 값을 유지
+    shouldResetOnRunStateChange: !isChairmanAbsent,
+    syncedAt,
   });
   const timeBasedCountdown = useAudienceTimeBasedCountdown({
     displayData:
-      viewState.type === 'TIME_BASED_TIMER' ? viewState.displayData : null,
+      viewState.type === 'TIME_BASED_TIMER'
+        ? isChairmanAbsent
+          ? { ...viewState.displayData, isRunning: false }
+          : viewState.displayData
+        : null,
     timePerTeam:
       viewState.type === 'TIME_BASED_TIMER'
         ? viewState.timeBox.timePerTeam
@@ -99,21 +130,22 @@ export default function AudienceSharePage() {
       viewState.type === 'TIME_BASED_TIMER'
         ? viewState.timeBox.timePerSpeaking
         : null,
+    syncedAt,
   });
+
+  // 토론이 종료되면 종료 안내 페이지로 이동 (뒤로 가기로 돌아오지 않도록 replace)
+  const isFinished = viewState.type === 'FINISHED';
+  useEffect(() => {
+    if (!isFinished) {
+      return;
+    }
+
+    navigate(buildLangPath(`/live/${tableId}/end`, lang), { replace: true });
+  }, [isFinished, lang, navigate, tableId]);
 
   if (!isValidTableId) {
     throw new Error(t('유효하지 않은 토론방 ID입니다.'));
   }
-
-  const handleClosePage = () => {
-    // 일단 페이지 닫기
-    window.close();
-
-    // 페이지를 못 닫을 경우 홈으로
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 100);
-  };
 
   const handleReload = () => {
     window.location.reload();
@@ -125,17 +157,11 @@ export default function AudienceSharePage() {
         return <LoadingContent />;
 
       case 'WAITING':
-        return (
-          <div className="flex h-full w-full flex-col items-center justify-center space-y-[20px]">
-            <h1 className="text-center text-2xl font-bold text-gray-800 xl:text-4xl">
-              {viewState.message}
-            </h1>
-          </div>
-        );
+        return <DebateWaitingNotice message={viewState.message} />;
 
       case 'NORMAL_TIMER':
         return (
-          <div className="flex h-full w-full items-center justify-center">
+          <div className="flex h-full w-full items-center justify-center [align-items:safe_center]">
             <AudienceNormalTimer
               remainingTime={
                 normalCountdown.currentSeconds ??
@@ -170,7 +196,7 @@ export default function AudienceSharePage() {
               viewState.timeBox.timePerSpeaking);
 
         return (
-          <div className="flex h-full w-full items-center justify-center px-4 xl:px-12">
+          <div className="flex h-full w-full items-center justify-center [align-items:safe_center] md:px-4 xl:px-12">
             <AudienceTimeBasedTimer
               prosTeamName={viewState.prosTeamName}
               consTeamName={viewState.consTeamName}
@@ -196,20 +222,7 @@ export default function AudienceSharePage() {
       }
 
       case 'FINISHED':
-        return (
-          <div className="flex h-full w-full flex-col items-center justify-center space-y-8">
-            <h1 className="text-center text-3xl font-bold text-gray-800 xl:text-5xl">
-              {viewState.message}
-            </h1>
-            <button
-              type="button"
-              className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-              onClick={handleClosePage}
-            >
-              {t('페이지 닫기')}
-            </button>
-          </div>
-        );
+        return <LoadingContent />;
 
       case 'ERROR':
       case 'CONFIG_ERROR':
@@ -219,42 +232,68 @@ export default function AudienceSharePage() {
     }
   };
 
+  const isTimerVisible =
+    viewState.type === 'NORMAL_TIMER' || viewState.type === 'TIME_BASED_TIMER';
+  const shouldShowWaitingNotice =
+    isTimerVisible && state.chairmanPresence === 'waiting' && !isConnectionLost;
+  const shouldShowConnectionLostNotice = isTimerVisible && isConnectionLost;
+  const shouldShowAbsentNotice =
+    isTimerVisible && isChairmanAbsent && !isConnectionLost;
+
   const isHeaderVisible =
     viewState.type === 'WAITING' ||
     viewState.type === 'NORMAL_TIMER' ||
-    viewState.type === 'TIME_BASED_TIMER' ||
-    viewState.type === 'FINISHED';
+    viewState.type === 'TIME_BASED_TIMER';
+
+  const tableInfo = debateTableQuery.data?.info;
+  const tableNameLabel =
+    !tableInfo?.name || tableInfo.name.trim() === ''
+      ? t('테이블 이름 없음')
+      : t(tableInfo.name);
+  const agendaLabel =
+    !tableInfo?.agenda || tableInfo.agenda.trim() === ''
+      ? t('주제 없음')
+      : t(tableInfo.agenda);
+  const shouldShowHeader = isHeaderVisible && !!tableInfo;
 
   return (
     <DefaultLayout>
-      {isHeaderVisible && debateTableQuery.data ? (
+      {shouldShowHeader ? (
         <DefaultLayout.Header>
           <DefaultLayout.Header.Left>
-            <HeaderTableInfo
-              name={
-                !debateTableQuery.data.info.name ||
-                debateTableQuery.data.info.name.trim() === ''
-                  ? t('테이블 이름 없음')
-                  : t(debateTableQuery.data.info.name)
-              }
-            />
+            <HeaderTableInfo name={tableNameLabel} />
           </DefaultLayout.Header.Left>
-          <DefaultLayout.Header.Center>
-            <HeaderTitle
-              title={
-                !debateTableQuery.data.info.agenda ||
-                debateTableQuery.data.info.agenda.trim() === ''
-                  ? t('주제 없음')
-                  : t(debateTableQuery.data.info.agenda)
-              }
-            />
+          {/* 세로 모드 모바일에서는 헤더 공간이 좁아 주제를 본문 상단에 표시 */}
+          <DefaultLayout.Header.Center className="hidden md:flex short:flex">
+            <HeaderTitle title={agendaLabel} />
           </DefaultLayout.Header.Center>
           <DefaultLayout.Header.Right />
         </DefaultLayout.Header>
       ) : null}
       <DefaultLayout.ContentContainer>
         <div className="relative flex h-full w-full flex-col">
-          {renderContent()}
+          {shouldShowHeader ? (
+            <p
+              data-testid="mobile-agenda"
+              className="line-clamp-2 flex-shrink-0 break-keep pb-2 text-center text-lg font-semibold text-default-black md:hidden short:hidden"
+            >
+              {agendaLabel}
+            </p>
+          ) : null}
+          {shouldShowWaitingNotice ? (
+            <div className="flex-shrink-0 pb-2">
+              <ChairmanStatusNotice variant="waiting" />
+            </div>
+          ) : null}
+          <div className="relative min-h-0 w-full flex-1">
+            {renderContent()}
+            {shouldShowAbsentNotice ? (
+              <ChairmanStatusNotice variant="absent" />
+            ) : null}
+            {shouldShowConnectionLostNotice ? (
+              <ConnectionLostNotice onReload={handleReload} />
+            ) : null}
+          </div>
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>

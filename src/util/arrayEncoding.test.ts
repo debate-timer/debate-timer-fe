@@ -1,4 +1,4 @@
-import { DebateTableData } from '../type/type';
+import { DebateTableData } from '../types/type';
 import {
   createTableShareUrlFromEncodedData,
   createTableShareUrlFromTable,

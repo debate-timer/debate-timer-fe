@@ -1,4 +1,4 @@
-import { TimeBasedStance } from '../../../type/type';
+import { TimeBasedStance } from '../../../types/type';
 import AudienceTimeBasedTimerDisplay from './AudienceTimeBasedTimerDisplay';
 
 export interface AudienceTimeBasedTimerProps {
@@ -28,7 +28,7 @@ export default function AudienceTimeBasedTimer({
 }: AudienceTimeBasedTimerProps) {
   return (
     <div
-      className="flex h-full w-full flex-row gap-8"
+      className="flex h-full w-full flex-row gap-2 md:gap-8"
       data-testid="time-based-timer-row"
     >
       <AudienceTimeBasedTimerDisplay

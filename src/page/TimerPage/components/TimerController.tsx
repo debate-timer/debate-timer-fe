@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { GiPauseButton } from 'react-icons/gi';
 import DTReset from '../../../components/icons/Reset';
 import DTPlay from '../../../components/icons/Play';
-import { Stance, TimeBoxType } from '../../../type/type';
+import { Stance, TimeBoxType } from '../../../types/type';
 import clsx from 'clsx';
 
 interface TimerControllerProps {

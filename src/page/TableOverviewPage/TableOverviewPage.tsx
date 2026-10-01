@@ -8,7 +8,7 @@ import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
-import { CoinState, StanceToString } from '../../type/type';
+import { CoinState, StanceToString } from '../../types/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import DTShare from '../../components/icons/Share';
 import DTDebate from '../../components/icons/Debate';

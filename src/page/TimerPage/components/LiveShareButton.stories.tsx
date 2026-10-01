@@ -21,3 +21,11 @@ export const Default: Story = {
     },
   },
 };
+
+// 이 화면이 현재 라이브 공유 중인 사회자일 때
+export const Sharing: Story = {
+  args: {
+    ...Default.args,
+    isSharing: true,
+  },
+};

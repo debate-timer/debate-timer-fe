@@ -3,7 +3,7 @@ import TableOverviewPage from './TableOverviewPage';
 import {
   // ParliamentaryTimeBoxInfo,
   TimeBoxInfo,
-} from '../../type/type';
+} from '../../types/type';
 
 // 1) 메타 설정
 const meta: Meta<typeof TableOverviewPage> = {

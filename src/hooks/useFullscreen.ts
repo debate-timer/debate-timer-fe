@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useState } from 'react';
 import {
   DocumentWithFullscreen,
   HTMLElementWithFullscreen,
-} from '../type/fullscreen';
+} from '../types/fullscreen';
 
 // 헬퍼 함수: 현재 전체 화면 요소가 무엇인지 반환 (없으면 null)
 const getFullscreenElement = (): Element | null => {

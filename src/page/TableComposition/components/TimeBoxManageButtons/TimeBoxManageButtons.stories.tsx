@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import TimeBoxManageButtons from './TimeBoxManageButtons';
-import { TimeBoxInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../types/type';
 
 const meta: Meta<typeof TimeBoxManageButtons> = {
   title: 'page/TableSetup/components/TimeBoxManageButtons',

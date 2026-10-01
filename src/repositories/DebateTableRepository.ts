@@ -4,7 +4,7 @@ import {
   PostDebateTableResponseType,
   PutDebateTableResponseType,
 } from '../apis/responses/debateTable';
-import { DebateTableData } from '../type/type';
+import { DebateTableData } from '../types/type';
 import { isGuestFlow } from '../util/sessionStorage';
 import apiDebateTableRepository from './ApiDebateTableRepository';
 import sessionDebateTableRepository from './SessionDebateTableRepository';

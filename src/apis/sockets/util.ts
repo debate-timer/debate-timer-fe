@@ -1,5 +1,7 @@
 import {
+  ChairmanNotice,
   NonTimerEventType,
+  ServerEventType,
   SocketEventType,
   TimerEventTypes,
   SocketMessage,
@@ -12,9 +14,12 @@ const TIMER_EVENT_TYPES: TimerEventTypes[] = [
   'PLAY',
   'RESET',
   'TEAM_SWITCH',
+  'SYNC',
 ];
 
 const NON_TIMER_EVENT_TYPES: NonTimerEventType[] = ['FINISHED', 'ERROR'];
+
+const SERVER_EVENT_TYPES: ServerEventType[] = ['CHAIRMAN_ABSENT'];
 
 export function isTimerEventType(
   event: SocketEventType,
@@ -28,6 +33,22 @@ export function isNonTimerEventType(
   return NON_TIMER_EVENT_TYPES.includes(event as NonTimerEventType);
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+// 서버는 값이 없는 선택 필드를 null로 채워 보내므로 undefined와 null 모두 허용
+function isOptional<T>(
+  value: unknown,
+  guard: (value: unknown) => value is T,
+): boolean {
+  return value === undefined || value === null || guard(value);
+}
+
+function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}
+
 export function isSocketMessage(value: unknown): value is SocketMessage {
   if (typeof value !== 'object' || value === null) {
     return false;
@@ -35,6 +56,13 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
 
   const obj = value as Record<string, unknown>;
   const eventType = obj.eventType as SocketEventType;
+
+  if (
+    !isOptional(obj.version, isFiniteNumber) ||
+    !isOptional(obj.serverTime, isFiniteNumber)
+  ) {
+    return false;
+  }
 
   if (isTimerEventType(eventType)) {
     const data = obj.data as Record<string, unknown>;
@@ -72,12 +100,58 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
       }
     }
 
+    if (
+      !isOptional(data.isRunning, isBoolean) ||
+      !isOptional(data.prosRemainingTime, isFiniteNumber) ||
+      !isOptional(data.consRemainingTime, isFiniteNumber)
+    ) {
+      return false;
+    }
+
+    if (eventType === 'SYNC') {
+      if (!isBoolean(data.isRunning)) {
+        return false;
+      }
+
+      if (
+        data.timerType === 'TIME_BASED' &&
+        (!isFiniteNumber(data.prosRemainingTime) ||
+          !isFiniteNumber(data.consRemainingTime))
+      ) {
+        return false;
+      }
+    }
+
     return true;
   }
 
-  if (isNonTimerEventType(eventType)) {
+  if (
+    isNonTimerEventType(eventType) ||
+    SERVER_EVENT_TYPES.includes(eventType as ServerEventType)
+  ) {
     return obj.data === null;
   }
 
   return false;
+}
+
+export function isChairmanNotice(value: unknown): value is ChairmanNotice {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const obj = value as Record<string, unknown>;
+  if (obj.type !== 'SYNC_REQUEST' && obj.type !== 'REPLACED') {
+    return false;
+  }
+
+  if (!isFiniteNumber(obj.roomId)) {
+    return false;
+  }
+
+  return (
+    obj.activeSessionId === undefined ||
+    obj.activeSessionId === null ||
+    typeof obj.activeSessionId === 'string'
+  );
 }

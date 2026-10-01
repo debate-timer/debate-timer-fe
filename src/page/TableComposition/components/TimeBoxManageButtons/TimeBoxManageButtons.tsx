@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { TimeBoxInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../types/type';
 import { useModal } from '../../../../hooks/useModal';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
 import DialogModal from '../../../../components/DialogModal/DialogModal';

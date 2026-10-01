@@ -18,6 +18,7 @@ import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
 import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 import LanguageWrapper from './LanguageWrapper';
 import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
+import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedPage';
 
 const appRoutes = [
   {
@@ -88,6 +89,11 @@ const appRoutes = [
   {
     path: 'live/:id',
     element: <AudienceSharePage />,
+    requiresAuth: false,
+  },
+  {
+    path: 'live/:id/end',
+    element: <AudienceFinishedPage />,
     requiresAuth: false,
   },
   {

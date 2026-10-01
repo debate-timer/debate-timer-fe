@@ -1,94 +1,87 @@
-# Debate Timer FE
+# Debate Timer FE 에이전트 작업 지침
 
-## Project Overview
+## 문서 읽기
 
-토론 타이머 웹 애플리케이션 프론트엔드. 토론 테이블 구성, 타이머 실행, 투표 기능을 제공한다.
+모든 코드 변경 전에 [헌법](docs/CONSTITUTION.md)과 [문서 지도](docs/README.md)를
+읽음. 작업 대상에 맞는 아키텍처·컨벤션 상세 문서는 문서 지도의 작업별 표에서
+고름. 문서·템플릿을 변경할 때는 [문서 작성 컨벤션](docs/conventions/docs.md)을
+적용함.
 
-## Tech Stack
+### 문서 우선순위
 
-- **Framework**: React 18 + Vite
-- **Language**: TypeScript (strict mode)
-- **Routing**: React Router v7 (`createBrowserRouter`)
-- **Server State**: TanStack React Query 5
-- **HTTP**: Axios (custom `request<T>` primitive in `src/apis/primitives.ts`)
-- **Styling**: Tailwind CSS 3 + PostCSS
-- **i18n**: i18next + react-i18next
-- **Animation**: Framer Motion
-- **Testing**: Vitest + @testing-library/react + userEvent + MSW
-- **Storybook**: Available on port 6006
+1. [헌법](docs/CONSTITUTION.md): 제품 원칙과 변경 통제를 소유함.
+2. [문서 지도](docs/README.md): 기술 구조와 작업별 읽기 경로를 소유하고 상세
+   문서를 계약으로 편입함.
+3. [아키텍처](docs/README.md#3-아키텍처-상세-계약)·[컨벤션](docs/README.md#4-코드와-문서-컨벤션)
+   상세 문서: 주제별 정확한 구현·작성 계약을 소유함.
+4. 이 파일 `AGENTS.md`: 에이전트의 실행 절차와 권한 경계를 소유함.
+5. 루트 [README.md](README.md): 공개 안내를 소유함.
 
-## Project Structure
+헌법과 충돌하면 헌법을 우선함. 문서 지도의 요약과 상세 계약이 다르거나 상세
+문서끼리 충돌하면 우선순위로 임의 선택하지 않고 문서 오류로 보고함. 실행 권한
+경계는 다른 문서에서 생략해도 계속 적용함.
 
-```
-src/
-├── page/{PageName}/             # Page components (local components/ + hooks/)
-├── components/{Component}/      # Reusable UI components
-├── hooks/
-│   ├── query/                   # TanStack Query hooks (useGet*)
-│   ├── mutations/               # TanStack Mutation hooks (usePost*, usePatch*, useDelete*)
-│   └── use{Hook}.ts             # Utility hooks
-├── apis/
-│   ├── apis/{domain}.ts         # API functions (Axios)
-│   ├── requests/{domain}.ts     # Request types
-│   ├── responses/{domain}.ts    # Response types
-│   ├── primitives.ts            # Generic request<T> helper
-│   ├── axiosInstance.ts         # Axios instance with interceptors
-│   └── endpoints.ts             # API URL constants
-├── util/                        # Utility functions
-├── constants/                   # Constants and static data
-├── type/                        # Shared TypeScript types
-├── repositories/                # Repository pattern (API/Session)
-├── mocks/handlers/              # MSW handlers
-├── layout/                      # Layout components (DefaultLayout)
-└── routes/routes.tsx            # Route definitions
-```
+### 에이전트 작업 안내
 
-## Code Conventions
+에이전트는 작업 내용을 대략 식별한 직후, [문서 지도](docs/README.md)의 작업별
+읽기 경로를 기준으로 즉시 읽어야 할 `docs/architecture/` 또는
+`docs/conventions/` 내 상세 문서를 사용자에게 명시적으로 답변함. 문서의 실제
+파일 경로와 선택 이유를 제시하고, 해당 문서를 읽은 뒤 작업을 진행함.
 
-- **Components**: function declaration (`export default function X() {}`), NOT arrow function const
-- **Variables**: `const` default, `let` only for reassignment, NEVER `var`
-- **Naming**: Components PascalCase, hooks `use` prefix camelCase, utils camelCase, constants UPPER_SNAKE_CASE
-- **Boolean**: `is`/`has`/`should` prefix
-- **Event handlers**: `handle` prefix
-- **i18n**: All user-facing text via `useTranslation()`
+## 작업 절차
 
-## Testing (TDD)
+1. 변경 목적과 영향을 받는 화면·데이터·소켓·테스트 경계를 확인함.
+2. 작업 관련 읽어야 할 상세 문서를 식별하고, 읽을 예정인 문서 목록을 사용자에게 안내.
+3. 작업 관련 문서와 현재 코드를 대조함. 기존 코드의 불일치를 새 규칙의 예외로
+   확대하지 않음.
+4. 기능 구현은 [TDD 절차](docs/conventions/testing-and-storybook.md)에 따라 실패
+   확인 → 최소 구현 → 리팩터링 순으로 진행함.
+5. 계약·경로가 바뀌면 해당 소유 문서와 문서 지도의 링크·요약을 갱신함.
+6. 영향 범위에 맞는 테스트, lint, 타입 검사, build를 실행하고 실제 결과를
+   보고함. 실행하지 못한 검증은 통과로 적지 않음.
 
-- **Approach**: Red-Green-Refactor
-- **Runner**: Vitest (globals: true, jsdom)
-- **Setup**: `setup.ts` (MSW server, ResizeObserver mock, i18n)
-- **Convention**: `{module}.test.ts(x)` co-located, Korean test descriptions
-- **Mocking**: MSW for API, minimize other mocks
-- **Order**: `util/` → `apis/` → `hooks/` → `components/` → `page/`
+기존 사용자 변경과 작업 트리를 보존함. 범위 밖 파일을 되돌리거나 커밋에 포함하지
+않음. 오류는 재현 결과와 직접 원인을 확인한 뒤 최소 범위로 수정함.
 
-## Key Commands
+## 권한과 Git
 
-```bash
-npm run dev          # Development server
-npm run dev-mock     # Dev with MSW API mocking
-npm run build        # Production build
-npm run test         # Run Vitest
-npm run lint         # ESLint + Stylelint + TSC
-npm run storybook    # Storybook on port 6006
-```
+읽기 전용 요청에서는 파일·Git index·외부 상태를 변경하지 않음. 계획만 승인된
+단계에서는 구현하지 않음. 커밋·push·PR·배포는 각각 요청된 권한 범위에서 수행함.
+원격 전송이나 외부 메시지 발송을 사용자 요청에서 추론하지 않음.
 
-## Speckits Workflow
+새 이슈 작업 브랜치는 주된 GitHub 레이블을 접두어로 하여
+`{label}/#{issue}-{slug}` 형식으로 만듦. 레이블의 적용 기준은 다음과 같음.
 
-This project uses the speckits specification workflow. Scripts are in `.specify/scripts/bash/` and templates in `.specify/templates/`.
+| 레이블     | 적용 기준                                                                          |
+| ---------- | ---------------------------------------------------------------------------------- |
+| `feat`     | 기능 개발                                                                          |
+| `fix`      | 일반 버그 수정                                                                     |
+| `hotfix`   | 긴급 수정                                                                          |
+| `design`   | UI 변경                                                                            |
+| `docs`     | 문서 작업                                                                          |
+| `test`     | 테스트 코드 작업                                                                   |
+| `refactor` | 기능 변경 없는 코드 구조 개선                                                      |
+| `style`    | 코드 컨벤션 관련 변경                                                              |
+| `config`   | 외부 라이브러리 추가·설정                                                          |
+| `chore`    | 파일 이동·이름 변경·삭제 등 파일 자체의 변경                                       |
+| `deploy`   | `develop`에서 `main`으로 배포하는 PR에 사용함. 별도 이슈 작업 브랜치를 만들지 않음 |
 
-Workflow order:
-1. `/speckits/specify` — Create feature specification
-2. `/speckits/clarify` — Clarify ambiguities in spec
-3. `/speckits/plan` — Generate TDD-driven implementation plan
-4. `/speckits/tasks` — Break plan into ordered tasks
-5. `/speckits/analyze` — Cross-artifact consistency check
-6. `/speckits/implement` — Execute tasks
-7. `/speckits/checklist` — Generate quality checklist
+여러 레이블에 해당하면 작업의 주된 목적을 브랜치 접두어로 선택함. 일반 작업의 PR
+대상은 `develop`임. 배포 PR은 `develop`에서 `main`으로 보냄. 커밋·push·PR 전에는
+실제 브랜치, staging 파일, 제외 파일을 확인함. 상태 변경 명령이 중단되면 실제
+Git·파일 상태를 확인한 뒤 재시도함.
 
-Command definitions are in `.claude/commands/speckits/`. Constitution is at `.specify/memory/constitution.md`.
+## 실행 명령
 
-## Git Workflow
+| 목적           | 명령                |
+| -------------- | ------------------- |
+| 개발           | `npm run dev`       |
+| MSW 개발       | `npm run dev-mock`  |
+| 테스트 1회     | `npx vitest run`    |
+| lint·타입 검사 | `npm run lint`      |
+| 생산 빌드      | `npm run build`     |
+| Storybook      | `npm run storybook` |
 
-- Main branch: `develop`
-- Feature branches: `feat/#{issue}-{slug}`
-- PR target: `develop`
+CI에 포함되지 않은 중요 검증은 완료 보고나 PR에 수동 실행 명령과 확인 동작을
+남김. 루트 `README.md`는 공개 안내 문서이며, 작업별 수정 권한은 현재 사용자
+요청을 따름.

@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { IMessage } from '@stomp/stompjs';
 import useSocket from './useSocket';
+import { socketManager } from '../../apis/sockets/SocketManager';
 import { SocketMessage } from '../../apis/sockets/type';
 import { isSocketMessage } from '../../apis/sockets/util';
+import useDocumentVisibility from '../useDocumentVisibility';
+
+// 탭이 돌아왔을 때 재동기화를 다시 시도하는 최소 간격
+// 서버도 룸별로 상태 공유 요청 간격을 제한하지만, 불필요한 구독 왕복을 먼저 줄인다
+const VISIBILITY_RESYNC_THROTTLE_MS = 3000;
 
 /**
  * 청중 전용 웹소켓 훅입니다.
@@ -17,6 +23,9 @@ import { isSocketMessage } from '../../apis/sockets/util';
  * @param {UseAudienceSocketOptions} options - 소켓 채널 구독 활성화 옵션
  * @returns {Object} 청중 소켓 상태와 제어 함수를 반환합니다.
  * @returns {SocketMessage | null} returns.latestMessage - 검증된 가장 최근의 수신 메시지입니다.
+ * @returns {number | null} returns.latestMessageReceivedAt - `latestMessage`를 수신한 시각입니다. 네트워크 지연 보정의 기준으로 사용합니다.
+ * @returns {number | null} returns.lastReceivedAt - 형식이 올바른 사회자 메시지를 마지막으로 수신한 시각입니다. version이 오래되어 반영하지 않은 메시지도 포함합니다.
+ * @returns {number | null} returns.chairmanAbsentAt - 서버로부터 활성 사회자가 없다는 알림(`CHAIRMAN_ABSENT`)을 마지막으로 받은 시각입니다.
  * @returns {boolean} returns.isConnected - 소켓 연결 상태입니다.
  * @returns {Function} returns.connect - `useSocket.connect`에 위임하기 전에 현재 메시지를 초기화합니다.
  * @returns {Function} returns.disconnect - `useSocket.disconnect`에 위임하기 전에 현재 메시지를 초기화합니다.
@@ -44,13 +53,31 @@ export default function useAudienceSocket(
     null,
   );
 
+  // latestMessage를 수신한 시각 (네트워크 지연 보정 기준)
+  const [latestMessageReceivedAt, setLatestMessageReceivedAt] = useState<
+    number | null
+  >(null);
+
+  // 형식이 올바른 메시지를 마지막으로 수신한 시각 (사회자 연결 여부 판단에 사용)
+  const [lastReceivedAt, setLastReceivedAt] = useState<number | null>(null);
+
+  // 서버가 활성 사회자가 없다고 알린 시각 (사회자 메시지가 아니므로 lastReceivedAt과 따로 관리)
+  const [chairmanAbsentAt, setChairmanAbsentAt] = useState<number | null>(null);
+
+  // 마지막으로 반영한 메시지의 version (이보다 작거나 같은 메시지는 오래된 것으로 간주)
+  const lastVersionRef = useRef<number | null>(null);
+
   /**
-   * 수신한 최신 청중 메시지를 초기화합니다.
+   * 수신한 최신 청중 메시지와 version 기준을 초기화합니다.
    * 세션 간에 오래된 메시지가 남지 않도록, 래핑된 connect 및 disconnect
    * 제어 함수에서 사용하는 초기화 동작을 한곳에 모읍니다.
    */
   const resetMessage = useCallback(() => {
     setLatestMessage(null);
+    setLatestMessageReceivedAt(null);
+    setLastReceivedAt(null);
+    setChairmanAbsentAt(null);
+    lastVersionRef.current = null;
   }, []);
 
   /**
@@ -80,6 +107,46 @@ export default function useAudienceSocket(
     return addConnectionListener(resetMessage);
   }, [addConnectionListener, resetMessage]);
 
+  const handleRoomMessage = useCallback((message: IMessage) => {
+    try {
+      const parsedData = JSON.parse(message.body);
+      if (isSocketMessage(parsedData)) {
+        // 사회자 부재 알림은 서버가 보낸 것이므로 사회자 메시지 수신 기록과 version 기준에 반영하지 않는다
+        if (parsedData.eventType === 'CHAIRMAN_ABSENT') {
+          setChairmanAbsentAt(Date.now());
+          return;
+        }
+
+        // 오래된 version이라 반영하지 않더라도 사회자가 메시지를 보내고 있다는 신호로 본다
+        const receivedAt = Date.now();
+        setLastReceivedAt(receivedAt);
+
+        const { version } = parsedData;
+        const lastVersion = lastVersionRef.current;
+        const hasVersion = version !== undefined && version !== null;
+
+        // version 없는 메시지는 기준이 생기기 전(하위 호환, 종료된 룸 입장 등)에만 반영
+        if (!hasVersion && lastVersion !== null) {
+          return;
+        }
+
+        if (hasVersion) {
+          if (lastVersion !== null && version <= lastVersion) {
+            return;
+          }
+          lastVersionRef.current = version;
+        }
+
+        setLatestMessage(parsedData);
+        setLatestMessageReceivedAt(receivedAt);
+      } else {
+        console.log('잘못된 소켓 메시지 형식입니다:', parsedData);
+      }
+    } catch (e) {
+      console.log('메시지 파싱 오류:', e);
+    }
+  }, []);
+
   useEffect(() => {
     if (!enabled) {
       resetMessage();
@@ -91,28 +158,62 @@ export default function useAudienceSocket(
     resetMessage();
 
     // 토론 이벤트를 발행하는 채널 구독 및 메시지 수신 시 상태 업데이트
-    subscribe(destination, (message: IMessage) => {
-      try {
-        const parsedData = JSON.parse(message.body);
-        if (isSocketMessage(parsedData)) {
-          setLatestMessage(parsedData);
-        } else {
-          console.log('잘못된 소켓 메시지 형식입니다:', parsedData);
-        }
-      } catch (e) {
-        console.log('메시지 파싱 오류:', e);
-      }
-    });
+    subscribe(destination, handleRoomMessage);
 
     // 컴포넌트 언마운트 또는 roomId 변경 시 해당 채널 구독 해제
     return () => {
       resetMessage();
       unsubscribe(destination);
     };
-  }, [enabled, roomId, resetMessage, subscribe, unsubscribe]);
+  }, [
+    enabled,
+    roomId,
+    handleRoomMessage,
+    resetMessage,
+    subscribe,
+    unsubscribe,
+  ]);
+
+  /**
+   * 백그라운드 탭에서 돌아오면 현재 상태를 다시 받아온다.
+   * 연결이 살아 있으면 룸 채널을 다시 구독한다. 서버는 청중이 구독할 때 사회자에게
+   * 상태 공유를 요청하므로, 재구독이 곧 재동기화 요청이 된다.
+   * 연결이 끊긴 채로 돌아왔다면 다시 연결한다.
+   */
+  const handleVisible = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
+
+    if (!socketManager.isConnected()) {
+      connectAudienceSocket();
+      return;
+    }
+
+    const destination = `/room/${roomId}`;
+    unsubscribe(destination);
+    resetMessage();
+    subscribe(destination, handleRoomMessage);
+  }, [
+    connectAudienceSocket,
+    enabled,
+    handleRoomMessage,
+    resetMessage,
+    roomId,
+    subscribe,
+    unsubscribe,
+  ]);
+
+  useDocumentVisibility(handleVisible, {
+    throttleMs: VISIBILITY_RESYNC_THROTTLE_MS,
+    enabled,
+  });
 
   return {
     latestMessage,
+    latestMessageReceivedAt,
+    lastReceivedAt,
+    chairmanAbsentAt,
     isConnected,
     error,
     connect: connectAudienceSocket,

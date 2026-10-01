@@ -54,17 +54,25 @@ describe('AudienceTimeBasedTimerDisplay', () => {
     );
 
     expect(screen.getByText('전체 시간')).toHaveClass(
-      'h-[48px]',
-      'w-[144px]',
+      'md:h-[48px]',
+      'md:w-[144px]',
       'bg-default-black',
-      'text-[24px]',
+      'md:text-[24px]',
     );
     expect(screen.getByText('현재 시간')).toHaveClass(
-      'h-[64px]',
-      'w-[200px]',
+      'md:h-[64px]',
+      'md:w-[200px]',
       'bg-camp-red',
-      'text-[32px]',
+      'md:text-[32px]',
     );
+    // 모바일(768px 미만, 가로 모드)에서는 배지를 화면에서만 숨기고 스크린 리더에는 남긴다
+    ['전체 시간', '현재 시간'].forEach((label) => {
+      expect(screen.getByText(label)).toHaveClass(
+        'sr-only',
+        'md:not-sr-only',
+        'short:sr-only',
+      );
+    });
     expect(screen.getByTestId('cons-total-timer')).toHaveAttribute(
       'aria-label',
       '04 : 00',

@@ -32,7 +32,8 @@ export default {
         },
       },
       backgroundImage: {
-        brandBackground: 'radial-gradient(80% 80% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',
+        brandBackground:
+          'radial-gradient(80% 80% at 50% 50%, #fecd4c21 0%, #ffffff42 100%)',
       },
       animation: {
         rotate: 'rotate 5s linear infinite',
@@ -103,6 +104,8 @@ export default {
       md: '768px',
       lg: '1280px',
       xl: { raw: '(min-width: 1600px) and (min-height: 1024px)' },
+      // 가로 모드 휴대폰처럼 세로 공간이 좁은 화면
+      short: { raw: '(max-height: 500px)' },
     },
   },
 };

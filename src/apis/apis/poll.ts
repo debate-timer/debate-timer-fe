@@ -1,4 +1,4 @@
-import { VoterPollInfo } from '../../type/type';
+import { VoterPollInfo } from '../../types/type';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
 import {

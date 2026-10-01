@@ -10,6 +10,7 @@ import {
   MockInstance,
 } from 'vitest';
 import type { SocketMessage } from '../../apis/sockets/type';
+import { socketManager } from '../../apis/sockets/SocketManager';
 import useAudienceSocket from './useAudienceSocket';
 
 const useSocketMock = vi.hoisted(() => vi.fn());
@@ -349,5 +350,333 @@ describe('useAudienceSocket', () => {
 
     expect(result.current.error).toBe(error);
     expect(result.current.isConnected).toBe(false);
+  });
+
+  describe('version 기반 순서 보장', () => {
+    const createMessage = (
+      version?: number,
+      eventType: 'STOP' | 'PLAY' = 'STOP',
+    ): SocketMessage => ({
+      eventType,
+      data: { timerType: 'NORMAL', sequence: 1, remainingTime: 30 },
+      ...(version !== undefined && { version }),
+    });
+
+    const setup = () => {
+      let handleMessage: (message: IMessage) => void = () => undefined;
+      let handleConnection: () => void = () => undefined;
+      subscribe.mockImplementation(
+        (_destination: string, callback: (message: IMessage) => void) => {
+          handleMessage = callback;
+        },
+      );
+      addConnectionListener.mockImplementation((listener: () => void) => {
+        handleConnection = listener;
+        return vi.fn();
+      });
+
+      const hook = renderHook(() => useAudienceSocket(123));
+      const receive = (message: SocketMessage) =>
+        act(() => {
+          handleMessage({ body: JSON.stringify(message) } as IMessage);
+        });
+
+      return { ...hook, receive, reconnect: () => act(handleConnection) };
+    };
+
+    it('이전에 받은 version보다 작거나 같은 메시지는 무시해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(9, 'PLAY'));
+      receive(createMessage(10, 'PLAY'));
+
+      expect(result.current.latestMessage).toEqual(createMessage(10));
+    });
+
+    it('더 큰 version의 메시지는 반영해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(11, 'PLAY'));
+
+      expect(result.current.latestMessage?.eventType).toBe('PLAY');
+    });
+
+    it('version이 있는 메시지를 받기 전에는 version 없는 메시지도 반영해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(undefined, 'PLAY'));
+      receive(createMessage(undefined, 'STOP'));
+
+      expect(result.current.latestMessage?.eventType).toBe('STOP');
+    });
+
+    it('version이 null인 메시지도 기준이 없을 때는 반영해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive({
+        eventType: 'FINISHED',
+        data: null,
+        version: null,
+      } as unknown as SocketMessage);
+
+      expect(result.current.latestMessage?.eventType).toBe('FINISHED');
+    });
+
+    it('version이 있는 메시지를 받은 뒤에는 version 없는 메시지를 무시해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(createMessage(10));
+      receive(createMessage(undefined, 'PLAY'));
+      receive({
+        eventType: 'FINISHED',
+        data: null,
+        version: null,
+      } as unknown as SocketMessage);
+
+      expect(result.current.latestMessage).toEqual(createMessage(10));
+    });
+
+    it('재연결되면 version 기준을 초기화해야 한다', () => {
+      const { result, receive, reconnect } = setup();
+
+      receive(createMessage(10));
+      reconnect();
+      receive(createMessage(5, 'PLAY'));
+
+      expect(result.current.latestMessage?.eventType).toBe('PLAY');
+    });
+  });
+
+  describe('마지막 수신 시각', () => {
+    const createMessage = (version: number): SocketMessage => ({
+      eventType: 'SYNC',
+      data: {
+        timerType: 'NORMAL',
+        sequence: 0,
+        remainingTime: 30,
+        isRunning: true,
+      },
+      version,
+    });
+
+    const setup = () => {
+      let handleMessage: (message: IMessage) => void = () => undefined;
+      let handleConnection: () => void = () => undefined;
+      subscribe.mockImplementation(
+        (_destination: string, callback: (message: IMessage) => void) => {
+          handleMessage = callback;
+        },
+      );
+      addConnectionListener.mockImplementation((listener: () => void) => {
+        handleConnection = listener;
+        return vi.fn();
+      });
+
+      const hook = renderHook(() => useAudienceSocket(123));
+      const receive = (body: string) =>
+        act(() => {
+          handleMessage({ body } as IMessage);
+        });
+
+      return { ...hook, receive, reconnect: () => act(handleConnection) };
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-22T00:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('메시지를 받기 전에는 lastReceivedAt이 null이어야 한다', () => {
+      const { result } = setup();
+
+      expect(result.current.lastReceivedAt).toBeNull();
+    });
+
+    it('유효한 메시지를 받으면 수신 시각으로 lastReceivedAt을 갱신해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      expect(result.current.lastReceivedAt).toBe(Date.now());
+
+      vi.advanceTimersByTime(5000);
+      receive(JSON.stringify(createMessage(11)));
+      expect(result.current.lastReceivedAt).toBe(Date.now());
+    });
+
+    it('version이 오래되어 무시된 메시지도 수신 시각은 갱신해야 한다', () => {
+      const { result, receive } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      vi.advanceTimersByTime(5000);
+      receive(JSON.stringify(createMessage(9)));
+
+      expect(result.current.latestMessage).toEqual(createMessage(10));
+      expect(result.current.lastReceivedAt).toBe(Date.now());
+    });
+
+    it('형식이 잘못된 메시지는 수신 시각을 갱신하지 않아야 한다', () => {
+      const { result, receive } = setup();
+
+      receive('invalid-json');
+      receive(JSON.stringify({ eventType: 'UNKNOWN', data: null }));
+
+      expect(result.current.lastReceivedAt).toBeNull();
+    });
+
+    it('반영한 메시지의 수신 시각을 latestMessageReceivedAt으로 노출해야 한다', () => {
+      const { result, receive } = setup();
+      const receivedAt = Date.now();
+
+      receive(JSON.stringify(createMessage(10)));
+
+      expect(result.current.latestMessageReceivedAt).toBe(receivedAt);
+    });
+
+    it('version이 오래되어 무시된 메시지는 latestMessageReceivedAt을 바꾸지 않아야 한다', () => {
+      const { result, receive } = setup();
+      const receivedAt = Date.now();
+
+      receive(JSON.stringify(createMessage(10)));
+      vi.advanceTimersByTime(5000);
+      receive(JSON.stringify(createMessage(9)));
+
+      expect(result.current.latestMessageReceivedAt).toBe(receivedAt);
+    });
+
+    it('재연결되면 latestMessageReceivedAt을 초기화해야 한다', () => {
+      const { result, receive, reconnect } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      reconnect();
+
+      expect(result.current.latestMessageReceivedAt).toBeNull();
+    });
+
+    it('재연결되면 lastReceivedAt을 초기화해야 한다', () => {
+      const { result, receive, reconnect } = setup();
+
+      receive(JSON.stringify(createMessage(10)));
+      reconnect();
+
+      expect(result.current.lastReceivedAt).toBeNull();
+    });
+
+    describe('사회자 부재 알림', () => {
+      const absentMessage = JSON.stringify({
+        eventType: 'CHAIRMAN_ABSENT',
+        data: null,
+        version: null,
+        serverTime: 1,
+      });
+
+      it('사회자 부재 알림을 받으면 수신 시각을 chairmanAbsentAt으로 노출해야 한다', () => {
+        const { result, receive } = setup();
+
+        receive(absentMessage);
+
+        expect(result.current.chairmanAbsentAt).toBe(Date.now());
+      });
+
+      it('사회자 부재 알림은 사회자 메시지 수신 기록과 최신 메시지에 반영하지 않아야 한다', () => {
+        const { result, receive } = setup();
+
+        receive(JSON.stringify(createMessage(10)));
+        const lastReceivedAt = result.current.lastReceivedAt;
+        vi.advanceTimersByTime(1000);
+        receive(absentMessage);
+
+        expect(result.current.lastReceivedAt).toBe(lastReceivedAt);
+        expect(result.current.latestMessage?.eventType).toBe('SYNC');
+      });
+
+      it('재연결되면 chairmanAbsentAt을 초기화해야 한다', () => {
+        const { result, receive, reconnect } = setup();
+
+        receive(absentMessage);
+        reconnect();
+
+        expect(result.current.chairmanAbsentAt).toBeNull();
+      });
+    });
+  });
+
+  describe('탭 복귀', () => {
+    const setVisibilityState = (state: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => state,
+      });
+    };
+
+    const returnToForeground = () => {
+      act(() => {
+        setVisibilityState('visible');
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-25T10:00:00Z'));
+      setVisibilityState('visible');
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('연결이 살아 있으면 복귀 시 채널을 다시 구독해 재동기화를 요청해야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+
+      renderHook(() => useAudienceSocket(123));
+      subscribe.mockClear();
+
+      returnToForeground();
+
+      expect(unsubscribe).toHaveBeenCalledWith('/room/123');
+      expect(subscribe).toHaveBeenCalledWith('/room/123', expect.any(Function));
+    });
+
+    it('연결이 끊겼으면 복귀 시 다시 연결해야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(false);
+
+      renderHook(() => useAudienceSocket(123));
+      subscribe.mockClear();
+
+      returnToForeground();
+
+      expect(connect).toHaveBeenCalledTimes(1);
+      expect(subscribe).not.toHaveBeenCalled();
+    });
+
+    it('짧은 간격으로 복귀를 반복해도 한 번만 재동기화를 요청해야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+
+      renderHook(() => useAudienceSocket(123));
+      subscribe.mockClear();
+
+      returnToForeground();
+      returnToForeground();
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+    });
+
+    it('비활성 상태에서는 복귀해도 재동기화하지 않아야 한다', () => {
+      vi.spyOn(socketManager, 'isConnected').mockReturnValue(true);
+
+      renderHook(() => useAudienceSocket(123, { enabled: false }));
+      subscribe.mockClear();
+
+      returnToForeground();
+
+      expect(subscribe).not.toHaveBeenCalled();
+      expect(connect).not.toHaveBeenCalled();
+    });
   });
 });

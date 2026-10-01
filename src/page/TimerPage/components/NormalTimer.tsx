@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 import TimerController from './TimerController';
 import { Formatting } from '../../../util/formatting';
 import CircularTimer from './CircularTimer';
