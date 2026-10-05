@@ -1,6 +1,6 @@
 // 이미지 임포트는 아래와 같이
-import PatchNoteImageKorean from '../assets/patchNote/0003_ko.png';
-import PatchNoteImageEnglish from '../assets/patchNote/0003_en.png';
+// src/assets에서 import한 이미지는 빌드 시 해시가 붙은 파일명으로 내보내져 브라우저 장기 캐싱이 가능함
+import ShareFeatureImage from '../assets/patchNote/0004_share.webp';
 
 // 기본적인 패치 노트 인터페이스
 interface BasePatchNoteData {
@@ -37,9 +37,9 @@ export function isPredefinedPatchNote(
 // 현재 활성화된 업데이트 데이터 (이 부분만 수정해서 배포하면 됨)
 export const LATEST_PATCH_NOTE: ImageOnlyPatchNoteData = {
   mode: 'image-only',
-  version: '0003',
-  imageKo: PatchNoteImageKorean,
-  imageEn: PatchNoteImageEnglish,
+  version: '0004',
+  imageKo: ShareFeatureImage,
+  imageEn: ShareFeatureImage,
 };
 
 // ImageOnlyPatchNoteData의 예시
