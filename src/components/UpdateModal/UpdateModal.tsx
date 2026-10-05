@@ -6,23 +6,67 @@ import {
   PatchNoteData,
 } from '../../constants/patch_note';
 import { DEFAULT_LANG, isSupportedLang } from '../../util/languageRouting';
-import DTClose from '../icons/Close';
+import DTCheck from '../icons/Check';
+
+const HIDE_FOR_WEEK_LABEL_CLASS =
+  'group flex w-fit cursor-pointer select-none flex-row items-center gap-[clamp(6px,0.5vw,8px)]';
+const HIDE_FOR_WEEK_BOX_CLASS =
+  'flex size-[clamp(16px,1.25vw,20px)] shrink-0 items-center justify-center rounded-[4px] border transition-colors';
+const HIDE_FOR_WEEK_FOCUS_CLASS =
+  'peer-focus-visible:ring-2 peer-focus-visible:ring-brand peer-focus-visible:ring-offset-1';
 
 interface UpdateModalProps {
   data: PatchNoteData;
   isChecked: boolean;
   onChecked: (value: boolean) => void;
   onClose: () => void;
-  onClickDetailButton: () => void;
 }
 
-export default function UpdateModal({
-  data,
-  isChecked,
-  onChecked,
-  onClose,
-  onClickDetailButton,
-}: UpdateModalProps) {
+interface HideForWeekCheckboxProps {
+  id: string;
+  isChecked: boolean;
+  onChecked: (value: boolean) => void;
+  className?: string;
+}
+
+function HideForWeekCheckbox(props: HideForWeekCheckboxProps) {
+  const { id, isChecked, onChecked, className = '' } = props;
+  const { t } = useTranslation();
+
+  return (
+    <label htmlFor={id} className={`${HIDE_FOR_WEEK_LABEL_CLASS} ${className}`}>
+      <input
+        id={id}
+        type="checkbox"
+        className="peer sr-only"
+        checked={isChecked}
+        onChange={(e) => onChecked(e.target.checked)}
+      />
+      <span
+        aria-hidden="true"
+        className={`${HIDE_FOR_WEEK_BOX_CLASS} ${HIDE_FOR_WEEK_FOCUS_CLASS} ${
+          isChecked
+            ? 'border-brand bg-brand'
+            : 'border-default-neutral bg-default-white group-hover:border-default-black2'
+        }`}
+      >
+        {isChecked && <DTCheck className="w-[65%] text-default-black" />}
+      </span>
+      <span
+        className={`text-[clamp(12px,0.875vw,14px)] transition-colors ${
+          isChecked
+            ? 'text-default-black'
+            : 'text-default-black2/70 group-hover:text-default-black'
+        }`}
+      >
+        {t('일주일간 보지 않기')}
+      </span>
+    </label>
+  );
+}
+
+export default function UpdateModal(props: UpdateModalProps) {
+  const { data, isChecked, onChecked, onClose } = props;
   const { t, i18n } = useTranslation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const primaryLang = currentLang?.split(/[-_]/)[0];
@@ -74,37 +118,17 @@ export default function UpdateModal({
               </p>
             </div>
 
-            {/* '일주일 간 보지 않기' 체크박스 */}
-            <label
-              htmlFor="update-modal-hide-for-week-predefined"
-              className="flex w-full flex-row items-center justify-start gap-[0.8%]"
-            >
-              <input
-                id="update-modal-hide-for-week-predefined"
-                type="checkbox"
-                className="border-gray size-[clamp(12px,0.93vw,15px)] rounded-[4px]"
-                checked={isChecked}
-                onChange={(e) => onChecked(e.target.checked)}
-              />
-              <p className="text-[clamp(10px,0.75vw,12px)]">
-                {t('일주일 간 보지 않기')}
-              </p>
-            </label>
+            {/* '일주일간 보지 않기' 체크박스 */}
+            <HideForWeekCheckbox
+              id="update-modal-hide-for-week-predefined"
+              isChecked={isChecked}
+              onChecked={onChecked}
+              className="px-[2%] py-[1.6%]"
+            />
           </div>
         </>
       ) : (
         <div className="flex min-h-0 w-full flex-1 flex-col">
-          <div className="flex w-full shrink-0 justify-end px-[1%] pt-[0.8%]">
-            <button
-              type="button"
-              className="m-1 size-[clamp(16px,1.25vw,20px)] bg-transparent"
-              onClick={onClose}
-              aria-label={t('모달 닫기')}
-            >
-              <DTClose aria-hidden="true" className="size-full text-black" />
-            </button>
-          </div>
-
           {/* 이미지 컨텐츠 */}
           <div className="min-h-0 w-full flex-1 overflow-hidden">
             <img
@@ -114,32 +138,25 @@ export default function UpdateModal({
             />
           </div>
 
-          {/* '일주일 간 보지 않기' 체크박스 */}
-          <label
-            htmlFor="update-modal-hide-for-week-image-only"
-            className="flex w-full shrink-0 flex-row items-center gap-[0.8%] px-[1%] py-[0.8%]"
-          >
-            <input
-              id="update-modal-hide-for-week-image-only"
-              type="checkbox"
-              className="border-gray size-[clamp(16px,1.25vw,20px)] rounded-[4px]"
-              checked={isChecked}
-              onChange={(e) => onChecked(e.target.checked)}
-            />
-            <p className="text-[clamp(10px,0.75vw,12px)]">
-              {t('일주일 간 보지 않기')}
-            </p>
-          </label>
+          {/* '일주일간 보지 않기' 체크박스 */}
+          <HideForWeekCheckbox
+            id="update-modal-hide-for-week-image-only"
+            isChecked={isChecked}
+            onChecked={onChecked}
+            className="shrink-0 px-[3%] py-[1.6%]"
+          />
         </div>
       )}
 
       {/* 버튼 영역 */}
       <button
+        type="button"
         className="flex h-[8.8%] shrink-0 flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
-        onClick={onClickDetailButton}
+        onClick={onClose}
+        aria-label={t('닫기')}
       >
         <p className="text-[clamp(16px,1.375vw,22px)] font-semibold">
-          {t('자세히 보기')}
+          {t('닫기')}
         </p>
       </button>
     </div>

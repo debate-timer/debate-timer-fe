@@ -4,6 +4,7 @@ import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import {
   ImageOnlyPatchNoteData,
+  PatchNoteData,
   PredefinedPatchNoteData,
 } from '../../constants/patch_note';
 import UpdateModal from './UpdateModal';
@@ -14,8 +15,8 @@ const translations = {
       '디베이트 타이머에 새로운 기능이 생겼어요!':
         '디베이트 타이머에 새로운 기능이 생겼어요!',
       '업데이트 이미지': '업데이트 이미지',
-      '일주일 간 보지 않기': '일주일 간 보지 않기',
-      '자세히 보기': '자세히 보기',
+      '일주일간 보지 않기': '일주일간 보지 않기',
+      닫기: '닫기',
     },
   },
   en: {
@@ -23,8 +24,8 @@ const translations = {
       '디베이트 타이머에 새로운 기능이 생겼어요!':
         'New features are now available in Debate Timer!',
       '업데이트 이미지': 'Update image',
-      '일주일 간 보지 않기': "Don't show again for a week",
-      '자세히 보기': 'View details',
+      '일주일간 보지 않기': "Don't show again for a week",
+      닫기: 'Close',
     },
   },
 };
@@ -32,7 +33,6 @@ const translations = {
 const predefinedPatchNote = {
   mode: 'predefined',
   version: 'test-predefined',
-  link: 'https://example.com/predefined',
   imageKo: '/patch-note-ko.png',
   imageEn: '/patch-note-en.png',
   titleKo: '한국어 제목',
@@ -44,14 +44,24 @@ const predefinedPatchNote = {
 const imageOnlyPatchNote: ImageOnlyPatchNoteData = {
   mode: 'image-only',
   version: 'test-image-only',
-  link: 'https://example.com/image-only',
   imageKo: '/patch-note-only-ko.png',
   imageEn: '/patch-note-only-en.png',
 };
 
+interface RenderOptions {
+  isChecked?: boolean;
+  onChecked?: (value: boolean) => void;
+  onClose?: () => void;
+}
+
 async function renderUpdateModal(
-  data: PredefinedPatchNoteData | ImageOnlyPatchNoteData,
+  data: PatchNoteData,
   language: 'ko' | 'en',
+  {
+    isChecked = false,
+    onChecked = vi.fn(),
+    onClose = vi.fn(),
+  }: RenderOptions = {},
 ) {
   const i18n = createInstance();
   await i18n.init({
@@ -65,17 +75,21 @@ async function renderUpdateModal(
     <I18nextProvider i18n={i18n}>
       <UpdateModal
         data={data}
-        isChecked={false}
-        onChecked={vi.fn()}
-        onClose={vi.fn()}
-        onClickDetailButton={vi.fn()}
+        isChecked={isChecked}
+        onChecked={onChecked}
+        onClose={onClose}
       />
     </I18nextProvider>,
   );
 }
 
+const modes = [
+  { mode: 'predefined', data: predefinedPatchNote },
+  { mode: 'image-only', data: imageOnlyPatchNote },
+];
+
 describe('UpdateModal', () => {
-  test.each([
+  it.each([
     {
       language: 'ko' as const,
       image: '/patch-note-ko.png',
@@ -83,8 +97,8 @@ describe('UpdateModal', () => {
       title: '한국어 제목',
       description: '한국어 설명',
       introduction: '디베이트 타이머에 새로운 기능이 생겼어요!',
-      hideForWeek: '일주일 간 보지 않기',
-      detailButton: '자세히 보기',
+      hideForWeek: '일주일간 보지 않기',
+      closeButton: '닫기',
     },
     {
       language: 'en' as const,
@@ -94,7 +108,7 @@ describe('UpdateModal', () => {
       description: 'English description',
       introduction: 'New features are now available in Debate Timer!',
       hideForWeek: "Don't show again for a week",
-      detailButton: 'View details',
+      closeButton: 'Close',
     },
   ])(
     'predefined 모드에서 $language 콘텐츠를 표시한다',
@@ -106,7 +120,7 @@ describe('UpdateModal', () => {
       description,
       introduction,
       hideForWeek,
-      detailButton,
+      closeButton,
     }) => {
       await renderUpdateModal(predefinedPatchNote, language);
 
@@ -121,29 +135,29 @@ describe('UpdateModal', () => {
         screen.getByRole('checkbox', { name: hideForWeek }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: detailButton }),
+        screen.getByRole('button', { name: closeButton }),
       ).toBeInTheDocument();
     },
   );
 
-  test.each([
+  it.each([
     {
       language: 'ko' as const,
       image: '/patch-note-only-ko.png',
       imageAlt: '업데이트 이미지',
-      hideForWeek: '일주일 간 보지 않기',
-      detailButton: '자세히 보기',
+      hideForWeek: '일주일간 보지 않기',
+      closeButton: '닫기',
     },
     {
       language: 'en' as const,
       image: '/patch-note-only-en.png',
       imageAlt: 'Update image',
       hideForWeek: "Don't show again for a week",
-      detailButton: 'View details',
+      closeButton: 'Close',
     },
   ])(
     'image-only 모드에서 $language 콘텐츠를 표시한다',
-    async ({ language, image, imageAlt, hideForWeek, detailButton }) => {
+    async ({ language, image, imageAlt, hideForWeek, closeButton }) => {
       await renderUpdateModal(imageOnlyPatchNote, language);
 
       expect(screen.getByRole('img', { name: imageAlt })).toHaveAttribute(
@@ -154,88 +168,70 @@ describe('UpdateModal', () => {
         screen.getByRole('checkbox', { name: hideForWeek }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: detailButton }),
+        screen.getByRole('button', { name: closeButton }),
       ).toBeInTheDocument();
     },
   );
 
-  test('image-only 모드에서 이미지, 체크박스, 상세 버튼을 겹치지 않고 순서대로 배치한다', async () => {
+  it.each(modes)(
+    '$mode 모드에서 하단 닫기 버튼 하나만 표시한다',
+    async ({ data }) => {
+      await renderUpdateModal(data, 'ko');
+
+      expect(screen.getAllByRole('button')).toHaveLength(1);
+      expect(screen.getByRole('button', { name: '닫기' })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: '자세히 보기' }),
+      ).not.toBeInTheDocument();
+    },
+  );
+
+  it.each(modes)(
+    '$mode 모드에서 하단 닫기 버튼을 누르면 onClose를 호출한다',
+    async ({ data }) => {
+      const user = userEvent.setup();
+      const onClose = vi.fn();
+      await renderUpdateModal(data, 'ko', { onClose });
+
+      await user.click(screen.getByRole('button', { name: '닫기' }));
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each([
+    { isChecked: false, expected: true },
+    { isChecked: true, expected: false },
+  ])(
+    '체크 상태가 $isChecked일 때 문구를 누르면 onChecked($expected)를 호출한다',
+    async ({ isChecked, expected }) => {
+      const user = userEvent.setup();
+      const onChecked = vi.fn();
+      await renderUpdateModal(imageOnlyPatchNote, 'ko', {
+        isChecked,
+        onChecked,
+      });
+
+      await user.click(screen.getByText('일주일간 보지 않기'));
+
+      expect(onChecked).toHaveBeenCalledWith(expected);
+    },
+  );
+
+  it('image-only 모드에서 이미지, 체크박스, 닫기 버튼을 겹치지 않고 순서대로 배치한다', async () => {
     await renderUpdateModal(imageOnlyPatchNote, 'ko');
 
     const image = screen.getByRole('img', { name: '업데이트 이미지' });
     const checkbox = screen.getByRole('checkbox', {
-      name: '일주일 간 보지 않기',
+      name: '일주일간 보지 않기',
     });
     const checkboxLabel = checkbox.closest('label');
-    const detailButton = screen.getByRole('button', { name: '자세히 보기' });
+    const closeButton = screen.getByRole('button', { name: '닫기' });
 
     expect(checkboxLabel).not.toBeNull();
     expect(image.parentElement?.nextElementSibling).toBe(checkboxLabel);
-    expect(checkboxLabel?.parentElement?.nextElementSibling).toBe(detailButton);
+    expect(checkboxLabel?.parentElement?.nextElementSibling).toBe(closeButton);
     expect(checkboxLabel).not.toHaveClass('absolute');
-    expect(detailButton).toHaveClass('h-[8.8%]', 'shrink-0');
-  });
-
-  test('image-only 모드에만 닫기 버튼을 표시한다', async () => {
-    const { unmount } = await renderUpdateModal(imageOnlyPatchNote, 'ko');
-
-    expect(
-      screen.getByRole('button', { name: '모달 닫기' }),
-    ).toBeInTheDocument();
-
-    unmount();
-    await renderUpdateModal(predefinedPatchNote, 'ko');
-
-    expect(
-      screen.queryByRole('button', { name: '모달 닫기' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('image-only 모드의 닫기 버튼은 체크박스와 크기가 같고 이미지 위의 별도 영역에 배치된다', async () => {
-    await renderUpdateModal(imageOnlyPatchNote, 'ko');
-
-    const closeButton = screen.getByRole('button', { name: '모달 닫기' });
-    const image = screen.getByRole('img', { name: '업데이트 이미지' });
-    const checkbox = screen.getByRole('checkbox', {
-      name: '일주일 간 보지 않기',
-    });
-
-    expect(closeButton.parentElement?.nextElementSibling).toBe(
-      image.parentElement,
-    );
-    expect(closeButton).toHaveClass(
-      'size-[clamp(16px,1.25vw,20px)]',
-      'bg-transparent',
-    );
-    expect(checkbox).toHaveClass('size-[clamp(16px,1.25vw,20px)]');
-    expect(closeButton.firstElementChild).toHaveClass('text-black');
-  });
-
-  test('image-only 모드의 닫기 버튼을 누르면 onClose를 호출한다', async () => {
-    const user = userEvent.setup();
-    const onClose = vi.fn();
-    const i18n = createInstance();
-    await i18n.init({
-      lng: 'ko',
-      fallbackLng: 'ko',
-      supportedLngs: ['ko', 'en'],
-      resources: translations,
-    });
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <UpdateModal
-          data={imageOnlyPatchNote}
-          isChecked={false}
-          onChecked={vi.fn()}
-          onClose={onClose}
-          onClickDetailButton={vi.fn()}
-        />
-      </I18nextProvider>,
-    );
-
-    await user.click(screen.getByRole('button', { name: '모달 닫기' }));
-
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(closeButton).toHaveClass('h-[8.8%]', 'shrink-0');
   });
 });

@@ -5,7 +5,6 @@ import PatchNoteImageEnglish from '../assets/patchNote/0003_en.png';
 // 기본적인 패치 노트 인터페이스
 interface BasePatchNoteData {
   version: string; // 로컬 스토리지 키 관리를 위한 버전 (이 버전을 바꾸면 사용자의 '다시 보지 않기'가 초기화됨)
-  link: string;
   imageKo: string;
   imageEn: string;
 }
@@ -41,7 +40,6 @@ export const LATEST_PATCH_NOTE: ImageOnlyPatchNoteData = {
   version: '0003',
   imageKo: PatchNoteImageKorean,
   imageEn: PatchNoteImageEnglish,
-  link: 'https://bustling-bathtub-b3a.notion.site/2f51550c60cf8084ab0af4d1f35aeefd',
 };
 
 // ImageOnlyPatchNoteData의 예시
@@ -57,7 +55,6 @@ export const PATCH_NOTE_0002: PredefinedPatchNoteData = {
     'Use a variety of services with feedback and voting after the debate!',
   imageKo: PatchNoteImageKorean,
   imageEn: PatchNoteImageEnglish,
-  link: 'https://bustling-bathtub-b3a.notion.site/2f41550c60cf80f69227e3145f6e19cc?pvs=143',
 };
 
 export const TEST_PATCH_NOTE: ImageOnlyPatchNoteData = {
@@ -65,6 +62,5 @@ export const TEST_PATCH_NOTE: ImageOnlyPatchNoteData = {
   version: '0001',
   imageKo: PatchNoteImageKorean,
   imageEn: PatchNoteImageEnglish,
-  link: 'https://bustling-bathtub-b3a.notion.site/2f41550c60cf80f69227e3145f6e19cc?pvs=143',
 };
 */

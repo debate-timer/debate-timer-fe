@@ -24,7 +24,6 @@ export const Default: Story = {
         '토론 종료 후 피드백 & 투표 기능으로\n다양한 서비스를 이용하세요!',
       descriptionEn:
         'Use a variety of services with feedback and voting after the debate!',
-      link: 'https://notion.so/',
       imageKo: PatchNoteImageKorean,
       imageEn: PatchNoteImageEnglish,
       mode: 'predefined',
@@ -32,6 +31,5 @@ export const Default: Story = {
     isChecked: false,
     onChecked: () => {},
     onClose: () => {},
-    onClickDetailButton: () => {},
   },
 };
