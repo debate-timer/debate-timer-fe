@@ -14,7 +14,6 @@ vi.mock('../../constants/patch_note', async (importOriginal) => {
     LATEST_PATCH_NOTE: {
       mode: 'image-only',
       version: 'test',
-      link: '',
       imageKo: '/patch-note-ko.png',
       imageEn: '/patch-note-en.png',
     },
@@ -32,10 +31,8 @@ async function renderUpdateModalWrapper() {
         translation: {
           '모달 닫기': 'Close modal',
           '업데이트 이미지': 'Update image',
-          '일주일 간 보지 않기': "Don't show again for a week",
-          '자세히 보기': 'View details',
-          '패치 노트 링크를 읽는 중 오류가 발생했습니다.':
-            'An error occurred while loading the patch note link.',
+          '일주일간 보지 않기': "Don't show again for a week",
+          닫기: 'Close',
         },
       },
     },
@@ -56,39 +53,32 @@ describe('UpdateModalWrapper', () => {
     vi.restoreAllMocks();
   });
 
-  test('패치 노트 링크가 없으면 현재 언어로 오류를 안내한다', async () => {
-    const user = userEvent.setup();
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    localStorage.clear();
+  it('우측 상단 X 버튼 없이 하단 닫기 버튼만 표시한다', async () => {
     await renderUpdateModalWrapper();
 
-    await user.click(
-      await screen.findByRole('button', { name: 'View details' }),
-    );
-
-    expect(alertSpy).toHaveBeenCalledWith(
-      'An error occurred while loading the patch note link.',
-    );
-  });
-
-  test('image-only 모달의 닫기 버튼만 표시하고 클릭하면 모달을 닫는다', async () => {
-    const user = userEvent.setup();
-    await renderUpdateModalWrapper();
-
-    const closeButtons = await screen.findAllByRole('button', {
-      name: 'Close modal',
-    });
-
-    expect(closeButtons).toHaveLength(1);
-
-    await user.click(closeButtons[0]);
-
+    expect(
+      await screen.findByRole('button', { name: 'Close' }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Close modal' }),
     ).not.toBeInTheDocument();
   });
 
-  test('일주일 숨김을 선택한 뒤 닫기 버튼을 누르면 숨김 상태를 저장한다', async () => {
+  it('하단 닫기 버튼을 누르면 외부 페이지를 열지 않고 모달을 닫는다', async () => {
+    const user = userEvent.setup();
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    await renderUpdateModalWrapper();
+
+    await user.click(await screen.findByRole('button', { name: 'Close' }));
+
+    expect(openSpy).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('img', { name: 'Update image' }),
+    ).not.toBeInTheDocument();
+    expect(localStorage.getItem('update_notification_status')).toBeNull();
+  });
+
+  it('일주일 숨김을 선택한 뒤 닫기 버튼을 누르면 숨김 상태를 저장한다', async () => {
     const user = userEvent.setup();
     await renderUpdateModalWrapper();
 
@@ -97,7 +87,7 @@ describe('UpdateModalWrapper', () => {
         name: "Don't show again for a week",
       }),
     );
-    await user.click(screen.getByRole('button', { name: 'Close modal' }));
+    await user.click(screen.getByRole('button', { name: 'Close' }));
 
     const storedStatus = JSON.parse(
       localStorage.getItem('update_notification_status') ?? '{}',
