@@ -232,6 +232,26 @@ describe('UpdateModal', () => {
     expect(image.parentElement?.nextElementSibling).toBe(checkboxLabel);
     expect(checkboxLabel?.parentElement?.nextElementSibling).toBe(closeButton);
     expect(checkboxLabel).not.toHaveClass('absolute');
-    expect(closeButton).toHaveClass('h-[8.8%]', 'shrink-0');
+    expect(closeButton).toHaveClass('shrink-0');
+  });
+
+  it('image-only 모드에서 정사각형 고정 없이 이미지가 모달 너비를 가득 채운다', async () => {
+    const { container } = await renderUpdateModal(imageOnlyPatchNote, 'ko');
+
+    const modal = container.firstElementChild;
+    const image = screen.getByRole('img', { name: '업데이트 이미지' });
+
+    expect(modal).not.toHaveClass('aspect-square');
+    expect(image).toHaveClass('block', 'h-auto', 'w-full');
+    expect(image).not.toHaveClass('object-contain');
+  });
+
+  it('predefined 모드는 정사각형 레이아웃을 유지한다', async () => {
+    const { container } = await renderUpdateModal(predefinedPatchNote, 'ko');
+
+    expect(container.firstElementChild).toHaveClass('aspect-square');
+    expect(screen.getByRole('button', { name: '닫기' })).toHaveClass(
+      'h-[8.8%]',
+    );
   });
 });

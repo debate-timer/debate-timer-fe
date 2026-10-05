@@ -7,6 +7,13 @@ import {
 } from '../../constants/patch_note';
 import { DEFAULT_LANG, isSupportedLang } from '../../util/languageRouting';
 import DTCheck from '../icons/Check';
+import clsx from 'clsx';
+
+// predefined 모드는 정사각형 비율 안에서 퍼센트 단위로 배치함
+const PREDEFINED_MODAL_CLASS =
+  'aspect-square w-[clamp(600px,min(47.5vw,90vh),780px)]';
+// image-only 모드는 이미지 비율대로 높이가 정해지므로 화면 높이를 넘지 않도록 너비를 제한함
+const IMAGE_ONLY_MODAL_CLASS = 'w-[clamp(600px,min(47.5vw,80vh),780px)]';
 
 const HIDE_FOR_WEEK_LABEL_CLASS =
   'group flex w-fit cursor-pointer select-none flex-row items-center gap-[clamp(6px,0.5vw,8px)]';
@@ -73,10 +80,16 @@ export default function UpdateModal(props: UpdateModalProps) {
   const lang = isSupportedLang(primaryLang) ? primaryLang : DEFAULT_LANG;
   const isEnglish = lang === 'en';
   const patchNoteImage = isEnglish ? data.imageEn : data.imageKo;
+  const isPredefined = isPredefinedPatchNote(data);
 
   return (
-    <div className="flex aspect-square w-[clamp(600px,min(47.5vw,90vh),780px)] flex-col overflow-hidden rounded-[2.2%] bg-default-white">
-      {isPredefinedPatchNote(data) ? (
+    <div
+      className={clsx(
+        'flex flex-col overflow-hidden rounded-[2.2%] bg-default-white',
+        isPredefined ? PREDEFINED_MODAL_CLASS : IMAGE_ONLY_MODAL_CLASS,
+      )}
+    >
+      {isPredefined ? (
         <>
           {/* 메인 컨텐츠 */}
           <div className="flex h-[59.5%] w-full flex-col gap-[clamp(36px,2.75vw,44px)] bg-[#EFF0F4] p-[4.5%]">
@@ -128,13 +141,13 @@ export default function UpdateModal(props: UpdateModalProps) {
           </div>
         </>
       ) : (
-        <div className="flex min-h-0 w-full flex-1 flex-col">
+        <div className="flex w-full flex-col">
           {/* 이미지 컨텐츠 */}
-          <div className="min-h-0 w-full flex-1 overflow-hidden">
+          <div className="w-full">
             <img
               src={patchNoteImage}
               alt={t('업데이트 이미지')}
-              className="h-full w-full rounded-t-[0.8%] object-contain"
+              className="block h-auto w-full"
             />
           </div>
 
@@ -151,7 +164,10 @@ export default function UpdateModal(props: UpdateModalProps) {
       {/* 버튼 영역 */}
       <button
         type="button"
-        className="flex h-[8.8%] shrink-0 flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover"
+        className={clsx(
+          'flex shrink-0 flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover',
+          isPredefined ? 'h-[8.8%]' : 'h-[clamp(52px,min(4.18vw,7.04vh),68px)]',
+        )}
         onClick={onClose}
         aria-label={t('닫기')}
       >
