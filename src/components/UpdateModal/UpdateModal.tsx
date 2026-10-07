@@ -9,11 +9,28 @@ import { DEFAULT_LANG, isSupportedLang } from '../../util/languageRouting';
 import DTCheck from '../icons/Check';
 import clsx from 'clsx';
 
-// predefined 모드는 정사각형 비율 안에서 퍼센트 단위로 배치함
+// 모바일에서는 상하좌우 16px 여백 안에 정사각형 전체가 들어오도록 함.
+const MOBILE_MODAL_CLASS =
+  'size-[min(calc(100vw-32px),calc(100dvh-32px))] md:h-auto';
+// 데스크탑의 predefined 모드는 기존 정사각형 배치를 유지함.
 const PREDEFINED_MODAL_CLASS =
-  'aspect-square w-[clamp(600px,min(47.5vw,90vh),780px)]';
-// image-only 모드는 이미지 비율대로 높이가 정해지므로 화면 높이를 넘지 않도록 너비를 제한함
-const IMAGE_ONLY_MODAL_CLASS = 'w-[clamp(600px,min(47.5vw,80vh),780px)]';
+  'aspect-square md:w-[clamp(600px,min(47.5vw,90vh),780px)]';
+// 데스크탑의 image-only 모드는 이미지의 원래 비율에 따라 높이가 결정됨.
+const IMAGE_ONLY_MODAL_CLASS = 'md:w-[clamp(600px,min(47.5vw,80vh),780px)]';
+const MAIN_CONTENT_CLASS =
+  'flex h-[59.5%] w-full shrink-0 flex-col gap-3 bg-[#EFF0F4] p-[4.5%] md:shrink md:gap-[clamp(36px,2.75vw,44px)]';
+const HEADER_CLASS =
+  'flex h-12 w-full shrink-0 flex-row items-center gap-[1%] md:h-[clamp(72px,6vh,96px)] md:shrink';
+const HEADER_TEXT_CLASS =
+  'flex min-w-0 w-full flex-col space-y-2 md:space-y-[clamp(15px,1.25vw,20px)]';
+const TEXT_CONTENT_CLASS =
+  'flex min-h-0 flex-1 flex-col items-center overflow-y-auto md:h-full md:min-h-[auto] md:flex-[0_1_auto] md:justify-center md:overflow-visible';
+const IMAGE_ONLY_CONTENT_CLASS =
+  'flex min-h-0 w-full flex-1 flex-col md:min-h-[auto] md:flex-[0_1_auto]';
+const IMAGE_ONLY_IMAGE_CONTAINER_CLASS =
+  'min-h-0 w-full flex-1 overflow-hidden md:min-h-[auto] md:flex-[0_1_auto] md:overflow-visible';
+const CLOSE_BUTTON_CLASS =
+  'flex shrink-0 flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover';
 
 const HIDE_FOR_WEEK_LABEL_CLASS =
   'group flex w-fit cursor-pointer select-none flex-row items-center gap-[clamp(6px,0.5vw,8px)]';
@@ -72,6 +89,7 @@ function HideForWeekCheckbox(props: HideForWeekCheckboxProps) {
   );
 }
 
+/** 모바일에서는 화면 여백 안에 정사각형으로, 데스크탑에서는 모드별 비율로 표시함. */
 export default function UpdateModal(props: UpdateModalProps) {
   const { data, isChecked, onChecked, onClose } = props;
   const { t, i18n } = useTranslation();
@@ -86,19 +104,20 @@ export default function UpdateModal(props: UpdateModalProps) {
     <div
       className={clsx(
         'flex flex-col overflow-hidden rounded-[2.2%] bg-default-white',
+        MOBILE_MODAL_CLASS,
         isPredefined ? PREDEFINED_MODAL_CLASS : IMAGE_ONLY_MODAL_CLASS,
       )}
     >
       {isPredefined ? (
         <>
           {/* 메인 컨텐츠 */}
-          <div className="flex h-[59.5%] w-full flex-col gap-[clamp(36px,2.75vw,44px)] bg-[#EFF0F4] p-[4.5%]">
-            <div className="flex h-[clamp(72px,6vh,96px)] w-full flex-row items-center gap-[1%]">
+          <div className={MAIN_CONTENT_CLASS}>
+            <div className={HEADER_CLASS}>
               <div className="h-full w-[15.7%] shrink-0">
-                <MegaphoneAsset className="my-[8px] h-[80px] w-[93px]" />
+                <MegaphoneAsset className="h-full w-full md:my-[8px] md:h-[80px] md:w-[93px]" />
               </div>
 
-              <div className="flex w-full flex-col space-y-[clamp(15px,1.25vw,20px)]">
+              <div className={HEADER_TEXT_CLASS}>
                 <p className="text-[clamp(12px,0.875vw,14px)] leading-none text-default-black">
                   {t('디베이트 타이머에 새로운 기능이 생겼어요!')}
                 </p>
@@ -119,14 +138,14 @@ export default function UpdateModal(props: UpdateModalProps) {
           </div>
 
           {/* 텍스트 컨텐츠 */}
-          <div className="flex w-full flex-1 flex-col p-[1%]">
+          <div className="flex min-h-0 w-full flex-1 flex-col p-[1%] md:min-h-[auto]">
             {/* 타이틀 및 내용 */}
-            <div className="flex h-full flex-col items-center justify-center">
-              <p className="text-[clamp(26px,2.1vw,34px)] font-bold text-brand">
+            <div className={TEXT_CONTENT_CLASS}>
+              <p className="shrink-0 text-[clamp(26px,2.1vw,34px)] font-bold text-brand md:shrink">
                 {isEnglish ? data.titleEn : data.titleKo}
               </p>
-              <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] bg-brand" />
-              <p className="text-center text-[clamp(14px,1.1vw,18px)]">
+              <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] shrink-0 bg-brand md:shrink" />
+              <p className="shrink-0 text-center text-[clamp(14px,1.1vw,18px)] md:shrink">
                 {isEnglish ? data.descriptionEn : data.descriptionKo}
               </p>
             </div>
@@ -136,18 +155,18 @@ export default function UpdateModal(props: UpdateModalProps) {
               id="update-modal-hide-for-week-predefined"
               isChecked={isChecked}
               onChecked={onChecked}
-              className="px-[2%] py-[1.6%]"
+              className="shrink-0 px-[2%] py-[1.6%] md:shrink"
             />
           </div>
         </>
       ) : (
-        <div className="flex w-full flex-col">
+        <div className={IMAGE_ONLY_CONTENT_CLASS}>
           {/* 이미지 컨텐츠 */}
-          <div className="w-full">
+          <div className={IMAGE_ONLY_IMAGE_CONTAINER_CLASS}>
             <img
               src={patchNoteImage}
               alt={t('업데이트 이미지')}
-              className="block h-auto w-full"
+              className="block h-full w-full object-contain md:h-auto md:object-fill"
             />
           </div>
 
@@ -165,7 +184,7 @@ export default function UpdateModal(props: UpdateModalProps) {
       <button
         type="button"
         className={clsx(
-          'flex shrink-0 flex-row items-center justify-center bg-brand transition-all hover:bg-brand-hover',
+          CLOSE_BUTTON_CLASS,
           isPredefined ? 'h-[8.8%]' : 'h-[clamp(52px,min(4.18vw,7.04vh),68px)]',
         )}
         onClick={onClose}
