@@ -84,7 +84,7 @@ const meta: Meta<typeof UpdateModal> = {
     const closeButton = await canvas.findByRole('button', {
       name: /^닫기$|^Close$/,
     });
-    const modal = closeButton.parentElement!;
+    const modal = canvas.getByTestId('update-modal');
     const image = canvas.getByRole<HTMLImageElement>('img', {
       name: /업데이트 이미지|Update image/,
     });
@@ -157,11 +157,15 @@ const meta: Meta<typeof UpdateModal> = {
           { normalizer: (value) => value },
         );
         const content = description.parentElement!;
-        content.scrollTop = content.scrollHeight;
-        expect(description.getBoundingClientRect().bottom).toBeLessThanOrEqual(
-          content.getBoundingClientRect().bottom + 1,
-        );
-        content.scrollTop = 0;
+        const originalScrollTop = content.scrollTop;
+        try {
+          content.scrollTop = content.scrollHeight;
+          expect(
+            description.getBoundingClientRect().bottom,
+          ).toBeLessThanOrEqual(content.getBoundingClientRect().bottom + 1);
+        } finally {
+          content.scrollTop = originalScrollTop;
+        }
       });
     }
   },

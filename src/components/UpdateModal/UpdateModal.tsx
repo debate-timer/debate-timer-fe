@@ -102,6 +102,7 @@ export default function UpdateModal(props: UpdateModalProps) {
 
   return (
     <div
+      data-testid="update-modal"
       className={clsx(
         'flex flex-col overflow-hidden rounded-[2.2%] bg-default-white',
         MOBILE_MODAL_CLASS,
