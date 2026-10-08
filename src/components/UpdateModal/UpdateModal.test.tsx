@@ -124,6 +124,8 @@ describe('UpdateModal', () => {
     }) => {
       await renderUpdateModal(predefinedPatchNote, language);
 
+      expect(screen.getByRole('dialog', { name: title })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();
       expect(screen.getByRole('img', { name: imageAlt })).toHaveAttribute(
         'src',
         image,
@@ -145,6 +147,7 @@ describe('UpdateModal', () => {
       language: 'ko' as const,
       image: '/patch-note-only-ko.png',
       imageAlt: '업데이트 이미지',
+      dialogName: '디베이트 타이머에 새로운 기능이 생겼어요!',
       hideForWeek: '일주일간 보지 않기',
       closeButton: '닫기',
     },
@@ -152,14 +155,25 @@ describe('UpdateModal', () => {
       language: 'en' as const,
       image: '/patch-note-only-en.png',
       imageAlt: 'Update image',
+      dialogName: 'New features are now available in Debate Timer!',
       hideForWeek: "Don't show again for a week",
       closeButton: 'Close',
     },
   ])(
     'image-only 모드에서 $language 콘텐츠를 표시한다',
-    async ({ language, image, imageAlt, hideForWeek, closeButton }) => {
+    async ({
+      language,
+      image,
+      imageAlt,
+      dialogName,
+      hideForWeek,
+      closeButton,
+    }) => {
       await renderUpdateModal(imageOnlyPatchNote, language);
 
+      expect(
+        screen.getByRole('dialog', { name: dialogName }),
+      ).toBeInTheDocument();
       expect(screen.getByRole('img', { name: imageAlt })).toHaveAttribute(
         'src',
         image,

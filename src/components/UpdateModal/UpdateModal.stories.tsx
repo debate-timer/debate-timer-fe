@@ -84,7 +84,7 @@ const meta: Meta<typeof UpdateModal> = {
     const closeButton = await canvas.findByRole('button', {
       name: /^닫기$|^Close$/,
     });
-    const modal = canvas.getByTestId('update-modal');
+    const modal = canvas.getByRole('dialog');
     const image = canvas.getByRole<HTMLImageElement>('img', {
       name: /업데이트 이미지|Update image/,
     });

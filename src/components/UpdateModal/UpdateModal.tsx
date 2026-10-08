@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useId } from 'react';
 import MegaphoneAsset from './MegaphoneAsset';
 import NoticeAsset from './NoticeAsset';
 import {
@@ -93,6 +94,7 @@ function HideForWeekCheckbox(props: HideForWeekCheckboxProps) {
 export default function UpdateModal(props: UpdateModalProps) {
   const { data, isChecked, onChecked, onClose } = props;
   const { t, i18n } = useTranslation();
+  const titleId = useId();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const primaryLang = currentLang?.split(/[-_]/)[0];
   const lang = isSupportedLang(primaryLang) ? primaryLang : DEFAULT_LANG;
@@ -102,7 +104,13 @@ export default function UpdateModal(props: UpdateModalProps) {
 
   return (
     <div
-      data-testid="update-modal"
+      role="dialog"
+      aria-labelledby={isPredefined ? titleId : undefined}
+      aria-label={
+        isPredefined
+          ? undefined
+          : t('디베이트 타이머에 새로운 기능이 생겼어요!')
+      }
       className={clsx(
         'flex flex-col overflow-hidden rounded-[2.2%] bg-default-white',
         MOBILE_MODAL_CLASS,
@@ -142,9 +150,12 @@ export default function UpdateModal(props: UpdateModalProps) {
           <div className="flex min-h-0 w-full flex-1 flex-col p-[1%] md:min-h-[auto]">
             {/* 타이틀 및 내용 */}
             <div className={TEXT_CONTENT_CLASS}>
-              <p className="shrink-0 text-[clamp(26px,2.1vw,34px)] font-bold text-brand md:shrink">
+              <h2
+                id={titleId}
+                className="shrink-0 text-[clamp(26px,2.1vw,34px)] font-bold text-brand md:shrink"
+              >
                 {isEnglish ? data.titleEn : data.titleKo}
-              </p>
+              </h2>
               <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] shrink-0 bg-brand md:shrink" />
               <p className="shrink-0 text-center text-[clamp(14px,1.1vw,18px)] md:shrink">
                 {isEnglish ? data.descriptionEn : data.descriptionKo}
