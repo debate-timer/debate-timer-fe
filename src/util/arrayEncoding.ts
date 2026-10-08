@@ -1,5 +1,5 @@
 import { deflate, inflate } from 'pako';
-import { DebateTableData } from '../type/type';
+import { DebateTableData } from '../types/type';
 
 export function encodeDebateTableData(data: DebateTableData): string {
   const json = JSON.stringify(data); // Deserialize

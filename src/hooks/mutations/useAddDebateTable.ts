@@ -1,6 +1,6 @@
 import { PostDebateTableResponseType } from '../../apis/responses/debateTable';
 import { getRepository } from '../../repositories/DebateTableRepository';
-import { DebateTableData } from '../../type/type';
+import { DebateTableData } from '../../types/type';
 import { usePreventDuplicateMutation } from './usePreventDuplicateMutation';
 
 export default function useAddDebateTable(onSuccess: (id: number) => void) {

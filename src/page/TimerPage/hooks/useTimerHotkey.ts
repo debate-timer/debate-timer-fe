@@ -24,6 +24,7 @@ export function useTimerHotkey(
     goToOtherItem,
     setProsConsSelected,
     switchCamp,
+    canSwitchCamp,
   } = state;
 
   useEffect(() => {
@@ -48,6 +49,11 @@ export function useTimerHotkey(
       // 핫키 입력시, 기본 동작(스크롤, 폼 전송 등) 막음
       if (keysToDisable.has(event.code)) {
         event.preventDefault();
+      }
+
+      // 키를 길게 눌러 반복 입력되면 재생/정지·진영 전환 이벤트가 연속 발행되므로 무시
+      if (event.repeat) {
+        return;
       }
       // 입력 포커스 해제(특히 input/select 사용 중일 때)
       if (event.target instanceof HTMLElement) {
@@ -86,9 +92,9 @@ export function useTimerHotkey(
             onEvent(normalTimer.resetTimer, 'RESET');
           } else {
             if (prosConsSelected === 'PROS') {
-              onEvent(() => timer1.resetCurrentTimer(timer2.isDone), 'RESET');
+              onEvent(() => timer1.resetCurrentTimer(), 'RESET');
             } else {
-              onEvent(() => timer2.resetCurrentTimer(timer1.isDone), 'RESET');
+              onEvent(() => timer2.resetCurrentTimer(), 'RESET');
             }
           }
           break;
@@ -111,7 +117,7 @@ export function useTimerHotkey(
           // 반대 진영 선택 및 찬성 타이머 정지
           if (prosConsSelected === 'PROS') {
             const handleSwitching = () => {
-              if (timer1.isDone) {
+              if (timer2.isDone) {
                 setProsConsSelected('CONS');
               } else {
                 switchCamp();
@@ -124,8 +130,10 @@ export function useTimerHotkey(
           break;
         case 'Enter':
         case 'NumpadEnter':
-          // 진영 전환
-          onEvent(switchCamp, 'TEAM_SWITCH');
+          // 진영 전환 (사회자 화면에서 전환되지 않으면 청중에게도 발행하지 않음)
+          if (canSwitchCamp) {
+            onEvent(switchCamp, 'TEAM_SWITCH');
+          }
           break;
       }
     };
@@ -144,6 +152,7 @@ export function useTimerHotkey(
     goToOtherItem,
     setProsConsSelected,
     switchCamp,
+    canSwitchCamp,
     onEvent,
   ]);
 }

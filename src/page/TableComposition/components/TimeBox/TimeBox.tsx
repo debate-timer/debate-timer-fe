@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { HTMLAttributes } from 'react';
 import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
-import { TimeBoxInfo } from '../../../../type/type';
+import { TimeBoxInfo } from '../../../../types/type';
 import { Formatting } from '../../../../util/formatting';
 import DTDrag from '../../../../components/icons/Drag';
 import SmallIconButtonContainer from '../../../../components/SmallIconContainer/SmallIconContainer';

@@ -8,7 +8,7 @@ import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
-import { CoinState, StanceToString } from '../../type/type';
+import { CoinState, StanceToString } from '../../types/type';
 import { isGuestFlow } from '../../util/sessionStorage';
 import DTShare from '../../components/icons/Share';
 import DTDebate from '../../components/icons/Debate';
@@ -26,11 +26,13 @@ import {
   isSupportedLang,
 } from '../../util/languageRouting';
 import useAnalytics from '../../hooks/useAnalytics';
+import { useEnsureGuestTable } from '../../hooks/useEnsureGuestTable';
 
 // 토론 개요를 보여주고 공유, 수정, 시작 액션을 제공하는 페이지다.
 export default function TableOverviewPage() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
+  useEnsureGuestTable(id);
   const tableId = Number(id);
   const navigate = useNavigate();
   const { openModal, closeModal, ModalWrapper } = useModal();

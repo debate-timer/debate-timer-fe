@@ -1,4 +1,4 @@
-import { BasePollInfo, PollInfo, VoterPollInfo } from '../../type/type';
+import { BasePollInfo, PollInfo, VoterPollInfo } from '../../types/type';
 
 // POST /api/polls/{tableId}
 export interface PostPollResponseType extends BasePollInfo {

@@ -4,6 +4,21 @@ import { socketManager, SocketOptions } from '../../apis/sockets/SocketManager';
 import { SocketMessage } from '../../apis/sockets/type';
 
 /**
+ * 구독 요청에 첨부할 STOMP 헤더
+ * - 함수로 전달하면 실제로 구독할 때(재연결 후 재구독 포함)마다 호출해 최신 값을 첨부합니다.
+ */
+export type SubscribeHeaders = StompHeaders | (() => StompHeaders | undefined);
+
+interface SubscriptionInfo {
+  callback: (message: IMessage) => void;
+  headers?: SubscribeHeaders;
+}
+
+function resolveHeaders(headers?: SubscribeHeaders) {
+  return typeof headers === 'function' ? headers() : headers;
+}
+
+/**
  * 소켓 연결을 돕는 React 훅입니다. 제공되는 함수는 아래와 같습니다:
  *
  * - `connect`는 기존 HTTP 연결을 WS 연결로 업그레이드합니다. `options`를 통해 설정을 변경할 수 있습니다.
@@ -19,10 +34,8 @@ export default function useSocket() {
   // 현재 컴포넌트에서 활성화한 구독을 저장하는 보관소
   const activeSubscriptions = useRef<Map<string, StompSubscription>>(new Map());
 
-  // 재연결시 복구를 위해 지금까지 구독했던 채널과 콜백을 저장하는 보관서
-  const subscriptionInfos = useRef<Map<string, (message: IMessage) => void>>(
-    new Map(),
-  );
+  // 재연결시 복구를 위해 지금까지 구독했던 채널과 콜백, 헤더를 저장하는 보관서
+  const subscriptionInfos = useRef<Map<string, SubscriptionInfo>>(new Map());
 
   const connectionListeners = useRef<Set<() => void>>(new Set());
 
@@ -80,11 +93,16 @@ export default function useSocket() {
    *
    * @params destination - 목적지 채널
    * @params callback - 구독 이후 메시지를 받을 때마다 수행할 동작이 묘사된 콜백 함수
+   * @params headers - (선택 옵션) 구독 요청에 첨부할 STOMP 헤더
    */
   const subscribe = useCallback(
-    (destination: string, callback: (message: IMessage) => void) => {
+    (
+      destination: string,
+      callback: (message: IMessage) => void,
+      headers?: SubscribeHeaders,
+    ) => {
       // 구독 정보를 백업 리스트에 등록
-      subscriptionInfos.current.set(destination, callback);
+      subscriptionInfos.current.set(destination, { callback, headers });
 
       // 소켓이 연결된 상태라면 즉시 구독 실행
       if (socketManager.isConnected()) {
@@ -94,7 +112,11 @@ export default function useSocket() {
         }
 
         // 중복이 아니라면 리스트에 등록
-        const subscription = socketManager.subscribe(destination, callback);
+        const subscription = socketManager.subscribe(
+          destination,
+          callback,
+          resolveHeaders(headers),
+        );
         if (subscription) {
           activeSubscriptions.current.set(destination, subscription);
         }
@@ -134,13 +156,19 @@ export default function useSocket() {
         activeSubscriptions.current.clear();
 
         // 백업 리스트의 모든 구독을 다시 활성화
-        subscriptionInfos.current.forEach((callback, destination) => {
-          const subscription = socketManager.subscribe(destination, callback);
-          if (!subscription) {
-            throw new Error(`채널 구독 실패: ${destination}`);
-          }
-          activeSubscriptions.current.set(destination, subscription);
-        });
+        subscriptionInfos.current.forEach(
+          ({ callback, headers }, destination) => {
+            const subscription = socketManager.subscribe(
+              destination,
+              callback,
+              resolveHeaders(headers),
+            );
+            if (!subscription) {
+              throw new Error(`채널 구독 실패: ${destination}`);
+            }
+            activeSubscriptions.current.set(destination, subscription);
+          },
+        );
       };
 
       // 재시도 및 오류 복구 최초 1회

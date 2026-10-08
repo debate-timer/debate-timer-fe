@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import TimeBasedTimer from '../components/TimeBasedTimer';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 
 // --- Mock 타이머 인스턴스 ---
 const mockTimerInstance = {

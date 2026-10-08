@@ -108,6 +108,16 @@ export const Failed: Story = {
   ],
 };
 
+// 다른 탭/기기에서 공유를 시작해 이 화면의 공유가 멈춘 상태
+export const Replaced: Story = {
+  args: {
+    isLoading: false,
+    isError: true,
+    errorType: 'replaced',
+    onRestart: () => {},
+  },
+};
+
 export const Loading: Story = {
   args: {
     isLoading: true,

@@ -10,7 +10,7 @@
 
   html,
   body {
-    @apply text-default-black;
+    @apply text-default-black break-keep;
   }
 }
 

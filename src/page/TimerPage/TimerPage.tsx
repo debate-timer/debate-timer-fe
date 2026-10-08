@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
@@ -14,12 +14,13 @@ import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import LiveShareButton from './components/LiveShareButton';
 import LiveShareModal from './components/LiveShareModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
-import { bgColorMap } from '../../type/type';
+import { bgColorMap } from '../../types/type';
 import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import { isGuestFlow } from '../../util/sessionStorage';
+import { useEnsureGuestTable } from '../../hooks/useEnsureGuestTable';
 import useAnalytics from '../../hooks/useAnalytics';
 import { consumeTemplateOrigin } from '../../util/analytics/templateOrigin';
 import {
@@ -31,19 +32,27 @@ import DTVolume from '../../components/icons/Volume';
 import VolumeBar from '../../components/VolumeBar/VolumeBar';
 import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
-import { SocketEventType, TimerDataPayload } from '../../apis/sockets/type';
+import { SocketEventType, TimerEventTypes } from '../../apis/sockets/type';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
+import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 
 // 피처 플래그
-const IS_LIVE_SHARE_ENABLED = false;
+const IS_LIVE_SHARE_ENABLED = true;
 
 // 토론 타이머 실행, 라운드 이동, 종료 흐름을 관리하는 메인 페이지다.
+interface SharedTimes {
+  remainingTime: number | null;
+  prosTotalTime: number | null;
+  consTotalTime: number | null;
+}
+
 export default function TimerPage() {
   const { t } = useTranslation();
   const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
+  useEnsureGuestTable(pathParams.id);
   const tableId = Number(pathParams.id);
   const {
     openUseTooltipModal,
@@ -94,6 +103,12 @@ export default function TimerPage() {
     consTimer: timer2,
   });
 
+  // 토론 종료 이벤트를 발행했는지 여부 (이후 상태 공유 요청에는 FINISHED로 응답)
+  const isDebateFinishedRef = useRef(false);
+
+  // 서버의 상태 공유 요청을 처리할 최신 핸들러 (소켓 훅보다 뒤에서 정의되므로 ref로 연결)
+  const syncRequestHandlerRef = useRef<() => void>(() => {});
+
   const {
     isLiveShareModalOpen,
     toggleLiveShareModal,
@@ -106,10 +121,84 @@ export default function TimerPage() {
     isLoading: isSocketLoading,
     isError: isSocketError,
     errorType: socketErrorType,
-  } = useLiveShare(tableId);
+    restartLiveShare,
+  } = useLiveShare(tableId, {
+    onSyncRequest: () => syncRequestHandlerRef.current(),
+  });
 
   const handleChangeAnswerTime = (time: number) => {
     setAnswerTime(time);
+  };
+
+  // 현재 타이머 상태로 청중 공유용 페이로드 생성
+  const isNormalTimerRunning = normalTimer.isRunning;
+  const isProsTimerRunning = timer1.isRunning;
+  const isConsTimerRunning = timer2.isRunning;
+  const prosTotalTime = timer1.totalTimer;
+  const consTotalTime = timer2.totalTimer;
+  const buildTimerPayload = useCallback(
+    (eventType: TimerEventTypes, sharedTimes?: SharedTimes) => {
+      const isTimeBasedTimerRunning =
+        prosConsSelected === 'PROS' ? isProsTimerRunning : isConsTimerRunning;
+
+      return buildTimerPayloadForShare({
+        eventType,
+        timerType,
+        sequence: index,
+        currentTeam: prosConsSelected,
+        remainingTime: sharedTimes ? sharedTimes.remainingTime : remainingTime,
+        isCurrentTimerRunning:
+          timerType === 'NORMAL'
+            ? isNormalTimerRunning
+            : isTimeBasedTimerRunning,
+        prosTotalTime: sharedTimes ? sharedTimes.prosTotalTime : prosTotalTime,
+        consTotalTime: sharedTimes ? sharedTimes.consTotalTime : consTotalTime,
+      });
+    },
+    [
+      consTotalTime,
+      index,
+      isConsTimerRunning,
+      isNormalTimerRunning,
+      isProsTimerRunning,
+      prosConsSelected,
+      prosTotalTime,
+      remainingTime,
+      timerType,
+    ],
+  );
+
+  // 자유토론 초기화 직후 공유할 시간을 만든다.
+  // 이벤트 발행 시점에는 React 상태가 아직 초기화 전 값이므로, 현재 팀은 턴 시작 시간을 직접 읽는다.
+  const getResetSharedTimes = (): SharedTimes | undefined => {
+    if (timerType !== 'TIME_BASED') {
+      return undefined;
+    }
+
+    const prosTimes =
+      prosConsSelected === 'PROS' ? timer1.getTurnStartTimes() : timer1;
+    const consTimes =
+      prosConsSelected === 'CONS' ? timer2.getTurnStartTimes() : timer2;
+
+    return {
+      remainingTime: getRemainingTimeForShare({
+        timerType,
+        normalTimer: normalTimer.timer,
+        currentTeam: prosConsSelected,
+        prosTimer: {
+          totalTimer: prosTimes.totalTimer,
+          speakingTimer: prosTimes.speakingTimer,
+          isSpeakingTimerAvailable: timer1.isSpeakingTimerAvailable,
+        },
+        consTimer: {
+          totalTimer: consTimes.totalTimer,
+          speakingTimer: consTimes.speakingTimer,
+          isSpeakingTimerAvailable: timer2.isSpeakingTimerAvailable,
+        },
+      }),
+      prosTotalTime: prosTimes.totalTimer,
+      consTotalTime: consTimes.totalTimer,
+    };
   };
 
   // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
@@ -117,43 +206,97 @@ export default function TimerPage() {
     // 이벤트 실행
     invoke();
 
+    // 종료 후 다른 이벤트를 발행하면 토론이 다시 진행 중인 것으로 본다
+    isDebateFinishedRef.current = eventType === 'FINISHED';
+
     // 만약 소켓 열려 있으면, 발송
-    if (isSocketConnected) {
-      if (eventType === 'FINISHED') {
-        issueEvent(eventType, null);
-        return;
-      }
-
-      if (remainingTime === null) {
-        return;
-      }
-
-      // 타입에 따른 페이로드 준비
-      let innerPayload: TimerDataPayload;
-
-      if (timerType === 'NORMAL') {
-        innerPayload = {
-          timerType: timerType,
-          remainingTime: remainingTime,
-          sequence: index,
-        };
-      } else if (timerType === 'TIME_BASED') {
-        innerPayload = {
-          currentTeam: prosConsSelected,
-          timerType: timerType,
-          remainingTime: remainingTime,
-          sequence: index,
-        };
-      } else {
-        // 피드백 타이머 타입은 여기 올 수 없음
-        // 따라서 별도 작업 하지 않고 그냥 반환
-        return;
-      }
-
-      // 이벤트 발행
-      issueEvent(eventType, innerPayload);
+    if (!isSocketConnected) {
+      return;
     }
+
+    if (eventType === 'FINISHED' || eventType === 'ERROR') {
+      issueEvent(eventType, null);
+      return;
+    }
+
+    const payload = buildTimerPayload(
+      eventType,
+      eventType === 'RESET' ? getResetSharedTimes() : undefined,
+    );
+    if (payload === null) {
+      return;
+    }
+
+    // 이벤트 발행
+    issueEvent(eventType, payload);
   };
+
+  // 상태 공유용 남은 시간을 실제 시각 기준으로 보정해 만든다.
+  // 사회자 탭이 백그라운드에 있는 동안 브라우저가 인터벌을 억제하면 화면의 남은 시간이
+  // 밀려 있으므로, 그대로 공유하면 청중이 지난 시간을 다시 보게 된다.
+  const buildSyncPayload = useCallback(() => {
+    const caughtUpNormalTime = normalTimer.catchUpToClock();
+    const caughtUpProsTimes = timer1.catchUpToClock();
+    const caughtUpConsTimes = timer2.catchUpToClock();
+
+    const caughtUpRemainingTime = getRemainingTimeForShare({
+      timerType,
+      normalTimer: caughtUpNormalTime,
+      currentTeam: prosConsSelected,
+      prosTimer: {
+        ...caughtUpProsTimes,
+        isSpeakingTimerAvailable: timer1.isSpeakingTimerAvailable,
+      },
+      consTimer: {
+        ...caughtUpConsTimes,
+        isSpeakingTimerAvailable: timer2.isSpeakingTimerAvailable,
+      },
+    });
+
+    return buildTimerPayloadForShare({
+      eventType: 'SYNC',
+      timerType,
+      sequence: index,
+      currentTeam: prosConsSelected,
+      remainingTime: caughtUpRemainingTime,
+      isCurrentTimerRunning:
+        timerType === 'NORMAL'
+          ? isNormalTimerRunning
+          : prosConsSelected === 'PROS'
+            ? isProsTimerRunning
+            : isConsTimerRunning,
+      prosTotalTime: caughtUpProsTimes.totalTimer,
+      consTotalTime: caughtUpConsTimes.totalTimer,
+    });
+  }, [
+    index,
+    isConsTimerRunning,
+    isNormalTimerRunning,
+    isProsTimerRunning,
+    normalTimer,
+    prosConsSelected,
+    timer1,
+    timer2,
+    timerType,
+  ]);
+
+  // 서버의 상태 공유 요청 시 현재 상태를 SYNC로 발행 (이미 종료했다면 FINISHED)
+  // 폐기된 렌더의 상태를 캡처하지 않도록 커밋 이후에 핸들러를 갱신
+  useEffect(() => {
+    syncRequestHandlerRef.current = () => {
+      if (isDebateFinishedRef.current) {
+        issueEvent('FINISHED', null);
+        return;
+      }
+
+      const payload = buildSyncPayload();
+      if (payload === null) {
+        return;
+      }
+
+      issueEvent('SYNC', payload);
+    };
+  }, [buildSyncPayload, issueEvent]);
 
   useTimerHotkey(state, handleTimerEvent);
 
@@ -290,14 +433,17 @@ export default function TimerPage() {
                 bgColorMap[bg],
               )}
             >
-              {/* 라이브 공유 버튼 및 모달 */}
+              {/* 라이브 공유 버튼 및 모달 (화면이 작아져도 타이머와 라운드 버튼 위에 보이고 클릭되도록 레이어를 올린다) */}
               {IS_LIVE_SHARE_ENABLED && isLoggedIn() && (
                 <div
-                  className="absolute right-4 top-4 flex"
+                  className="absolute right-4 top-4 z-20 flex"
                   ref={liveShareModalRef}
                 >
                   {!isLiveShareModalOpen && (
-                    <LiveShareButton onClick={toggleLiveShareModal} />
+                    <LiveShareButton
+                      onClick={toggleLiveShareModal}
+                      isSharing={isSocketConnected}
+                    />
                   )}
 
                   {isLiveShareModalOpen && (
@@ -308,6 +454,7 @@ export default function TimerPage() {
                         isError={isSocketError}
                         errorType={socketErrorType}
                         toggleModal={toggleLiveShareModal}
+                        onRestart={restartLiveShare}
                       />
                     </div>
                   )}

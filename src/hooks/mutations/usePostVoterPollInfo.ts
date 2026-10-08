@@ -1,5 +1,5 @@
 import { postVoterPollInfo } from '../../apis/apis/poll';
-import { VoterPollInfo } from '../../type/type';
+import { VoterPollInfo } from '../../types/type';
 import { usePreventDuplicateMutation } from './usePreventDuplicateMutation';
 
 export default function usePostVoterPollInfo(onSuccess: () => void) {

@@ -1,5 +1,5 @@
 import { type PropsWithChildren } from 'react';
-import { Stance, TimeBoxType } from '../../../type/type';
+import { Stance, TimeBoxType } from '../../../types/type';
 import { MotionValue, useTransform, motion } from 'framer-motion';
 
 /**

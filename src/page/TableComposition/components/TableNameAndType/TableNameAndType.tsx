@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
-import { DebateInfo, StanceToString } from '../../../../type/type';
+import { DebateInfo, StanceToString } from '../../../../types/type';
 import useDebounce from '../../../../hooks/useDebounce';
 import {
   TABLE_FIELD_LIMITS,

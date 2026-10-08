@@ -1,4 +1,4 @@
-import { TimeBasedStance, TimeBoxType } from '../../type/type';
+import { TimeBasedStance, TimeBoxType } from '../../types/type';
 
 interface ShareTimerState {
   totalTimer: number | null;

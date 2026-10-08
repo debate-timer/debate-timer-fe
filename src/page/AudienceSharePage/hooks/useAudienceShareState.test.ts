@@ -1,10 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
-import { useAudienceShareState } from './useAudienceShareState';
+import {
+  CHAIRMAN_ABSENT_TIMEOUT_MS,
+  useAudienceShareState,
+} from './useAudienceShareState';
 import { useAudienceCountdown } from './useAudienceCountdown';
 import * as useAudienceSocketModule from '../../../hooks/sockets/useAudienceSocket';
 import { SocketMessage } from '../../../apis/sockets/type';
 import { SocketError } from '../../../apis/sockets/error';
-import { TimeBoxInfo } from '../../../type/type';
+import { TimeBoxInfo } from '../../../types/type';
 
 vi.mock('../../../hooks/sockets/useAudienceSocket');
 
@@ -43,6 +46,9 @@ describe('useAudienceShareState', () => {
       connect: mockConnect as unknown as (options?: unknown) => void,
       disconnect: mockDisconnect as unknown as () => void,
       latestMessage: null,
+      latestMessageReceivedAt: null,
+      lastReceivedAt: null,
+      chairmanAbsentAt: null,
       isConnected: false,
       error: null,
     });
@@ -60,6 +66,9 @@ describe('useAudienceShareState', () => {
       connect: mockConnect as unknown as (options?: unknown) => void,
       disconnect: mockDisconnect as unknown as () => void,
       latestMessage: null,
+      latestMessageReceivedAt: null,
+      lastReceivedAt: null,
+      chairmanAbsentAt: null,
       isConnected: true,
       error: null,
       ...state,
@@ -590,44 +599,261 @@ describe('useAudienceShareState', () => {
     expect(result.current.prosCountdown.currentSeconds).toBe(8);
   });
 
-  it('유효한 토론 이벤트가 600초 동안 없으면 오류 상태가 생성되고 소켓 및 시간 자원이 정리된다.', () => {
+  it('유효한 토론 이벤트가 600초 동안 없어도 오류로 처리하지 않고 소켓을 유지한다.', () => {
     setSocketState({
       isConnected: true,
       latestMessage: {
         eventType: 'PLAY',
         data: { timerType: 'NORMAL', sequence: 0, remainingTime: 60 },
       },
+      lastReceivedAt: Date.now(),
     });
 
-    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+    const { result } = renderHook(() => useAudienceShareState(1));
     expect(result.current.status).toBe('displaying');
 
     act(() => {
       vi.advanceTimersByTime(600 * 1000);
     });
-    rerender();
 
-    expect(result.current.status).toBe('displaying'); // wait, the error is set but what is the status?
-    // Wait, earlier I set it to just keep status as is and append error? Or does it change status to 'displaying' but with error?
-    // "오류 상태가 생성되고" -> error 필드가 갱신됨.
-    expect(result.current.error?.code).toBe('EVENT_TIMEOUT');
-    expect(mockDisconnect).toHaveBeenCalled();
+    expect(result.current.status).toBe('displaying');
+    expect(result.current.error).toBeNull();
+    expect(mockDisconnect).not.toHaveBeenCalled();
   });
 
-  it('소켓 연결 후 첫 이벤트가 600초 동안 없으면 EVENT_TIMEOUT 오류가 생성되고 소켓이 정리된다.', () => {
+  it('소켓 연결 후 첫 이벤트가 600초 동안 없어도 오류로 처리하지 않고 소켓을 유지한다.', () => {
     setSocketState({ isConnected: true, latestMessage: null });
 
-    const { result, rerender } = renderHook(() => useAudienceShareState(1));
-    expect(result.current.status).toBe('waiting');
+    const { result } = renderHook(() =>
+      useAudienceShareState(1, { table: normalTable }),
+    );
 
     act(() => {
       vi.advanceTimersByTime(600 * 1000);
     });
-    rerender();
 
     expect(result.current.status).toBe('waiting');
-    expect(result.current.error?.code).toBe('EVENT_TIMEOUT');
-    expect(mockDisconnect).toHaveBeenCalled();
+    expect(result.current.error).toBeNull();
+    expect(mockDisconnect).not.toHaveBeenCalled();
+  });
+
+  describe('사회자 연결 상태', () => {
+    const syncMessage: SocketMessage = {
+      eventType: 'SYNC',
+      data: {
+        timerType: 'NORMAL',
+        sequence: 0,
+        remainingTime: 60,
+        isRunning: true,
+      },
+      version: 1,
+    };
+
+    it('연결 후 사회자 메시지를 아직 받지 못하면 waiting이다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(14999);
+      });
+
+      expect(result.current.chairmanPresence).toBe('waiting');
+    });
+
+    it('연결 후 15초 동안 사회자 메시지를 한 번도 받지 못하면 absent가 된다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(15000);
+      });
+
+      expect(result.current.chairmanPresence).toBe('absent');
+    });
+
+    it('연결되지 않은 동안에는 첫 메시지 대기 시간을 재지 않는다', () => {
+      setSocketState({ isConnected: false, latestMessage: null });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(60 * 1000);
+      });
+
+      expect(result.current.chairmanPresence).toBe('waiting');
+    });
+
+    it('서버가 사회자 부재를 알리면 바로 absent가 된다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: Date.now(),
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.chairmanPresence).toBe('absent');
+    });
+
+    it('사회자 부재 알림 이후 사회자 메시지를 받으면 present로 바뀐다', () => {
+      const absentAt = Date.now();
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: absentAt,
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+        chairmanAbsentAt: absentAt,
+      });
+      rerender();
+
+      expect(result.current.chairmanPresence).toBe('present');
+    });
+
+    it('사회자 메시지 이후 사회자 부재 알림을 받으면 absent가 된다', () => {
+      const receivedAt = Date.now();
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: receivedAt,
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: receivedAt,
+        chairmanAbsentAt: Date.now(),
+      });
+      rerender();
+
+      expect(result.current.chairmanPresence).toBe('absent');
+    });
+
+    it('사회자 메시지를 받으면 present이다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.chairmanPresence).toBe('present');
+    });
+
+    it('마지막 수신 후 15초 동안 메시지가 없으면 absent가 된다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(14999);
+      });
+      expect(result.current.chairmanPresence).toBe('present');
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(result.current.chairmanPresence).toBe('absent');
+    });
+
+    it('수신이 이어지면 판정 시간이 다시 시작된다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(10000);
+      });
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+      });
+      rerender();
+
+      act(() => {
+        vi.advanceTimersByTime(10000);
+      });
+
+      expect(result.current.chairmanPresence).toBe('present');
+    });
+
+    it('absent 상태에서 다시 메시지를 받으면 present로 복구된다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(15000);
+      });
+      expect(result.current.chairmanPresence).toBe('absent');
+
+      setSocketState({
+        isConnected: true,
+        latestMessage: { ...syncMessage, version: 2 },
+        lastReceivedAt: Date.now(),
+      });
+      rerender();
+
+      expect(result.current.chairmanPresence).toBe('present');
+    });
+
+    it('재연결로 수신 기록이 초기화되면 waiting으로 돌아간다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        lastReceivedAt: Date.now(),
+      });
+
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      act(() => {
+        vi.advanceTimersByTime(15000);
+      });
+      expect(result.current.chairmanPresence).toBe('absent');
+
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        lastReceivedAt: null,
+      });
+      rerender();
+
+      expect(result.current.chairmanPresence).toBe('waiting');
+    });
   });
 
   it('ERROR 메시지와 소켓 오류 처리', () => {
@@ -663,7 +889,7 @@ describe('useAudienceShareState', () => {
     expect(mockDisconnect).toHaveBeenCalledTimes(1);
   });
 
-  it('재연결 세션에서는 이전 최신 메시지와 표시 화면이 첫 데이터로 재사용되지 않는다.', () => {
+  it('재연결로 메시지 기준이 초기화돼도 마지막 화면을 유지하고 새 메시지로 덮어쓴다.', () => {
     const { result, rerender } = renderHook(() => useAudienceShareState(1));
 
     setSocketState({
@@ -676,12 +902,284 @@ describe('useAudienceShareState', () => {
     rerender();
     expect(result.current.status).toBe('displaying');
 
-    // 끊김 후 재연결, 메시지 null
+    // 끊김 후 재연결, 메시지 기준 초기화
     setSocketState({
       isConnected: true,
       latestMessage: null,
     });
     rerender();
-    expect(result.current.status).toBe('waiting');
+
+    // 빈 화면으로 되돌아가지 않는다
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
+      expect(result.current.displayData.singleTime).toBe(60);
+    }
+
+    // 재연결 후 도착한 SYNC가 화면을 덮어쓴다
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'SYNC',
+        data: {
+          timerType: 'NORMAL',
+          sequence: 0,
+          remainingTime: 30,
+          isRunning: false,
+        },
+      },
+    });
+    rerender();
+
+    expect(result.current.status).toBe('displaying');
+    if (
+      result.current.status === 'displaying' &&
+      result.current.displayData.timerType === 'NORMAL'
+    ) {
+      expect(result.current.displayData.singleTime).toBe(30);
+    }
+  });
+
+  it('재연결을 시도하는 동안에도 마지막 화면을 유지한다.', () => {
+    const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+    setSocketState({
+      isConnected: true,
+      latestMessage: {
+        eventType: 'PLAY',
+        data: { timerType: 'NORMAL', sequence: 0, remainingTime: 60 },
+      },
+    });
+    rerender();
+    expect(result.current.status).toBe('displaying');
+
+    // 연결이 끊겨 재시도하는 구간
+    setSocketState({
+      isConnected: false,
+      latestMessage: null,
+    });
+    rerender();
+
+    expect(result.current.status).toBe('displaying');
+    expect(result.current.connectionStatus).toBe('connected');
+  });
+
+  describe('네트워크 지연 보정 기준 시각(syncedAt)', () => {
+    const RECEIVED_AT = 1_790_000_000_000;
+    const playMessage = (serverTime?: number | null): SocketMessage => ({
+      eventType: 'PLAY',
+      data: { timerType: 'NORMAL', sequence: 0, remainingTime: 75 },
+      version: 1,
+      serverTime,
+    });
+
+    it('수신 시각에서 서버 중계 이후 흐른 시간을 뺀 시각을 syncedAt으로 노출한다', () => {
+      setSocketState({
+        latestMessage: playMessage(RECEIVED_AT - 200),
+        latestMessageReceivedAt: RECEIVED_AT,
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.status).toBe('displaying');
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBe(RECEIVED_AT - 200);
+      }
+    });
+
+    it('서버 중계 시각이 없으면 수신 시각을 syncedAt으로 노출한다', () => {
+      setSocketState({
+        latestMessage: playMessage(null),
+        latestMessageReceivedAt: RECEIVED_AT,
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBe(RECEIVED_AT);
+      }
+    });
+
+    it('기기 시계가 어긋나 지연이 비정상이면 수신 시각을 syncedAt으로 노출한다', () => {
+      setSocketState({
+        latestMessage: playMessage(RECEIVED_AT + 5000),
+        latestMessageReceivedAt: RECEIVED_AT,
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      if (result.current.status === 'displaying') {
+        expect(result.current.syncedAt).toBe(RECEIVED_AT);
+      }
+    });
+  });
+
+  describe('사회자 첫 메시지 대기', () => {
+    const syncMessage: SocketMessage = {
+      eventType: 'SYNC',
+      data: {
+        timerType: 'NORMAL',
+        sequence: 1,
+        remainingTime: 42,
+        isRunning: true,
+      },
+    };
+
+    it('연결 후 사회자 메시지가 없으면 시간이 지나도 대기 상태를 유지한다', () => {
+      setSocketState({ isConnected: true, latestMessage: null });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+      expect(result.current.status).toBe('waiting');
+
+      act(() => {
+        vi.advanceTimersByTime(CHAIRMAN_ABSENT_TIMEOUT_MS + 5000);
+      });
+
+      expect(result.current.status).toBe('waiting');
+    });
+
+    it('사회자 메시지 전에 사회자 부재 알림을 받아도 대기 상태를 유지한다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: Date.now(),
+      });
+
+      const { result } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+      act(() => {
+        vi.advanceTimersByTime(CHAIRMAN_ABSENT_TIMEOUT_MS + 5000);
+      });
+
+      expect(result.current.status).toBe('waiting');
+    });
+
+    it('대기 중 사회자 SYNC를 받으면 받은 상태로 표시한다', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: null,
+        chairmanAbsentAt: Date.now(),
+      });
+      const { result, rerender } = renderHook(() =>
+        useAudienceShareState(1, { table: normalTable }),
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+      const receivedAt = Date.now();
+      setSocketState({
+        isConnected: true,
+        latestMessage: syncMessage,
+        latestMessageReceivedAt: receivedAt,
+        lastReceivedAt: receivedAt,
+        chairmanAbsentAt: receivedAt - 3000,
+      });
+      rerender();
+
+      expect(result.current.status).toBe('displaying');
+      expect(result.current.chairmanPresence).toBe('present');
+      if (result.current.status === 'displaying') {
+        expect(result.current.displayData).toMatchObject({
+          sequence: 1,
+          singleTime: 42,
+          isRunning: true,
+        });
+      }
+    });
+  });
+
+  describe('재연결 소진', () => {
+    const playMessage: SocketMessage = {
+      eventType: 'PLAY',
+      data: { timerType: 'NORMAL', sequence: 0, remainingTime: 60 },
+    };
+
+    it('보여주던 화면이 있으면 오류 대신 연결 끊김으로 표시하고 화면을 유지한다.', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+        lastReceivedAt: Date.now(),
+      });
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+      expect(result.current.status).toBe('displaying');
+
+      setSocketState({
+        isConnected: false,
+        latestMessage: playMessage,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+      rerender();
+
+      expect(result.current.status).toBe('displaying');
+      expect(result.current.connectionStatus).toBe('lost');
+      expect(result.current.error).toBeNull();
+    });
+
+    it('연결 끊김 상태에서는 소켓을 다시 끊지 않는다.', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+      });
+      const { rerender } = renderHook(() => useAudienceShareState(1));
+      mockDisconnect.mockClear();
+
+      setSocketState({
+        isConnected: false,
+        latestMessage: playMessage,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+      rerender();
+
+      expect(mockDisconnect).not.toHaveBeenCalled();
+    });
+
+    it('보여주던 화면이 없으면 기존처럼 오류로 처리한다.', () => {
+      setSocketState({
+        isConnected: false,
+        latestMessage: null,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+
+      const { result } = renderHook(() => useAudienceShareState(1));
+
+      expect(result.current.error).not.toBeNull();
+      expect(result.current.connectionStatus).toBe('connected');
+    });
+
+    it('다시 연결되면 연결 끊김 표시를 해제한다.', () => {
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+      });
+      const { result, rerender } = renderHook(() => useAudienceShareState(1));
+
+      setSocketState({
+        isConnected: false,
+        latestMessage: playMessage,
+        error: new SocketError('SOCKET_RETRY_EXHAUSTED', '재연결 소진'),
+      });
+      rerender();
+      expect(result.current.connectionStatus).toBe('lost');
+
+      setSocketState({
+        isConnected: true,
+        latestMessage: playMessage,
+        latestMessageReceivedAt: Date.now(),
+        error: null,
+      });
+      rerender();
+
+      expect(result.current.connectionStatus).toBe('connected');
+      expect(result.current.status).toBe('displaying');
+    });
   });
 });

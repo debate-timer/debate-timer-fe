@@ -3,9 +3,9 @@ import { SocketError } from '../../apis/sockets/error';
 
 describe('AudienceShareError 오류 객체', () => {
   it('올바른 코드와 이름으로 초기화된다', () => {
-    const error = new AudienceShareError('EVENT_TIMEOUT');
+    const error = new AudienceShareError('SERVER_ERROR');
     expect(error.name).toBe('AudienceShareError');
-    expect(error.code).toBe('EVENT_TIMEOUT');
+    expect(error.code).toBe('SERVER_ERROR');
     expect(error.technicalError).toBeNull();
   });
 

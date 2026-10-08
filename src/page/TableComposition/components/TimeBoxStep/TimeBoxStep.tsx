@@ -7,7 +7,7 @@ import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndC
 import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
 import TimerCreationContent from '../TimerCreationContent/TimerCreationContent';
-import { DebateTableData, TimeBoxInfo } from '../../../../type/type';
+import { DebateTableData, TimeBoxInfo } from '../../../../types/type';
 import DTEdit from '../../../../components/icons/Edit';
 import DTCheck from '../../../../components/icons/Check';
 import FloatingActionButton from '../../../../components/FloatingActionButton/FloatingActionButton';

@@ -28,6 +28,12 @@ export function useNormalTimer(): NormalTimerLogics {
   // 실제 시간 계산용 레퍼런스
   const targetTimeRef = useRef<number | null>(null);
 
+  // 콜백에서 최신 남은 시간을 읽기 위한 레퍼런스
+  const timerRef = useRef<number | null>(null);
+  useEffect(() => {
+    timerRef.current = timer;
+  }, [timer]);
+
   /**
    * 타이머를 1초마다 1씩 감소시키며 시작
    * 이미 동작중이면 재시작하지 않음
@@ -118,6 +124,25 @@ export function useNormalTimer(): NormalTimerLogics {
     setIsAdditionalTimerOn(false);
   }, []);
 
+  /**
+   * 남은 시간을 실제 시각 기준으로 즉시 다시 계산합니다.
+   * 백그라운드 탭에서는 브라우저가 인터벌을 억제해 표시가 밀리므로,
+   * 탭이 돌아왔을 때 다음 인터벌을 기다리지 않고 맞추는 데 사용합니다.
+   * @returns 보정된 남은 시간 (정지 상태면 현재 값 그대로)
+   */
+  const catchUpToClock = useCallback((): number | null => {
+    if (intervalRef.current === null || targetTimeRef.current === null) {
+      return timerRef.current;
+    }
+
+    const remainingSeconds = Math.ceil(
+      (targetTimeRef.current - Date.now()) / 1000,
+    );
+    timerRef.current = remainingSeconds;
+    setTimer(remainingSeconds);
+    return remainingSeconds;
+  }, []);
+
   useEffect(() => () => pauseTimer(), [pauseTimer]);
 
   return {
@@ -131,6 +156,7 @@ export function useNormalTimer(): NormalTimerLogics {
     resetTimer,
     setDefaultTimer,
     clearTimer,
+    catchUpToClock,
     handleChangeAdditionalTimer,
     handleCloseAdditionalTimer,
   };
@@ -147,6 +173,7 @@ export interface NormalTimerLogics {
   resetTimer: (value?: number) => void;
   setDefaultTimer: Dispatch<SetStateAction<number>>;
   clearTimer: () => void;
+  catchUpToClock: () => number | null;
   handleChangeAdditionalTimer: () => void;
   handleCloseAdditionalTimer: () => void;
 }
