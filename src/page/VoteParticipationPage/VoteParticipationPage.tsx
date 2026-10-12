@@ -97,8 +97,8 @@ export default function VoteParticipationPage() {
       <DefaultLayout.ContentContainer noPadding={true}>
         {isLoading && <LoadingIndicator />}
         {!isLoading && (
-          <div className="sm:px-10  flex h-full w-full justify-center bg-default-white px-6 pb-8 pt-10">
-            <div className="flex w-full  flex-1 flex-col items-center gap-10">
+          <div className="sm:px-10 flex h-full w-full justify-center bg-default-white px-6 pt-10 pb-8">
+            <div className="flex w-full flex-1 flex-col items-center gap-10">
               <header className="mt-6 flex w-full flex-col items-center text-center">
                 <h1 className="sm:text-4xl text-3xl font-bold text-default-black">
                   {t('승패투표')}
@@ -109,7 +109,7 @@ export default function VoteParticipationPage() {
                 <div className="flex w-full max-w-[480px] items-center gap-3 md:flex-row md:gap-4">
                   <label
                     htmlFor="participant-name"
-                    className="sm:text-xl whitespace-nowrap text-lg font-semibold text-default-black"
+                    className="sm:text-xl text-lg font-semibold whitespace-nowrap text-default-black"
                   >
                     {t('참여자 :')}
                   </label>
@@ -150,7 +150,7 @@ export default function VoteParticipationPage() {
             className={clsx(
               'button mb-8 w-full max-w-[400px] rounded-full',
               isSubmitDisabled
-                ? 'disabled bg-default-disabled/hover'
+                ? 'disabled bg-default-disabled-hover'
                 : 'enabled brand mb-8',
             )}
             onClick={openModal}

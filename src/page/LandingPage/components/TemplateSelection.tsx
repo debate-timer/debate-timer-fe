@@ -50,7 +50,7 @@ export default function TemplateSelection() {
           <LoadingSpinner
             strokeWidth={3}
             size={'size-24'}
-            color={'text-default-disabled/hover'}
+            color={'text-default-disabled-hover'}
           />
           <p className="text-center text-gray-500">
             {t('템플릿을 불러오는 중입니다...')}

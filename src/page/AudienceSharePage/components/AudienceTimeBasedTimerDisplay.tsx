@@ -35,8 +35,8 @@ function TimerValue({
   return (
     <span
       className={clsx(
-        'grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] font-bold tabular-nums leading-none md:leading-normal short:leading-none',
-        isDisabled ? 'text-default-disabled/hover' : 'text-default-black',
+        'grid w-[5ch] grid-cols-[2ch_1ch_2ch] items-center justify-center gap-x-[0.33ch] leading-none font-bold tabular-nums md:leading-normal short:leading-none',
+        isDisabled ? 'text-default-disabled-hover' : 'text-default-black',
         className,
       )}
       data-testid={testId}
@@ -78,7 +78,7 @@ export default function AudienceTimeBasedTimerDisplay({
 
   return (
     <section
-      className="flex h-full min-w-0 flex-1 flex-col items-center justify-center rounded-[16px] px-1 py-4 [justify-content:safe_center] md:px-6 md:py-8 short:py-2"
+      className="flex h-full min-w-0 flex-1 flex-col items-center [justify-content:safe_center] justify-center rounded-[16px] px-1 py-4 md:px-6 md:py-8 short:py-2"
       data-testid={`${teamId}-timer-display`}
       aria-current={isCurrentTeam ? 'step' : undefined}
     >
@@ -90,8 +90,8 @@ export default function AudienceTimeBasedTimerDisplay({
 
       <h1
         className={clsx(
-          'w-full break-keep text-center text-[22px] font-bold md:text-[52px] xl:text-[68px] short:text-[22px]',
-          !isCurrentTeam && 'text-default-disabled/hover',
+          'w-full text-center text-[22px] font-bold break-keep md:text-[52px] xl:text-[68px] short:text-[22px]',
+          !isCurrentTeam && 'text-default-disabled-hover',
         )}
       >
         {teamLabel}
@@ -117,8 +117,8 @@ export default function AudienceTimeBasedTimerDisplay({
           {/* 모바일(세로·가로)에서는 배지를 화면에서 숨기고 글자 크기 차이로 전체/현재 시간을 구분 */}
           <span
             className={clsx(
-              'sr-only md:not-sr-only md:mt-[36px] md:flex md:h-[48px] md:w-[144px] md:items-center md:justify-center md:whitespace-nowrap md:rounded-[8px] md:text-[24px] md:text-default-white short:sr-only',
-              isCurrentTeam ? 'bg-default-black' : 'bg-default-disabled/hover',
+              'sr-only md:not-sr-only md:mt-[36px] md:flex md:h-[48px] md:w-[144px] md:items-center md:justify-center md:rounded-[8px] md:text-[24px] md:whitespace-nowrap md:text-default-white short:sr-only',
+              isCurrentTeam ? 'bg-default-black' : 'bg-default-disabled-hover',
             )}
           >
             {t('전체 시간')}
@@ -131,10 +131,10 @@ export default function AudienceTimeBasedTimerDisplay({
           />
           <span
             className={clsx(
-              'sr-only md:not-sr-only md:mt-[28px] md:flex md:h-[64px] md:w-[200px] md:items-center md:justify-center md:whitespace-nowrap md:rounded-[8px] md:text-[32px] md:text-default-white short:sr-only',
+              'sr-only md:not-sr-only md:mt-[28px] md:flex md:h-[64px] md:w-[200px] md:items-center md:justify-center md:rounded-[8px] md:text-[32px] md:whitespace-nowrap md:text-default-white short:sr-only',
               isCurrentTeam
                 ? activeCurrentBadgeClass
-                : 'bg-default-disabled/hover',
+                : 'bg-default-disabled-hover',
             )}
           >
             {t('현재 시간')}

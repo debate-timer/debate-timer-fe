@@ -1,6 +1,7 @@
 import { defineConfig as defineViteConfig, loadEnv, mergeConfig } from 'vite';
 import { defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 const viteConfig = defineViteConfig(({ mode }) => {
@@ -9,7 +10,7 @@ const viteConfig = defineViteConfig(({ mode }) => {
   const hasSentryAuth =
     !!env.SENTRY_AUTH_TOKEN && !!env.SENTRY_ORG && !!env.SENTRY_PROJECT;
   const shouldUploadSourcemaps = isProductionBuild && hasSentryAuth;
-  const plugins = [react()];
+  const plugins = [react(), tailwindcss()];
 
   if (shouldUploadSourcemaps) {
     plugins.push(

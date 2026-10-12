@@ -12,9 +12,6 @@ import react from 'eslint-plugin-react';
 // 웹 접근성 관련 규칙
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 
-// Tailwind CSS 클래스 검사를 위한 플러그인
-import tailwindcss from 'eslint-plugin-tailwindcss';
-
 // Prettier 관련 설정
 import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
@@ -26,7 +23,15 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   // 기본 설정 옵션
   {
-    ignores: ['dist', 'public/mockServiceWorker.js', '.agents/', '.claude/', '.agent/', '.codex/'], // 배포 디렉터리(dist) 및 AI 에이전트 설정 파일 제외
+    ignores: [
+      'dist',
+      'storybook-static',
+      'public/mockServiceWorker.js',
+      '.agents/',
+      '.claude/',
+      '.agent/',
+      '.codex/',
+    ], // 빌드 산출물 및 AI 에이전트 설정 파일 제외
   },
   {
     // 확장 규칙 설정
@@ -52,7 +57,6 @@ export default tseslint.config(
       'react-refresh': reactRefresh, // React Refresh 관련 규칙
       'jsx-a11y': jsxA11y, // 웹 접근성 관련 규칙
       prettier: prettier, // Prettier 규칙
-      tailwindcss: tailwindcss, // Tailwind CSS 클래스명 검사
     },
 
     // 규칙 설정
@@ -65,7 +69,6 @@ export default tseslint.config(
       ],
       'jsx-a11y/alt-text': 'warn', // 접근성: alt 속성 검사
       'prettier/prettier': 'warn', // Prettier 관련 규칙 적용
-      'tailwindcss/classnames-order': 'warn', // Tailwind CSS 클래스명 정렬 검사
       'react/react-in-jsx-scope': 'off',
     },
 
@@ -76,9 +79,6 @@ export default tseslint.config(
       },
       react: {
         version: 'detect',
-      },
-      tailwindcss: {
-        config: './tailwind.config.js', // Tailwind 설정 파일 위치 지정
       },
     },
   },
