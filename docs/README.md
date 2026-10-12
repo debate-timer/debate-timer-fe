@@ -28,7 +28,7 @@
 | 서버 상태·HTTP    | TanStack Query 5, Axios                 | `src/hooks/query/`, `src/apis/primitives.ts`   |
 | 실시간 통신       | STOMP, SockJS                           | `src/apis/sockets/`, `src/hooks/sockets/`      |
 | 데이터 소스       | API·Session Repository                  | `src/repositories/`                            |
-| 스타일·애니메이션 | Tailwind CSS 3, Framer Motion           | `src/components/`, `src/index.css`             |
+| 스타일·애니메이션 | Tailwind CSS 4, Framer Motion           | `src/components/`, `src/index.css`             |
 | 오류 관측         | Sentry                                  | `src/instrument.ts`, `src/util/sentry.ts`      |
 | 테스트·Story      | Vitest, Testing Library, MSW, Storybook | `setup.ts`, `src/mocks/`, `*.stories.tsx`      |
 
