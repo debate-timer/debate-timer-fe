@@ -29,6 +29,10 @@ const viteConfig = defineViteConfig(({ mode }) => {
   return {
     base: env.VITE_BASE_PATH || '/',
     plugins,
+    optimizeDeps: {
+      // Storybook 빌드 산출물이 앱 개발 서버의 의존성 탐색에 섞이지 않도록 함.
+      entries: ['**/*.html', '!storybook-static/**'],
+    },
     build: {
       sourcemap: shouldUploadSourcemaps ? 'hidden' : false,
     },
