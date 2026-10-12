@@ -9,10 +9,7 @@ export default function DTRightArrow({
     <svg
       viewBox="0 0 33 30"
       fill="none"
-      className={`
-        aspect-[33/30]
-        ${className}
-      `}
+      className={`aspect-[33/30] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

@@ -147,9 +147,9 @@ describe('sentry 유틸', () => {
     expect(
       shouldSkipSentryEvent(new Error('Debate live session was cancelled')),
     ).toBe(false);
-    expect(shouldSkipSentryEvent(new Error('Request was aborted by server'))).toBe(
-      false,
-    );
+    expect(
+      shouldSkipSentryEvent(new Error('Request was aborted by server')),
+    ).toBe(false);
   });
 
   it('Sentry context에 원본 요청/응답 데이터가 그대로 전송되지 않도록 민감 필드를 마스킹한다', () => {

@@ -23,12 +23,12 @@ export default function ConnectionLostNotice({
         className="h-12 w-12 text-gray-600 xl:h-16 xl:w-16"
         aria-hidden="true"
       />
-      <p className="break-keep text-xl font-semibold text-gray-800 xl:text-2xl">
+      <p className="text-xl font-semibold break-keep text-gray-800 xl:text-2xl">
         {t('서버 연결이 끊겼어요. 새로고침 해주세요.')}
       </p>
       <button
         type="button"
-        className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-hidden"
         onClick={onReload}
       >
         {t('새로고침')}

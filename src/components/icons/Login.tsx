@@ -9,10 +9,7 @@ export default function DTLogin({
     <svg
       viewBox="0 0 28 30"
       fill="none"
-      className={`
-        aspect-[28/30]
-        ${className}
-      `}
+      className={`aspect-[28/30] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

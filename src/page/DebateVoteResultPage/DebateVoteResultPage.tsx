@@ -133,7 +133,7 @@ export default function DebateVoteResultPage() {
   return (
     <DefaultLayout>
       <DefaultLayout.ContentContainer noPadding={true}>
-        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-brandBackground px-6 py-10 ">
+        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-brandBackground px-6 py-10">
           <header className="flex w-full max-w-[1120px] flex-col items-center gap-2 text-center">
             <h1 className="text-3xl font-bold text-default-black lg:text-4xl xl:text-display-raw">
               {t('승패투표')}
@@ -191,7 +191,7 @@ export default function DebateVoteResultPage() {
               isBold: true,
             }}
           >
-            <div className="break-keep px-20 py-10 text-center text-xl font-bold">
+            <div className="px-20 py-10 text-center text-xl font-bold break-keep">
               {t('정말로 세부 결과를 공개할까요?')}
             </div>
           </DialogModal>

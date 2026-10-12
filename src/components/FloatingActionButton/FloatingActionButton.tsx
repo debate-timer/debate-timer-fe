@@ -20,10 +20,7 @@ export default function FloatingActionButton({
   return (
     <button
       onClick={onClick}
-      className={`
-        flex rounded-[16px] shadow-xl transition-all duration-200 ease-in-out
-        ${className}
-      `}
+      className={`flex rounded-[16px] shadow-xl transition-all duration-200 ease-in-out ${className} `}
       disabled={disabled}
     >
       {children}

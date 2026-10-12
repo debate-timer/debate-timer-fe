@@ -9,10 +9,7 @@ export default function DTExpand({
     <svg
       viewBox="0 0 13 8"
       fill="none"
-      className={`
-        aspect-[13/8]
-        ${className}
-      `}
+      className={`aspect-[13/8] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

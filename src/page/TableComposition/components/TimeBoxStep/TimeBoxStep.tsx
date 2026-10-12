@@ -275,7 +275,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
               >
                 <FloatingActionButton
                   onClick={openModal}
-                  className="pointer-events-auto my-[16px] bg-default-disabled/hover hover:bg-default-neutral"
+                  className="pointer-events-auto my-[16px] bg-default-disabled-hover hover:bg-default-neutral"
                 >
                   <div className="flex h-[56px] w-fit flex-row items-center justify-center space-x-[12px] p-[16px]">
                     <DTAdd className="h-full p-[4px]" />

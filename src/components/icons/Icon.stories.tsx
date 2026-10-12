@@ -48,7 +48,7 @@ export const OnLoginIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTLogin className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">로그인</p>
     </div>
@@ -60,7 +60,7 @@ export const OnHomeIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTHome className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">홈</p>
     </div>
@@ -72,7 +72,7 @@ export const OnHelpIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTHelp className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">도움말</p>
     </div>
@@ -84,7 +84,7 @@ export const OnCloseIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTClose className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">닫기</p>
     </div>
@@ -96,7 +96,7 @@ export const OnCheckIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTCheck className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">확인</p>
     </div>
@@ -108,7 +108,7 @@ export const OnExpandIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTExpand className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">확장 (더보기)</p>
     </div>
@@ -120,7 +120,7 @@ export const OnDebateIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTDebate className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">토론</p>
     </div>
@@ -132,7 +132,7 @@ export const OnRightArrowIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTRightArrow className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">우측 화살표</p>
     </div>
@@ -144,7 +144,7 @@ export const OnLeftArrowIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTLeftArrow className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">좌측 화살표</p>
     </div>
@@ -156,7 +156,7 @@ export const OnDragIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTDrag className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">드래그</p>
     </div>
@@ -168,7 +168,7 @@ export const OnCopyIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTCopy className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">복사</p>
     </div>
@@ -180,7 +180,7 @@ export const OnDeleteIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTDelete className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">삭제</p>
     </div>
@@ -192,7 +192,7 @@ export const OnEditIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTEdit className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">수정</p>
     </div>
@@ -204,7 +204,7 @@ export const OnPlayIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTPlay className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">시작/재생</p>
     </div>
@@ -216,7 +216,7 @@ export const OnResetIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTReset className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">초기화</p>
     </div>
@@ -228,7 +228,7 @@ export const OnShareIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTShare className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">공유</p>
     </div>
@@ -240,7 +240,7 @@ export const OnExchangeIcon: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTExchange className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">교체</p>
     </div>
@@ -252,7 +252,7 @@ export const OnBell: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTBell className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">타종</p>
     </div>
@@ -264,7 +264,7 @@ export const OnVolume: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTVolume className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">볼륨 조절</p>
     </div>
@@ -276,7 +276,7 @@ export const OnShareLive: Story = {
     color: '#FECD4C',
   },
   render: (args) => (
-    <div className="bg-neutral-white flex flex-col items-center rounded border p-4 shadow-sm">
+    <div className="bg-neutral-white flex flex-col items-center rounded-sm border p-4 shadow-xs">
       <DTShareLive className="size-16" {...args} />
       <p className="mt-2 text-sm text-gray-600">라이브로 공유</p>
     </div>

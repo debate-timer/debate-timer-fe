@@ -36,11 +36,7 @@ export default function Table({
   return (
     <>
       <button
-        className={`
-          m-5 flex h-[220px] w-[340px] items-center overflow-hidden rounded-[28px] shadow-lg transition-all duration-300 hover:scale-105
-          ${bgColor}
-          ${isHovered ? 'px-4' : 'px-12'}
-        `}
+        className={`m-5 flex h-[220px] w-[340px] items-center overflow-hidden rounded-[28px] shadow-lg transition-all duration-300 hover:scale-105 ${bgColor} ${isHovered ? 'px-4' : 'px-12'} `}
         onClick={() => onClick()}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -48,10 +44,7 @@ export default function Table({
       >
         {/* Left component (fixed width, slides in) */}
         <div
-          className={`
-            flex h-full transform flex-col items-start justify-between overflow-hidden pb-12 pt-4 transition-all duration-300
-            ${isHovered ? 'w-[144px] translate-x-0 opacity-100' : 'w-0 -translate-x-10 opacity-0'}
-          `}
+          className={`flex h-full transform flex-col items-start justify-between overflow-hidden pt-4 pb-12 transition-all duration-300 ${isHovered ? 'w-[144px] translate-x-0 opacity-100' : 'w-0 -translate-x-10 opacity-0'} `}
         >
           <div className="flex flex-row space-x-1">
             <button
@@ -96,7 +89,7 @@ export default function Table({
 
         {/* Right component (fills remaining space) */}
         <div
-          className={`flex flex-grow flex-col items-start overflow-hidden ${psClass} w-full duration-300`}
+          className={`flex grow flex-col items-start overflow-hidden ${psClass} w-full duration-300`}
         >
           <p
             className={`w-full truncate text-start text-[28px] font-semibold text-default-black duration-300`}

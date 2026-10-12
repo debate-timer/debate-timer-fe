@@ -102,7 +102,7 @@ describe('AudienceTimeBasedTimerDisplay', () => {
     );
 
     expect(screen.getByText('팀명 없음')).toHaveClass(
-      'text-default-disabled/hover',
+      'text-default-disabled-hover',
     );
     expect(screen.getByTestId('cons-timer-display')).not.toHaveClass(
       'bg-gray-100',
@@ -114,16 +114,16 @@ describe('AudienceTimeBasedTimerDisplay', () => {
       'grayscale',
     );
     expect(screen.getByText('전체 시간')).toHaveClass(
-      'bg-default-disabled/hover',
+      'bg-default-disabled-hover',
     );
     expect(screen.getByText('현재 시간')).toHaveClass(
-      'bg-default-disabled/hover',
+      'bg-default-disabled-hover',
     );
     expect(screen.getByTestId('cons-total-timer')).toHaveClass(
-      'text-default-disabled/hover',
+      'text-default-disabled-hover',
     );
     expect(screen.getByTestId('cons-current-timer')).toHaveClass(
-      'text-default-disabled/hover',
+      'text-default-disabled-hover',
     );
     expect(screen.getByTestId('timer-progress-fill')).toHaveClass(
       'bg-default-neutral',

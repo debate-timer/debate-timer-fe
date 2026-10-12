@@ -140,7 +140,7 @@ export default function TimeBasedTimer({
       >
         {/* 1회당 발언 시간 X */}
         {!isSpeakingTimerMode && (
-          <span className="flex w-full flex-row items-center justify-center p-[16px] text-[90px] font-bold tabular-nums text-default-black xl:text-[110px]">
+          <span className="flex w-full flex-row items-center justify-center p-[16px] text-[90px] font-bold text-default-black tabular-nums xl:text-[110px]">
             <p className="flex flex-1 items-center justify-center">{minute}</p>
             <p className="flex items-center justify-center">:</p>
             <p className="flex flex-1 items-center justify-center">{second}</p>
@@ -153,7 +153,7 @@ export default function TimeBasedTimer({
             <h1 className="w-[88px] rounded-[8px] bg-default-black py-[6px] text-center text-[16px] text-default-white xl:w-[112px] xl:text-[20px]">
               {t('전체 시간')}
             </h1>
-            <span className="flex flex-row text-[56px] font-semibold tabular-nums text-default-black xl:text-[72px]">
+            <span className="flex flex-row text-[56px] font-semibold text-default-black tabular-nums xl:text-[72px]">
               <p className="flex w-[80px] items-center justify-center xl:w-[100px]">
                 {minute}
               </p>
@@ -174,7 +174,7 @@ export default function TimeBasedTimer({
             >
               {t('현재 시간')}
             </h1>
-            <span className="flex flex-row text-[80px] font-bold tabular-nums text-default-black xl:text-[110px]">
+            <span className="flex flex-row text-[80px] font-bold text-default-black tabular-nums xl:text-[110px]">
               <p className="flex w-[120px] items-center justify-center xl:w-[180px]">
                 {speakingMinute}
               </p>

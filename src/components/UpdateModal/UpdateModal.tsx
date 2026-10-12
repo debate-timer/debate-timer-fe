@@ -156,7 +156,7 @@ export default function UpdateModal(props: UpdateModalProps) {
               >
                 {isEnglish ? data.titleEn : data.titleKo}
               </h2>
-              <div className="mb-[1.6%] mt-[0.8%] h-[2px] w-[10%] shrink-0 bg-brand md:shrink" />
+              <div className="mt-[0.8%] mb-[1.6%] h-[2px] w-[10%] shrink-0 bg-brand md:shrink" />
               <p className="shrink-0 text-center text-[clamp(14px,1.1vw,18px)] md:shrink">
                 {isEnglish ? data.descriptionEn : data.descriptionKo}
               </p>

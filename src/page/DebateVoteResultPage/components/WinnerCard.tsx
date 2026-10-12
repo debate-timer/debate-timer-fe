@@ -26,7 +26,7 @@ export default function WinnerCard({ teamkey, teamName }: WinnerCardProps) {
           'relative mt-6 flex h-[280px] w-[280px] items-center justify-center rounded-[32px] border-2',
           teamkey
             ? [style?.baseBg, style?.baseBorder]
-            : ['bg-default-disabled/hover', 'border-neutral-300'],
+            : ['bg-default-disabled-hover', 'border-neutral-300'],
         )}
       >
         <div className="text-center">

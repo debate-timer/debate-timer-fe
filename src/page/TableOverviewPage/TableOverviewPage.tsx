@@ -167,7 +167,7 @@ export default function TableOverviewPage() {
           {!isLoading && (
             <button
               onClick={handleOpenModal}
-              className="sm:right-3 sm:top-20 sm:w-24 2xl:w-40 fixed right-2 top-16 flex w-20 flex-col items-center md:right-4 md:top-24 md:w-28 lg:right-6 lg:top-28 lg:w-32 xl:right-8 xl:top-32 xl:w-36"
+              className="sm:right-3 sm:top-20 sm:w-24 2xl:w-40 fixed top-16 right-2 flex w-20 flex-col items-center md:top-24 md:right-4 md:w-28 lg:top-28 lg:right-6 lg:w-32 xl:top-32 xl:right-8 xl:w-36"
             >
               <img
                 src={Coins}
@@ -175,7 +175,7 @@ export default function TableOverviewPage() {
                 className="mb-2 h-auto w-full"
               />
 
-              <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full border-[2px] border-default-disabled/hover bg-default-white px-2 py-1.5 text-xs font-semibold text-default-black transition-colors duration-200 hover:bg-default-disabled/hover md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
+              <div className="sm:px-3 sm:py-2 sm:text-sm w-full rounded-full border-[2px] border-default-disabled-hover bg-default-white px-2 py-1.5 text-xs font-semibold text-default-black transition-colors duration-200 hover:bg-default-disabled-hover md:px-4 md:py-2.5 md:text-base lg:px-5 lg:py-3 lg:text-lg xl:px-6">
                 {t('팀 선정하기')}
               </div>
             </button>
@@ -183,7 +183,7 @@ export default function TableOverviewPage() {
         </DefaultLayout.ContentContainer>
 
         <DefaultLayout.StickyFooterWrapper>
-          <div className="mx-auto mb-8 mt-2 flex w-full max-w-4xl items-center justify-between gap-2">
+          <div className="mx-auto mt-2 mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
             <button
               className={clsx('flex aspect-square rounded-full p-[20px]', {
                 'button disabled': isLoading,

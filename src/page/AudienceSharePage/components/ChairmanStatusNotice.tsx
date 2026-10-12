@@ -25,7 +25,7 @@ export default function ChairmanStatusNotice({
         className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 xl:text-base"
       >
         <motion.span
-          className="h-2 w-2 flex-shrink-0 rounded-full bg-gray-500"
+          className="h-2 w-2 shrink-0 rounded-full bg-gray-500"
           animate={{ opacity: [1, 0.4, 1] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
@@ -46,7 +46,7 @@ export default function ChairmanStatusNotice({
         className="h-12 w-12 text-gray-600 xl:h-16 xl:w-16"
         aria-hidden="true"
       />
-      <p className="break-keep text-xl font-semibold text-gray-800 xl:text-2xl">
+      <p className="text-xl font-semibold break-keep text-gray-800 xl:text-2xl">
         {t('사회자 연결이 끊겼어요. 재접속을 기다리는 중이에요.')}
       </p>
     </div>

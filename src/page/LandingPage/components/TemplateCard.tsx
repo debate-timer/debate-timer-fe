@@ -21,7 +21,7 @@ export default function TemplateCard({
   return (
     <article
       className={clsx(
-        'flex flex-col rounded-3xl border-4 border-white bg-gradient-to-b from-default-white to-brand',
+        'flex flex-col rounded-3xl border-4 border-white bg-linear-to-b/srgb from-default-white to-brand',
         'ring-3 ring-brand/20',
         'p-6 shadow-[0_0_32px_rgba(255,165,0,0.1)] md:p-7',
         className,
@@ -30,7 +30,7 @@ export default function TemplateCard({
       {/* 헤더 */}
       <div className="flex justify-between">
         <div className="flex flex-col gap-2">
-          <h3 className="text-[min(max(0.9rem,1.4vw),1.1rem)] font-semibold leading-tight">
+          <h3 className="text-[min(max(0.9rem,1.4vw),1.1rem)] leading-tight font-semibold">
             {organization.organization}
           </h3>
           <p className="mt-1 min-h-[1.25rem] text-[min(max(0.75rem,1.1vw),0.9rem)] text-neutral-700">

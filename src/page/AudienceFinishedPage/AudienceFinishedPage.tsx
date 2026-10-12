@@ -38,16 +38,16 @@ export default function AudienceFinishedPage() {
             />
 
             {/* 종료 안내 문구 */}
-            <h1 className="break-keep text-2xl font-bold text-gray-800 md:text-3xl xl:text-5xl">
+            <h1 className="text-2xl font-bold break-keep text-gray-800 md:text-3xl xl:text-5xl">
               {t('토론이 종료되었습니다.')}
             </h1>
-            <p className="break-keep text-base text-gray-500 md:text-lg xl:text-xl">
+            <p className="text-base break-keep text-gray-500 md:text-lg xl:text-xl">
               {t('참여해 주셔서 감사합니다.')}
             </p>
 
             <button
               type="button"
-              className="mt-4 w-full rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 md:w-auto"
+              className="mt-4 w-full rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-hidden md:w-auto"
               onClick={handleClosePage}
             >
               {t('페이지 닫기')}

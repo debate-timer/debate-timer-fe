@@ -23,7 +23,7 @@ export default function VoteDetailResult({
         transition={{ duration: 0.35 }}
       >
         {/* 내용 */}
-        <div className="px-6 pb-8 pt-10">
+        <div className="px-6 pt-10 pb-8">
           <h2 className="mb-6 text-center text-[min(max(1.25rem,2.4vw),1.6rem)]">
             {t('투표 세부 결과')}
           </h2>

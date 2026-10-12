@@ -44,10 +44,10 @@ export default function CustomRangeSlider({
         {/* 볼륨 수치로 나타내는 말풍선 */}
         {showTooltip && (
           <div className="absolute -top-8 left-1/2 -translate-x-1/2 transform">
-            <div className="relative rounded bg-gray-800 px-2 py-1 text-xs text-white shadow-lg">
+            <div className="relative rounded-sm bg-gray-800 px-2 py-1 text-xs text-white shadow-lg">
               {value}
               {/* 말풍선 꼬리 */}
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-t-4 border-r-4 border-l-4 border-t-gray-800 border-r-transparent border-l-transparent"></div>
             </div>
           </div>
         )}

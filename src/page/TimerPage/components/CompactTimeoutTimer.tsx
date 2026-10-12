@@ -63,8 +63,8 @@ export default function CompactTimeoutTimer({
         'flex flex-col items-center justify-center rounded-[10px] bg-default-neutral/50 p-[20px]',
         'transition-all duration-700 ease-out',
         {
-          'opacity-0 translate-y-8': !isMounted, // 초기 상태: 숨겨지고 아래로 내려감 (32px)
-          'opacity-100 translate-y-0': isMounted, // 최종 상태: 나타나고 원래 위치로
+          'translate-y-8 opacity-0': !isMounted, // 초기 상태: 숨겨지고 아래로 내려감 (32px)
+          'translate-y-0 opacity-100': isMounted, // 최종 상태: 나타나고 원래 위치로
         },
         className,
       )}

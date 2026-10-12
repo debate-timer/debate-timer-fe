@@ -1,5 +1,8 @@
 import Skeleton from '../Skeleton/Skeleton';
 
+const HEADER_TITLE_CLASS_NAME =
+  'w-full max-w-[50vw] overflow-hidden text-xl leading-tight text-ellipsis whitespace-nowrap md:text-3xl md:leading-[36px] short:text-xl short:leading-[28px]';
+
 interface HeaderTitleProps {
   title?: string;
   skeletonEnabled?: boolean;
@@ -15,11 +18,7 @@ export default function HeaderTitle(props: HeaderTitleProps) {
           <Skeleton width={400} height={32} />
         </div>
       )}
-      {!isLoading && (
-        <h1 className="w-full max-w-[50vw] overflow-hidden text-ellipsis whitespace-nowrap text-xl leading-tight md:text-3xl short:text-xl">
-          {title}
-        </h1>
-      )}
+      {!isLoading && <h1 className={HEADER_TITLE_CLASS_NAME}>{title}</h1>}
     </>
   );
 }

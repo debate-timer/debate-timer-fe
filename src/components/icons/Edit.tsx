@@ -9,10 +9,7 @@ export default function DTEdit({
     <svg
       viewBox="0 0 19 18"
       fill="none"
-      className={`
-        aspect-[19/18]
-        ${className}
-      `}
+      className={`aspect-[19/18] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

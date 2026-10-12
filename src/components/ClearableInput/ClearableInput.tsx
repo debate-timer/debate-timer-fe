@@ -41,7 +41,7 @@ export default function ClearableInput({
         aria-invalid={isError || undefined}
         aria-describedby={errorId}
         className={clsx(
-          'text-body h-[48px] w-full appearance-none rounded-[4px] p-[12px] text-default-black placeholder-default-border focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+          'text-body h-[48px] w-full appearance-none rounded-[4px] p-[12px] text-default-black placeholder-default-border focus:outline-hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
           // box-border 기준이라 테두리를 굵혀도 외곽 크기(48px)는 유지 → 레이아웃 밀림 없음
           isError
             ? 'border-2 border-semantic-error'
@@ -52,7 +52,7 @@ export default function ClearableInput({
         <button
           type="button"
           onClick={onClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-neutral-400 hover:text-neutral-600"
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-xl text-neutral-400 hover:text-neutral-600"
         >
           <IoMdCloseCircle />
         </button>
@@ -62,7 +62,7 @@ export default function ClearableInput({
         <span
           aria-live="polite"
           className={clsx(
-            'pointer-events-none absolute right-1 top-full mt-[2px] text-[11px] leading-none',
+            'pointer-events-none absolute top-full right-1 mt-[2px] text-[11px] leading-none',
             isOverLimit
               ? 'font-semibold text-semantic-error'
               : 'text-default-neutral',
@@ -80,7 +80,7 @@ export default function ClearableInput({
           id={errorId}
           role="alert"
           aria-live="polite"
-          className="absolute left-1 top-full mt-[2px] pr-14 text-[12px] font-semibold leading-none text-semantic-error"
+          className="absolute top-full left-1 mt-[2px] pr-14 text-[12px] leading-none font-semibold text-semantic-error"
         >
           {errorMessage}
         </span>

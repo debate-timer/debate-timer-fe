@@ -10,10 +10,7 @@ export default function DTShareLive({
       viewBox="0 0 46 35"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`
-        aspect-[46/35]
-        ${className}
-      `}
+      className={`aspect-[46/35] ${className} `}
       {...props}
     >
       <path

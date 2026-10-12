@@ -23,7 +23,7 @@ export default function CircularTimer({
   className = 'w-[480px] h-[480px]',
   children,
 }: PropsWithChildren<CircularTimerProps>) {
-  const BASE_COLOR = '#D6D7D9'; // bg-default-disabled/hover
+  const BASE_COLOR = '#D6D7D9'; // bg-default-disabled-hover
   const PROGRESS_COLOR =
     boxType === 'FEEDBACK'
       ? '#FECD4C' // bg-brand
