@@ -81,10 +81,7 @@ export default function TimeBox(props: TimeBoxProps) {
 
   const renderDragHandle = () => (
     <div
-      className={`
-        absolute flex cursor-grab items-center justify-center
-        ${isPros ? 'right-[10px]' : 'left-[10px]'}
-      `}
+      className={`absolute flex cursor-grab items-center justify-center ${isPros ? 'right-[10px]' : 'left-[10px]'} `}
       onMouseDown={onMouseDown}
       title={t('위/아래로 드래그')}
     >
@@ -99,7 +96,7 @@ export default function TimeBox(props: TimeBoxProps) {
       {isPros
         ? isModifiable && (
             <>
-              <div className="absolute left-[10px] top-[10px]">
+              <div className="absolute top-[10px] left-[10px]">
                 <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
@@ -117,7 +114,7 @@ export default function TimeBox(props: TimeBoxProps) {
         : isModifiable && (
             <>
               {renderDragHandle()}
-              <div className="absolute right-[10px] top-[10px]">
+              <div className="absolute top-[10px] right-[10px]">
                 <TimeBoxManageButtons
                   info={props.info}
                   prosTeamName={props.prosTeamName}
@@ -152,7 +149,7 @@ export default function TimeBox(props: TimeBoxProps) {
   const renderNeutralTimeoutPanel = () => (
     <div className="timebox neutral">
       {isModifiable && renderDragHandle()}
-      <div className="absolute right-2 top-2">
+      <div className="absolute top-2 right-2">
         <TimeBoxManageButtons
           info={props.info}
           prosTeamName={props.prosTeamName}
@@ -176,7 +173,7 @@ export default function TimeBox(props: TimeBoxProps) {
       {isModifiable && (
         <>
           {renderDragHandle()}
-          <div className="absolute right-2 top-2">
+          <div className="absolute top-2 right-2">
             <TimeBoxManageButtons
               info={props.info}
               prosTeamName={props.prosTeamName}

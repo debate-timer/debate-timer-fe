@@ -31,7 +31,7 @@ export default function LoggedInStoreDBModal({
         isBold: true,
       }}
     >
-      <h1 className="break-keep px-20 py-10 text-center text-xl font-bold">
+      <h1 className="px-20 py-10 text-center text-xl font-bold break-keep">
         {t('공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?')}
       </h1>
     </DialogModal>

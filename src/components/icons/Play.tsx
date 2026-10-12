@@ -9,10 +9,7 @@ export default function DTPlay({
     <svg
       viewBox="0 0 59 67"
       fill="none"
-      className={`
-        aspect-[59/67]
-        ${className}
-      `}
+      className={`aspect-[59/67] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

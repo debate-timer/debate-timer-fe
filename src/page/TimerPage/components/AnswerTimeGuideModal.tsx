@@ -20,7 +20,7 @@ export default function AnswerTimeGuideModal({
 
   return (
     <div
-      className="fixed left-1/2 top-[240px] z-40 flex h-[90px] w-[520px] -translate-x-1/2 items-center justify-center rounded-[8px] bg-[#FECD4C]/[0.62] px-[22px] text-center text-[22px] font-bold leading-[1.35] text-default-black shadow-[0_3px_8px_rgba(0,0,0,0.24)]"
+      className="fixed top-[240px] left-1/2 z-40 flex h-[90px] w-[520px] -translate-x-1/2 items-center justify-center rounded-[8px] bg-[#FECD4C]/[0.62] px-[22px] text-center text-[22px] leading-[1.35] font-bold text-default-black shadow-[0_3px_8px_rgba(0,0,0,0.24)]"
       data-testid="answer-time-guide-modal"
     >
       <p className="whitespace-pre-line">

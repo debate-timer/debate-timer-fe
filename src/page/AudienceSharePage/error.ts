@@ -1,9 +1,7 @@
 import { SocketErrorCode } from '../../apis/sockets/error';
 
 export type AudienceShareErrorCode =
-  | SocketErrorCode
-  | 'SERVER_ERROR'
-  | 'UNKNOWN';
+  SocketErrorCode | 'SERVER_ERROR' | 'UNKNOWN';
 
 export class AudienceShareError extends Error {
   public readonly code: AudienceShareErrorCode;

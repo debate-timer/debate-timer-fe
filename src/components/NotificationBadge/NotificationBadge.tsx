@@ -29,7 +29,7 @@ export default function NotificationBadge({
       role="status"
       aria-label={ariaLabel}
       className={clsx(
-        'inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-semantic-error px-[4px] text-[10px] font-bold leading-none text-default-white',
+        'inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-semantic-error px-[4px] text-[10px] leading-none font-bold text-default-white',
         className,
       )}
     >

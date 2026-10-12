@@ -9,10 +9,7 @@ export default function DTExchange({
     <svg
       viewBox="0 0 66 66"
       fill="none"
-      className={`
-        aspect-[66/66]
-        ${className}
-      `}
+      className={`aspect-[66/66] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

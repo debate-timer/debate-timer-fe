@@ -9,10 +9,7 @@ export default function DTLeftArrow({
     <svg
       viewBox="0 0 34 30"
       fill="none"
-      className={`
-        aspect-[34/30]
-        ${className}
-      `}
+      className={`aspect-[34/30] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
