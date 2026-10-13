@@ -13,13 +13,13 @@ jobs:
     environment: DEPLOY_PROD
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: '22.12.0'
-
-      - name: Checkout Code
-        uses: actions/checkout@v4
+          node-version-file: '.node-version'
 
       - name: Setup .env
         run: |
