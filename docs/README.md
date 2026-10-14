@@ -72,7 +72,7 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은
 | [TypeScript·구조](conventions/typescript-and-structure.md) | 이름·선언·타입·파일 배치·주석                    |
 | [React·UI](conventions/react-and-ui.md)                    | 컴포넌트·Props·훅·effect·스타일·국제화·접근성    |
 | [데이터·실시간](conventions/data-and-realtime.md)          | Query·Mutation·API·MSW·Repository·소켓 작성 형식 |
-| [테스트·Storybook](conventions/testing-and-storybook.md)   | TDD, 테스트·모킹·Story 작성 방식                 |
+| [테스트·Storybook](conventions/testing-and-storybook.md)   | TDD, 테스트·모킹·Story 작성, Storybook 10 설정·수동 검증 |
 
 ## 5. 스킬 워크플로
 

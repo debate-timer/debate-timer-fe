@@ -41,6 +41,20 @@ CSF에서 `Meta<typeof Target>`와 `StoryObj<typeof Target>`를 사용하고
 `const meta`를 default export함. 자동 문서가 필요한 대상은
 `tags: ['autodocs']`를 지정함.
 
+Storybook 10의 React·Vite Story 타입과 Preview 타입은
+`@storybook/react-vite`에서 가져옴. 상호작용 검증의 `expect`, `fn`, `within` 등은
+`storybook/test`, args를 갱신하는 `useArgs`는 `storybook/preview-api`를 사용함.
+문서 기능은 `@storybook/addon-docs`, Controls·Actions·Interactions·viewport는
+Storybook에 통합된 기능을 사용함. `.storybook`의 TS·TSX 설정도 앱 타입 검사에
+포함함.
+
+viewport 목록은 `parameters.viewport.options`에 정의하고, Story의 고정 화면은
+`globals.viewport = { value: '화면 키', isRotated: false }`로 선택함. 전역 기본은
+화면 선택을 강제하지 않는 반응형으로 유지함. 언어·화면 크기를 조합하는 헬퍼는
+`parameters`와 `globals`를 함께 반환함. 근거는
+`src/components/UpdateModal/UpdateModal.stories.tsx`와
+`src/page/AudienceFinishedPage/AudienceFinishedPage.stories.tsx`에 있음.
+
 `Default`, `Disabled`, `Loading`, `Failed`, `On*`, `When*`처럼 의미 있는 상태를
 named Story로 구분함. Props만으로 표현되는 상태는 `args`, Provider·Layout·훅
 조립이 필요하면 `render`를 사용함. 페이지 Story는
@@ -48,3 +62,26 @@ named Story로 구분함. Props만으로 표현되는 상태는 `args`, Provider
 `src/components/ClearableInput/ClearableInput.stories.tsx`,
 `src/components/DialogModal/DialogModal.stories.tsx`,
 `src/page/TimerPage/stories/NormalTimerTestPage.stories.tsx`에 있음.
+
+### 버전 이전 시 수동 검증
+
+`npm run storybook`과 `npm run build-storybook`의 정적 결과를 각각 브라우저에서
+확인함. 정적 결과는
+`npx --no-install vite preview --outDir storybook-static --port 6007`로 실행함.
+색인의 Story·문서 ID를 이전 버전과 비교하고 Docs·Controls·Actions·
+Interactions의 표시와 동작을 확인함. worker의 HTTP 200만으로 MSW 검증을
+완료하지 않으며 테이블 조회·투표·타이머·청중 시뮬레이터의 실제 응답과
+Router·Query·Portal 조립 결과를 확인함.
+
+UpdateModal은 기존 `play`를 모든 화면·언어 조합에서 실행함. 모바일·가로 화면·
+767/768px 경계·데스크톱에서 이미지 비율·긴 설명 스크롤, 체크박스의 args 반영과
+닫기 동작을 확인함. 청중 모바일 Story는 375×812인지 확인함. 앱 개발 서버는
+Storybook 빌드 후 재시작해 산출물이 의존성 탐색에 섞이지 않는지 확인함.
+고정 viewport 검증 시 관리 화면의 미리보기 영역을 충분히 확보함. 영역이 작으면
+Storybook 10이 iframe 높이를 제한하므로 화면 이름만으로 크기를 판단하지 않음.
+
+`npx --no-install storybook doctor`와 `NODE_OPTIONS=--trace-deprecation`을 적용한
+개발·빌드 로그로 의존성과 Node 경고를 확인함. Windows의 도구 실행 오류는 실제
+peer 충돌과 구분해 기록함. Chromatic 게시·시각 비교는 별도 권한으로 수행하고,
+인증 가능한 경우 CLI의 `--dry-run`으로 감지·빌드를 확인함. 미실행 항목과
+수동 확인 범위는 완료 보고와 PR에 명시함.
