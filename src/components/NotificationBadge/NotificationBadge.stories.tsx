@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import NotificationBadge from './NotificationBadge';
 
 const meta: Meta<typeof NotificationBadge> = {

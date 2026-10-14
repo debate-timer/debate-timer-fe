@@ -1,5 +1,5 @@
 // Storybook 코드
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import CustomRangeSlider from './CustomRangeSlider';
 
 const meta: Meta<typeof CustomRangeSlider> = {

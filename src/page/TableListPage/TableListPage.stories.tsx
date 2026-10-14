@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import TableListPage from './TableListPage';
 
 const meta: Meta<typeof TableListPage> = {
