@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import DebateVoteResultPage from './DebateVoteResultPage';
 
 const meta: Meta<typeof DebateVoteResultPage> = {

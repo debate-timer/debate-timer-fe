@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import VolumeBar from './VolumeBar';
 
 const meta: Meta<typeof VolumeBar> = {

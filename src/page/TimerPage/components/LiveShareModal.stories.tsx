@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { http, HttpResponse, delay } from 'msw';
 import { ApiUrl } from '../../../apis/endpoints';
 import { socketManager } from '../../../apis/sockets/SocketManager';

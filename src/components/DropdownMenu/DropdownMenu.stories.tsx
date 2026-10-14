@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import DropdownMenu, { DropdownMenuItem } from './DropdownMenu';
 
 const meta: Meta<typeof DropdownMenu> = {

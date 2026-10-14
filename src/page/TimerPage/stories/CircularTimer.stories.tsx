@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import CircularTimer from '../components/CircularTimer';
 import { MotionValue } from 'framer-motion';
 

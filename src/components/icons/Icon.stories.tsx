@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import DTLogin from './Login';
 import DTHelp from './Help';
 import DTClose from './Close';

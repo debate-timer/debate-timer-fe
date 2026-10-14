@@ -1,5 +1,5 @@
 // LabeledCheckbox.stories.tsx
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import LabeledCheckBox from './LabeledCheckBox';
 
 const meta: Meta<typeof LabeledCheckBox> = {

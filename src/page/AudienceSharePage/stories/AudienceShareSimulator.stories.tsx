@@ -1,7 +1,7 @@
 // AudienceShareSimulator.stories.tsx
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { IMessage, StompSubscription } from '@stomp/stompjs';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { socketManager } from '../../../apis/sockets/SocketManager';
@@ -330,14 +330,14 @@ export const Mobile: Story = {
   ...Default,
   parameters: {
     viewport: {
-      viewports: {
+      options: {
         mobile375: {
           name: 'Mobile 375',
           styles: { width: '375px', height: '812px' },
           type: 'mobile',
         },
       },
-      defaultViewport: 'mobile375',
     },
   },
+  globals: { viewport: { value: 'mobile375', isRotated: false } },
 };

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import LoggedInStoreDBModal from '../components/LoggedInStoreDBModal';
 
 const meta: Meta<typeof LoggedInStoreDBModal> = {
