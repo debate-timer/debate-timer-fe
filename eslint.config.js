@@ -62,7 +62,9 @@ export default tseslint.config(
     // 규칙 설정
     rules: {
       ...react.configs.recommended.rules, // React 권장 규칙
-      ...reactHooks.configs.recommended.rules, // React Hooks 권장 규칙
+      // React 이전에 필요한 훅 검사만 유지하며 Compiler 규칙은 별도 도입함.
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true }, // React Refresh 관련 규칙

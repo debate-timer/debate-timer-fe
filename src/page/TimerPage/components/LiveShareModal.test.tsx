@@ -161,7 +161,7 @@ describe('LiveShareModal', () => {
     ).toBeInTheDocument();
   });
 
-  test('복사 완료 표시는 잠시 후 원래 버튼 문구로 돌아간다', async () => {
+  it('복사 완료 표시는 잠시 후 원래 버튼 문구로 돌아간다', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
@@ -170,11 +170,11 @@ describe('LiveShareModal', () => {
 
       await user.click(screen.getByRole('button', { name: COPY_LINK_LABEL }));
       expect(
-        screen.getByRole('button', { name: COPIED_LABEL }),
+        await screen.findByRole('button', { name: COPIED_LABEL }),
       ).toBeInTheDocument();
 
-      act(() => {
-        vi.advanceTimersByTime(2000);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2000);
       });
 
       expect(
