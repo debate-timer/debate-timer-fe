@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { StrictMode, useEffect } from 'react';
 import type { StompSubscription } from '@stomp/stompjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import useSocket from './useSocket';
@@ -42,12 +43,73 @@ function getErrorListener() {
   ) => void;
 }
 
-describe('useSocket', () => {
+describe('소켓 구독 관리', () => {
   beforeEach(() => {
     vi.useRealTimers();
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     socketManagerMock.isConnected.mockReturnValue(false);
     socketManagerMock.subscribe.mockImplementation(() => createSubscription());
+  });
+
+  it('Strict Mode 재실행과 재마운트마다 구독과 연결 리스너를 정리한다', () => {
+    const connectListeners = new Set<() => void>();
+    const closeListeners = new Set<() => void>();
+    const errorListeners = new Set<() => void>();
+    const subscriptions: StompSubscription[] = [];
+    socketManagerMock.isConnected.mockReturnValue(true);
+    socketManagerMock.onConnectEvent.mockImplementation((listener) =>
+      connectListeners.add(listener),
+    );
+    socketManagerMock.offConnectEvent.mockImplementation((listener) =>
+      connectListeners.delete(listener),
+    );
+    socketManagerMock.onCloseEvent.mockImplementation((listener) =>
+      closeListeners.add(listener),
+    );
+    socketManagerMock.offCloseEvent.mockImplementation((listener) =>
+      closeListeners.delete(listener),
+    );
+    socketManagerMock.onErrorEvent.mockImplementation((listener) =>
+      errorListeners.add(listener),
+    );
+    socketManagerMock.offErrorEvent.mockImplementation((listener) =>
+      errorListeners.delete(listener),
+    );
+    socketManagerMock.subscribe.mockImplementation(() => {
+      const subscription = createSubscription();
+      subscriptions.push(subscription);
+      return subscription;
+    });
+    const callback = vi.fn();
+    const mount = () =>
+      renderHook(
+        () => {
+          const socket = useSocket();
+          useEffect(() => {
+            socket.subscribe('/topic/strict-mode', callback);
+          }, [socket.subscribe]);
+        },
+        { wrapper: StrictMode },
+      );
+
+    [1, 2].forEach((cycle) => {
+      const mounted = mount();
+      expect(connectListeners.size).toBe(1);
+      expect(closeListeners.size).toBe(1);
+      expect(errorListeners.size).toBe(1);
+      expect(subscriptions).toHaveLength(cycle * 2);
+      expect(
+        subscriptions[subscriptions.length - 1].unsubscribe,
+      ).not.toHaveBeenCalled();
+
+      mounted.unmount();
+      expect(connectListeners.size).toBe(0);
+      expect(closeListeners.size).toBe(0);
+      expect(errorListeners.size).toBe(0);
+      subscriptions.forEach((subscription) => {
+        expect(subscription.unsubscribe).toHaveBeenCalledOnce();
+      });
+    });
   });
 
   it('connect와 disconnect 호출을 SocketManager에 위임해야 한다', () => {

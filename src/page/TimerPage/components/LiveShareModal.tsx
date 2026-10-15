@@ -31,7 +31,9 @@ export default function LiveShareModal({
 }: LiveShareModalProps) {
   const { t } = useTranslation();
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
-  const copyFeedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const copyFeedbackTimerRef = useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
   const copyRequestIdRef = useRef(0);
 
   useEffect(() => {

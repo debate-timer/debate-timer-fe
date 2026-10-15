@@ -1,7 +1,7 @@
 # Debate Timer FE 문서 지도
 
 이 문서는 프로젝트 아키텍처와 코드 컨벤션의 진입점임. 토론 테이블 구성, 타이머
-실행, 투표를 제공하는 React 18·Vite SPA의 현재 구조를 요약하고 작업별 상세
+실행, 투표를 제공하는 React 19·Vite SPA의 현재 구조를 요약하고 작업별 상세
 계약을 연결함. 제품 원칙은 [헌법](CONSTITUTION.md)이 소유함.
 
 ## 1. 문서의 권위와 읽기 순서
@@ -23,7 +23,7 @@
 
 | 영역              | 현재 기술 또는 경계                     | 대표 코드                                      |
 | ----------------- | --------------------------------------- | ---------------------------------------------- |
-| 앱 실행·UI        | React 18, Vite, TypeScript strict       | `src/main.tsx`, `src/page/`, `src/components/` |
+| 앱 실행·UI        | React 19, Vite, TypeScript strict       | `src/main.tsx`, `src/page/`, `src/components/` |
 | 라우팅·언어       | React Router v7, i18next                | `src/routes/routes.tsx`, `src/i18n.ts`         |
 | 서버 상태·HTTP    | TanStack Query 5, Axios                 | `src/hooks/query/`, `src/apis/primitives.ts`   |
 | 실시간 통신       | STOMP, SockJS                           | `src/apis/sockets/`, `src/hooks/sockets/`      |
