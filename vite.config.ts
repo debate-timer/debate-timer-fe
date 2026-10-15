@@ -34,6 +34,8 @@ const viteConfig = defineViteConfig(({ mode }) => {
       entries: ['**/*.html', '!storybook-static/**'],
     },
     build: {
+      // 도구 기본값과 관계없이 제품의 지원 브라우저 범위를 유지함.
+      target: ['chrome111', 'safari16.4', 'firefox128'],
       sourcemap: shouldUploadSourcemaps ? 'hidden' : false,
     },
     server: {
