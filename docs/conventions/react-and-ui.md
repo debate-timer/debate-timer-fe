@@ -25,11 +25,18 @@
 
 DOM 이벤트와 timer를 등록한 effect는 cleanup 또는 종료 조건에서 해제함. 이전
 상태에 의존하는 변경은 함수형 setter를 사용함. effect 의존성·자식 props·외부
-listener에 전달할 제어 함수는 `useCallback`으로 안정화함. 재구독 없이 최신
-콜백이 필요한 경우 Ref를 동기화함. `useLayoutEffect`는 DOM 측정·전체 화면처럼
+listener에 전달할 제어 함수는 `useCallback`으로 안정화함. `useLayoutEffect`는 DOM 측정·전체 화면처럼
 paint 전에 동기화해야 하는 작업에 한정함. 근거는
 `src/hooks/useDocumentVisibility.ts`, `src/hooks/useModal.tsx`,
 `src/hooks/useFullscreen.ts`에 있음.
+
+effect가 등록한 이벤트에서 최신 콜백을 읽되 콜백 변경으로 재구독할 필요가 없으면
+`useEffectEvent`를 사용함. Effect Event는 정의한 컴포넌트·훅의 effect와 그 내부
+이벤트에서만 호출하며 반환하거나 다른 훅·컴포넌트에 전달하지 않음. effect 의존성에
+넣거나 실제 재구독 조건을 숨기는 데 사용하지 않음. 클릭 핸들러·외부 호출 API처럼
+effect 밖에서도 호출해야 하는 콜백은 기존 함수·`useCallback`·Ref 방식을 유지함.
+근거는 `src/hooks/useDocumentVisibility.ts`임. Hooks 검사는 `eslint.config.js`의
+`rules-of-hooks`·`exhaustive-deps`가 소유하며 Compiler 규칙은 별도 도입함.
 
 ## 스타일과 접근성
 
