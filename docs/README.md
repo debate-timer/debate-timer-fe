@@ -54,6 +54,10 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은
 [workflow](../.github/workflows/)에서 checkout 이후, `npm ci` 이전에 수행함.
 환경·의존성 변경 시 위 설정을 대조함.
 
+앱·Storybook은 Vite 8을 사용하며 공용 Vite 설정의 명시적 빌드 대상을 공유함.
+지원 브라우저 계약은 [React·UI 컨벤션](conventions/react-and-ui.md#스타일과-접근성)이
+소유함.
+
 ## 3. 아키텍처 상세 계약
 
 | 문서                                                 | 읽을 때                                                           |

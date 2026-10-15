@@ -1,5 +1,19 @@
 ﻿# Node 환경 통일 이후 핵심 의존성 업데이트 계획
 
+## 현재 진행 상태와 다음 작업
+
+| 단계 | 상태 | 근거 |
+| --- | --- | --- |
+| Node — PR 1 | 완료·병합됨 | [PR #524](https://github.com/debate-timer/debate-timer-fe/pull/524), `4cc685b` |
+| Storybook — PR 2 | 완료·병합됨 | [PR #526](https://github.com/debate-timer/debate-timer-fe/pull/526), `3aefc0e` |
+| Vite — PR 3 | 구현·로컬 검증 완료 | [이슈 #527](https://github.com/debate-timer/debate-timer-fe/issues/527), Vite 6.4.4 → 7.3.7 → 8.3.4 순서로 검증했음 |
+| React — PR 4 | Vite 이후 진행 | 완료된 Vite 단계의 `develop`을 기준으로 호환 범위를 확정함 |
+
+Vite 작업은 Storybook 병합 커밋 `3aefc0ea893641aadecc809fda55e14f1df1b29a`의
+원격·로컬 `develop`을 동기화한 뒤 `config/#527-vite-8-migration`에서 진행했음.
+다음 구현은 Vite 작업 병합 후 최신 `develop`에서 시작하는 React 이전임.
+React의 구체적인 목표 패치는 해당 단계 착수 시 공식 지원·peer 조건으로 확정함.
+
 ## 완료한 Node 환경 통일
 
 Node 환경 설정을 구현하고 Windows에서 Node `24.21.0`·npm `11.19.1`로 검증했음.
@@ -51,23 +65,20 @@ sourcemap 업로드도 미실행임.
 
 Node → Storybook → Vite → React 순서로 총 4개 PR을 진행함. 각 PR을 검증·병합한
 뒤 다음 작업은 병합된 `develop`에서 새 이슈·브랜치로 시작함. 커밋·push·PR 생성·
-병합·배포는 각각 요청된 권한 범위에서 수행함. Storybook의 로컬 구현·검증 결과는
-아래에 기록하며, Vite·React 단계는 Storybook 검증·병합 이후 진행함.
+병합·배포는 각각 요청된 권한 범위에서 수행함. Node·Storybook은 병합됐으며,
+Vite는 로컬 구현·검증을 완료했음. Vite 병합 후 React 이전을 진행함.
+아래에는 단계별 근거와 후속 계획을 함께 보존함.
 
 각 단계 착수 시 공식 지원 상태, `engines`와 peer 의존성을 확인해 목표 버전을
 확정함. 아래 경계 안에서 필수 호환성 변경만 포함하고 새 기능 도입은 분리함.
 라이브러리 지원 때문에 목표 조정이 필요하면 수정 계획을 먼저 정리함.
 
-### 1. Storybook — PR 2
+### 1. Storybook — PR 2 완료
 
-- 현재 Vite 6에서 독립 실행할 수 있는 Storybook·addon 조합을 선정함. React 18과
-  Vite 6을 유지하며 Storybook과 Vite PR을 합치지 않음.
-- `.storybook` 설정, CSF Story, 문서·상호작용 기능, Chromatic과 MSW addon의
-  지원 범위를 확인함. 패키지 이동·통합·폐기가 필요한 경우 사용 코드를 함께 이전함.
-- Node 24의 `DEP0190` 발생 경로를 다시 확인하고 해결 여부를 기록함. 경고 숨김을
-  해결로 처리하지 않음.
-- 공통 검증과 개발 서버 확인을 완료하고 Story 미리보기·상호작용·MSW 응답을
-  검증함. 인증이 필요한 Chromatic 검증은 실행 결과 또는 미실행 사유를 기록함.
+[이슈 #525](https://github.com/debate-timer/debate-timer-fe/issues/525)의 작업을
+[PR #526](https://github.com/debate-timer/debate-timer-fe/pull/526)으로 완료했으며,
+사용자가 2026-10-14에 `develop`으로 병합했음. 병합 커밋은 `3aefc0e`임.
+React 18·Vite 6을 유지한 이전이며 Vite·React 구현은 포함하지 않았음.
 
 #### Storybook 구현 결과
 
@@ -113,6 +124,8 @@ Story의 `play`를 실행했음. 브라우저 보조 도구는 임시 폴더에�
 | 타이머·청중 시뮬레이터 | 양쪽에서 MSW 테이블 조회 후 가짜 소켓의 SYNC·PLAY·카운트다운·STOP·자유토론 전환·FINISHED의 종료 화면 이동을 확인했음 |
 | 앱 개발 서버 재시작 | Storybook 빌드 후 재시작했으며 HTML·진입 모듈·CSS·worker가 HTTP 200이었음. 의존성 탐색 오류가 없었음 |
 | Chromatic dry-run | 인증·Git/framework 감지·빌드·파일 검증·업로드 준비가 통과했음. 게시·서버 검증·시각 비교는 생략됐음 |
+| Linux PR CI | [frontend-CI](https://github.com/debate-timer/debate-timer-fe/actions/runs/38541254452)에서 `npm ci`·전체 테스트·lint가 통과했음 |
+| 원격 미리보기·개발 배포 | [Deploy-Preview](https://github.com/debate-timer/debate-timer-fe/actions/runs/38541254242)·[Deploy-Development](https://github.com/debate-timer/debate-timer-fe/actions/runs/38541812762)가 성공했음 |
 
 UpdateModal은 반응형 기본값, 390×844·320×568·667×375·767×900·768×900·
 1440×900의 기존 한국어·영어 조합을 확인했음. `play`의 이미지 비율·겹침·긴 설명
@@ -140,32 +153,70 @@ Windows 명령 실행 오류나 실제 peer 충돌은 최종 진단에 남지 �
 [테스트·Storybook 컨벤션](docs/conventions/testing-and-storybook.md#버전-이전-시-수동-검증)에
 기록했음. Chromatic 명령은
 `npm run chromatic -- --dry-run --no-interactive --disable-telemetry`임.
-Linux·원격 CI, Chromatic 실제 게시·시각 비교, 실제 API·소켓 서버 연결과 Sentry
-업로드는 미실행임. 구현 검증 시점에는 커밋·push·PR 생성·병합·배포를 수행하지
-않았음. 후속 커밋·PR 작업은
-[이슈 #525](https://github.com/debate-timer/debate-timer-fe/issues/525)에서 추적함.
+Linux의 일반 설치·테스트·lint는 위 CI에서 확인했음. 엄격한 설치 옵션과 doctor·
+Storybook 빌드·브라우저 검증은 Windows 로컬에서 수행한 결과임.
 사용자는 `npm run storybook`으로 로컬 실행 후 일부 Story가 정상 동작함을
 추가 확인했음. 이 확인을 전체 화면·전체 사용 흐름 검증으로 확대하지 않음.
 
-### 2. Vite — PR 3
+### 2. Vite — PR 3 구현·로컬 검증 완료
 
-- 한 PR에서 현재 Vite 6 기준 검증 → Vite 7 이전·검증 → Vite 8 이전·검증 순서로
-  진행함. Vite 7이 통과하기 전에는 Vite 8로 진행하지 않음.
-- React 18을 유지함. React·Tailwind·Sentry 플러그인과 Vitest는 목표 Vite의
-  호환성에 필요한 범위에서만 함께 변경함.
-- Vite 7과 8을 각각 검증한 커밋 단위로 남겨 단계별로 되돌릴 수 있도록 함.
-  각 버전에서 공통 검증을 모두 실행함.
-- Vite 8의 Rolldown·Oxc 전환에 따른 플러그인·설정·변환 결과를 확인함.
-  Sentry sourcemap 생성·업로드·삭제, SockJS의 `global` 설정, proxy·환경 변수·
-  정적 경로와 미리보기의 `VITE_BASE_PATH`를 확인함.
-- 개발 서버와 생산 빌드를 모두 검증하고 Storybook 빌드 이후 앱 개발 서버도
-  재확인함. 산출물이 앱의 의존성 탐색에 섞이지 않는지 확인함.
-- [지원 브라우저 계약](docs/conventions/react-and-ui.md#스타일과-접근성)을 유지함.
-  Safari 16.4+·Chrome 111+·Firefox 128+와 목표 Vite의 기본 빌드 대상을 대조하고
-  필요한 설정을 명시함. 도구의 새 기본값으로 제품 지원 범위를 축소하지 않음.
+2026-10-15에 [이슈 #527](https://github.com/debate-timer/debate-timer-fe/issues/527)을
+`config` 레이블로 생성했음. 원격을 fetch하고 `develop`을 fast-forward 방식으로
+확인한 뒤 새 브랜치를 만들었음. 기존 `future.md`는 패치·파일 사본·전용 stash로
+보관한 뒤 복원했으며 원문과 SHA-256이 일치했음.
 
-### 3. React — PR 4
+Vite 6.4.4의 기준 결과를 확보하고 7.3.7의 검증을 완료한 뒤 8.3.4로 이전했음.
+최종 선언은 `^8.3.4`이며 lockfile에는 8.3.4와 Rolldown 1.2.14가 설치됐음.
+다른 직접 의존성의 선언·잠금 버전과 기존 제한·override를 유지했음.
+React 18.3.1·Storybook 10.6.2·Vitest 4.1.11과 기존 React·Tailwind·Sentry
+플러그인을 그대로 사용하며 새 플러그인·호환성 우회 설정을 추가하지 않았음.
+공용 `build.target`은 [지원 브라우저 계약](docs/conventions/react-and-ui.md#스타일과-접근성)에
+맞춰 명시했으며 Storybook builder가 같은 값을 전달받는 것을 확인했음.
 
+#### Vite 단계의 실제 검증 결과
+
+Windows·Node 24.21.0·npm 11.19.1·Chrome headless에서 확인했음.
+설정·의존성 이전이므로 새 제품 기능이나 테스트를 추가하지 않고 기존 테스트와
+Story의 `play`를 실행했음. 브라우저 검증 도구와 단계별 로그는 임시 폴더에 뒀음.
+
+| 검증 | 결과 |
+| --- | --- |
+| 엄격한 재설치·의존성 트리 | Vite 6·7·8 각각 `npm ci --engine-strict --strict-peer-deps`·`npm ls --depth=0`가 통과했음 |
+| 전체 테스트·lint·타입 | 세 버전 모두 59개 파일·546개 항목과 `npm run lint`가 통과했음 |
+| 앱·Storybook 빌드·doctor | 세 버전 모두 통과했음. Storybook 빌드는 `--disable-telemetry`로 실행했음 |
+| Story 색인 | 세 버전 모두 123개 Story·47개 문서이며 ID 추가·누락이 없었음 |
+| Storybook 개발·정적 화면 | 세 버전 양쪽에서 UpdateModal 12개 `play`, 양방향 args, Actions, Docs, Portal 닫기와 모바일 크기가 통과했음 |
+| MSW·청중 시뮬레이터 | 세 버전 양쪽에서 테이블 8개, 투표 GET·POST·확인 모달, 가짜 소켓 SYNC·PLAY·카운트다운·STOP·자유토론·FINISHED 이동이 통과했음 |
+| 앱 개발 화면 | 세 버전에서 테이블 선택, 타이머 재생·정지·Space, 여섯 차례 이동 후 종료 화면, 도움말 Esc 닫기, 투표 제출 후 완료 화면과 영어 경로를 확인했음 |
+| 생산·하위 경로 화면 | Vite 7·8에서 기본 경로와 `/pr-527` 생산 빌드로 같은 앱 흐름·번역·스타일을 확인했음. API 응답은 별도 MSW 세션으로 모방했음 |
+| 개발 서버·HMR | 세 버전에서 진입 HTML·모듈·CSS·worker HTTP 200과 임시 모듈의 실제 HMR 갱신이 통과했음. Vite 7·8은 Storybook 빌드 후 재시작·재검증했음 |
+| proxy·SockJS·Sentry 설정 | Vite 7·8의 실제 로드된 설정과 로컬 HTTP·WebSocket 경로 재작성·upgrade가 통과했음. `global: 'window'`를 유지했음 |
+
+Sentry는 인증 없는 생산 설정에서 sourcemap이 꺼지고, 가짜 인증값을 넣어 설정만
+로드하면 hidden sourcemap·Sentry 플러그인이 켜지며 개발 모드에서는 꺼지는 것을
+확인했음. 가짜 인증값으로 빌드·업로드하지 않았음. 인증 없는 최종 생산 산출물에
+`.map` 파일이 없었음. 실제 sourcemap 생성·업로드·업로드 후 삭제는 미검증임.
+
+Vite 7의 개발 Storybook 검증 중 정적 빌드가 HTML을 갱신해 화면이 새로고침되면서
+args 확인이 한 차례 시간 초과됐음. 빌드 완료 후 같은 검증이 전부 통과했음.
+성공 안내가 두 번 표시되는 기존 상태는 임시 검증 도구의 선택자로 처리했음.
+제품 코드를 이 사유로 수정하지 않았음.
+
+세 버전 모두 npm 감사 7건(낮음 1·높음 6), ESLint 비권장 버전·설치 스크립트 허용
+안내와 큰 묶음 경고를 관측했음. Vite 8 Storybook 빌드에는 Rolldown의
+`PLUGIN_TIMINGS` 안내가 추가됐으며 빌드는 통과했음. 관련 없는 정비는 하지 않았음.
+
+구현 검증 시점에는 커밋·push·PR 생성·병합·배포를 수행하지 않았음.
+Vite 7 검증 상태의 manifest·
+lockfile·설정과 재적용 패치는 `%TEMP%/dt-vite-migration-20261015/`에 보관했음.
+후속 PR 준비에서 승인 후 7·8 검증 상태를 별도 커밋으로 구성함. 원격 CI·Chromatic dry-run과
+실제 게시·시각 비교, Linux, 지원 브라우저별 실행, 실제 API·소켓 서버와 Sentry
+업로드는 이번 단계에서 미실행임. 이전 Storybook 단계의 원격 성공 기록을 이번
+Vite 변경의 검증 결과로 해석하지 않음.
+
+### 3. React — PR 4 후속 작업
+
+- Vite PR 검증·병합 후 최신 `develop`에서 새 이슈·브랜치로 시작함.
 - React·React DOM·양쪽 타입을 함께 갱신함. UI·라우팅·상태·애니메이션 라이브러리와
   Storybook·테스트 도구가 목표 React를 지원하는지 확인함.
 - JSX 변환, ref 전달·정리, 폐기 API, Strict Mode의 effect·구독·timer 정리를
@@ -175,7 +226,8 @@ Linux·원격 CI, Chromatic 실제 게시·시각 비교, 실제 API·소켓 서
 
 ## 공통 완료 기준
 
-Node PR과 후속 각 단계에서 다음 명령을 실행함. Vite PR에서는 7과 8 각각 실행함.
+후속 React 단계와 재검증에서도 다음 명령을 실행함. Vite 단계에서는 기준 6과
+이전한 7·8에서 각각 실행했음.
 
 ```text
 npm ci --engine-strict --strict-peer-deps
@@ -193,10 +245,27 @@ npm run build-storybook
 원격 CI·실제 서버 연결·Sentry 업로드 등 미실행 항목을 완료 보고에 명시함.
 CI에서 수행하지 않는 검증은 위 명령과 해당 단계의 확인 동작을 PR에 남김.
 
+## 남은 검증과 운영 확인
+
+- Chromatic 실제 게시·서버 검증·시각 비교는 dry-run으로 검증하지 못한 범위임.
+  이번 병합에 대응하는 `Deploy-storybook` 실행은 조회되지 않았으므로 게시 완료로
+  기록하지 않음. 필요 시 workflow 실행 여부와 실제 게시 결과를 확인함.
+- TimerPage의 테이블 선택·시작·정지·다음 순서·종료와 투표 제출 후 완료 화면,
+  Space·도움말 Esc 닫기는 위 Vite 단계에서 로컬 모방 응답으로 확인했음.
+  실제 서버 연결과 전체 키보드 포커스 이동·포커스 복원 검증은 후속 대상으로 남김.
+- 실제 API·소켓 서버를 연결한 타이머·청중 공유·투표 검증과 인증을 사용하는
+  Sentry sourcemap 업로드는 후속 단계에서 실행 범위를 기록함. 원격 개발 배포
+  성공만으로 실제 화면·서버 연결·Sentry 업로드 성공을 단정하지 않음.
+- Linux에서 엄격한 설치 옵션·doctor·Storybook 빌드까지 확인하려면 해당 명령을
+  별도로 실행함. 현재 PR CI의 일반 `npm ci`·테스트·lint 성공과 구분함.
+- 앱·Storybook 묶음 크기 경고, npm 감사 7건과 비권장 버전·설치 스크립트 허용
+  안내는 Storybook 단계의 잔여 기록임. 후속 단계에서 재확인하고 관련 없는 정비는
+  별도 작업으로 분리함.
+
 ## 별도 후속 작업과 제한 유지
 
 TypeScript, 검사 도구, MSW, 기타 런타임 의존성과 미사용 패키지 정리는 별도
-후속 작업으로 둠. 세 단계의 호환성에 필수적인 변경만 해당 PR에 포함함.
+후속 작업으로 둠. 남은 각 단계의 호환성에 필수적인 변경만 해당 PR에 포함함.
 현재 제한은 `typescript-eslint <8.56`, Query ESLint 5.91.4와 내부 utils 8.55.0
 으로 지정한 override, MSW 2.12.7, React Query 5.100.10 이하임.
 

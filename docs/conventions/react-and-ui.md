@@ -53,7 +53,10 @@ breakpoint는 초기화하며 `sm` 등 다른 화면 조건을 자동으로 추�
 
 클래스 정렬은 `.prettierrc`의 `prettier-plugin-tailwindcss`가 담당함.
 `tailwindStylesheet`는 `./src/index.css`, `tailwindFunctions`는 `['clsx']`임.
-지원 브라우저는 Safari 16.4+, Chrome 111+, Firefox 128+임. `hover`는 기본 입력
+지원 브라우저는 Safari 16.4+, Chrome 111+, Firefox 128+임. 공용
+[`vite.config.ts`](../../vite.config.ts)의 `build.target`에 `chrome111`,
+`safari16.4`, `firefox128`을 명시하며 Storybook도 이 대상을 전달받음. Vite의
+기본값 변경으로 지원 범위를 축소하지 않음. `hover`는 기본 입력
 장치가 hover를 지원할 때만 적용되므로 터치 동작을 hover에 의존하지 않음.
 
 사용자 클릭 동작에는 `<button>`·`<a>` 같은 시맨틱 요소를 사용함. **모든 버튼에
