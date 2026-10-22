@@ -85,6 +85,7 @@ export default function DebateEndPage() {
         <div className="mb-8 flex w-full justify-center lg:mb-10">
           <TranscriptBanner
             status={transcript.status}
+            pendingCount={transcript.pendingCount}
             onOpen={handleOpenTranscript}
             onRetry={transcript.retry}
           />

@@ -49,4 +49,20 @@ describe('TranscriptBanner', () => {
 
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
+
+  it('Soniox 전사를 기다리는 동안 남은 구간 수를 알린다', () => {
+    render(
+      <TranscriptBanner
+        status="transcribing"
+        pendingCount={2}
+        onOpen={vi.fn()}
+        onRetry={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText('발언을 텍스트로 바꾸고 있어요 (2개 구간 남음)'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
 });

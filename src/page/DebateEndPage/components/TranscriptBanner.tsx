@@ -5,6 +5,8 @@ import { SubmitTranscriptStatus } from '../hooks/useSubmitTranscript';
 
 interface TranscriptBannerProps {
   status: SubmitTranscriptStatus;
+  // Soniox 모드에서 아직 전사 중인 구간 수
+  pendingCount?: number;
   onOpen: () => void;
   onRetry: () => void;
 }
@@ -16,7 +18,7 @@ const ACTION_CLASS =
 
 // 토론 종료 화면에서 토론 기록의 전송 상태를 알리고 결과 화면으로 안내한다.
 export default function TranscriptBanner(props: TranscriptBannerProps) {
-  const { status, onOpen, onRetry } = props;
+  const { status, pendingCount = 0, onOpen, onRetry } = props;
   const { t } = useTranslation();
 
   if (status === 'none') {
@@ -24,6 +26,9 @@ export default function TranscriptBanner(props: TranscriptBannerProps) {
   }
 
   const messages: Record<Exclude<SubmitTranscriptStatus, 'none'>, string> = {
+    transcribing: t('발언을 텍스트로 바꾸고 있어요 ({{count}}개 구간 남음)', {
+      count: pendingCount,
+    }),
     submitting: t('토론 기록을 보내고 있어요'),
     ready: t('이번 토론이 자동으로 기록됐어요'),
     error: t('토론 기록을 보내지 못했어요'),
@@ -40,7 +45,11 @@ export default function TranscriptBanner(props: TranscriptBannerProps) {
     >
       <span className="flex size-12 flex-none items-center justify-center rounded-full bg-brand">
         <RiMicFill
-          className={clsx('size-6', status === 'submitting' && 'animate-pulse')}
+          className={clsx(
+            'size-6',
+            (status === 'submitting' || status === 'transcribing') &&
+              'animate-pulse',
+          )}
         />
       </span>
       <span className="min-w-0 flex-1">
