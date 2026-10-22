@@ -28,6 +28,7 @@ export interface UseSonioxTranscriberParams {
 }
 
 interface RecordingSession {
+  tableId: number;
   recorder: MediaRecorder;
   segment: SegmentKey;
   startedAt: number;
@@ -70,22 +71,21 @@ export default function useSonioxTranscriber(
   tableIdRef.current = tableId;
   langRef.current = lang;
 
+  // 전사 대기는 구간을 끝낼 때 이미 기록했으므로, 결과를 저장하거나 실패로 남기며 대기를 푼다.
   const transcribe = useCallback((session: RecordingSession, audio: Blob) => {
-    const currentTableId = tableIdRef.current;
-    markSegmentPending(currentTableId, session.segment.id, Date.now());
-    setPendingCount((prev) => prev + 1);
+    const { tableId: sessionTableId, segment, startedAt } = session;
+    if (audio.size === 0) {
+      appendSegmentUtterances(sessionTableId, segment, startedAt, []);
+      setPendingCount((prev) => prev - 1);
+      return;
+    }
     postSonioxTranscription(audio, toAudioFileName(audio.type), langRef.current)
       .then(({ utterances }) => {
-        appendSegmentUtterances(
-          currentTableId,
-          session.segment,
-          session.startedAt,
-          utterances,
-        );
+        appendSegmentUtterances(sessionTableId, segment, startedAt, utterances);
         setUtteranceCount((prev) => prev + utterances.length);
       })
       .catch(() => {
-        failPendingSegment(currentTableId, session.segment.id);
+        failPendingSegment(sessionTableId, segment.id);
         setFailedCount((prev) => prev + 1);
       })
       .finally(() => {
@@ -105,6 +105,7 @@ export default function useSonioxTranscriber(
         audioBitsPerSecond: RECORDER_AUDIO_BITS_PER_SECOND,
       });
       const session: RecordingSession = {
+        tableId: tableIdRef.current,
         recorder,
         segment,
         startedAt: Date.now(),
@@ -119,9 +120,7 @@ export default function useSonioxTranscriber(
         const audio = new Blob(session.chunks, {
           type: recorder.mimeType || mimeType || 'audio/webm',
         });
-        if (audio.size > 0) {
-          transcribe(session, audio);
-        }
+        transcribe(session, audio);
       };
       activeRef.current = session;
       recorder.start();
@@ -130,14 +129,18 @@ export default function useSonioxTranscriber(
     [transcribe],
   );
 
-  // 녹음 중인 구간을 끝낸다. 남은 오디오는 onstop에서 전사 요청으로 이어진다.
+  // 녹음 중인 구간을 끝낸다. 남은 오디오는 비동기 onstop에서 전사 요청으로 이어지므로,
+  // 그 전에 종료 화면으로 이동해도 기다릴 수 있도록 전사 대기를 먼저 기록한다.
   const stopRecording = useCallback(() => {
     const active = activeRef.current;
     activeRef.current = null;
     setIsListening(false);
-    if (active && active.recorder.state !== 'inactive') {
-      active.recorder.stop();
+    if (!active || active.recorder.state === 'inactive') {
+      return;
     }
+    markSegmentPending(active.tableId, active.segment.id, Date.now());
+    setPendingCount((prev) => prev + 1);
+    active.recorder.stop();
   }, []);
 
   const releaseMicrophone = useCallback(() => {

@@ -19,6 +19,8 @@ const mockedPost = vi.mocked(postSonioxTranscription);
 class FakeMediaRecorder {
   static instances: FakeMediaRecorder[] = [];
   static isTypeSupported = vi.fn(() => true);
+  // 실제 브라우저처럼 stop 이벤트를 나중에 보내려면 true로 둔다.
+  static isStopDeferred = false;
   mimeType: string;
   state: 'inactive' | 'recording' = 'inactive';
   ondataavailable: ((event: { data: Blob }) => void) | null = null;
@@ -28,11 +30,15 @@ class FakeMediaRecorder {
   });
   stop = vi.fn(() => {
     this.state = 'inactive';
-    this.ondataavailable?.({
-      data: new Blob(['audio'], { type: this.mimeType }),
-    });
-    this.onstop?.();
+    if (!FakeMediaRecorder.isStopDeferred) {
+      this.flush();
+    }
   });
+
+  flush(data: Blob = new Blob(['audio'], { type: this.mimeType })) {
+    this.ondataavailable?.({ data });
+    this.onstop?.();
+  }
 
   constructor(
     public stream: MediaStream,
@@ -66,6 +72,7 @@ describe('useSonioxTranscriber', () => {
     sessionStorage.clear();
     mockedPost.mockReset();
     FakeMediaRecorder.instances = [];
+    FakeMediaRecorder.isStopDeferred = false;
     trackStop.mockClear();
     getUserMedia.mockClear();
     vi.stubGlobal('MediaRecorder', FakeMediaRecorder);
@@ -208,5 +215,44 @@ describe('useSonioxTranscriber', () => {
     expect(recorder.stop).toHaveBeenCalled();
     expect(trackStop).toHaveBeenCalled();
     expect(result.current.isListening).toBe(false);
+  });
+
+  it('구간을 끝내는 즉시 전사 대기로 기록해 녹음 마무리 전에 종료 화면으로 가도 기다리게 한다', async () => {
+    respondWith([{ offsetMs: 0, text: '마지막 발언' }]);
+    FakeMediaRecorder.isStopDeferred = true;
+    const { result, rerender, unmount } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    const recorder = latest();
+
+    unmount();
+
+    expect(countPendingSegments(getTranscriptDraft(7)!, Date.now())).toBe(1);
+    recorder.flush();
+    await waitFor(() =>
+      expect(getTranscriptDraft(7)?.segments).toHaveLength(1),
+    );
+    expect(countPendingSegments(getTranscriptDraft(7)!, Date.now())).toBe(0);
+  });
+
+  it('녹음된 오디오가 없으면 전사하지 않고 대기에서 뺀다', async () => {
+    FakeMediaRecorder.isStopDeferred = true;
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    const recorder = latest();
+    rerender({ ...baseParams, isRunning: false });
+
+    act(() => recorder.flush(new Blob([])));
+
+    expect(mockedPost).not.toHaveBeenCalled();
+    expect(countPendingSegments(getTranscriptDraft(7)!, Date.now())).toBe(0);
+    expect(result.current.pendingCount).toBe(0);
   });
 });
