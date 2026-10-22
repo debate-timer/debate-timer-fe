@@ -476,7 +476,7 @@ export default function TimerPage() {
 
               {/* 토론 기록 켜기/끄기와 인식 상태 */}
               {isTranscribeAvailable && (
-                <div className="absolute left-4 top-4 z-20">
+                <div className="absolute top-4 left-4 z-20">
                   <TranscribeControl
                     isSupported={transcriber.isSupported}
                     isEnabled={transcriber.isEnabled}

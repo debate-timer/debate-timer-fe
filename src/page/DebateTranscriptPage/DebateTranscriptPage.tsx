@@ -121,7 +121,7 @@ export default function DebateTranscriptPage() {
         {data && (
           <div className="mx-auto w-full max-w-[1140px] pb-16">
             <p className="text-sm text-default-border">{data.tableName}</p>
-            <h1 className="mt-1 text-2xl font-bold leading-tight md:text-[32px]">
+            <h1 className="mt-1 text-2xl leading-tight font-bold md:text-[32px]">
               {data.agenda}
             </h1>
 

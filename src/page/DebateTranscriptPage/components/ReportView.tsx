@@ -102,7 +102,7 @@ export default function ReportView(props: ReportViewProps) {
       <ol className="divide-y-2 divide-default-dim2">
         {items.map((item, itemIndex) => (
           <li key={item.claim} className="p-5">
-            <p className="flex gap-2 font-bold leading-snug">
+            <p className="flex gap-2 leading-snug font-bold">
               <span className={clsx('flex-none', STANCE_TEXT_CLASS[side])}>
                 {t('주장 {{number}}', { number: itemIndex + 1 })}
               </span>
@@ -184,7 +184,7 @@ export default function ReportView(props: ReportViewProps) {
           {report.clashes.map((clash, clashIndex) => (
             <article
               key={clash.title}
-              className="overflow-hidden rounded-[20px] border-2 border-default-disabled/hover"
+              className="border-default-disabled/hover overflow-hidden rounded-[20px] border-2"
             >
               <div className="flex items-center gap-2 px-5 py-4">
                 <span className={CLASH_NUMBER_CLASS}>{clashIndex + 1}</span>
@@ -261,7 +261,7 @@ export default function ReportView(props: ReportViewProps) {
                 </span>
                 {line && (
                   <>
-                    <span className="font-semibold leading-relaxed">
+                    <span className="leading-relaxed font-semibold">
                       “{line.text}”
                     </span>
                     <span

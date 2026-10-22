@@ -101,7 +101,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
             </p>
           )}
           {isEnabled && interimText && (
-            <p className="line-clamp-2 rounded-[12px] bg-default-white/90 px-3 py-2 text-sm text-default-black2 shadow">
+            <p className="line-clamp-2 rounded-[12px] bg-default-white/90 px-3 py-2 text-sm text-default-black2 shadow-sm">
               {interimText}
             </p>
           )}
