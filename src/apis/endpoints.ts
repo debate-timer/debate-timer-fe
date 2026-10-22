@@ -13,4 +13,5 @@ export const ApiUrl = {
   poll: makeUrl('/polls'),
   organization: makeUrl('/organizations'),
   live: makeUrl('/live'),
+  transcript: makeUrl('/transcripts'),
 };
