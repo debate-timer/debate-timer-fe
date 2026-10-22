@@ -13,6 +13,9 @@ export interface SpeechSegment {
   utterances: Utterance[];
 }
 
+// 발언을 텍스트로 바꾸는 방식. RPC는 크롬 음성 인식 실시간, SONIOX는 발언 구간이 끝난 뒤 서버 배치 전사다.
+export type SttMode = 'RPC' | 'SONIOX';
+
 export type TranscriptStatus = 'PROCESSING' | 'DONE' | 'FAILED';
 
 // 시간표 기준으로 화자가 구분된 속기록 한 줄
