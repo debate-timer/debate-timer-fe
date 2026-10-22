@@ -6,6 +6,7 @@ import { organizationHandlers } from './organization';
 import { staticAssetHandlers } from './static_asset';
 import { liveHandlers } from './live';
 import { transcriptHandlers } from './transcript';
+import { sttHandlers } from './stt';
 
 const TRANSLATIONS: Record<string, Record<string, string>> = {
   ko: {
@@ -53,4 +54,5 @@ export const allHandlers = [
   ...staticAssetHandlers,
   ...liveHandlers,
   ...transcriptHandlers,
+  ...sttHandlers,
 ];

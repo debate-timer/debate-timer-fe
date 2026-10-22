@@ -13,6 +13,7 @@ const mockTranscript: GetTranscriptResponseType = {
   prosTeamName: '찬성',
   consTeamName: '반대',
   status: 'PROCESSING',
+  sttMode: 'SONIOX',
   lines: [
     {
       index: 0,
@@ -38,6 +39,7 @@ describe('토론 기록 API', () => {
           utterances: [{ offsetMs: 1000, text: '찬성 입론입니다' }],
         },
       ],
+      sttMode: 'SONIOX',
     };
     server.use(
       http.post(

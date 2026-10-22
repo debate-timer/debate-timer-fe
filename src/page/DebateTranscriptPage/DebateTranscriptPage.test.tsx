@@ -17,6 +17,7 @@ const doneTranscript: GetTranscriptResponseType = {
   prosTeamName: '찬성',
   consTeamName: '반대',
   status: 'DONE',
+  sttMode: 'RPC',
   lines: [
     {
       index: 0,

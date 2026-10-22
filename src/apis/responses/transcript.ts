@@ -1,5 +1,6 @@
 import {
   DebateReport,
+  SttMode,
   TranscriptLine,
   TranscriptStatus,
 } from '../../types/transcript';
@@ -18,6 +19,7 @@ export interface GetTranscriptResponseType {
   prosTeamName: string;
   consTeamName: string;
   status: TranscriptStatus;
+  sttMode: SttMode;
   lines: TranscriptLine[];
   report: DebateReport | null;
   errorMessage: string | null;

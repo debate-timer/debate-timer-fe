@@ -40,7 +40,10 @@ export default function useSubmitTranscript(tableId: number) {
       return;
     }
     setIsFailed(false);
-    mutate({ tableId, body: { segments: toSpeechSegments(draft) } });
+    mutate({
+      tableId,
+      body: { segments: toSpeechSegments(draft), sttMode: draft.sttMode },
+    });
   }, [mutate, tableId]);
 
   useEffect(() => {

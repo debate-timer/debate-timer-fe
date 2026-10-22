@@ -76,6 +76,7 @@ describe('useSubmitTranscript', () => {
           utterances: [{ offsetMs: 1000, text: '찬성 입론' }],
         },
       ],
+      sttMode: 'RPC',
     });
     expect(getSubmittedTranscriptId(5)).toBe(31);
     expect(getTranscriptDraft(5)).toBeNull();
