@@ -368,5 +368,8 @@
   "{{count}}개 구간 전사 중": "Transcribing {{count}} segment(s)",
   "{{count}}개 구간 전사 실패": "{{count}} segment(s) failed to transcribe",
   "발언을 텍스트로 바꾸고 있어요 ({{count}}개 구간 남음)": "Converting speech to text ({{count}} segment(s) left)",
-  "음성 인식: {{mode}}": "Speech recognition: {{mode}}"
+  "음성 인식: {{mode}}": "Speech recognition: {{mode}}",
+  "AI가 속기록을 보정하고 있어요": "AI is polishing the transcript",
+  "음성 인식 오류와 문장부호를 다듬고 있어요. 잠시만 기다려 주세요.": "Fixing speech recognition errors and punctuation. Please wait a moment.",
+  "속기록 보정이 끝나면 분석을 시작해요.": "Analysis starts once the transcript is polished."
 }

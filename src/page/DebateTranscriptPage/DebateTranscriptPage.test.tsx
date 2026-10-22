@@ -18,6 +18,7 @@ const doneTranscript: GetTranscriptResponseType = {
   consTeamName: '반대',
   status: 'DONE',
   sttMode: 'RPC',
+  refining: false,
   lines: [
     {
       index: 0,
@@ -142,6 +143,22 @@ describe('DebateTranscriptPage', () => {
       'aria-selected',
       'true',
     );
+  });
+
+  it('AI가 속기록을 보정하는 중이면 원문 대신 보정 중임을 알린다', async () => {
+    renderPage({
+      ...doneTranscript,
+      status: 'PROCESSING',
+      refining: true,
+      report: null,
+    });
+
+    expect(
+      await screen.findByText('AI가 속기록을 보정하고 있어요'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('정규직 과보호가 채용을 막습니다'),
+    ).not.toBeInTheDocument();
   });
 
   it('분석 중이면 보고서 탭에서 진행 중임을 알린다', async () => {

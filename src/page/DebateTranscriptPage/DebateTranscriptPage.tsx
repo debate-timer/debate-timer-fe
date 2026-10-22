@@ -72,6 +72,32 @@ export default function DebateTranscriptPage() {
     </button>
   );
 
+  // 속기록은 AI가 STT 원문을 보정한 결과로 보여준다. 보정에 실패하면 서버가 원문을 준다.
+  const renderTranscript = () => {
+    if (!data) {
+      return null;
+    }
+    if (data.refining) {
+      return (
+        <div className={STATUS_BOX_CLASS}>
+          <LoadingIndicator />
+          <p className="font-bold">{t('AI가 속기록을 보정하고 있어요')}</p>
+          <p className="text-sm text-default-border">
+            {t(
+              '음성 인식 오류와 문장부호를 다듬고 있어요. 잠시만 기다려 주세요.',
+            )}
+          </p>
+        </div>
+      );
+    }
+    return (
+      <TranscriptView
+        lines={data.lines}
+        highlightedLineIndex={highlightedLineIndex}
+      />
+    );
+  };
+
   const renderReport = () => {
     if (!data) {
       return null;
@@ -82,7 +108,9 @@ export default function DebateTranscriptPage() {
           <LoadingIndicator />
           <p className="font-bold">{t('AI가 분석 보고서를 만들고 있어요')}</p>
           <p className="text-sm text-default-border">
-            {t('보통 30초에서 1분 정도 걸려요. 속기록은 먼저 볼 수 있어요.')}
+            {data.refining
+              ? t('속기록 보정이 끝나면 분석을 시작해요.')
+              : t('보통 30초에서 1분 정도 걸려요. 속기록은 먼저 볼 수 있어요.')}
           </p>
         </div>
       );
@@ -148,14 +176,7 @@ export default function DebateTranscriptPage() {
             </div>
 
             <div className="pt-2">
-              {tab === 'transcript' ? (
-                <TranscriptView
-                  lines={data.lines}
-                  highlightedLineIndex={highlightedLineIndex}
-                />
-              ) : (
-                renderReport()
-              )}
+              {tab === 'transcript' ? renderTranscript() : renderReport()}
             </div>
           </div>
         )}

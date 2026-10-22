@@ -14,6 +14,7 @@ const mockTranscript: GetTranscriptResponseType = {
   consTeamName: '반대',
   status: 'PROCESSING',
   sttMode: 'SONIOX',
+  refining: true,
   lines: [
     {
       index: 0,

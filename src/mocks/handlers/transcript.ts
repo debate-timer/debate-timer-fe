@@ -11,6 +11,7 @@ const mockTranscript: GetTranscriptResponseType = {
   consTeamName: '반대',
   status: 'DONE',
   sttMode: 'RPC',
+  refining: false,
   lines: [
     {
       index: 0,
