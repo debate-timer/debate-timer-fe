@@ -40,7 +40,7 @@ function prepareDraft() {
   );
 }
 
-describe('useSubmitTranscript', () => {
+describe('토론 기록 초안 전송 훅', () => {
   beforeEach(() => {
     sessionStorage.clear();
   });

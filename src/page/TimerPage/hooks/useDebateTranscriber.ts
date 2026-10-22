@@ -90,15 +90,16 @@ export default function useDebateTranscriber(
       };
 
       recognition.onresult = (event: SpeechRecognitionEventLike) => {
-        let interim = '';
-        for (let i = event.resultIndex; i < event.results.length; i += 1) {
-          const result = event.results[i];
-          const text = result[0].transcript;
-          if (!result.isFinal) {
-            interim += text;
-            continue;
-          }
-          if (text.trim() !== '') {
+        const results = Array.from(event.results).slice(event.resultIndex);
+        const interim = results
+          .filter((result) => !result.isFinal)
+          .map((result) => result[0].transcript)
+          .join('');
+        results
+          .filter((result) => result.isFinal)
+          .map((result) => result[0].transcript)
+          .filter((text) => text.trim() !== '')
+          .forEach((text) => {
             appendUtterance(
               tableIdRef.current,
               session.segment,
@@ -106,8 +107,7 @@ export default function useDebateTranscriber(
               Date.now(),
             );
             setUtteranceCount((prev) => prev + 1);
-          }
-        }
+          });
         if (session.isCurrent) {
           setInterimText(interim);
         }

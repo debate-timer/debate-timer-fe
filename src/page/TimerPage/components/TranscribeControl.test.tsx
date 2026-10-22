@@ -33,7 +33,7 @@ function renderControl(props: Partial<TranscribeControlProps> = {}) {
   return merged;
 }
 
-describe('TranscribeControl', () => {
+describe('토론 기록 켜기 컨트롤', () => {
   it('기록이 꺼져 있을 때 누르면 동의를 받은 뒤 고른 모드로 기록을 켠다', async () => {
     const user = userEvent.setup();
     const props = renderControl();

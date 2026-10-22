@@ -71,7 +71,7 @@ const baseParams: UseSonioxTranscriberParams = {
 const respondWith = (utterances: { offsetMs: number; text: string }[]) =>
   mockedPost.mockResolvedValue({ utterances });
 
-describe('useSonioxTranscriber', () => {
+describe('Soniox 구간 녹음 훅', () => {
   beforeEach(() => {
     sessionStorage.clear();
     mockedPost.mockReset();

@@ -57,7 +57,7 @@ const baseParams: UseDebateTranscriberParams = {
   lang: 'ko-KR',
 };
 
-describe('useDebateTranscriber', () => {
+describe('크롬 음성 인식 기록 훅', () => {
   beforeEach(() => {
     sessionStorage.clear();
     FakeRecognition.instances = [];

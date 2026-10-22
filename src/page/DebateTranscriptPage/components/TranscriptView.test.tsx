@@ -16,7 +16,7 @@ const line = (
   ...overrides,
 });
 
-describe('TranscriptView', () => {
+describe('대본형 속기록', () => {
   it('같은 팀 문장이 이어지면 팀 이름을 한 번만 쓰고 한 발언으로 이어 보여준다', () => {
     render(
       <TranscriptView

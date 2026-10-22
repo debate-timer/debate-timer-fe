@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TranscriptBanner from './TranscriptBanner';
 
-describe('TranscriptBanner', () => {
+describe('토론 기록 전송 배너', () => {
   it('기록이 없으면 아무것도 보여주지 않는다', () => {
     const { container } = render(
       <TranscriptBanner status="none" onOpen={vi.fn()} onRetry={vi.fn()} />,

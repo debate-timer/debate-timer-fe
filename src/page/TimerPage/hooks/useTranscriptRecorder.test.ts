@@ -36,7 +36,7 @@ const params = {
   lang: 'ko-KR',
 };
 
-describe('useTranscriptRecorder', () => {
+describe('STT 모드 선택 기록 훅', () => {
   beforeEach(() => {
     vi.mocked(useDebateTranscriber).mockReturnValue({ ...rpc });
     vi.mocked(useSonioxTranscriber).mockReturnValue({ ...soniox });

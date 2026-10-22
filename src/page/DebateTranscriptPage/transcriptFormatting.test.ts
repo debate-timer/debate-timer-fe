@@ -20,7 +20,7 @@ const line = (
   ...overrides,
 });
 
-describe('formatOffset', () => {
+describe('경과 시간 표시', () => {
   it.each([
     [0, '00:00'],
     [65_000, '01:05'],
@@ -31,7 +31,7 @@ describe('formatOffset', () => {
   });
 });
 
-describe('groupTranscriptLines', () => {
+describe('타임박스 구간 묶기', () => {
   it('연속한 같은 타임박스 발언을 한 구간으로 묶는다', () => {
     const groups = groupTranscriptLines([
       line(0, 0),
@@ -53,7 +53,7 @@ describe('groupTranscriptLines', () => {
   });
 });
 
-describe('mergeSpeeches', () => {
+describe('같은 팀 발언 합치기', () => {
   it('같은 팀 문장이 이어지면 하나의 발언으로 합치고 팀이 바뀌면 새 발언을 시작한다', () => {
     const speeches = mergeSpeeches([
       line(0, 2, { stance: 'PROS', offsetMs: 1000 }),
@@ -90,7 +90,7 @@ describe('mergeSpeeches', () => {
   });
 });
 
-describe('groupTranscriptLines의 발언 합치기', () => {
+describe('타임박스 구간의 발언 합치기', () => {
   it('구간마다 같은 팀이 이어진 문장을 발언으로 합쳐 둔다', () => {
     const groups = groupTranscriptLines([
       line(0, 0),

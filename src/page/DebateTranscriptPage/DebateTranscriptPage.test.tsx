@@ -93,7 +93,7 @@ function renderPage(transcript: GetTranscriptResponseType) {
   );
 }
 
-describe('DebateTranscriptPage', () => {
+describe('토론 속기록 화면', () => {
   it('화자가 구분된 속기록을 보여준다', async () => {
     renderPage(doneTranscript);
 
