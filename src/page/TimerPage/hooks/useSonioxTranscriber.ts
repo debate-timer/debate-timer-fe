@@ -27,6 +27,11 @@ export interface UseSonioxTranscriberParams {
   lang: string;
 }
 
+interface DesiredSegment {
+  timeBoxIndex: number;
+  team: TimeBasedStance | null;
+}
+
 interface RecordingSession {
   tableId: number;
   recorder: MediaRecorder;
@@ -65,6 +70,10 @@ export default function useSonioxTranscriber(
 
   const streamRef = useRef<MediaStream | null>(null);
   const activeRef = useRef<RecordingSession | null>(null);
+  // 지금 녹음해야 하는 구간. 마이크를 다시 받는 동안 타이머가 멈추거나 구간이 바뀌었는지 확인한다.
+  const desiredRef = useRef<DesiredSegment | null>(null);
+  const isEnabledRef = useRef(false);
+  const isRequestingMicrophoneRef = useRef(false);
   const hasStartedDraftRef = useRef(false);
   const tableIdRef = useRef(tableId);
   const langRef = useRef(lang);
@@ -94,11 +103,7 @@ export default function useSonioxTranscriber(
   }, []);
 
   const startRecording = useCallback(
-    (segment: SegmentKey) => {
-      const stream = streamRef.current;
-      if (!stream) {
-        return;
-      }
+    (segment: SegmentKey, stream: MediaStream) => {
       const mimeType = getRecorderMimeType();
       const recorder = new MediaRecorder(stream, {
         ...(mimeType ? { mimeType } : {}),
@@ -148,9 +153,50 @@ export default function useSonioxTranscriber(
     streamRef.current = null;
   }, []);
 
+  /**
+   * 기록 중인데 마이크 스트림이 없거나 끊긴 경우 다시 받는다.
+   * 개발 서버의 코드 갱신(Fast Refresh)이 정리 effect를 실행해 마이크를 놓거나, 장치가 분리된 경우다.
+   * 받는 사이 기록을 끄거나 화면을 떠났으면 받은 마이크를 바로 놓는다.
+   */
+  const reacquireMicrophone = useCallback(() => {
+    if (isRequestingMicrophoneRef.current) {
+      return;
+    }
+    isRequestingMicrophoneRef.current = true;
+    requestMicrophoneStream()
+      .then((stream) => {
+        if (!isEnabledRef.current) {
+          stopMediaStream(stream);
+          return;
+        }
+        streamRef.current = stream;
+        const desired = desiredRef.current;
+        if (desired && !activeRef.current) {
+          startRecording(
+            createSegmentKey(desired.timeBoxIndex, desired.team),
+            stream,
+          );
+        }
+      })
+      .catch(() => {
+        desiredRef.current = null;
+        setError('not-allowed');
+        setIsEnabled(false);
+      })
+      .finally(() => {
+        isRequestingMicrophoneRef.current = false;
+      });
+  }, [startRecording]);
+
   const shouldRecord = isEnabled && isRunning && isSupported;
 
+  // 녹음 effect보다 먼저 선언해, 코드 갱신으로 effect가 다시 실행돼도 최신 기록 여부를 먼저 맞춘다.
   useEffect(() => {
+    isEnabledRef.current = isEnabled;
+  }, [isEnabled]);
+
+  useEffect(() => {
+    desiredRef.current = shouldRecord ? { timeBoxIndex, team } : null;
     const active = activeRef.current;
     if (
       shouldRecord &&
@@ -161,14 +207,29 @@ export default function useSonioxTranscriber(
       return;
     }
     stopRecording();
-    if (shouldRecord) {
-      startRecording(createSegmentKey(timeBoxIndex, team));
+    if (!shouldRecord) {
+      return;
     }
-  }, [shouldRecord, timeBoxIndex, team, startRecording, stopRecording]);
+    const stream = streamRef.current;
+    if (stream?.active) {
+      startRecording(createSegmentKey(timeBoxIndex, team), stream);
+      return;
+    }
+    reacquireMicrophone();
+  }, [
+    shouldRecord,
+    timeBoxIndex,
+    team,
+    reacquireMicrophone,
+    startRecording,
+    stopRecording,
+  ]);
 
   // 화면을 떠나면 녹음 중이던 구간까지 전사를 요청하고 마이크를 놓는다.
   useEffect(() => {
     return () => {
+      isEnabledRef.current = false;
+      desiredRef.current = null;
       stopRecording();
       releaseMicrophone();
     };
@@ -181,7 +242,9 @@ export default function useSonioxTranscriber(
       return;
     }
     try {
-      streamRef.current ??= await requestMicrophoneStream();
+      if (!streamRef.current?.active) {
+        streamRef.current = await requestMicrophoneStream();
+      }
     } catch {
       setError('not-allowed');
       return;

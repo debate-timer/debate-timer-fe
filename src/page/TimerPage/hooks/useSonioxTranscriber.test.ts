@@ -50,7 +50,11 @@ class FakeMediaRecorder {
 }
 
 const trackStop = vi.fn();
-const fakeStream = { getTracks: () => [{ stop: trackStop }] };
+const createStream = () => ({
+  active: true,
+  getTracks: () => [{ stop: trackStop }],
+});
+let fakeStream = createStream();
 const getUserMedia = vi.fn(async () => fakeStream);
 
 const latest = () =>
@@ -71,10 +75,12 @@ describe('useSonioxTranscriber', () => {
   beforeEach(() => {
     sessionStorage.clear();
     mockedPost.mockReset();
+    mockedPost.mockResolvedValue({ utterances: [] });
     FakeMediaRecorder.instances = [];
     FakeMediaRecorder.isStopDeferred = false;
     trackStop.mockClear();
     getUserMedia.mockClear();
+    fakeStream = createStream();
     vi.stubGlobal('MediaRecorder', FakeMediaRecorder);
     vi.stubGlobal('navigator', {
       ...navigator,
@@ -254,5 +260,61 @@ describe('useSonioxTranscriber', () => {
     expect(mockedPost).not.toHaveBeenCalled();
     expect(countPendingSegments(getTranscriptDraft(7)!, Date.now())).toBe(0);
     expect(result.current.pendingCount).toBe(0);
+  });
+
+  it('기록 중 마이크 스트림이 끊겨 있으면 다시 요청한 뒤 녹음을 시작한다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    fakeStream.active = false;
+    fakeStream = createStream();
+
+    rerender({ ...baseParams, isRunning: true });
+
+    await waitFor(() => expect(FakeMediaRecorder.instances).toHaveLength(1));
+    expect(getUserMedia).toHaveBeenCalledTimes(2);
+    expect(latest().stream).toBe(fakeStream);
+    expect(latest().start).toHaveBeenCalled();
+    expect(result.current.isListening).toBe(true);
+  });
+
+  it('마이크를 다시 요청하는 사이 타이머가 멈추면 녹음을 시작하지 않는다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    fakeStream.active = false;
+    let resolveStream: (stream: typeof fakeStream) => void = () => {};
+    getUserMedia.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveStream = resolve)),
+    );
+
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: false });
+    await act(async () => resolveStream(createStream()));
+
+    expect(FakeMediaRecorder.instances).toHaveLength(0);
+    expect(result.current.isListening).toBe(false);
+  });
+
+  it('마이크를 다시 요청했는데 거부되면 기록을 끄고 권한 오류를 알린다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    fakeStream.active = false;
+    getUserMedia.mockRejectedValueOnce(
+      new DOMException('denied', 'NotAllowedError'),
+    );
+
+    rerender({ ...baseParams, isRunning: true });
+
+    await waitFor(() => expect(result.current.error).toBe('not-allowed'));
+    expect(result.current.isEnabled).toBe(false);
+    expect(FakeMediaRecorder.instances).toHaveLength(0);
   });
 });
