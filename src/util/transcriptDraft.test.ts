@@ -196,9 +196,9 @@ describe('토론 기록 초안 저장소', () => {
       expect(
         countPendingSegments(draft, 9000 + PENDING_SEGMENT_TIMEOUT_MS - 1),
       ).toBe(1);
-      expect(countPendingSegments(draft, 9000 + PENDING_SEGMENT_TIMEOUT_MS)).toBe(
-        0,
-      );
+      expect(
+        countPendingSegments(draft, 9000 + PENDING_SEGMENT_TIMEOUT_MS),
+      ).toBe(0);
     });
   });
 });
