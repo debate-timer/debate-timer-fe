@@ -19,6 +19,7 @@ import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultP
 import LanguageWrapper from './LanguageWrapper';
 import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
 import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedPage';
+import DebateTranscriptPage from '../page/DebateTranscriptPage/DebateTranscriptPage';
 
 const appRoutes = [
   {
@@ -64,6 +65,11 @@ const appRoutes = [
   {
     path: 'table/customize/:tableId/end/vote/:pollId/result',
     element: <DebateVoteResultPage />,
+    requiresAuth: true,
+  },
+  {
+    path: 'table/customize/:tableId/end/transcript/:transcriptId',
+    element: <DebateTranscriptPage />,
     requiresAuth: true,
   },
   {
