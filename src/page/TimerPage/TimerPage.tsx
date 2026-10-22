@@ -37,6 +37,9 @@ import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
+import useDebateTranscriber from './hooks/useDebateTranscriber';
+import TranscribeControl from './components/TranscribeControl';
+import { toRecognitionLang } from '../../util/speechRecognition';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = true;
@@ -49,7 +52,7 @@ interface SharedTimes {
 }
 
 export default function TimerPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
   useEnsureGuestTable(pathParams.id);
@@ -95,6 +98,16 @@ export default function TimerPage() {
     normalTimer,
   } = state;
   const timerType = data && data.table[index].boxType;
+
+  // 토론 기록: 타이머가 실행되는 동안의 발언을 현재 타임박스(자유토론은 현재 팀) 구간으로 기록한다.
+  const isTranscribeAvailable = isLoggedIn() && !isGuestFlow();
+  const transcriber = useDebateTranscriber({
+    tableId,
+    timeBoxIndex: index,
+    team: timerType === 'TIME_BASED' ? prosConsSelected : null,
+    isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
+    lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+  });
   const remainingTime = getRemainingTimeForShare({
     timerType,
     normalTimer: normalTimer.timer,
@@ -458,6 +471,22 @@ export default function TimerPage() {
                       />
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* 토론 기록 켜기/끄기와 인식 상태 */}
+              {isTranscribeAvailable && (
+                <div className="absolute left-4 top-4 z-20">
+                  <TranscribeControl
+                    isSupported={transcriber.isSupported}
+                    isEnabled={transcriber.isEnabled}
+                    isListening={transcriber.isListening}
+                    interimText={transcriber.interimText}
+                    utteranceCount={transcriber.utteranceCount}
+                    error={transcriber.error}
+                    onEnable={transcriber.enable}
+                    onDisable={transcriber.disable}
+                  />
                 </div>
               )}
 
