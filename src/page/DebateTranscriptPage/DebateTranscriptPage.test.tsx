@@ -107,6 +107,18 @@ describe('DebateTranscriptPage', () => {
     );
   });
 
+  it.each([
+    ['RPC', '음성 인식: 실시간 인식 (크롬)'],
+    ['SONIOX', '음성 인식: 발언 후 일괄 인식 (Soniox)'],
+  ] as const)(
+    '%s 모드로 기록한 속기록이면 인식 방식을 보여준다',
+    async (sttMode, label) => {
+      renderPage({ ...doneTranscript, sttMode });
+
+      expect(await screen.findByText(label)).toBeInTheDocument();
+    },
+  );
+
   it('분석 보고서 탭에서 주장과 근거, 충돌 쟁점, 팀별 피드백을 보여준다', async () => {
     const user = userEvent.setup();
     renderPage(doneTranscript);

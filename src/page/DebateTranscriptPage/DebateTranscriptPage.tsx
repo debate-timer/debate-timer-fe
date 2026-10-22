@@ -9,6 +9,7 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { useGetTranscript } from '../../hooks/query/useGetTranscript';
 import TranscriptView from './components/TranscriptView';
 import ReportView from './components/ReportView';
+import { SttMode } from '../../types/transcript';
 
 type DetailTab = 'transcript' | 'report';
 
@@ -105,6 +106,11 @@ export default function DebateTranscriptPage() {
     );
   };
 
+  const sttModeLabels: Record<SttMode, string> = {
+    RPC: t('실시간 인식 (크롬)'),
+    SONIOX: t('발언 후 일괄 인식 (Soniox)'),
+  };
+
   return (
     <DefaultLayout>
       <DefaultLayout.Header>
@@ -120,7 +126,14 @@ export default function DebateTranscriptPage() {
         {isError && <ErrorIndicator onClickRetry={() => refetch()} />}
         {data && (
           <div className="mx-auto w-full max-w-[1140px] pb-16">
-            <p className="text-sm text-default-border">{data.tableName}</p>
+            <p className="text-sm text-default-border">
+              {data.tableName}
+              <span className="ml-2 rounded-full bg-default-neutral px-2 py-0.5 text-xs font-semibold text-default-black2">
+                {t('음성 인식: {{mode}}', {
+                  mode: sttModeLabels[data.sttMode],
+                })}
+              </span>
+            </p>
             <h1 className="mt-1 text-2xl leading-tight font-bold md:text-[32px]">
               {data.agenda}
             </h1>

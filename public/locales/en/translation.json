@@ -367,5 +367,6 @@
   "녹음 중": "Recording",
   "{{count}}개 구간 전사 중": "Transcribing {{count}} segment(s)",
   "{{count}}개 구간 전사 실패": "{{count}} segment(s) failed to transcribe",
-  "발언을 텍스트로 바꾸고 있어요 ({{count}}개 구간 남음)": "Converting speech to text ({{count}} segment(s) left)"
+  "발언을 텍스트로 바꾸고 있어요 ({{count}}개 구간 남음)": "Converting speech to text ({{count}} segment(s) left)",
+  "음성 인식: {{mode}}": "Speech recognition: {{mode}}"
 }
