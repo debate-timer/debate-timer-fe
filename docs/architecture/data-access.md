@@ -54,8 +54,9 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 `src/repositories/DebateTableRepository.ts`가 토론 테이블 CRUD 계약과
 `getRepository()` 선택을 소유함. 게스트 흐름은 `SessionDebateTableRepository`,
 그 외는 `ApiDebateTableRepository`를 사용함. 두 구현은 같은 인터페이스를 따르는
-인스턴스로 제공됨. 세션 저장의 브라우저 경계는 `src/util/sessionStorage.ts`가
-소유함.
+인스턴스로 제공됨. 게스트 테이블 세션 저장의 브라우저 경계는
+`src/util/sessionStorage.ts`가 소유함. 타이머 화면에서 쌓아 종료 화면에서 보내는
+토론 기록 초안은 `src/util/transcriptDraft.ts`가 테이블별 키로 소유함.
 
 `src/mocks/handlers/global.ts`의 `allHandlers`가 브라우저 개발 모드와 Node
 테스트의 공통 핸들러 집합임. `src/mocks/browser.ts`와 `src/mocks/server.ts`는
