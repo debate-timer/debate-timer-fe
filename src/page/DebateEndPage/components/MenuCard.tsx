@@ -11,10 +11,8 @@ type MenuCardProps = {
   ariaLabel?: string;
 };
 
-const TITLE_SIZE =
-  'text-lg md:text-xl lg:text-2xl xl:text-title-raw xl:leading-[32px]';
-const DESCRIPTION_SIZE =
-  'text-sm md:text-base lg:text-lg xl:text-detail-raw xl:leading-[28px]';
+const titleSize = 'text-lg md:text-xl lg:text-2xl xl:text-title-raw';
+const descSize = 'text-sm md:text-base lg:text-lg xl:text-detail-raw';
 
 export default function MenuCard({
   title,
@@ -30,11 +28,11 @@ export default function MenuCard({
       type="button"
       onClick={onClick}
       className={clsx(
-        'flex h-[280px] w-[280px] flex-col items-center justify-center gap-6',
-        'rounded-[34px] border-2 border-default-disabled-hover bg-white',
-        'transition-all duration-300 hover:border-brand/40',
-        'hover:shadow-[0px_0px_22px_6px_#FECD4C63]',
-        'md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px]',
+        'flex h-[280px] w-[280px] flex-col items-center justify-center gap-6 ',
+        'rounded-[34px] border-2 border-default-disabled/hover bg-white ',
+        'transition-all duration-300 hover:border-brand/40 ',
+        'hover:shadow-[0px_0px_22px_6px_#FECD4C63] ',
+        'md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px] ',
         'xl:h-[370px] xl:w-[370px] xl:gap-11',
         className,
       )}
@@ -48,13 +46,11 @@ export default function MenuCard({
         }
       />
       <div className="text-center">
-        <p className={clsx('font-semibold text-default-black', TITLE_SIZE)}>
+        <p className={clsx('font-semibold text-default-black', titleSize)}>
           {title}
         </p>
         {description && (
-          <p className={clsx('text-default-border', DESCRIPTION_SIZE)}>
-            {description}
-          </p>
+          <p className={clsx('text-default-border', descSize)}>{description}</p>
         )}
       </div>
     </button>
