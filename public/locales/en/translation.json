@@ -354,10 +354,17 @@
   "토론 기록 ID가 올바르지 않습니다.": "The debate record ID is invalid.",
   "토론 기록 끄기": "Turn off debate recording",
   "토론 기록 켜기": "Turn on debate recording",
-  "토론 기록은 크롬 브라우저에서만 사용할 수 있어요": "Debate recording is only available in Chrome",
   "토론 기록을 보내고 있어요": "Sending the debate record",
   "토론 기록을 보내지 못했어요": "We couldn't send the debate record",
   "토론 음성 기록에 동의하시나요?": "Do you agree to record the debate audio?",
   "타이머가 실행되는 동안의 발언을 구글 음성 인식으로 텍스트로 바꿔요. 토론이 끝나면 속기록을 서버로 보내 AI가 분석 보고서를 만들어요.": "While the timer runs, speech is converted to text with Google speech recognition. When the debate ends, the transcript is sent to our server and AI writes an analysis report.",
-  "팽팽": "Even"
+  "팽팽": "Even",
+  "실시간 인식 (크롬)": "Real-time (Chrome)",
+  "발언 후 일괄 인식 (Soniox)": "After each speech (Soniox)",
+  "음성 인식 방식": "Speech recognition mode",
+  "발언 구간이 끝날 때마다 녹음한 오디오를 서버로 보내 Soniox로 텍스트로 바꿔요. 토론이 끝나면 속기록을 서버로 보내 AI가 분석 보고서를 만들어요.": "Each time a speech segment ends, its recorded audio is sent to our server and converted to text with Soniox. When the debate ends, the transcript is sent to our server and AI writes an analysis report.",
+  "이 브라우저에서는 토론 기록을 사용할 수 없어요": "Debate recording is not available in this browser",
+  "녹음 중": "Recording",
+  "{{count}}개 구간 전사 중": "Transcribing {{count}} segment(s)",
+  "{{count}}개 구간 전사 실패": "{{count}} segment(s) failed to transcribe"
 }

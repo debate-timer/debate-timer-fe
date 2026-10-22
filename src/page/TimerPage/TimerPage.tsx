@@ -37,7 +37,7 @@ import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
-import useDebateTranscriber from './hooks/useDebateTranscriber';
+import useTranscriptRecorder from './hooks/useTranscriptRecorder';
 import TranscribeControl from './components/TranscribeControl';
 import { toRecognitionLang } from '../../util/speechRecognition';
 
@@ -100,8 +100,9 @@ export default function TimerPage() {
   const timerType = data && data.table[index].boxType;
 
   // 토론 기록: 타이머가 실행되는 동안의 발언을 현재 타임박스(자유토론은 현재 팀) 구간으로 기록한다.
+  // 기록을 켤 때 크롬 실시간 인식(RPC)과 Soniox 구간 배치 전사 중 하나를 고른다.
   const isTranscribeAvailable = isLoggedIn() && !isGuestFlow();
-  const transcriber = useDebateTranscriber({
+  const transcriber = useTranscriptRecorder({
     tableId,
     timeBoxIndex: index,
     team: timerType === 'TIME_BASED' ? prosConsSelected : null,
@@ -478,11 +479,15 @@ export default function TimerPage() {
               {isTranscribeAvailable && (
                 <div className="absolute top-4 left-4 z-20">
                   <TranscribeControl
-                    isSupported={transcriber.isSupported}
+                    supportedModes={transcriber.supportedModes}
+                    sttMode={transcriber.sttMode}
+                    isModeLocked={transcriber.isModeLocked}
                     isEnabled={transcriber.isEnabled}
                     isListening={transcriber.isListening}
                     interimText={transcriber.interimText}
                     utteranceCount={transcriber.utteranceCount}
+                    pendingCount={transcriber.pendingCount}
+                    failedCount={transcriber.failedCount}
                     error={transcriber.error}
                     onEnable={transcriber.enable}
                     onDisable={transcriber.disable}
