@@ -13,7 +13,7 @@ import {
 
 // 노란 시간표 카드와 구분되도록 기본블랙(차콜) 카드에 테마 노랑으로 강조한다.
 const CARD_CLASS =
-  'flex h-[200px] flex-col gap-3 rounded-[28px] border-2 p-6 text-left text-default-white shadow-lg transition-all duration-300 hover:-translate-y-1';
+  'm-5 flex h-[220px] w-[340px] flex-col gap-3 rounded-[28px] border-2 p-6 text-left text-default-white shadow-lg transition-all duration-300 hover:-translate-y-1';
 const GENERATING_CHIP_CLASS =
   'flex flex-none items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-default-black';
 
@@ -48,18 +48,18 @@ export default function TranscriptListContent() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1140px] px-5 pt-5 pb-16">
-      <p className="text-xl font-semibold md:text-subtitle-raw">
+    <div className="pb-16">
+      <p className="m-5 mb-0 text-xl font-semibold md:text-subtitle-raw">
         {t('토론 기록')}
       </p>
-      <p className="mt-1 mb-6 text-sm text-default-border md:text-base">
+      <p className="mx-5 mt-1 text-sm text-default-border md:text-base">
         {t(
           '타이머로 진행한 토론이 끝날 때마다 속기록과 분석 보고서가 자동으로 쌓여요.',
         )}
       </p>
 
       {data.transcripts.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-[28px] bg-default-dim2 p-12 text-center">
+        <div className="m-5 flex h-[220px] w-[340px] flex-col items-center justify-center gap-2 rounded-[28px] bg-default-dim2 p-6 text-center">
           <p className="font-semibold">{t('아직 토론 기록이 없어요')}</p>
           <p className="text-sm text-default-border">
             {t('타이머 화면에서 녹음을 켜고 토론을 진행해 보세요.')}
@@ -67,7 +67,8 @@ export default function TranscriptListContent() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {/* 시간표 탭처럼 주제 길이와 상관없이 같은 크기의 카드를 줄 바꿈으로 놓는다. */}
+      <div className="flex max-w-[1140px] flex-wrap justify-start">
         {data.transcripts.map((transcript) => {
           const generating = isGenerating(transcript);
           return (

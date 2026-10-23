@@ -103,4 +103,14 @@ describe('대시보드 토론 기록 목록', () => {
       await screen.findByText('아직 토론 기록이 없어요'),
     ).toBeInTheDocument();
   });
+
+  it('주제 길이나 유무와 상관없이 모든 카드를 시간표 카드와 같은 고정 크기로 보여준다', async () => {
+    renderList();
+
+    const cards = await screen.findAllByRole('link');
+
+    cards.forEach((card) => {
+      expect(card).toHaveClass('h-[220px]', 'w-[340px]');
+    });
+  });
 });
