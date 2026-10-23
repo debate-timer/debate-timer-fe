@@ -11,11 +11,11 @@ import {
   isSupportedLang,
 } from '../../../util/languageRouting';
 
-// 시간표 카드(노란색)와 구분되도록 테마의 파란색 계열을 쓴다.
+// 노란 시간표 카드와 구분되도록 기본블랙(차콜) 카드에 테마 노랑으로 강조한다.
 const CARD_CLASS =
-  'flex h-[200px] flex-col gap-3 rounded-[28px] border-2 p-6 text-left shadow-lg transition-all duration-300 hover:-translate-y-1';
+  'flex h-[200px] flex-col gap-3 rounded-[28px] border-2 p-6 text-left text-default-white shadow-lg transition-all duration-300 hover:-translate-y-1';
 const GENERATING_CHIP_CLASS =
-  'flex flex-none items-center gap-1.5 rounded-full bg-default-white px-2.5 py-1 text-xs font-bold text-default-black';
+  'flex flex-none items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-default-black';
 
 // 생성 시각을 "10.23 (목) 01:39"처럼 보여준다.
 function formatCreatedAt(createdAt: string, lang: string): string {
@@ -59,7 +59,7 @@ export default function TranscriptListContent() {
       </p>
 
       {data.transcripts.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-[28px] bg-camp-blue/10 p-12 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-[28px] bg-default-dim2 p-12 text-center">
           <p className="font-semibold">{t('아직 토론 기록이 없어요')}</p>
           <p className="text-sm text-default-border">
             {t('타이머 화면에서 녹음을 켜고 토론을 진행해 보세요.')}
@@ -80,11 +80,11 @@ export default function TranscriptListContent() {
               className={clsx(
                 CARD_CLASS,
                 generating
-                  ? 'border-dashed border-camp-blue/50 bg-camp-blue/10'
-                  : 'border-transparent bg-camp-blue/20 hover:bg-camp-blue/30',
+                  ? 'border-dashed border-brand/70 bg-default-black2'
+                  : 'border-transparent bg-default-black hover:bg-neutral-800',
               )}
             >
-              <span className="flex w-full items-center justify-between gap-2 text-sm text-default-black2">
+              <span className="flex w-full items-center justify-between gap-2 text-sm text-neutral-300">
                 <span className="truncate">
                   {transcript.tableName ?? t('삭제된 시간표')}
                 </span>
@@ -92,17 +92,17 @@ export default function TranscriptListContent() {
                   <span className={GENERATING_CHIP_CLASS}>
                     <span
                       aria-hidden="true"
-                      className="size-2 animate-pulse rounded-full bg-camp-blue"
+                      className="size-2 animate-pulse rounded-full bg-default-black"
                     />
                     {t('생성 중')}
                   </span>
                 )}
               </span>
-              <span className="size-[10px] flex-none bg-camp-blue" />
+              <span className="size-[10px] flex-none bg-brand" />
               <span className="line-clamp-2 text-xl leading-snug font-bold">
                 {transcript.agenda ?? t('주제를 알 수 없어요')}
               </span>
-              <span className="mt-auto text-sm font-semibold text-default-black2">
+              <span className="mt-auto text-sm font-semibold text-neutral-300">
                 {formatCreatedAt(transcript.createdAt, lang)}
               </span>
             </Link>
