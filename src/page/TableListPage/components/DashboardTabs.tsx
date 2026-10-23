@@ -6,8 +6,6 @@ export type DashboardTab = 'tables' | 'records';
 interface DashboardTabsProps {
   selectedTab: DashboardTab;
   onSelect: (tab: DashboardTab) => void;
-  // 아직 보지 않은 토론 기록이 있으면 토론 기록 탭에 N 표시를 한다.
-  hasNewRecords: boolean;
 }
 
 const NEW_BADGE_CLASS =
@@ -18,7 +16,7 @@ const TAB_CLASS =
 
 // 대시보드 헤더에서 시간표와 토론 기록을 전환한다.
 export default function DashboardTabs(props: DashboardTabsProps) {
-  const { selectedTab, onSelect, hasNewRecords } = props;
+  const { selectedTab, onSelect } = props;
   const { t } = useTranslation();
   const tabs: { key: DashboardTab; label: string }[] = [
     { key: 'tables', label: t('시간표') },
@@ -47,9 +45,10 @@ export default function DashboardTabs(props: DashboardTabsProps) {
           )}
         >
           {label}
-          {key === 'records' && hasNewRecords && (
+          {/* 새로 생긴 기능이라 토론 기록 탭에는 항상 New 태그를 붙인다. */}
+          {key === 'records' && (
             <span aria-hidden="true" className={NEW_BADGE_CLASS}>
-              N
+              New
             </span>
           )}
         </button>

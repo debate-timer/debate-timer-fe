@@ -83,30 +83,20 @@ describe('TableListPage', () => {
         </TestWrapper>,
       );
 
-    beforeEach(() => {
-      localStorage.clear();
-    });
-
-    it('아직 보지 않은 토론 기록이 있으면 토론 기록 탭에 N 표시를 하고, 탭을 열면 지운다', async () => {
+    it('토론 기록 탭에는 탭을 연 적이 있어도 New 태그를 계속 붙인다', async () => {
       const user = userEvent.setup();
       renderAt('/home');
 
       const recordsTab = await screen.findByRole('tab', { name: '토론 기록' });
-      await waitFor(() =>
-        expect(within(recordsTab).getByText('N')).toBeInTheDocument(),
-      );
+      expect(within(recordsTab).getByText('New')).toBeInTheDocument();
 
       await user.click(recordsTab);
       await screen.findByText('노동시장 유연화를 확대해야 한다');
       await user.click(screen.getByRole('tab', { name: '시간표' }));
 
-      await waitFor(() =>
-        expect(
-          within(screen.getByRole('tab', { name: '토론 기록' })).queryByText(
-            'N',
-          ),
-        ).not.toBeInTheDocument(),
-      );
+      expect(
+        within(screen.getByRole('tab', { name: '토론 기록' })).getByText('New'),
+      ).toBeInTheDocument();
     });
 
     it('처음에는 시간표 탭을 보여준다', async () => {

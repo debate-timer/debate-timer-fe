@@ -1,13 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { Suspense, useEffect, useState } from 'react';
-import { useGetTranscripts } from '../../hooks/query/useGetTranscripts';
-import {
-  getTranscriptListSeenAt,
-  hasUnseenTranscripts,
-  markTranscriptListSeen,
-} from '../../util/transcriptListSeen';
+import { Suspense } from 'react';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import TableListPageContent from './components/TableListPageContent';
 import TranscriptListContent from './components/TranscriptListContent';
@@ -23,23 +17,6 @@ export default function TableListPage() {
   const selectedTab: DashboardTab =
     searchParams.get(TAB_QUERY_KEY) === 'records' ? 'records' : 'tables';
 
-  // 탭 N 표시를 위해 시간표 탭에서도 토론 기록 목록을 가져온다. 목록 탭과 같은 캐시를 쓴다.
-  const { data: transcriptList } = useGetTranscripts(true);
-  const [seenAt, setSeenAt] = useState(() => getTranscriptListSeenAt());
-  const hasNewRecords =
-    selectedTab !== 'records' &&
-    !!transcriptList &&
-    hasUnseenTranscripts(transcriptList.transcripts, seenAt);
-
-  // 토론 기록 탭에서 목록을 받으면 본 것으로 기록한다.
-  useEffect(() => {
-    if (selectedTab !== 'records' || !transcriptList) {
-      return;
-    }
-    markTranscriptListSeen(transcriptList.transcripts);
-    setSeenAt(getTranscriptListSeenAt());
-  }, [selectedTab, transcriptList]);
-
   const handleSelectTab = (tab: DashboardTab) => {
     setSearchParams(tab === 'records' ? { [TAB_QUERY_KEY]: tab } : {});
   };
@@ -49,11 +26,7 @@ export default function TableListPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left />
         <DefaultLayout.Header.Center>
-          <DashboardTabs
-            selectedTab={selectedTab}
-            onSelect={handleSelectTab}
-            hasNewRecords={hasNewRecords}
-          />
+          <DashboardTabs selectedTab={selectedTab} onSelect={handleSelectTab} />
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
