@@ -90,9 +90,8 @@ describe('크롬 음성 인식 기록 훅', () => {
     rerender({ ...baseParams, isRunning: true });
     expect(latest().start).toHaveBeenCalled();
     expect(latest().lang).toBe('ko-KR');
-
-    act(() => latest().emit([{ text: '찬성 입론', isFinal: false }]));
-    expect(result.current.interimText).toBe('찬성 입론');
+    // 인식 중인 문장은 화면에 보여주지 않으므로 확정 문장만 받는다.
+    expect(latest().interimResults).toBe(false);
 
     act(() => latest().emit([{ text: '찬성 입론입니다', isFinal: true }]));
 
@@ -102,7 +101,6 @@ describe('크롬 음성 인식 기록 훅', () => {
       expect.objectContaining({ timeBoxIndex: 0, team: null }),
     );
     expect(segments[0].utterances[0].text).toBe('찬성 입론입니다');
-    expect(result.current.interimText).toBe('');
     expect(result.current.utteranceCount).toBe(1);
   });
 

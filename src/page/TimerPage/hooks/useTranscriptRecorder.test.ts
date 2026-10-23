@@ -10,7 +10,6 @@ const rpc = {
   isSupported: true,
   isEnabled: false,
   isListening: false,
-  interimText: '실시간 문장',
   utteranceCount: 1,
   error: null,
   enable: vi.fn(),
@@ -81,7 +80,6 @@ describe('STT 모드 선택 기록 훅', () => {
       sttMode: 'SONIOX',
       isModeLocked: true,
       isEnabled: true,
-      interimText: '',
       utteranceCount: 4,
       pendingCount: 2,
       failedCount: 1,
@@ -104,7 +102,6 @@ describe('STT 모드 선택 기록 훅', () => {
     expect(result.current).toMatchObject({
       sttMode: 'RPC',
       isModeLocked: true,
-      interimText: '실시간 문장',
       utteranceCount: 1,
       pendingCount: 0,
       failedCount: 0,

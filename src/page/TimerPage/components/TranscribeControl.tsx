@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiMicFill, RiMicOffFill } from 'react-icons/ri';
 import clsx from 'clsx';
@@ -14,19 +14,21 @@ export interface TranscribeControlProps {
   isModeLocked: boolean;
   isEnabled: boolean;
   isListening: boolean;
-  interimText: string;
   utteranceCount: number;
   pendingCount: number;
   failedCount: number;
   error: TranscriberError | null;
+  // 타이머 화면에 처음 들어왔을 때 녹음할지 바로 묻는다.
+  shouldPromptOnMount: boolean;
   onEnable: (mode: SttMode) => void;
   onDisable: () => void;
 }
 
 const STT_MODES: SttMode[] = ['RPC', 'SONIOX'];
 
+// 바로 위 라이브 공유 버튼과 같은 크기·모양으로 맞춘다.
 const MIC_BUTTON_CLASS =
-  'relative flex size-[64px] items-center justify-center rounded-full border-[2px] p-[16px] shadow-lg transition-colors';
+  'relative flex size-[88px] items-center justify-center rounded-full border-[2px] p-[22px] shadow-lg transition-colors';
 const STATUS_PILL_CLASS =
   'flex w-fit items-center gap-2 rounded-full bg-default-black/80 px-3 py-1.5 text-sm font-semibold text-default-white';
 const MODE_OPTION_CLASS =
@@ -40,11 +42,11 @@ export default function TranscribeControl(props: TranscribeControlProps) {
     isModeLocked,
     isEnabled,
     isListening,
-    interimText,
     utteranceCount,
     pendingCount,
     failedCount,
     error,
+    shouldPromptOnMount,
     onEnable,
     onDisable,
   } = props;
@@ -53,6 +55,33 @@ export default function TranscribeControl(props: TranscribeControlProps) {
     isCloseButtonExist: false,
   });
   const [selectedMode, setSelectedMode] = useState<SttMode>(sttMode);
+  const hasPromptedRef = useRef(false);
+  const isAnyModeSupported = STT_MODES.some((mode) => supportedModes[mode]);
+
+  // 처음 들어왔을 때 한 번만 묻는다. 취소하면 마이크 버튼으로 다시 켤 수 있다.
+  useEffect(() => {
+    if (
+      !shouldPromptOnMount ||
+      hasPromptedRef.current ||
+      isEnabled ||
+      !isAnyModeSupported
+    ) {
+      return;
+    }
+    hasPromptedRef.current = true;
+    setSelectedMode((mode) =>
+      supportedModes[mode]
+        ? mode
+        : (STT_MODES.find((candidate) => supportedModes[candidate]) ?? mode),
+    );
+    openModal();
+  }, [
+    shouldPromptOnMount,
+    isEnabled,
+    isAnyModeSupported,
+    supportedModes,
+    openModal,
+  ]);
 
   const modeLabels: Record<SttMode, string> = {
     RPC: t('실시간 인식 (크롬)'),
@@ -67,7 +96,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
     ),
   };
 
-  if (!STT_MODES.some((mode) => supportedModes[mode])) {
+  if (!isAnyModeSupported) {
     return (
       <p className={STATUS_PILL_CLASS}>
         {t('이 브라우저에서는 토론 기록을 사용할 수 없어요')}
@@ -77,7 +106,6 @@ export default function TranscribeControl(props: TranscribeControlProps) {
 
   const consentMode = isModeLocked ? sttMode : selectedMode;
   const label = isEnabled ? t('토론 기록 끄기') : t('토론 기록 켜기');
-  const listeningLabel = sttMode === 'SONIOX' ? t('녹음 중') : t('기록 중');
 
   const handleClick = () => {
     if (isEnabled) {
@@ -96,7 +124,8 @@ export default function TranscribeControl(props: TranscribeControlProps) {
 
   return (
     <>
-      <div className="flex items-start gap-3">
+      {/* 오른쪽 위 공유 버튼 밑에 두므로 상태 표시는 버튼 왼쪽에 오른쪽 정렬한다. */}
+      <div className="flex flex-row-reverse items-start gap-3">
         <button
           type="button"
           onClick={handleClick}
@@ -117,7 +146,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
           )}
         </button>
 
-        <div className="flex max-w-[360px] flex-col gap-2 pt-2">
+        <div className="flex max-w-[360px] flex-col items-end gap-2 pt-2">
           {isEnabled && (
             <p className={STATUS_PILL_CLASS} aria-live="polite">
               <span
@@ -129,7 +158,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
                     : 'bg-default-neutral',
                 )}
               />
-              {isListening ? listeningLabel : t('타이머를 시작하면 기록해요')}
+              {isListening ? t('녹음 중') : t('타이머를 시작하면 기록해요')}
               <span className="font-normal text-default-white/70">
                 {t('{{count}}문장', { count: utteranceCount })}
               </span>
@@ -143,11 +172,6 @@ export default function TranscribeControl(props: TranscribeControlProps) {
           {failedCount > 0 && (
             <p className={clsx(STATUS_PILL_CLASS, 'bg-semantic-error/90')}>
               {t('{{count}}개 구간 전사 실패', { count: failedCount })}
-            </p>
-          )}
-          {isEnabled && interimText && (
-            <p className="line-clamp-2 rounded-[12px] bg-default-white/90 px-3 py-2 text-sm text-default-black2 shadow-sm">
-              {interimText}
             </p>
           )}
           {error === 'not-allowed' && (

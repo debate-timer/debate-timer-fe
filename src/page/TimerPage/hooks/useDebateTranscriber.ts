@@ -62,7 +62,6 @@ export default function useDebateTranscriber(
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [interimText, setInterimText] = useState('');
   const [utteranceCount, setUtteranceCount] = useState(0);
   const [error, setError] = useState<TranscriberError | null>(null);
 
@@ -82,7 +81,8 @@ export default function useDebateTranscriber(
       const recognition = new RecognitionConstructor();
       recognition.lang = langRef.current;
       recognition.continuous = true;
-      recognition.interimResults = true;
+      // 인식 중인 문장은 화면에 보여주지 않으므로 확정 문장만 받는다.
+      recognition.interimResults = false;
       const session: RecognitionSession = {
         recognition,
         segment,
@@ -90,12 +90,8 @@ export default function useDebateTranscriber(
       };
 
       recognition.onresult = (event: SpeechRecognitionEventLike) => {
-        const results = Array.from(event.results).slice(event.resultIndex);
-        const interim = results
-          .filter((result) => !result.isFinal)
-          .map((result) => result[0].transcript)
-          .join('');
-        results
+        Array.from(event.results)
+          .slice(event.resultIndex)
           .filter((result) => result.isFinal)
           .map((result) => result[0].transcript)
           .filter((text) => text.trim() !== '')
@@ -108,9 +104,6 @@ export default function useDebateTranscriber(
             );
             setUtteranceCount((prev) => prev + 1);
           });
-        if (session.isCurrent) {
-          setInterimText(interim);
-        }
       };
 
       recognition.onerror = (event) => {
@@ -128,7 +121,6 @@ export default function useDebateTranscriber(
         const desired = desiredRef.current;
         if (!desired) {
           setIsListening(false);
-          setInterimText('');
           return;
         }
         // 같은 구간에서 크롬이 인식을 스스로 끝낸 경우 같은 구간으로 이어 간다.
@@ -167,7 +159,6 @@ export default function useDebateTranscriber(
       }
       // 남은 확정 문장은 기존 구간에 저장되고, 다음 구간은 onend에서 시작한다.
       active.isCurrent = false;
-      setInterimText('');
       active.recognition.stop();
       return;
     }
@@ -209,7 +200,6 @@ export default function useDebateTranscriber(
     isSupported,
     isEnabled,
     isListening,
-    interimText,
     utteranceCount,
     error,
     enable,

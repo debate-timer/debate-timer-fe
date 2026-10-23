@@ -9,11 +9,11 @@ const baseProps: TranscribeControlProps = {
   isModeLocked: false,
   isEnabled: false,
   isListening: false,
-  interimText: '',
   utteranceCount: 0,
   pendingCount: 0,
   failedCount: 0,
   error: null,
+  shouldPromptOnMount: false,
   onEnable: vi.fn(),
   onDisable: vi.fn(),
 };
@@ -111,16 +111,36 @@ describe('토론 기록 켜기 컨트롤', () => {
     expect(props.onDisable).toHaveBeenCalledTimes(1);
   });
 
-  it('인식 중인 문장과 기록한 문장 수를 보여준다', () => {
+  it('크롬 실시간 인식도 인식 중인 문장 대신 녹음 중 상태와 기록한 문장 수만 보여준다', () => {
     renderControl({
+      sttMode: 'RPC',
       isEnabled: true,
       isListening: true,
-      interimText: '찬성 측 입론',
       utteranceCount: 3,
     });
 
-    expect(screen.getByText('찬성 측 입론')).toBeInTheDocument();
+    expect(screen.getByText('녹음 중')).toBeInTheDocument();
     expect(screen.getByText('3문장')).toBeInTheDocument();
+  });
+
+  it('타이머 화면에 처음 들어오면 녹음할지 묻는 동의 창을 연다', async () => {
+    const user = userEvent.setup();
+    const props = renderControl({ shouldPromptOnMount: true });
+
+    expect(
+      screen.getByText('토론 음성 기록에 동의하시나요?'),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+
+    expect(props.onEnable).toHaveBeenCalledWith('RPC');
+  });
+
+  it('이미 기록 중이면 처음 들어와도 동의 창을 다시 열지 않는다', () => {
+    renderControl({ shouldPromptOnMount: true, isEnabled: true });
+
+    expect(
+      screen.queryByText('토론 음성 기록에 동의하시나요?'),
+    ).not.toBeInTheDocument();
   });
 
   it('Soniox 모드는 녹음 상태와 전사 중·실패 구간 수를 보여준다', () => {

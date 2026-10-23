@@ -61,7 +61,6 @@ export default function useTranscriptRecorder(
       ? {
           isEnabled: soniox.isEnabled,
           isListening: soniox.isListening,
-          interimText: '',
           utteranceCount: soniox.utteranceCount,
           pendingCount: soniox.pendingCount,
           failedCount: soniox.failedCount,
@@ -70,7 +69,6 @@ export default function useTranscriptRecorder(
       : {
           isEnabled: rpc.isEnabled,
           isListening: rpc.isListening,
-          interimText: rpc.interimText,
           utteranceCount: rpc.utteranceCount,
           pendingCount: 0,
           failedCount: 0,

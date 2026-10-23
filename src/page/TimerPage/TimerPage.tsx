@@ -475,20 +475,20 @@ export default function TimerPage() {
                 </div>
               )}
 
-              {/* 토론 기록 켜기/끄기와 인식 상태 */}
+              {/* 토론 기록 켜기/끄기와 녹음 상태. 라이브 공유 버튼(top-4, 96px) 바로 밑에 둔다. */}
               {isTranscribeAvailable && (
-                <div className="absolute top-4 left-4 z-20">
+                <div className="absolute top-[116px] right-4 z-10 pr-[4px]">
                   <TranscribeControl
                     supportedModes={transcriber.supportedModes}
                     sttMode={transcriber.sttMode}
                     isModeLocked={transcriber.isModeLocked}
                     isEnabled={transcriber.isEnabled}
                     isListening={transcriber.isListening}
-                    interimText={transcriber.interimText}
                     utteranceCount={transcriber.utteranceCount}
                     pendingCount={transcriber.pendingCount}
                     failedCount={transcriber.failedCount}
                     error={transcriber.error}
+                    shouldPromptOnMount
                     onEnable={transcriber.enable}
                     onDisable={transcriber.disable}
                   />
