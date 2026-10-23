@@ -9,6 +9,7 @@ import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { useGetTranscript } from '../../hooks/query/useGetTranscript';
 import TranscriptView from './components/TranscriptView';
 import ReportView from './components/ReportView';
+import TranscriptGenerating from './components/TranscriptGenerating';
 import { SttMode } from '../../types/transcript';
 
 type DetailTab = 'transcript' | 'report';
@@ -72,23 +73,10 @@ export default function DebateTranscriptPage() {
     </button>
   );
 
-  // 속기록은 AI가 STT 원문을 보정한 결과로 보여준다. 보정에 실패하면 서버가 원문을 준다.
+  // 속기록은 AI가 STT 원문을 보정한 결과다. 보정에 실패하면 서버가 원문을 준다.
   const renderTranscript = () => {
     if (!data) {
       return null;
-    }
-    if (data.refining) {
-      return (
-        <div className={STATUS_BOX_CLASS}>
-          <LoadingIndicator />
-          <p className="font-bold">{t('AI가 속기록을 보정하고 있어요')}</p>
-          <p className="text-sm text-default-border">
-            {t(
-              '음성 인식 오류와 문장부호를 다듬고 있어요. 잠시만 기다려 주세요.',
-            )}
-          </p>
-        </div>
-      );
     }
     return (
       <TranscriptView
@@ -101,19 +89,6 @@ export default function DebateTranscriptPage() {
   const renderReport = () => {
     if (!data) {
       return null;
-    }
-    if (data.status === 'PROCESSING') {
-      return (
-        <div className={STATUS_BOX_CLASS}>
-          <LoadingIndicator />
-          <p className="font-bold">{t('AI가 분석 보고서를 만들고 있어요')}</p>
-          <p className="text-sm text-default-border">
-            {data.refining
-              ? t('속기록 보정이 끝나면 분석을 시작해요.')
-              : t('보통 30초에서 1분 정도 걸려요. 속기록은 먼저 볼 수 있어요.')}
-          </p>
-        </div>
-      );
     }
     if (data.status === 'FAILED' || !data.report) {
       return (
@@ -134,6 +109,9 @@ export default function DebateTranscriptPage() {
     );
   };
 
+  const isGenerating =
+    !!data && (data.refining || data.status === 'PROCESSING');
+
   const sttModeLabels: Record<SttMode, string> = {
     RPC: t('실시간 인식 (크롬)'),
     SONIOX: t('발언 후 일괄 인식 (Soniox)'),
@@ -152,7 +130,15 @@ export default function DebateTranscriptPage() {
       <DefaultLayout.ContentContainer>
         {isLoading && <LoadingIndicator />}
         {isError && <ErrorIndicator onClickRetry={() => refetch()} />}
-        {data && (
+        {/* 보정·분석이 끝나기 전에는 내용 대신 진행 단계만 보여준다. */}
+        {data && isGenerating && (
+          <TranscriptGenerating
+            tableName={data.tableName}
+            agenda={data.agenda}
+            refining={data.refining}
+          />
+        )}
+        {data && !isGenerating && (
           <div className="mx-auto w-full max-w-[1140px] pb-16">
             <p className="text-sm text-default-border">
               {data.tableName}

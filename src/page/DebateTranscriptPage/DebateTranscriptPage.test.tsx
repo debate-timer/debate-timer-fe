@@ -145,31 +145,38 @@ describe('토론 속기록 화면', () => {
     );
   });
 
-  it('AI가 속기록을 보정하는 중이면 원문 대신 보정 중임을 알린다', async () => {
-    renderPage({
-      ...doneTranscript,
-      status: 'PROCESSING',
-      refining: true,
-      report: null,
+  describe('기록을 만드는 중', () => {
+    const stepState = (name: string) =>
+      screen.getByRole('listitem', { name: new RegExp(name) }).dataset.state;
+
+    it('속기록을 보정하는 중이면 속기록·보고서 대신 진행 단계를 보여준다', async () => {
+      renderPage({
+        ...doneTranscript,
+        status: 'PROCESSING',
+        refining: true,
+        report: null,
+      });
+
+      expect(
+        await screen.findByText('토론 기록을 만들고 있어요'),
+      ).toBeInTheDocument();
+      expect(stepState('속기록 보정 중')).toBe('active');
+      expect(stepState('분석 보고서 발행 중')).toBe('waiting');
+      expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('정규직 과보호가 채용을 막습니다'),
+      ).not.toBeInTheDocument();
     });
 
-    expect(
-      await screen.findByText('AI가 속기록을 보정하고 있어요'),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText('정규직 과보호가 채용을 막습니다'),
-    ).not.toBeInTheDocument();
-  });
+    it('보정이 끝나고 분석 중이면 보정 단계를 완료로, 보고서 단계를 진행 중으로 보여준다', async () => {
+      renderPage({ ...doneTranscript, status: 'PROCESSING', report: null });
 
-  it('분석 중이면 보고서 탭에서 진행 중임을 알린다', async () => {
-    const user = userEvent.setup();
-    renderPage({ ...doneTranscript, status: 'PROCESSING', report: null });
+      await screen.findByText('토론 기록을 만들고 있어요');
 
-    await user.click(await screen.findByRole('tab', { name: '분석 보고서' }));
-
-    expect(
-      screen.getByText('AI가 분석 보고서를 만들고 있어요'),
-    ).toBeInTheDocument();
+      expect(stepState('속기록 보정 중')).toBe('done');
+      expect(stepState('분석 보고서 발행 중')).toBe('active');
+      expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    });
   });
 
   it('분석에 실패하면 실패 사유를 보여준다', async () => {
