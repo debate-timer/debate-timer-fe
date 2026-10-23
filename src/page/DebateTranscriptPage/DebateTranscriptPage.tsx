@@ -10,6 +10,7 @@ import { useGetTranscript } from '../../hooks/query/useGetTranscript';
 import TranscriptView from './components/TranscriptView';
 import ReportView from './components/ReportView';
 import TranscriptGenerating from './components/TranscriptGenerating';
+import TranscriptHeaderCard from './components/TranscriptHeaderCard';
 import { SttMode } from '../../types/transcript';
 
 type DetailTab = 'transcript' | 'report';
@@ -140,17 +141,17 @@ export default function DebateTranscriptPage() {
         )}
         {data && !isGenerating && (
           <div className="mx-auto w-full max-w-[1140px] pb-16">
-            <p className="text-sm text-default-border">
-              {data.tableName}
-              <span className="ml-2 rounded-full bg-default-neutral px-2 py-0.5 text-xs font-semibold text-default-black2">
-                {t('음성 인식: {{mode}}', {
-                  mode: sttModeLabels[data.sttMode],
-                })}
-              </span>
-            </p>
-            <h1 className="mt-1 text-2xl leading-tight font-bold md:text-[32px]">
-              {data.agenda}
-            </h1>
+            <TranscriptHeaderCard
+              tableName={data.tableName}
+              agenda={data.agenda}
+              badge={
+                <span className="rounded-full bg-brand px-2.5 py-0.5 text-xs font-semibold text-default-black">
+                  {t('음성 인식: {{mode}}', {
+                    mode: sttModeLabels[data.sttMode],
+                  })}
+                </span>
+              }
+            />
 
             <div
               role="tablist"

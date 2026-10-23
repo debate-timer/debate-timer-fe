@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { RiCheckLine, RiMicFill } from 'react-icons/ri';
 import clsx from 'clsx';
+import TranscriptHeaderCard from './TranscriptHeaderCard';
 import {
   buildLangPath,
   DEFAULT_LANG,
@@ -47,15 +48,12 @@ export default function TranscriptGenerating(props: TranscriptGeneratingProps) {
     <div className="mx-auto flex w-full max-w-[640px] flex-col items-center px-4 py-10 md:py-16">
       <div className="relative mb-8 flex size-24 items-center justify-center rounded-full bg-brand/30">
         <span className="absolute inset-0 animate-ping rounded-full bg-brand/30" />
-        <span className="relative flex size-16 items-center justify-center rounded-full bg-brand">
+        <span className="relative flex size-16 items-center justify-center rounded-full bg-default-black text-brand">
           <RiMicFill className="size-7" />
         </span>
       </div>
-      <p className="text-sm text-default-border">{tableName}</p>
-      <h1 className="mt-1 text-center text-2xl font-bold md:text-[28px]">
-        {agenda}
-      </h1>
-      <p className="mt-3 font-semibold">{t('토론 기록을 만들고 있어요')}</p>
+      <TranscriptHeaderCard tableName={tableName} agenda={agenda} />
+      <p className="mt-6 font-semibold">{t('토론 기록을 만들고 있어요')}</p>
 
       <div
         role="progressbar"
