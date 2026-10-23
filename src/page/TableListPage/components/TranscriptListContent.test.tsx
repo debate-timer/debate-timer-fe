@@ -45,9 +45,9 @@ function renderList(response: GetTranscriptsResponseType = transcripts) {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/home?tab=records']}>
+      <MemoryRouter initialEntries={['/?tab=records']}>
         <Routes>
-          <Route path="/home" element={<TranscriptListContent />} />
+          <Route path="/" element={<TranscriptListContent />} />
           <Route path="*" element={<LocationProbe />} />
         </Routes>
       </MemoryRouter>

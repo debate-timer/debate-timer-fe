@@ -114,7 +114,8 @@ export default function TranscriptGenerating(props: TranscriptGeneratingProps) {
           '화면을 닫아도 괜찮아요. 완료되면 대시보드의 토론 기록에서 볼 수 있어요.',
         )}{' '}
         <Link
-          to={buildLangPath('/home?tab=records', lang)}
+          // 대시보드는 "/" 경로이고, 토론 기록 탭을 주소로 지정한다.
+          to={`${buildLangPath('/', lang)}?tab=records`}
           className="font-semibold text-default-black underline"
         >
           {t('토론 기록으로 가기')}
