@@ -373,5 +373,13 @@
   "토론 기록을 만들고 있어요": "Creating the debate record",
   "토론 기록 생성 진행률": "Debate record progress",
   "화면을 닫아도 괜찮아요. 완료되면 대시보드의 토론 기록에서 볼 수 있어요.": "You can close this page. Once it's ready, find it under Debate records on the dashboard.",
-  "토론 기록으로 가기": "Go to debate records"
+  "토론 기록으로 가기": "Go to debate records",
+  "시간표": "Timetables",
+  "대시보드": "Dashboard",
+  "생성 중": "Generating",
+  "삭제된 시간표": "Deleted timetable",
+  "주제를 알 수 없어요": "Unknown topic",
+  "아직 토론 기록이 없어요": "No debate records yet",
+  "타이머 화면에서 녹음을 켜고 토론을 진행해 보세요.": "Turn on recording on the timer screen and run a debate.",
+  "타이머로 진행한 토론이 끝날 때마다 속기록과 분석 보고서가 자동으로 쌓여요.": "Each debate you run with the timer adds a transcript and an analysis report here automatically."
 }

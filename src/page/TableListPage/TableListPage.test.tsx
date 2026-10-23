@@ -7,12 +7,18 @@ import TableListPage from './TableListPage';
 import userEvent from '@testing-library/user-event';
 import { Suspense } from 'react';
 
-function TestWrapper({ children }: { children: React.ReactNode }) {
+function TestWrapper({
+  children,
+  initialEntry = '/home',
+}: {
+  children: React.ReactNode;
+  initialEntry?: string;
+}) {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalPortal.Provider>
-        <MemoryRouter>{children}</MemoryRouter>
+        <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>
       </GlobalPortal.Provider>
     </QueryClientProvider>
   );
@@ -64,6 +70,50 @@ describe('TableListPage', () => {
       expect(
         screen.queryByText('테이블을 삭제하시겠습니까?'),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('시간표·토론 기록 탭', () => {
+    const renderAt = (initialEntry: string) =>
+      render(
+        <TestWrapper initialEntry={initialEntry}>
+          <Suspense>
+            <TableListPage />
+          </Suspense>
+        </TestWrapper>,
+      );
+
+    it('처음에는 시간표 탭을 보여준다', async () => {
+      renderAt('/home');
+
+      expect(
+        await screen.findByRole('tab', { name: '시간표' }),
+      ).toHaveAttribute('aria-selected', 'true');
+      await waitFor(() => expect(screen.getByText('+')).toBeInTheDocument());
+    });
+
+    it('토론 기록 탭을 누르면 토론 기록 목록을 보여준다', async () => {
+      const user = userEvent.setup();
+      renderAt('/home');
+
+      await user.click(await screen.findByRole('tab', { name: '토론 기록' }));
+
+      expect(screen.getByRole('tab', { name: '토론 기록' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      expect(
+        await screen.findByText('노동시장 유연화를 확대해야 한다'),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('+')).not.toBeInTheDocument();
+    });
+
+    it('주소에 토론 기록 탭이 지정돼 있으면 토론 기록 목록으로 시작한다', async () => {
+      renderAt('/home?tab=records');
+
+      expect(
+        await screen.findByText('노동시장 유연화를 확대해야 한다'),
+      ).toBeInTheDocument();
     });
   });
 });
