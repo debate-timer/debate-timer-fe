@@ -42,6 +42,10 @@ interface RecordingSession {
   isPendingMarked: boolean;
 }
 
+// 이보다 짧은 구간은 오디오 머리 정보만 담겨 Soniox가 깨진 파일로 거절하므로 보내지 않는다.
+// 타이머를 켜자마자 끄거나 자유토론 팀을 바로 바꿀 때 생긴다.
+export const MIN_SEGMENT_DURATION_MS = 1000;
+
 let segmentSequence = 0;
 const createSegmentKey = (
   timeBoxIndex: number,
@@ -98,9 +102,11 @@ export default function useSonioxTranscriber(
   }, []);
 
   // 전사 대기는 구간을 끝낼 때 이미 기록했으므로, 결과를 저장하거나 실패로 남기며 대기를 푼다.
+  // 빈 오디오나 너무 짧은 구간은 보내지 않고 문장 없는 구간으로 대기만 푼다.
   const transcribe = useCallback((session: RecordingSession, audio: Blob) => {
     const { tableId: sessionTableId, segment, startedAt } = session;
-    if (audio.size === 0) {
+    const isTooShort = Date.now() - startedAt < MIN_SEGMENT_DURATION_MS;
+    if (audio.size === 0 || isTooShort) {
       appendSegmentUtterances(sessionTableId, segment, startedAt, []);
       setPendingCount((prev) => prev - 1);
       return;

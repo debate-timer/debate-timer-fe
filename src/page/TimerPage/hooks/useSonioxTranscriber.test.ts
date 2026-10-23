@@ -6,6 +6,7 @@ import {
   getTranscriptDraft,
 } from '../../../util/transcriptDraft';
 import useSonioxTranscriber, {
+  MIN_SEGMENT_DURATION_MS,
   UseSonioxTranscriberParams,
 } from './useSonioxTranscriber';
 
@@ -21,6 +22,8 @@ class FakeMediaRecorder {
   static isTypeSupported = vi.fn(() => true);
   // 실제 브라우저처럼 stop 이벤트를 나중에 보내려면 true로 둔다.
   static isStopDeferred = false;
+  // 녹음이 끝날 때 흐른 것으로 볼 녹음 시간
+  static recordingMs = 2000;
   mimeType: string;
   state: 'inactive' | 'recording' = 'inactive';
   ondataavailable: ((event: { data: Blob }) => void) | null = null;
@@ -36,6 +39,7 @@ class FakeMediaRecorder {
   });
 
   flush(data: Blob = new Blob(['audio'], { type: this.mimeType })) {
+    vi.setSystemTime(Date.now() + FakeMediaRecorder.recordingMs);
     this.ondataavailable?.({ data });
     this.onstop?.();
   }
@@ -78,6 +82,8 @@ describe('Soniox 구간 녹음 훅', () => {
     mockedPost.mockResolvedValue({ utterances: [] });
     FakeMediaRecorder.instances = [];
     FakeMediaRecorder.isStopDeferred = false;
+    FakeMediaRecorder.recordingMs = 2000;
+    vi.useFakeTimers({ toFake: ['Date'] });
     trackStop.mockClear();
     getUserMedia.mockClear();
     fakeStream = createStream();
@@ -90,6 +96,7 @@ describe('Soniox 구간 녹음 훅', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it('기록을 켜면 마이크 권한을 받고 Soniox 모드 초안을 시작하지만 타이머가 멈춰 있으면 녹음하지 않는다', async () => {
@@ -366,5 +373,24 @@ describe('Soniox 구간 녹음 훅', () => {
     });
 
     expect(trackStop).toHaveBeenCalled();
+  });
+
+  it('1초 미만으로 녹음된 구간은 Soniox에 보내지 않고 문장 없는 구간으로 정리한다', async () => {
+    FakeMediaRecorder.recordingMs = MIN_SEGMENT_DURATION_MS - 700;
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+
+    rerender({ ...baseParams, isRunning: false });
+
+    expect(mockedPost).not.toHaveBeenCalled();
+    expect(result.current.pendingCount).toBe(0);
+    expect(result.current.failedCount).toBe(0);
+    const draft = getTranscriptDraft(7)!;
+    expect(draft.segments).toEqual([]);
+    expect(countPendingSegments(draft, Date.now())).toBe(0);
   });
 });
