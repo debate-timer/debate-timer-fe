@@ -2,8 +2,11 @@ import { http, HttpResponse } from 'msw';
 import { server } from '../../mocks/server';
 import { ApiUrl } from '../endpoints';
 import { PostTranscriptRequestType } from '../requests/transcript';
-import { GetTranscriptResponseType } from '../responses/transcript';
-import { getTranscript, postTranscript } from './transcript';
+import {
+  GetTranscriptResponseType,
+  GetTranscriptsResponseType,
+} from '../responses/transcript';
+import { getTranscript, getTranscripts, postTranscript } from './transcript';
 
 const mockTranscript: GetTranscriptResponseType = {
   id: 11,
@@ -69,5 +72,27 @@ describe('토론 기록 API', () => {
     const data = await getTranscript(11);
 
     expect(data).toEqual(mockTranscript);
+  });
+
+  it('회원의 토론 기록 목록을 조회한다', async () => {
+    const response: GetTranscriptsResponseType = {
+      transcripts: [
+        {
+          id: 12,
+          tableId: 5,
+          tableName: '정기토론',
+          agenda: '노동시장 유연화를 확대해야 한다',
+          sttMode: 'SONIOX',
+          status: 'PROCESSING',
+          refining: true,
+          createdAt: '2026-10-23T01:39:15',
+        },
+      ],
+    };
+    server.use(http.get(ApiUrl.transcript, () => HttpResponse.json(response)));
+
+    const data = await getTranscripts();
+
+    expect(data).toEqual(response);
   });
 });

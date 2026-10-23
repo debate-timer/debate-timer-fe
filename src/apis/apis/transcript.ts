@@ -3,6 +3,7 @@ import { request } from '../primitives';
 import { PostTranscriptRequestType } from '../requests/transcript';
 import {
   GetTranscriptResponseType,
+  GetTranscriptsResponseType,
   PostTranscriptResponseType,
 } from '../responses/transcript';
 
@@ -30,6 +31,18 @@ export async function getTranscript(
   const response = await request<GetTranscriptResponseType>(
     'GET',
     requestUrl,
+    null,
+    null,
+  );
+
+  return response.data;
+}
+
+// GET /api/transcripts
+export async function getTranscripts(): Promise<GetTranscriptsResponseType> {
+  const response = await request<GetTranscriptsResponseType>(
+    'GET',
+    ApiUrl.transcript,
     null,
     null,
   );

@@ -1,6 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../../apis/endpoints';
-import { GetTranscriptResponseType } from '../../apis/responses/transcript';
+import {
+  GetTranscriptResponseType,
+  GetTranscriptsResponseType,
+} from '../../apis/responses/transcript';
 
 const mockTranscript: GetTranscriptResponseType = {
   id: 1,
@@ -88,7 +91,37 @@ const mockTranscript: GetTranscriptResponseType = {
   errorMessage: null,
 };
 
+const mockTranscripts: GetTranscriptsResponseType = {
+  transcripts: [
+    {
+      id: 2,
+      tableId: 1,
+      tableName: '정기토론',
+      agenda: '대학 수업 과제에서 생성형 AI 사용을 허용해야 한다',
+      sttMode: 'SONIOX',
+      status: 'PROCESSING',
+      refining: true,
+      createdAt: '2026-10-23T01:39:15',
+    },
+    {
+      id: 1,
+      tableId: 1,
+      tableName: '정기토론',
+      agenda: '노동시장 유연화를 확대해야 한다',
+      sttMode: 'RPC',
+      status: 'DONE',
+      refining: false,
+      createdAt: '2026-10-22T20:10:00',
+    },
+  ],
+};
+
 export const transcriptHandlers = [
+  // GET /api/transcripts
+  http.get(ApiUrl.transcript, () => {
+    return HttpResponse.json(mockTranscripts);
+  }),
+
   // POST /api/transcripts/{tableId}
   http.post(ApiUrl.transcript + '/:tableId', () => {
     return HttpResponse.json({ id: 1 }, { status: 201 });

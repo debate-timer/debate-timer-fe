@@ -26,3 +26,20 @@ export interface GetTranscriptResponseType {
   report: DebateReport | null;
   errorMessage: string | null;
 }
+
+// GET /api/transcripts
+// 시간표가 삭제됐으면 tableName·agenda는 null이다.
+export interface TranscriptSummary {
+  id: number;
+  tableId: number;
+  tableName: string | null;
+  agenda: string | null;
+  sttMode: SttMode;
+  status: TranscriptStatus;
+  refining: boolean;
+  createdAt: string;
+}
+
+export interface GetTranscriptsResponseType {
+  transcripts: TranscriptSummary[];
+}
