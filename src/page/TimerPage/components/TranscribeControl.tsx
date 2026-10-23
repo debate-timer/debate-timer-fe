@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiMicFill, RiMicOffFill } from 'react-icons/ri';
+import { RiMicFill } from 'react-icons/ri';
 import clsx from 'clsx';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
@@ -26,9 +26,9 @@ export interface TranscribeControlProps {
 
 const STT_MODES: SttMode[] = ['RPC', 'SONIOX'];
 
-// 바로 위 라이브 공유 버튼과 같은 크기·모양으로 맞춘다.
-const MIC_BUTTON_CLASS =
-  'relative flex size-[88px] items-center justify-center rounded-full border-[2px] p-[22px] shadow-lg transition-colors';
+// 녹음하지 않을 때는 "토론 녹화하기" 버튼, 녹음 중에는 "토론 녹음 중" 태그로 보이는 타원형 버튼
+const RECORD_BUTTON_CLASS =
+  'flex items-center gap-2 rounded-full border-2 px-5 py-2.5 text-base font-bold whitespace-nowrap shadow-lg transition-colors';
 const STATUS_PILL_CLASS =
   'flex w-fit items-center gap-2 rounded-full bg-default-black/80 px-3 py-1.5 text-sm font-semibold text-default-white';
 const MODE_OPTION_CLASS =
@@ -105,7 +105,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
   }
 
   const consentMode = isModeLocked ? sttMode : selectedMode;
-  const label = isEnabled ? t('토론 기록 끄기') : t('토론 기록 켜기');
+  const label = isEnabled ? t('토론 녹음 끄기') : t('토론 녹화하기');
 
   const handleClick = () => {
     if (isEnabled) {
@@ -124,8 +124,8 @@ export default function TranscribeControl(props: TranscribeControlProps) {
 
   return (
     <>
-      {/* 오른쪽 위 공유 버튼 밑에 두므로 상태 표시는 버튼 왼쪽에 오른쪽 정렬한다. */}
-      <div className="flex flex-row-reverse items-start gap-3">
+      {/* 오른쪽 위 공유 버튼 밑에 두므로 버튼과 상태 표시를 오른쪽 정렬한다. */}
+      <div className="flex max-w-[360px] flex-col items-end gap-2">
         <button
           type="button"
           onClick={handleClick}
@@ -133,53 +133,53 @@ export default function TranscribeControl(props: TranscribeControlProps) {
           aria-pressed={isEnabled}
           title={label}
           className={clsx(
-            MIC_BUTTON_CLASS,
+            RECORD_BUTTON_CLASS,
             isEnabled
               ? 'border-semantic-error bg-semantic-error text-default-white'
-              : 'border-default-black2 bg-default-white text-default-black',
+              : 'border-default-black bg-default-white text-default-black hover:bg-default-dim2',
           )}
         >
           {isEnabled ? (
-            <RiMicFill className="size-full" />
-          ) : (
-            <RiMicOffFill className="size-full" />
-          )}
-        </button>
-
-        <div className="flex max-w-[360px] flex-col items-end gap-2 pt-2">
-          {isEnabled && (
-            <p className={STATUS_PILL_CLASS} aria-live="polite">
+            <>
               <span
                 aria-hidden="true"
                 className={clsx(
-                  'size-2.5 rounded-full',
-                  isListening
-                    ? 'animate-pulse bg-semantic-error'
-                    : 'bg-default-neutral',
+                  'size-2.5 rounded-full bg-default-white',
+                  isListening && 'animate-pulse',
                 )}
               />
-              {isListening ? t('녹음 중') : t('타이머를 시작하면 기록해요')}
-              <span className="font-normal text-default-white/70">
-                {t('{{count}}문장', { count: utteranceCount })}
-              </span>
-            </p>
+              {t('토론 녹음 중')}
+            </>
+          ) : (
+            <>
+              <RiMicFill aria-hidden="true" className="size-5" />
+              {t('토론 녹화하기')}
+            </>
           )}
-          {isEnabled && pendingCount > 0 && (
-            <p className={STATUS_PILL_CLASS} aria-live="polite">
-              {t('{{count}}개 구간 전사 중', { count: pendingCount })}
-            </p>
-          )}
-          {failedCount > 0 && (
-            <p className={clsx(STATUS_PILL_CLASS, 'bg-semantic-error/90')}>
-              {t('{{count}}개 구간 전사 실패', { count: failedCount })}
-            </p>
-          )}
-          {error === 'not-allowed' && (
-            <p className={STATUS_PILL_CLASS}>
-              {t('마이크 권한을 허용해야 토론을 기록할 수 있어요')}
-            </p>
-          )}
-        </div>
+        </button>
+
+        {isEnabled && (
+          <p className={STATUS_PILL_CLASS} aria-live="polite">
+            {isListening
+              ? t('{{count}}문장 기록', { count: utteranceCount })
+              : t('타이머를 시작하면 기록해요')}
+          </p>
+        )}
+        {isEnabled && pendingCount > 0 && (
+          <p className={STATUS_PILL_CLASS} aria-live="polite">
+            {t('{{count}}개 구간 전사 중', { count: pendingCount })}
+          </p>
+        )}
+        {failedCount > 0 && (
+          <p className={clsx(STATUS_PILL_CLASS, 'bg-semantic-error/90')}>
+            {t('{{count}}개 구간 전사 실패', { count: failedCount })}
+          </p>
+        )}
+        {error === 'not-allowed' && (
+          <p className={STATUS_PILL_CLASS}>
+            {t('마이크 권한을 허용해야 토론을 기록할 수 있어요')}
+          </p>
+        )}
       </div>
 
       <ModalWrapper>

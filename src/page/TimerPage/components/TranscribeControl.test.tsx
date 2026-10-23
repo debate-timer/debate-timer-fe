@@ -38,7 +38,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     const user = userEvent.setup();
     const props = renderControl();
 
-    await user.click(screen.getByRole('button', { name: '토론 기록 켜기' }));
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
     expect(props.onEnable).not.toHaveBeenCalled();
     expect(
       screen.getByText('토론 음성 기록에 동의하시나요?'),
@@ -53,7 +53,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     const user = userEvent.setup();
     const props = renderControl();
 
-    await user.click(screen.getByRole('button', { name: '토론 기록 켜기' }));
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
     await user.click(
       screen.getByRole('radio', { name: /발언 후 일괄 인식 \(Soniox\)/ }),
     );
@@ -69,7 +69,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     const user = userEvent.setup();
     renderControl({ supportedModes: { RPC: false, SONIOX: true } });
 
-    await user.click(screen.getByRole('button', { name: '토론 기록 켜기' }));
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
 
     expect(
       screen.getByRole('radio', { name: /실시간 인식 \(크롬\)/ }),
@@ -83,7 +83,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     const user = userEvent.setup();
     const props = renderControl({ sttMode: 'SONIOX', isModeLocked: true });
 
-    await user.click(screen.getByRole('button', { name: '토론 기록 켜기' }));
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
 
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
@@ -94,24 +94,33 @@ describe('토론 기록 켜기 컨트롤', () => {
     const user = userEvent.setup();
     const props = renderControl();
 
-    await user.click(screen.getByRole('button', { name: '토론 기록 켜기' }));
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
     await user.click(screen.getByRole('button', { name: '취소' }));
 
     expect(props.onEnable).not.toHaveBeenCalled();
   });
 
-  it('기록 중에 누르면 기록을 끈다', async () => {
+  it('녹음하지 않을 때는 토론 녹화하기 버튼을 보여준다', () => {
+    renderControl();
+
+    const button = screen.getByRole('button', { name: '토론 녹화하기' });
+    expect(button).toHaveTextContent('토론 녹화하기');
+    expect(button).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('녹음 중에는 토론 녹음 중 태그를 보여주고, 누르면 녹음을 끈다', async () => {
     const user = userEvent.setup();
     const props = renderControl({ isEnabled: true });
 
-    const button = screen.getByRole('button', { name: '토론 기록 끄기' });
+    const button = screen.getByRole('button', { name: '토론 녹음 끄기' });
+    expect(button).toHaveTextContent('토론 녹음 중');
     expect(button).toHaveAttribute('aria-pressed', 'true');
     await user.click(button);
 
     expect(props.onDisable).toHaveBeenCalledTimes(1);
   });
 
-  it('크롬 실시간 인식도 인식 중인 문장 대신 녹음 중 상태와 기록한 문장 수만 보여준다', () => {
+  it('크롬 실시간 인식도 인식 중인 문장 대신 녹음 중 태그와 기록한 문장 수만 보여준다', () => {
     renderControl({
       sttMode: 'RPC',
       isEnabled: true,
@@ -119,8 +128,8 @@ describe('토론 기록 켜기 컨트롤', () => {
       utteranceCount: 3,
     });
 
-    expect(screen.getByText('녹음 중')).toBeInTheDocument();
-    expect(screen.getByText('3문장')).toBeInTheDocument();
+    expect(screen.getByText('토론 녹음 중')).toBeInTheDocument();
+    expect(screen.getByText('3문장 기록')).toBeInTheDocument();
   });
 
   it('타이머 화면에 처음 들어오면 녹음할지 묻는 동의 창을 연다', async () => {
@@ -152,7 +161,7 @@ describe('토론 기록 켜기 컨트롤', () => {
       failedCount: 1,
     });
 
-    expect(screen.getByText('녹음 중')).toBeInTheDocument();
+    expect(screen.getByText('토론 녹음 중')).toBeInTheDocument();
     expect(screen.getByText('2개 구간 전사 중')).toBeInTheDocument();
     expect(screen.getByText('1개 구간 전사 실패')).toBeInTheDocument();
   });
@@ -161,7 +170,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     renderControl({ supportedModes: { RPC: false, SONIOX: false } });
 
     expect(
-      screen.queryByRole('button', { name: '토론 기록 켜기' }),
+      screen.queryByRole('button', { name: '토론 녹화하기' }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByText('이 브라우저에서는 토론 기록을 사용할 수 없어요'),
