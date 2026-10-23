@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GlobalPortal } from '../../util/GlobalPortal';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import TableListPage from './TableListPage';
 import userEvent from '@testing-library/user-event';
 import { Suspense } from 'react';
@@ -82,6 +82,32 @@ describe('TableListPage', () => {
           </Suspense>
         </TestWrapper>,
       );
+
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    it('아직 보지 않은 토론 기록이 있으면 토론 기록 탭에 N 표시를 하고, 탭을 열면 지운다', async () => {
+      const user = userEvent.setup();
+      renderAt('/home');
+
+      const recordsTab = await screen.findByRole('tab', { name: '토론 기록' });
+      await waitFor(() =>
+        expect(within(recordsTab).getByText('N')).toBeInTheDocument(),
+      );
+
+      await user.click(recordsTab);
+      await screen.findByText('노동시장 유연화를 확대해야 한다');
+      await user.click(screen.getByRole('tab', { name: '시간표' }));
+
+      await waitFor(() =>
+        expect(
+          within(screen.getByRole('tab', { name: '토론 기록' })).queryByText(
+            'N',
+          ),
+        ).not.toBeInTheDocument(),
+      );
+    });
 
     it('처음에는 시간표 탭을 보여준다', async () => {
       renderAt('/home');
