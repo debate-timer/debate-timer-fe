@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { TimeBasedStance } from '../../../types/type';
+import { TEAM_STYLE, TimeBasedStance } from '../../../types/type';
 import {
   DebateReport,
   EvidenceType,
@@ -22,24 +22,36 @@ const EVIDENCE_STYLE: Record<
   EvidenceType,
   { label: string; className: string }
 > = {
-  SOURCED: { label: '출처 명시', className: 'bg-emerald-100 text-emerald-700' },
+  SOURCED: {
+    label: '출처 명시',
+    className: 'bg-default-black text-default-white',
+  },
   LOGICAL: {
     label: '논리·사례',
     className: 'bg-default-dim2 text-default-black2',
   },
-  VAGUE: { label: '출처 불명확', className: 'bg-amber-100 text-amber-700' },
+  VAGUE: { label: '출처 불명확', className: 'bg-brand/40 text-default-black' },
   NONE: {
     label: '근거 없음',
     className: 'bg-semantic-warning/30 text-semantic-error',
   },
 };
 
+// 진영 머리 배경은 투표 화면 등과 같은 앱 공용 진영 색(TEAM_STYLE)을 쓴다.
 const SIDE_STYLE: Record<
   TimeBasedStance,
   { label: string; border: string; bg: string }
 > = {
-  PROS: { label: '찬성', border: 'border-camp-blue', bg: 'bg-[#C2E8FF]' },
-  CONS: { label: '반대', border: 'border-camp-red', bg: 'bg-[#FFC7D3]' },
+  PROS: {
+    label: '찬성',
+    border: 'border-camp-blue',
+    bg: TEAM_STYLE.PROS.baseBg,
+  },
+  CONS: {
+    label: '반대',
+    border: 'border-camp-red',
+    bg: TEAM_STYLE.CONS.baseBg,
+  },
 };
 
 const CHIP_CLASS =
@@ -324,7 +336,7 @@ function FeedbackList(props: FeedbackListProps) {
   const { title, items, mark } = props;
   const markClass =
     mark === '+'
-      ? 'bg-emerald-100 text-emerald-700'
+      ? 'bg-default-black text-default-white'
       : 'bg-semantic-warning/30 text-semantic-error';
   return (
     <div>
