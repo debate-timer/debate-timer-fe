@@ -13,6 +13,8 @@ import {
   isSupportedLang,
 } from '../../util/languageRouting';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
+import TranscriptBanner from './components/TranscriptBanner';
+import useSubmitTranscript from './hooks/useSubmitTranscript';
 
 // 토론 종료 후 피드백 타이머와 투표 진행 액션을 제공하는 페이지다.
 export default function DebateEndPage() {
@@ -39,6 +41,19 @@ export default function DebateEndPage() {
     );
   };
   const { mutate } = usePostPoll(handleVoteClick);
+  // 타이머 화면에서 기록한 토론이 있으면 종료와 함께 서버로 보낸다.
+  const transcript = useSubmitTranscript(tableId);
+  const handleOpenTranscript = () => {
+    if (transcript.transcriptId === null) {
+      return;
+    }
+    navigate(
+      buildLangPath(
+        `/table/customize/${tableId}/end/transcript/${transcript.transcriptId}`,
+        lang,
+      ),
+    );
+  };
 
   const backgroundStyle = {
     background:
@@ -65,6 +80,17 @@ export default function DebateEndPage() {
           className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 xl:h-20 xl:w-20"
         />
       </div>
+
+      {transcript.status !== 'none' && (
+        <div className="mb-8 flex w-full justify-center lg:mb-10">
+          <TranscriptBanner
+            status={transcript.status}
+            pendingCount={transcript.pendingCount}
+            onOpen={handleOpenTranscript}
+            onRetry={transcript.retry}
+          />
+        </div>
+      )}
 
       <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-10 lg:gap-12 xl:gap-20">
         <MenuCard

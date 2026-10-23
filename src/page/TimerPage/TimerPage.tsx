@@ -37,6 +37,9 @@ import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
+import useTranscriptRecorder from './hooks/useTranscriptRecorder';
+import TranscribeControl from './components/TranscribeControl';
+import { toRecognitionLang } from '../../util/speechRecognition';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = true;
@@ -49,7 +52,7 @@ interface SharedTimes {
 }
 
 export default function TimerPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
   useEnsureGuestTable(pathParams.id);
@@ -95,6 +98,17 @@ export default function TimerPage() {
     normalTimer,
   } = state;
   const timerType = data && data.table[index].boxType;
+
+  // 토론 기록: 타이머가 실행되는 동안의 발언을 현재 타임박스(자유토론은 현재 팀) 구간으로 기록한다.
+  // 기록을 켤 때 크롬 실시간 인식(RPC)과 Soniox 구간 배치 전사 중 하나를 고른다.
+  const isTranscribeAvailable = isLoggedIn() && !isGuestFlow();
+  const transcriber = useTranscriptRecorder({
+    tableId,
+    timeBoxIndex: index,
+    team: timerType === 'TIME_BASED' ? prosConsSelected : null,
+    isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
+    lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+  });
   const remainingTime = getRemainingTimeForShare({
     timerType,
     normalTimer: normalTimer.timer,
@@ -458,6 +472,26 @@ export default function TimerPage() {
                       />
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* 토론 기록 켜기/끄기와 녹음 상태. 라이브 공유 버튼(top-4, 96px) 바로 밑에 둔다. */}
+              {isTranscribeAvailable && (
+                <div className="absolute top-[116px] right-4 z-10 pr-[4px]">
+                  <TranscribeControl
+                    supportedModes={transcriber.supportedModes}
+                    sttMode={transcriber.sttMode}
+                    isModeLocked={transcriber.isModeLocked}
+                    isEnabled={transcriber.isEnabled}
+                    isListening={transcriber.isListening}
+                    utteranceCount={transcriber.utteranceCount}
+                    pendingCount={transcriber.pendingCount}
+                    failedCount={transcriber.failedCount}
+                    error={transcriber.error}
+                    shouldPromptOnMount
+                    onEnable={transcriber.enable}
+                    onDisable={transcriber.disable}
+                  />
                 </div>
               )}
 
