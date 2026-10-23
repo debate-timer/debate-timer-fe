@@ -70,8 +70,13 @@ export default function useDebateTranscriber(
   const hasStartedDraftRef = useRef(false);
   const tableIdRef = useRef(tableId);
   const langRef = useRef(lang);
-  tableIdRef.current = tableId;
-  langRef.current = lang;
+
+  // 렌더 중에 ref를 바꾸면 커밋되지 않은 렌더 값이 남을 수 있어 커밋 뒤에 맞춘다.
+  // 인식 세그먼트 effect보다 먼저 선언해 launch가 커밋된 최신 값을 읽게 한다.
+  useEffect(() => {
+    tableIdRef.current = tableId;
+    langRef.current = lang;
+  }, [tableId, lang]);
 
   const launch = useCallback(
     (segment: SegmentKey) => {

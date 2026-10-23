@@ -317,4 +317,54 @@ describe('Soniox 구간 녹음 훅', () => {
     expect(result.current.isEnabled).toBe(false);
     expect(FakeMediaRecorder.instances).toHaveLength(0);
   });
+
+  it('마이크가 분리돼 녹음이 스스로 멈춰도 그 구간을 전사 대기로 기록하고 대기 수가 음수가 되지 않는다', async () => {
+    let resolvePost: (value: {
+      utterances: { offsetMs: number; text: string }[];
+    }) => void = () => {};
+    mockedPost.mockImplementationOnce(
+      () => new Promise((resolve) => (resolvePost = resolve)),
+    );
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+
+    // 훅이 stop을 부르지 않았는데 브라우저가 녹음을 끝낸 경우
+    act(() => latest().flush());
+
+    expect(result.current.pendingCount).toBe(1);
+    expect(countPendingSegments(getTranscriptDraft(7)!, Date.now())).toBe(1);
+
+    await act(async () =>
+      resolvePost({ utterances: [{ offsetMs: 0, text: '마지막 발언' }] }),
+    );
+
+    expect(result.current.pendingCount).toBe(0);
+    expect(getTranscriptDraft(7)?.segments).toHaveLength(1);
+  });
+
+  it('마이크 권한을 묻는 사이 화면을 떠나면 나중에 받은 마이크를 바로 놓는다', async () => {
+    let resolveStream: (stream: typeof fakeStream) => void = () => {};
+    getUserMedia.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveStream = resolve)),
+    );
+    const { result, unmount } = renderHook(() =>
+      useSonioxTranscriber(baseParams),
+    );
+
+    let enabling: Promise<void> = Promise.resolve();
+    act(() => {
+      enabling = result.current.enable();
+    });
+    unmount();
+    await act(async () => {
+      resolveStream(createStream());
+      await enabling;
+    });
+
+    expect(trackStop).toHaveBeenCalled();
+  });
 });

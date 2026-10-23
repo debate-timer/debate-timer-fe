@@ -38,6 +38,8 @@ interface RecordingSession {
   segment: SegmentKey;
   startedAt: number;
   chunks: Blob[];
+  // 전사 대기로 기록했는지. 구간을 끝낼 때와 녹음기가 스스로 멈출 때 중 먼저 오는 쪽에서 한 번만 기록한다.
+  isPendingMarked: boolean;
 }
 
 let segmentSequence = 0;
@@ -74,11 +76,26 @@ export default function useSonioxTranscriber(
   const desiredRef = useRef<DesiredSegment | null>(null);
   const isEnabledRef = useRef(false);
   const isRequestingMicrophoneRef = useRef(false);
+  const isMountedRef = useRef(false);
   const hasStartedDraftRef = useRef(false);
   const tableIdRef = useRef(tableId);
   const langRef = useRef(lang);
-  tableIdRef.current = tableId;
-  langRef.current = lang;
+
+  // 렌더 중에 ref를 바꾸면 커밋되지 않은 렌더 값이 남을 수 있어 커밋 뒤에 맞춘다.
+  // 녹음기 onstop은 effect가 끝난 뒤 이벤트로 오므로 이 값을 읽는다.
+  useEffect(() => {
+    tableIdRef.current = tableId;
+    langRef.current = lang;
+  }, [tableId, lang]);
+
+  const markPending = useCallback((session: RecordingSession) => {
+    if (session.isPendingMarked) {
+      return;
+    }
+    session.isPendingMarked = true;
+    markSegmentPending(session.tableId, session.segment.id, Date.now());
+    setPendingCount((prev) => prev + 1);
+  }, []);
 
   // 전사 대기는 구간을 끝낼 때 이미 기록했으므로, 결과를 저장하거나 실패로 남기며 대기를 푼다.
   const transcribe = useCallback((session: RecordingSession, audio: Blob) => {
@@ -115,6 +132,7 @@ export default function useSonioxTranscriber(
         segment,
         startedAt: Date.now(),
         chunks: [],
+        isPendingMarked: false,
       };
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -122,6 +140,12 @@ export default function useSonioxTranscriber(
         }
       };
       recorder.onstop = () => {
+        // 마이크 분리처럼 녹음기가 스스로 멈추면 stopRecording을 거치지 않으므로 여기서 정리한다.
+        if (activeRef.current === session) {
+          activeRef.current = null;
+          setIsListening(false);
+        }
+        markPending(session);
         const audio = new Blob(session.chunks, {
           type: recorder.mimeType || mimeType || 'audio/webm',
         });
@@ -131,7 +155,7 @@ export default function useSonioxTranscriber(
       recorder.start();
       setIsListening(true);
     },
-    [transcribe],
+    [markPending, transcribe],
   );
 
   // 녹음 중인 구간을 끝낸다. 남은 오디오는 비동기 onstop에서 전사 요청으로 이어지므로,
@@ -143,10 +167,9 @@ export default function useSonioxTranscriber(
     if (!active || active.recorder.state === 'inactive') {
       return;
     }
-    markSegmentPending(active.tableId, active.segment.id, Date.now());
-    setPendingCount((prev) => prev + 1);
+    markPending(active);
     active.recorder.stop();
-  }, []);
+  }, [markPending]);
 
   const releaseMicrophone = useCallback(() => {
     stopMediaStream(streamRef.current);
@@ -227,7 +250,9 @@ export default function useSonioxTranscriber(
 
   // 화면을 떠나면 녹음 중이던 구간까지 전사를 요청하고 마이크를 놓는다.
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
+      isMountedRef.current = false;
       isEnabledRef.current = false;
       desiredRef.current = null;
       stopRecording();
@@ -243,7 +268,13 @@ export default function useSonioxTranscriber(
     }
     try {
       if (!streamRef.current?.active) {
-        streamRef.current = await requestMicrophoneStream();
+        const stream = await requestMicrophoneStream();
+        // 권한을 묻는 사이 화면을 떠났으면 받은 마이크를 바로 놓는다.
+        if (!isMountedRef.current) {
+          stopMediaStream(stream);
+          return;
+        }
+        streamRef.current = stream;
       }
     } catch {
       setError('not-allowed');
