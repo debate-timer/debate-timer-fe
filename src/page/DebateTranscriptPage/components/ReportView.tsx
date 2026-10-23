@@ -70,14 +70,15 @@ export default function ReportView(props: ReportViewProps) {
   const findLine = (lineIndex: number) =>
     lines.find(({ index }) => index === lineIndex);
 
-  const renderTimeChip = (lineIndex: number) => {
+  // AI가 같은 발언 번호를 두 번 넣을 수 있어 목록 안 순서를 key에 함께 쓴다.
+  const renderTimeChip = (lineIndex: number, position: number) => {
     const line = findLine(lineIndex);
     if (!line) {
       return null;
     }
     return (
       <button
-        key={lineIndex}
+        key={`${position}-${lineIndex}`}
         type="button"
         onClick={() => onJumpToLine(lineIndex)}
         aria-label={t('속기록에서 {{time}} 발언 보기', {
@@ -113,7 +114,7 @@ export default function ReportView(props: ReportViewProps) {
       )}
       <ol className="divide-y-2 divide-default-dim2">
         {items.map((item, itemIndex) => (
-          <li key={item.claim} className="p-5">
+          <li key={`${itemIndex}-${item.claim}`} className="p-5">
             <p className="flex gap-2 leading-snug font-bold">
               <span className={clsx('flex-none', STANCE_TEXT_CLASS[side])}>
                 {t('주장 {{number}}', { number: itemIndex + 1 })}
@@ -121,9 +122,9 @@ export default function ReportView(props: ReportViewProps) {
               <span>{item.claim}</span>
             </p>
             <ul className="mt-3 space-y-2 border-l-2 border-default-dim2 pl-3">
-              {item.evidences.map((evidence) => (
+              {item.evidences.map((evidence, evidenceIndex) => (
                 <li
-                  key={evidence.content}
+                  key={`${evidenceIndex}-${evidence.content}`}
                   className="flex items-start gap-2 text-[15px]"
                 >
                   <span
@@ -138,7 +139,7 @@ export default function ReportView(props: ReportViewProps) {
                   <span className="flex-1 leading-relaxed text-default-black2">
                     {evidence.content}
                   </span>
-                  {renderTimeChip(evidence.lineIndex)}
+                  {renderTimeChip(evidence.lineIndex, 0)}
                 </li>
               ))}
             </ul>
@@ -195,7 +196,7 @@ export default function ReportView(props: ReportViewProps) {
         <div className="flex flex-col gap-4">
           {report.clashes.map((clash, clashIndex) => (
             <article
-              key={clash.title}
+              key={`${clashIndex}-${clash.title}`}
               className="border-default-disabled/hover overflow-hidden rounded-[20px] border-2"
             >
               <div className="flex items-center gap-2 px-5 py-4">
@@ -238,7 +239,9 @@ export default function ReportView(props: ReportViewProps) {
               <div className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
                 <p className="text-sm text-default-black2">{clash.reason}</p>
                 <div className="flex flex-wrap gap-1">
-                  {clash.lineIndices.map(renderTimeChip)}
+                  {clash.lineIndices.map((lineIndex, position) =>
+                    renderTimeChip(lineIndex, position),
+                  )}
                 </div>
               </div>
             </article>
@@ -248,11 +251,11 @@ export default function ReportView(props: ReportViewProps) {
 
       <ReportSection number="03" title={t('큰 역할을 했던 발언')}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {report.keyMoments.map((moment) => {
+          {report.keyMoments.map((moment, momentIndex) => {
             const line = findLine(moment.lineIndex);
             return (
               <button
-                key={`${moment.lineIndex}-${moment.label}`}
+                key={`${momentIndex}-${moment.lineIndex}-${moment.label}`}
                 type="button"
                 disabled={!line}
                 onClick={() => onJumpToLine(moment.lineIndex)}
@@ -342,8 +345,8 @@ function FeedbackList(props: FeedbackListProps) {
     <div>
       <p className="mb-2 text-sm font-bold">{title}</p>
       <ul className="space-y-2 text-[15px]">
-        {items.map((item) => (
-          <li key={item} className="flex gap-2">
+        {items.map((item, itemIndex) => (
+          <li key={`${itemIndex}-${item}`} className="flex gap-2">
             <span
               aria-hidden="true"
               className={clsx(
