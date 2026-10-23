@@ -5,7 +5,12 @@ import { Suspense } from 'react';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import TableListPageContent from './components/TableListPageContent';
 import TranscriptListContent from './components/TranscriptListContent';
-import DashboardTabs, { DashboardTab } from './components/DashboardTabs';
+import DashboardTabs from './components/DashboardTabs';
+import {
+  DashboardTab,
+  dashboardTabId,
+  dashboardTabPanelId,
+} from './dashboardTab';
 import UpdateModalWrapper from '../../components/UpdateModal/UpdateModalWrapper';
 
 const TAB_QUERY_KEY = 'tab';
@@ -32,16 +37,30 @@ export default function TableListPage() {
       </DefaultLayout.Header>
 
       <DefaultLayout.ContentContainer>
-        {selectedTab === 'records' ? (
-          <TranscriptListContent />
-        ) : (
-          <Suspense fallback={<LoadingIndicator />}>
-            <p className="m-5 mb-0 text-xl font-semibold md:text-subtitle-raw">
-              {t('토론 시간표를 선택해주세요')}
-            </p>
-            <TableListPageContent />
-          </Suspense>
-        )}
+        {/* 탭마다 패널을 두고 선택하지 않은 패널은 숨긴다. 내용은 선택한 탭만 그려 불필요한 조회를 막는다. */}
+        <div
+          role="tabpanel"
+          id={dashboardTabPanelId('tables')}
+          aria-labelledby={dashboardTabId('tables')}
+          hidden={selectedTab !== 'tables'}
+        >
+          {selectedTab === 'tables' && (
+            <Suspense fallback={<LoadingIndicator />}>
+              <p className="m-5 mb-0 text-xl font-semibold md:text-subtitle-raw">
+                {t('토론 시간표를 선택해주세요')}
+              </p>
+              <TableListPageContent />
+            </Suspense>
+          )}
+        </div>
+        <div
+          role="tabpanel"
+          id={dashboardTabPanelId('records')}
+          aria-labelledby={dashboardTabId('records')}
+          hidden={selectedTab !== 'records'}
+        >
+          {selectedTab === 'records' && <TranscriptListContent />}
+        </div>
 
         {/* 업데이트 안내는 탭과 상관없이 대시보드에 들어오면 보여준다. */}
         <Suspense>

@@ -99,6 +99,27 @@ describe('TableListPage', () => {
       ).toBeInTheDocument();
     });
 
+    it('각 탭이 자기 탭 패널을 가리키고, 선택하지 않은 탭의 패널은 숨긴다', async () => {
+      renderAt('/home');
+
+      const tablesTab = await screen.findByRole('tab', { name: '시간표' });
+      const recordsTab = screen.getByRole('tab', { name: '토론 기록' });
+      const tablesPanel = document.getElementById(
+        tablesTab.getAttribute('aria-controls') ?? '',
+      );
+      const recordsPanel = document.getElementById(
+        recordsTab.getAttribute('aria-controls') ?? '',
+      );
+
+      expect(tablesPanel).toHaveAttribute('role', 'tabpanel');
+      expect(recordsPanel).toHaveAttribute('role', 'tabpanel');
+      expect(tablesPanel).not.toBe(recordsPanel);
+      expect(tablesPanel).toHaveAttribute('aria-labelledby', tablesTab.id);
+      expect(recordsPanel).toHaveAttribute('aria-labelledby', recordsTab.id);
+      expect(tablesPanel).not.toHaveAttribute('hidden');
+      expect(recordsPanel).toHaveAttribute('hidden');
+    });
+
     it('처음에는 시간표 탭을 보여준다', async () => {
       renderAt('/home');
 

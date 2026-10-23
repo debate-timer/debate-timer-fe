@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-
-export type DashboardTab = 'tables' | 'records';
+import {
+  DashboardTab,
+  dashboardTabId,
+  dashboardTabPanelId,
+} from '../dashboardTab';
 
 interface DashboardTabsProps {
   selectedTab: DashboardTab;
@@ -32,10 +35,12 @@ export default function DashboardTabs(props: DashboardTabsProps) {
       {tabs.map(({ key, label }) => (
         <button
           key={key}
+          id={dashboardTabId(key)}
           type="button"
           role="tab"
           aria-label={label}
           aria-selected={selectedTab === key}
+          aria-controls={dashboardTabPanelId(key)}
           onClick={() => onSelect(key)}
           className={clsx(
             TAB_CLASS,
