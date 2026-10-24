@@ -50,8 +50,8 @@ describe('TimerProgressBar', () => {
   });
 
   it.each([
-    ['PROS', 'bg-camp-blue'],
-    ['CONS', 'bg-camp-red'],
+    ['PROS', 'bg-stance-blue'],
+    ['CONS', 'bg-stance-red'],
     ['DISABLED', 'bg-default-neutral'],
   ] as const)('%s 팀 색상을 진행 영역에 적용한다', (team, colorClass) => {
     render(<TimerProgressBar progress={50} team={team} isRunning={false} />);

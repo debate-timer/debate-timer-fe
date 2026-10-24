@@ -114,11 +114,12 @@ export default function NormalTimer({
                 className={clsx(
                   'flex h-[52px] w-full items-center justify-center rounded-[20px] text-[20px] font-semibold transition-all duration-200 ease-in-out xl:h-[68px] xl:text-[28px]',
                   {
-                    'bg-camp-blue/50 hover:bg-camp-blue':
+                    'bg-stance-blue/50 hover:bg-stance-blue':
                       item.stance === 'PROS',
                   },
                   {
-                    'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS',
+                    'bg-stance-red/50 hover:bg-stance-red':
+                      item.stance === 'CONS',
                   },
                   {
                     'bg-default-neutral/50 hover:bg-default-neutral':

@@ -18,8 +18,8 @@ interface TimerProgressBarProps {
 }
 
 const TEAM_COLOR_CLASS: Record<TimerProgressBarTeam, string> = {
-  PROS: 'bg-camp-blue',
-  CONS: 'bg-camp-red',
+  PROS: 'bg-stance-blue',
+  CONS: 'bg-stance-red',
   DISABLED: 'bg-default-neutral',
 };
 

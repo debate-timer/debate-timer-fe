@@ -44,12 +44,12 @@ const SIDE_STYLE: Record<
 > = {
   PROS: {
     label: '찬성',
-    border: 'border-camp-blue',
+    border: 'border-stance-blue',
     bg: TEAM_STYLE.PROS.baseBg,
   },
   CONS: {
     label: '반대',
-    border: 'border-camp-red',
+    border: 'border-stance-red',
     bg: TEAM_STYLE.CONS.baseBg,
   },
 };
@@ -208,9 +208,9 @@ export default function ReportView(props: ReportViewProps) {
                   className={clsx(
                     CHIP_CLASS,
                     clash.advantage === 'PROS' &&
-                      'bg-camp-blue text-default-white',
+                      'bg-stance-blue text-default-white',
                     clash.advantage === 'CONS' &&
-                      'bg-camp-red text-default-white',
+                      'bg-stance-red text-default-white',
                     clash.advantage === 'EVEN' &&
                       'bg-default-dim2 text-default-black2',
                   )}
@@ -223,14 +223,14 @@ export default function ReportView(props: ReportViewProps) {
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2">
-                <div className="bg-camp-blue/5 p-5">
-                  <p className="mb-1 text-sm font-bold text-camp-blue">
+                <div className="bg-stance-blue/5 p-5">
+                  <p className="mb-1 text-sm font-bold text-stance-blue">
                     {t('찬성')}
                   </p>
                   <p className="leading-relaxed">{clash.prosPosition}</p>
                 </div>
-                <div className="bg-camp-red/5 p-5">
-                  <p className="mb-1 text-sm font-bold text-camp-red">
+                <div className="bg-stance-red/5 p-5">
+                  <p className="mb-1 text-sm font-bold text-stance-red">
                     {t('반대')}
                   </p>
                   <p className="leading-relaxed">{clash.consPosition}</p>

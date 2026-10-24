@@ -168,8 +168,8 @@ export default function TimeBasedTimer({
             <h1
               className={clsx(
                 'w-[140px] rounded-[8px] py-[6px] text-center text-[20px] text-default-white xl:w-[180px] xl:text-[28px]',
-                { 'bg-camp-blue': prosCons === 'PROS' },
-                { 'bg-camp-red': prosCons === 'CONS' },
+                { 'bg-stance-blue': prosCons === 'PROS' },
+                { 'bg-stance-red': prosCons === 'CONS' },
               )}
             >
               {t('현재 시간')}

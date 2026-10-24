@@ -12,16 +12,16 @@ export default function PropsAndConsTitle({
   return (
     <div className="mx-auto mb-4 flex w-full items-center justify-between gap-2">
       <div className="flex w-1/2 flex-col items-center">
-        <span className="text-2xl font-bold text-camp-blue">
+        <span className="text-2xl font-bold text-stance-blue">
           {prosTeamName ?? t('찬성')}
         </span>
-        <div className="mt-1 h-1 w-full bg-camp-blue" />
+        <div className="mt-1 h-1 w-full bg-stance-blue" />
       </div>
       <div className="flex w-1/2 flex-col items-center">
-        <span className="text-2xl font-bold text-camp-red">
+        <span className="text-2xl font-bold text-stance-red">
           {consTeamName ?? t('반대')}
         </span>
-        <div className="mt-1 h-1 w-full bg-camp-red" />
+        <div className="mt-1 h-1 w-full bg-stance-red" />
       </div>
     </div>
   );
