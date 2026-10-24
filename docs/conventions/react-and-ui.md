@@ -40,6 +40,12 @@ effect 밖에서도 호출해야 하는 콜백은 기존 함수·`useCallback`·
 
 ## 스타일과 접근성
 
+새 UI는 기존 UI의 재사용 가능성을 먼저 확인하고,
+[공통 디자인](design.md)에서 시각 역할·필요한 변형을 선택함. 구현 시 실제 CSS
+정의와 사용처를 대조하고, 관련 상태·긴 번역 문구·화면 조건에서 결과를 확인함.
+UI 책임과 재사용 범위는 [구조와 UI](../architecture/structure-and-ui.md),
+검증 절차는 [테스트·Storybook](testing-and-storybook.md)을 따름.
+
 Tailwind utility와 제한된 공통 CSS를 사용함. `className` 문자열이 100자를
 초과하면 `UPPER_SNAKE_CASE` 상수로 분리함. `DT*` 아이콘은 해당 아이콘 컴포넌트
 파일에서 직접 import함. 다른 아이콘의 export 방식은 규정하지 않음.
@@ -55,8 +61,14 @@ utility를 사용하며 일반 CSS 선택자를 참조하지 않음. 기존 `.bu
 화면 조건은 `md` 768px 이상, `lg` 1280px 이상임. `xl`은 너비 1600px 이상이면서
 높이 1024px 이상, `short`는 높이 500px 이하인 사용자 정의 variant임. 기본
 breakpoint는 초기화하며 `sm` 등 다른 화면 조건을 자동으로 추가하지 않음.
-프로젝트 색상과 사용 중인 기본 팔레트 색상은 v3 값을 유지함. 색상 추가 시
-기존 디자인과의 호환 여부를 확인함.
+기본 팔레트는 v3 호환 재정의 없이 Tailwind CSS 4의 내장값을 사용함. 브랜드·
+진영색과 기존 UI가 소비하는 `default-*`·`semantic-*` 사용자 정의 색상은
+`src/index.css`에 남아 있음. 색상의 의미별 사용 기준은
+[공통 디자인](design.md#색상과-강조)이 소유하며, 기존 사용자 정의 색상을
+전환할 때는 사용처를 함께 확인함. 새 글자 역할은
+[역할별 타이포그래피](design.md#타이포그래피)의 `text-ui-*`를 사용하며, 기존의
+크기 전용 글자 스타일 선택자와 구분함. 사양과 소스의 동기화는
+[사용과 사양 동기화](design.md#사용과-사양-동기화)를 따름.
 
 클래스 정렬은 `.prettierrc`의 `prettier-plugin-tailwindcss`가 담당함.
 `tailwindStylesheet`는 `./src/index.css`, `tailwindFunctions`는 `['clsx']`임.
