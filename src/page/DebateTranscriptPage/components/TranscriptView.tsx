@@ -12,8 +12,8 @@ interface TranscriptViewProps {
 }
 
 const STANCE_BORDER_CLASS: Record<Stance, string> = {
-  PROS: 'border-camp-blue',
-  CONS: 'border-camp-red',
+  PROS: 'border-stance-blue',
+  CONS: 'border-stance-red',
   NEUTRAL: 'border-default-neutral',
 };
 

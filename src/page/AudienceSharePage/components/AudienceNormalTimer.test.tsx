@@ -61,7 +61,7 @@ describe('AudienceNormalTimer', () => {
       screen.getByRole('heading', { name: '사용자 지정 발언' }),
     ).toBeInTheDocument();
     expect(screen.getByTestId('timer-progress-fill')).toHaveClass(
-      'bg-camp-red',
+      'bg-stance-red',
     );
   });
 

@@ -62,7 +62,7 @@ describe('AudienceTimeBasedTimerDisplay', () => {
     expect(screen.getByText('현재 시간')).toHaveClass(
       'md:h-[64px]',
       'md:w-[200px]',
-      'bg-camp-red',
+      'bg-stance-red',
       'md:text-[32px]',
     );
     // 모바일(768px 미만, 가로 모드)에서는 배지를 화면에서만 숨기고 스크린 리더에는 남긴다
@@ -154,7 +154,7 @@ describe('AudienceTimeBasedTimerDisplay', () => {
     expect(screen.getByTestId('pros-speaking-status')).toHaveTextContent(
       '현재 발언 중',
     );
-    expect(screen.getByText('현재 시간')).toHaveClass('bg-camp-blue');
+    expect(screen.getByText('현재 시간')).toHaveClass('bg-stance-blue');
   });
 
   it('0초 아래의 값과 100%를 넘는 진행도를 각각 0초와 100%로 제한한다', () => {

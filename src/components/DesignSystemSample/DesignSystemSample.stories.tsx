@@ -17,17 +17,17 @@ const ColorItem = ({ className, title }: ColorItemProps) => {
 const DesignSystemSample = () => (
   <div className="flex w-fit flex-col space-y-4 p-4">
     <section className="flex flex-col items-start space-y-4 p-4">
-      <h1 className="text-title rounded-xl bg-brand p-4">Typography</h1>
+      <h1 className="rounded-xl bg-brand p-4 text-ui-title">Typography</h1>
 
-      <p className="text-display">대제목</p>
-      <p className="text-title">제목</p>
-      <p className="text-subtitle">부제목</p>
-      <p className="text-detail">세부사항</p>
-      <p className="text-body">내용</p>
+      <p className="text-ui-headline">Headline · 화면의 대표 제목</p>
+      <p className="text-ui-title">Title · 구역·내용 묶음의 제목</p>
+      <p className="text-ui-body">Body · 본문</p>
+      <p className="text-ui-label">Label · 짧은 조작·항목 이름</p>
+      <p className="text-ui-caption">Caption · 보조 설명</p>
     </section>
 
     <section className="flex flex-col items-start space-y-4 p-4">
-      <h1 className="text-title rounded-xl bg-brand p-4">Colors</h1>
+      <h1 className="rounded-xl bg-brand p-4 text-ui-title">Colors</h1>
       <ColorItem className={'bg-team-blue'} title="찬성" />
       <ColorItem className={'bg-team-red'} title="반대" />
       <ColorItem className={'bg-brand'} title="브랜드" />

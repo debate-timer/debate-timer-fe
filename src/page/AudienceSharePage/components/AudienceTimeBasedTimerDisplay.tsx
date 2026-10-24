@@ -74,7 +74,7 @@ export default function AudienceTimeBasedTimerDisplay({
       : (currentSpeakingRemainingTime ?? timePerSpeaking);
   const progress = ((progressBase - progressRemaining) / progressBase) * 100;
   const activeCurrentBadgeClass =
-    team === 'PROS' ? 'bg-camp-blue' : 'bg-camp-red';
+    team === 'PROS' ? 'bg-stance-blue' : 'bg-stance-red';
 
   return (
     <section

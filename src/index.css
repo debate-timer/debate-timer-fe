@@ -5,8 +5,8 @@
   --breakpoint-*: initial;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1280px;
-  --color-camp-red: #e14666;
-  --color-camp-blue: #1e91d6;
+  --color-stance-red: #e14666;
+  --color-stance-blue: #1e91d6;
   --color-brand: #fecd4c;
   --color-brand-hover: #dba822;
   --color-default-disabled-hover: #d6d7d9;
@@ -22,43 +22,37 @@
   --color-semantic-error: #d70000;
   --color-semantic-table: #ff5622;
   --color-semantic-material: #6750a4;
-  --color-blue-500: #3b82f6;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-300: #d4d4d4;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-50: #fafafa;
-  --color-neutral-500: #737373;
-  --color-neutral-600: #525252;
-  --color-neutral-700: #404040;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-  --color-red-500: #ef4444;
-  --color-slate-50: #f8fafc;
-  --color-zinc-300: #d4d4d8;
-  --color-zinc-400: #a1a1aa;
   --font-pretendard:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
     'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', sans-serif;
+  /* 공통 글자 역할의 크기·행간·굵기를 함께 정의함. */
+  --text-ui-headline: 28px;
+  --text-ui-headline--line-height: 36px;
+  --text-ui-headline--font-weight: 700;
+  --text-ui-title: 24px;
+  --text-ui-title--line-height: 32px;
+  --text-ui-title--font-weight: 600;
+  --text-ui-body: 16px;
+  --text-ui-body--line-height: 24px;
+  --text-ui-body--font-weight: 400;
+  --text-ui-label: 16px;
+  --text-ui-label--line-height: 24px;
+  --text-ui-label--font-weight: 600;
+  --text-ui-caption: 14px;
+  --text-ui-caption--line-height: 20px;
+  --text-ui-caption--font-weight: 400;
+  /* 오래된 타이포그래피이며 최신 타이포그래피로 교체 후 삭제 예정. */
   --text-display-raw: 72px;
   --text-title-raw: 28px;
   --text-subtitle-raw: 24px;
   --text-detail-raw: 20px;
   --text-body-raw: 16px;
   --text-timer-raw: 110px;
-  --shadow-camp-blue: 0 0 30px #ff3b2f;
-  --shadow-camp-red: 0 0 30px #007aff;
-  --shadow-camp-neutral: 0 0 30px #737373;
+  --shadow-stance-blue: 0 0 30px #ff3b2f;
+  --shadow-stance-red: 0 0 30px #007aff;
+  --shadow-stance-neutral: 0 0 30px #737373;
   --animate-rotate: rotate 5s linear infinite;
   --animate-gradient: gradient 10s ease infinite;
   --animate-color-transition: colorTransition 5s ease-in-out infinite;
@@ -148,7 +142,7 @@
   }
 }
 
-/* Text styles */
+/* 오래된 타이포그래피이며 최신 타이포그래피로 교체 후 삭제 예정. */
 .text-display {
   @apply text-display-raw;
 }
@@ -179,11 +173,11 @@
 }
 
 .timebox.pros {
-  @apply w-1/2 bg-camp-blue/50;
+  @apply w-1/2 bg-stance-blue/50;
 }
 
 .timebox.cons {
-  @apply w-1/2 bg-camp-red/50;
+  @apply w-1/2 bg-stance-red/50;
 }
 
 .timebox.neutral {

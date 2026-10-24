@@ -30,8 +30,8 @@ export default function CircularTimer({
       : stance === 'NEUTRAL'
         ? '#A3A3A3' // bg-default-neutral
         : stance === 'PROS'
-          ? '#1E91D6' // bg-camp-blue
-          : '#E14666'; // bg-camp-red
+          ? '#1E91D6' // bg-stance-blue
+          : '#E14666'; // bg-stance-red
   const angle = useTransform(progress, [0, 100], [0, 360]);
   const backgroundImage = useTransform(angle, (currentAngle) => {
     if (currentAngle >= 360) {
