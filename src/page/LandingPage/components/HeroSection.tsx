@@ -7,8 +7,8 @@ interface HeroSectionProps {
   onDashboardButtonClicked: () => void;
 }
 
-// 브랜드 노랑은 흰 바탕 글자색으로 명암비가 부족해, 큰 제목 기준(3:1)을 넘는 같은 계열의 진한 앰버를 사용함
-const HIGHLIGHT = 'bg-transparent text-amber-600';
+// 큰 제목 한 단어 강조라 명암비(약 2.2:1)보다 브랜드 색 일관성을 우선해 브랜드 호버 노랑을 사용함
+const HIGHLIGHT = 'bg-transparent text-brand-hover';
 const PRIMARY_BUTTON =
   'rounded-full bg-brand px-7 py-3.5 text-ui-label text-default-black transition-colors hover:bg-brand-hover';
 const SECONDARY_BUTTON =
