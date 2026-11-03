@@ -71,7 +71,7 @@ describe('토론 템플릿 슬라이드', () => {
     );
   });
 
-  it('반복 재생용 복제 항목은 보조 기술에서 숨긴다', async () => {
+  it('템플릿마다 링크를 한 번만 노출한다', async () => {
     render(<TemplateMarquee />, { wrapper: Wrapper });
 
     expect(

@@ -6,6 +6,7 @@ import ErrorIndicator from '../../../components/ErrorIndicator/ErrorIndicator';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { buildLangPath, getSelectedLang } from '../../../util/languageRouting';
 import { createTemplateShareUrl } from '../../../util/templateShareUrl';
+import Marquee from './Marquee';
 
 interface MarqueeItem {
   organizationName: string;
@@ -32,13 +33,12 @@ export default function TemplateMarquee() {
       })),
     ) ?? [];
 
-  const renderChips = (isDuplicate: boolean) =>
+  const renderChips = () =>
     items.map((item) => (
       <a
         key={`${item.organizationName}-${item.name}`}
         href={createTemplateShareUrl(item.organizationName, item)}
         className={CHIP}
-        tabIndex={isDuplicate ? -1 : undefined}
         aria-label={t('{{label}} 토론하기', { label: item.name })}
         onClick={() =>
           trackEvent('template_selected', {
@@ -87,17 +87,7 @@ export default function TemplateMarquee() {
         </div>
       );
     }
-    // 끊김 없이 흐르도록 목록을 두 번 이어 붙이고, 두 번째 묶음은 보조 기술에서 숨긴다.
-    return (
-      <div className="w-full overflow-hidden py-1">
-        <div className="flex w-max animate-marquee gap-3 motion-reduce:animate-none">
-          <div className="flex gap-3">{renderChips(false)}</div>
-          <div className="flex gap-3" aria-hidden="true">
-            {renderChips(true)}
-          </div>
-        </div>
-      </div>
-    );
+    return <Marquee label={t('토론 템플릿')}>{renderChips()}</Marquee>;
   };
 
   return (
