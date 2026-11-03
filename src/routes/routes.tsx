@@ -10,6 +10,7 @@ import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
 import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
+import TemplateListPage from '../page/TemplateListPage/TemplateListPage';
 import TableSharingPage from '../page/TableSharingPage/TableSharingPage';
 import DebateEndPage from '../page/DebateEndPage/DebateEndPage';
 import DebateVotePage from '../page/DebateVotePage/DebateVotePage';
@@ -25,6 +26,11 @@ const appRoutes = [
   {
     path: 'home',
     element: <LandingPage />,
+    requiresAuth: false,
+  },
+  {
+    path: 'templates',
+    element: <TemplateListPage />,
     requiresAuth: false,
   },
   {

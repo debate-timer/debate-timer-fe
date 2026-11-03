@@ -1,15 +1,18 @@
 import { useTranslation } from 'react-i18next';
-import { Organization } from '../../../types/type';
+import { Organization } from '../../types/type';
 import clsx from 'clsx';
-import { createTableShareUrlFromEncodedData } from '../../../util/arrayEncoding';
-import useAnalytics from '../../../hooks/useAnalytics';
+import { createTemplateShareUrl } from '../../util/templateShareUrl';
+import useAnalytics from '../../hooks/useAnalytics';
 
 interface TemplateCardProps {
   organization: Organization;
   className?: string; // 카드의 추가 className이 필요하면 사용
 }
 
-// 단체별 템플릿 링크와 선택 액션을 보여주는 카드다.
+/**
+ * 단체별 템플릿 목록과 토론 시작 링크를 보여 주는 카드.
+ * 템플릿을 고르면 `template_selected` 이벤트를 기록하고 공유 화면으로 이동함.
+ */
 export default function TemplateCard({
   organization,
   className = '',
@@ -59,7 +62,10 @@ export default function TemplateCard({
 
               {/* 템플릿 선택 시 template_selected 이벤트를 기록하고 공유 링크로 이동한다. */}
               <a
-                href={`${createTableShareUrlFromEncodedData(template.data)}&source=template&org=${encodeURIComponent(organization.organization)}&tmpl=${encodeURIComponent(template.name)}`}
+                href={createTemplateShareUrl(
+                  organization.organization,
+                  template,
+                )}
                 className="shrink-0 rounded-full border border-neutral-300 bg-brand px-4 py-1.5 text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-default-black transition-colors duration-100 hover:bg-semantic-table hover:text-white"
                 aria-label={t('{{label}} 토론하기', { label: template.name })}
                 onClick={() =>
