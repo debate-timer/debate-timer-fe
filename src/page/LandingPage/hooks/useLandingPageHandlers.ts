@@ -14,6 +14,8 @@ import {
 import useAnalytics from '../../../hooks/useAnalytics';
 import { setLoginTrigger } from '../../../util/analytics/loginTrigger';
 
+export type LandingLoginTriggerContext = 'landing_hero' | 'landing_closing_cta';
+
 // 랜딩 페이지의 CTA와 로그인 진입 경로 추적을 한곳에서 관리한다.
 const useLandingPageHandlers = () => {
   // 라우팅, 인증, 분석에 필요한 의존성을 준비한다.
@@ -34,22 +36,23 @@ const useLandingPageHandlers = () => {
       SAMPLE_TABLE_DATA,
     );
   }, []);
-  // 테이블 섹션 CTA에서 로그인 시작 시 login_started 이벤트를 기록한다.
-  const handleTableSectionLoginButtonClick = useCallback(() => {
-    if (!isLoggedIn()) {
-      trackEvent('login_started', {
+  // 본문 CTA에서 로그인 시작 시 누른 위치와 함께 login_started 이벤트를 기록한다.
+  const handleLoginStart = useCallback(
+    (triggerContext: LandingLoginTriggerContext) => {
+      if (isLoggedIn()) {
+        navigate(rootPath);
+        return;
+      }
+      const trigger = {
         trigger_page: homePath,
-        trigger_context: 'landing_table_section',
-      });
-      setLoginTrigger({
-        trigger_page: homePath,
-        trigger_context: 'landing_table_section',
-      });
+        trigger_context: triggerContext,
+      };
+      trackEvent('login_started', trigger);
+      setLoginTrigger(trigger);
       oAuthLogin();
-    } else {
-      navigate(rootPath);
-    }
-  }, [homePath, navigate, rootPath, trackEvent]);
+    },
+    [homePath, navigate, rootPath, trackEvent],
+  );
   // 로그인된 사용자를 메인 화면으로 이동시킨다.
   const handleDashboardButtonClick = useCallback(() => {
     navigate(rootPath);
@@ -73,7 +76,7 @@ const useLandingPageHandlers = () => {
 
   return {
     handleStartWithoutLogin,
-    handleTableSectionLoginButtonClick,
+    handleLoginStart,
     handleDashboardButtonClick,
     handleHeaderLoginButtonClick,
   };

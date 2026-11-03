@@ -2,7 +2,8 @@ interface LoginTriggerData {
   trigger_page: string;
   trigger_context:
     | 'landing_header'
-    | 'landing_table_section'
+    | 'landing_hero'
+    | 'landing_closing_cta'
     | 'share_save'
     | 'timer_modal'
     | 'protected_route';

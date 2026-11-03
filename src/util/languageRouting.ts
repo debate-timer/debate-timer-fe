@@ -45,6 +45,8 @@ const buildLangPath = (pathname: string, lang: SupportedLang): string => {
   return `/${lang}${pathname === '/' ? '' : pathname}`;
 };
 
+export type { SupportedLang };
+
 export {
   SUPPORTED_LANGS,
   DEFAULT_LANG,
