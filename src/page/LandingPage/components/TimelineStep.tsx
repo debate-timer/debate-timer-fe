@@ -4,29 +4,40 @@ import { useTranslation } from 'react-i18next';
 import { LandingStep } from '../constants/landingSteps';
 import { resolveLocalizedAsset } from '../../../util/localizedAsset';
 
+export type TimelineStepStatus = 'done' | 'active' | 'upcoming';
+
 interface TimelineStepProps {
   step: LandingStep;
   order: number;
+  status: TimelineStepStatus;
   children?: ReactNode;
 }
+
+const DOT_STYLE: Record<TimelineStepStatus, string> = {
+  done: 'border-neutral-900 bg-neutral-900 text-brand',
+  active: 'border-neutral-900 bg-brand text-neutral-900',
+  upcoming: 'border-neutral-300 bg-white text-neutral-400',
+};
 
 const SCENE_FRAME =
   'flex min-w-0 flex-[1_1_300px] items-center justify-center overflow-hidden rounded-2xl border border-neutral-200';
 
 export default function TimelineStep(props: TimelineStepProps) {
-  const { step, order, children } = props;
+  const { step, order, status, children } = props;
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage ?? i18n.language;
 
   return (
-    <li className="flex gap-5 md:gap-8">
+    <li
+      data-step-id={step.id}
+      aria-current={status === 'active' ? 'step' : undefined}
+      className="flex gap-5 md:gap-8"
+    >
       <div className="flex flex-none flex-col items-center">
         <span
           className={clsx(
-            'flex size-11 items-center justify-center rounded-full border-[3px] border-neutral-900 text-ui-title md:size-14',
-            step.isHighlighted
-              ? 'bg-brand text-neutral-900'
-              : 'bg-neutral-900 text-brand',
+            'flex size-11 items-center justify-center rounded-full border-[3px] text-ui-title transition-colors duration-300 md:size-14',
+            DOT_STYLE[status],
           )}
         >
           {order}

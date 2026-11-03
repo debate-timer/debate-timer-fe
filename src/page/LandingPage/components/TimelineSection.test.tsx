@@ -27,6 +27,22 @@ const STEPS: LandingStep[] = [
 ];
 
 describe('토론 흐름 타임라인', () => {
+  beforeEach(() => {
+    vi.stubGlobal('IntersectionObserver', undefined);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('현재 보고 있는 단계를 표시한다', () => {
+    render(<TimelineSection steps={STEPS} />);
+
+    const items = screen.getAllByRole('listitem');
+    expect(items[0]).toHaveAttribute('aria-current', 'step');
+    expect(items[1]).not.toHaveAttribute('aria-current');
+  });
+
   it('단계마다 번호·이름·제목·설명을 순서대로 보여 준다', () => {
     render(<TimelineSection steps={STEPS} />);
 

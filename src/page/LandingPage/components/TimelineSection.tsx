@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { LandingStep } from '../constants/landingSteps';
-import TimelineStep from './TimelineStep';
+import useActiveStep from '../hooks/useActiveStep';
+import TimelineStep, { TimelineStepStatus } from './TimelineStep';
 
 interface TimelineSectionProps {
   steps: LandingStep[];
@@ -8,14 +9,32 @@ interface TimelineSectionProps {
   renderStepExtra?: (step: LandingStep) => ReactNode;
 }
 
+function getStepStatus(index: number, activeIndex: number): TimelineStepStatus {
+  if (index === activeIndex) {
+    return 'active';
+  }
+  return index < activeIndex ? 'done' : 'upcoming';
+}
+
 export default function TimelineSection(props: TimelineSectionProps) {
   const { steps, renderStepExtra } = props;
+  const listRef = useRef<HTMLOListElement>(null);
+  const activeStepId = useActiveStep(
+    listRef,
+    steps.map((step) => step.id),
+  );
+  const activeIndex = steps.findIndex((step) => step.id === activeStepId);
 
   return (
     <section className="flex w-full justify-center px-4 pt-20 pb-8">
-      <ol className="flex w-full max-w-[1000px] flex-col">
+      <ol ref={listRef} className="flex w-full max-w-[1000px] flex-col">
         {steps.map((step, index) => (
-          <TimelineStep key={step.id} step={step} order={index + 1}>
+          <TimelineStep
+            key={step.id}
+            step={step}
+            order={index + 1}
+            status={getStepStatus(index, activeIndex)}
+          >
             {renderStepExtra?.(step)}
           </TimelineStep>
         ))}
