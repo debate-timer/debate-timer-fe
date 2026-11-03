@@ -30,6 +30,17 @@ describe('히어로 섹션', () => {
     expect(handlers.onLoginStart).toHaveBeenCalledTimes(1);
   });
 
+  it('서비스 이름을 강조해 보여 준다', () => {
+    vi.mocked(isLoggedIn).mockReturnValue(false);
+    renderHero();
+
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent(
+      '토론의 시작부터 끝까지, 디베이트 타이머 하나로',
+    );
+    expect(heading.querySelector('mark')).toHaveTextContent('디베이트 타이머');
+  });
+
   it('로그인 상태에서는 대시보드 이동 버튼만 보여 준다', async () => {
     vi.mocked(isLoggedIn).mockReturnValue(true);
     const user = userEvent.setup();

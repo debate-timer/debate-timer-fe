@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { isLoggedIn } from '../../../util/accessToken';
 
 interface HeroSectionProps {
@@ -7,6 +7,9 @@ interface HeroSectionProps {
   onDashboardButtonClicked: () => void;
 }
 
+// 브랜드 노랑은 흰 바탕 글자색으로 명암비가 부족해 글자 아래 형광펜으로만 사용함
+const HIGHLIGHT =
+  'bg-[linear-gradient(transparent_58%,var(--color-brand)_58%,var(--color-brand)_92%,transparent_92%)] px-1 text-inherit [box-decoration-break:clone]';
 const PRIMARY_BUTTON =
   'rounded-full bg-brand px-7 py-3.5 text-ui-label text-default-black transition-colors hover:bg-brand-hover';
 const SECONDARY_BUTTON =
@@ -23,7 +26,12 @@ export default function HeroSection(props: HeroSectionProps) {
     >
       {/* 소개용 대표 문구라 Headline보다 크게 쓰는 변형 */}
       <h1 className="text-[min(max(2rem,4.5vw),3.5rem)] leading-tight font-bold whitespace-pre-line">
-        {t('토론의 시작부터 끝까지,\n디베이트 타이머 하나로')}
+        <Trans
+          i18nKey={
+            '토론의 시작부터 끝까지,\n<highlight>디베이트 타이머</highlight> 하나로'
+          }
+          components={{ highlight: <mark className={HIGHLIGHT} /> }}
+        />
       </h1>
       <div className="flex flex-wrap justify-center gap-3">
         {isLoggedIn() ? (
