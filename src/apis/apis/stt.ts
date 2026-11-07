@@ -6,14 +6,17 @@ import { PostSonioxTranscriptionResponseType } from '../responses/stt';
 const SONIOX_TRANSCRIPTION_TIMEOUT_MS = 200_000;
 
 // POST /api/stt/soniox
+// sessionId는 한 번의 녹음(기록 시작~종료)을 묶는 식별자로, 서버가 구간 오디오를 세션별로 보관할 때 쓴다.
 export async function postSonioxTranscription(
   audio: Blob,
   fileName: string,
   language: string,
+  sessionId: string,
 ): Promise<PostSonioxTranscriptionResponseType> {
   const body = new FormData();
   body.append('audio', audio, fileName);
   body.append('language', language);
+  body.append('sessionId', sessionId);
   const response = await request<PostSonioxTranscriptionResponseType>(
     'POST',
     `${ApiUrl.stt}/soniox`,

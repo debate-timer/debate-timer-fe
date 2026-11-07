@@ -133,6 +133,7 @@ describe('Soniox 구간 녹음 훅', () => {
       expect.any(Blob),
       'segment.webm',
       'ko-KR',
+      expect.any(String),
     );
     expect(draft.segments).toEqual([
       expect.objectContaining({
@@ -392,5 +393,60 @@ describe('Soniox 구간 녹음 훅', () => {
     const draft = getTranscriptDraft(7)!;
     expect(draft.segments).toEqual([]);
     expect(countPendingSegments(draft, Date.now())).toBe(0);
+  });
+
+  it('한 번 기록을 켠 동안의 구간은 같은 녹음 세션 식별자로 보낸다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: true, timeBoxIndex: 1 });
+    rerender({ ...baseParams, isRunning: false, timeBoxIndex: 1 });
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(2));
+    const [first, second] = mockedPost.mock.calls.map((call) => call[3]);
+    expect(first).toMatch(/^[A-Za-z0-9_-]{1,64}$/);
+    expect(second).toBe(first);
+  });
+
+  it('기록을 껐다가 다시 켜면 새 녹음 세션 식별자로 보낸다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    act(() => result.current.disable());
+
+    // 타이머가 도는 중이라 다시 켜자마자 녹음을 시작하고, 타이머를 멈추면 그 구간을 보낸다.
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: false });
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(2));
+    const [beforeDisable, afterEnable] = mockedPost.mock.calls.map(
+      (call) => call[3],
+    );
+    expect(afterEnable).not.toBe(beforeDisable);
+  });
+
+  it('기록 중에 다시 켜도 녹음 세션 식별자를 바꾸지 않는다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: false });
+
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: false });
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(2));
+    const [first, second] = mockedPost.mock.calls.map((call) => call[3]);
+    expect(second).toBe(first);
   });
 });
