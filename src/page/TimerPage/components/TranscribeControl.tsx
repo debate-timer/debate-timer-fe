@@ -6,6 +6,7 @@ import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
 import { SttMode } from '../../../types/transcript';
 import { TranscriberError } from '../hooks/useDebateTranscriber';
+import MicCheckPanel from './MicCheckPanel';
 
 export interface TranscribeControlProps {
   supportedModes: Record<SttMode, boolean>;
@@ -25,6 +26,9 @@ export interface TranscribeControlProps {
 }
 
 const STT_MODES: SttMode[] = ['RPC', 'SONIOX'];
+
+// 동의를 받은 뒤 기록을 켜기 전에 마이크 테스트 단계를 거친다.
+type PromptStep = 'consent' | 'mic-check';
 
 // 녹음하지 않을 때는 "토론 녹화하기" 버튼, 녹음 중에는 "토론 녹음 중" 태그로 보이는 타원형 버튼
 const RECORD_BUTTON_CLASS =
@@ -55,6 +59,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
     isCloseButtonExist: false,
   });
   const [selectedMode, setSelectedMode] = useState<SttMode>(sttMode);
+  const [promptStep, setPromptStep] = useState<PromptStep>('consent');
   const hasPromptedRef = useRef(false);
   const isAnyModeSupported = STT_MODES.some((mode) => supportedModes[mode]);
 
@@ -74,6 +79,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
         ? mode
         : (STT_MODES.find((candidate) => supportedModes[candidate]) ?? mode),
     );
+    setPromptStep('consent');
     openModal();
   }, [
     shouldPromptOnMount,
@@ -115,9 +121,14 @@ export default function TranscribeControl(props: TranscribeControlProps) {
     if (!isModeLocked && !supportedModes[selectedMode]) {
       setSelectedMode(STT_MODES.find((mode) => supportedModes[mode]) ?? 'RPC');
     }
+    setPromptStep('consent');
     openModal();
   };
   const handleConsent = () => {
+    setPromptStep('mic-check');
+  };
+  // 마이크 테스트 화면이 닫히며 테스트용 마이크를 놓은 뒤, 기록용 마이크를 새로 받는다.
+  const handleStart = () => {
     closeModal();
     onEnable(consentMode);
   };
@@ -183,57 +194,75 @@ export default function TranscribeControl(props: TranscribeControlProps) {
       </div>
 
       <ModalWrapper>
-        <DialogModal
-          left={{ text: t('취소'), onClick: closeModal }}
-          right={{
-            text: t('동의하고 기록하기'),
-            isBold: true,
-            onClick: handleConsent,
-          }}
-        >
-          <div className="flex flex-col gap-3 px-10 py-8 text-center">
-            <p className="text-xl font-bold">
-              {t('토론 음성 기록에 동의하시나요?')}
-            </p>
-            {!isModeLocked && (
-              <fieldset className="flex flex-col gap-2">
-                <legend className="mb-2 text-sm font-semibold">
-                  {t('음성 인식 방식')}
-                </legend>
-                {STT_MODES.map((mode) => (
-                  <label
-                    key={mode}
-                    className={clsx(
-                      MODE_OPTION_CLASS,
-                      selectedMode === mode
-                        ? 'border-brand'
-                        : 'border-default-border',
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="stt-mode"
-                      value={mode}
-                      checked={selectedMode === mode}
-                      disabled={!supportedModes[mode]}
-                      onChange={() => setSelectedMode(mode)}
-                      className="mt-1"
-                    />
-                    <span className="text-sm font-semibold">
-                      {modeLabels[mode]}
-                    </span>
-                  </label>
-                ))}
-              </fieldset>
-            )}
-            <p className="text-sm leading-relaxed text-default-black2">
-              {modeDescriptions[consentMode]}
-            </p>
-            <p className="text-sm font-semibold text-semantic-error">
-              {t('참여자 모두에게 녹음 동의를 받아 주세요.')}
-            </p>
-          </div>
-        </DialogModal>
+        {promptStep === 'mic-check' ? (
+          <DialogModal
+            left={{ text: t('취소'), onClick: closeModal }}
+            right={{
+              text: t('기록 시작'),
+              isBold: true,
+              onClick: handleStart,
+            }}
+          >
+            <div className="flex w-[420px] max-w-full flex-col gap-3 px-10 py-8">
+              <p className="text-center text-xl font-bold">
+                {t('마이크 테스트')}
+              </p>
+              <MicCheckPanel />
+            </div>
+          </DialogModal>
+        ) : (
+          <DialogModal
+            left={{ text: t('취소'), onClick: closeModal }}
+            right={{
+              text: t('동의하고 기록하기'),
+              isBold: true,
+              onClick: handleConsent,
+            }}
+          >
+            <div className="flex flex-col gap-3 px-10 py-8 text-center">
+              <p className="text-xl font-bold">
+                {t('토론 음성 기록에 동의하시나요?')}
+              </p>
+              {!isModeLocked && (
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="mb-2 text-sm font-semibold">
+                    {t('음성 인식 방식')}
+                  </legend>
+                  {STT_MODES.map((mode) => (
+                    <label
+                      key={mode}
+                      className={clsx(
+                        MODE_OPTION_CLASS,
+                        selectedMode === mode
+                          ? 'border-brand'
+                          : 'border-default-border',
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="stt-mode"
+                        value={mode}
+                        checked={selectedMode === mode}
+                        disabled={!supportedModes[mode]}
+                        onChange={() => setSelectedMode(mode)}
+                        className="mt-1"
+                      />
+                      <span className="text-sm font-semibold">
+                        {modeLabels[mode]}
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+              <p className="text-sm leading-relaxed text-default-black2">
+                {modeDescriptions[consentMode]}
+              </p>
+              <p className="text-sm font-semibold text-semantic-error">
+                {t('참여자 모두에게 녹음 동의를 받아 주세요.')}
+              </p>
+            </div>
+          </DialogModal>
+        )}
       </ModalWrapper>
     </>
   );

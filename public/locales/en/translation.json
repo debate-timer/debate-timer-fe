@@ -381,5 +381,22 @@
   "토론 녹화하기": "Record debate",
   "토론 녹음 중": "Recording debate",
   "토론 녹음 끄기": "Stop recording debate",
-  "{{count}}문장 기록": "{{count}} sentences recorded"
+  "{{count}}문장 기록": "{{count}} sentences recorded",
+  "기록 시작": "Start recording",
+  "마이크 테스트": "Microphone check",
+  "품질이 좋아요. 들어보고 시작하세요.": "Sounds good. Listen, then start.",
+  "소리가 안 들려요. 마이크를 확인해 주세요.": "No sound. Please check your mic.",
+  "소리가 작아요. 더 가까이서 말해 주세요.": "Too quiet. Please speak closer.",
+  "소리가 너무 커요. 조금 떨어져 주세요.": "Too loud. Please move back a little.",
+  "주변 소음이 커요. 조용한 곳이 더 정확해요.": "It's noisy. A quiet place works better.",
+  "마이크를 쓸 수 없어요. 권한을 확인해 주세요.": "Mic unavailable. Please check permission.",
+  "마이크 테스트를 지원하지 않는 브라우저예요.": "This browser doesn't support the mic check.",
+  "평소처럼 말해 보세요. 서버로 보내지 않아요.": "Speak as usual. Nothing is sent to the server.",
+  "마이크 입력 크기": "Microphone input level",
+  "마이크 연결 중...": "Connecting microphone...",
+  "녹음 중... {{count}}초 남음": "Recording... {{count}}s left",
+  "{{count}}초 테스트 녹음": "{{count}}s test recording",
+  "다시 테스트하기": "Test again",
+  "말소리 {{speech}} · 배경 소음 {{noise}} · 차이 {{snr}}": "Voice {{speech}} · Background {{noise}} · Difference {{snr}}",
+  "테스트 녹음 듣기": "Play test recording"
 }
