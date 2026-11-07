@@ -33,21 +33,19 @@ export default function MicCheckPanel() {
   }, [isSupported, start]);
 
   const verdictMessages: Record<MicVerdict, string> = {
-    good: t('녹음 품질이 좋아요. 녹음된 소리를 들어보고 기록을 시작하세요.'),
-    silent: t(
-      '소리가 거의 들어오지 않아요. 마이크 연결과 입력 장치를 확인해 주세요.',
-    ),
-    quiet: t('소리가 작아요. 마이크에 더 가까이에서 말해 주세요.'),
-    clipping: t('소리가 너무 커서 찌그러져요. 마이크와 조금 떨어져 주세요.'),
-    noisy: t('주변 소음이 커요. 조용한 곳에서 기록하면 더 정확해요.'),
+    good: t('품질이 좋아요. 들어보고 시작하세요.'),
+    silent: t('소리가 안 들려요. 마이크를 확인해 주세요.'),
+    quiet: t('소리가 작아요. 더 가까이서 말해 주세요.'),
+    clipping: t('소리가 너무 커요. 조금 떨어져 주세요.'),
+    noisy: t('주변 소음이 커요. 조용한 곳이 더 정확해요.'),
   };
 
   if (!isSupported || status === 'error') {
     return (
       <p className="text-sm text-default-black2">
         {isSupported
-          ? t('마이크를 사용할 수 없어요. 마이크 권한과 연결을 확인해 주세요.')
-          : t('이 브라우저에서는 마이크 테스트를 할 수 없어요.')}
+          ? t('마이크를 쓸 수 없어요. 권한을 확인해 주세요.')
+          : t('마이크 테스트를 지원하지 않는 브라우저예요.')}
       </p>
     );
   }
@@ -59,9 +57,7 @@ export default function MicCheckPanel() {
   return (
     <div className="flex flex-col gap-3 text-left">
       <p className="text-sm leading-relaxed text-default-black2">
-        {t(
-          '평소 발언하듯 한두 문장을 말해 보세요. 녹음은 이 기기에서만 재생하고 서버로 보내지 않아요.',
-        )}
+        {t('평소처럼 말해 보세요. 서버로 보내지 않아요.')}
       </p>
 
       <div className="flex items-center gap-3">
