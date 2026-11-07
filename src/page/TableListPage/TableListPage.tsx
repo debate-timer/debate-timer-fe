@@ -12,6 +12,7 @@ import {
   dashboardTabPanelId,
 } from './dashboardTab';
 import UpdateModalWrapper from '../../components/UpdateModal/UpdateModalWrapper';
+import useFeatureFlag from '../../hooks/useFeatureFlag';
 
 const TAB_QUERY_KEY = 'tab';
 
@@ -19,8 +20,15 @@ export default function TableListPage() {
   const { t } = useTranslation();
   // 탭을 주소에 남겨 뒤로 가기·새로고침에도 같은 탭을 보여준다.
   const [searchParams, setSearchParams] = useSearchParams();
+  // 토론 기록 탭은 피쳐 플래그(TRANSCRIPT)를 부여받은 회원에게만 보여준다.
+  const { isEnabled: hasTranscriptFlag } = useFeatureFlag('TRANSCRIPT');
+  const availableTabs: DashboardTab[] = hasTranscriptFlag
+    ? ['tables', 'records']
+    : ['tables'];
   const selectedTab: DashboardTab =
-    searchParams.get(TAB_QUERY_KEY) === 'records' ? 'records' : 'tables';
+    hasTranscriptFlag && searchParams.get(TAB_QUERY_KEY) === 'records'
+      ? 'records'
+      : 'tables';
 
   const handleSelectTab = (tab: DashboardTab) => {
     setSearchParams(tab === 'records' ? { [TAB_QUERY_KEY]: tab } : {});
@@ -31,7 +39,11 @@ export default function TableListPage() {
       <DefaultLayout.Header>
         <DefaultLayout.Header.Left />
         <DefaultLayout.Header.Center>
-          <DashboardTabs selectedTab={selectedTab} onSelect={handleSelectTab} />
+          <DashboardTabs
+            tabs={availableTabs}
+            selectedTab={selectedTab}
+            onSelect={handleSelectTab}
+          />
         </DefaultLayout.Header.Center>
         <DefaultLayout.Header.Right />
       </DefaultLayout.Header>
@@ -53,14 +65,16 @@ export default function TableListPage() {
             </Suspense>
           )}
         </div>
-        <div
-          role="tabpanel"
-          id={dashboardTabPanelId('records')}
-          aria-labelledby={dashboardTabId('records')}
-          hidden={selectedTab !== 'records'}
-        >
-          {selectedTab === 'records' && <TranscriptListContent />}
-        </div>
+        {hasTranscriptFlag && (
+          <div
+            role="tabpanel"
+            id={dashboardTabPanelId('records')}
+            aria-labelledby={dashboardTabId('records')}
+            hidden={selectedTab !== 'records'}
+          >
+            {selectedTab === 'records' && <TranscriptListContent />}
+          </div>
+        )}
 
         {/* 업데이트 안내는 탭과 상관없이 대시보드에 들어오면 보여준다. */}
         <Suspense>

@@ -4,6 +4,7 @@ import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
 import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
+import FeatureFlagRoute from './FeatureFlagRoute';
 import OAuth from '../page/OAuthPage/OAuth';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
@@ -69,7 +70,11 @@ const appRoutes = [
   },
   {
     path: 'table/customize/:tableId/end/transcript/:transcriptId',
-    element: <DebateTranscriptPage />,
+    element: (
+      <FeatureFlagRoute flag="TRANSCRIPT">
+        <DebateTranscriptPage />
+      </FeatureFlagRoute>
+    ),
     requiresAuth: true,
   },
   {
