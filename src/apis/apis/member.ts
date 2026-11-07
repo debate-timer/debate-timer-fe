@@ -2,7 +2,10 @@ import * as Sentry from '@sentry/react';
 import { setAccessToken } from '../../util/accessToken';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
-import { GetDebateTableListResponseType } from '../responses/member';
+import {
+  GetDebateTableListResponseType,
+  GetMemberFeatureFlagsResponseType,
+} from '../responses/member';
 import { PostUserResponseType } from '../responses/member';
 
 // Template
@@ -67,4 +70,17 @@ export async function logout(): Promise<boolean> {
   const response = await request('POST', requestUrl + `/logout`, null, null);
 
   return response.status === 204 ? true : false;
+}
+
+// GET /api/member/feature-flags
+export async function getMemberFeatureFlags(): Promise<GetMemberFeatureFlagsResponseType> {
+  const requestUrl = `${ApiUrl.member}/feature-flags`;
+  const response = await request<GetMemberFeatureFlagsResponseType>(
+    'GET',
+    requestUrl,
+    null,
+    null,
+  );
+
+  return response.data;
 }
