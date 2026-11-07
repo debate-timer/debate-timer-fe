@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
@@ -127,21 +133,17 @@ describe('TimerPage - 토론 기록 피쳐 플래그', () => {
     await waitFor(() => expect(findTranscribeEntry()).toBeInTheDocument());
   });
 
-  it('플래그가 없는 회원에게는 토론 기록 컨트롤을 보여주지 않는다', async () => {
-    respondFlags([]);
-
+  it('플래그가 없어지면 토론 기록 컨트롤을 보여주지 않는다', async () => {
+    respondFlags(['TRANSCRIPT']);
     const { queryClient } = renderTimerPage();
+    // 타이머 화면이 표시되고 플래그가 반영된 것을 컨트롤로 먼저 확인한다.
+    await waitFor(() => expect(findTranscribeEntry()).toBeInTheDocument());
 
-    // 빈 플래그 응답과 시간표가 모두 화면에 반영된 뒤에 컨트롤이 없음을 확인한다.
-    await waitFor(() => {
-      expect(
-        queryClient.getQueryState(MEMBER_FEATURE_FLAGS_QUERY_KEY)?.status,
-      ).toBe('success');
-      expect(queryClient.getQueryState(['DebateTableData', 5])?.status).toBe(
-        'success',
-      );
-    });
-    await screen.findAllByRole('button');
-    expect(findTranscribeEntry()).not.toBeInTheDocument();
+    respondFlags([]);
+    await act(() =>
+      queryClient.refetchQueries({ queryKey: MEMBER_FEATURE_FLAGS_QUERY_KEY }),
+    );
+
+    await waitFor(() => expect(findTranscribeEntry()).not.toBeInTheDocument());
   });
 });
