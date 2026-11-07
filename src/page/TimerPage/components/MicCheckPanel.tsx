@@ -70,12 +70,13 @@ export default function MicCheckPanel() {
           aria-valuenow={meterPercent}
           className="h-3 w-full overflow-hidden rounded-full bg-default-dim2"
         >
+          {/* 훅이 매 프레임 부드럽게 다듬은 값을 주므로 CSS 전환을 겹치지 않고, 레이아웃을 다시 계산하지 않도록 밀어서 채운다. */}
           <div
             className={clsx(
-              'h-full rounded-full transition-[width] duration-75',
+              'h-full w-full rounded-full will-change-transform',
               level >= 0.98 ? 'bg-semantic-error' : 'bg-brand',
             )}
-            style={{ width: `${meterPercent}%` }}
+            style={{ transform: `translateX(${(level - 1) * 100}%)` }}
           />
         </div>
       </div>

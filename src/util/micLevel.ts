@@ -14,6 +14,9 @@ export const MIN_SNR_DB = 15;
 
 // 화면 막대에서 0%로 보이는 최소 크기
 const METER_FLOOR_DB = -60;
+// 막대가 측정값을 따라가는 시간 상수. 커질 때는 말소리에 바로 반응하고, 작아질 때는 천천히 내려와 깜빡이지 않게 한다.
+const METER_ATTACK_MS = 50;
+const METER_RELEASE_MS = 300;
 
 export type MicVerdict = 'silent' | 'quiet' | 'clipping' | 'noisy' | 'good';
 
@@ -61,6 +64,20 @@ export function toMeterRatio(rmsDb: number): number {
     return 0;
   }
   return Math.min(1, (rmsDb - METER_FLOOR_DB) / -METER_FLOOR_DB);
+}
+
+// 프레임마다 튀는 측정값을 막대가 부드럽게 따라가도록, 지난 프레임 이후 흐른 시간만큼만 다가간다.
+export function smoothMeterLevel(
+  previous: number,
+  target: number,
+  elapsedMs: number,
+): number {
+  if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) {
+    return previous;
+  }
+  const timeConstantMs = target > previous ? METER_ATTACK_MS : METER_RELEASE_MS;
+  const ratio = 1 - Math.exp(-elapsedMs / timeConstantMs);
+  return previous + (target - previous) * ratio;
 }
 
 function percentile(sorted: number[], ratio: number): number {

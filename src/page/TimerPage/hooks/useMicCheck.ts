@@ -11,12 +11,15 @@ import {
   LevelFrame,
   measureFrame,
   MicCheckResult,
+  smoothMeterLevel,
   toMeterRatio,
 } from '../../../util/micLevel';
 
 // 테스트 녹음 길이. 한두 문장을 말하고 잠깐 쉬는 소리까지 담기는 길이다.
 export const MIC_CHECK_DURATION_MS = 5000;
 const ANALYSER_FFT_SIZE = 2048;
+// 첫 프레임은 지난 프레임 시각이 없으므로 60fps 한 프레임만큼 흐른 것으로 본다.
+const FIRST_FRAME_MS = 16;
 
 export type MicCheckStatus =
   'idle' | 'requesting' | 'ready' | 'recording' | 'done' | 'error';
@@ -116,12 +119,19 @@ export default function useMicCheck() {
     analyser.fftSize = ANALYSER_FFT_SIZE;
     audioContext.createMediaStreamSource(stream).connect(analyser);
     const samples = new Float32Array(analyser.fftSize);
+    let previousTime: number | null = null;
 
-    const tick = () => {
+    // 판정에는 측정값을 그대로 모으고, 막대에는 부드럽게 다듬은 값을 쓴다.
+    const tick = (time: number) => {
       analyser.getFloatTimeDomainData(samples);
       const frame = measureFrame(samples);
       framesRef.current?.push(frame);
-      setLevel(toMeterRatio(frame.rmsDb));
+      const elapsedMs =
+        previousTime === null ? FIRST_FRAME_MS : time - previousTime;
+      previousTime = time;
+      setLevel((previous) =>
+        smoothMeterLevel(previous, toMeterRatio(frame.rmsDb), elapsedMs),
+      );
       animationFrameRef.current = requestAnimationFrame(tick);
     };
     animationFrameRef.current = requestAnimationFrame(tick);
