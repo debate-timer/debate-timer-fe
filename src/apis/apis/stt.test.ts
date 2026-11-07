@@ -19,7 +19,7 @@ describe('음성 전사 API', () => {
     axiosInstance.defaults.baseURL = undefined;
   });
 
-  it('발언 구간 오디오와 언어를 multipart로 보내 Soniox 전사 문장을 받는다', async () => {
+  it('발언 구간 오디오와 언어, 녹음 세션 식별자를 multipart로 보내 Soniox 전사 문장을 받는다', async () => {
     const response: PostSonioxTranscriptionResponseType = {
       utterances: [{ offsetMs: 300, text: '찬성 입론입니다.' }],
     };
@@ -33,6 +33,7 @@ describe('음성 전사 API', () => {
         expect(audio.name).toBe('segment.webm');
         expect(audio.size).toBe(3);
         expect(form.get('language')).toBe('ko-KR');
+        expect(form.get('sessionId')).toBe('session-1');
         return HttpResponse.json(response);
       }),
     );
@@ -41,6 +42,7 @@ describe('음성 전사 API', () => {
       new Blob([new Uint8Array([1, 2, 3])], { type: 'audio/webm' }),
       'segment.webm',
       'ko-KR',
+      'session-1',
     );
 
     expect(data).toEqual(response);

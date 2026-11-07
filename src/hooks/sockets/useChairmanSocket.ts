@@ -12,6 +12,7 @@ import { isChairmanNotice, isTimerEventType } from '../../apis/sockets/util';
 import useDocumentVisibility from '../useDocumentVisibility';
 import { chairmanTokenQueryKey } from '../query/useGetChairmanToken';
 import useSocket from './useSocket';
+import { createRandomId } from '../../util/randomId';
 
 // 청중이 사회자 연결 여부를 판단할 수 있도록 현재 상태를 주기적으로 공유하는 간격
 export const CHAIRMAN_HEARTBEAT_INTERVAL_MS = 5000;
@@ -34,16 +35,9 @@ const CHAIRMAN_SOCKET_OPTIONS = {
 
 /**
  * 공유를 시작할 때마다 새 사회자 세션 식별자를 만든다.
- * `crypto.randomUUID`는 보안 컨텍스트(HTTPS)에서만 제공되므로 없으면 시각과 난수로 대신한다.
  */
 export function createChairmanSessionId(): string {
-  if (
-    typeof crypto !== 'undefined' &&
-    typeof crypto.randomUUID === 'function'
-  ) {
-    return crypto.randomUUID();
-  }
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  return createRandomId();
 }
 
 function parseMessageBody(message: IMessage): unknown {

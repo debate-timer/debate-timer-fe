@@ -16,6 +16,7 @@ import {
   SegmentKey,
   startTranscriptDraft,
 } from '../../../util/transcriptDraft';
+import { createRandomId } from '../../../util/randomId';
 import { TranscriberError } from './useDebateTranscriber';
 
 export interface UseSonioxTranscriberParams {
@@ -34,6 +35,8 @@ interface DesiredSegment {
 
 interface RecordingSession {
   tableId: number;
+  // 이 구간을 녹음한 기록 세션. 기록을 끈 뒤 전사 요청이 나가도 녹음할 때의 세션으로 보낸다.
+  recordingSessionId: string;
   recorder: MediaRecorder;
   segment: SegmentKey;
   startedAt: number;
@@ -83,6 +86,9 @@ export default function useSonioxTranscriber(
   const isMountedRef = useRef(false);
   const hasStartedDraftRef = useRef(false);
   const tableIdRef = useRef(tableId);
+  // 기록을 켤 때마다 새로 만드는 녹음 세션 식별자. 서버가 구간 오디오를 세션별로 묶어 보관한다.
+  // 동의를 철회했다가 다시 켜면 이어서 기록하더라도 새 세션으로 본다.
+  const recordingSessionIdRef = useRef('');
   const langRef = useRef(lang);
 
   // 렌더 중에 ref를 바꾸면 커밋되지 않은 렌더 값이 남을 수 있어 커밋 뒤에 맞춘다.
@@ -104,14 +110,24 @@ export default function useSonioxTranscriber(
   // 전사 대기는 구간을 끝낼 때 이미 기록했으므로, 결과를 저장하거나 실패로 남기며 대기를 푼다.
   // 빈 오디오나 너무 짧은 구간은 보내지 않고 문장 없는 구간으로 대기만 푼다.
   const transcribe = useCallback((session: RecordingSession, audio: Blob) => {
-    const { tableId: sessionTableId, segment, startedAt } = session;
+    const {
+      tableId: sessionTableId,
+      recordingSessionId,
+      segment,
+      startedAt,
+    } = session;
     const isTooShort = Date.now() - startedAt < MIN_SEGMENT_DURATION_MS;
     if (audio.size === 0 || isTooShort) {
       appendSegmentUtterances(sessionTableId, segment, startedAt, []);
       setPendingCount((prev) => prev - 1);
       return;
     }
-    postSonioxTranscription(audio, toAudioFileName(audio.type), langRef.current)
+    postSonioxTranscription(
+      audio,
+      toAudioFileName(audio.type),
+      langRef.current,
+      recordingSessionId,
+    )
       .then(({ utterances }) => {
         appendSegmentUtterances(sessionTableId, segment, startedAt, utterances);
         setUtteranceCount((prev) => prev + utterances.length);
@@ -134,6 +150,7 @@ export default function useSonioxTranscriber(
       });
       const session: RecordingSession = {
         tableId: tableIdRef.current,
+        recordingSessionId: recordingSessionIdRef.current,
         recorder,
         segment,
         startedAt: Date.now(),
@@ -266,7 +283,7 @@ export default function useSonioxTranscriber(
     };
   }, [releaseMicrophone, stopRecording]);
 
-  // 페이지에서 처음 켤 때만 새 초안을 만들고, 껐다 켜면 이어서 기록한다.
+  // 페이지에서 처음 켤 때만 새 초안을 만들고, 껐다 켜면 이어서 기록한다. 녹음 세션은 켤 때마다 새로 만든다.
   const enable = useCallback(async () => {
     if (!isSupported) {
       setError('unsupported');
@@ -285,6 +302,9 @@ export default function useSonioxTranscriber(
     } catch {
       setError('not-allowed');
       return;
+    }
+    if (!isEnabledRef.current) {
+      recordingSessionIdRef.current = createRandomId();
     }
     if (!hasStartedDraftRef.current) {
       startTranscriptDraft(tableIdRef.current, Date.now(), 'SONIOX');
