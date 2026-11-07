@@ -381,5 +381,22 @@
   "토론 녹화하기": "Record debate",
   "토론 녹음 중": "Recording debate",
   "토론 녹음 끄기": "Stop recording debate",
-  "{{count}}문장 기록": "{{count}} sentences recorded"
+  "{{count}}문장 기록": "{{count}} sentences recorded",
+  "기록 시작": "Start recording",
+  "마이크 테스트": "Microphone check",
+  "녹음 품질이 좋아요. 녹음된 소리를 들어보고 기록을 시작하세요.": "Recording quality looks good. Listen to the test clip, then start recording.",
+  "소리가 거의 들어오지 않아요. 마이크 연결과 입력 장치를 확인해 주세요.": "Almost no sound is coming in. Check the microphone connection and input device.",
+  "소리가 작아요. 마이크에 더 가까이에서 말해 주세요.": "Your voice is quiet. Please speak closer to the microphone.",
+  "소리가 너무 커서 찌그러져요. 마이크와 조금 떨어져 주세요.": "Your voice is too loud and distorts. Please move a little away from the microphone.",
+  "주변 소음이 커요. 조용한 곳에서 기록하면 더 정확해요.": "Background noise is high. Recording in a quieter place is more accurate.",
+  "마이크를 사용할 수 없어요. 마이크 권한과 연결을 확인해 주세요.": "The microphone is unavailable. Check the microphone permission and connection.",
+  "이 브라우저에서는 마이크 테스트를 할 수 없어요.": "This browser does not support the microphone check.",
+  "평소 발언하듯 한두 문장을 말해 보세요. 녹음은 이 기기에서만 재생하고 서버로 보내지 않아요.": "Say a sentence or two as you would in the debate. The test clip only plays on this device and is not sent to the server.",
+  "마이크 입력 크기": "Microphone input level",
+  "마이크 연결 중...": "Connecting microphone...",
+  "녹음 중... {{count}}초 남음": "Recording... {{count}}s left",
+  "{{count}}초 테스트 녹음": "{{count}}s test recording",
+  "다시 테스트하기": "Test again",
+  "말소리 {{speech}} · 배경 소음 {{noise}} · 차이 {{snr}}": "Voice {{speech}} · Background {{noise}} · Difference {{snr}}",
+  "테스트 녹음 듣기": "Play test recording"
 }
