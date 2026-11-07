@@ -9,7 +9,8 @@ import {
 interface DashboardTabsProps {
   // 보여줄 탭. 피쳐 플래그가 없는 탭은 빼고 넘긴다.
   tabs: DashboardTab[];
-  selectedTab: DashboardTab;
+  // 어느 탭을 보여줄지 정해지기 전에는 null 로 두어 아무 탭도 선택하지 않는다.
+  selectedTab: DashboardTab | null;
   onSelect: (tab: DashboardTab) => void;
 }
 

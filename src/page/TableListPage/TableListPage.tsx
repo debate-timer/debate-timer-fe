@@ -43,7 +43,7 @@ export default function TableListPage() {
         <DefaultLayout.Header.Center>
           <DashboardTabs
             tabs={availableTabs}
-            selectedTab={selectedTab}
+            selectedTab={isTabPending ? null : selectedTab}
             onSelect={handleSelectTab}
           />
         </DefaultLayout.Header.Center>

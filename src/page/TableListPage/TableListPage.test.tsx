@@ -204,6 +204,11 @@ describe('TableListPage', () => {
       await waitFor(() => expect(isFlagRequested).toBe(true));
       expect(screen.queryByText('+')).not.toBeInTheDocument();
       expect(tableRequestCount).toBe(0);
+      // 어느 탭인지 정해지기 전이므로 시간표 탭을 선택한 것으로 표시하지 않는다.
+      expect(screen.getByRole('tab', { name: '시간표' })).toHaveAttribute(
+        'aria-selected',
+        'false',
+      );
 
       releaseFlags();
 
