@@ -180,6 +180,43 @@ describe('TableListPage', () => {
       });
     });
 
+    it('플래그를 받기 전에는 주소의 토론 기록 탭 대신 시간표를 보여주거나 조회하지 않는다', async () => {
+      let releaseFlags: () => void = () => {};
+      const flagsReady = new Promise<void>((resolve) => {
+        releaseFlags = resolve;
+      });
+      let isFlagRequested = false;
+      let tableRequestCount = 0;
+      server.use(
+        http.get(`${ApiUrl.member}/feature-flags`, async () => {
+          isFlagRequested = true;
+          await flagsReady;
+          return HttpResponse.json({ featureFlags: ['TRANSCRIPT'] });
+        }),
+        http.get(ApiUrl.table, () => {
+          tableRequestCount += 1;
+          return HttpResponse.json({ tables: [] });
+        }),
+      );
+
+      renderAt('/home?tab=records');
+
+      await waitFor(() => expect(isFlagRequested).toBe(true));
+      expect(screen.queryByText('+')).not.toBeInTheDocument();
+      expect(tableRequestCount).toBe(0);
+
+      releaseFlags();
+
+      expect(
+        await screen.findByText('노동시장 유연화를 확대해야 한다'),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: '토론 기록' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      expect(tableRequestCount).toBe(0);
+    });
+
     it('주소에 토론 기록 탭이 지정돼 있으면 토론 기록 목록으로 시작한다', async () => {
       renderAt('/home?tab=records');
 

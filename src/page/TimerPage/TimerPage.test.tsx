@@ -8,12 +8,13 @@ import { GlobalPortal } from '../../util/GlobalPortal';
 import { http, HttpResponse } from 'msw';
 import { server } from '../../mocks/server';
 import { ApiUrl } from '../../apis/endpoints';
+import { MEMBER_FEATURE_FLAGS_QUERY_KEY } from '../../hooks/query/useGetMemberFeatureFlags';
 
 function renderTimerPage() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const view = render(
     <QueryClientProvider client={queryClient}>
       <GlobalPortal.Provider>
         <MemoryRouter initialEntries={['/timer/5']}>
@@ -24,6 +25,7 @@ function renderTimerPage() {
       </GlobalPortal.Provider>
     </QueryClientProvider>,
   );
+  return { ...view, queryClient };
 }
 
 describe('TimerPage - 헤더 음소거 아이콘', () => {
@@ -128,10 +130,18 @@ describe('TimerPage - 토론 기록 피쳐 플래그', () => {
   it('플래그가 없는 회원에게는 토론 기록 컨트롤을 보여주지 않는다', async () => {
     respondFlags([]);
 
-    renderTimerPage();
+    const { queryClient } = renderTimerPage();
 
+    // 빈 플래그 응답과 시간표가 모두 화면에 반영된 뒤에 컨트롤이 없음을 확인한다.
+    await waitFor(() => {
+      expect(
+        queryClient.getQueryState(MEMBER_FEATURE_FLAGS_QUERY_KEY)?.status,
+      ).toBe('success');
+      expect(queryClient.getQueryState(['DebateTableData', 5])?.status).toBe(
+        'success',
+      );
+    });
     await screen.findAllByRole('button');
-    await new Promise((resolve) => setTimeout(resolve, 100));
     expect(findTranscribeEntry()).not.toBeInTheDocument();
   });
 });
