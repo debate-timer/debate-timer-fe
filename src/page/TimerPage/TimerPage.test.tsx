@@ -1,16 +1,26 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import TimerPage from './TimerPage';
 import { GlobalPortal } from '../../util/GlobalPortal';
+import { http, HttpResponse } from 'msw';
+import { server } from '../../mocks/server';
+import { ApiUrl } from '../../apis/endpoints';
+import { MEMBER_FEATURE_FLAGS_QUERY_KEY } from '../../hooks/query/useGetMemberFeatureFlags';
 
 function renderTimerPage() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const view = render(
     <QueryClientProvider client={queryClient}>
       <GlobalPortal.Provider>
         <MemoryRouter initialEntries={['/timer/5']}>
@@ -21,6 +31,7 @@ function renderTimerPage() {
       </GlobalPortal.Provider>
     </QueryClientProvider>,
   );
+  return { ...view, queryClient };
 }
 
 describe('TimerPage - 헤더 음소거 아이콘', () => {
@@ -93,5 +104,46 @@ describe('TimerPage - 헤더 음소거 아이콘', () => {
       expect(screen.queryByTestId('volume-icon-muted')).not.toBeInTheDocument();
       expect(screen.getByTestId('volume-icon-normal')).toBeInTheDocument();
     });
+  });
+});
+
+describe('TimerPage - 토론 기록 피쳐 플래그', () => {
+  const findTranscribeEntry = () =>
+    screen.queryByRole('button', { name: '토론 녹화하기' }) ??
+    screen.queryByText('이 브라우저에서는 토론 기록을 사용할 수 없어요');
+
+  const respondFlags = (featureFlags: string[]) =>
+    server.use(
+      http.get(`${ApiUrl.member}/feature-flags`, () =>
+        HttpResponse.json({ featureFlags }),
+      ),
+    );
+
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('isVisited', 'true');
+    localStorage.setItem('accessToken', 'test-access-token');
+  });
+
+  it('플래그가 있는 회원에게 토론 기록 컨트롤을 보여준다', async () => {
+    respondFlags(['TRANSCRIPT']);
+
+    renderTimerPage();
+
+    await waitFor(() => expect(findTranscribeEntry()).toBeInTheDocument());
+  });
+
+  it('플래그가 없어지면 토론 기록 컨트롤을 보여주지 않는다', async () => {
+    respondFlags(['TRANSCRIPT']);
+    const { queryClient } = renderTimerPage();
+    // 타이머 화면이 표시되고 플래그가 반영된 것을 컨트롤로 먼저 확인한다.
+    await waitFor(() => expect(findTranscribeEntry()).toBeInTheDocument());
+
+    respondFlags([]);
+    await act(() =>
+      queryClient.refetchQueries({ queryKey: MEMBER_FEATURE_FLAGS_QUERY_KEY }),
+    );
+
+    await waitFor(() => expect(findTranscribeEntry()).not.toBeInTheDocument());
   });
 });

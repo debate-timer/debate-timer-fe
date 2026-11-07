@@ -56,11 +56,15 @@ const getUserMedia = vi.fn(async () => ({
 
 // 화면 갱신 한 번마다 쌓인 콜백을 실행한다.
 let frameCallbacks: FrameRequestCallback[] = [];
+// 60fps 화면처럼 프레임마다 약 16ms씩 시간이 흐른다.
+const FRAME_MS = 16;
+let frameTime = 0;
 const runFrames = (count: number) => {
   for (let i = 0; i < count; i += 1) {
     const callbacks = frameCallbacks;
     frameCallbacks = [];
-    callbacks.forEach((callback) => callback(0));
+    frameTime += FRAME_MS;
+    callbacks.forEach((callback) => callback(frameTime));
   }
 };
 
@@ -69,6 +73,7 @@ describe('마이크 테스트 훅', () => {
     vi.useFakeTimers();
     currentAmplitude = 0;
     frameCallbacks = [];
+    frameTime = 0;
     FakeAudioContext.instances = [];
     FakeMediaRecorder.instances = [];
     trackStop.mockClear();
@@ -103,10 +108,24 @@ describe('마이크 테스트 훅', () => {
     expect(result.current.status).toBe('ready');
 
     currentAmplitude = 0.1; // -20dB
-    act(() => runFrames(1));
+    act(() => runFrames(60));
 
     expect(getUserMedia).toHaveBeenCalledWith({ audio: true });
     expect(result.current.level).toBeCloseTo(2 / 3);
+  });
+
+  it('입력 크기가 프레임마다 튀어도 막대는 이어서 부드럽게 움직인다', async () => {
+    const { result } = renderHook(() => useMicCheck());
+    await act(() => result.current.start());
+    currentAmplitude = 0.1; // -20dB
+    act(() => runFrames(60));
+
+    currentAmplitude = 0;
+    act(() => runFrames(1));
+
+    // 한 프레임 조용해졌다고 막대가 0으로 떨어지지 않는다.
+    expect(result.current.level).toBeGreaterThan(0.5);
+    expect(result.current.level).toBeLessThan(2 / 3);
   });
 
   it('실제 기록과 같은 설정으로 정해진 시간만큼 녹음한 뒤 들어볼 수 있게 하고 품질을 판정한다', async () => {

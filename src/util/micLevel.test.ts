@@ -2,6 +2,7 @@ import {
   analyzeFrames,
   LevelFrame,
   measureFrame,
+  smoothMeterLevel,
   toDb,
   toMeterRatio,
 } from './micLevel';
@@ -72,4 +73,28 @@ describe('마이크 테스트 품질 판정', () => {
   it('말소리와 배경 소음의 차이가 작으면 소음이 크다고 본다', () => {
     expect(analyzeFrames(speechWithPauses(-20, -30)).verdict).toBe('noisy');
   });
+});
+
+describe('마이크 막대 움직임', () => {
+  it('커질 때는 빠르게, 작아질 때는 천천히 따라간다', () => {
+    const rise = smoothMeterLevel(0, 1, 16);
+    const fall = 1 - smoothMeterLevel(1, 0, 16);
+
+    expect(rise).toBeGreaterThan(0);
+    expect(rise).toBeLessThan(1);
+    expect(fall).toBeGreaterThan(0);
+    expect(rise).toBeGreaterThan(fall * 2);
+  });
+
+  it('시간이 충분히 지나면 측정한 크기에 닿는다', () => {
+    expect(smoothMeterLevel(0, 0.5, 2000)).toBeCloseTo(0.5);
+    expect(smoothMeterLevel(1, 0.2, 2000)).toBeCloseTo(0.2);
+  });
+
+  it.each([0, -16, Number.NaN])(
+    '프레임 간격이 %s이면 이전 크기를 유지한다',
+    (elapsedMs) => {
+      expect(smoothMeterLevel(0.3, 1, elapsedMs)).toBe(0.3);
+    },
+  );
 });

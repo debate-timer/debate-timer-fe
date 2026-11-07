@@ -39,6 +39,7 @@ import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 import useTranscriptRecorder from './hooks/useTranscriptRecorder';
 import TranscribeControl from './components/TranscribeControl';
+import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { toRecognitionLang } from '../../util/speechRecognition';
 
 // 피처 플래그
@@ -101,7 +102,12 @@ export default function TimerPage() {
 
   // 토론 기록: 타이머가 실행되는 동안의 발언을 현재 타임박스(자유토론은 현재 팀) 구간으로 기록한다.
   // 기록을 켤 때 크롬 실시간 인식(RPC)과 Soniox 구간 배치 전사 중 하나를 고른다.
-  const isTranscribeAvailable = isLoggedIn() && !isGuestFlow();
+  // 피쳐 플래그(TRANSCRIPT)를 부여받은 회원에게만 보여준다.
+  const isMemberFlow = isLoggedIn() && !isGuestFlow();
+  const { isEnabled: hasTranscriptFlag } = useFeatureFlag('TRANSCRIPT', {
+    enabled: isMemberFlow,
+  });
+  const isTranscribeAvailable = isMemberFlow && hasTranscriptFlag;
   const transcriber = useTranscriptRecorder({
     tableId,
     timeBoxIndex: index,
