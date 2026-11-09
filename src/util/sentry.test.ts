@@ -6,6 +6,7 @@ import {
   isSentryCaptured,
   markSentryCaptured,
   normalizeEndpoint,
+  resolveSentryAllowUrls,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
   sanitizeSentryContext,
@@ -220,5 +221,26 @@ describe('sentry 유틸', () => {
     expect(sentryError.name).toBe(
       'fatal · render-error · timer · TypeError: Cannot read properties of undefined',
     );
+  });
+
+  it('빌드 결과물에서는 앱 번들 경로의 에러만 수집하도록 assets 경로를 허용한다', () => {
+    expect(
+      resolveSentryAllowUrls('https://www.debate-timer.com', '/', true),
+    ).toEqual(['https://www.debate-timer.com/assets/']);
+  });
+
+  it('PR 미리보기처럼 base 경로가 있으면 base 경로 아래 assets만 허용한다', () => {
+    expect(
+      resolveSentryAllowUrls('https://preview.example.com', '/pr-12/', true),
+    ).toEqual(['https://preview.example.com/pr-12/assets/']);
+    expect(
+      resolveSentryAllowUrls('https://preview.example.com', '/pr-12', true),
+    ).toEqual(['https://preview.example.com/pr-12/assets/']);
+  });
+
+  it('개발 서버에서는 번들 경로가 달라 허용 경로를 제한하지 않는다', () => {
+    expect(
+      resolveSentryAllowUrls('http://localhost:3000', '/', false),
+    ).toBeUndefined();
   });
 });
