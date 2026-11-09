@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { shouldSkipSentryEvent } from './util/sentry';
+import { resolveSentryAllowUrls, shouldSkipSentryEvent } from './util/sentry';
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 const isSentryEnabled =
@@ -24,6 +24,12 @@ if (isSentryEnabled && dsn) {
     replaysSessionSampleRate: 0,
     // 에러가 발생한 세션은 모두 Replay로 남김
     replaysOnErrorSampleRate: 1.0,
+    // 앱 번들에서 난 에러만 수집 (브라우저 주입 스크립트, Google AdSense 스크립트 에러 제외)
+    allowUrls: resolveSentryAllowUrls(
+      window.location.origin,
+      import.meta.env.BASE_URL,
+      import.meta.env.PROD,
+    ),
     beforeSend(event, hint) {
       const originalException = hint?.originalException;
 
