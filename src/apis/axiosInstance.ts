@@ -109,11 +109,12 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        // Refresh Token은 HttpOnly 쿠키에 있다고 가정 (JS 접근 X)
-        // => withCredentials로 자동 전송되거나, 백엔드가 쿠키로 다룸
+        // Refresh Token은 API 도메인 쿠키에 있으므로
+        // 교차 출처 요청에도 쿠키가 실리도록 withCredentials를 명시
         const refreshResponse = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/member/reissue`,
           null,
+          { withCredentials: true },
         );
 
         // 새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정
