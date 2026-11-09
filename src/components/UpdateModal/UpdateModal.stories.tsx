@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, waitFor, within } from '@storybook/test';
+import { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fn, waitFor, within } from 'storybook/test';
 import { ComponentProps, useEffect, useMemo } from 'react';
-import { useArgs } from '@storybook/preview-api';
+import { useArgs } from 'storybook/preview-api';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import { useModal } from '../../hooks/useModal';
@@ -195,39 +195,46 @@ export const Default: Story = {
   },
 };
 
-function viewport(width: number, height: number) {
+function viewport(
+  width: number,
+  height: number,
+  language: 'ko' | 'en' = 'ko',
+): Pick<Story, 'parameters' | 'globals'> {
   return {
-    viewport: {
-      viewports: {
-        patchNote: {
-          name: `${width} × ${height}`,
-          styles: { width: `${width}px`, height: `${height}px` },
-          type: width < 768 ? 'mobile' : 'desktop',
+    parameters: {
+      language,
+      viewport: {
+        options: {
+          patchNote: {
+            name: `${width} × ${height}`,
+            styles: { width: `${width}px`, height: `${height}px` },
+            type: width < 768 ? 'mobile' : 'desktop',
+          },
         },
       },
-      defaultViewport: 'patchNote',
     },
+    globals: { viewport: { value: 'patchNote', isRotated: false } },
   };
 }
 
 export const Mobile: Story = {
   args: { ...Default.args, data: LATEST_PATCH_NOTE },
-  parameters: viewport(390, 844),
+  ...viewport(390, 844),
 };
 
 export const MobileEnglish: Story = {
   ...Mobile,
-  parameters: { ...viewport(390, 844), language: 'en' },
+  ...viewport(390, 844, 'en'),
 };
 
 export const PredefinedMobile: Story = {
   args: Default.args,
-  parameters: viewport(390, 844),
+  ...viewport(390, 844),
 };
 
 export const SmallMobileEnglish: Story = {
   args: Default.args,
-  parameters: { ...viewport(320, 568), language: 'en' },
+  ...viewport(320, 568, 'en'),
 };
 
 export const LongContentMobileEnglish: Story = {
@@ -246,35 +253,35 @@ export const LongContentMobileEnglish: Story = {
         'Try the new feedback and voting features after your debate.\nReview the results together and share your thoughts with everyone.\nRead the complete update and learn how to use each new feature.',
     },
   },
-  parameters: { ...viewport(320, 568), language: 'en' },
+  ...viewport(320, 568, 'en'),
 };
 
 export const MobileLandscape: Story = {
   args: Mobile.args,
-  parameters: viewport(667, 375),
+  ...viewport(667, 375),
 };
 
 export const PredefinedLandscapeEnglish: Story = {
   args: Default.args,
-  parameters: { ...viewport(667, 375), language: 'en' },
+  ...viewport(667, 375, 'en'),
 };
 
 export const MobileBoundary: Story = {
   args: Mobile.args,
-  parameters: viewport(767, 900),
+  ...viewport(767, 900),
 };
 
 export const DesktopBoundary: Story = {
   args: Mobile.args,
-  parameters: viewport(768, 900),
+  ...viewport(768, 900),
 };
 
 export const Desktop: Story = {
   args: Mobile.args,
-  parameters: viewport(1440, 900),
+  ...viewport(1440, 900),
 };
 
 export const PredefinedDesktop: Story = {
   args: Default.args,
-  parameters: viewport(1440, 900),
+  ...viewport(1440, 900),
 };

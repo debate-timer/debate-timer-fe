@@ -15,7 +15,7 @@ export default function TableSection({ onLogin }: TableSectionProps) {
           <span className="relative z-10">{t('홈 | 설정')}</span>
           <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand/70"></span>
         </div>
-        <h2 className="mt-4 whitespace-pre-line text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold whitespace-pre-line">
           {t('토론 정보\n관리 및 기록')}
         </h2>
       </div>

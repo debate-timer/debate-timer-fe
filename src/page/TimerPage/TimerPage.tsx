@@ -37,6 +37,10 @@ import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
+import useTranscriptRecorder from './hooks/useTranscriptRecorder';
+import TranscribeControl from './components/TranscribeControl';
+import useFeatureFlag from '../../hooks/useFeatureFlag';
+import { toRecognitionLang } from '../../util/speechRecognition';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = true;
@@ -49,7 +53,7 @@ interface SharedTimes {
 }
 
 export default function TimerPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
   useEnsureGuestTable(pathParams.id);
@@ -95,6 +99,22 @@ export default function TimerPage() {
     normalTimer,
   } = state;
   const timerType = data && data.table[index].boxType;
+
+  // 토론 기록: 타이머가 실행되는 동안의 발언을 현재 타임박스(자유토론은 현재 팀) 구간으로 기록한다.
+  // 기록을 켤 때 크롬 실시간 인식(RPC)과 Soniox 구간 배치 전사 중 하나를 고른다.
+  // 피쳐 플래그(TRANSCRIPT)를 부여받은 회원에게만 보여준다.
+  const isMemberFlow = isLoggedIn() && !isGuestFlow();
+  const { isEnabled: hasTranscriptFlag } = useFeatureFlag('TRANSCRIPT', {
+    enabled: isMemberFlow,
+  });
+  const isTranscribeAvailable = isMemberFlow && hasTranscriptFlag;
+  const transcriber = useTranscriptRecorder({
+    tableId,
+    timeBoxIndex: index,
+    team: timerType === 'TIME_BASED' ? prosConsSelected : null,
+    isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
+    lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+  });
   const remainingTime = getRemainingTimeForShare({
     timerType,
     normalTimer: normalTimer.timer,
@@ -412,7 +432,7 @@ export default function TimerPage() {
               </button>
 
               {isVolumeBarOpen && (
-                <div className="absolute -right-[60px] top-[48px]">
+                <div className="absolute top-[48px] -right-[60px]">
                   <VolumeBar
                     volume={volume}
                     onVolumeChange={(value: number) => setVolume(value)}
@@ -436,7 +456,7 @@ export default function TimerPage() {
               {/* 라이브 공유 버튼 및 모달 (화면이 작아져도 타이머와 라운드 버튼 위에 보이고 클릭되도록 레이어를 올린다) */}
               {IS_LIVE_SHARE_ENABLED && isLoggedIn() && (
                 <div
-                  className="absolute right-4 top-4 z-20 flex"
+                  className="absolute top-4 right-4 z-20 flex"
                   ref={liveShareModalRef}
                 >
                   {!isLiveShareModalOpen && (
@@ -458,6 +478,26 @@ export default function TimerPage() {
                       />
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* 토론 기록 켜기/끄기와 녹음 상태. 라이브 공유 버튼(top-4, 96px) 바로 밑에 둔다. */}
+              {isTranscribeAvailable && (
+                <div className="absolute top-[116px] right-4 z-10 pr-[4px]">
+                  <TranscribeControl
+                    supportedModes={transcriber.supportedModes}
+                    sttMode={transcriber.sttMode}
+                    isModeLocked={transcriber.isModeLocked}
+                    isEnabled={transcriber.isEnabled}
+                    isListening={transcriber.isListening}
+                    utteranceCount={transcriber.utteranceCount}
+                    pendingCount={transcriber.pendingCount}
+                    failedCount={transcriber.failedCount}
+                    error={transcriber.error}
+                    shouldPromptOnMount
+                    onEnable={transcriber.enable}
+                    onDisable={transcriber.disable}
+                  />
                 </div>
               )}
 

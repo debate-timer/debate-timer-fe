@@ -1,6 +1,134 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' source(none);
+@source './';
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1280px;
+  --color-stance-red: #e14666;
+  --color-stance-blue: #1e91d6;
+  --color-brand: #fecd4c;
+  --color-brand-hover: #dba822;
+  --color-default-disabled-hover: #d6d7d9;
+  --color-default-neutral: #a3a3a3;
+  --color-default-dim: #222222;
+  --color-default-dim2: #f2f2f2;
+  --color-default-border: #79747e;
+  --color-default-timeout: #4f4f4f;
+  --color-default-white: #ffffff;
+  --color-default-black: #222222;
+  --color-default-black2: #404040;
+  --color-semantic-warning: #ff8b87;
+  --color-semantic-error: #d70000;
+  --color-semantic-table: #ff5622;
+  --color-semantic-material: #6750a4;
+  --font-pretendard:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', sans-serif;
+  /* 공통 글자 역할의 크기·행간·굵기를 함께 정의함. */
+  --text-ui-headline: 28px;
+  --text-ui-headline--line-height: 36px;
+  --text-ui-headline--font-weight: 700;
+  --text-ui-title: 24px;
+  --text-ui-title--line-height: 32px;
+  --text-ui-title--font-weight: 600;
+  --text-ui-body: 16px;
+  --text-ui-body--line-height: 24px;
+  --text-ui-body--font-weight: 400;
+  --text-ui-label: 16px;
+  --text-ui-label--line-height: 24px;
+  --text-ui-label--font-weight: 600;
+  --text-ui-caption: 14px;
+  --text-ui-caption--line-height: 20px;
+  --text-ui-caption--font-weight: 400;
+  /* 오래된 타이포그래피이며 최신 타이포그래피로 교체 후 삭제 예정. */
+  --text-display-raw: 72px;
+  --text-title-raw: 28px;
+  --text-subtitle-raw: 24px;
+  --text-detail-raw: 20px;
+  --text-body-raw: 16px;
+  --text-timer-raw: 110px;
+  --shadow-stance-blue: 0 0 30px #ff3b2f;
+  --shadow-stance-red: 0 0 30px #007aff;
+  --shadow-stance-neutral: 0 0 30px #737373;
+  --animate-rotate: rotate 5s linear infinite;
+  --animate-gradient: gradient 10s ease infinite;
+  --animate-color-transition: colorTransition 5s ease-in-out infinite;
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg) scale(10);
+    }
+    100% {
+      transform: rotate(-360deg) scale(10);
+    }
+  }
+
+  @keyframes gradient {
+    0%,
+    100% {
+      background-size: 300% 300%;
+      background-position: left center;
+    }
+    33% {
+      background-size: 300% 300%;
+      background-position: center center;
+    }
+    66% {
+      background-size: 300% 300%;
+      background-position: right center;
+    }
+  }
+
+  @keyframes colorTransition {
+    0%,
+    100% {
+      background-color: #ffa2a2;
+    }
+    50% {
+      background-color: #ff6467;
+    }
+  }
+}
+
+@custom-variant xl (@media (min-width: 1600px) and (min-height: 1024px));
+@custom-variant short (@media (max-height: 500px));
+
+@utility bg-brandBackground {
+  background-image: radial-gradient(
+    80% 80% at 50% 50%,
+    #fecd4c21 0%,
+    #ffffff42 100%
+  );
+}
+
+/* v3의 테두리·입력 안내·버튼 커서를 유지함. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+    opacity: 1;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input,
+  textarea,
+  select {
+    background-color: revert;
+  }
+}
 
 @layer base {
   body {
@@ -10,11 +138,11 @@
 
   html,
   body {
-    @apply text-default-black break-keep;
+    @apply break-keep text-default-black;
   }
 }
 
-/* Text styles */
+/* 오래된 타이포그래피이며 최신 타이포그래피로 교체 후 삭제 예정. */
 .text-display {
   @apply text-display-raw;
 }
@@ -41,28 +169,28 @@
 
 /* Timebox styles */
 .timebox {
-  @apply relative flex select-none flex-col items-center justify-center rounded-[12px] p-[12px];
+  @apply relative flex flex-col items-center justify-center rounded-[12px] p-[12px] select-none;
 }
 
 .timebox.pros {
-  @apply bg-camp-blue/50 w-1/2;
+  @apply w-1/2 bg-stance-blue/50;
 }
 
 .timebox.cons {
-  @apply bg-camp-red/50 w-1/2;
+  @apply w-1/2 bg-stance-red/50;
 }
 
 .timebox.neutral {
-  @apply bg-default-neutral/60 w-full;
+  @apply w-full bg-default-neutral/60;
 }
 
 .timebox.time-based {
-  @apply bg-brand/70 w-full;
+  @apply w-full bg-brand/70;
 }
 
 /* Button styles */
 .button {
-  @apply text-subtitle transition-colors duration-200 flex flex-row items-center justify-center h-[72px];
+  @apply flex h-[72px] flex-row items-center justify-center text-subtitle-raw transition-colors duration-200;
 }
 
 .button.enabled.brand {
@@ -70,13 +198,16 @@
 }
 
 .button.enabled.neutral {
-  @apply border-[2px] font-semibold border-default-disabled/hover bg-default-white text-default-black hover:bg-default-disabled/hover;
+  @apply border-2 border-default-disabled-hover bg-default-white font-semibold text-default-black hover:bg-default-disabled-hover;
 }
 
 .button.disabled {
-  @apply bg-default-disabled/hover text-default-white cursor-not-allowed;
+  @apply cursor-not-allowed bg-default-disabled-hover text-default-white;
 }
 
-p {
-  white-space: pre-wrap;
+/* 줄바꿈 utility가 기본 문단 스타일보다 우선하도록 함. */
+@layer base {
+  p {
+    white-space: pre-wrap;
+  }
 }

@@ -75,7 +75,7 @@ export default function NormalTimer({
   return (
     <div className="flex flex-row space-x-[80px]">
       {/* 좌측 영역 */}
-      <span className="flex w-[360px] flex-shrink-0 flex-col items-center justify-center xl:w-[450px]">
+      <span className="flex w-[360px] shrink-0 flex-col items-center justify-center xl:w-[450px]">
         <span className="flex w-full flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
           {/* 제목 */}
           <h1 className="text-center text-[52px] font-bold xl:text-[68px]">
@@ -114,11 +114,12 @@ export default function NormalTimer({
                 className={clsx(
                   'flex h-[52px] w-full items-center justify-center rounded-[20px] text-[20px] font-semibold transition-all duration-200 ease-in-out xl:h-[68px] xl:text-[28px]',
                   {
-                    'bg-camp-blue/50 hover:bg-camp-blue':
+                    'bg-stance-blue/50 hover:bg-stance-blue':
                       item.stance === 'PROS',
                   },
                   {
-                    'bg-camp-red/50 hover:bg-camp-red': item.stance === 'CONS',
+                    'bg-stance-red/50 hover:bg-stance-red':
+                      item.stance === 'CONS',
                   },
                   {
                     'bg-default-neutral/50 hover:bg-default-neutral':
@@ -141,7 +142,7 @@ export default function NormalTimer({
       </span>
 
       {/* 우측 영역 */}
-      <span className="flex w-[360px] flex-shrink-0 flex-col space-y-[16px] xl:w-[480px]">
+      <span className="flex w-[360px] shrink-0 flex-col space-y-[16px] xl:w-[480px]">
         {/* 타이머 */}
         <CircularTimer
           progress={progressMotionValue}
@@ -151,7 +152,7 @@ export default function NormalTimer({
         >
           <span
             className={clsx(
-              'flex w-full flex-row items-center justify-center p-[16px] text-[70px] font-bold tabular-nums text-default-black xl:text-[110px]',
+              'flex w-full flex-row items-center justify-center p-[16px] text-[70px] font-bold text-default-black tabular-nums xl:text-[110px]',
               { 'space-x-[8px]': totalTime < 0 },
               { 'space-x-[16px]': totalTime >= 0 },
             )}

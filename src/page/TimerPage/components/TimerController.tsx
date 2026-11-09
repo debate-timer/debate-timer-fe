@@ -27,9 +27,9 @@ export default function TimerController({
     boxType === 'FEEDBACK'
       ? 'bg-brand'
       : stance === 'PROS'
-        ? 'bg-camp-blue'
+        ? 'bg-stance-blue'
         : stance === 'CONS'
-          ? 'bg-camp-red'
+          ? 'bg-stance-red'
           : 'bg-default-neutral';
   return (
     <div className="flex flex-row items-center justify-center space-x-[16px] xl:space-x-[24px]">

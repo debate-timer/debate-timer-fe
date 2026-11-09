@@ -26,6 +26,13 @@ AxiosResponse 전체 대신 `response.data`로 반환함. 요청·응답 계약�
 `src/apis/requests/`, `src/apis/responses/`에 배치함. 모든 요청 body를 별도 타입
 파일에 두는 규칙은 없음.
 
+파일 업로드처럼 기본 JSON 헤더·5초 제한 시간과 다른 요청은 다섯째 인자
+`options`의 `headers`·`timeout`으로 덮어씀. FormData는 `Content-Type`을
+`multipart/form-data`로 지정해야 Axios가 JSON으로 바꾸지 않고 boundary를 붙임.
+`src/apis/apis/stt.ts`의 `postSonioxTranscription()`이 예시임. jsdom의
+FormData·Blob 본문은 MSW가 끝까지 읽지 못하므로 이 API의 직접 MSW 테스트는
+`// @vitest-environment node`에서 실행함.
+
 `src/apis/apis/live.ts`의 `getChairmanToken()`은 `ApiUrl.live`에 인코딩된 table
 ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)`을
 호출한 뒤 `response.data`를 반환함. 화면이 Axios 설정이나 HTTP 응답 전체를 알
@@ -54,8 +61,11 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 `src/repositories/DebateTableRepository.ts`가 토론 테이블 CRUD 계약과
 `getRepository()` 선택을 소유함. 게스트 흐름은 `SessionDebateTableRepository`,
 그 외는 `ApiDebateTableRepository`를 사용함. 두 구현은 같은 인터페이스를 따르는
-인스턴스로 제공됨. 세션 저장의 브라우저 경계는 `src/util/sessionStorage.ts`가
-소유함.
+인스턴스로 제공됨. 게스트 테이블 세션 저장의 브라우저 경계는
+`src/util/sessionStorage.ts`가 소유함. 타이머 화면에서 쌓아 종료 화면에서 보내는
+토론 기록 초안은 `src/util/transcriptDraft.ts`가 테이블별 키로 소유함. 초안은
+STT 모드(`RPC`·`SONIOX`)와 Soniox 전사를 기다리는 구간을 함께 저장하고, 종료
+화면은 대기 구간이 끝난 뒤 초안을 보냄.
 
 `src/mocks/handlers/global.ts`의 `allHandlers`가 브라우저 개발 모드와 Node
 테스트의 공통 핸들러 집합임. `src/mocks/browser.ts`와 `src/mocks/server.ts`는

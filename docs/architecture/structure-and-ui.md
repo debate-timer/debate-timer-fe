@@ -49,7 +49,8 @@ UI·훅·Story는 페이지 안에 두고, 둘 이상의 화면에서 쓰는 계
 `src/hooks/`는 범용 React 훅, `src/page/**/hooks/`는 기능 상태와 이벤트 해석을
 소유함. `src/hooks/query/`와 `src/hooks/mutations/`는 서버 상태의 별도 경계임.
 이전 상태에 의존하는 변경은 함수형 setter를 사용하고, DOM listener·timer·구독은
-효과의 종료 시점에 정리함. 재구독 없이 최신 콜백을 사용해야 하면 Ref에 동기화함.
+효과의 종료 시점에 정리함. 재구독 없이 최신 콜백을 읽는 Effect Event와 Ref의
+선택 기준은 [React·UI 컨벤션](../conventions/react-and-ui.md#훅과-효과)이 소유함.
 실제 예시는 `src/hooks/useDocumentVisibility.ts`,
 `src/page/TimerPage/hooks/useTimerPageState.ts`,
 `src/hooks/sockets/useAudienceSocket.ts`에 있음.

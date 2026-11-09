@@ -62,14 +62,14 @@ export default function LanguageSelector() {
   }, [menuRef]);
 
   const triggerButtonClasses = clsx(
-    'flex h-full cursor-pointer items-center justify-center gap-[8px] px-[4px] font-semibold leading-none text-default-black',
+    'flex h-full cursor-pointer items-center justify-center gap-[8px] px-[4px] leading-none font-semibold text-default-black',
   );
 
   const menuPanelClasses = clsx(
-    'absolute right-0 top-full z-10 mt-[16px] flex w-[68px] origin-top transform flex-col overflow-hidden border border-default-disabled/hover bg-default-white shadow-[0_3px_5px_rgba(0,0,0,0.2)] transition-opacity transition-transform duration-200 ease-out',
+    'absolute top-full right-0 z-10 mt-[16px] flex w-[68px] origin-top transform flex-col overflow-hidden border border-default-disabled-hover bg-default-white shadow-[0_3px_5px_rgba(0,0,0,0.2)] transition-opacity transition-transform duration-200 ease-out',
     {
-      'opacity-100 scale-y-100 pointer-events-auto': isMenuOpen,
-      'opacity-0 scale-y-95 pointer-events-none': !isMenuOpen,
+      'pointer-events-auto scale-y-100 opacity-100': isMenuOpen,
+      'pointer-events-none scale-y-95 opacity-0': !isMenuOpen,
     },
   );
 

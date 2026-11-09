@@ -535,7 +535,7 @@ export default function TimerCreationContent({
           <h1 className="text-subtitle">
             {timerType === 'NORMAL' ? t('일반 타이머') : t('자유토론 타이머')}
           </h1>
-          <p className="text-body whitespace-pre-line leading-[1.5] text-default-neutral ">
+          <p className="text-body leading-[1.5] whitespace-pre-line text-default-neutral">
             {timerType === 'NORMAL'
               ? t('한 팀의 발언 시간이 세팅된 일반적인 타이머')
               : t(
@@ -582,7 +582,7 @@ export default function TimerCreationContent({
         <span className="w-[40px]"></span>
 
         {/* 옵션 */}
-        <span className="flex w-full flex-1 flex-col space-y-[16px]">
+        <span className="flex w-full flex-1 flex-col gap-y-[16px] [&>*:not(:first-child)]:my-0">
           {options.map((timerType, index) => {
             switch (timerType) {
               // 타이머 종류
@@ -755,13 +755,13 @@ export default function TimerCreationContent({
                   >
                     {/* 제목 및 종소리 횟수 배지 */}
                     <div className="flex w-full flex-row justify-between">
-                      <div className="relative flex items-center space-x-[8px]">
+                      <div className="relative flex items-center">
                         <p className="text-body w-[80px] font-medium">
                           {t('종소리 설정')}
                         </p>
                         <NotificationBadge
                           count={bells.length}
-                          className="absolute -right-[16px] -top-[4px]"
+                          className="absolute -top-[4px] -right-[16px]"
                         />
                       </div>
 
@@ -777,7 +777,7 @@ export default function TimerCreationContent({
                       >
                         <DTExpand
                           className={clsx(
-                            'h-full transform rounded-full p-[8px] text-default-black transition-all duration-300 ease-in-out hover:bg-default-disabled/hover',
+                            'h-full transform rounded-full p-[8px] text-default-black transition-all duration-300 ease-in-out hover:bg-default-disabled-hover',
                             {
                               'rotate-180': isBellExpanded,
                               'rotate-0': !isBellExpanded,
@@ -904,7 +904,7 @@ export default function TimerCreationContent({
                               </div>
 
                               <button
-                                className="absolute right-2 top-1/2 -translate-y-1/2 text-default-border"
+                                className="absolute top-1/2 right-2 -translate-y-1/2 text-default-border"
                                 onClick={() => handleDeleteBell(idx)}
                               >
                                 <DTClose className="size-[10px]" />

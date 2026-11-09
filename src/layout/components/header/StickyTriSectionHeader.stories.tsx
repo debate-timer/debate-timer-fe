@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import StickyTriSectionHeader from './StickyTriSectionHeader';
 import HeaderTableInfo from '../../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../../components/HeaderTitle/HeaderTitle';

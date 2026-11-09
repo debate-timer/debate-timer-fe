@@ -2,13 +2,7 @@ import { Stance, TimeBoxType } from '../../types/type';
 
 // WS 사용을 위한 이벤트 타입
 export type TimerEventTypes =
-  | 'NEXT'
-  | 'STOP'
-  | 'BEFORE'
-  | 'PLAY'
-  | 'RESET'
-  | 'TEAM_SWITCH'
-  | 'SYNC';
+  'NEXT' | 'STOP' | 'BEFORE' | 'PLAY' | 'RESET' | 'TEAM_SWITCH' | 'SYNC';
 
 // 데이터가 없는 이벤트
 export type NonTimerEventType = 'FINISHED' | 'ERROR';

@@ -103,10 +103,10 @@ export default function TeamSelectionModal({
         background: 'linear-gradient(180deg, #D1E5E9 0%, #FFF5D0 100%)',
       }}
     >
-      <div className="flex flex-grow flex-col items-center justify-center">
+      <div className="flex grow flex-col items-center justify-center">
         {coinState === 'initial' && (
           <div className="mt-7 flex flex-col items-center justify-center p-8 text-center">
-            <p className="sm:text-xl sm:leading-loose whitespace-pre-line text-lg font-semibold leading-7 md:text-2xl md:leading-9 lg:text-3xl lg:leading-[45px] xl:text-[34px] xl:leading-[50px]">
+            <p className="sm:text-xl sm:leading-loose text-lg leading-7 font-semibold whitespace-pre-line md:text-2xl md:leading-9 lg:text-3xl lg:leading-[45px] xl:text-[34px] xl:leading-[50px]">
               {t('팀별로\n동전의 앞 / 뒷면 중\n하나를 선택해 주세요.')}
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function TeamSelectionModal({
         {(coinState === 'front' || coinState === 'back') && (
           <div className="flex">
             <button
-              className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled/hover bg-default-white py-3 text-lg font-semibold hover:bg-default-disabled/hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
+              className="sm:text-lg sm:py-4 w-full border-[2px] border-default-disabled-hover bg-default-white py-3 text-lg font-semibold hover:bg-default-disabled-hover md:py-5 md:text-xl lg:py-[21px] lg:text-[22px]"
               onClick={handleEdit}
             >
               {t('토론 정보 수정하기')}

@@ -26,12 +26,23 @@
 `useNavigate`로 라우트 입력과 이동을 처리함. 숫자 식별자는 변환 후 유효성과 존재
 여부를 검사함. 언어를 보존하는 이동 경로는 `buildLangPath`로 만듦.
 
-| 단계           | 소유 코드                        | 결과                                        |
-| -------------- | -------------------------------- | ------------------------------------------- |
-| 라우트 선언    | `src/routes/routes.tsx`          | 경로·화면·인증 필요 여부를 한 항목에 보관함 |
-| 인증 판정      | `src/routes/ProtectedRoute.tsx`  | 미인증이면 언어별 홈으로 이동함             |
-| 언어 정규화    | `src/routes/LanguageWrapper.tsx` | 기본 언어 접두어를 없애고 i18n 상태를 맞춤  |
-| 화면 입력 처리 | 각 `src/page/` 컴포넌트          | URL 값을 검증한 뒤 기능 훅에 전달함         |
+| 단계           | 소유 코드                         | 결과                                          |
+| -------------- | --------------------------------- | --------------------------------------------- |
+| 라우트 선언    | `src/routes/routes.tsx`           | 경로·화면·인증 필요 여부를 한 항목에 보관함   |
+| 인증 판정      | `src/routes/ProtectedRoute.tsx`   | 미인증이면 언어별 홈으로 이동함               |
+| 기능 판정      | `src/routes/FeatureFlagRoute.tsx` | 피쳐 플래그가 없으면 언어별 대시보드로 이동함 |
+| 언어 정규화    | `src/routes/LanguageWrapper.tsx`  | 기본 언어 접두어를 없애고 i18n 상태를 맞춤    |
+| 화면 입력 처리 | 각 `src/page/` 컴포넌트           | URL 값을 검증한 뒤 기능 훅에 전달함           |
+
+### 피쳐 플래그
+
+회원별로 여는 기능은 `src/types/featureFlag.ts`의 `FeatureFlag`로 표현함.
+`src/hooks/useFeatureFlag.ts`가 `GET /api/member/feature-flags` 조회 결과로 보유
+여부를 판정하며, 조회 중이거나 실패하면 사용할 수 없는 것으로 봄. 기능 전용
+라우트는 `appRoutes`의 `element`를 `FeatureFlagRoute`로 감싸고, 화면 안의
+진입점은 같은 훅으로 숨김. 로그아웃하면 조회 결과를 지움. 현재 `TRANSCRIPT`가
+타이머 화면의 토론 기록 컨트롤, 대시보드의 토론 기록 탭, 속기록 상세 화면을
+제어함.
 
 ## 언어와 URL
 

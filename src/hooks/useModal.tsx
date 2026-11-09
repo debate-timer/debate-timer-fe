@@ -71,7 +71,7 @@ export function useModal(options: UseModalOptions = {}) {
       return (
         <GlobalPortal.Consumer>
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             onClick={handleOverlayClick}
           >
             <div className="relative overflow-hidden rounded-[20px] bg-white shadow-lg">
@@ -80,7 +80,7 @@ export function useModal(options: UseModalOptions = {}) {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className={`absolute right-4 top-4 text-3xl ${closeButtonColor}`}
+                  className={`absolute top-4 right-4 text-3xl ${closeButtonColor}`}
                   aria-label={t('모달 닫기')}
                 >
                   <DTClose className="size-[32px]" />

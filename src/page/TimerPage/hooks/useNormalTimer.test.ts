@@ -1,8 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useNormalTimer } from './useNormalTimer';
 
-describe('useNormalTimer', () => {
+describe('일반 타이머', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-09-25T10:00:00Z'));
@@ -12,7 +13,32 @@ describe('useNormalTimer', () => {
     vi.useRealTimers();
   });
 
-  describe('catchUpToClock', () => {
+  it('Strict Mode에서 재생을 반복해도 인터벌은 하나이며 재마운트 전에 정리된다', () => {
+    const mount = () =>
+      renderHook(() => useNormalTimer(), { wrapper: StrictMode });
+    const firstMount = mount();
+    const timerCount = vi.getTimerCount();
+
+    act(() => firstMount.result.current.setTimer(10));
+    act(() => {
+      firstMount.result.current.startTimer();
+      firstMount.result.current.startTimer();
+    });
+    expect(vi.getTimerCount()).toBe(timerCount + 1);
+    act(() => vi.advanceTimersByTime(1000));
+    expect(firstMount.result.current.timer).toBe(9);
+
+    firstMount.unmount();
+    expect(vi.getTimerCount()).toBe(timerCount);
+    const secondMount = mount();
+    act(() => secondMount.result.current.setTimer(20));
+    act(() => secondMount.result.current.startTimer());
+    expect(vi.getTimerCount()).toBe(timerCount + 1);
+    secondMount.unmount();
+    expect(vi.getTimerCount()).toBe(timerCount);
+  });
+
+  describe('실제 시각 보정', () => {
     it('인터벌이 밀려 있어도 실제 시각 기준 남은 시간으로 즉시 보정한다', () => {
       const { result } = renderHook(() => useNormalTimer());
 

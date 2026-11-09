@@ -31,7 +31,9 @@ export default function LiveShareModal({
 }: LiveShareModalProps) {
   const { t } = useTranslation();
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
-  const copyFeedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const copyFeedbackTimerRef = useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
   const copyRequestIdRef = useRef(0);
 
   useEffect(() => {
@@ -80,14 +82,14 @@ export default function LiveShareModal({
   return (
     <div
       data-testid="live-share-modal"
-      className="flex h-[300px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled/hover bg-default-white p-6 shadow-lg"
+      className="flex h-[300px] w-[300px] flex-col items-center justify-between rounded-2xl border-2 border-default-disabled-hover bg-default-white p-6 shadow-lg"
     >
       {isLoading ? (
         <div className="flex size-full items-center justify-center">
           <LoadingSpinner
             strokeWidth={2}
             size={'size-24'}
-            color={'text-default-disabled/hover'}
+            color={'text-default-disabled-hover'}
           />
         </div>
       ) : (

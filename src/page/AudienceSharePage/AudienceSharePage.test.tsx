@@ -388,7 +388,7 @@ describe('AudienceSharePage', () => {
       expect(screen.getByText('반대 팀')).toBeInTheDocument();
       expect(screen.getByText('이토론 토론자')).toBeInTheDocument();
       expect(screen.getByTestId('timer-progress-fill')).toHaveClass(
-        'bg-camp-red',
+        'bg-stance-red',
       );
     });
 

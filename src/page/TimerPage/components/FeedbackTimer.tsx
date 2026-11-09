@@ -55,7 +55,7 @@ export default function FeedbackTimer({
   return (
     <div className="flex flex-row items-center space-x-[80px]">
       {/* 좌측 영역 */}
-      <div className="flex h-[186px] w-[466px] flex-shrink-0 flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
+      <div className="flex h-[186px] w-[466px] shrink-0 flex-col items-center justify-center space-y-[20px] px-[45px] xl:space-y-[36px]">
         {/* 제목 */}
         <h1 className="text-[52px] font-bold xl:text-[68px]">
           {t('피드백 타이머')}
@@ -92,7 +92,7 @@ export default function FeedbackTimer({
         >
           <span
             className={clsx(
-              'flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[70px] font-bold tabular-nums text-default-black xl:text-[110px]',
+              'flex w-full flex-row items-center justify-center space-x-[16px] p-[16px] text-[70px] font-bold text-default-black tabular-nums xl:text-[110px]',
             )}
           >
             <p className="flex flex-1 items-center justify-center">{minute}</p>

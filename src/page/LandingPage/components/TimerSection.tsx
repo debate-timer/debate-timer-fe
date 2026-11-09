@@ -16,14 +16,14 @@ export default function TimerSection() {
           <span className="relative z-10">{t('타이머 화면')}</span>
           <span className="absolute bottom-0 left-0 z-0 h-4 w-full bg-brand/70"></span>
         </div>
-        <h2 className="mt-4 whitespace-pre-line text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold whitespace-pre-line">
           {t('원하는 때에\n작전 시간 사용하기')}
         </h2>
       </div>
       <div className="flex flex-row items-center justify-center gap-8 px-4">
         <img src={timer} alt="section301" className="flex w-1/2" />
         <div className="flex w-1/2 flex-col items-center gap-4">
-          <h3 className="whitespace-pre-line text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
+          <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold whitespace-pre-line">
             {t(
               '토론자가 작전 시간을 요청하면\n작전 시간 버튼을 눌러 시간을 사용해요',
             )}
@@ -32,7 +32,7 @@ export default function TimerSection() {
       </div>
       <div className="flex flex-row items-center justify-center gap-8 px-4">
         <div className="flex w-1/2 flex-col items-center gap-4">
-          <h3 className="whitespace-pre-line text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold">
+          <h3 className="text-[min(max(1.1rem,1.75vw),1.8rem)] font-semibold whitespace-pre-line">
             {t('작전 시간이 나타나면\n원하는 시간을 입력하세요!')}
           </h3>
         </div>
@@ -40,7 +40,7 @@ export default function TimerSection() {
       </div>
 
       <div>
-        <h2 className="mt-4 whitespace-pre-line text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold">
+        <h2 className="mt-4 text-left text-[min(max(1.25rem,2.75vw),2.5rem)] font-bold whitespace-pre-line">
           {t('키보드 단축키로\n더 편리한 조작')}
         </h2>
       </div>

@@ -18,35 +18,14 @@ export default function LabeledCheckBox({
 
   return (
     <label
-      className={`
-        flex items-center gap-2 text-sm md:text-base
-        ${disabled ? 'text-neutral-400' : 'cursor-pointer text-neutral-900'}
-        `}
+      className={`flex items-center gap-2 text-sm md:text-base ${disabled ? 'text-neutral-400' : 'cursor-pointer text-neutral-900'} `}
     >
       <input
         {...rest}
         type="checkbox"
         checked={checked}
         disabled={disabled}
-        className={`
-          checked:before:text-background-default
-          relative
-          h-5 w-5
-          cursor-pointer
-          appearance-none rounded-sm
-          border
-          border-neutral-300
-          checked:border-transparent
-          checked:bg-blue-500
-          checked:before:absolute
-          checked:before:left-1/2
-          checked:before:top-[-4px]
-          checked:before:-translate-x-1/2
-          checked:before:text-xl
-          checked:before:font-bold
-          checked:before:content-['✓']
-          focus:outline-none
-        `}
+        className={`checked:before:text-background-default relative h-5 w-5 cursor-pointer appearance-none rounded-xs border border-neutral-300 checked:border-transparent checked:bg-blue-500 checked:before:absolute checked:before:top-[-4px] checked:before:left-1/2 checked:before:-translate-x-1/2 checked:before:text-xl checked:before:font-bold checked:before:content-['✓'] focus:outline-hidden`}
       />
       {label}
     </label>

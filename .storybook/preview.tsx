@@ -1,10 +1,9 @@
 // preview.ts
-import type { Preview } from '@storybook/react';
+import type { Preview } from '@storybook/react-vite';
 import '../src/index.css';
 import { GlobalPortal } from '../src/util/GlobalPortal/index';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import React from 'react';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { allHandlers } from '../src/mocks/handlers/global';
 
@@ -24,7 +23,7 @@ const preview: Preview = {
       },
     },
     viewport: {
-      viewports: {
+      options: {
         laptop1024: {
           name: 'Laptop 1024',
           styles: {
@@ -58,7 +57,6 @@ const preview: Preview = {
           type: 'desktop',
         },
       },
-      defaultViewport: 'responsive',
     },
   },
   loaders: [mswLoader],

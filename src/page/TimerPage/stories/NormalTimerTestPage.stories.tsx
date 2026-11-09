@@ -1,5 +1,5 @@
 // NormalTimerTestPage.stories.tsx
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { TimeBoxInfo } from '../../../types/type';
 import DefaultLayout from '../../../layout/defaultLayout/DefaultLayout';
 import HeaderTableInfo from '../../../components/HeaderTableInfo/HeaderTableInfo';

@@ -55,7 +55,7 @@ export default function AnswerTimeSetting({
     >
       <button
         type="button"
-        className="flex h-[44px] w-[184px] items-center justify-center gap-[8px] whitespace-nowrap text-subtitle-raw font-bold leading-none text-default-black"
+        className="flex h-[44px] w-[184px] items-center justify-center gap-[8px] text-subtitle-raw leading-none font-bold whitespace-nowrap text-default-black"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
@@ -64,7 +64,7 @@ export default function AnswerTimeSetting({
         <span>{t('답변시간 설정')}</span>
         <DTExpand
           className={clsx(
-            'w-[12px] flex-shrink-0 transition-transform duration-200',
+            'w-[12px] shrink-0 transition-transform duration-200',
             {
               'rotate-180': isOpen,
             },
@@ -74,7 +74,7 @@ export default function AnswerTimeSetting({
 
       <div
         className={clsx(
-          'absolute right-0 top-full z-20 mt-[16px] flex h-[130px] w-[240px] origin-top flex-col border border-default-disabled/hover bg-default-white px-[22px] py-[12px] text-left shadow-[0_3px_8px_rgba(0,0,0,0.22)] transition-opacity transition-transform duration-200 ease-out',
+          'absolute top-full right-0 z-20 mt-[16px] flex h-[130px] w-[240px] origin-top flex-col border border-default-disabled-hover bg-default-white px-[22px] py-[12px] text-left shadow-[0_3px_8px_rgba(0,0,0,0.22)] transition-opacity transition-transform duration-200 ease-out',
           {
             'pointer-events-auto scale-y-100 opacity-100': isOpen,
             'pointer-events-none scale-y-95 opacity-0': !isOpen,
@@ -83,11 +83,11 @@ export default function AnswerTimeSetting({
         role="dialog"
         aria-label={t('답변시간 설정')}
       >
-        <p className="text-[16px] font-bold leading-none text-default-black">
+        <p className="text-[16px] leading-none font-bold text-default-black">
           {t('보장 시간')}
         </p>
 
-        <div className="my-[12px] h-[2px] bg-default-disabled/hover" />
+        <div className="my-[12px] h-[2px] bg-default-disabled-hover" />
 
         <div className="flex items-center gap-[8px]" role="group">
           {ANSWER_TIME_OPTIONS.map((seconds) => (
@@ -95,7 +95,7 @@ export default function AnswerTimeSetting({
               key={seconds}
               type="button"
               className={clsx(
-                'flex h-[28px] w-[42px] items-center justify-center rounded-[4px] border border-default-neutral text-[12px] font-semibold leading-none transition-colors',
+                'flex h-[28px] w-[42px] items-center justify-center rounded-[4px] border border-default-neutral text-[12px] leading-none font-semibold transition-colors',
                 {
                   'bg-brand text-default-black': seconds === answerTime,
                   'bg-default-white text-default-black': seconds !== answerTime,

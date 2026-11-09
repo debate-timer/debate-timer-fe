@@ -28,7 +28,7 @@ function StickyTriSectionHeader(props: PropsWithChildren) {
 
   return (
     // 언어 선택 등 헤더 아래로 펼쳐지는 메뉴가 잘리지 않도록 넘침은 제목 영역에서만 숨김
-    <header className="sticky top-0 z-30 h-[56px] flex-shrink-0 border-b-[3px] border-default-disabled/hover md:h-[80px] short:h-[56px]">
+    <header className="sticky top-0 z-30 h-[56px] shrink-0 border-b-[3px] border-default-disabled-hover md:h-[80px] short:h-[56px]">
       <div className="relative flex h-full items-center justify-between p-[8px] md:p-[16px] short:p-[8px]">
         {children}
       </div>
@@ -90,7 +90,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
     <>
       <div className="flex h-full flex-1 items-center justify-end gap-[8px] text-right md:gap-[12px]">
         {isGuestFlow() && (
-          <div className="animate-pulse whitespace-nowrap rounded-full bg-neutral-300 px-4 py-2 font-semibold">
+          <div className="animate-pulse rounded-full bg-neutral-300 px-4 py-2 font-semibold whitespace-nowrap">
             {t('비회원 모드')}
           </div>
         )}
@@ -169,7 +169,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
             isBold: true,
           }}
         >
-          <div className="break-keep px-20 py-10 text-center text-xl font-bold">
+          <div className="px-20 py-10 text-center text-xl font-bold break-keep">
             <p className="whitespace-pre-line">
               {t(
                 '비회원으로 사용하던 시간표가 있습니다.\n로그인 후에도 이 시간표를 계속 사용하시겠습니까?',

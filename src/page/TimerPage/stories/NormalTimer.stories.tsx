@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import NormalTimer from '../components/NormalTimer';
 
 const meta: Meta<typeof NormalTimer> = {

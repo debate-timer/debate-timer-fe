@@ -9,10 +9,7 @@ export default function DTCheck({
     <svg
       viewBox="0 0 20 16"
       fill="none"
-      className={`
-        aspect-[20/16]
-        ${className}
-      `}
+      className={`aspect-[20/16] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

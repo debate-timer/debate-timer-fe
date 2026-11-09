@@ -1,5 +1,5 @@
 // VoteCompletePage.stories.tsx
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import VoteParticipationPage from './VoteParticipationPage';
 
 const meta: Meta<typeof VoteParticipationPage> = {

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import AudienceFinishedPage from './AudienceFinishedPage';
 
 const meta: Meta<typeof AudienceFinishedPage> = {
@@ -26,14 +26,14 @@ export const Mobile: Story = {
   ...Default,
   parameters: {
     viewport: {
-      viewports: {
+      options: {
         mobile375: {
           name: 'Mobile 375',
           styles: { width: '375px', height: '812px' },
           type: 'mobile',
         },
       },
-      defaultViewport: 'mobile375',
     },
   },
+  globals: { viewport: { value: 'mobile375', isRotated: false } },
 };

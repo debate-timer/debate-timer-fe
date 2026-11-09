@@ -2,6 +2,12 @@ import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../../apis/endpoints';
 
 export const memberHandlers = [
+  // GET /api/member/feature-flags
+  // 개발 모드에서는 모든 기능을 볼 수 있도록 전부 내려준다.
+  http.get(`${ApiUrl.member}/feature-flags`, () => {
+    return HttpResponse.json({ featureFlags: ['TRANSCRIPT'] });
+  }),
+
   // POST "/api/member"
   http.post(ApiUrl.member, async () => {
     return HttpResponse.json({

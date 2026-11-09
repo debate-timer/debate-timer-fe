@@ -40,11 +40,9 @@ export default function AnswerTimeProgress({
       )}
       onClick={onClick}
     >
-      <span className="flex-shrink-0 font-bold text-default-black">
-        {t('답변')}
-      </span>
+      <span className="shrink-0 font-bold text-default-black">{t('답변')}</span>
 
-      <div className="relative h-[12px] min-w-0 flex-1 overflow-hidden rounded-full bg-default-disabled/hover xl:h-[18px]">
+      <div className="relative h-[12px] min-w-0 flex-1 overflow-hidden rounded-full bg-default-disabled-hover xl:h-[18px]">
         <div className="absolute inset-[1px] rounded-full bg-default-white" />
         <div
           className={clsx(
@@ -57,7 +55,7 @@ export default function AnswerTimeProgress({
         />
       </div>
 
-      <span className="flex-shrink-0 text-right font-bold tabular-nums leading-none text-default-black">
+      <span className="shrink-0 text-right leading-none font-bold text-default-black tabular-nums">
         {t('{{seconds}}초', { seconds: elapsedTime.toFixed(1) })}
       </span>
     </button>

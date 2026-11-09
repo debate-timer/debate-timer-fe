@@ -48,12 +48,12 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
         data-testid="audience-share-error-icon"
         aria-hidden="true"
       />
-      <p className="whitespace-pre-line break-keep px-4 text-center text-xl font-semibold text-gray-800 xl:text-2xl">
+      <p className="px-4 text-center text-xl font-semibold break-keep whitespace-pre-line text-gray-800 xl:text-2xl">
         {message}
       </p>
       <button
         type="button"
-        className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        className="rounded-lg bg-gray-800 px-6 py-3 text-lg font-semibold text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-hidden"
         onClick={onReload}
       >
         {t('새로고침')}
@@ -161,7 +161,7 @@ export default function AudienceSharePage() {
 
       case 'NORMAL_TIMER':
         return (
-          <div className="flex h-full w-full items-center justify-center [align-items:safe_center]">
+          <div className="flex h-full w-full [align-items:safe_center] items-center justify-center">
             <AudienceNormalTimer
               remainingTime={
                 normalCountdown.currentSeconds ??
@@ -196,7 +196,7 @@ export default function AudienceSharePage() {
               viewState.timeBox.timePerSpeaking);
 
         return (
-          <div className="flex h-full w-full items-center justify-center [align-items:safe_center] md:px-4 xl:px-12">
+          <div className="flex h-full w-full [align-items:safe_center] items-center justify-center md:px-4 xl:px-12">
             <AudienceTimeBasedTimer
               prosTeamName={viewState.prosTeamName}
               consTeamName={viewState.consTeamName}
@@ -275,13 +275,13 @@ export default function AudienceSharePage() {
           {shouldShowHeader ? (
             <p
               data-testid="mobile-agenda"
-              className="line-clamp-2 flex-shrink-0 break-keep pb-2 text-center text-lg font-semibold text-default-black md:hidden short:hidden"
+              className="line-clamp-2 shrink-0 pb-2 text-center text-lg font-semibold break-keep text-default-black md:hidden short:hidden"
             >
               {agendaLabel}
             </p>
           ) : null}
           {shouldShowWaitingNotice ? (
-            <div className="flex-shrink-0 pb-2">
+            <div className="shrink-0 pb-2">
               <ChairmanStatusNotice variant="waiting" />
             </div>
           ) : null}

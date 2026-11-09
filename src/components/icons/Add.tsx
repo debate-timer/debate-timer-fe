@@ -9,10 +9,7 @@ export default function DTAdd({
     <svg
       viewBox="0 0 15 14"
       fill="none"
-      className={`
-        aspect-[15/14]
-        ${className}
-      `}
+      className={`aspect-[15/14] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

@@ -19,12 +19,19 @@ export class APIError extends Error {
   }
 }
 
+// 기본 JSON 요청과 다른 헤더·제한 시간이 필요한 요청(파일 업로드 등)의 선택 설정
+export interface RequestOptions {
+  headers?: Record<string, string>;
+  timeout?: number;
+}
+
 // Low-level http request function
 export async function request<T>(
   method: HttpMethod,
   endpoint: string,
   data: object | null,
   params: object | null,
+  options: RequestOptions = {},
 ): Promise<AxiosResponse<T>> {
   const instance = axiosInstance;
 
@@ -35,6 +42,7 @@ export async function request<T>(
       url: endpoint,
       data,
       params,
+      ...options,
     });
 
     // If successful, return it

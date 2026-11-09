@@ -27,12 +27,12 @@ export default function VoteTeamButton({
       className={clsx(
         'flex w-full max-w-[320px] flex-1 flex-col items-center justify-center',
         'rounded-[32px] border-[3px] px-8 py-8 text-center',
-        'transition-transform duration-150 hover:scale-[1.02] focus:outline-none',
+        'transition-transform duration-150 hover:scale-[1.02] focus:outline-hidden',
         'md:aspect-square md:gap-2',
         // 조건 변경
         isSelected || selectedTeam === null
           ? [style.baseBg, style.baseBorder]
-          : 'border-neutral-300 bg-default-disabled/hover',
+          : 'border-neutral-300 bg-default-disabled-hover',
       )}
       aria-pressed={isSelected}
     >

@@ -25,17 +25,58 @@
 
 DOM 이벤트와 timer를 등록한 effect는 cleanup 또는 종료 조건에서 해제함. 이전
 상태에 의존하는 변경은 함수형 setter를 사용함. effect 의존성·자식 props·외부
-listener에 전달할 제어 함수는 `useCallback`으로 안정화함. 재구독 없이 최신
-콜백이 필요한 경우 Ref를 동기화함. `useLayoutEffect`는 DOM 측정·전체 화면처럼
+listener에 전달할 제어 함수는 `useCallback`으로 안정화함. `useLayoutEffect`는 DOM 측정·전체 화면처럼
 paint 전에 동기화해야 하는 작업에 한정함. 근거는
 `src/hooks/useDocumentVisibility.ts`, `src/hooks/useModal.tsx`,
 `src/hooks/useFullscreen.ts`에 있음.
 
+effect가 등록한 이벤트에서 최신 콜백을 읽되 콜백 변경으로 재구독할 필요가 없으면
+`useEffectEvent`를 사용함. Effect Event는 정의한 컴포넌트·훅의 effect와 그 내부
+이벤트에서만 호출하며 반환하거나 다른 훅·컴포넌트에 전달하지 않음. effect 의존성에
+넣거나 실제 재구독 조건을 숨기는 데 사용하지 않음. 클릭 핸들러·외부 호출 API처럼
+effect 밖에서도 호출해야 하는 콜백은 기존 함수·`useCallback`·Ref 방식을 유지함.
+근거는 `src/hooks/useDocumentVisibility.ts`임. Hooks 검사는 `eslint.config.js`의
+`rules-of-hooks`·`exhaustive-deps`가 소유하며 Compiler 규칙은 별도 도입함.
+
 ## 스타일과 접근성
+
+새 UI는 기존 UI의 재사용 가능성을 먼저 확인하고,
+[공통 디자인](design.md)에서 시각 역할·필요한 변형을 선택함. 구현 시 실제 CSS
+정의와 사용처를 대조하고, 관련 상태·긴 번역 문구·화면 조건에서 결과를 확인함.
+UI 책임과 재사용 범위는 [구조와 UI](../architecture/structure-and-ui.md),
+검증 절차는 [테스트·Storybook](testing-and-storybook.md)을 따름.
 
 Tailwind utility와 제한된 공통 CSS를 사용함. `className` 문자열이 100자를
 초과하면 `UPPER_SNAKE_CASE` 상수로 분리함. `DT*` 아이콘은 해당 아이콘 컴포넌트
 파일에서 직접 import함. 다른 아이콘의 export 방식은 규정하지 않음.
+
+Tailwind CSS 4 설정은 `src/index.css`가 소유함. 공통 Vite 설정의
+`@tailwindcss/vite` 플러그인이 앱과 Storybook에 한 번씩 적용됨. 클래스 탐색은
+`source(none)`과 `@source './'`로 `src`에 한정함. 색상·글꼴·글자 크기·그림자·
+애니메이션은 `@theme`, 배경 이미지는 `@utility`로 등록함. `@apply`에는 등록된
+utility를 사용하며 일반 CSS 선택자를 참조하지 않음. 기존 `.button`·`.timebox`·
+글자 스타일 선택자는 우선순위를 유지하기 위해 계층 밖에 둠. 기본 문단 줄바꿈은
+`base` 계층에 두어 `truncate`·`whitespace-*` utility가 우선하도록 함.
+
+화면 조건은 `md` 768px 이상, `lg` 1280px 이상임. `xl`은 너비 1600px 이상이면서
+높이 1024px 이상, `short`는 높이 500px 이하인 사용자 정의 variant임. 기본
+breakpoint는 초기화하며 `sm` 등 다른 화면 조건을 자동으로 추가하지 않음.
+기본 팔레트는 v3 호환 재정의 없이 Tailwind CSS 4의 내장값을 사용함. 브랜드·
+진영색과 기존 UI가 소비하는 `default-*`·`semantic-*` 사용자 정의 색상은
+`src/index.css`에 남아 있음. 색상의 의미별 사용 기준은
+[공통 디자인](design.md#색상과-강조)이 소유하며, 기존 사용자 정의 색상을
+전환할 때는 사용처를 함께 확인함. 새 글자 역할은
+[역할별 타이포그래피](design.md#타이포그래피)의 `text-ui-*`를 사용하며, 기존의
+크기 전용 글자 스타일 선택자와 구분함. 사양과 소스의 동기화는
+[사용과 사양 동기화](design.md#사용과-사양-동기화)를 따름.
+
+클래스 정렬은 `.prettierrc`의 `prettier-plugin-tailwindcss`가 담당함.
+`tailwindStylesheet`는 `./src/index.css`, `tailwindFunctions`는 `['clsx']`임.
+지원 브라우저는 Safari 16.4+, Chrome 111+, Firefox 128+임. 공용
+[`vite.config.ts`](../../vite.config.ts)의 `build.target`에 `chrome111`,
+`safari16.4`, `firefox128`을 명시하며 Storybook도 이 대상을 전달받음. Vite의
+기본값 변경으로 지원 범위를 축소하지 않음. `hover`는 기본 입력
+장치가 hover를 지원할 때만 적용되므로 터치 동작을 hover에 의존하지 않음.
 
 사용자 클릭 동작에는 `<button>`·`<a>` 같은 시맨틱 요소를 사용함. **모든 버튼에
 번역된 `aria-label`을 부여함.** `title`은 보조 설명으로만 사용함.

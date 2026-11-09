@@ -22,7 +22,7 @@ export default function Header({ onLoginButtonClicked }: HeaderProps) {
 
   return (
     <header
-      className={`fixed left-0 top-0 z-20 flex w-full items-center justify-center bg-white py-2 transition-shadow duration-200 ${
+      className={`fixed top-0 left-0 z-20 flex w-full items-center justify-center bg-white py-2 transition-shadow duration-200 ${
         isScrolled ? 'shadow-md' : ''
       }`}
     >

@@ -9,10 +9,7 @@ export default function DTBell({
     <svg
       viewBox="0 0 23 23"
       fill="none"
-      className={`
-        aspect-[23/23]
-        ${className}
-      `}
+      className={`aspect-[23/23] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

@@ -32,7 +32,7 @@ export default function AnswerTimeTimer({
         <button
           type="button"
           className={
-            'flex h-[40px] w-[168px] flex-shrink-0 items-center justify-center rounded-[44px] border border-default-disabled/hover bg-default-white font-semibold leading-none text-default-neutral xl:w-[208px]'
+            'flex h-[40px] w-[168px] shrink-0 items-center justify-center rounded-[44px] border border-default-disabled-hover bg-default-white leading-none font-semibold text-default-neutral xl:w-[208px]'
           }
           disabled={!isMainTimerRunning}
           onClick={() => onClick(owner, isMainTimerRunning)}

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import LabeledRadioButton from './LabeledRadioButton';
 
 const meta: Meta<typeof LabeledRadioButton> = {

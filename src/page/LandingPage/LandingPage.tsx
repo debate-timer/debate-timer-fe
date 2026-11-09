@@ -25,7 +25,7 @@ export default function LandingPage() {
 
         <main className="flex w-full flex-col items-center">
           {/* 흰색 배경 */}
-          <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 pb-48 pt-20 md:w-[64%]">
+          <div className="flex w-[95%] max-w-[1226px] flex-col gap-96 pt-20 pb-48 md:w-[64%]">
             {/* 메인 화면 */}
             <MainSection
               onStartWithoutLogin={handleStartWithoutLogin}
@@ -40,7 +40,7 @@ export default function LandingPage() {
           </div>
 
           {/* 회색 배경 */}
-          <div className="flex w-full flex-col items-center bg-default-disabled/hover py-48">
+          <div className="flex w-full flex-col items-center bg-default-disabled-hover py-48">
             {/* 타이머 화면 */}
             <TimerSection />
           </div>

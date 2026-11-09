@@ -9,10 +9,7 @@ export default function DTReset({
     <svg
       viewBox="0 0 49 36"
       fill="none"
-      className={`
-        aspect-[49/36]
-        ${className}
-      `}
+      className={`aspect-[49/36] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

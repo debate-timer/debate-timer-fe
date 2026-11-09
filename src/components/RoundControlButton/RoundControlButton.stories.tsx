@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import PrevNextButton from './RoundControlButton';
 
 const meta: Meta<typeof PrevNextButton> = {

@@ -170,7 +170,7 @@ export default function DebateWaitingNotice({
           />
         </motion.g>
       </svg>
-      <h1 className="break-keep px-4 text-center text-2xl font-bold text-gray-800 xl:text-4xl">
+      <h1 className="px-4 text-center text-2xl font-bold break-keep text-gray-800 xl:text-4xl">
         {message}
       </h1>
     </div>

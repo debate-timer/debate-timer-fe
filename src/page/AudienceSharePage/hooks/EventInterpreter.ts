@@ -23,8 +23,7 @@ export type AudienceTimeBasedDisplayData = {
 };
 
 export type AudienceDisplayData =
-  | AudienceNormalDisplayData
-  | AudienceTimeBasedDisplayData;
+  AudienceNormalDisplayData | AudienceTimeBasedDisplayData;
 
 export function getNextTeam(team: TimeBasedStance): TimeBasedStance {
   return team === 'PROS' ? 'CONS' : 'PROS';

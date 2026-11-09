@@ -43,9 +43,9 @@ export default function ShareModal({
         {copyState && (
           <div className="absolute flex size-full rounded-2xl">
             <div className="absolute z-10 size-full rounded-2xl bg-default-black opacity-80" />
-            <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4  p-[30px] text-default-white">
+            <div className="absolute z-20 flex size-full flex-col items-center justify-center space-y-4 p-[30px] text-default-white">
               <IoShareOutline className="size-[120px]" />
-              <p className="whitespace-nowrap text-center text-[20px]">
+              <p className="text-center text-[20px] whitespace-nowrap">
                 {t('링크가 클립보드에 복사됨')}
               </p>
             </div>
@@ -59,7 +59,7 @@ export default function ShareModal({
             <LoadingSpinner
               strokeWidth={3}
               size={'size-24'}
-              color={'text-default-disabled/hover'}
+              color={'text-default-disabled-hover'}
             />
           )}
           {!isLoading && (

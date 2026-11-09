@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import TimeBox from './TimeBox';
 
 const meta: Meta<typeof TimeBox> = {

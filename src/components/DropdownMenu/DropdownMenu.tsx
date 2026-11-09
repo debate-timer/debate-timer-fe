@@ -63,13 +63,13 @@ export default function DropdownMenu<T>({
 
   const buttonClasses = clsx(
     'relative flex w-full items-center justify-between rounded-md border bg-default-white px-4 py-2 text-left transition-all duration-200 ease-in-out',
-    'focus:outline-none',
+    'focus:outline-hidden',
     {
-      'border-default-disabled/hover text-default-disabled/hover cursor-not-allowed':
+      'cursor-not-allowed border-default-disabled-hover text-default-disabled-hover':
         disabled,
-      'border-semantic-material ring-semantic-material/30 ring-4':
+      'border-semantic-material ring-4 ring-semantic-material/30':
         isOpen && !disabled,
-      'border-default-border text-default-black hover:bg-default-disabled/hover':
+      'border-default-border text-default-black hover:bg-default-disabled-hover':
         !disabled,
     },
   );
@@ -77,16 +77,16 @@ export default function DropdownMenu<T>({
   const menuClasses = clsx(
     'absolute z-10 mt-1 w-full overflow-hidden rounded-lg bg-default-white shadow-lg transition-all duration-200 ease-out',
     {
-      'max-h-60 opacity-100 transform scale-y-100 origin-top': isOpen,
-      'max-h-0 opacity-0 transform scale-y-95 origin-top pointer-events-none':
+      'max-h-60 origin-top scale-y-100 transform opacity-100': isOpen,
+      'pointer-events-none max-h-0 origin-top scale-y-95 transform opacity-0':
         !isOpen,
     },
   );
 
   const optionItemClasses = (optionValue: T) =>
     clsx(
-      'cursor-pointer px-4 py-2 text-default-black transition-colors duration-150 ',
-      'hover:bg-default-disabled/hover',
+      'cursor-pointer px-4 py-2 text-default-black transition-colors duration-150',
+      'hover:bg-default-disabled-hover',
       {
         'bg-semantic-material/30 font-bold': optionValue === selectedValue,
       },

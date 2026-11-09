@@ -4,6 +4,7 @@ import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
 import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
 import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
+import FeatureFlagRoute from './FeatureFlagRoute';
 import OAuth from '../page/OAuthPage/OAuth';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
@@ -19,6 +20,7 @@ import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultP
 import LanguageWrapper from './LanguageWrapper';
 import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
 import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedPage';
+import DebateTranscriptPage from '../page/DebateTranscriptPage/DebateTranscriptPage';
 
 const appRoutes = [
   {
@@ -64,6 +66,15 @@ const appRoutes = [
   {
     path: 'table/customize/:tableId/end/vote/:pollId/result',
     element: <DebateVoteResultPage />,
+    requiresAuth: true,
+  },
+  {
+    path: 'table/customize/:tableId/end/transcript/:transcriptId',
+    element: (
+      <FeatureFlagRoute flag="TRANSCRIPT">
+        <DebateTranscriptPage />
+      </FeatureFlagRoute>
+    ),
     requiresAuth: true,
   },
   {

@@ -9,10 +9,7 @@ export default function DTClose({
     <svg
       viewBox="0 0 39 38"
       fill="none"
-      className={`
-        aspect-[39/38]
-        ${className}
-      `}
+      className={`aspect-[39/38] ${className} `}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

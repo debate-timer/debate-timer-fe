@@ -63,7 +63,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
         </div>
       </div>
 
-      <div className="flex flex-col space-y-1 text-slate-50">
+      <div className="flex flex-col gap-y-1 text-slate-50">
         <div className="mb-2 flex flex-row items-center space-x-4">
           <LuKeyboard size={18} />
           <h1 className="text-xl font-bold">{t('키보드 조작')}</h1>
@@ -78,7 +78,7 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
         </div>
       </div>
 
-      <div className="flex flex-col space-y-1 text-slate-50">
+      <div className="flex flex-col gap-y-1 text-slate-50">
         <div className="mb-2 flex flex-row items-center space-x-4">
           <RiFullscreenFill size={18} />
           <h1 className="text-xl font-bold">{t('전체 화면')}</h1>

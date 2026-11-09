@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import TimerCreationContent from './TimerCreationContent';
 
 const meta: Meta<typeof TimerCreationContent> = {

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import SmallIconButtonContainer from './SmallIconContainer';
 import DTHome from '../icons/Home';
 

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import FirstUseToolTip from '../components/FirstUseToolTip';
 
 const meta: Meta<typeof FirstUseToolTip> = {

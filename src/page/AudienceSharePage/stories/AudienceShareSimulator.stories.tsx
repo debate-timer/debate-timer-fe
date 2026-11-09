@@ -1,7 +1,7 @@
 // AudienceShareSimulator.stories.tsx
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { IMessage, StompSubscription } from '@stomp/stompjs';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { socketManager } from '../../../apis/sockets/SocketManager';
@@ -218,7 +218,7 @@ function AudienceShareSimulator() {
   return (
     // 모바일에서는 청중 화면을 실제 크기로 먼저 보여주고, 컨트롤 패널은 아래로 스크롤해 사용
     <div className="flex flex-col md:h-screen md:flex-row">
-      <div className="relative h-screen flex-none overflow-hidden border-b border-neutral-300 supports-[height:100dvh]:h-dvh md:h-full md:flex-1 md:border-b-0 md:border-r">
+      <div className="relative h-screen flex-none overflow-hidden border-b border-neutral-300 supports-[height:100dvh]:h-dvh md:h-full md:flex-1 md:border-r md:border-b-0">
         <Routes>
           <Route path="/live/:id" element={<AudienceSharePage />} />
           <Route path="/live/:id/end" element={<AudienceFinishedPage />} />
@@ -295,7 +295,7 @@ function AudienceShareSimulator() {
           </h2>
           <ol className="flex flex-col gap-1 text-xs text-gray-700">
             {logs.map((log) => (
-              <li key={log.id} className="rounded bg-white px-2 py-1">
+              <li key={log.id} className="rounded-sm bg-white px-2 py-1">
                 #{log.id} {log.eventType} · v{log.version}
                 {log.note && (
                   <span className="block text-gray-500">{t(log.note)}</span>
@@ -330,14 +330,14 @@ export const Mobile: Story = {
   ...Default,
   parameters: {
     viewport: {
-      viewports: {
+      options: {
         mobile375: {
           name: 'Mobile 375',
           styles: { width: '375px', height: '812px' },
           type: 'mobile',
         },
       },
-      defaultViewport: 'mobile375',
     },
   },
+  globals: { viewport: { value: 'mobile375', isRotated: false } },
 };

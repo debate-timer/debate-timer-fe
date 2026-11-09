@@ -113,7 +113,7 @@ export default function VolumeBar({
       </svg>
 
       {/* Content Layer */}
-      <div className="relative z-10 flex h-full w-full items-center justify-center px-4 pb-2 pt-5">
+      <div className="relative z-10 flex h-full w-full items-center justify-center px-4 pt-5 pb-2">
         <div className="flex w-full flex-row items-center gap-2">
           <button
             onClick={handleMute}
@@ -124,7 +124,7 @@ export default function VolumeBar({
             <DTVolume
               className={clsx('size-full', {
                 'text-default-black': isNotMute,
-                'text-default-disabled/hover': !isNotMute,
+                'text-default-disabled-hover': !isNotMute,
               })}
             />
           </button>

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 import FeedbackTimer from '../components/FeedbackTimer';
 import { useFeedbackTimer } from '../hooks/useFeedbackTimer';
