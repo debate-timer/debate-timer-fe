@@ -9,6 +9,7 @@ import {
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
   sanitizeSentryContext,
+  sanitizeSentryRequest,
   sanitizeSentrySearch,
   sanitizeSentryUrl,
   shouldSkipSentryEvent,
@@ -195,6 +196,36 @@ describe('sentry 유틸', () => {
     ).toBe(
       'https://api.example.com/oauth?code=%5BFiltered%5D&redirect=%2Fhome',
     );
+  });
+
+  it('이벤트에 담기는 페이지 주소와 query string에서 OAuth 인가 코드를 마스킹한다', () => {
+    expect(
+      sanitizeSentryRequest({
+        url: 'https://www.debate-timer.com/oauth?code=AUTH_CODE&prompt=consent',
+        query_string: 'code=AUTH_CODE&prompt=consent',
+      }),
+    ).toEqual({
+      url: 'https://www.debate-timer.com/oauth?code=%5BFiltered%5D&prompt=consent',
+      query_string: 'code=%5BFiltered%5D&prompt=consent',
+    });
+    expect(
+      sanitizeSentryRequest({
+        query_string: [
+          ['code', 'AUTH_CODE'],
+          ['prompt', 'consent'],
+        ],
+      }),
+    ).toEqual({
+      query_string: [
+        ['code', '[Filtered]'],
+        ['prompt', 'consent'],
+      ],
+    });
+    expect(
+      sanitizeSentryRequest({
+        query_string: { code: 'AUTH_CODE', prompt: 'consent' },
+      }),
+    ).toEqual({ query_string: { code: '[Filtered]', prompt: 'consent' } });
   });
 
   it('API 에러 알림 제목은 level, error type, feature, status, endpoint 순서로 구성한다', () => {
