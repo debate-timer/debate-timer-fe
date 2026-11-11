@@ -6,7 +6,7 @@ import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import TranscriptDetail from '../../components/TranscriptDetail/TranscriptDetail';
 import TranscriptGenerating from '../../components/TranscriptDetail/TranscriptGenerating';
-import { useGetSharedTranscript } from '../../hooks/query/useGetSharedTranscript';
+import useGetSharedTranscript from '../../hooks/query/useGetSharedTranscript';
 
 // 공유 링크를 받은 사람이 로그인 없이 속기록과 분석 보고서를 보는 화면이다.
 export default function SharedTranscriptPage() {

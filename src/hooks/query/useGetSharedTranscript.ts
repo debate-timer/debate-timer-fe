@@ -7,7 +7,7 @@ const POLLING_INTERVAL_MS = 2000;
 const MAX_RETRY_COUNT = 3;
 
 // 공유받은 기록도 보정과 분석이 끝날 때까지(refining, PROCESSING) 주기적으로 다시 조회한다.
-export function useGetSharedTranscript(shareToken: string, enabled: boolean) {
+export default function useGetSharedTranscript(shareToken: string, enabled: boolean) {
   return useQuery<GetSharedTranscriptResponseType>({
     queryKey: ['SharedTranscript', shareToken],
     queryFn: () => getSharedTranscript(shareToken),
