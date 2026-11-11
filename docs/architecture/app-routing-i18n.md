@@ -44,7 +44,8 @@
 라우트는 `appRoutes`의 `element`를 `FeatureFlagRoute`로 감싸고, 화면 안의
 진입점은 같은 훅으로 숨김. 로그아웃하면 조회 결과를 지움. 현재 `TRANSCRIPT`가
 타이머 화면의 토론 기록 컨트롤, 대시보드의 토론 기록 탭, 속기록 상세 화면을
-제어함.
+제어함. 속기록 공유 링크 화면(`transcript/shared/:shareToken`)은 공유받은
+사람이 보는 화면이므로 로그인과 피쳐 플래그 없이 열림.
 
 ## 언어와 URL
 

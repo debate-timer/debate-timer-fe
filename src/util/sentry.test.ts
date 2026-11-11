@@ -9,7 +9,9 @@ import {
   resolveSentryAllowUrls,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
+  sanitizeSentryBreadcrumb,
   sanitizeSentryContext,
+  sanitizeSentryEvent,
   sanitizeSentryRequest,
   sanitizeSentrySearch,
   sanitizeSentryUrl,
@@ -227,6 +229,52 @@ describe('sentry 유틸', () => {
         query_string: { code: 'AUTH_CODE', prompt: 'consent' },
       }),
     ).toEqual({ query_string: { code: '[Filtered]', prompt: 'consent' } });
+  });
+
+  it('공유 링크 토큰은 페이지·API 주소와 pathname에서 가린다', () => {
+    expect(
+      sanitizeSentryUrl('https://a.com/transcript/shared/secret?x=1'),
+    ).toBe('https://a.com/transcript/shared/:shareToken?x=1');
+    expect(sanitizeSentryUrl('/api/shared-transcripts/secret')).toBe(
+      '/api/shared-transcripts/:shareToken',
+    );
+    const error = new AxiosError('Not Found', 'ERR_BAD_REQUEST', {
+      headers: new AxiosHeaders(),
+      method: 'get',
+      url: '/api/shared-transcripts/secret',
+    });
+    expect(
+      buildSentryApiErrorMetadata(error, '/transcript/shared/secret').pathname,
+    ).toBe('/transcript/shared/:shareToken');
+  });
+
+  it('breadcrumb와 이벤트의 이동·요청 주소에서 공유 링크 토큰을 가린다', () => {
+    expect(
+      sanitizeSentryBreadcrumb({
+        category: 'navigation',
+        message: '/transcript/shared/secret',
+        data: { from: '/', to: '/transcript/shared/secret' },
+      }),
+    ).toEqual({
+      category: 'navigation',
+      message: '/transcript/shared/:shareToken',
+      data: { from: '/', to: '/transcript/shared/:shareToken' },
+    });
+    expect(
+      sanitizeSentryBreadcrumb({
+        category: 'xhr',
+        data: { url: '/api/shared-transcripts/secret', status_code: 404 },
+      }).data,
+    ).toEqual({ url: '/api/shared-transcripts/:shareToken', status_code: 404 });
+    expect(
+      sanitizeSentryEvent({
+        transaction: '/transcript/shared/secret',
+        request: { url: 'https://a.com/transcript/shared/secret' },
+      }),
+    ).toEqual({
+      transaction: '/transcript/shared/:shareToken',
+      request: { url: 'https://a.com/transcript/shared/:shareToken' },
+    });
   });
 
   it('API 에러 알림 제목은 level, error type, feature, status, endpoint 순서로 구성한다', () => {

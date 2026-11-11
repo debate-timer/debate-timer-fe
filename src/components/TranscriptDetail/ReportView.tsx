@@ -1,16 +1,16 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { TEAM_STYLE, TimeBasedStance } from '../../../types/type';
+import { TEAM_STYLE, TimeBasedStance } from '../../types/type';
 import {
   DebateReport,
   EvidenceType,
   ReportArgument,
   ReportTeamFeedback,
   TranscriptLine,
-} from '../../../types/transcript';
-import { formatOffset } from '../transcriptFormatting';
-import { STANCE_TEXT_CLASS } from '../stanceStyle';
+} from '../../types/transcript';
+import { formatOffset } from './transcriptFormatting';
+import { STANCE_TEXT_CLASS } from './stanceStyle';
 
 interface ReportViewProps {
   report: DebateReport;

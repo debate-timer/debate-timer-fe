@@ -3,10 +3,18 @@ import { server } from '../../mocks/server';
 import { ApiUrl } from '../endpoints';
 import { PostTranscriptRequestType } from '../requests/transcript';
 import {
+  GetSharedTranscriptResponseType,
   GetTranscriptResponseType,
   GetTranscriptsResponseType,
 } from '../responses/transcript';
-import { getTranscript, getTranscripts, postTranscript } from './transcript';
+import {
+  deleteTranscriptShare,
+  getSharedTranscript,
+  getTranscript,
+  getTranscripts,
+  postTranscript,
+  postTranscriptShare,
+} from './transcript';
 
 const mockTranscript: GetTranscriptResponseType = {
   id: 11,
@@ -31,6 +39,7 @@ const mockTranscript: GetTranscriptResponseType = {
   ],
   report: null,
   errorMessage: null,
+  shareToken: null,
 };
 
 describe('토론 기록 API', () => {
@@ -92,6 +101,56 @@ describe('토론 기록 API', () => {
     server.use(http.get(ApiUrl.transcript, () => HttpResponse.json(response)));
 
     const data = await getTranscripts();
+
+    expect(data).toEqual(response);
+  });
+
+  it('기록 ID로 공유 링크 토큰을 발급받는다', async () => {
+    server.use(
+      http.post(`${ApiUrl.transcript}/:transcriptId/share`, ({ params }) => {
+        expect(params.transcriptId).toBe('11');
+        return HttpResponse.json({ shareToken: 'share-token' });
+      }),
+    );
+
+    const data = await postTranscriptShare(11);
+
+    expect(data).toEqual({ shareToken: 'share-token' });
+  });
+
+  it('기록 ID로 공유를 해제한다', async () => {
+    let requestedId: string | undefined;
+    server.use(
+      http.delete(`${ApiUrl.transcript}/:transcriptId/share`, ({ params }) => {
+        requestedId = String(params.transcriptId);
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    await deleteTranscriptShare(11);
+
+    expect(requestedId).toBe('11');
+  });
+
+  it('공유 토큰으로 공유된 기록을 조회한다', async () => {
+    const response: GetSharedTranscriptResponseType = {
+      tableName: '정기토론',
+      agenda: '노동시장 유연화를 확대해야 한다',
+      prosTeamName: '찬성',
+      consTeamName: '반대',
+      status: 'DONE',
+      refining: false,
+      lines: mockTranscript.lines,
+      report: null,
+    };
+    server.use(
+      http.get(`${ApiUrl.sharedTranscript}/:shareToken`, ({ params }) => {
+        expect(params.shareToken).toBe('a b');
+        return HttpResponse.json(response);
+      }),
+    );
+
+    const data = await getSharedTranscript('a b');
 
     expect(data).toEqual(response);
   });
