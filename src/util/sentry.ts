@@ -230,6 +230,23 @@ export function shouldSkipSentryEvent(
   return exceptionValue === 'Script error.';
 }
 
+// 수집 허용 스크립트 경로
+// 브라우저가 주입한 스크립트나 광고 스크립트에서 난 에러는 앱 번들 경로가 아니므로 제외된다.
+// 개발 서버는 번들 경로가 달라 빌드 결과물에만 적용한다.
+export function resolveSentryAllowUrls(
+  origin: string,
+  baseUrl: string,
+  isProductionBuild: boolean,
+) {
+  if (!isProductionBuild) {
+    return undefined;
+  }
+
+  const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+
+  return [`${origin}${normalizedBaseUrl}assets/`];
+}
+
 // 컨텍스트 마스킹
 export function sanitizeSentrySearch(search: string) {
   if (!search) {
