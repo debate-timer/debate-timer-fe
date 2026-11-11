@@ -32,6 +32,7 @@ export default function DebateTranscriptPage() {
     isShareLoading,
     isShareError,
     isUnsharing,
+    isUnshareError,
     handleOpenShare,
     handleRetryShare,
     handleCopy,
@@ -108,6 +109,7 @@ export default function DebateTranscriptPage() {
           isLoading={isShareLoading}
           isError={isShareError}
           isUnsharing={isUnsharing}
+          isUnshareError={isUnshareError}
           onRetry={handleRetryShare}
           onCopy={handleCopy}
           onUnshare={handleUnshare}

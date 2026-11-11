@@ -7,6 +7,7 @@ interface TranscriptShareModalProps {
   isLoading: boolean;
   isError: boolean;
   isUnsharing: boolean;
+  isUnshareError: boolean;
   onRetry: () => void;
   onCopy: () => void;
   onUnshare: () => void;
@@ -20,6 +21,7 @@ export default function TranscriptShareModal(props: TranscriptShareModalProps) {
     isLoading,
     isError,
     isUnsharing,
+    isUnshareError,
     onRetry,
     onCopy,
     onUnshare,
@@ -50,6 +52,14 @@ export default function TranscriptShareModal(props: TranscriptShareModalProps) {
           >
             {t('공유 중지')}
           </button>
+          {isUnshareError && (
+            <p
+              role="alert"
+              className="text-center text-ui-caption text-red-600"
+            >
+              {t('공유를 중지하지 못했어요. 다시 시도해 주세요.')}
+            </p>
+          )}
         </div>
       )}
     </div>

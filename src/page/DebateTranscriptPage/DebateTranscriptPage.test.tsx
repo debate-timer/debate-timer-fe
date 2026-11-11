@@ -223,6 +223,48 @@ describe('토론 속기록 화면', () => {
       ).not.toBeInTheDocument();
     });
 
+    it('공유를 중지하지 못하면 모달에 안내하고 다시 누를 수 있다', async () => {
+      const user = userEvent.setup();
+      server.use(
+        http.delete(`${ApiUrl.transcript}/:transcriptId/share`, () =>
+          HttpResponse.json({}, { status: 500 }),
+        ),
+      );
+      renderPage(doneTranscript);
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await user.click(
+        await screen.findByRole('button', { name: '공유 중지' }),
+      );
+
+      expect(
+        await screen.findByText(
+          '공유를 중지하지 못했어요. 다시 시도해 주세요.',
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '공유 중지' })).toBeEnabled();
+    });
+
+    it('다시 연 모달에서 링크 발급이 끝나기 전에는 공유를 중지할 수 없다', async () => {
+      const user = userEvent.setup();
+      renderPage(doneTranscript);
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await screen.findByRole('button', { name: '공유 링크 복사' });
+      await user.keyboard('{Escape}');
+      server.use(
+        http.post(
+          `${ApiUrl.transcript}/:transcriptId/share`,
+          () => new Promise<never>(() => {}),
+        ),
+      );
+
+      await user.click(screen.getByRole('button', { name: '공유하기' }));
+
+      expect(
+        await screen.findByRole('button', { name: '공유 중지' }),
+      ).toBeDisabled();
+    });
+
     it('공유 링크를 만들지 못하면 다시 시도할 수 있다', async () => {
       const user = userEvent.setup();
       server.use(
