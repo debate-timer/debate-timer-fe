@@ -39,6 +39,8 @@ import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 import useTranscriptRecorder from './hooks/useTranscriptRecorder';
 import TranscribeControl from './components/TranscribeControl';
+import TranscriptLeaveModal from './components/TranscriptLeaveModal';
+import useTranscriptLeaveGuard from './hooks/useTranscriptLeaveGuard';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { toRecognitionLang } from '../../util/speechRecognition';
 
@@ -114,6 +116,11 @@ export default function TimerPage() {
     team: timerType === 'TIME_BASED' ? prosConsSelected : null,
     isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
     lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+  });
+  // 토론 기록 중 화면을 벗어나면 속기록이 유실되므로 확인을 받은 뒤에만 나간다.
+  const transcriptLeaveGuard = useTranscriptLeaveGuard({
+    tableId,
+    isRecording: isTranscribeAvailable && transcriber.isEnabled,
   });
   const remainingTime = getRemainingTimeForShare({
     timerType,
@@ -546,6 +553,13 @@ export default function TimerPage() {
       {isAnswerTimeGuideOpen && (
         <AnswerTimeGuideModal onClose={closeAnswerTimeGuideModal} />
       )}
+
+      {/* 토론 기록 중 화면 이탈 시 속기록 유실을 안내하는 모달이다. */}
+      <TranscriptLeaveModal
+        isOpen={transcriptLeaveGuard.isLeaveModalOpen}
+        onConfirm={transcriptLeaveGuard.confirmLeave}
+        onCancel={transcriptLeaveGuard.cancelLeave}
+      />
 
       {/* 토론 종료 후 로그인 저장 여부를 묻는 모달이다. */}
       <LoginAndStoreModal

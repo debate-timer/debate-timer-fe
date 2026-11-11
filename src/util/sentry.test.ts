@@ -6,9 +6,13 @@ import {
   isSentryCaptured,
   markSentryCaptured,
   normalizeEndpoint,
+  resolveSentryAllowUrls,
   resolveApiErrorLevel,
   resolveFeatureFromPathname,
+  sanitizeSentryBreadcrumb,
   sanitizeSentryContext,
+  sanitizeSentryEvent,
+  sanitizeSentryRequest,
   sanitizeSentrySearch,
   sanitizeSentryUrl,
   shouldSkipSentryEvent,
@@ -197,6 +201,82 @@ describe('sentry 유틸', () => {
     );
   });
 
+  it('이벤트에 담기는 페이지 주소와 query string에서 OAuth 인가 코드를 마스킹한다', () => {
+    expect(
+      sanitizeSentryRequest({
+        url: 'https://www.debate-timer.com/oauth?code=AUTH_CODE&prompt=consent',
+        query_string: 'code=AUTH_CODE&prompt=consent',
+      }),
+    ).toEqual({
+      url: 'https://www.debate-timer.com/oauth?code=%5BFiltered%5D&prompt=consent',
+      query_string: 'code=%5BFiltered%5D&prompt=consent',
+    });
+    expect(
+      sanitizeSentryRequest({
+        query_string: [
+          ['code', 'AUTH_CODE'],
+          ['prompt', 'consent'],
+        ],
+      }),
+    ).toEqual({
+      query_string: [
+        ['code', '[Filtered]'],
+        ['prompt', 'consent'],
+      ],
+    });
+    expect(
+      sanitizeSentryRequest({
+        query_string: { code: 'AUTH_CODE', prompt: 'consent' },
+      }),
+    ).toEqual({ query_string: { code: '[Filtered]', prompt: 'consent' } });
+  });
+
+  it('공유 링크 토큰은 페이지·API 주소와 pathname에서 가린다', () => {
+    expect(
+      sanitizeSentryUrl('https://a.com/transcript/shared/secret?x=1'),
+    ).toBe('https://a.com/transcript/shared/:shareToken?x=1');
+    expect(sanitizeSentryUrl('/api/shared-transcripts/secret')).toBe(
+      '/api/shared-transcripts/:shareToken',
+    );
+    const error = new AxiosError('Not Found', 'ERR_BAD_REQUEST', {
+      headers: new AxiosHeaders(),
+      method: 'get',
+      url: '/api/shared-transcripts/secret',
+    });
+    expect(
+      buildSentryApiErrorMetadata(error, '/transcript/shared/secret').pathname,
+    ).toBe('/transcript/shared/:shareToken');
+  });
+
+  it('breadcrumb와 이벤트의 이동·요청 주소에서 공유 링크 토큰을 가린다', () => {
+    expect(
+      sanitizeSentryBreadcrumb({
+        category: 'navigation',
+        message: '/transcript/shared/secret',
+        data: { from: '/', to: '/transcript/shared/secret' },
+      }),
+    ).toEqual({
+      category: 'navigation',
+      message: '/transcript/shared/:shareToken',
+      data: { from: '/', to: '/transcript/shared/:shareToken' },
+    });
+    expect(
+      sanitizeSentryBreadcrumb({
+        category: 'xhr',
+        data: { url: '/api/shared-transcripts/secret', status_code: 404 },
+      }).data,
+    ).toEqual({ url: '/api/shared-transcripts/:shareToken', status_code: 404 });
+    expect(
+      sanitizeSentryEvent({
+        transaction: '/transcript/shared/secret',
+        request: { url: 'https://a.com/transcript/shared/secret' },
+      }),
+    ).toEqual({
+      transaction: '/transcript/shared/:shareToken',
+      request: { url: 'https://a.com/transcript/shared/:shareToken' },
+    });
+  });
+
   it('API 에러 알림 제목은 level, error type, feature, status, endpoint 순서로 구성한다', () => {
     const error = new AxiosError('Request failed', undefined, {
       method: 'post',
@@ -220,5 +300,26 @@ describe('sentry 유틸', () => {
     expect(sentryError.name).toBe(
       'fatal · render-error · timer · TypeError: Cannot read properties of undefined',
     );
+  });
+
+  it('빌드 결과물에서는 앱 번들 경로의 에러만 수집하도록 assets 경로를 허용한다', () => {
+    expect(
+      resolveSentryAllowUrls('https://www.debate-timer.com', '/', true),
+    ).toEqual(['https://www.debate-timer.com/assets/']);
+  });
+
+  it('PR 미리보기처럼 base 경로가 있으면 base 경로 아래 assets만 허용한다', () => {
+    expect(
+      resolveSentryAllowUrls('https://preview.example.com', '/pr-12/', true),
+    ).toEqual(['https://preview.example.com/pr-12/assets/']);
+    expect(
+      resolveSentryAllowUrls('https://preview.example.com', '/pr-12', true),
+    ).toEqual(['https://preview.example.com/pr-12/assets/']);
+  });
+
+  it('개발 서버에서는 번들 경로가 달라 허용 경로를 제한하지 않는다', () => {
+    expect(
+      resolveSentryAllowUrls('http://localhost:3000', '/', false),
+    ).toBeUndefined();
   });
 });

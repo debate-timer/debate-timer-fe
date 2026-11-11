@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import TimerPage from './TimerPage';
 import { GlobalPortal } from '../../util/GlobalPortal';
@@ -40,14 +40,15 @@ function renderTimerPage() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
+  // 타이머 화면은 useBlocker를 쓰므로 data router로 감싼다.
+  const router = createMemoryRouter(
+    [{ path: '/timer/:id', element: <TimerPage /> }],
+    { initialEntries: ['/timer/5'] },
+  );
   return render(
     <QueryClientProvider client={queryClient}>
       <GlobalPortal.Provider>
-        <MemoryRouter initialEntries={['/timer/5']}>
-          <Routes>
-            <Route path="/timer/:id" element={<TimerPage />} />
-          </Routes>
-        </MemoryRouter>
+        <RouterProvider router={router} />
       </GlobalPortal.Provider>
     </QueryClientProvider>,
   );

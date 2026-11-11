@@ -33,7 +33,9 @@
 `src/apis/axiosInstance.ts`의 interceptor가 HTTP 오류의 경로, method, 상태,
 기능을 바탕으로 Sentry level·tag·fingerprint를 설정함. `src/util/sentry.ts`가
 URL query, 요청·응답 context를 정리하고 `src/instrument.ts`가 Replay의
-개인정보를 마스킹함.
+개인정보를 마스킹함. 브라우저 SDK는 이벤트에 현재 페이지 주소와 query를 그대로
+담으므로 `beforeSend`가 `sanitizeSentryRequest()`로 OAuth 인가 코드 같은 민감
+query를 가린 뒤 전송함.
 
 수집한 Axios 오류에는 표식을 남기고, `APIError`로 변환할 때 그 표식을 전달함.
 `ErrorBoundary`는 이미 수집된 오류를 다시 전송하지 않음. 취소·오프라인·복구

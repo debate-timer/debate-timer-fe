@@ -21,6 +21,7 @@ import LanguageWrapper from './LanguageWrapper';
 import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
 import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedPage';
 import DebateTranscriptPage from '../page/DebateTranscriptPage/DebateTranscriptPage';
+import SharedTranscriptPage from '../page/SharedTranscriptPage/SharedTranscriptPage';
 
 const appRoutes = [
   {
@@ -76,6 +77,12 @@ const appRoutes = [
       </FeatureFlagRoute>
     ),
     requiresAuth: true,
+  },
+  {
+    // 공유 링크로 받은 사람은 로그인·피쳐 플래그 없이 본다.
+    path: 'transcript/shared/:shareToken',
+    element: <SharedTranscriptPage />,
+    requiresAuth: false,
   },
   {
     path: 'vote/:id',
