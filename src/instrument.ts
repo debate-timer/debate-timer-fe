@@ -1,7 +1,8 @@
 import * as Sentry from '@sentry/react';
 import {
   resolveSentryAllowUrls,
-  sanitizeSentryRequest,
+  sanitizeSentryBreadcrumb,
+  sanitizeSentryEvent,
   shouldSkipSentryEvent,
 } from './util/sentry';
 
@@ -55,12 +56,14 @@ if (isSentryEnabled && dsn) {
         event.extra = sanitizedExtra;
       }
 
-      // 현재 페이지 주소의 OAuth 인가 코드 같은 민감 query를 전송 전에 가림
-      if (event.request) {
-        event.request = sanitizeSentryRequest(event.request);
-      }
-
-      return event;
+      // 현재 페이지 주소의 OAuth 인가 코드 같은 민감 query와 공유 링크 토큰을 전송 전에 가림
+      return sanitizeSentryEvent(event);
+    },
+    beforeSendTransaction(event) {
+      return sanitizeSentryEvent(event);
+    },
+    beforeBreadcrumb(breadcrumb) {
+      return sanitizeSentryBreadcrumb(breadcrumb);
     },
     initialScope: {
       tags: {

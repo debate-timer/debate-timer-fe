@@ -1,4 +1,7 @@
-import { createTranscriptShareUrl } from './transcriptShare';
+import {
+  createTranscriptShareUrl,
+  maskTranscriptShareToken,
+} from './transcriptShare';
 
 describe('토론 기록 공유 링크', () => {
   it.each([
@@ -24,5 +27,18 @@ describe('토론 기록 공유 링크', () => {
     expect(createTranscriptShareUrl('https://a.com', 'a/b c')).toBe(
       'https://a.com/transcript/shared/a%2Fb%20c',
     );
+  });
+
+  it.each([
+    ['/transcript/shared/abc-123', '/transcript/shared/:shareToken'],
+    ['/en/transcript/shared/abc-123', '/en/transcript/shared/:shareToken'],
+    [
+      'https://a.com/transcript/shared/abc?x=1#y',
+      'https://a.com/transcript/shared/:shareToken?x=1#y',
+    ],
+    ['/api/shared-transcripts/abc-123', '/api/shared-transcripts/:shareToken'],
+    ['/api/transcripts/1/share', '/api/transcripts/1/share'],
+  ])('%s 에서 공유 토큰을 가린다', (value, expected) => {
+    expect(maskTranscriptShareToken(value)).toBe(expected);
   });
 });

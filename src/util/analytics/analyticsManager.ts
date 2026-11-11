@@ -1,3 +1,4 @@
+import { maskTranscriptShareToken } from '../transcriptShare';
 import { isLoggedIn } from '../accessToken';
 import { DEFAULT_LANG } from '../languageRouting';
 import type {
@@ -97,7 +98,7 @@ export class AnalyticsManager implements AnalyticsManagerInterface {
     return {
       user_type: isLoggedIn() ? 'member' : 'guest',
       language: document.documentElement.lang || DEFAULT_LANG,
-      page_path: window.location.pathname,
+      page_path: maskTranscriptShareToken(window.location.pathname),
     };
   }
 

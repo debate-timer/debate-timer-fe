@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
-import type { Event, SeverityLevel } from '@sentry/react';
+import type { Breadcrumb, Event, SeverityLevel } from '@sentry/react';
+import { maskTranscriptShareToken } from './transcriptShare';
 
 export type DebateFeature =
   | 'landing'
@@ -174,7 +175,7 @@ export function buildSentryApiErrorMetadata(
     endpoint,
     feature,
     level: resolveApiErrorLevel(status, feature),
-    pathname,
+    pathname: maskTranscriptShareToken(pathname),
   };
 }
 
@@ -275,18 +276,56 @@ export function sanitizeSentryUrl(url?: string) {
     const isAbsoluteUrl = /^[a-z][a-z\d+\-.]*:\/\//i.test(url);
     const parsedUrl = new URL(url, window.location.origin);
     const sanitizedSearch = sanitizeSentrySearch(parsedUrl.search);
-    const sanitizedPath = `${parsedUrl.pathname}${sanitizedSearch}${parsedUrl.hash}`;
+    const sanitizedPath = `${maskTranscriptShareToken(parsedUrl.pathname)}${sanitizedSearch}${parsedUrl.hash}`;
 
     return isAbsoluteUrl
       ? `${parsedUrl.origin}${sanitizedPath}`
       : sanitizedPath;
   } catch {
     const [pathname, search = ''] = url.split('?');
-    return `${pathname}${sanitizeSentrySearch(search ? `?${search}` : '')}`;
+    return `${maskTranscriptShareToken(pathname)}${sanitizeSentrySearch(search ? `?${search}` : '')}`;
   }
 }
 
 type SentryRequest = NonNullable<Event['request']>;
+
+// breadcrumb 주소 필드: 라우트 이동(from·to)과 fetch·xhr 요청(url)
+const BREADCRUMB_URL_KEYS = ['url', 'from', 'to'];
+
+// 공유 링크 토큰 마스킹: 라우트 이동과 API 요청 breadcrumb에 토큰이 담김
+export function sanitizeSentryBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
+  const sanitized: Breadcrumb = { ...breadcrumb };
+
+  if (typeof sanitized.message === 'string') {
+    sanitized.message = maskTranscriptShareToken(sanitized.message);
+  }
+  if (sanitized.data) {
+    sanitized.data = Object.fromEntries(
+      Object.entries(sanitized.data).map(([key, value]) => [
+        key,
+        BREADCRUMB_URL_KEYS.includes(key) && typeof value === 'string'
+          ? maskTranscriptShareToken(value)
+          : value,
+      ]),
+    );
+  }
+
+  return sanitized;
+}
+
+// 공유 링크 토큰 마스킹: 성능 추적이 현재 경로를 transaction 이름으로 씀
+export function sanitizeSentryEvent<T extends Event>(event: T): T {
+  const sanitized: T = { ...event };
+
+  if (sanitized.transaction) {
+    sanitized.transaction = maskTranscriptShareToken(sanitized.transaction);
+  }
+  if (sanitized.request) {
+    sanitized.request = sanitizeSentryRequest(sanitized.request);
+  }
+
+  return sanitized;
+}
 
 // 이벤트 페이지 주소 마스킹: 브라우저 SDK가 현재 주소와 query를 그대로 담아 OAuth 인가 코드가 남음
 export function sanitizeSentryRequest(request: SentryRequest): SentryRequest {
