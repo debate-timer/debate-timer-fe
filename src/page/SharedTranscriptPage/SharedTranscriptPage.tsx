@@ -6,16 +6,23 @@ import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import TranscriptDetail from '../../components/TranscriptDetail/TranscriptDetail';
 import TranscriptGenerating from '../../components/TranscriptDetail/TranscriptGenerating';
-import useGetSharedTranscript from '../../hooks/query/useGetSharedTranscript';
+import useGetSharedTranscript, {
+  isShareStoppedError,
+} from '../../hooks/query/useGetSharedTranscript';
 
 // 공유 링크를 받은 사람이 로그인 없이 속기록과 분석 보고서를 보는 화면이다.
 export default function SharedTranscriptPage() {
   const { t } = useTranslation();
   const { shareToken = '' } = useParams();
-  const { data, isLoading, isError, refetch } = useGetSharedTranscript(
-    shareToken,
-    shareToken !== '',
-  );
+  const {
+    data: lastData,
+    error,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetSharedTranscript(shareToken, shareToken !== '');
+  // 공유가 중지(404)되면 이전에 받은 내용도 숨기고, 일시적인 오류면 받은 내용을 그대로 보여준다.
+  const data = isShareStoppedError(error) ? undefined : lastData;
 
   const isGenerating =
     !!data && (data.refining || data.status === 'PROCESSING');
@@ -32,7 +39,7 @@ export default function SharedTranscriptPage() {
 
       <DefaultLayout.ContentContainer>
         {isLoading && <LoadingIndicator />}
-        {isError && (
+        {isError && !data && (
           <ErrorIndicator onClickRetry={() => refetch()}>
             {t(
               '토론 기록을 불러오지 못했어요.\n공유가 중지됐거나 잘못된 링크일 수 있어요.',

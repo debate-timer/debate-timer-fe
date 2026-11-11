@@ -132,4 +132,30 @@ describe('공유받은 토론 기록 화면', () => {
       await screen.findByText(/공유가 중지됐거나 잘못된 링크/),
     ).toBeInTheDocument();
   });
+
+  it('생성 중에 공유가 중지되면 이전 내용을 숨기고 안내 문구를 보여준다', async () => {
+    let requestCount = 0;
+    renderPage(() => {
+      requestCount += 1;
+      return requestCount === 1
+        ? HttpResponse.json({
+            ...sharedTranscript,
+            status: 'PROCESSING',
+            report: null,
+          })
+        : HttpResponse.json({}, { status: 404 });
+    });
+    await screen.findByText('토론 기록을 만들고 있어요');
+
+    expect(
+      await screen.findByText(
+        /공유가 중지됐거나 잘못된 링크/,
+        {},
+        { timeout: 4000 },
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('토론 기록을 만들고 있어요'),
+    ).not.toBeInTheDocument();
+  });
 });
