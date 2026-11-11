@@ -1,5 +1,9 @@
 import { ComponentType, createContext, useContext, useMemo } from 'react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import {
+  createMemoryRouter,
+  parsePath,
+  RouterProvider,
+} from 'react-router-dom';
 
 // 라우터는 경로 설정이 바뀔 때만 만들고, 매 렌더의 Story는 context로 전달해 args 변경을 반영합니다.
 const StoryElementContext = createContext<{ Story: ComponentType } | null>(
@@ -36,11 +40,8 @@ export default function StoryRouter({
           { path: '*', element: <StoryOutlet /> },
         ],
         {
-          initialEntries: [
-            routeState
-              ? { pathname: route, state: routeState }
-              : { pathname: route },
-          ],
+          // 객체의 pathname은 다시 파싱되지 않으므로 검색어·해시를 먼저 분리합니다.
+          initialEntries: [{ ...parsePath(route), state: routeState }],
         },
       ),
     [route, routeState, routePattern],
