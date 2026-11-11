@@ -20,6 +20,8 @@ interface TranscriptDetailProps {
   errorMessage: string | null;
   // 시간표 이름 옆에 붙는 칩(인식 방식 등)
   badge?: ReactNode;
+  // 기록 카드 오른쪽 위에 놓는 버튼(공유 등)
+  headerAction?: ReactNode;
 }
 
 type DetailTab = 'transcript' | 'report';
@@ -34,8 +36,16 @@ const STATUS_BOX_CLASS =
  * 보고서에서 발언을 고르면 속기록 탭으로 이동해 해당 발언을 잠시 강조한다.
  */
 export default function TranscriptDetail(props: TranscriptDetailProps) {
-  const { tableName, agenda, status, lines, report, errorMessage, badge } =
-    props;
+  const {
+    tableName,
+    agenda,
+    status,
+    lines,
+    report,
+    errorMessage,
+    badge,
+    headerAction,
+  } = props;
   const { t } = useTranslation();
   const [tab, setTab] = useState<DetailTab>('transcript');
   const [highlightedLineIndex, setHighlightedLineIndex] = useState<
@@ -103,6 +113,7 @@ export default function TranscriptDetail(props: TranscriptDetailProps) {
         tableName={tableName}
         agenda={agenda}
         badge={badge}
+        action={headerAction}
       />
 
       <div

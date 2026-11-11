@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -180,6 +180,73 @@ describe('토론 속기록 화면', () => {
       expect(stepState('속기록 보정 중')).toBe('done');
       expect(stepState('분석 보고서 발행 중')).toBe('active');
       expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('공유', () => {
+    it('공유 버튼을 누르면 공유 링크를 만들어 복사할 수 있다', async () => {
+      const user = userEvent.setup();
+      renderPage(doneTranscript);
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await user.click(
+        await screen.findByRole('button', { name: '공유 링크 복사' }),
+      );
+
+      await expect(navigator.clipboard.readText()).resolves.toMatch(
+        /\/transcript\/shared\/mock-share-token$/,
+      );
+    });
+
+    it('공유 중지를 누르면 공유를 해제하고 모달을 닫는다', async () => {
+      const user = userEvent.setup();
+      let deletedId: string | undefined;
+      server.use(
+        http.delete(
+          `${ApiUrl.transcript}/:transcriptId/share`,
+          ({ params }) => {
+            deletedId = String(params.transcriptId);
+            return new HttpResponse(null, { status: 204 });
+          },
+        ),
+      );
+      renderPage({ ...doneTranscript, shareToken: 'share-token' });
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await user.click(
+        await screen.findByRole('button', { name: '공유 중지' }),
+      );
+
+      await waitFor(() => expect(deletedId).toBe('9'));
+      expect(
+        screen.queryByRole('button', { name: '공유 링크 복사' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('공유 링크를 만들지 못하면 다시 시도할 수 있다', async () => {
+      const user = userEvent.setup();
+      server.use(
+        http.post(`${ApiUrl.transcript}/:transcriptId/share`, () =>
+          HttpResponse.json({}, { status: 500 }),
+        ),
+      );
+      renderPage(doneTranscript);
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+
+      expect(
+        await screen.findByText(/QR 코드를 불러오지 못했어요/),
+      ).toBeInTheDocument();
+    });
+
+    it('기록을 만드는 중이면 공유 버튼을 보여주지 않는다', async () => {
+      renderPage({ ...doneTranscript, status: 'PROCESSING', report: null });
+
+      await screen.findByText('토론 기록을 만들고 있어요');
+
+      expect(
+        screen.queryByRole('button', { name: '공유하기' }),
+      ).not.toBeInTheDocument();
     });
   });
 

@@ -8,6 +8,12 @@ import { useGetTranscript } from '../../hooks/query/useGetTranscript';
 import TranscriptDetail from '../../components/TranscriptDetail/TranscriptDetail';
 import TranscriptGenerating from '../../components/TranscriptDetail/TranscriptGenerating';
 import { SttMode } from '../../types/transcript';
+import DTShare from '../../components/icons/Share';
+import useTranscriptShare from './hooks/useTranscriptShare';
+import TranscriptShareModal from './components/TranscriptShareModal';
+
+const SHARE_BUTTON_CLASS =
+  'flex size-11 flex-none items-center justify-center rounded-full bg-default-white p-3 text-default-black transition hover:bg-brand';
 
 // 토론 종료 후 만들어진 속기록과 AI 분석 보고서를 보여주는 화면이다.
 export default function DebateTranscriptPage() {
@@ -19,6 +25,18 @@ export default function DebateTranscriptPage() {
     transcriptId,
     isIdValid,
   );
+  const {
+    ModalWrapper,
+    shareUrl,
+    isCopied,
+    isShareLoading,
+    isShareError,
+    isUnsharing,
+    handleOpenShare,
+    handleRetryShare,
+    handleCopy,
+    handleUnshare,
+  } = useTranscriptShare(transcriptId);
 
   if (!isIdValid) {
     throw new Error(t('토론 기록 ID가 올바르지 않습니다.'));
@@ -61,6 +79,17 @@ export default function DebateTranscriptPage() {
             lines={data.lines}
             report={data.report}
             errorMessage={data.errorMessage}
+            headerAction={
+              <button
+                type="button"
+                aria-label={t('공유하기')}
+                title={t('공유하기')}
+                onClick={handleOpenShare}
+                className={SHARE_BUTTON_CLASS}
+              >
+                <DTShare className="h-full" />
+              </button>
+            }
             badge={
               <span className="rounded-full bg-brand px-2.5 py-0.5 text-xs font-semibold text-default-black">
                 {t('음성 인식: {{mode}}', {
@@ -71,6 +100,19 @@ export default function DebateTranscriptPage() {
           />
         )}
       </DefaultLayout.ContentContainer>
+
+      <ModalWrapper closeButtonColor="text-neutral-900">
+        <TranscriptShareModal
+          shareUrl={shareUrl}
+          isCopied={isCopied}
+          isLoading={isShareLoading}
+          isError={isShareError}
+          isUnsharing={isUnsharing}
+          onRetry={handleRetryShare}
+          onCopy={handleCopy}
+          onUnshare={handleUnshare}
+        />
+      </ModalWrapper>
     </DefaultLayout>
   );
 }

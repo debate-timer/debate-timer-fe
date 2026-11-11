@@ -398,5 +398,7 @@
   "{{count}}초 테스트 녹음": "{{count}}s test recording",
   "다시 테스트하기": "Test again",
   "말소리 {{speech}} · 배경 소음 {{noise}} · 차이 {{snr}}": "Voice {{speech}} · Background {{noise}} · Difference {{snr}}",
-  "테스트 녹음 듣기": "Play test recording"
+  "테스트 녹음 듣기": "Play test recording",
+  "공유 중지": "Stop sharing",
+  "링크가 있는 사람은 누구나 로그인 없이 이 기록을 볼 수 있어요.": "Anyone with the link can view this record without signing in."
 }
