@@ -36,7 +36,7 @@ function renderGuard(isRecording: boolean) {
   return router;
 }
 
-describe('useTranscriptLeaveGuard', () => {
+describe('토론 기록 이탈 방지 훅(useTranscriptLeaveGuard)은', () => {
   describe('토론 기록 중일 때', () => {
     it('다른 화면으로 이동하면 이동을 막고 안내창을 연다', async () => {
       renderGuard(true);

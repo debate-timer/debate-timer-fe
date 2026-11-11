@@ -18,7 +18,27 @@ function renderModal(isOpen: boolean) {
   return { onConfirm, onCancel };
 }
 
-describe('TranscriptLeaveModal', () => {
+// 모달 밖의 버튼에 포커스를 둔 뒤 모달을 열고 닫을 수 있게 렌더링한다.
+function renderWithTrigger() {
+  const renderTree = (isOpen: boolean) => (
+    <GlobalPortal.Provider>
+      <button>타이머 버튼</button>
+      <TranscriptLeaveModal
+        isOpen={isOpen}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    </GlobalPortal.Provider>
+  );
+  const view = render(renderTree(false));
+  screen.getByRole('button', { name: '타이머 버튼' }).focus();
+  view.rerender(renderTree(true));
+  return {
+    close: () => view.rerender(renderTree(false)),
+  };
+}
+
+describe('속기록 유실 안내 모달(TranscriptLeaveModal)은', () => {
   it('열려 있으면 속기록 유실 안내를 두 줄로 보여준다', () => {
     renderModal(true);
 
@@ -78,5 +98,49 @@ describe('TranscriptLeaveModal', () => {
 
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('경고 문구를 대화상자의 설명으로 연결한다', () => {
+    renderModal(true);
+
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
+      '지금 나가면 토론 기록이 사라져요.\n그래도 나가시겠어요?',
+    );
+  });
+
+  describe('포커스는', () => {
+    it('열리면 취소 버튼으로 이동한다', () => {
+      renderWithTrigger();
+
+      expect(screen.getByRole('button', { name: '취소' })).toHaveFocus();
+    });
+
+    it('Tab을 눌러도 모달 안에서만 순환한다', async () => {
+      const user = userEvent.setup();
+      renderWithTrigger();
+
+      await user.tab();
+      expect(screen.getByRole('button', { name: '확인' })).toHaveFocus();
+
+      await user.tab();
+      expect(screen.getByRole('button', { name: '취소' })).toHaveFocus();
+    });
+
+    it('Shift+Tab을 눌러도 모달 안에서만 순환한다', async () => {
+      const user = userEvent.setup();
+      renderWithTrigger();
+
+      await user.tab({ shift: true });
+
+      expect(screen.getByRole('button', { name: '확인' })).toHaveFocus();
+    });
+
+    it('닫히면 열기 전 요소로 돌아간다', () => {
+      const { close } = renderWithTrigger();
+
+      close();
+
+      expect(screen.getByRole('button', { name: '타이머 버튼' })).toHaveFocus();
+    });
   });
 });

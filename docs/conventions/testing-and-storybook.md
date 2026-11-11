@@ -24,9 +24,9 @@
 - API는 MSW로 모방함. SDK·소켓·브라우저 경계는 필요할 때 `vi.mock`·`vi.spyOn`을
   사용함. 순수 함수와 실제 Provider 사용을 우선하고 불필요한 mock을 줄임.
 - Router·Query·Portal·i18n에 의존하는 UI는 테스트 wrapper에서 필요한 Provider를
-  조립함. `useBlocker` 같은 data router 전용 API를 쓰는 화면은
-  `createMemoryRouter`·`RouterProvider`로 감쌈. Storybook 전역 decorator는
-  `.storybook/StoryRouter.tsx`의 data router를 사용함.
+  조립함.
+  `useBlocker` 같은 data router 전용 API를 쓰는 화면은 `createMemoryRouter`·`RouterProvider`로 감쌈.
+  Storybook 전역 decorator는 `.storybook/StoryRouter.tsx`의 data router를 사용함.
 - 정상값뿐 아니라 null·잘못된 타입·경계값·중복 이벤트·재연결처럼 계약을 깨뜨릴
   수 있는 경로를 검사함. 같은 계약의 입력 조합은 `it.each`로 묶음.
 
