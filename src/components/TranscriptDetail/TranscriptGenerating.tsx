@@ -7,7 +7,7 @@ import {
   buildLangPath,
   DEFAULT_LANG,
   isSupportedLang,
-} from '../../../util/languageRouting';
+} from '../../util/languageRouting';
 
 interface TranscriptGeneratingProps {
   tableName: string;

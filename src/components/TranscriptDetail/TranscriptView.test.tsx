@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { TranscriptLine } from '../../../types/transcript';
+import { TranscriptLine } from '../../types/transcript';
 import TranscriptView from './TranscriptView';
 
 const line = (
