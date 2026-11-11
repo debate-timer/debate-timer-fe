@@ -14,6 +14,8 @@ interface TranscriptGeneratingProps {
   agenda: string;
   // AI가 STT 원문을 보정하는 중이면 true, 보정이 끝나고 분석 보고서를 만드는 중이면 false
   refining: boolean;
+  // 대시보드 토론 기록으로 가는 안내를 보여줄지 여부. 공유받은 사람에게는 대시보드가 없으므로 끈다.
+  showRecordsLink?: boolean;
 }
 
 type StepState = 'done' | 'active' | 'waiting';
@@ -25,7 +27,7 @@ const STEP_DOT_CLASS =
 
 // 속기록 보정과 분석 보고서 발행이 끝날 때까지 속기록 화면 대신 진행 단계를 보여준다.
 export default function TranscriptGenerating(props: TranscriptGeneratingProps) {
-  const { tableName, agenda, refining } = props;
+  const { tableName, agenda, refining, showRecordsLink = true } = props;
   const { t, i18n } = useTranslation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
@@ -107,18 +109,24 @@ export default function TranscriptGenerating(props: TranscriptGeneratingProps) {
         ))}
       </ol>
 
-      <p className="mt-8 text-center text-sm text-default-border">
-        {t(
-          '화면을 닫아도 괜찮아요. 완료되면 대시보드의 토론 기록에서 볼 수 있어요.',
-        )}{' '}
-        <Link
-          // 대시보드는 "/" 경로이고, 토론 기록 탭을 주소로 지정한다.
-          to={`${buildLangPath('/', lang)}?tab=records`}
-          className="font-semibold text-default-black underline"
-        >
-          {t('토론 기록으로 가기')}
-        </Link>
-      </p>
+      {showRecordsLink ? (
+        <p className="mt-8 text-center text-sm text-default-border">
+          {t(
+            '화면을 닫아도 괜찮아요. 완료되면 대시보드의 토론 기록에서 볼 수 있어요.',
+          )}{' '}
+          <Link
+            // 대시보드는 "/" 경로이고, 토론 기록 탭을 주소로 지정한다.
+            to={`${buildLangPath('/', lang)}?tab=records`}
+            className="font-semibold text-default-black underline"
+          >
+            {t('토론 기록으로 가기')}
+          </Link>
+        </p>
+      ) : (
+        <p className="mt-8 text-center text-sm text-default-border">
+          {t('완료되면 이 화면에 기록이 표시돼요.')}
+        </p>
+      )}
     </div>
   );
 }
