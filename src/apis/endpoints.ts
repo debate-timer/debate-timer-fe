@@ -14,5 +14,6 @@ export const ApiUrl = {
   organization: makeUrl('/organizations'),
   live: makeUrl('/live'),
   transcript: makeUrl('/transcripts'),
+  sharedTranscript: makeUrl('/shared-transcripts'),
   stt: makeUrl('/stt'),
 };

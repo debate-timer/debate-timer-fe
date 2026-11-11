@@ -25,6 +25,26 @@ export interface GetTranscriptResponseType {
   lines: TranscriptLine[];
   report: DebateReport | null;
   errorMessage: string | null;
+  // 공유 링크 토큰. 공유하지 않으면 null이다.
+  shareToken: string | null;
+}
+
+// POST /api/transcripts/{transcriptId}/share
+export interface PostTranscriptShareResponseType {
+  shareToken: string;
+}
+
+// GET /api/shared-transcripts/{shareToken}
+// 로그인 없이 보는 공유 기록이라 시간표 ID·인식 방식·실패 사유는 없다.
+export interface GetSharedTranscriptResponseType {
+  tableName: string;
+  agenda: string;
+  prosTeamName: string;
+  consTeamName: string;
+  status: TranscriptStatus;
+  refining: boolean;
+  lines: TranscriptLine[];
+  report: DebateReport | null;
 }
 
 // GET /api/transcripts

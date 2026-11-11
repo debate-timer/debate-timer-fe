@@ -66,6 +66,7 @@ const doneTranscript: GetTranscriptResponseType = {
     },
   },
   errorMessage: null,
+  shareToken: null,
 };
 
 function renderPage(transcript: GetTranscriptResponseType) {
