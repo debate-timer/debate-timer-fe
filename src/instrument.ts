@@ -1,5 +1,9 @@
 import * as Sentry from '@sentry/react';
-import { resolveSentryAllowUrls, shouldSkipSentryEvent } from './util/sentry';
+import {
+  resolveSentryAllowUrls,
+  sanitizeSentryRequest,
+  shouldSkipSentryEvent,
+} from './util/sentry';
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 const isSentryEnabled =
@@ -49,6 +53,11 @@ if (isSentryEnabled && dsn) {
         delete sanitizedExtra.Authorization;
         delete sanitizedExtra.authorization;
         event.extra = sanitizedExtra;
+      }
+
+      // 현재 페이지 주소의 OAuth 인가 코드 같은 민감 query를 전송 전에 가림
+      if (event.request) {
+        event.request = sanitizeSentryRequest(event.request);
       }
 
       return event;

@@ -5,9 +5,14 @@ import { setMemberId } from '../../util/accessToken';
 import { analyticsManager } from '../../util/analytics';
 import { DEFAULT_LANG } from '../../util/languageRouting';
 
-export function usePostUser(onSuccess: (data: PostUserResponseType) => void) {
+export function usePostUser(
+  onSuccess: (data: PostUserResponseType) => void,
+  onFailure: () => void,
+) {
   return useMutation({
     mutationFn: (code: string) => postUser(code),
+    // 로그인 실패는 오류 화면 대신 콜백 화면이 직접 처리함
+    throwOnError: false,
     onSuccess: (data) => {
       setMemberId(data.id);
       analyticsManager.setUserId(String(data.id));
@@ -19,6 +24,7 @@ export function usePostUser(onSuccess: (data: PostUserResponseType) => void) {
     },
     onError: (error) => {
       console.error('User creation error:', error);
+      onFailure();
     },
   });
 }

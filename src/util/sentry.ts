@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import type { SeverityLevel } from '@sentry/react';
+import type { Event, SeverityLevel } from '@sentry/react';
 
 export type DebateFeature =
   | 'landing'
@@ -284,6 +284,33 @@ export function sanitizeSentryUrl(url?: string) {
     const [pathname, search = ''] = url.split('?');
     return `${pathname}${sanitizeSentrySearch(search ? `?${search}` : '')}`;
   }
+}
+
+type SentryRequest = NonNullable<Event['request']>;
+
+// 이벤트 페이지 주소 마스킹: 브라우저 SDK가 현재 주소와 query를 그대로 담아 OAuth 인가 코드가 남음
+export function sanitizeSentryRequest(request: SentryRequest): SentryRequest {
+  const { url, query_string: query } = request;
+  const sanitized: SentryRequest = { ...request };
+
+  if (url !== undefined) {
+    sanitized.url = sanitizeSentryUrl(url);
+  }
+  if (typeof query === 'string') {
+    sanitized.query_string = sanitizeSentrySearch(query).replace(/^\?/, '');
+  } else if (Array.isArray(query)) {
+    sanitized.query_string = query.map(([key, value]): [string, string] => [
+      key,
+      isSensitiveKey(key) ? filteredValue : value,
+    ]);
+  } else if (query && typeof query === 'object') {
+    sanitized.query_string = sanitizeSentryContext(query) as Record<
+      string,
+      string
+    >;
+  }
+
+  return sanitized;
 }
 
 // 요청/응답 데이터 마스킹

@@ -6,7 +6,9 @@
 `src/mocks/browser.ts`의 worker 시작 완료 후 앱을 렌더링함. 이후
 `QueryClientProvider` → `GlobalPortal.Provider` → `RouterProvider` 순으로
 조립함. Query와 Mutation의 기본 `throwOnError`는 `true`이며, 지역 오류 UI가
-필요한 조회 훅에서 개별 설정을 변경함. API 모방과 조회 경계는
+필요한 조회 훅과 화면이 실패를 직접 처리하는 변경 훅에서 개별 설정을 변경함.
+변경 훅 예시는 로그인 실패 시 메인으로 이동하는
+`src/hooks/mutations/usePostUser.ts`에 있음. API 모방과 조회 경계는
 [데이터 접근](data-access.md)이 소유함.
 
 `src/i18n.ts`가 번역 파일 로딩, 언어 감지, React 연결을 초기화함.
