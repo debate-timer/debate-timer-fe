@@ -60,10 +60,8 @@ export default function TranscriptLeaveModal(props: TranscriptLeaveModalProps) {
               <p id="transcript-leave-title" className="text-ui-title">
                 {t('토론 기록이 진행 중이에요')}
               </p>
-              <p className="text-ui-body text-neutral-600">
-                {t(
-                  '지금 나가면 지금까지 기록된 토론 속기록이 사라져요. 그래도 나가시겠어요?',
-                )}
+              <p className="text-ui-body whitespace-pre-line text-neutral-600">
+                {t('지금 나가면 토론 기록이 사라져요.\n그래도 나가시겠어요?')}
               </p>
             </div>
           </DialogModal>

@@ -19,15 +19,17 @@ function renderModal(isOpen: boolean) {
 }
 
 describe('TranscriptLeaveModal', () => {
-  it('열려 있으면 속기록 유실 안내를 보여준다', () => {
+  it('열려 있으면 속기록 유실 안내를 두 줄로 보여준다', () => {
     renderModal(true);
 
     expect(screen.getByText('토론 기록이 진행 중이에요')).toBeInTheDocument();
+    // 기본 normalizer는 줄바꿈을 공백으로 합치므로 원문 그대로 비교한다.
     expect(
       screen.getByText(
-        '지금 나가면 지금까지 기록된 토론 속기록이 사라져요. 그래도 나가시겠어요?',
+        '지금 나가면 토론 기록이 사라져요.\n그래도 나가시겠어요?',
+        { normalizer: (text) => text },
       ),
-    ).toBeInTheDocument();
+    ).toHaveClass('whitespace-pre-line');
   });
 
   it('닫혀 있으면 아무것도 보여주지 않는다', () => {
