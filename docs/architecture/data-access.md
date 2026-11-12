@@ -19,6 +19,8 @@ API를 직접 호출함. 구현 형식과 테스트 규칙은
 token을 붙임. 첫 401은 `_retry`로 제한하고 재발급에 성공하면 원래 요청을 다시
 보냄. 재발급이 실패하면 인증 상태를 정리하고 홈으로 이동함.
 
+계정에 결속해야 하는 요청은 `RequestOptions.expectedMemberId`에 시작 계정을 보존함. 이 값은 Axios 내부 메타데이터이며 HTTP header·body·query로 전송하지 않음. 해당 옵션이 있는 요청은 실제 전송 전·응답 수신·401 재발급 전후에 현재 회원 ID와 토큰 존재를 확인함. 계정 변경·로그아웃 시 취소하고, 이전 요청의 재발급 결과로 새 계정 토큰을 교체하거나 인증을 정리하지 않음. 같은 계정의 토큰 재발급은 허용하며 옵션 없는 기존 API의 재발급 동작은 유지함.
+
 `src/apis/primitives.ts`의 `request<T>(method, endpoint, data, params)`가 Axios
 호출과 `APIError` 변환을 담당함. 도메인 함수는 `src/apis/apis/{domain}.ts`에
 있으며 공통 URL을 `src/apis/endpoints.ts`의 `ApiUrl`에서 가져옴. 성공 결과는
@@ -59,6 +61,8 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 ## 회원 설정과 공개 투표
 
 회원 설정은 `GET/PATCH /api/member/settings`를 사용함. `getMemberSettings()`·`patchMemberSettings()`가 기존 HTTP 경계를 재사용하며, 응답은 `language: 'ko' | 'en' | null`·`volume: number`임. 부분 수정은 최소 한 필드가 필요하고 생략 필드는 전송하지 않음. 음량의 범위 검사·소수 1자리 반올림은 서버가 수행하며 FE API는 정규화된 최종 응답을 반환함.
+
+설정 API는 호출 시점에 로그인 계정을 확인하고 `expectedMemberId`로 HTTP 요청·재시도·응답까지 결속함. 훅의 진입 검사와 캐시 키 분리만으로 전송 계정의 일치를 보장하지 않음. 계정 변경에 따른 취소는 호출자에게 취소 오류로 전달하고 서버 오류로 변환하지 않음.
 
 `useGetMemberSettings(memberId)`는 `['MemberSettings', memberId]` 키로 계정별 캐시를 분리함. 회원 ID는 캐시 식별자이며 HTTP body·query로 보내지 않음. 현재 access token과 일치하는 회원 ID가 있어야 조회하며, 수동 재시도도 같은 인증 조건을 검사함. 자동 재시도·재마운트·포커스·재연결·주기 재조회를 끄고 `staleTime`·`gcTime`은 `Infinity`로 설정함.
 

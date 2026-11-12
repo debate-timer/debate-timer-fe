@@ -30,6 +30,8 @@
 
 ## 수집과 개인정보 제거
 
+Axios 취소 오류는 응답 interceptor에서 관측 대상으로 수집하지 않고 `request<T>`도 `APIError`로 바꾸지 않은 채 전달함. 계정 결속 요청의 회원 변경·로그아웃 취소도 여기에 포함함. 이전 계정 요청의 취소가 새 계정 인증 정리나 서버 실패로 오인되지 않게 하며 계정 결속 조건은 [데이터 접근](data-access.md)이 소유함.
+
 `src/apis/axiosInstance.ts`의 interceptor가 HTTP 오류의 경로, method, 상태,
 기능을 바탕으로 Sentry level·tag·fingerprint를 설정함. `src/util/sentry.ts`가
 URL query, 요청·응답 context를 정리하고 `src/instrument.ts`가 Replay의
