@@ -74,7 +74,7 @@ export async function getVoterPollInfo(
   const requestUrl: string = ApiUrl.poll;
   const response = await request<GetVoterPollInfoResponseType>(
     'GET',
-    requestUrl + `/${pollId}/votes`,
+    requestUrl + `/${encodeURIComponent(pollId)}/votes`,
     null,
     null,
   );

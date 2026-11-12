@@ -7,6 +7,7 @@ function makeUrl(endpoint: string): string {
 // URL 테이블
 export const ApiUrl = {
   member: makeUrl('/member'),
+  memberSettings: makeUrl('/member/settings'),
   table: makeUrl('/table'),
   parliamentary: makeUrl('/table/parliamentary'),
   customize: makeUrl('/table/customize'),

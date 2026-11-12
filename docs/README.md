@@ -12,7 +12,7 @@
 
 ### 정책·도메인 위키
 
-[위키](wiki/README.md)는 기능의 목적·개념·관계·제품 정책과 사용 예시를 연결함. 기능 문서는 `docs/wiki/feature/{기능}.md`에 작성함. 현재 기능 목록은 위키 안내에서 찾으며, 타이머 진행의 확정 정책·승인 근거와 현재 구현의 차이를 문서화했음.
+[위키](wiki/README.md)는 기능의 목적·개념·관계·제품 정책과 사용 예시를 연결함. 기능 문서는 `docs/wiki/feature/{기능}.md`에 작성함. 현재 기능 목록은 위키 안내에서 찾으며, 타이머 진행과 [전역 설정](wiki/feature/settings.md)의 정책·근거·현재 구현 차이를 문서화했음. 전역 설정에는 MP-02 구현 전 목표와 구현 제안·미확정 질문을 구분했음.
 
 | 문서 | 읽을 때 |
 | --- | --- |
@@ -61,8 +61,8 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은 [workflow](../.git
 | --- | --- |
 | [구조와 UI](architecture/structure-and-ui.md) | 화면·공용 UI·훅·타입·유틸의 책임과 상태 소유권을 정할 때 |
 | [앱·라우팅·국제화](architecture/app-routing-i18n.md) | 앱 초기화, Provider, 경로, 인증, 언어 동기화를 바꿀 때 |
-| [데이터 접근](architecture/data-access.md) | Axios, 도메인 API, Query·Mutation, Repository, MSW 흐름을 바꿀 때 |
-| [실시간 통신](architecture/realtime.md) | 소켓 연결·구독·검증·재연결·동기화를 바꿀 때 |
+| [데이터 접근](architecture/data-access.md) | Axios, 도메인 API, Query·Mutation, Repository, MSW, 회원 설정·공개 투표 응답을 바꿀 때 |
+| [실시간 통신](architecture/realtime.md) | 소켓 연결·구독·검증·재연결·동기화와 ABORT 기본 통신·후속 연동 경계를 바꿀 때 |
 | [오류와 관측](architecture/errors-observability.md) | 지역 복구, ErrorBoundary, Sentry 수집·마스킹을 바꿀 때 |
 
 ## 4. 코드와 문서 컨벤션

@@ -1,6 +1,7 @@
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { server } from './src/mocks/server';
+import { resetMemberSettings } from './src/mocks/handlers/member';
 import { vi } from 'vitest';
 import i18n from './src/i18n';
 
@@ -12,7 +13,10 @@ beforeAll(() => {
 });
 
 // 각 테스트 후 핸들러 리셋
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  resetMemberSettings();
+});
 
 // msw 서버 종료
 afterAll(() => server.close());

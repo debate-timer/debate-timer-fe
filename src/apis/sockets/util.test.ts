@@ -2,6 +2,23 @@ import { describe, it, expect } from 'vitest';
 import { isChairmanNotice, isSocketMessage } from './util';
 
 describe('소켓 메시지 여부 검증', () => {
+  it('ABORT는 null payload만 허용하고 기존 종료와 일시정지를 구분한다', () => {
+    expect(
+      isSocketMessage({
+        eventType: 'ABORT',
+        data: null,
+        version: 1,
+        serverTime: 1,
+      }),
+    ).toBe(true);
+    expect(isSocketMessage({ eventType: 'ABORT', data: {} })).toBe(false);
+    expect(isSocketMessage({ eventType: 'ABORT' })).toBe(false);
+    expect(
+      isSocketMessage({ eventType: 'ABORT', data: null, version: '1' }),
+    ).toBe(false);
+    expect(isSocketMessage({ eventType: 'STOP', data: null })).toBe(false);
+    expect(isSocketMessage({ eventType: 'FINISHED', data: null })).toBe(true);
+  });
   it('유효한 모든 타이머 이벤트 메시지는 런타임 검증을 통과한다', () => {
     expect(
       isSocketMessage({

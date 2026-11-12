@@ -23,6 +23,7 @@ export class APIError extends Error {
 export interface RequestOptions {
   headers?: Record<string, string>;
   timeout?: number;
+  expectedMemberId?: string;
 }
 
 // Low-level http request function
@@ -48,6 +49,9 @@ export async function request<T>(
     // If successful, return it
     return response;
   } catch (error) {
+    if (axios.isCancel(error)) {
+      throw error;
+    }
     if (axios.isAxiosError(error)) {
       // If error is raised during API request,
       // pass it as an APIError

@@ -1,12 +1,44 @@
 import * as Sentry from '@sentry/react';
-import { setAccessToken } from '../../util/accessToken';
+import { getMemberId, setAccessToken } from '../../util/accessToken';
+import { assertMemberSettingsAccount } from '../../util/memberSettingsAccount';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
 import {
   GetDebateTableListResponseType,
   GetMemberFeatureFlagsResponseType,
+  GetMemberSettingsResponseType,
+  PatchMemberSettingsResponseType,
+  PostUserResponseType,
 } from '../responses/member';
-import { PostUserResponseType } from '../responses/member';
+import { PatchMemberSettingsRequestType } from '../requests/member';
+
+// GET /api/member/settings
+export async function getMemberSettings(): Promise<GetMemberSettingsResponseType> {
+  const identity = assertMemberSettingsAccount(getMemberId());
+  const response = await request<GetMemberSettingsResponseType>(
+    'GET',
+    ApiUrl.memberSettings,
+    null,
+    null,
+    { expectedMemberId: identity.memberId },
+  );
+  return response.data;
+}
+
+// PATCH /api/member/settings
+export async function patchMemberSettings(
+  settings: PatchMemberSettingsRequestType,
+): Promise<PatchMemberSettingsResponseType> {
+  const identity = assertMemberSettingsAccount(getMemberId());
+  const response = await request<PatchMemberSettingsResponseType>(
+    'PATCH',
+    ApiUrl.memberSettings,
+    settings,
+    null,
+    { expectedMemberId: identity.memberId },
+  );
+  return response.data;
+}
 
 // Template
 /*

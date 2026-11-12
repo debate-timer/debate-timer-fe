@@ -53,6 +53,16 @@ TimerPage·AudienceSharePage
 기준이 생기기 전까지만 반영함. 이 순서 계약은
 `src/hooks/sockets/useAudienceSocket.ts`가 소유함.
 
+## 중도 중단 이벤트의 기본 통신
+
+일시정지 `STOP`의 타이머 payload와 정상 종료 `FINISHED`의 `data: null` 계약을 유지함. 신규 `ABORT`는 데이터 없는 이벤트 union에 추가하며 `data: null`일 때만 수신 검증을 통과함. 의미는 공유 토글 끄기·토론 중 로그아웃에 따른 중도 중단이며 일시 연결 단절과 구분함.
+
+사회자는 기존 `/app/event/{roomId}`에 사회자 토큰·`X-Chairman-Session`·증가하는 `version`으로 발행함. 청중 훅은 기존 `/room/{roomId}`에서 유효한 `ABORT`를 수신하고 기존 version 규칙을 거쳐 `latestMessage`로 전달함. `serverTime`·version의 기존 선택·nullable 형식과 다른 이벤트의 의미를 변경하지 않음.
+
+현재 구현 범위는 발행·수신 기반까지임. 발행 함수는 서버의 중단 성공 여부를 반환하지 않고 발행 직후 disconnect를 수행하지 않음. 청중 화면의 중단 안내·기능 정리·재연결 차단은 후속 화면 연동 범위이며 현재 `ABORT`의 null payload를 타이머나 정상 종료로 해석하지 않음.
+
+사회자 성공 확인·재시도·종료 상태 복원·새 청중 차단·구버전 중단 안내는 후속 통신 보완 사항임. 별도 목적지·`scope`·처리 결과 이벤트·공유 세션 필드는 추가하지 않았음. 모의 테스트 통과를 실제 서버 WS 연동 완료로 해석하지 않음.
+
 ## 복구와 현재 상태
 
 `SocketManager`의 재연결은 지수 backoff와 jitter를 사용하고 횟수·시간 제한을

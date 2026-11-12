@@ -5,7 +5,7 @@ export type TimerEventTypes =
   'NEXT' | 'STOP' | 'BEFORE' | 'PLAY' | 'RESET' | 'TEAM_SWITCH' | 'SYNC';
 
 // 데이터가 없는 이벤트
-export type NonTimerEventType = 'FINISHED' | 'ERROR';
+export type NonTimerEventType = 'FINISHED' | 'ABORT' | 'ERROR';
 
 // 서버만 보내는 데이터가 없는 이벤트 (사회자는 발행할 수 없음)
 // - `CHAIRMAN_ABSENT`: 룸에 활성 사회자가 없음을 청중에게 알림
