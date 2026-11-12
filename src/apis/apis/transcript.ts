@@ -1,5 +1,5 @@
 import { ApiUrl } from '../endpoints';
-import { request } from '../primitives';
+import { RequestOptions, request } from '../primitives';
 import { PostTranscriptRequestType } from '../requests/transcript';
 import {
   GetSharedTranscriptResponseType,
@@ -13,6 +13,10 @@ import {
 export async function postTranscript(
   tableId: number,
   body: PostTranscriptRequestType,
+  options: Pick<
+    RequestOptions,
+    'expectedMemberId' | 'expectedAuthRevision'
+  > = {},
 ): Promise<PostTranscriptResponseType> {
   const requestUrl = `${ApiUrl.transcript}/${encodeURIComponent(tableId)}`;
   const response = await request<PostTranscriptResponseType>(
@@ -20,6 +24,7 @@ export async function postTranscript(
     requestUrl,
     body,
     null,
+    options,
   );
 
   return response.data;

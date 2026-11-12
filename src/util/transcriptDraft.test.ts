@@ -12,6 +12,7 @@ import {
   setSubmittedTranscriptId,
   startTranscriptDraft,
 } from './transcriptDraft';
+import { setAccessToken, setMemberId } from './accessToken';
 
 describe('토론 기록 초안 저장소', () => {
   beforeEach(() => {
@@ -21,7 +22,7 @@ describe('토론 기록 초안 저장소', () => {
   it('기록을 시작하면 빈 초안과 시작 시각을 저장한다', () => {
     startTranscriptDraft(3, 1000);
 
-    expect(getTranscriptDraft(3)).toEqual({
+    expect(getTranscriptDraft(3)).toMatchObject({
       startedAt: 1000,
       sttMode: 'RPC',
       segments: [],
@@ -112,17 +113,46 @@ describe('토론 기록 초안 저장소', () => {
     expect(getTranscriptDraft(3)).toBeNull();
   });
 
-  it('STT 모드 필드가 없는 이전 초안은 RPC 모드로 읽는다', () => {
+  it('소유 정보가 없는 이전 초안은 자동 승계하지 않는다', () => {
     sessionStorage.setItem(
       'TranscriptDraft:3',
       JSON.stringify({ startedAt: 1000, segments: [] }),
     );
 
+    expect(getTranscriptDraft(3)).toBeNull();
+  });
+
+  it('교체된 초안의 지연 결과와 삭제는 새 초안에 영향을 주지 않는다', () => {
+    const context = startTranscriptDraft(3, 1000);
+    startTranscriptDraft(3, 2000);
+    appendUtterance(
+      context,
+      { id: 'old', timeBoxIndex: 0, team: null },
+      '지연 결과',
+      3000,
+    );
+    clearTranscriptDraft(context);
     expect(getTranscriptDraft(3)).toMatchObject({
-      sttMode: 'RPC',
-      pendingSegments: [],
-      failedSegmentCount: 0,
+      startedAt: 2000,
+      segments: [],
     });
+  });
+
+  it('다른 계정과 재로그인한 동일 계정에는 이전 작업 결과를 반영하지 않는다', () => {
+    setAccessToken('token');
+    setMemberId(1);
+    const context = startTranscriptDraft(3, 1000);
+    setMemberId(2);
+    expect(getTranscriptDraft(3)).toBeNull();
+    setMemberId(1);
+    appendUtterance(
+      context,
+      { id: 'old', timeBoxIndex: 0, team: null },
+      '지연 결과',
+      3000,
+    );
+    expect(getTranscriptDraft(3)?.segments).toEqual([]);
+    localStorage.clear();
   });
 
   describe('Soniox 구간 배치 전사', () => {

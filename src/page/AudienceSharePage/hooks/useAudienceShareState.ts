@@ -27,7 +27,11 @@ export type AudienceShareState =
        */
       syncedAt: number | null;
     }
-  | { status: 'finished'; error: AudienceShareError | null };
+  | {
+      status: 'finished';
+      error: AudienceShareError | null;
+      terminationReason?: 'FINISHED' | 'ABORT';
+    };
 
 /**
  * 사회자 연결 상태
@@ -45,6 +49,8 @@ export const CHAIRMAN_ABSENT_TIMEOUT_MS = 15 * 1000;
 
 interface UseAudienceShareStateOptions {
   enabled?: boolean;
+  /** 새 종료 안내 연결 시 활성화함. 기존 페이지 전환은 MP-04에서 수행함. */
+  handleAbort?: boolean;
   table?: TimeBoxInfo[];
 }
 
@@ -55,7 +61,7 @@ export function useAudienceShareState(
   chairmanPresence: ChairmanPresence;
   connectionStatus: AudienceConnectionStatus;
 } {
-  const { enabled = true, table } = options;
+  const { enabled = true, table, handleAbort = false } = options;
   const {
     connect,
     disconnect,
@@ -72,6 +78,9 @@ export function useAudienceShareState(
     isSocketError(socketError) && socketError.code === 'SOCKET_RETRY_EXHAUSTED';
 
   const [error, setError] = useState<AudienceShareError | null>(null);
+  const [terminationReason, setTerminationReason] = useState<
+    'FINISHED' | 'ABORT'
+  >('FINISHED');
   const [isFinished, setIsFinished] = useState<boolean>(false);
 
   const [displayData, setDisplayData] = useState<AudienceDisplayData | null>(
@@ -141,7 +150,11 @@ export function useAudienceShareState(
       return;
     }
 
-    if (latestMessage.eventType === 'FINISHED') {
+    if (
+      latestMessage.eventType === 'FINISHED' ||
+      (handleAbort && latestMessage.eventType === 'ABORT')
+    ) {
+      setTerminationReason(latestMessage.eventType);
       cleanup();
       setIsFinished(true);
       return;
@@ -170,6 +183,7 @@ export function useAudienceShareState(
     latestMessageReceivedAt,
     error,
     isFinished,
+    handleAbort,
     cleanup,
     table,
   ]);
@@ -259,6 +273,7 @@ export function useAudienceShareState(
 
   return {
     status,
+    ...(handleAbort && status === 'finished' ? { terminationReason } : {}),
     error,
     chairmanPresence,
     connectionStatus,

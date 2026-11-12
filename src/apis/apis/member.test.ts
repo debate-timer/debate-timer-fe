@@ -5,11 +5,29 @@ import { ApiUrl } from '../endpoints';
 import { GetMemberFeatureFlagsResponseType } from '../responses/member';
 import {
   getMemberFeatureFlags,
+  logout,
   getMemberSettings,
   patchMemberSettings,
 } from './member';
 
 describe('회원 API', () => {
+  it('로그아웃은 인증 헤더·null 본문으로 요청하고 204 응답을 성공으로 판정한다', async () => {
+    localStorage.setItem('accessToken', 'logout-account');
+    localStorage.setItem('memberId', '10');
+    server.use(
+      http.post(`${ApiUrl.member}/logout`, async ({ request }) => {
+        expect(request.headers.get('Authorization')).toBe('logout-account');
+        expect(await request.json()).toBeNull();
+        expect(new URL(request.url).search).toBe('');
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    try {
+      expect(await logout()).toBe(true);
+    } finally {
+      localStorage.clear();
+    }
+  });
   it('로그인한 회원의 피쳐 플래그를 조회한다', async () => {
     const response: GetMemberFeatureFlagsResponseType = {
       featureFlags: ['TRANSCRIPT'],

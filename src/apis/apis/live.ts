@@ -1,4 +1,4 @@
-import { request } from '../primitives';
+import { RequestOptions, request } from '../primitives';
 import { ApiUrl } from '../endpoints';
 import {
   GetChairmanTokenResponseType,
@@ -8,12 +8,17 @@ import {
 // GET /api/live/{tableId}/chairman-token
 export async function getChairmanToken(
   tableId: string,
+  options: Pick<
+    RequestOptions,
+    'expectedMemberId' | 'expectedAuthRevision'
+  > = {},
 ): Promise<GetChairmanTokenResponseType> {
   const response = await request<GetChairmanTokenResponseType>(
     'GET',
     `${ApiUrl.live}/${encodeURIComponent(tableId)}/chairman-token`,
     null,
     null,
+    options,
   );
 
   return response.data;

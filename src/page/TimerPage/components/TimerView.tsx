@@ -10,13 +10,18 @@ interface TimerViewProps {
   state: TimerPageLogics;
   onEvent: (invoke: () => void, eventType: SocketEventType) => void;
   answerTime: number;
+  isAnswerTimeEnabled?: boolean;
+  isInputBlocked?: boolean;
 }
 
-export default function TimerView({
-  state,
-  onEvent,
-  answerTime,
-}: TimerViewProps) {
+export default function TimerView(props: TimerViewProps) {
+  const {
+    state,
+    onEvent,
+    answerTime,
+    isAnswerTimeEnabled = true,
+    isInputBlocked = false,
+  } = props;
   // 상태 풀기
   const {
     data,
@@ -33,6 +38,8 @@ export default function TimerView({
 
   const { answerTimerState, handleClickAnswerTimer } = useAnswerTimer({
     answerTime,
+    isEnabled: isAnswerTimeEnabled,
+    isInputBlocked,
     data,
     index,
     normalTimer,
@@ -60,6 +67,7 @@ export default function TimerView({
         item={data.table[index]}
         answerTimer={
           <AnswerTimeTimer
+            isEnabled={isAnswerTimeEnabled}
             owner="NORMAL"
             answerTime={answerTime}
             answerTimerState={answerTimerState}
@@ -104,6 +112,7 @@ export default function TimerView({
           teamName={data.info.prosTeamName}
           answerTimer={
             <AnswerTimeTimer
+              isEnabled={isAnswerTimeEnabled}
               owner="PROS"
               answerTime={answerTime}
               answerTimerState={answerTimerState}
@@ -149,6 +158,7 @@ export default function TimerView({
           teamName={data.info.consTeamName}
           answerTimer={
             <AnswerTimeTimer
+              isEnabled={isAnswerTimeEnabled}
               owner="CONS"
               answerTime={answerTime}
               answerTimerState={answerTimerState}

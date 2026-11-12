@@ -95,38 +95,53 @@ it('조회·저장 실패에도 설정 상태와 재시도 버튼을 표시하�
     screen.queryByRole('button', { name: /재시도/ }),
   ).not.toBeInTheDocument();
 });
-it('설정 저장 응답을 기다리지 않고 로그아웃하며 최신 변경 요청을 발행한다', async () => {
-  setAccessToken('a');
-  setMemberId(1);
-  let release!: () => void;
-  const blocked = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  const bodies: unknown[] = [];
-  server.use(
-    http.patch(`${ApiUrl.member}/settings`, async ({ request }) => {
-      bodies.push(await request.json());
-      await blocked;
-      return HttpResponse.json({ language: null, volume: 0.9 });
-    }),
-  );
-  const onLogout = vi.fn().mockResolvedValue(undefined);
-  const user = userEvent.setup();
-  renderSettings('/home', onLogout);
-  try {
-    await user.click(screen.getByRole('button', { name: '설정' }));
-    fireEvent.change(screen.getByRole('slider'), { target: { value: '7' } });
-    fireEvent.pointerUp(screen.getByRole('slider'));
-    await waitFor(() => expect(bodies).toHaveLength(1));
-    fireEvent.change(screen.getByRole('slider'), { target: { value: '9' } });
-    await user.click(screen.getByRole('button', { name: '로그아웃' }));
-    expect(onLogout).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(bodies).toHaveLength(2));
-    expect(bodies[1]).toEqual({ volume: 0.9 });
-    expect(
-      screen.queryByText('저장하지 않은 변경을 버리고 로그아웃할까요?'),
-    ).not.toBeInTheDocument();
-  } finally {
-    release();
-  }
-});
+it.each([false, true])(
+  '로그아웃 저장 책임은 일반 흐름과 위임 콜백으로 구분한다 (위임: %s)',
+  async (isDelegated) => {
+    setAccessToken('a');
+    setMemberId(1);
+    let release!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const bodies: unknown[] = [];
+    server.use(
+      http.patch(`${ApiUrl.member}/settings`, async ({ request }) => {
+        bodies.push(await request.json());
+        await blocked;
+        return HttpResponse.json({ language: null, volume: 0.9 });
+      }),
+    );
+    const onLogout = isDelegated
+      ? vi.fn().mockResolvedValue(undefined)
+      : undefined;
+    server.use(
+      http.post(
+        `${ApiUrl.member}/logout`,
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+    const user = userEvent.setup();
+    renderSettings('/home', onLogout);
+    try {
+      await user.click(screen.getByRole('button', { name: '설정' }));
+      fireEvent.change(screen.getByRole('slider'), { target: { value: '7' } });
+      fireEvent.pointerUp(screen.getByRole('slider'));
+      await waitFor(() => expect(bodies).toHaveLength(1));
+      fireEvent.change(screen.getByRole('slider'), { target: { value: '9' } });
+      await user.click(screen.getByRole('button', { name: '로그아웃' }));
+      if (onLogout) {
+        expect(onLogout).toHaveBeenCalledTimes(1);
+        expect(bodies).toHaveLength(1);
+      } else {
+        await waitFor(() => expect(bodies).toHaveLength(2));
+        expect(bodies[1]).toEqual({ volume: 0.9 });
+      }
+      expect(
+        screen.queryByText('저장하지 않은 변경을 버리고 로그아웃할까요?'),
+      ).not.toBeInTheDocument();
+    } finally {
+      release();
+    }
+  },
+);

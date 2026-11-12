@@ -109,7 +109,10 @@ export async function getDebateTableList(): Promise<GetDebateTableListResponseTy
 // POST /api/member/logout
 export async function logout(): Promise<boolean> {
   const requestUrl: string = ApiUrl.member;
-  const response = await request('POST', requestUrl + `/logout`, null, null);
+  const response = await request('POST', requestUrl + `/logout`, null, null, {
+    expectedMemberId: getMemberId() ?? undefined,
+    expectedAuthRevision: getAuthRevision(),
+  });
 
   return response.status === 204 ? true : false;
 }
