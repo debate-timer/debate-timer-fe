@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { PropsWithChildren } from 'react';
 import clsx from 'clsx';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useLogout from '../../../hooks/mutations/useLogout';
 import { isLoggedIn } from '../../../util/accessToken';
 import {
@@ -14,6 +14,7 @@ import DialogModal from '../../../components/DialogModal/DialogModal';
 import DTHome from '../../../components/icons/Home';
 import DTLogin from '../../../components/icons/Login';
 import useFullscreen from '../../../hooks/useFullscreen';
+import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import LanguageSelector from './LanguageSelector';
 import {
   buildLangPath,
@@ -74,11 +75,17 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
   const navigate = useNavigate();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const location = useLocation();
+  const legacyAuth =
+    /^\/(?:en\/|ko\/)?(?:live\/|vote\/|table\/customize\/[^/]+(?:$|\/end\/(?:feedback|vote\/[^/]+)$))/.test(
+      location.pathname,
+    );
   const homePath = buildLangPath('/home', lang);
   const { mutate: logoutMutate } = useLogout(() => navigate(homePath));
   const { openModal, closeModal, ModalWrapper } = useModal({});
   const { isFullscreen, setFullscreen } = useFullscreen();
-  const defaultIcons: HeaderIcons[] = ['home', 'auth'];
+  const defaultIcons: HeaderIcons[] =
+    legacyAuth || !isLoggedIn() ? ['home', 'auth'] : ['home'];
 
   const handleLoginStart = (keepData: boolean) => {
     sessionStorage.setItem('keepGuestTable', String(keepData));
@@ -96,6 +103,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         )}
 
         <LanguageSelector />
+        <SettingsModal onLogin={openModal} />
 
         <div className="w-[1px] min-w-[1px] self-stretch bg-neutral-500" />
 

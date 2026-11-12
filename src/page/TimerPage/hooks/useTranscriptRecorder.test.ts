@@ -125,3 +125,18 @@ describe('STT 모드 선택 기록 훅', () => {
     expect(soniox.enable).toHaveBeenCalledTimes(2);
   });
 });
+
+it('UI 언어를 바꿔도 최초 기록 언어를 두 전사 방식에 유지한다', async () => {
+  vi.mocked(useDebateTranscriber).mockReturnValue({ ...rpc });
+  vi.mocked(useSonioxTranscriber).mockReturnValue({ ...soniox });
+  const { result, rerender } = renderHook(
+    ({ lang }) => useTranscriptRecorder({ ...params, lang }),
+    { initialProps: { lang: 'ko-KR' } },
+  );
+  await act(async () => {
+    await result.current.enable('RPC');
+  });
+  rerender({ lang: 'en-US' });
+  expect(vi.mocked(useDebateTranscriber).mock.lastCall?.[0].lang).toBe('ko-KR');
+  expect(vi.mocked(useSonioxTranscriber).mock.lastCall?.[0].lang).toBe('ko-KR');
+});

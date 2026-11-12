@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -115,17 +116,19 @@ describe('AudienceSharePage', () => {
 
     const createPage = () => (
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={[initialRoute]}>
-          <TestErrorBoundary onError={onError}>
-            <Routes>
-              <Route path="/live/:id" element={<AudienceSharePage />} />
-              <Route
-                path="/live/:id/end"
-                element={<div>종료 안내 페이지</div>}
-              />
-            </Routes>
-          </TestErrorBoundary>
-        </MemoryRouter>
+        <GlobalSettingsProvider>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <TestErrorBoundary onError={onError}>
+              <Routes>
+                <Route path="/live/:id" element={<AudienceSharePage />} />
+                <Route
+                  path="/live/:id/end"
+                  element={<div>종료 안내 페이지</div>}
+                />
+              </Routes>
+            </TestErrorBoundary>
+          </MemoryRouter>
+        </GlobalSettingsProvider>
       </QueryClientProvider>
     );
     const result = render(createPage());

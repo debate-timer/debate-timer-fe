@@ -1,5 +1,9 @@
 import * as Sentry from '@sentry/react';
-import { getMemberId, setAccessToken } from '../../util/accessToken';
+import {
+  getAuthRevision,
+  getMemberId,
+  setAccessToken,
+} from '../../util/accessToken';
 import { assertMemberSettingsAccount } from '../../util/memberSettingsAccount';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
@@ -20,7 +24,10 @@ export async function getMemberSettings(): Promise<GetMemberSettingsResponseType
     ApiUrl.memberSettings,
     null,
     null,
-    { expectedMemberId: identity.memberId },
+    {
+      expectedMemberId: identity.memberId,
+      expectedAuthRevision: getAuthRevision(),
+    },
   );
   return response.data;
 }
@@ -35,7 +42,10 @@ export async function patchMemberSettings(
     ApiUrl.memberSettings,
     settings,
     null,
-    { expectedMemberId: identity.memberId },
+    {
+      expectedMemberId: identity.memberId,
+      expectedAuthRevision: getAuthRevision(),
+    },
   );
   return response.data;
 }

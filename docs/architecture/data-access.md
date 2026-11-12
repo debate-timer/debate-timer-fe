@@ -68,7 +68,7 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 
 `usePatchMemberSettings(memberId)`는 요청 시작 계정을 보존함. 성공 시 해당 계정의 진행 중 조회를 취소해 지연 조회가 최종 저장값을 되돌리지 못하게 하고, 여전히 같은 계정으로 로그인한 경우에만 전체 최종 응답을 캐시에 반영함. 같은 계정의 토큰 재발급은 허용함. 실패 시 기존 캐시를 유지하고 두 훅 모두 `throwOnError: false`로 지역 복구 상태를 제공함.
 
-설정 훅은 아직 화면에 연결하지 않았음. 전역 적용값·500ms 저장 지연·연속 저장 순서·로그아웃 시 조회 취소와 캐시 제거는 후속 전역 설정 계층이 소유함. 비회원 값이나 조회 실패의 기본값을 서버에 자동 저장하지 않음.
+설정 훅은 공용 전역 설정 계층에서 사용함. 적용값·저장 지연·순서·계정별 조회 취소와 캐시 제거는 해당 계층이 소유함. 비회원 값이나 조회 실패의 기본값을 서버에 자동 저장하지 않음.
 
 공개 `GET /api/polls/{pollId}/votes`의 `GetVoterPollInfoResponseType`은 `tableInfo: { name: string; agenda: string }`를 포함함. `id`는 투표 ID이며 시간표 ID가 아님. 공개 응답에는 `voterNames`가 없고 사회자 조회의 이름 목록은 유지함. FE는 숫자 투표 ID를 인코딩해 URL 문자열로 전송하며 기존 `['VoterPoll', pollId]` 키를 유지함.
 
@@ -92,3 +92,7 @@ STT 모드(`RPC`·`SONIOX`)와 Soniox 전사를 기다리는 구간을 함께 �
 
 API 실패의 사용자 복구와 Sentry 수집은 [오류와 관측](errors-observability.md)이
 소유함.
+
+## MP-02 저장 수명
+
+공용 설정 계층이 500ms 대기·조작 완료 저장·직렬 PATCH를 소유함. 직접 변경한 필드만 저장하고 실패한 변경은 다음 직접 변경 때 최신값과 합쳐 다시 저장함. 자동 반복 재시도는 하지 않음. 일반 로그아웃 직전에는 진행 중·미저장 필드를 합쳐 도메인 API로 즉시 발행하고 응답을 기다리지 않음. 이 발행은 직렬 큐를 기다리지 않으므로 최종 저장·서버 완료 순서를 보장하지 않으며 계정 결속 검사는 유지함. 설정 상태 UI·재시도 버튼·설정으로 인한 beforeunload 차단은 제공하지 않음. 인증 revision을 내부 요청 메타데이터로 함께 확인해 A→B→A의 이전 응답도 배제함. 브라우저 키는 guest-settings-language·timer-volume이며 회원 설정을 복제하지 않음.

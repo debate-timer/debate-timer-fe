@@ -27,7 +27,8 @@ export default function useTranscriptLeaveGuard(
   const shouldBlock = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) =>
       isRecording &&
-      currentLocation.pathname !== nextLocation.pathname &&
+      buildLangPath(currentLocation.pathname, DEFAULT_LANG) !==
+        buildLangPath(nextLocation.pathname, DEFAULT_LANG) &&
       !isDebateEndPath(nextLocation.pathname, tableId),
     [isRecording, tableId],
   );

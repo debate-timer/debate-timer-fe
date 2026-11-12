@@ -10,9 +10,11 @@ import {
   isSupportedLang,
 } from '../../../util/languageRouting';
 import i18n from '../../../i18n';
+import useGlobalSettings from '../../../hooks/useGlobalSettings';
 
 export default function LanguageSelector() {
   const { t } = useTranslation();
+  const { controller } = useGlobalSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const { lang: currentLangParam } = useParams();
@@ -36,6 +38,8 @@ export default function LanguageSelector() {
     if (!isSupportedLang(newLang)) {
       return;
     }
+    controller.change({ language: newLang });
+    void controller.flush();
     const newPathname = buildLangPath(location.pathname, newLang);
     const nextUrl = `${newPathname}${location.search}${location.hash}`;
     if (i18n.language !== newLang) {

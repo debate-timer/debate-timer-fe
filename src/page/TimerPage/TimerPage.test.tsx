@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   act,
@@ -27,9 +28,11 @@ function renderTimerPage() {
   );
   const view = render(
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <RouterProvider router={router} />
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <RouterProvider router={router} />
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
   return { ...view, queryClient };

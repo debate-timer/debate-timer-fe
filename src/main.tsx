@@ -1,4 +1,5 @@
 import './instrument';
+import GlobalSettingsProvider from './components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
@@ -98,9 +99,11 @@ function initializeApp() {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <GlobalPortal.Provider>
-          <RouterProvider router={router} />
-        </GlobalPortal.Provider>
+        <GlobalSettingsProvider>
+          <GlobalPortal.Provider>
+            <RouterProvider router={router} />
+          </GlobalPortal.Provider>
+        </GlobalSettingsProvider>
       </QueryClientProvider>
     </StrictMode>,
   );

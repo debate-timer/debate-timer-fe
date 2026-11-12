@@ -61,14 +61,7 @@ utility를 사용하며 일반 CSS 선택자를 참조하지 않음. 기존 `.bu
 화면 조건은 `md` 768px 이상, `lg` 1280px 이상임. `xl`은 너비 1600px 이상이면서
 높이 1024px 이상, `short`는 높이 500px 이하인 사용자 정의 variant임. 기본
 breakpoint는 초기화하며 `sm` 등 다른 화면 조건을 자동으로 추가하지 않음.
-기본 팔레트는 v3 호환 재정의 없이 Tailwind CSS 4의 내장값을 사용함. 브랜드·
-진영색과 기존 UI가 소비하는 `default-*`·`semantic-*` 사용자 정의 색상은
-`src/index.css`에 남아 있음. 색상의 의미별 사용 기준은
-[공통 디자인](design.md#색상과-강조)이 소유하며, 기존 사용자 정의 색상을
-전환할 때는 사용처를 함께 확인함. 새 글자 역할은
-[역할별 타이포그래피](design.md#타이포그래피)의 `text-ui-*`를 사용하며, 기존의
-크기 전용 글자 스타일 선택자와 구분함. 사양과 소스의 동기화는
-[사용과 사양 동기화](design.md#사용과-사양-동기화)를 따름.
+기본 팔레트는 별도 재정의 없이 Tailwind CSS 4의 내장값을 사용함. 브랜드·진영색과 기존 UI가 소비하는 `default-*`·`semantic-*` 사용자 정의 색상은 `src/index.css`에 남아 있음. 색상의 의미별 사용 기준은 [공통 디자인](design.md#색상과-강조)이 소유하며, 기존 사용자 정의 색상을 전환할 때는 사용처를 함께 확인함. 새 글자 역할은 [역할별 타이포그래피](design.md#타이포그래피)의 `text-ui-*`를 사용하며, 기존의 크기 전용 글자 스타일 선택자와 구분함. 사양과 소스의 동기화는 [사용과 사양 동기화](design.md#사용과-사양-동기화)를 따름.
 
 클래스 정렬은 `.prettierrc`의 `prettier-plugin-tailwindcss`가 담당함.
 `tailwindStylesheet`는 `./src/index.css`, `tailwindFunctions`는 `['clsx']`임.

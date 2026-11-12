@@ -1,3 +1,4 @@
+import { getAuthRevision } from '../../util/accessToken';
 import {
   QueryClient,
   QueryClientProvider,
@@ -248,5 +249,33 @@ describe('회원 설정 서버 상태', () => {
     });
     expect(client.getQueryData(['MemberSettings', '2'])).toEqual(SETTINGS_B);
     expect(client.getQueryData(['MemberSettings', '1'])).toBeUndefined();
+  });
+  it('계정 재진입 전 저장 응답이 새 세션의 조회를 취소하지 않는다', async () => {
+    let finish!: (value: GetMemberSettingsResponseType) => void;
+    vi.mocked(patchMemberSettings).mockReturnValueOnce(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    const wrapper = createWrapper(client);
+    const mutation = renderHook(() => usePatchMemberSettings('1'), { wrapper });
+    act(() => {
+      mutation.result.current.mutate({ volume: 0.9 });
+    });
+    await waitFor(() => expect(patchMemberSettings).toHaveBeenCalledTimes(1));
+    setAccount('2');
+    getAuthRevision();
+    setAccount('1');
+    getAuthRevision();
+    client.removeQueries({ queryKey: ['MemberSettings', '1'] });
+    vi.mocked(getMemberSettings).mockReturnValueOnce(new Promise(() => {}));
+    renderHook(() => useGetMemberSettings('1'), { wrapper });
+    await waitFor(() =>
+      expect(client.isFetching({ queryKey: ['MemberSettings', '1'] })).toBe(1),
+    );
+    await act(async () => {
+      finish(SETTINGS_A);
+    });
+    expect(client.isFetching({ queryKey: ['MemberSettings', '1'] })).toBe(1);
   });
 });

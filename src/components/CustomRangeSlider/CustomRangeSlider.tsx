@@ -4,6 +4,8 @@ interface CustomRangeSliderProps {
   // Controlled props
   value: number;
   onValueChange: (value: number) => void;
+  onValueCommit?: () => void;
+  ariaLabel?: string;
 
   // Configuration
   min?: number;
@@ -14,6 +16,8 @@ interface CustomRangeSliderProps {
 export default function CustomRangeSlider({
   value,
   onValueChange,
+  onValueCommit,
+  ariaLabel,
   min = 0,
   max = 100,
   step = 1,
@@ -56,6 +60,9 @@ export default function CustomRangeSlider({
       {/* 실제 상호작용 레이어 */}
       <input
         type="range"
+        aria-label={ariaLabel}
+        onPointerUp={onValueCommit}
+        onKeyUp={onValueCommit}
         min={min}
         max={max}
         step={step}
@@ -64,7 +71,10 @@ export default function CustomRangeSlider({
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         onFocus={() => setShowTooltip(true)}
-        onBlur={() => setShowTooltip(false)}
+        onBlur={() => {
+          setShowTooltip(false);
+          onValueCommit?.();
+        }}
         className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
       />
     </div>

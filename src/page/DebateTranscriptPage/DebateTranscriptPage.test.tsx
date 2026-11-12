@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -80,16 +81,20 @@ function renderPage(transcript: GetTranscriptResponseType) {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <MemoryRouter initialEntries={['/table/customize/1/end/transcript/9']}>
-          <Routes>
-            <Route
-              path="/table/customize/:tableId/end/transcript/:transcriptId"
-              element={<DebateTranscriptPage />}
-            />
-          </Routes>
-        </MemoryRouter>
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <MemoryRouter
+            initialEntries={['/table/customize/1/end/transcript/9']}
+          >
+            <Routes>
+              <Route
+                path="/table/customize/:tableId/end/transcript/:transcriptId"
+                element={<DebateTranscriptPage />}
+              />
+            </Routes>
+          </MemoryRouter>
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
 }

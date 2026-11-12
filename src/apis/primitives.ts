@@ -24,6 +24,7 @@ export interface RequestOptions {
   headers?: Record<string, string>;
   timeout?: number;
   expectedMemberId?: string;
+  expectedAuthRevision?: number;
 }
 
 // Low-level http request function

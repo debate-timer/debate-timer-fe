@@ -4,7 +4,7 @@
 
 `src/main.tsx`가 앱 초기화를 소유함. `VITE_MOCK_API`가 활성화된 경우
 `src/mocks/browser.ts`의 worker 시작 완료 후 앱을 렌더링함. 이후
-`QueryClientProvider` → `GlobalPortal.Provider` → `RouterProvider` 순으로
+`QueryClientProvider` → `GlobalSettingsProvider` → `GlobalPortal.Provider` → `RouterProvider` 순으로
 조립함. Query와 Mutation의 기본 `throwOnError`는 `true`이며, 지역 오류 UI가
 필요한 조회 훅과 화면이 실패를 직접 처리하는 변경 훅에서 개별 설정을 변경함.
 변경 훅 예시는 로그인 실패 시 메인으로 이동하는
@@ -49,8 +49,7 @@
 
 ## 언어와 URL
 
-- `src/i18n.ts`의 지원 언어는 `ko`, `en`이며 기본 언어는 `ko`임. 감지 순서는
-  경로 → `localStorage` → 브라우저 언어임.
+- `src/i18n.ts`의 지원 언어는 `ko`, `en`이며 기본 언어는 `ko`임. 초기 감지는 경로 → 브라우저 언어이며 저장 설정의 적용은 전역 설정 계층이 소유함.
 - `src/util/languageRouting.ts`는 기본 언어의 `/ko` 접두어를 없애고 다른 언어에
   `/{lang}`을 붙이는 경로 함수를 소유함.
 - `src/routes/LanguageWrapper.tsx`는 URL과 i18n 상태를 맞추고 정규화 이동에
@@ -65,3 +64,7 @@
 `replace`를 사용함. 페이지 안에서 링크를 만들 때는 언어 접두어를 문자열로 직접
 이어 붙이지 않고 `buildLangPath`를 사용함. 지원하지 않는 언어가 URL에 들어온
 경우 `LanguageWrapper`와 경로 함수의 현재 처리 방식을 함께 확인함.
+
+## 전역 설정의 언어 연결
+
+언어 감지의 자동 localStorage 캐시를 끄고 명시 링크·직접 선택·계정/비회원 저장값을 구분함. LanguageWrapper가 공용 설정으로 i18n·문서 언어·URL을 맞추며 query·hash를 보존함. 언어 접두어만 변경하는 이동은 속기 이탈로 처리하지 않음.

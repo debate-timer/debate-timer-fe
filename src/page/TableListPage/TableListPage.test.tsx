@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GlobalPortal } from '../../util/GlobalPortal';
 import { MemoryRouter } from 'react-router-dom';
@@ -20,9 +21,13 @@ function TestWrapper({
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <MemoryRouter initialEntries={[initialEntry]}>
+            {children}
+          </MemoryRouter>
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>
   );
 }
