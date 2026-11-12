@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SttMode } from '../../../types/transcript';
 import useDebateTranscriber, {
   UseDebateTranscriberParams,
@@ -12,8 +12,13 @@ import useSonioxTranscriber from './useSonioxTranscriber';
 export default function useTranscriptRecorder(
   params: UseDebateTranscriberParams,
 ) {
-  const rpc = useDebateTranscriber(params);
-  const soniox = useSonioxTranscriber(params);
+  const recognitionLangRef = useRef<string | null>(null);
+  const stableParams = {
+    ...params,
+    lang: recognitionLangRef.current ?? params.lang,
+  };
+  const rpc = useDebateTranscriber(stableParams);
+  const soniox = useSonioxTranscriber(stableParams);
   const supportedModes: Record<SttMode, boolean> = {
     RPC: rpc.isSupported,
     SONIOX: soniox.isSupported,
@@ -37,6 +42,7 @@ export default function useTranscriptRecorder(
 
   const enable = useCallback(
     async (mode: SttMode) => {
+      recognitionLangRef.current ??= params.lang;
       const nextMode = isModeLocked ? sttMode : mode;
       setSttMode(nextMode);
       if (nextMode === 'SONIOX') {
@@ -45,7 +51,7 @@ export default function useTranscriptRecorder(
       }
       enableRpc();
     },
-    [enableRpc, enableSoniox, isModeLocked, sttMode],
+    [enableRpc, enableSoniox, isModeLocked, sttMode, params.lang],
   );
 
   const disable = useCallback(() => {

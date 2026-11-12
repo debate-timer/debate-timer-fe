@@ -60,14 +60,14 @@ describe('토론 기록 이탈 방지 훅(useTranscriptLeaveGuard)은', () => {
       expect(guard.isLeaveModalOpen).toBe(true);
     });
 
-    it('언어를 바꿔 같은 화면의 다른 경로로 이동해도 안내창을 연다', async () => {
+    it('언어만 바꾸면 토론 화면 이탈로 처리하지 않는다', async () => {
       renderGuard(true);
 
       await act(async () => {
         navigateFromTimer(`/en${TIMER_PATH}`);
       });
 
-      expect(guard.isLeaveModalOpen).toBe(true);
+      expect(guard.isLeaveModalOpen).toBe(false);
     });
 
     it('확인하면 막았던 화면으로 이동한다', async () => {

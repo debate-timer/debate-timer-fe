@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -24,16 +25,18 @@ function renderComponent(info: DebateInfo, onButtonClick = vi.fn()) {
   const queryClient = new QueryClient();
   render(
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <MemoryRouter>
-          <TableNameAndType
-            info={info}
-            isLoading={false}
-            onInfoChange={vi.fn()}
-            onButtonClick={onButtonClick}
-          />
-        </MemoryRouter>
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <MemoryRouter>
+            <TableNameAndType
+              info={info}
+              isLoading={false}
+              onInfoChange={vi.fn()}
+              onButtonClick={onButtonClick}
+            />
+          </MemoryRouter>
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
 }

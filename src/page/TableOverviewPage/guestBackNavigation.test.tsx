@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { act, render, screen, waitFor } from '@testing-library/react';
@@ -44,9 +45,11 @@ function renderWithRouter(initialEntry: string) {
 
   render(
     <QueryClientProvider client={new QueryClient()}>
-      <GlobalPortal.Provider>
-        <RouterProvider router={router} />
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <RouterProvider router={router} />
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
 

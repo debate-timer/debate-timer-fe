@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -64,11 +65,13 @@ describe('AudienceSharePage 통합 - 청중이 사회자보다 먼저 입장', (
     });
     const createPage = () => (
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={['/live/123']}>
-          <Routes>
-            <Route path="/live/:id" element={<AudienceSharePage />} />
-          </Routes>
-        </MemoryRouter>
+        <GlobalSettingsProvider>
+          <MemoryRouter initialEntries={['/live/123']}>
+            <Routes>
+              <Route path="/live/:id" element={<AudienceSharePage />} />
+            </Routes>
+          </MemoryRouter>
+        </GlobalSettingsProvider>
       </QueryClientProvider>
     );
     const result = render(createPage());

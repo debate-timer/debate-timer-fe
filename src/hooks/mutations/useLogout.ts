@@ -1,18 +1,30 @@
 import * as Sentry from '@sentry/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { logout } from '../../apis/apis/member';
-import { removeAccessToken, removeMemberId } from '../../util/accessToken';
+import {
+  getAuthRevision,
+  removeAccessToken,
+  removeMemberId,
+} from '../../util/accessToken';
 import { analyticsManager } from '../../util/analytics';
 import { MEMBER_FEATURE_FLAGS_QUERY_KEY } from '../query/useGetMemberFeatureFlags';
 
 export default function useLogout(onSuccess: () => void) {
   const queryClient = useQueryClient();
   return useMutation({
+    throwOnError: false,
+    onMutate: () => getAuthRevision(),
     mutationFn: async () => {
       const response = await logout();
+      if (!response) {
+        throw new Error('LOGOUT_FAILED');
+      }
       return response;
     },
-    onSuccess: () => {
+    onSuccess: (_data, _variables, revision) => {
+      if (revision !== getAuthRevision()) {
+        return;
+      }
       removeAccessToken();
       removeMemberId();
       // 다른 계정으로 로그인했을 때 이전 회원의 플래그를 쓰지 않도록 지운다.

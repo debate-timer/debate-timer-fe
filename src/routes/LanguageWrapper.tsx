@@ -1,46 +1,58 @@
-import { useEffect } from 'react';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import i18n from '../i18n';
 import usePageTracking from '../hooks/usePageTracking';
+import useGlobalSettings from '../hooks/useGlobalSettings';
 import {
-  DEFAULT_LANG,
   buildLangPath,
-  getSelectedLangFromRoute,
+  getLangFromPath,
   isSupportedLang,
-  stripDefaultLangFromPath,
 } from '../util/languageRouting';
 
 export default function LanguageWrapper() {
-  const { lang } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { language, status, controller } = useGlobalSettings();
+  const linkRef = useRef(
+    location.state && 'settingsLinkLanguage' in location.state
+      ? location.state.settingsLinkLanguage
+      : getLangFromPath(location.pathname),
+  );
   usePageTracking();
-
   useEffect(() => {
-    const selectedLang = getSelectedLangFromRoute(lang, location.pathname);
-    const currentLang = i18n.resolvedLanguage ?? i18n.language;
-
-    if (lang === DEFAULT_LANG) {
-      const nextPath = stripDefaultLangFromPath(location.pathname);
-      const nextUrl = `${nextPath || '/'}${location.search}${location.hash}`;
-      navigate(nextUrl, { replace: true });
-      return;
+    const browser = [...navigator.languages, navigator.language]
+      .map((value) => value.toLowerCase().split('-')[0])
+      .find(isSupportedLang);
+    const selected = controller.getSnapshot().language;
+    const lang =
+      (controller.hasDirectLanguage() ? selected : null) ??
+      linkRef.current ??
+      selected ??
+      (isSupportedLang(browser) ? browser : 'ko');
+    void i18n.changeLanguage(lang);
+    document.documentElement.lang = lang;
+    const path = buildLangPath(location.pathname, lang);
+    if (path !== location.pathname) {
+      navigate(`${path}${location.search}${location.hash}`, {
+        replace: true,
+        state: {
+          ...location.state,
+          settingsLinkLanguage: linkRef.current ?? null,
+        },
+      });
     }
-
-    if (!lang && isSupportedLang(currentLang) && currentLang !== DEFAULT_LANG) {
-      const nextPath = buildLangPath(location.pathname, currentLang);
-      if (nextPath !== location.pathname) {
-        const nextUrl = `${nextPath}${location.search}${location.hash}`;
-        navigate(nextUrl, { replace: true });
-        return;
-      }
-    }
-
-    if (isSupportedLang(selectedLang) && i18n.language !== selectedLang) {
-      i18n.changeLanguage(selectedLang);
-    }
-  }, [lang, location.hash, location.pathname, location.search, navigate]);
-
+  }, [
+    language,
+    status,
+    controller,
+    location.pathname,
+    location.search,
+    location.hash,
+    location.state,
+    navigate,
+  ]);
+  useEffect(() => {
+    void controller.flush();
+  }, [controller, location.key]);
   return <Outlet />;
 }

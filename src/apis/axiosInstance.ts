@@ -2,6 +2,7 @@ import axios, { InternalAxiosRequestConfig, CanceledError } from 'axios';
 import * as Sentry from '@sentry/react';
 import {
   getAccessToken,
+  getAuthRevision,
   getMemberId,
   removeAccessToken,
   removeMemberId,
@@ -28,13 +29,17 @@ declare module 'axios' {
   interface AxiosRequestConfig {
     /** 서버에 전송하지 않는 요청 시작 계정 식별자임. */
     expectedMemberId?: string;
+    expectedAuthRevision?: number;
   }
 }
 
 function assertRequestAccount(config?: InternalAxiosRequestConfig): void {
   if (
     config?.expectedMemberId !== undefined &&
-    (getMemberId() !== config.expectedMemberId || !getAccessToken())
+    (getMemberId() !== config.expectedMemberId ||
+      !getAccessToken() ||
+      (config.expectedAuthRevision !== undefined &&
+        config.expectedAuthRevision !== getAuthRevision()))
   ) {
     throw new CanceledError('MEMBER_SETTINGS_ACCOUNT_CHANGED', config);
   }

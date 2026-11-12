@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { useCallback, useRef, useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -47,9 +48,11 @@ function renderTimerPage() {
   );
   return render(
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <RouterProvider router={router} />
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <RouterProvider router={router} />
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
 }

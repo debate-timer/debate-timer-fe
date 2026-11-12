@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -19,24 +20,26 @@ function TestWrapper({
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <MemoryRouter initialEntries={initialEntries}>
-          <Routes>
-            {/* TableComposition 테스트 경로 */}
-            <Route path="/composition" element={children} />
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <MemoryRouter initialEntries={initialEntries}>
+            <Routes>
+              {/* TableComposition 테스트 경로 */}
+              <Route path="/composition" element={children} />
 
-            {/* 실제로 이동하고 싶은 /overview 경로 - 테스트용 컴포넌트 */}
-            <Route
-              path="/:lang/overview/customize/1"
-              element={<h1 data-testid="overview-page">Overview Page</h1>}
-            />
-            <Route
-              path="/overview/customize/1"
-              element={<h1 data-testid="overview-page">Overview Page</h1>}
-            />
-          </Routes>
-        </MemoryRouter>
-      </GlobalPortal.Provider>
+              {/* 실제로 이동하고 싶은 /overview 경로 - 테스트용 컴포넌트 */}
+              <Route
+                path="/:lang/overview/customize/1"
+                element={<h1 data-testid="overview-page">Overview Page</h1>}
+              />
+              <Route
+                path="/overview/customize/1"
+                element={<h1 data-testid="overview-page">Overview Page</h1>}
+              />
+            </Routes>
+          </MemoryRouter>
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>
   );
 }

@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../src/components/GlobalSettingsProvider/GlobalSettingsProvider';
 // preview.ts
 import type { Preview } from '@storybook/react-vite';
 import '../src/index.css';
@@ -66,14 +67,16 @@ const preview: Preview = {
 
       return (
         <QueryClientProvider client={queryClient}>
-          <GlobalPortal.Provider>
-            <StoryRouter
-              Story={Story}
-              route={route}
-              routeState={routeState}
-              routePattern={routePattern}
-            />
-          </GlobalPortal.Provider>
+          <GlobalSettingsProvider>
+            <GlobalPortal.Provider>
+              <StoryRouter
+                Story={Story}
+                route={route}
+                routeState={routeState}
+                routePattern={routePattern}
+              />
+            </GlobalPortal.Provider>
+          </GlobalSettingsProvider>
         </QueryClientProvider>
       );
     },

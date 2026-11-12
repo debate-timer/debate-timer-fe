@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { isLoggedIn } from '../../../util/accessToken';
+import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import LanguageSelector from '../../../layout/components/header/LanguageSelector';
 
 interface HeaderProps {
   onLoginButtonClicked: () => void;
 }
 
-export default function Header({ onLoginButtonClicked }: HeaderProps) {
+export default function Header(props: HeaderProps) {
+  const { onLoginButtonClicked } = props;
   const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -27,17 +29,19 @@ export default function Header({ onLoginButtonClicked }: HeaderProps) {
       }`}
     >
       <div className="flex w-[90%] max-w-[1226px] items-center justify-between md:w-[70%]">
-        <p className="flex items-center text-body-raw font-semibold md:text-subtitle-raw">
-          Debate Timer
-        </p>
+        <p className="flex items-center text-ui-label">Debate Timer</p>
         <div className="flex items-center space-x-4">
           <LanguageSelector />
-          <button
-            className="text-body-raw font-semibold md:text-subtitle-raw"
-            onClick={onLoginButtonClicked}
-          >
-            {!isLoggedIn() ? t('3초 로그인') : t('로그아웃')}
-          </button>
+          <SettingsModal onLogin={onLoginButtonClicked} />
+          {!isLoggedIn() && (
+            <button
+              className="text-ui-label"
+              aria-label={t('로그인')}
+              onClick={onLoginButtonClicked}
+            >
+              {!isLoggedIn() ? t('3초 로그인') : t('로그아웃')}
+            </button>
+          )}
         </div>
       </div>
     </header>
