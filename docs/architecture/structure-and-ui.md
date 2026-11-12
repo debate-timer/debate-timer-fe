@@ -86,3 +86,13 @@ UI·훅·Story는 페이지 안에 두고, 둘 이상의 화면에서 쓰는 계
 ## 전역 설정 상태
 
 `GlobalSettingsProvider`가 앱 수명의 적용값·대기 저장·실패 상태를 소유함. `useGlobalSettings`로 헤더·모달·종소리가 공유하며 모달을 닫아도 저장 수명은 유지함. 직접 선택의 직렬 저장은 `SettingsController`가 담당함.
+
+## 토론 제어의 MP-04 연결 계약
+
+`useDebateControls`는 테이블·현재 차례·진영·실행 여부·인식 언어 후보, 공유/속기 허용 여부와 `stopTimers`·`onSyncRequest`를 받음. `DebateMenu`·`DebateFeatureIndicators`는 반환한 표시 상태·콜백만 소비함. 훅을 오버레이 밖의 페이지 수명에 배치하며 테이블 변경 시 페이지 조립 경계를 새로 마운트함. 메뉴 개폐는 기능을 재생성하지 않음.
+
+`answerTime`·`isAnswerTimeEnabled`·`isInputBlocked`를 `TimerView`에 연결하고, `useTimerHotkey`에는 입력 가능 여부를 전달함. 공용 `ToggleButton`은 필수 `aria-label`, `isPressed`, `onPressedChange`로 외부 상태를 표시하며 확인·오류·통신을 소유하지 않음.
+
+`useDebateLogout`은 `SettingsModal.onLogout`에 전달할 `requestLogout(): Promise<void>`와 확인 UI 상태를 제공함. 호출자는 타이머 정지·속기 폐기·공유 중단·전체 화면 해제·설정 발행·성공 이동을 연결함. 취소는 Promise를 완료하고 로그아웃 실패는 거절함. 로컬 정리는 한 번만 실행하고 실패 뒤 재시도는 로그아웃을 다시 수행함.
+
+설정 모달의 위임 콜백은 경고·설정 발행·실패 표시를 소유함. 모달은 자기 창을 닫은 뒤 콜백을 호출하며 별도 설정 발행을 하지 않음. 일반 로그아웃의 설정 발행은 기존 모달이 소유함. MP-03은 이 계약과 독립 Story까지 준비하며 현재 헤더·자동 속기 팝업의 교체는 MP-04에서 수행함. 제품 정책은 [토론 메뉴 위키](../wiki/feature/debate-controls.md)가 소유함.

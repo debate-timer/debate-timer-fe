@@ -59,7 +59,7 @@ TimerPage·AudienceSharePage
 
 사회자는 기존 `/app/event/{roomId}`에 사회자 토큰·`X-Chairman-Session`·증가하는 `version`으로 발행함. 청중 훅은 기존 `/room/{roomId}`에서 유효한 `ABORT`를 수신하고 기존 version 규칙을 거쳐 `latestMessage`로 전달함. `serverTime`·version의 기존 선택·nullable 형식과 다른 이벤트의 의미를 변경하지 않음.
 
-현재 구현 범위는 발행·수신 기반까지임. 발행 함수는 서버의 중단 성공 여부를 반환하지 않고 발행 직후 disconnect를 수행하지 않음. 청중 화면의 중단 안내·기능 정리·재연결 차단은 후속 화면 연동 범위이며 현재 `ABORT`의 null payload를 타이머나 정상 종료로 해석하지 않음.
+MP-01의 통신 범위는 발행·수신 기반까지임. 발행 함수는 서버의 중단 성공 여부를 반환하지 않고 발행 직후 disconnect를 수행하지 않음. 청중 화면의 중단 안내·기능 정리·재연결 차단은 후속 화면 연동 범위이며 현재 `ABORT`의 null payload를 타이머나 정상 종료로 해석하지 않음.
 
 사회자 성공 확인·재시도·종료 상태 복원·새 청중 차단·구버전 중단 안내는 후속 통신 보완 사항임. 별도 목적지·`scope`·처리 결과 이벤트·공유 세션 필드는 추가하지 않았음. 모의 테스트 통과를 실제 서버 WS 연동 완료로 해석하지 않음.
 
@@ -75,3 +75,15 @@ TimerPage·AudienceSharePage
 `src/hooks/sockets/useChairmanSocket.ts`에 있음. 타이머 이벤트의 payload 생성과
 화면 반영은 각 페이지의 코드가 맡음. 이 문서는 연결·구독·메시지 경계의 공통
 계약만 소유함.
+
+## MP-03 명시적 공유 제어
+
+`useLiveShareSession`이 오버레이와 독립된 `startSharing`·`stopSharing`·재시작을 제공함. `useLiveShare`는 MP-04까지 현재 모달 기반 화면 API를 유지하는 어댑터임. 새로운 시작은 확인 이후에만 호출하며, 시작 의사를 취소하면 지연 토큰으로 연결하거나 현재 상태를 다시 발행하지 않음.
+
+`SocketManager.publish` → `useSocket.publish` → `useChairmanSocket.sendDebateEvent`는 로컬 STOMP 발행 여부를 boolean으로 전달함. 연결 부재·교체된 사회자·잘못된 타이머 payload는 발행하지 않음. 이 값은 서버의 명령 처리 성공을 뜻하지 않음.
+
+MP-03에서 승인한 축소 범위에 따라 `stopSharing`은 연결 중 `ABORT`를 발행한 뒤 로컬 연결·구독·자동 재연결을 정리함. 발행 실패는 지역 오류로 남기고 로컬 정리는 수행함. 토큰 대기 취소는 중단 명령 실패로 표시하지 않음. 서버 성공 확인·상태 복원·새 청중 차단·이전 서버 세션의 지연 명령 차단은 후속 계약임. 기존 `STOP`·`FINISHED`의 의미와 payload는 유지함.
+
+청중 상태 훅의 `handleAbort: true`는 `ABORT` 수신 시 종료 상태에 `terminationReason: 'ABORT'`를 보존하고 disconnect해 재연결을 막음. 이후 메시지는 반영하지 않음. 정상 종료는 `FINISHED` 사유로 구분함. 기본값은 기존 페이지 동작을 유지하며 MP-04에서 새 종료 안내에 연결함. 새로고침 뒤의 사유 복원은 보장하지 않음.
+
+명시적 공유의 연결 실패는 로컬 연결 정리가 소켓 오류를 초기화해도 보존함. 사용자의 재시작 전에는 다시 연결하지 않으며 이전 소켓의 늦은 연결·오류·종료 이벤트는 현재 연결에 반영하지 않음.
