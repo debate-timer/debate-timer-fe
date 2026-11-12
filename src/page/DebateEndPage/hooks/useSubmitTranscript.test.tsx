@@ -84,6 +84,44 @@ describe('토론 기록 초안 전송 훅', () => {
     expect(getTranscriptDraft(5)).toBeNull();
   });
 
+  it('다른 테이블로 이동해도 응답을 시작한 테이블에 보관하고 새 기록을 따로 제출한다', async () => {
+    prepareDraft();
+    startTranscriptDraft(6, 1000);
+    appendUtterance(
+      6,
+      { id: 'new', timeBoxIndex: 0, team: null },
+      '새 토론',
+      2000,
+    );
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const received = vi.fn();
+    server.use(
+      http.post(`${ApiUrl.transcript}/:tableId`, async ({ params }) => {
+        received(params.tableId);
+        if (params.tableId === '5') {
+          await pending;
+        }
+        return HttpResponse.json(
+          { id: params.tableId === '5' ? 99 : 66 },
+          { status: 201 },
+        );
+      }),
+    );
+    const { result, rerender } = renderHook(
+      ({ tableId }) => useSubmitTranscript(tableId),
+      { initialProps: { tableId: 5 }, wrapper: createWrapper() },
+    );
+    await waitFor(() => expect(received).toHaveBeenCalledWith('5'));
+    rerender({ tableId: 6 });
+    act(() => release());
+    await waitFor(() => expect(result.current.transcriptId).toBe(66));
+    expect(getSubmittedTranscriptId(5)).toBe(99);
+    expect(getSubmittedTranscriptId(6)).toBe(66);
+  });
+
   it('이미 보낸 기록이 있으면 다시 보내지 않고 그 ID를 쓴다', () => {
     setSubmittedTranscriptId(5, 12);
 
@@ -93,6 +131,31 @@ describe('토론 기록 초안 전송 훅', () => {
 
     expect(result.current.status).toBe('ready');
     expect(result.current.transcriptId).toBe(12);
+  });
+
+  it('제출 도중 새 초안이 시작되면 이전 응답으로 새 초안을 삭제하지 않는다', async () => {
+    prepareDraft();
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const received = vi.fn();
+    server.use(
+      http.post(`${ApiUrl.transcript}/:tableId`, async () => {
+        received();
+        await pending;
+        return HttpResponse.json({ id: 99 }, { status: 201 });
+      }),
+    );
+    renderHook(() => useSubmitTranscript(5), { wrapper: createWrapper() });
+    await waitFor(() => expect(received).toHaveBeenCalled());
+    startTranscriptDraft(5, 9000);
+    await act(async () => {
+      release();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(getTranscriptDraft(5)?.startedAt).toBe(9000);
+    expect(getSubmittedTranscriptId(5)).toBeNull();
   });
 
   it('보내기에 실패하면 초안을 남기고 다시 시도할 수 있다', async () => {

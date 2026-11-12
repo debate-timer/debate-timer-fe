@@ -153,7 +153,7 @@ describe('useChairmanSocket', () => {
     expect(disconnect).toHaveBeenCalledOnce();
     expect(removeQueries).toHaveBeenCalledWith({
       queryKey: ['chairmanToken', '123'],
-      exact: true,
+      exact: false,
     });
   });
 

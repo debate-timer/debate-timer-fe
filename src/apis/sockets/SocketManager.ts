@@ -213,6 +213,9 @@ class SocketManager {
       heartbeatOutgoing: this.currentOptions.heartbeatOutMs,
 
       onConnect: () => {
+        if (this.client !== newClient) {
+          return;
+        }
         console.log('✅ 웹 소켓(STOMP) 연결 성공');
         this.retryCount = 0;
         this.retryStartedAt = null;
@@ -229,6 +232,9 @@ class SocketManager {
       },
 
       onStompError: (frame) => {
+        if (this.client !== newClient) {
+          return;
+        }
         this.reportSocketError(
           new SocketError(
             'SOCKET_STOMP_ERROR',
@@ -332,10 +338,10 @@ class SocketManager {
     destination: string,
     body: SocketMessage,
     headers?: StompHeaders,
-  ): void {
+  ): boolean {
     if (!this.client || !this.client.connected) {
       console.warn('소켓이 연결되어 있지 않아 메시지를 보낼 수 없습니다.');
-      return;
+      return false;
     }
 
     this.client.publish({
@@ -343,6 +349,7 @@ class SocketManager {
       headers,
       body: JSON.stringify(body),
     });
+    return true;
   }
 
   /**

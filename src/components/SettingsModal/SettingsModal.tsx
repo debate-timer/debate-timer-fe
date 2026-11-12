@@ -88,15 +88,19 @@ export default function SettingsModal(props: SettingsModalProps) {
     busyRef.current = true;
     setBusy(true);
     try {
-      controller.issueBeforeLogout();
       setFailedLogout(false);
       if (onLogout) {
+        setOpen(false);
+        trigger.current?.focus();
         await onLogout();
       } else {
+        controller.issueBeforeLogout();
         await logout.mutateAsync();
       }
     } catch {
-      setFailedLogout(true);
+      if (!onLogout) {
+        setFailedLogout(true);
+      }
     } finally {
       busyRef.current = false;
       setBusy(false);

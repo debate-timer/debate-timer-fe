@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DebateTableData, TimeBasedStance } from '../../../types/type';
 import { NormalTimerLogics } from './useNormalTimer';
+import shouldIgnoreTimerHotkey from './shouldIgnoreTimerHotkey';
 import { TimeBasedTimerLogics } from './useTimeBasedTimer';
 
 export type AnswerTimerOwner = 'NORMAL' | 'PROS' | 'CONS';
@@ -15,6 +16,8 @@ export interface AnswerTimerState {
 
 interface UseAnswerTimerParams {
   answerTime: number;
+  isEnabled?: boolean;
+  isInputBlocked?: boolean;
   data: DebateTableData | undefined;
   index: number;
   normalTimer: NormalTimerLogics;
@@ -23,15 +26,18 @@ interface UseAnswerTimerParams {
   prosConsSelected: TimeBasedStance;
 }
 
-export function useAnswerTimer({
-  answerTime,
-  data,
-  index,
-  normalTimer,
-  timer1,
-  timer2,
-  prosConsSelected,
-}: UseAnswerTimerParams) {
+export function useAnswerTimer(params: UseAnswerTimerParams) {
+  const {
+    isEnabled = true,
+    isInputBlocked = false,
+    answerTime,
+    data,
+    index,
+    normalTimer,
+    timer1,
+    timer2,
+    prosConsSelected,
+  } = params;
   const [answerTimerState, setAnswerTimerState] =
     useState<AnswerTimerState | null>(null);
   const previousProsConsSelectedRef = useRef(prosConsSelected);
@@ -47,7 +53,9 @@ export function useAnswerTimer({
 
   const resetAnswerTimer = useCallback(() => {
     setAnswerTimerState((currentState) => {
-      if (!currentState) return currentState;
+      if (!currentState) {
+        return currentState;
+      }
 
       return { ...currentState, status: 'resetting', elapsedTime: 0 };
     });
@@ -55,9 +63,14 @@ export function useAnswerTimer({
 
   const handleClickAnswerTimer = useCallback(
     (owner: AnswerTimerOwner, isMainTimerRunning: boolean) => {
+      if (!isEnabled || isInputBlocked) {
+        return;
+      }
       setAnswerTimerState((currentState) => {
         if (currentState?.owner !== owner) {
-          if (!isMainTimerRunning) return currentState;
+          if (!isMainTimerRunning) {
+            return currentState;
+          }
 
           return { owner, status: 'running', elapsedTime: 0 };
         }
@@ -69,11 +82,13 @@ export function useAnswerTimer({
         return { ...currentState, status: 'resetting', elapsedTime: 0 };
       });
     },
-    [],
+    [isEnabled, isInputBlocked],
   );
 
   useEffect(() => {
-    if (answerTimerState?.status !== 'running') return;
+    if (answerTimerState?.status !== 'running') {
+      return;
+    }
 
     const intervalId = window.setInterval(() => {
       setAnswerTimerState((currentState) => {
@@ -104,11 +119,15 @@ export function useAnswerTimer({
   }, [answerTime, answerTimerState?.status]);
 
   useEffect(() => {
-    if (answerTimerState?.status !== 'resetting') return;
+    if (answerTimerState?.status !== 'resetting') {
+      return;
+    }
 
     const timeoutId = window.setTimeout(() => {
       setAnswerTimerState((currentState) => {
-        if (currentState?.status !== 'resetting') return currentState;
+        if (currentState?.status !== 'resetting') {
+          return currentState;
+        }
 
         return null;
       });
@@ -118,27 +137,54 @@ export function useAnswerTimer({
   }, [answerTimerState?.status]);
 
   useEffect(() => {
-    if (!answerTimerOwner || isAnswerTimerMainTimerRunning) return;
+    if (!answerTimerOwner || isAnswerTimerMainTimerRunning) {
+      return;
+    }
 
     resetAnswerTimer();
   }, [answerTimerOwner, isAnswerTimerMainTimerRunning, resetAnswerTimer]);
 
   useEffect(() => {
-    if (previousProsConsSelectedRef.current === prosConsSelected) return;
+    if (previousProsConsSelectedRef.current === prosConsSelected) {
+      return;
+    }
 
     previousProsConsSelectedRef.current = prosConsSelected;
 
-    if (answerTimerOwner !== 'PROS' && answerTimerOwner !== 'CONS') return;
+    if (answerTimerOwner !== 'PROS' && answerTimerOwner !== 'CONS') {
+      return;
+    }
 
     resetAnswerTimer();
   }, [answerTimerOwner, prosConsSelected, resetAnswerTimer]);
 
   useEffect(() => {
-    if (!data) return;
+    setAnswerTimerState(null);
+  }, [index, isEnabled]);
+
+  useEffect(() => {
+    setAnswerTimerState((current) =>
+      current && current.elapsedTime >= answerTime
+        ? { ...current, elapsedTime: answerTime, status: 'stopped' }
+        : current,
+    );
+  }, [answerTime]);
+
+  useEffect(() => {
+    if (!data || !isEnabled || isInputBlocked) {
+      return;
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code !== 'ShiftLeft' && event.code !== 'ShiftRight') return;
-      if (event.repeat) return;
+      if (shouldIgnoreTimerHotkey(event)) {
+        return;
+      }
+      if (event.code !== 'ShiftLeft' && event.code !== 'ShiftRight') {
+        return;
+      }
+      if (event.repeat) {
+        return;
+      }
 
       event.preventDefault();
 
@@ -166,6 +212,8 @@ export function useAnswerTimer({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
     data,
+    isEnabled,
+    isInputBlocked,
     handleClickAnswerTimer,
     index,
     normalTimer.isRunning,

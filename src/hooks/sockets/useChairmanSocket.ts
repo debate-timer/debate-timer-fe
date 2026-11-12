@@ -69,6 +69,7 @@ function parseMessageBody(message: IMessage): unknown {
  * @returns {Error | null} returns.error - 가장 최근에 발생한 소켓 오류입니다.
  */
 interface UseChairmanSocketOptions {
+  enabled?: boolean;
   /**
    * 소켓이 연결(재연결 포함)되거나, 서버가 `/chairman/{roomId}`로 현재 상태 공유를 요청했을 때 호출됩니다.
    * 연결된 동안에는 heartbeat로 `CHAIRMAN_HEARTBEAT_INTERVAL_MS`마다 호출됩니다.
@@ -87,7 +88,7 @@ export default function useChairmanSocket(
   roomId: number,
   options: UseChairmanSocketOptions = {},
 ) {
-  const { onSyncRequest, getAuthToken } = options;
+  const { onSyncRequest, getAuthToken, enabled = true } = options;
   const queryClient = useQueryClient();
   const {
     connect,
@@ -167,7 +168,7 @@ export default function useChairmanSocket(
     disconnect();
     queryClient.removeQueries({
       queryKey: chairmanTokenQueryKey(String(roomId)),
-      exact: true,
+      exact: false,
     });
   }, [disconnect, queryClient, resetSignalState, roomId]);
 
@@ -220,6 +221,9 @@ export default function useChairmanSocket(
 
   // 서버로부터 토론 이벤트를 갱신해달라는 요청과 활성 사회자 교체 알림을 받게 될 채널 구독
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const destination = `/chairman/${roomId}`;
 
     resetSignalState();
@@ -251,7 +255,14 @@ export default function useChairmanSocket(
     return () => {
       unsubscribe(destination);
     };
-  }, [roomId, handleReplaced, resetSignalState, subscribe, unsubscribe]);
+  }, [
+    enabled,
+    roomId,
+    handleReplaced,
+    resetSignalState,
+    subscribe,
+    unsubscribe,
+  ]);
 
   // 연결된 동안 현재 상태를 주기적으로 공유해 청중이 사회자 연결 끊김을 감지할 수 있게 한다
   useEffect(() => {
@@ -289,10 +300,13 @@ export default function useChairmanSocket(
       // 사회자가 새로고침해도 이전보다 큰 값이 되도록 현재 시각을 기준으로 증가
       const version = Math.max(versionRef.current + 1, Date.now());
 
+      if (isReplaced) {
+        return false;
+      }
       if (isTimerEventType(eventType)) {
         if (payload === null) {
           console.error('No payload for timer event.');
-          return;
+          return false;
         } else {
           body = {
             eventType,
@@ -309,12 +323,12 @@ export default function useChairmanSocket(
       }
 
       versionRef.current = version;
-      publish(destination, body, {
+      return publish(destination, body, {
         Authorization: authToken,
         [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current,
       });
     },
-    [roomId, publish],
+    [roomId, publish, isReplaced],
   );
 
   return {

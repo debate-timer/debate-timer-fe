@@ -177,9 +177,9 @@ axiosInstance.interceptors.response.use(
         const currentLang = i18n.resolvedLanguage ?? i18n.language;
         const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
         Sentry.setUser(null);
-        window.location.href = buildLangPath('/home', lang);
         removeAccessToken();
         removeMemberId();
+        window.location.href = buildLangPath('/home', lang);
         analyticsManager.reset();
         return Promise.reject(refreshError);
       }

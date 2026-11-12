@@ -9,12 +9,22 @@ import {
 import { analyticsManager } from '../../util/analytics';
 import { MEMBER_FEATURE_FLAGS_QUERY_KEY } from '../query/useGetMemberFeatureFlags';
 
-export default function useLogout(onSuccess: () => void) {
+/** 선택한 인증 revision에 결속해 토론 정리 중 계정이 바뀌면 로그아웃을 보내지 않음. */
+export default function useLogout(
+  onSuccess: () => void,
+  options: { expectedAuthRevision?: number } = {},
+) {
   const queryClient = useQueryClient();
   return useMutation({
     throwOnError: false,
     onMutate: () => getAuthRevision(),
     mutationFn: async () => {
+      if (
+        options.expectedAuthRevision !== undefined &&
+        options.expectedAuthRevision !== getAuthRevision()
+      ) {
+        throw new Error('ACCOUNT_CHANGED');
+      }
       const response = await logout();
       if (!response) {
         throw new Error('LOGOUT_FAILED');

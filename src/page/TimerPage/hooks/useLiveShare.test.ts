@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SocketError } from '../../../apis/sockets/error';
 import { useLiveShare } from './useLiveShare';
+import useLiveShareSession from './useLiveShareSession';
 
 const useChairmanSocketMock = vi.hoisted(() => vi.fn());
 const useGetChairmanTokenMock = vi.hoisted(() => vi.fn());
@@ -201,5 +202,51 @@ describe('useLiveShare', () => {
 
       expect(result.current.errorType).toBe('else');
     });
+  });
+  it('명시적 공유는 확인 전 시작하지 않고 중단 발행 후 로컬 연결을 정리한다', () => {
+    const { result, rerender } = renderHook(() => useLiveShareSession(1));
+    expect(connect).not.toHaveBeenCalled();
+    act(() => result.current.startSharing());
+    expect(connect).toHaveBeenCalledTimes(1);
+    mockChairmanSocket({ isConnected: true });
+    sendDebateEvent.mockReturnValue(true);
+    rerender();
+    act(() => result.current.stopSharing());
+    expect(sendDebateEvent).toHaveBeenCalledWith(
+      'ABORT',
+      null,
+      'chairman-token',
+    );
+    expect(disconnect).toHaveBeenCalled();
+    expect(result.current.isSharing).toBe(false);
+  });
+
+  it('토큰 대기 중 끄면 늦은 토큰으로 연결하지 않는다', () => {
+    useGetChairmanTokenMock.mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isError: false,
+      refetch,
+    });
+    const { result, rerender } = renderHook(() => useLiveShareSession(1));
+    act(() => result.current.startSharing());
+    act(() => result.current.stopSharing());
+    mockChairmanToken('late');
+    rerender();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('발행 예외에도 로컬 정리를 하고 중단 발행 오류를 남긴다', () => {
+    const { result, rerender } = renderHook(() => useLiveShareSession(1));
+    act(() => result.current.startSharing());
+    mockChairmanSocket({ isConnected: true });
+    sendDebateEvent.mockImplementationOnce(() => {
+      throw new Error('send');
+    });
+    rerender();
+    act(() => result.current.stopSharing());
+    expect(result.current.isSharing).toBe(false);
+    expect(result.current.isError).toBe(true);
+    expect(disconnect).toHaveBeenCalled();
   });
 });
