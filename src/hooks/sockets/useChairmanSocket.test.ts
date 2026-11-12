@@ -44,6 +44,34 @@ describe('useChairmanSocket', () => {
     vi.restoreAllMocks();
   });
 
+  it('ABORT를 기존 목적지·사회자 인증·증가하는 version으로 발행하며 성공이나 연결 종료를 만들지 않는다', () => {
+    const { result } = renderHook(() => useChairmanSocket(123));
+    let returned: unknown;
+    act(() => {
+      returned = result.current.sendDebateEvent(
+        'ABORT',
+        null,
+        'chairman-token',
+      );
+      result.current.sendDebateEvent('ABORT', null, 'chairman-token');
+    });
+    const [first, second] = publish.mock.calls;
+    expect(first).toEqual([
+      '/app/event/123',
+      { eventType: 'ABORT', data: null, version: expect.any(Number) },
+      {
+        Authorization: 'chairman-token',
+        'X-Chairman-Session': expect.any(String),
+      },
+    ]);
+    expect(second[1].version).toBeGreaterThan(first[1].version);
+    expect(second[2]['X-Chairman-Session']).toBe(
+      first[2]['X-Chairman-Session'],
+    );
+    expect(returned).toBeUndefined();
+    expect(disconnect).not.toHaveBeenCalled();
+  });
+
   it('마운트 시 roomId 기반 사회자 채널을 구독해야 한다', () => {
     renderHook(() => useChairmanSocket(123));
 

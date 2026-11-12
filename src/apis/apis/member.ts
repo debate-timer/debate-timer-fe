@@ -5,8 +5,35 @@ import { request } from '../primitives';
 import {
   GetDebateTableListResponseType,
   GetMemberFeatureFlagsResponseType,
+  GetMemberSettingsResponseType,
+  PatchMemberSettingsResponseType,
+  PostUserResponseType,
 } from '../responses/member';
-import { PostUserResponseType } from '../responses/member';
+import { PatchMemberSettingsRequestType } from '../requests/member';
+
+// GET /api/member/settings
+export async function getMemberSettings(): Promise<GetMemberSettingsResponseType> {
+  const response = await request<GetMemberSettingsResponseType>(
+    'GET',
+    ApiUrl.memberSettings,
+    null,
+    null,
+  );
+  return response.data;
+}
+
+// PATCH /api/member/settings
+export async function patchMemberSettings(
+  settings: PatchMemberSettingsRequestType,
+): Promise<PatchMemberSettingsResponseType> {
+  const response = await request<PatchMemberSettingsResponseType>(
+    'PATCH',
+    ApiUrl.memberSettings,
+    settings,
+    null,
+  );
+  return response.data;
+}
 
 // Template
 /*

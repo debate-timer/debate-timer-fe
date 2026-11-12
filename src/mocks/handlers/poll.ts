@@ -69,6 +69,7 @@ export const pollHandlers = [
       prosTeamName: '찬성',
       consTeamName: '반대',
       participateCode: '494bcec7-f8e8-4e96-8922-511cd7114a07',
+      tableInfo: { name: '정기 토론회', agenda: '공유 토론 주제' },
       totalCount: 1,
       prosCount: 1,
       consCount: 0,

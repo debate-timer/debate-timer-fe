@@ -33,6 +33,7 @@ import VolumeBar from '../../components/VolumeBar/VolumeBar';
 import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerEventTypes } from '../../apis/sockets/type';
+import { isTimerEventType } from '../../apis/sockets/util';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
@@ -241,7 +242,7 @@ export default function TimerPage() {
       return;
     }
 
-    if (eventType === 'FINISHED' || eventType === 'ERROR') {
+    if (!isTimerEventType(eventType)) {
       issueEvent(eventType, null);
       return;
     }
