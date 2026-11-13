@@ -4,8 +4,6 @@ import { LANDING_URLS } from '../../../constants/urls';
 const FOOTER_LINKS = [
   { label: '개인정보처리방침', href: LANDING_URLS.PRIVACY_POLICY_URL },
   { label: '서비스 이용약관', href: LANDING_URLS.TERMS_OF_SERVICE_URL },
-  // TODO: 헤더 '문의' 메뉴가 반영되면 제보 링크를 푸터에서 제거함.
-  { label: '버그 및 불편사항 제보', href: LANDING_URLS.REPORT_FORM_URL },
 ] as const;
 
 export default function LandingFooter() {
