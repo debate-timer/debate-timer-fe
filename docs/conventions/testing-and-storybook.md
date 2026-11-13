@@ -67,6 +67,8 @@ named Story로 구분함. Props만으로 표현되는 상태는 `args`, Provider
 
 ### 버전 이전 시 수동 검증
 
+일반 디자인 변경도 긴 한국어·영어 문구, 좁은 화면, 오류·비활성·키보드 포커스를 변경 영향에 맞춰 확인함. 단독 Story로 발견하기 어려운 입력창·하단 버튼 묶음과 모달 컨테이너 조합은 별도 Story로 확인함. 상호작용 Story는 조작 결과가 화면에 반영되어야 하며 페이지 Story에는 필요한 경로·데이터 조건을 제공함. 클래스 이름만 확인하는 테스트 대신 사용자 동작·접근성 테스트와 브라우저 시각 확인을 변경 목적에 맞게 선택함. 모달은 초기 포커스·순환·복귀와 중첩 Escape를 검증함.
+
 `npm run storybook`과 `npm run build-storybook`의 정적 결과를 각각 브라우저에서
 확인함. 정적 결과는
 `npx --no-install vite preview --outDir storybook-static --port 6007`로 실행함.

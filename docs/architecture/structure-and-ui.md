@@ -2,12 +2,9 @@
 
 ## 적용 범위와 흐름
 
-라우트 화면이 필요한 상태와 동작을 조립하고, 공용 UI가 표시 계약을 제공하며,
-훅이 재사용 가능한 상태·부수 효과를 맡음. HTTP·소켓의 구체적 경계는
-[데이터 접근](data-access.md)과 [실시간 통신](realtime.md)이 소유함. 코드를
-작성할 때의 형식은
-[TypeScript·구조](../conventions/typescript-and-structure.md)와
-[React·UI](../conventions/react-and-ui.md)를 따름.
+라우트 화면은 화면 조립과 기능 상태를, 공용 UI는 재사용 가능한 표시·조작을, 훅은 재사용 가능한 상태·부수 효과를 소유함. 이 문서는 계층과 공통 책임 경계를 정의하며 개별 UI의 디자인·Props·호출 계약은 해당 선언의 JSDoc에 둠. 문서의 소유권은 [문서 작성 컨벤션](../conventions/docs.md#내용의-소유권)을 따름.
+
+HTTP·소켓 경계는 [데이터 접근](data-access.md)과 [실시간 통신](realtime.md), 코드 형식은 [TypeScript·구조](../conventions/typescript-and-structure.md)와 [React·UI](../conventions/react-and-ui.md), 시각 기준은 [공통 디자인](../conventions/design.md)을 따름.
 
 ```text
 라우트 → page → 기능 전용 components/hooks → 공용 components/hooks
@@ -17,82 +14,45 @@ layout → 공용 화면 틀
 
 ## 화면과 공용 UI
 
-| 위치                              | 책임                             | 현재 근거                                       |
-| --------------------------------- | -------------------------------- | ----------------------------------------------- |
-| `src/page/{PageName}/`            | 라우트 단위 화면과 기능 조립     | `src/page/TimerPage/TimerPage.tsx`              |
-| `src/page/{PageName}/components/` | 해당 화면에서 쓰는 UI            | `src/page/TableComposition/components/TimeBox/` |
-| `src/page/{PageName}/hooks/`      | 해당 화면의 상태·효과            | `src/page/TimerPage/hooks/useTimerPageState.ts` |
-| `src/components/{Component}/`     | 화면 간 재사용 UI                | `src/components/DialogModal/DialogModal.tsx`    |
-| `src/layout/`                     | Header·Content·Footer 등 화면 틀 | `src/layout/defaultLayout/DefaultLayout.tsx`    |
+| 위치 | 책임 |
+| --- | --- |
+| `src/page/{PageName}/` | 라우트 단위 화면과 기능 조립 |
+| `src/page/{PageName}/components/` | 해당 화면 전용 UI |
+| `src/page/{PageName}/hooks/` | 해당 화면의 상태·효과 |
+| `src/components/{Component}/` | 화면 간 재사용 UI |
+| `src/layout/` | 헤더·본문·푸터 등 화면 틀 |
 
-페이지가 라우트 입력, 데이터 훅, 로컬 상태를 연결함. 기능에만 필요한
-UI·훅·Story는 페이지 안에 두고, 둘 이상의 화면에서 쓰는 계약을 공용 위치로 올림.
-큰 레이아웃은 `DefaultLayout` 같은 합성 API로 조립함. `src/util/GlobalPortal/`은
-화면 트리 밖에 렌더링해야 하는 UI의 포털을 제공함.
+페이지는 라우트 입력·데이터 훅·로컬 상태를 연결함. 기능 전용 UI·훅·Story는 페이지 가까이에 두고, 둘 이상의 화면에서 같은 계약이 필요할 때 공용 위치로 올림. 공유 범위보다 폴더 이름을 먼저 정하지 않음. 큰 레이아웃은 합성 API로 조립하며 화면 트리 밖의 표시는 포털 경계에서 처리함.
+
+공용 UI는 색상·크기·형태와 상태 표현을, 호출 화면은 배치·문구·동작을 소유함. 스타일만 반복되면 CSS utility를, 구조와 동작까지 반복되면 공용 컴포넌트를 검토함. 시각적 유사성만으로 상태와 기능을 합치지 않음.
+
+모달의 본문·행동 영역과 컨테이너의 책임을 구분함. 열림·닫힘·오버레이·대화상자 의미·포커스 수명은 컨테이너 경계에서 관리하며 자식과 중복해서 처리하지 않음. 실행 중인 기능의 수명은 메뉴·오버레이의 개폐와 분리함.
 
 ### 배치 판단
 
-1. URL의 식별자나 화면 이동에 묶인 조립은 `page/`가 소유함.
-2. 한 화면에서만 쓰는 표시와 상태는 해당 페이지의 `components/`·`hooks/`가
-   소유함.
-3. 다른 화면에서도 같은 호출 계약이 필요해지면 `src/components/`·`src/hooks/`로
-   올림.
-4. UI 없이 계산 가능한 변환·검증은 `src/util/` 또는 기능 안의 순수 함수가
-   소유함.
-
-예를 들어 토론 테이블 화면이 여러 입력·타이머를 조립할 때 페이지가 전체 흐름을
-소유하고, `TimeBox`는 기능 안의 UI를 맡음. `DialogModal`은 화면과 무관한 표시
-계약이므로 공용 컴포넌트에 있음. 공유 범위보다 폴더 이름을 먼저 정하지 않음.
+1. URL 식별자나 화면 이동에 묶인 조립은 `page/`가 소유함.
+2. 한 화면에서만 쓰는 표시와 상태는 해당 페이지의 `components/`·`hooks/`가 소유함.
+3. 다른 화면에서도 같은 호출 계약이 필요해지면 공용 `components/`·`hooks/`로 올림.
+4. UI 없이 계산 가능한 변환·검증은 순수 함수로 분리함.
 
 ## 상태와 부수 효과
 
-`src/hooks/`는 범용 React 훅, `src/page/**/hooks/`는 기능 상태와 이벤트 해석을
-소유함. `src/hooks/query/`와 `src/hooks/mutations/`는 서버 상태의 별도 경계임.
-이전 상태에 의존하는 변경은 함수형 setter를 사용하고, DOM listener·timer·구독은
-효과의 종료 시점에 정리함. 재구독 없이 최신 콜백을 읽는 Effect Event와 Ref의
-선택 기준은 [React·UI 컨벤션](../conventions/react-and-ui.md#훅과-효과)이 소유함.
-실제 예시는 `src/hooks/useDocumentVisibility.ts`,
-`src/page/TimerPage/hooks/useTimerPageState.ts`,
-`src/hooks/sockets/useAudienceSocket.ts`에 있음.
+| 상태 종류 | 소유 위치 |
+| --- | --- |
+| 입력·모달·타이머 표시처럼 화면에만 필요한 상태 | 화면 또는 화면 전용 훅 |
+| 화면 간 재사용하는 브라우저·UI 상태 | 공용 훅 |
+| 서버 조회·변경 상태 | 데이터 조회·변경 전용 훅 |
+| 메시지 구독과 연결 상태 | 통신 전용 훅 |
+| 여러 화면에서 공유하는 설정·저장 수명 | 앱 수명의 상태 소유자 |
 
-`src/page/AudienceSharePage/hooks/AudienceScreenState.ts`와
-`EventInterpreter.ts`처럼 해석·계산이 React 없이 가능한 부분은 순수 함수로
-분리함. 화면은 그 결과를 받아 UI 상태를 결정함. 입력 경계의 오류·복구는
-[오류와 관측](errors-observability.md)이 소유함.
+이전 상태에 의존하는 변경은 함수형 setter를 사용함. DOM listener·timer·구독은 효과 종료 시 정리함. 재구독 없이 최신 콜백을 읽는 방식과 Ref의 선택 기준은 [React·UI](../conventions/react-and-ui.md#훅과-효과)가 소유함. 상태를 다른 계층으로 옮길 때 누가 생성·갱신·정리하는지 먼저 정하고, 여러 계층에 같은 권위의 상태를 복제하지 않음.
 
-| 상태 종류                                      | 소유 위치              | 근거                                                           |
-| ---------------------------------------------- | ---------------------- | -------------------------------------------------------------- |
-| 입력·모달·타이머 표시처럼 화면에만 필요한 상태 | 화면 또는 화면 전용 훅 | `src/page/TimerPage/hooks/useTimerPageState.ts`                |
-| 화면 간 재사용하는 브라우저·UI 상태            | 공용 훅                | `src/hooks/useModal.tsx`, `src/hooks/useDocumentVisibility.ts` |
-| 서버 조회·변경 상태                            | Query·Mutation 훅      | `src/hooks/query/`, `src/hooks/mutations/`                     |
-| 메시지 구독과 연결 상태                        | 소켓 훅                | `src/hooks/sockets/`                                           |
-
-상태를 다른 계층으로 옮길 때는 누가 생성·갱신·정리하는지 먼저 결정함. 같은
-상태를 페이지와 공용 훅이 각각 복제해 권위 있는 값을 둘로 만들지 않음.
+이벤트 해석·계산은 가능하면 React 밖의 순수 함수로 분리함. UI는 표시 상태와 콜백을 소비하며 통신·확인·실패 처리 책임을 명확히 구분함. 기능을 중단하거나 화면을 닫아도 계속되어야 하는 저장·정리 작업은 해당 수명의 소유자가 관리함. 입력 경계의 오류·복구는 [오류와 관측](errors-observability.md)을 따름. 기능별 제품 정책은 [위키](../wiki/README.md)를 따름.
 
 ## 공용 계약과 유틸리티
 
-- `src/types/`는 공용 도메인 타입을 소유함. API 요청·응답 타입은
-  `src/apis/requests/`·`src/apis/responses/`가 소유하고, 기능 안에서만 쓰는
-  Props·상태 타입은 사용 지점 가까이에 둠.
-- `src/util/`은 포맷, 검증, 인코딩, 브라우저 저장소 접근 같은 재사용 함수를
-  소유함. `src/util/tableValidation.ts`, `src/util/formatting.ts`,
-  `src/util/sessionStorage.ts`가 근거임.
-- `src/constants/`는 여러 곳에서 쓰는 오류·URL·정적 값의 목적별 묶음을 소유함.
+- `src/types/`는 공용 도메인 타입을 소유함. API 요청·응답 타입은 `src/apis/requests/`·`src/apis/responses/`에 두며 기능 안에서만 쓰는 Props·상태 타입은 사용 지점 가까이에 둠.
+- `src/util/`은 포맷·검증·인코딩·브라우저 저장소 접근 등 재사용 순수 함수와 브라우저 경계를 소유함.
+- `src/constants/`는 여러 곳에서 쓰는 정적 값의 목적별 묶음을 소유함.
 
-새 화면을 추가할 때는 라우트와 화면의 책임을 먼저 정하고, 기능 전용 구현을 화면
-가까이에 배치함. 공용으로 승격하는 경우 실제 소비 범위와 상태 소유권을 확인함.
-
-## 전역 설정 상태
-
-`GlobalSettingsProvider`가 앱 수명의 적용값·대기 저장·실패 상태를 소유함. `useGlobalSettings`로 헤더·모달·종소리가 공유하며 모달을 닫아도 저장 수명은 유지함. 직접 선택의 직렬 저장은 `SettingsController`가 담당함.
-
-## 토론 제어의 MP-04 연결 계약
-
-`useDebateControls`는 테이블·현재 차례·진영·실행 여부·인식 언어 후보, 공유/속기 허용 여부와 `stopTimers`·`onSyncRequest`를 받음. `DebateMenu`·`DebateFeatureIndicators`는 반환한 표시 상태·콜백만 소비함. 훅을 오버레이 밖의 페이지 수명에 배치하며 테이블 변경 시 페이지 조립 경계를 새로 마운트함. 메뉴 개폐는 기능을 재생성하지 않음.
-
-`answerTime`·`isAnswerTimeEnabled`·`isInputBlocked`를 `TimerView`에 연결하고, `useTimerHotkey`에는 입력 가능 여부를 전달함. 공용 `ToggleButton`은 필수 `aria-label`, `isPressed`, `onPressedChange`로 외부 상태를 표시하며 확인·오류·통신을 소유하지 않음.
-
-`useDebateLogout`은 `SettingsModal.onLogout`에 전달할 `requestLogout(): Promise<void>`와 확인 UI 상태를 제공함. 호출자는 타이머 정지·속기 폐기·공유 중단·전체 화면 해제·설정 발행·성공 이동을 연결함. 취소는 Promise를 완료하고 로그아웃 실패는 거절함. 로컬 정리는 한 번만 실행하고 실패 뒤 재시도는 로그아웃을 다시 수행함.
-
-설정 모달의 위임 콜백은 경고·설정 발행·실패 표시를 소유함. 모달은 자기 창을 닫은 뒤 콜백을 호출하며 별도 설정 발행을 하지 않음. 일반 로그아웃의 설정 발행은 기존 모달이 소유함. MP-03은 이 계약과 독립 Story까지 준비하며 현재 헤더·자동 속기 팝업의 교체는 MP-04에서 수행함. 제품 정책은 [토론 메뉴 위키](../wiki/feature/debate-controls.md)가 소유함.
+새 화면은 라우트와 화면의 책임을 먼저 정하고 기능 전용 구현을 가까이에 배치함. 공용 승격 시 실제 소비 범위와 상태 소유권을 확인함.

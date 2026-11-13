@@ -92,7 +92,7 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은 [workflow](../.git
 | 작업 | 읽을 상세 문서 | 계약 변경 시 갱신할 문서 |
 | --- | --- | --- |
 | 페이지·공용 UI·상태 훅 | 구조와 UI, React·UI, TypeScript·구조, 공통 디자인 | 구조와 UI, React·UI 또는 공통 디자인 |
-| 디자인·타이포그래피 | 공통 디자인, React·UI, 문서 작성 | 공통 디자인 |
+| 디자인·타이포그래피 | 공통 디자인, React·UI, 테스트·Storybook의 조합 Story·시각 검증, 문서 작성 | 공통 디자인 |
 | 라우트·인증·언어 | 앱·라우팅·국제화, React·UI | 앱·라우팅·국제화 |
 | HTTP·Query·Mutation·Repository·MSW | 데이터 접근, 데이터·실시간, 테스트·Storybook | 데이터 접근 또는 데이터·실시간 |
 | 소켓·타이머 공유 상태 | 실시간 통신, 데이터·실시간, 테스트·Storybook | 실시간 통신 또는 데이터·실시간 |
