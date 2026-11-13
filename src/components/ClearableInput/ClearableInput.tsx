@@ -1,89 +1,99 @@
 import clsx from 'clsx';
-import { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes, useId } from 'react';
 import { IoMdCloseCircle } from 'react-icons/io';
 import { useTranslation } from 'react-i18next';
 
 interface ClearableInputProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string;
-  disabled?: boolean;
+  /** 전달한 경우에만 값이 있는 활성 입력에 클리어 버튼을 표시함. */
   onClear?: () => void;
-  /** 검증 실패 시 붉은 테두리로 표시 */
   isError?: boolean;
-  /** 설정 시 입력창 경계 바로 아래에 `현재/최대` 글자 수 카운터를 노출한다. */
   maxCount?: number;
-  /** 설정 시 입력창 경계 바로 아래(왼쪽)에 붉은 에러 메시지를 노출한다. */
   errorMessage?: string;
 }
 
-export default function ClearableInput({
-  value,
-  onClear,
-  disabled = false,
-  isError = false,
-  maxCount,
-  errorMessage,
-  className,
-  id,
-  ...rest
-}: ClearableInputProps) {
+const INPUT_CLASS =
+  'form-control-border text-ui-body h-12 w-full appearance-none bg-white py-2.5 pl-3 text-neutral-900 placeholder:text-neutral-500 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-500 disabled:placeholder:text-neutral-400 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none';
+const CLEAR_BUTTON_CLASS =
+  'absolute top-1 right-1 flex size-10 items-center justify-center rounded-full text-xl text-neutral-400 before:absolute before:size-5 before:rounded-full hover:before:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 [&>svg]:relative';
+
+/**
+ * 입력과 지우기 조작, 공간을 확보하는 오류 설명·카운터를 제공함.
+ *
+ * 공용 `ClearableInput`은 입력 ID를 보존하거나 생성하고 외부 설명과 내부 오류 ID를 병합함. 지우기 버튼은 값·활성 상태·콜백 유무에 따라 표시하며 오류 설명과 카운터는 높이를 확보하는 행에 배치함.
+ *
+ */
+export default function ClearableInput(props: ClearableInputProps) {
+  const {
+    value,
+    onClear,
+    disabled = false,
+    isError = false,
+    maxCount,
+    errorMessage,
+    className,
+    id,
+    'aria-describedby': describedBy,
+    ...rest
+  } = props;
   const { t } = useTranslation();
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const hasClearButton = Boolean(value && !disabled && onClear);
   const hasCounter = typeof maxCount === 'number';
   const isOverLimit = hasCounter && value.length > maxCount;
-  const errorId = errorMessage && id ? `${id}-error` : undefined;
+  const errorId = errorMessage ? `${inputId}-error` : undefined;
+  const descriptionIds =
+    [describedBy, errorId].filter(Boolean).join(' ') || undefined;
 
   return (
     <div className={clsx('relative w-full', className)}>
       <input
         {...rest}
-        id={id}
+        id={inputId}
         value={value}
         disabled={disabled}
         aria-invalid={isError || undefined}
-        aria-describedby={errorId}
-        className={clsx(
-          'text-body h-[48px] w-full appearance-none rounded-[4px] p-[12px] text-default-black placeholder-default-border focus:outline-hidden [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-          // box-border 기준이라 테두리를 굵혀도 외곽 크기(48px)는 유지 → 레이아웃 밀림 없음
-          isError
-            ? 'border-2 border-semantic-error'
-            : 'border border-default-border',
-        )}
+        aria-describedby={descriptionIds}
+        className={clsx(INPUT_CLASS, hasClearButton ? 'pr-12' : 'pr-3')}
       />
-      {value && !disabled && onClear && (
+      {hasClearButton && (
         <button
           type="button"
+          aria-label={t('입력 내용 지우기')}
           onClick={onClear}
-          className="absolute top-1/2 right-3 -translate-y-1/2 text-xl text-neutral-400 hover:text-neutral-600"
+          className={CLEAR_BUTTON_CLASS}
         >
-          <IoMdCloseCircle />
+          <IoMdCloseCircle aria-hidden="true" />
         </button>
       )}
-      {hasCounter && (
-        // 박스 경계 바로 아래에 절대배치 → 레이아웃을 밀지 않아 행 간격이 균일하게 유지된다.
-        <span
-          aria-live="polite"
-          className={clsx(
-            'pointer-events-none absolute top-full right-1 mt-[2px] text-[11px] leading-none',
-            isOverLimit
-              ? 'font-semibold text-semantic-error'
-              : 'text-default-neutral',
+      {(hasCounter || errorMessage) && (
+        <div className="mt-0.5 grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 px-1">
+          {errorMessage && (
+            <span
+              id={errorId}
+              role="alert"
+              aria-live="polite"
+              className="col-start-1 row-start-1 min-w-0 text-ui-caption wrap-break-word text-red-500"
+            >
+              {errorMessage}
+            </span>
           )}
-        >
-          {t('{{current}}/{{max}}', {
-            current: value.length,
-            max: maxCount,
-          })}
-        </span>
-      )}
-      {errorMessage && (
-        // 카운터(우하단)와 겹치지 않도록 우측 여백을 두고 좌하단에 절대배치한다.
-        <span
-          id={errorId}
-          role="alert"
-          aria-live="polite"
-          className="absolute top-full left-1 mt-[2px] pr-14 text-[12px] leading-none font-semibold text-semantic-error"
-        >
-          {errorMessage}
-        </span>
+          {hasCounter && (
+            <span
+              aria-live="polite"
+              className={clsx(
+                'pointer-events-none col-start-2 row-start-1 text-ui-caption tabular-nums',
+                isOverLimit ? 'font-semibold text-red-500' : 'text-neutral-500',
+              )}
+            >
+              {t('{{current}}/{{max}}', {
+                current: value.length,
+                max: maxCount,
+              })}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );

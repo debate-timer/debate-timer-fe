@@ -165,7 +165,7 @@ StickyTriSectionHeader.Right = function Right(props: PropsWithChildren) {
         })}
       </div>
 
-      <ModalWrapper closeButtonColor="text-neutral-1000">
+      <ModalWrapper>
         <DialogModal
           left={{
             text: t('아니오'),

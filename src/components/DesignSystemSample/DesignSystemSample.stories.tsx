@@ -23,6 +23,7 @@ const DesignSystemSample = () => (
       <p className="text-ui-title">Title · 구역·내용 묶음의 제목</p>
       <p className="text-ui-body">Body · 본문</p>
       <p className="text-ui-label">Label · 짧은 조작·항목 이름</p>
+      <p className="text-ui-button-lg">큰 버튼 · 하단의 주요 조작</p>
       <p className="text-ui-caption">Caption · 보조 설명</p>
     </section>
 

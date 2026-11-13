@@ -11,7 +11,12 @@ interface UseDebateLogoutOptions {
   onSuccess: () => void;
 }
 
-/** 확인 이후의 로컬 폐기와 로그아웃을 직렬화하며 실패해도 진행을 자동 재개하지 않음. */
+/**
+ * 확인 이후의 로컬 폐기와 로그아웃을 직렬화하며 실패해도 진행을 자동 재개하지 않음.
+ *
+ * `useDebateLogout`은 `SettingsModal.onLogout`에 전달할 `requestLogout(): Promise<void>`와 확인 UI 상태를 제공함. 호출자는 타이머 정지·속기 폐기·공유 중단·전체 화면 해제·설정 발행·성공 이동을 연결함. 취소는 Promise를 완료하고 로그아웃 실패는 거절함. 로컬 정리는 한 번만 실행하고 실패 뒤 재시도는 로그아웃을 다시 수행함.
+ *
+ */
 export default function useDebateLogout(options: UseDebateLogoutOptions) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isInterrupted, setIsInterrupted] = useState(false);

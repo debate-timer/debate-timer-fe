@@ -79,6 +79,10 @@ const TIME_BASED_OPTIONS: TimerCreationOption[] = [
 ] as const;
 
 const SAVED_BELL_CONFIGS_KEY = 'savedBellInputConfigs';
+const BELL_ITEM_CLASS =
+  'flex min-h-9 w-full shrink-0 items-center gap-2 rounded-lg border border-neutral-200 bg-white py-0.5 pr-0.5 pl-2.5 text-ui-caption text-neutral-700';
+const BELL_DELETE_BUTTON_CLASS =
+  'flex size-7 shrink-0 items-center justify-center rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-hover';
 
 interface TimerCreationContentProps {
   beforeData?: TimeBoxInfo;
@@ -704,6 +708,7 @@ export default function TimerCreationContent({
                   >
                     <span className="flex flex-row items-center space-x-[16px]">
                       <DropdownMenu
+                        aria-label={t('발언 유형')}
                         className={clsx({
                           'w-full': currentSpeechType !== 'CUSTOM',
                         })}
@@ -738,6 +743,7 @@ export default function TimerCreationContent({
                     key={`${timerType}-${index}`}
                   >
                     <DropdownMenu
+                      aria-label={t('팀')}
                       className="w-full"
                       options={stanceOptions}
                       selectedValue={stance}
@@ -794,6 +800,7 @@ export default function TimerCreationContent({
                         <span className="flex w-full flex-row items-center space-x-[4px]">
                           {/* 벨 유형 */}
                           <DropdownMenu
+                            aria-label={t('종소리 설정')}
                             options={bellOptions}
                             selectedValue={bellInput.type}
                             onSelect={(value: BellType) => {
@@ -807,12 +814,13 @@ export default function TimerCreationContent({
                           <span className="w-[8px]"></span>
 
                           {/* 분, 초, 타종 횟수 */}
-                          <input
+                          <ClearableInput
+                            aria-label={t('분')}
                             type="text"
                             inputMode="numeric"
                             pattern="[0-9]*"
-                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
-                            value={bellInput.min}
+                            className="max-w-15 shrink-0"
+                            value={String(bellInput.min)}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
@@ -831,12 +839,13 @@ export default function TimerCreationContent({
 
                           <span>{t('분')}</span>
 
-                          <input
+                          <ClearableInput
+                            aria-label={t('초')}
                             type="text"
                             inputMode="numeric"
                             pattern="[0-9]*"
-                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
-                            value={bellInput.sec}
+                            className="max-w-15 shrink-0"
+                            value={String(bellInput.sec)}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
@@ -858,11 +867,12 @@ export default function TimerCreationContent({
 
                           <DTBell className="w-[24px]" />
                           <p>x</p>
-                          <input
+                          <ClearableInput
+                            aria-label={t('횟수')}
                             type="text"
                             inputMode="numeric"
-                            className="w-[60px] rounded-[4px] border border-default-border p-[8px]"
-                            value={bellInput.count}
+                            className="max-w-15 shrink-0"
+                            value={String(bellInput.count)}
                             onChange={handleBellCountChange}
                             placeholder={t('횟수')}
                           />
@@ -879,39 +889,42 @@ export default function TimerCreationContent({
                         </span>
 
                         {/* 벨 리스트 */}
-                        <span className="flex h-[100px] w-full flex-col items-center gap-2 overflow-y-auto">
+                        <ul className="flex h-25 w-full flex-col gap-2 overflow-y-auto p-1">
                           {bells.map((bell, idx) => (
-                            <span
-                              key={idx}
-                              className="relative flex w-full flex-row rounded-[4px] border border-default-border bg-[#FFF2D0] px-[12px] py-[4px]"
-                            >
-                              <div className="flex items-center gap-1">
-                                <p className="text-[14px]">
+                            <li key={idx} className={BELL_ITEM_CLASS}>
+                              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+                                <span>
                                   {t(BELL_TYPE_LABEL_KEYS[bell.type])}
-                                </p>
-                                <p className="text-[14px]">
+                                </span>
+                                <span className="tabular-nums">
                                   {t('{{minutes}}분 {{seconds}}초', {
                                     minutes: bell.min,
                                     seconds: bell.sec,
                                   })}
-                                </p>
-
-                                <span className="w-[8px]"></span>
-                                <DTBell className="size-[14px]" />
-                                <span className="text-[14px]">
-                                  x {bell.count}
+                                </span>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-1.5 tabular-nums">
+                                  <DTBell
+                                    aria-hidden="true"
+                                    className="size-3"
+                                  />
+                                  × {bell.count}
                                 </span>
                               </div>
 
                               <button
-                                className="absolute top-1/2 right-2 -translate-y-1/2 text-default-border"
+                                type="button"
+                                aria-label={`${t(BELL_TYPE_LABEL_KEYS[bell.type])} ${t('{{minutes}}분 {{seconds}}초', { minutes: bell.min, seconds: bell.sec })} ${t('삭제하기')}`}
+                                className={BELL_DELETE_BUTTON_CLASS}
                                 onClick={() => handleDeleteBell(idx)}
                               >
-                                <DTClose className="size-[10px]" />
+                                <DTClose
+                                  aria-hidden="true"
+                                  className="size-3"
+                                />
                               </button>
-                            </span>
+                            </li>
                           ))}
-                        </span>
+                        </ul>
                       </div>
                     )}
                   </div>

@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import Button from '../../../../components/Button/Button';
 import { useTranslation } from 'react-i18next';
 import ClearableInput from '../../../../components/ClearableInput/ClearableInput';
 import HeaderTitle from '../../../../components/HeaderTitle/HeaderTitle';
@@ -191,7 +191,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
 
       <DefaultLayout.StickyFooterWrapper>
         <div className="mx-auto mb-8 w-full max-w-4xl">
-          <button
+          <Button
+            aria-label={t('다음')}
             disabled={isNextBlocked}
             onClick={() => {
               // 제출 시점에 현재값(디바운스 미반영분 포함)으로 전체 필드를 재검증한다.
@@ -215,13 +216,11 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
               onInfoChange(updatedInfo);
               onButtonClick();
             }}
-            className={clsx('w-full rounded-full', {
-              'button enabled brand': !isNextBlocked,
-              'button disabled': isNextBlocked,
-            })}
+            size="large"
+            className="w-full"
           >
             {t('다음')}
-          </button>
+          </Button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
     </DefaultLayout>

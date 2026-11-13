@@ -15,6 +15,7 @@ import DTAdd from '../../../../components/icons/Add';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator';
+import Button from '../../../../components/Button/Button';
 
 interface TimeBoxStepProps {
   initData: DebateTableData;
@@ -295,35 +296,28 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
           ref={footerRef}
           className="mx-auto mb-8 flex w-full max-w-4xl items-center justify-between gap-2"
         >
-          <button
+          <Button
+            variant="neutral"
+            aria-label={t('토론 정보 수정하기')}
             onClick={onEditTableInfoButtonClick}
-            className={clsx(
-              'flex h-full w-full gap-[12px] rounded-full p-[24px]',
-              {
-                'button disabled': isLoading,
-                'button enabled neutral': !isLoading,
-              },
-            )}
+            size="large"
+            className="min-w-0 flex-1"
             disabled={isLoading}
           >
-            <DTEdit className="h-full" />
+            <DTEdit className="size-6 shrink-0" aria-hidden="true" />
             {t('토론 정보 수정하기')}
-          </button>
+          </Button>
 
-          <button
+          <Button
+            aria-label={isEdit ? t('수정 완료') : t('추가하기')}
             onClick={onFinishButtonClick}
-            className={clsx(
-              'flex h-full w-full gap-[12px] rounded-full p-[24px]',
-              {
-                'button enabled brand': !isSubmitButtonDisabled,
-                'button disabled': isSubmitButtonDisabled,
-              },
-            )}
+            size="large"
+            className="min-w-0 flex-1"
             disabled={isSubmitButtonDisabled}
           >
-            <DTCheck className="h-full" />
+            <DTCheck className="size-6 shrink-0" aria-hidden="true" />
             {isEdit ? t('수정 완료') : t('추가하기')}
-          </button>
+          </Button>
         </div>
       </DefaultLayout.StickyFooterWrapper>
 

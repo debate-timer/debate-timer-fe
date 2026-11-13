@@ -90,7 +90,7 @@ export default function UpdateModalWrapper() {
 
   return (
     <>
-      <ModalWrapper>
+      <ModalWrapper hasDialogContent>
         <UpdateModal
           data={LATEST_PATCH_NOTE}
           isChecked={isChecked}

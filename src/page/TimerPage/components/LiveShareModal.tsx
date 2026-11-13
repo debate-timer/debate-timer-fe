@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
 import { IoLinkOutline } from 'react-icons/io5';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import DTClose from '../../../components/icons/Close';
 import { LiveShareErrorType } from '../hooks/useLiveShare';
 import { copyToClipboard } from '../../../util/clipboard';
@@ -87,7 +87,6 @@ export default function LiveShareModal({
       {isLoading ? (
         <div className="flex size-full items-center justify-center">
           <LoadingSpinner
-            strokeWidth={2}
             size={'size-24'}
             color={'text-default-disabled-hover'}
           />

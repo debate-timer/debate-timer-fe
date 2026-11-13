@@ -18,7 +18,7 @@ import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator
 import Coins from '../../assets/teamSelection/coins.png';
 import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
 import { useModal } from '../../hooks/useModal';
-import clsx from 'clsx';
+import Button from '../../components/Button/Button';
 import { useState, useCallback } from 'react';
 import {
   buildLangPath,
@@ -184,11 +184,11 @@ export default function TableOverviewPage() {
 
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mt-2 mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
-            <button
-              className={clsx('flex aspect-square rounded-full p-[20px]', {
-                'button disabled': isLoading,
-                'button enabled neutral': !isLoading,
-              })}
+            <Button
+              variant="neutral"
+              aria-label={t('공유하기')}
+              size="large"
+              shape="icon"
               disabled={isLoading}
               onClick={() => {
                 // 공유 버튼 클릭 시 table_shared 이벤트를 기록한다.
@@ -198,13 +198,13 @@ export default function TableOverviewPage() {
                 openShareModal();
               }}
             >
-              <DTShare className="h-full" />
-            </button>
-            <button
-              className={clsx('flex aspect-square rounded-full p-[20px]', {
-                'button disabled': isLoading,
-                'button enabled neutral': !isLoading,
-              })}
+              <DTShare className="size-6" aria-hidden="true" />
+            </Button>
+            <Button
+              variant="neutral"
+              aria-label={t('토론 정보 수정하기')}
+              size="large"
+              shape="icon"
               disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
@@ -224,30 +224,26 @@ export default function TableOverviewPage() {
                 }
               }}
             >
-              <DTEdit className="h-full" />
-            </button>
+              <DTEdit className="size-6" aria-hidden="true" />
+            </Button>
             <div className="flex w-full space-x-2">
-              <button
-                className={clsx(
-                  'flex flex-1 flex-row gap-[12px] rounded-full p-[24px]',
-                  {
-                    'button disabled': isLoading,
-                    'button enabled brand': !isLoading,
-                  },
-                )}
+              <Button
+                aria-label={t('토론하기')}
+                size="large"
+                className="min-w-0 flex-1"
                 disabled={isLoading}
                 onClick={handleStartDebate}
               >
-                <DTDebate className="h-full" />
+                <DTDebate className="size-6 shrink-0" aria-hidden="true" />
                 {t('토론하기')}
-              </button>
+              </Button>
             </div>
           </div>
         </DefaultLayout.StickyFooterWrapper>
       </DefaultLayout>
 
-      <TableShareModal />
-      <ModalWrapper closeButtonColor="text-neutral-1000">
+      {TableShareModal()}
+      <ModalWrapper>
         <TeamSelectionModal
           onClose={closeModal}
           onStartDebate={handleStartDebate}

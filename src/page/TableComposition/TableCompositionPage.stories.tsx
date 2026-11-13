@@ -5,6 +5,10 @@ const meta: Meta<typeof TableCompositionPage> = {
   title: 'page/TableCompositon',
   component: TableCompositionPage,
   tags: ['autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+    route: '/composition?mode=add&type=CUSTOMIZE',
+  },
   decorators: [
     (Story) => {
       // 세션 초기화

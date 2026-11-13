@@ -102,7 +102,7 @@ export default function DebateTranscriptPage() {
         )}
       </DefaultLayout.ContentContainer>
 
-      <ModalWrapper closeButtonColor="text-neutral-900">
+      <ModalWrapper>
         <TranscriptShareModal
           shareUrl={shareUrl}
           isCopied={isCopied}

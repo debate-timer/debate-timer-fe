@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useGetOrganizationTemplates } from '../../../hooks/query/useGetOrganizationTemplates';
 import useAnalytics from '../../../hooks/useAnalytics';
 import ErrorIndicator from '../../../components/ErrorIndicator/ErrorIndicator';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import { buildLangPath, getSelectedLang } from '../../../util/languageRouting';
 import { createTemplateShareUrl } from '../../../util/templateShareUrl';
 import Marquee from './Marquee';
@@ -81,7 +81,6 @@ export default function TemplateMarquee() {
       return (
         <div className="flex justify-center py-4">
           <LoadingSpinner
-            strokeWidth={3}
             size={'size-10'}
             color={'text-default-disabled-hover'}
           />

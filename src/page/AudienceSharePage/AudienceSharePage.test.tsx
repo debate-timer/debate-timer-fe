@@ -197,9 +197,9 @@ describe('AudienceSharePage', () => {
         enabled: false,
         table: undefined,
       });
-      expect(screen.getByRole('status', { name: 'Loading' })).toHaveClass(
-        'text-gray-500',
-      );
+      expect(
+        screen.getByRole('status', { name: '데이터를 불러오고 있습니다...' }),
+      ).toHaveClass('text-gray-500');
       expect(screen.queryByText('공유 토론 테이블')).not.toBeInTheDocument();
     });
 
@@ -219,7 +219,7 @@ describe('AudienceSharePage', () => {
         });
       });
       expect(
-        screen.getByRole('status', { name: 'Loading' }),
+        screen.getByRole('status', { name: '데이터를 불러오고 있습니다...' }),
       ).toBeInTheDocument();
       expect(screen.queryByText('공유 토론 테이블')).not.toBeInTheDocument();
       expect(screen.queryByText('남은 시간')).not.toBeInTheDocument();

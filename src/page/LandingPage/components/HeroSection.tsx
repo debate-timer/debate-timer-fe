@@ -1,4 +1,5 @@
 import { Trans, useTranslation } from 'react-i18next';
+import Button from '../../../components/Button/Button';
 import { isLoggedIn } from '../../../util/accessToken';
 
 interface HeroSectionProps {
@@ -10,11 +11,6 @@ interface HeroSectionProps {
 // 형광펜으로 그은 느낌을 위해 양 끝을 같은 방향으로 비스듬히 자름
 const HIGHLIGHT =
   'relative isolate inline-block bg-transparent px-3 text-default-black before:absolute before:inset-x-0 before:inset-y-[6%] before:-z-10 before:bg-brand before:[clip-path:polygon(0.4em_0,100%_0,calc(100%_-_0.4em)_100%,0_100%)] before:content-[""]';
-const PRIMARY_BUTTON =
-  'rounded-full bg-brand px-7 py-3.5 text-ui-label text-default-black transition-colors hover:bg-brand-hover';
-const SECONDARY_BUTTON =
-  'rounded-full border border-neutral-900 bg-white px-7 py-3.5 text-ui-label text-default-black transition-colors hover:bg-neutral-100';
-
 export default function HeroSection(props: HeroSectionProps) {
   const { onStartWithoutLogin, onLoginStart, onDashboardButtonClicked } = props;
   const { t } = useTranslation();
@@ -35,32 +31,32 @@ export default function HeroSection(props: HeroSectionProps) {
       </h1>
       <div className="flex flex-wrap justify-center gap-3">
         {isLoggedIn() ? (
-          <button
+          <Button
             type="button"
-            className={PRIMARY_BUTTON}
+            variant="primary"
             onClick={onDashboardButtonClicked}
             aria-label={t('대시보드로 이동')}
           >
             {t('대시보드로 이동')}
-          </button>
+          </Button>
         ) : (
           <>
-            <button
+            <Button
               type="button"
-              className={PRIMARY_BUTTON}
+              variant="primary"
               onClick={onStartWithoutLogin}
               aria-label={t('비회원으로 시작하기')}
             >
               {t('비회원으로 시작하기')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className={SECONDARY_BUTTON}
+              variant="secondary"
               onClick={onLoginStart}
               aria-label={t('3초 로그인')}
             >
               {t('3초 로그인')}
-            </button>
+            </Button>
           </>
         )}
       </div>
