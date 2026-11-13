@@ -4,6 +4,9 @@ import clsx from 'clsx';
 import { createTemplateShareUrl } from '../../util/templateShareUrl';
 import useAnalytics from '../../hooks/useAnalytics';
 
+const START_BUTTON =
+  'shrink-0 rounded-full border border-neutral-300 bg-brand px-4 py-1.5 text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-default-black transition-colors duration-100 hover:bg-semantic-table hover:text-white';
+
 interface TemplateCardProps {
   organization: Organization;
   className?: string; // 카드의 추가 className이 필요하면 사용
@@ -66,7 +69,7 @@ export default function TemplateCard({
                   organization.organization,
                   template,
                 )}
-                className="shrink-0 rounded-full border border-neutral-300 bg-brand px-4 py-1.5 text-[min(max(0.75rem,1.1vw),0.9rem)] font-medium text-default-black transition-colors duration-100 hover:bg-semantic-table hover:text-white"
+                className={START_BUTTON}
                 aria-label={t('{{label}} 토론하기', { label: template.name })}
                 onClick={() =>
                   trackEvent('template_selected', {

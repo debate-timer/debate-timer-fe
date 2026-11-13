@@ -13,6 +13,9 @@ interface TimelineStepProps {
   children?: ReactNode;
 }
 
+const STEP_DOT =
+  'flex size-11 items-center justify-center rounded-full border-[3px] text-ui-title transition-colors duration-300 md:size-14';
+
 const DOT_STYLE: Record<TimelineStepStatus, string> = {
   done: 'border-neutral-900 bg-neutral-900 text-brand',
   active: 'border-neutral-900 bg-brand text-neutral-900',
@@ -34,14 +37,7 @@ export default function TimelineStep(props: TimelineStepProps) {
       className="flex gap-5 md:gap-8"
     >
       <div className="flex flex-none flex-col items-center">
-        <span
-          className={clsx(
-            'flex size-11 items-center justify-center rounded-full border-[3px] text-ui-title transition-colors duration-300 md:size-14',
-            DOT_STYLE[status],
-          )}
-        >
-          {order}
-        </span>
+        <span className={clsx(STEP_DOT, DOT_STYLE[status])}>{order}</span>
         <div
           aria-hidden="true"
           className={clsx(
