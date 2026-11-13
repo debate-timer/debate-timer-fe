@@ -166,7 +166,7 @@ export default function DebateVoteResultPage() {
           </DefaultLayout.StickyFooterWrapper>
         </div>
       </DefaultLayout.ContentContainer>
-      <ModalWrapper>
+      <ModalWrapper showCloseButton={isConfirmed}>
         {isConfirmed ? (
           <VoteDetailResult
             pros={{

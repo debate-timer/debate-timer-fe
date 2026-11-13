@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { PropsWithChildren } from 'react';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 export default function LoadingIndicator({ children }: PropsWithChildren) {
   const { t } = useTranslation();

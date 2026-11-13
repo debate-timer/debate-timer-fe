@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
 import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
 import { decodeDebateTableData } from '../../util/arrayEncoding';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import { DebateTableData } from '../../types/type';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
@@ -154,11 +154,7 @@ export default function TableSharingPage() {
   return (
     <>
       <div className="flex min-h-screen w-full flex-col items-center justify-center space-y-8">
-        <LoadingSpinner
-          strokeWidth={3}
-          size={'size-24'}
-          color={'text-brand-main'}
-        />
+        <LoadingSpinner size={'size-24'} color={'text-brand-main'} />
 
         <p className="text-2xl">{t('데이터를 처리하고 있습니다...')}</p>
       </div>

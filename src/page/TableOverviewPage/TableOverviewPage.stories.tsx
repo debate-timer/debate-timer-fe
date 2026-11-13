@@ -10,6 +10,11 @@ const meta: Meta<typeof TableOverviewPage> = {
   title: 'page/TableOverviewPage',
   component: TableOverviewPage,
   tags: ['autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+    route: '/overview/customize/1',
+    routePattern: '/overview/customize/:id',
+  },
 };
 
 export default meta;

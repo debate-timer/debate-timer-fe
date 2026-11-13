@@ -1,3 +1,5 @@
+import clsx from 'clsx';
+
 interface LabeledRadioButtonProps {
   id: string;
   name: string;
@@ -8,37 +10,23 @@ interface LabeledRadioButtonProps {
   disabled?: boolean;
 }
 
-export default function LabeledRadioButton({
-  id,
-  name,
-  value,
-  label,
-  checked,
-  onChange,
-  disabled = false,
-}: LabeledRadioButtonProps) {
-  const radioSize = 'size-[20px]';
+const RADIO_CLASS =
+  'relative flex size-5 shrink-0 appearance-none items-center justify-center rounded-full border-2 border-neutral-400 bg-white before:size-2.5 before:rounded-full before:bg-transparent checked:border-brand checked:before:bg-brand enabled:cursor-pointer enabled:hover:border-neutral-600 enabled:checked:hover:border-brand-hover enabled:checked:hover:before:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed';
 
-  const checkedColorClass = 'bg-semantic-material border-semantic-material';
-  const uncheckedColorClass =
-    'bg-default-disabled-hover border-default-disabled-hover';
-
-  const containerClasses = `
-    flex items-center cursor-pointer select-none
-    ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-  `;
-  const outerRingClasses = `
-    relative flex items-center justify-center rounded-full transition-all duration-200 ease-in-out border-2
-    ${radioSize}
-    ${checked ? 'border-semantic-material' : 'border-default-disabled-hover'}
-  `;
-  const innerDotClasses = `
-    rounded-full transition-all duration-200 ease-in-out w-2.5 h-2.5
-    ${checked ? checkedColorClass : uncheckedColorClass}
-  `;
+/** 네이티브 라디오의 선택 동작과 레이블 클릭 영역을 제공하는 공용 선택지임. */
+export default function LabeledRadioButton(props: LabeledRadioButtonProps) {
+  const { id, name, value, label, checked, onChange, disabled = false } = props;
 
   return (
-    <label htmlFor={id} className={containerClasses}>
+    <label
+      htmlFor={id}
+      className={clsx(
+        'flex min-h-11 items-center gap-2 text-ui-body select-none',
+        disabled
+          ? 'cursor-not-allowed text-neutral-500 opacity-50'
+          : 'cursor-pointer text-neutral-900',
+      )}
+    >
       <input
         type="radio"
         id={id}
@@ -47,16 +35,9 @@ export default function LabeledRadioButton({
         checked={checked}
         onChange={onChange}
         disabled={disabled}
-        className="sr-only"
+        className={RADIO_CLASS}
       />
-
-      <div className={outerRingClasses}>
-        <div className={innerDotClasses}></div>
-      </div>
-
-      {label && (
-        <span className="text-body ml-2 text-default-black">{label}</span>
-      )}
+      {label && <span className="min-w-0 wrap-break-word">{label}</span>}
     </label>
   );
 }

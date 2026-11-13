@@ -11,7 +11,7 @@ import ChairmanStatusNotice from './components/ChairmanStatusNotice';
 import ConnectionLostNotice from './components/ConnectionLostNotice';
 import DebateWaitingNotice from './components/DebateWaitingNotice';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
 import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';

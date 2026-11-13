@@ -14,7 +14,6 @@ import { setLoginTrigger } from '../../../util/analytics/loginTrigger';
 interface LoginAndStoreModalProps {
   Wrapper: ComponentType<{
     children: ReactNode;
-    closeButtonColor?: string;
   }>;
   onClose: () => void;
 }
@@ -31,7 +30,7 @@ export function LoginAndStoreModal({
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   return (
-    <Wrapper closeButtonColor="text-neutral-1000">
+    <Wrapper>
       <DialogModal
         left={{
           text: t('아니오'),

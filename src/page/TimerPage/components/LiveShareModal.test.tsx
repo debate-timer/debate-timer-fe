@@ -10,7 +10,7 @@ vi.mock('qrcode.react', () => ({
   ),
 }));
 
-vi.mock('../../../components/LoadingSpinner', () => ({
+vi.mock('../../../components/LoadingSpinner/LoadingSpinner', () => ({
   default: () => <div role="status">loading</div>,
 }));
 

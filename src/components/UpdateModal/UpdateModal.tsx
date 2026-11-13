@@ -105,6 +105,7 @@ export default function UpdateModal(props: UpdateModalProps) {
   return (
     <div
       role="dialog"
+      aria-modal="true"
       aria-labelledby={isPredefined ? titleId : undefined}
       aria-label={
         isPredefined

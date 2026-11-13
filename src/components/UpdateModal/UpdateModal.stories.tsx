@@ -49,7 +49,7 @@ function ModalPreview(props: ModalPreviewProps) {
 
   return (
     <I18nextProvider i18n={storyI18n}>
-      <ModalWrapper>
+      <ModalWrapper hasDialogContent>
         <UpdateModal {...modalProps} onClose={closeModal} />
       </ModalWrapper>
     </I18nextProvider>

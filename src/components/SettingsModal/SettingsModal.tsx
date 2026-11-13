@@ -15,6 +15,10 @@ interface SettingsModalProps {
   onLogin?: () => void;
   onLogout?: () => Promise<void>;
 }
+/**
+ * 설정 모달의 위임 콜백은 경고·설정 발행·실패 표시를 소유함. 모달은 자기 창을 닫은 뒤 콜백을 호출하며 별도 설정 발행을 하지 않음. 일반 로그아웃의 설정 발행은 기존 모달이 소유함. MP-03은 이 계약과 독립 Story까지 준비하며 현재 헤더·자동 속기 팝업의 교체는 MP-04에서 수행함. 제품 정책은 토론 메뉴 위키가 소유함.
+ *
+ */
 export default function SettingsModal(props: SettingsModalProps) {
   const { onLogin, onLogout } = props;
   const { t, i18n } = useTranslation();

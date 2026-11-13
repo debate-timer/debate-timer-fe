@@ -42,7 +42,9 @@ export default function VoteParticipationPage() {
     refetch,
     isRefetchError,
   } = useGetVoterPollInfo(pollId, { enabled: isValidPollId });
-  const { openModal, closeModal, ModalWrapper } = useModal();
+  const { openModal, closeModal, ModalWrapper } = useModal({
+    isCloseButtonExist: false,
+  });
 
   const isSubmitDisabled =
     participantName.trim().length === 0 || selectedTeam === null;

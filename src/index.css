@@ -40,6 +40,9 @@
   --text-ui-label: 16px;
   --text-ui-label--line-height: 24px;
   --text-ui-label--font-weight: 600;
+  --text-ui-button-lg: 24px;
+  --text-ui-button-lg--line-height: 32px;
+  --text-ui-button-lg--font-weight: 600;
   --text-ui-caption: 14px;
   --text-ui-caption--line-height: 20px;
   --text-ui-caption--font-weight: 400;
@@ -54,6 +57,20 @@
   --shadow-stance-red: 0 0 30px #007aff;
   --shadow-stance-neutral: 0 0 30px #737373;
   --animate-rotate: rotate 5s linear infinite;
+  --animate-debate-dot: debate-dot 1.2s ease-in-out infinite;
+
+  @keyframes debate-dot {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.45;
+    }
+    30% {
+      transform: translateY(-3px);
+      opacity: 1;
+    }
+  }
   --animate-gradient: gradient 10s ease infinite;
   --animate-color-transition: colorTransition 5s ease-in-out infinite;
   --animate-marquee: marquee 50s linear infinite;
@@ -112,6 +129,32 @@
     #fecd4c21 0%,
     #ffffff42 100%
   );
+}
+
+/* 입력창과 선택창이 공유하는 테두리와 상태 강조를 정의함. */
+@utility form-control-border {
+  @apply rounded-lg border-2 border-neutral-300;
+
+  &:enabled:hover {
+    @apply border-neutral-400;
+  }
+
+  &:enabled:focus,
+  &:enabled[aria-expanded='true'] {
+    @apply border-brand-hover ring-2 ring-brand/20 outline-hidden;
+  }
+
+  &:enabled[aria-invalid='true'] {
+    @apply border-red-500;
+
+    &:focus {
+      @apply ring-red-500/20;
+    }
+  }
+
+  &:disabled {
+    @apply border-neutral-200;
+  }
 }
 
 /* 기본 테두리·입력 안내·버튼 커서·입력 배경 스타일을 지정함. */

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import Button from '../../../components/Button/Button';
 import { isLoggedIn } from '../../../util/accessToken';
 
 interface ClosingCtaSectionProps {
@@ -6,11 +7,6 @@ interface ClosingCtaSectionProps {
   onLoginStart: () => void;
   onDashboardButtonClicked: () => void;
 }
-
-const DARK_BUTTON =
-  'rounded-full bg-neutral-900 px-7 py-3.5 text-ui-label text-white transition-colors hover:bg-neutral-700';
-const LIGHT_BUTTON =
-  'rounded-full bg-white px-7 py-3.5 text-ui-label text-neutral-900 transition-colors hover:bg-neutral-100';
 
 export default function ClosingCtaSection(props: ClosingCtaSectionProps) {
   const { onStartWithoutLogin, onLoginStart, onDashboardButtonClicked } = props;
@@ -24,32 +20,32 @@ export default function ClosingCtaSection(props: ClosingCtaSectionProps) {
         </h2>
         <div className="flex flex-wrap justify-center gap-3">
           {isLoggedIn() ? (
-            <button
+            <Button
               type="button"
-              className={DARK_BUTTON}
+              variant="dark"
               onClick={onDashboardButtonClicked}
               aria-label={t('대시보드로 이동')}
             >
               {t('대시보드로 이동')}
-            </button>
+            </Button>
           ) : (
             <>
-              <button
+              <Button
                 type="button"
-                className={DARK_BUTTON}
+                variant="dark"
                 onClick={onLoginStart}
                 aria-label={t('3초 로그인')}
               >
                 {t('3초 로그인')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className={LIGHT_BUTTON}
+                variant="light"
                 onClick={onStartWithoutLogin}
                 aria-label={t('비회원으로 시작하기')}
               >
                 {t('비회원으로 시작하기')}
-              </button>
+              </Button>
             </>
           )}
         </div>

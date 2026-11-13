@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
 import { IoLinkOutline, IoShareOutline } from 'react-icons/io5';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import ErrorIndicator from '../ErrorIndicator/ErrorIndicator';
 import clsx from 'clsx';
 
@@ -57,7 +57,6 @@ export default function ShareModal({
         <div className="m-[50px] flex size-full items-center justify-center">
           {isLoading && (
             <LoadingSpinner
-              strokeWidth={3}
               size={'size-24'}
               color={'text-default-disabled-hover'}
             />

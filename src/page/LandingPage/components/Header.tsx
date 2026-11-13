@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { isLoggedIn } from '../../../util/accessToken';
 import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import LanguageSelector from '../../../layout/components/header/LanguageSelector';
+import Button from '../../../components/Button/Button';
 
 interface HeaderProps {
   onLoginButtonClicked: () => void;
@@ -34,13 +35,13 @@ export default function Header(props: HeaderProps) {
           <LanguageSelector />
           <SettingsModal onLogin={onLoginButtonClicked} />
           {!isLoggedIn() && (
-            <button
-              className="text-ui-label"
+            <Button
+              variant="text"
               aria-label={t('로그인')}
               onClick={onLoginButtonClicked}
             >
               {!isLoggedIn() ? t('3초 로그인') : t('로그아웃')}
-            </button>
+            </Button>
           )}
         </div>
       </div>

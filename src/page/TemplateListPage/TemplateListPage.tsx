@@ -4,7 +4,7 @@ import Header from '../LandingPage/components/Header';
 import useLandingPageHandlers from '../LandingPage/hooks/useLandingPageHandlers';
 import TemplateCard from '../../components/TemplateCard/TemplateCard';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import { useGetOrganizationTemplates } from '../../hooks/query/useGetOrganizationTemplates';
 import { LANDING_URLS } from '../../constants/urls';
 import { buildLangPath, getSelectedLang } from '../../util/languageRouting';
@@ -30,7 +30,6 @@ export default function TemplateListPage() {
       return (
         <div className="flex flex-col items-center gap-2 py-12">
           <LoadingSpinner
-            strokeWidth={3}
             size={'size-24'}
             color={'text-default-disabled-hover'}
           />
