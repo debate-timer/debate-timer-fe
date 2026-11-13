@@ -8,7 +8,7 @@
 - 제공: 녹음 세션 시작·청중 참가, 턴별 녹음 업로드, 서버의 후보 선택·백그라운드 전사·S3 보관, 토론 종료 후 서버의 속기록 생성임.
 - 경계: 기존 RPC·Soniox(V1) 속기는 그대로 유지함. 이 기능은 V2로 분리해 구현하며 전환·제거가 가능해야 함. 속기 시작·끄기와 로그아웃의 공통 수명은 [토론 메뉴와 진행 수명](debate-controls.md), 타이머 진행 규칙은 [타이머 진행](timer.md), 공유 통신 계약은 [실시간 통신](../../architecture/realtime.md)이 소유함.
 
-**지식 상태:** 2026-11-12 계획 대화에서 사용자가 품질 판정·청중 권한·속기록 생성 방식을 선택하고 구현을 요청한 [결정](../decisions/transcript-multi-device.md#transcript-multi-device-dec-001--v2-분리와-턴별-후보-선택-방식)을 따르는 **목표** 설계임. BE는 `debate-timer-be`의 `feat/multi-device-recording-v2` 브랜치에 구현했으나 PR·병합·배포 전임. FE는 구현하지 않았음. 아래에서 BE 구현을 근거로 든 내용은 해당 브랜치에서 확인한 사실이며 운영 동작의 증거가 아님.
+**지식 상태:** 2026-11-12 계획 대화에서 사용자가 품질 판정·청중 권한·속기록 생성 방식을 선택하고 구현을 요청한 [결정](../decisions/transcript-multi-device.md#transcript-multi-device-dec-001--v2-분리와-턴별-후보-선택-방식)을 따르는 **목표** 설계임. BE는 [debate-timer-be PR #330](https://github.com/debate-timer/debate-timer-be/pull/330)에 구현했으나 병합·배포 전임. FE는 구현하지 않았음. 아래에서 BE 구현을 근거로 든 내용은 해당 PR에서 확인한 사실이며 운영 동작의 증거가 아님.
 
 ## 주요 개념과 관계
 
@@ -56,8 +56,8 @@ V1과 달리 FE가 구간별 전사 결과를 모아 `POST /api/transcripts/{tab
 | 지식 상태 | 목표(결정 승인)·BE 구현에서 확인한 사실 |
 | 대상과 조건 | 세션 생성·조회·종료·사회자 재참가는 플래그가 있는 테이블 소유 회원만 호출함. 청중 참가는 참가 코드, 업로드는 `X-Recording-Device` 기기 토큰으로 확인함 |
 | 동작과 결과 | 사회자 기기를 포함해 세션당 최대 8대가 참가함. 초과하면 `409 RECORDING_DEVICE_LIMIT_EXCEEDED`임. 참가 코드가 틀리면 `403`, 끝난 세션이면 `409 RECORDING_SESSION_CLOSED`임 |
-| 예외와 복구 | 사회자 기기가 새로고침·서버 재시작으로 토큰을 잃으면 `POST /{sessionKey}/host-device`로 사회자 기기로 다시 참가함. 청중은 참가 코드로 다시 참가함 |
-| 근거와 적용 범위 | BE `RecordingServiceV2`·`RecordingControllerV2`와 테스트임. 기능이 꺼져 있으면(`recording-v2.enabled=false`, 기본값) V2 API는 `404 RECORDING_V2_DISABLED`임 |
+| 예외와 복구 | 사회자 기기가 새로고침·서버 재시작으로 토큰을 잃으면 `POST /{sessionKey}/host-device`로 사회자 기기로 다시 참가함. 청중은 참가 코드로 다시 참가함. 재참가는 사회자·청중 모두 새 기기를 추가하며 기존 기기를 교체·회수하지 않음. 토큰을 잃은 기기도 정원에 남으므로 정원이 찬 세션에서는 사회자 재참가도 `409 RECORDING_DEVICE_LIMIT_EXCEEDED`임. 서버 재시작으로 메모리의 기기 목록을 잃으면 정원도 비워짐 |
+| 근거와 적용 범위 | BE `RecordingServiceV2`·`RecordingSessionRegistryV2`·`RecordingControllerV2`와 테스트임. 재참가의 정원 처리는 구현에서 확인한 사실이며 승인한 정책이 아님([미확정 질문](#결정-근거와-미확정-질문)). 기능이 꺼져 있으면(`recording-v2.enabled=false`, 기본값) V2 API는 `404 RECORDING_V2_DISABLED`임 |
 
 ### 턴 키와 시간 기준
 
@@ -66,8 +66,8 @@ V1과 달리 FE가 구간별 전사 결과를 모아 `POST /api/transcripts/{tab
 | 지식 상태 | 목표. FE 생성 규칙은 미구현임 |
 | 대상과 조건 | 모든 참가 기기가 같은 구간에 같은 턴 키를 써야 같은 턴의 후보로 모임 |
 | 동작과 결과 | 턴 키는 `{timeBoxIndex}-{version}`이며 `version`은 그 구간을 시작한 공유 이벤트의 값임. 영문·숫자·`_`·`-` 64자 이하가 아니면 `400 INVALID_RECORDING_TURN`임. `startedAtEpochMs`는 공유 이벤트의 `serverTime`으로 추정한 서버 시계 기준 녹음 시작 시각임 |
-| 예외와 복구 | 서버는 전사된 턴 중 가장 먼저 시작한 턴을 0으로 두고 각 턴의 문장 시간을 토론 경과 시간으로 맞춤. 기기 시계 추정 오차만큼 턴 사이 간격이 어긋날 수 있음 |
-| 근거와 적용 범위 | BE `TranscriptAssemblerV2`임. `version`·`serverTime`의 의미는 [실시간 통신](../../architecture/realtime.md)과 `src/apis/sockets/type.ts`를 따름 |
+| 예외와 복구 | 서버는 턴 키만으로 후보를 묶음. 구간 시작 이벤트를 놓친 기기가 다른 턴 키로 올리면 같은 발언이 별도 턴으로 전사되어 속기록에 중복될 수 있음. 중도 입장·재연결 청중은 사회자의 동기화 응답을 받는데, 사회자는 발행마다 새 `version`을 쓰므로 이 응답으로는 구간 시작 `version`을 알 수 없음([미확정 질문](#결정-근거와-미확정-질문)). 서버는 전사된 턴 중 가장 먼저 시작한 턴을 0으로 두고 각 턴의 문장 시간을 토론 경과 시간으로 맞춤. 기기 시계 추정 오차만큼 턴 사이 간격이 어긋날 수 있음 |
+| 근거와 적용 범위 | BE `RecordingSessionRegistryV2`·`TranscriptAssemblerV2`, FE [사회자 소켓](../../../src/hooks/sockets/useChairmanSocket.ts)의 발행 `version` 계산과 [TimerPage](../../../src/page/TimerPage/TimerPage.tsx)의 동기화 응답임. `version`·`serverTime`의 의미는 [실시간 통신](../../architecture/realtime.md)과 `src/apis/sockets/type.ts`를 따름 |
 
 ### 후보 선택
 
@@ -118,6 +118,8 @@ V1과 달리 FE가 구간별 전사 결과를 모아 `POST /api/transcripts/{tab
 | 질문 | 확인한 사실 | 다음 확인 방법 |
 | --- | --- | --- |
 | 청중 녹음 동의 문구와 절차는 무엇인가 | 사회자 속기는 녹음 동의를 거침. 청중 기기 녹음의 동의·고지 정책은 없음 | 기획·법무 검토 후 문구와 거절 시 동작을 결정함 |
+| 진행 중 참가·재연결 기기는 구간 시작 `version`을 어떻게 얻는가 | 동기화 응답은 새 `version`을 쓰고, BE 참가·상태 응답에도 현재 구간 정보가 없음. 실시간 통신은 놓친 이벤트를 다시 보내지 않음 | 동기화 응답에 구간 시작 `version`을 싣는 안, 중도 입장 기기는 다음 구간부터 녹음하는 안 등을 검토해 [턴 키와 시간 기준](#턴-키와-시간-기준)에 반영함 |
+| 토큰을 잃은 기기의 정원을 회수할 것인가 | 재참가는 새 기기를 추가하고 기존 기기는 정원과 수집 창의 제출 대상에 남음. 남은 기기 때문에 턴은 전원 제출 조기 마감 없이 수집 창 시간까지 기다림 | 사회자 재참가 시 기존 사회자 기기 교체, 기기 만료·해제 API 등을 결정하고 FE의 정원 초과 안내를 정함 |
 | 공유를 켜지 않은 토론에서도 V2를 쓰는가 | 청중은 공유 이벤트로 턴 경계를 알므로 공유가 없으면 사회자 기기만 참가함 | 사회자 속기 시작 화면에서 V1·V2 선택 조건을 결정함 |
 | 다기기 녹음의 진입점과 V1 모드와의 관계는 무엇인가 | 속기 시작은 RPC/Soniox를 선택하고 최초 성공 후 모드를 잠금 | [토론 메뉴](debate-controls.md) 정책 개정 여부를 결정함 |
 | 청중 화면에 녹음 중·업로드 실패를 어떻게 알리는가 | BE는 업로드 실패를 오류 코드로만 응답함 | 청중 UI 설계에서 결정함 |
@@ -126,6 +128,6 @@ V1과 달리 FE가 구간별 전사 결과를 모아 `POST /api/transcripts/{tab
 
 ## 검증 근거와 한계
 
-- BE: 브랜치의 점수기·수집 창·레지스트리·처리기·서비스·속기록 생성·컨트롤러·REST Docs 테스트가 있음. 실행 결과는 PR·CI에 남김.
+- BE: PR #330의 점수기·수집 창·레지스트리·처리기·서비스·속기록 생성·컨트롤러·REST Docs 테스트가 있음. 실행 결과는 PR·CI에 남김.
 - FE: 구현·테스트가 없음. 실제 기기 여러 대로 한 토론을 진행해 S3에 턴당 파일 하나, 상태 조회의 선택 기기, 속기록 생성을 확인하는 수동 검증이 필요함.
 - Web Audio 지표 계산 방식은 기기·브라우저별 편차를 검증하지 않았음.

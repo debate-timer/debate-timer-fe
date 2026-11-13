@@ -4,7 +4,7 @@
 
 ### TRANSCRIPT-MULTI-DEVICE-DEC-001 — V2 분리와 턴별 후보 선택 방식
 
-- 결정일: 2026-11-12, 상태: 승인임. 작업: `debate-timer-be`의 `feat/multi-device-recording-v2` 브랜치이며 PR 생성 전임.
+- 결정일: 2026-11-12, 상태: 승인임. 작업: BE 구현 [debate-timer-be PR #330](https://github.com/debate-timer/debate-timer-be/pull/330), 설계 문서 [PR #566](https://github.com/debate-timer/debate-timer-fe/pull/566)임.
 - 승인 근거: 계획 대화에서 사용자가 청중 기기 녹음 수집과 턴별 최고 품질 선택을 요청하고, 아래 세 선택지를 고른 뒤 계획의 구현을 요청했음.
 - 이 승인은 FE 구현·서버 운영 배포의 증거가 아님.
 
