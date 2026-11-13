@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { render, screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import type { PropsWithChildren } from 'react';
@@ -14,7 +15,9 @@ function Wrapper({ children }: PropsWithChildren) {
   });
   return (
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{children}</MemoryRouter>
+      <GlobalSettingsProvider>
+        <MemoryRouter>{children}</MemoryRouter>
+      </GlobalSettingsProvider>
     </QueryClientProvider>
   );
 }
