@@ -20,7 +20,7 @@ export default function ClosingCtaSection(props: ClosingCtaSectionProps) {
     <section className="flex w-full justify-center bg-brand px-4 py-18">
       <div className="flex flex-col items-center gap-6 text-center">
         <h2 className="text-[min(max(1.5rem,3vw),2.5rem)] leading-tight font-bold">
-          {t('우리 시간표, 저장해 두세요')}
+          {t('첫 토론, 지금 열어 보세요')}
         </h2>
         <div className="flex flex-wrap justify-center gap-3">
           {isLoggedIn() ? (

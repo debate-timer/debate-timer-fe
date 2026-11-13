@@ -7,8 +7,9 @@ interface HeroSectionProps {
   onDashboardButtonClicked: () => void;
 }
 
-// 큰 제목 한 단어 강조라 명암비(약 2.2:1)보다 브랜드 색 일관성을 우선해 브랜드 호버 노랑을 사용함
-const HIGHLIGHT = 'bg-transparent text-brand-hover';
+// 형광펜으로 그은 느낌을 위해 양 끝을 같은 방향으로 비스듬히 자름
+const HIGHLIGHT =
+  'relative isolate inline-block bg-transparent px-3 text-default-black before:absolute before:inset-x-0 before:inset-y-[6%] before:-z-10 before:bg-brand before:[clip-path:polygon(0.4em_0,100%_0,calc(100%_-_0.4em)_100%,0_100%)] before:content-[""]';
 const PRIMARY_BUTTON =
   'rounded-full bg-brand px-7 py-3.5 text-ui-label text-default-black transition-colors hover:bg-brand-hover';
 const SECONDARY_BUTTON =
