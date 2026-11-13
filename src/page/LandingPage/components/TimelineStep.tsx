@@ -20,7 +20,7 @@ const DOT_STYLE: Record<TimelineStepStatus, string> = {
 };
 
 const SCENE_FRAME =
-  'flex min-w-0 flex-[1_1_300px] items-center justify-center overflow-hidden rounded-2xl border border-neutral-200';
+  'flex min-w-0 flex-[1_1_300px] items-center justify-center overflow-hidden rounded-2xl';
 
 export default function TimelineStep(props: TimelineStepProps) {
   const { step, order, status, children } = props;
@@ -42,7 +42,13 @@ export default function TimelineStep(props: TimelineStepProps) {
         >
           {order}
         </span>
-        <div aria-hidden="true" className="w-0.5 grow bg-neutral-200" />
+        <div
+          aria-hidden="true"
+          className={clsx(
+            'w-0.5 grow transition-colors duration-300',
+            status === 'done' ? 'bg-neutral-900' : 'bg-neutral-200',
+          )}
+        />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-5 pb-20 md:pb-24">
@@ -69,18 +75,18 @@ export default function TimelineStep(props: TimelineStepProps) {
                 key={scene.id}
                 className={clsx(
                   SCENE_FRAME,
-                  step.isHighlighted
-                    ? 'h-80 md:h-[440px]'
-                    : 'h-64 md:h-[360px]',
-                  step.isHighlighted ? 'bg-amber-50' : 'bg-neutral-50',
+                  src
+                    ? 'bg-white'
+                    : clsx(
+                        'border border-neutral-200',
+                        step.isHighlighted
+                          ? 'h-80 bg-amber-50 md:h-[440px]'
+                          : 'h-64 bg-neutral-50 md:h-[360px]',
+                      ),
                 )}
               >
                 {src ? (
-                  <img
-                    src={src}
-                    alt={t(scene.alt)}
-                    className="size-full object-cover"
-                  />
+                  <img src={src} alt={t(scene.alt)} className="h-auto w-full" />
                 ) : (
                   <span className="px-6 text-center text-ui-caption text-neutral-500">
                     {t(scene.alt)}

@@ -1,10 +1,20 @@
+import timetableKo from '../../../assets/landing/scenes/timetable.ko.webp';
+import timetableEn from '../../../assets/landing/scenes/timetable.en.webp';
+import dashboardKo from '../../../assets/landing/scenes/dashboard.ko.webp';
+import dashboardEn from '../../../assets/landing/scenes/dashboard.en.webp';
+import presetKo from '../../../assets/landing/scenes/preset.ko.webp';
+import presetEn from '../../../assets/landing/scenes/preset.en.webp';
+import shareKo from '../../../assets/landing/scenes/share.ko.webp';
+import shareEn from '../../../assets/landing/scenes/share.en.webp';
+import feedbackVoteKo from '../../../assets/landing/scenes/feedback-vote.ko.webp';
+import feedbackVoteEn from '../../../assets/landing/scenes/feedback-vote.en.webp';
 import { LocalizedAsset } from '../../../util/localizedAsset';
 
 export interface LandingScene {
   id: string;
   /** 이미지 대체 문구이자 이미지가 없을 때 자리표시에 보여 줄 번역 키 */
   alt: string;
-  /** 언어별 장면 이미지. 언어별 이미지가 준비되면 `{장면}.{ko|en}.webp`를 연결함. */
+  /** 언어별 장면 이미지. 파일 이름은 `{장면}.{ko|en}.webp` */
   assets: LocalizedAsset;
 }
 
@@ -18,7 +28,6 @@ export interface LandingStep {
   isHighlighted?: boolean;
 }
 
-// TODO: 장면 이미지 에셋이 준비되면 assets에 연결함.
 export const LANDING_STEPS: LandingStep[] = [
   {
     id: 'prepare',
@@ -27,8 +36,16 @@ export const LANDING_STEPS: LandingStep[] = [
     description:
       '발언 순서부터 종소리, 작전 시간까지 그대로 저장해 두고, 언제든 다시 꺼내 써요.',
     scenes: [
-      { id: 'composition', alt: '시간표 구성 화면', assets: {} },
-      { id: 'dashboard', alt: '대시보드 화면', assets: {} },
+      {
+        id: 'timetable',
+        alt: '저장한 토론 시간표 화면',
+        assets: { ko: timetableKo, en: timetableEn },
+      },
+      {
+        id: 'dashboard',
+        alt: '대시보드 화면',
+        assets: { ko: dashboardKo, en: dashboardEn },
+      },
     ],
   },
   {
@@ -40,8 +57,8 @@ export const LANDING_STEPS: LandingStep[] = [
     scenes: [
       {
         id: 'share',
-        alt: '타이머 공유 QR 화면과 모바일 공유 화면',
-        assets: {},
+        alt: '진행자 노트북의 QR을 휴대폰으로 스캔해 같은 타이머를 보는 장면',
+        assets: { ko: shareKo, en: shareEn },
       },
     ],
   },
@@ -51,8 +68,11 @@ export const LANDING_STEPS: LandingStep[] = [
     title: '다음 발언도, 종소리도 자동으로',
     description: '타이머 담당, 종 담당은 이제 디베이트 타이머가 할게요.',
     scenes: [
-      { id: 'timer', alt: '자동으로 넘어가는 타이머 화면', assets: {} },
-      { id: 'bell', alt: '자동 종소리 설정 화면', assets: {} },
+      {
+        id: 'preset',
+        alt: '발언마다 타이머를 다시 맞추고 직접 종을 치던 일을, 미리 짜 둔 시간표와 종소리 설정이 대신하는 장면',
+        assets: { ko: presetKo, en: presetEn },
+      },
     ],
     isHighlighted: true,
   },
@@ -65,7 +85,7 @@ export const LANDING_STEPS: LandingStep[] = [
       {
         id: 'feedback-vote',
         alt: '피드백 타이머와 승패 투표 화면',
-        assets: {},
+        assets: { ko: feedbackVoteKo, en: feedbackVoteEn },
       },
     ],
   },
