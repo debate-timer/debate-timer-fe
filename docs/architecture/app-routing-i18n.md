@@ -18,8 +18,11 @@
 
 `src/routes/routes.tsx`의 `appRoutes`가 `path`, `element`, `requiresAuth`를 한
 항목에 보관함. 인증이 필요한 항목만 `ProtectedRoute`로 감싸고, 기본 경로와
-`:lang` 경로에 같은 목록을 사용함. 최상위 `ErrorBoundaryWrapper`는 라우트 화면의
-렌더 오류를 받음.
+`:lang` 경로에 같은 목록을 사용함. 최상위 `src/routes/RootLayout.tsx`가
+`ErrorBoundaryWrapper`, `BackActionHandler`, `ScrollRestoration`을 조립함.
+`ErrorBoundaryWrapper`는 라우트 화면의 렌더 오류를 받음. `ScrollRestoration`은 새
+화면으로 이동하면 맨 위부터 보여 주고, 뒤로가기·앞으로가기에서는 이전 스크롤
+위치를 복원함. 언어 전환도 새 경로로 이동하므로 맨 위로 올라감.
 
 `src/routes/ProtectedRoute.tsx`는 토큰이 없으면 현재 위치를 남기고 언어가 적용된
 홈 경로로 `replace` 이동함. 화면은 `useParams`, `useSearchParams`,

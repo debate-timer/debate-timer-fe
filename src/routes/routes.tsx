@@ -2,11 +2,9 @@ import { createBrowserRouter } from 'react-router-dom';
 import TableListPage from '../page/TableListPage/TableListPage';
 import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
 import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
-import ErrorBoundaryWrapper from '../components/ErrorBoundary/ErrorBoundaryWrapper';
 import ProtectedRoute from './ProtectedRoute';
 import OAuth from '../page/OAuthPage/OAuth';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
-import BackActionHandler from '../components/BackActionHandler';
 import TimerPage from '../page/TimerPage/TimerPage';
 import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
@@ -18,6 +16,7 @@ import VoteParticipationPage from '../page/VoteParticipationPage/VoteParticipati
 import VoteCompletePage from '../page/VoteCompletePage/VoteCompletePage';
 import DebateVoteResultPage from '../page/DebateVoteResultPage/DebateVoteResultPage';
 import LanguageWrapper from './LanguageWrapper';
+import RootLayout from './RootLayout';
 import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
 import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedPage';
 import DebateTranscriptPage from '../page/DebateTranscriptPage/DebateTranscriptPage';
@@ -128,12 +127,7 @@ const protectedAppRoutes = appRoutes.map((route) => ({
 const router = createBrowserRouter(
   [
     {
-      element: (
-        <>
-          <ErrorBoundaryWrapper />
-          <BackActionHandler />
-        </>
-      ),
+      element: <RootLayout />,
       children: [
         {
           path: '/',
