@@ -16,7 +16,8 @@ interface MarqueeItem {
 }
 
 const CHIP =
-  'flex flex-none items-center gap-2.5 rounded-full border border-neutral-300 bg-white py-2.5 pr-4.5 pl-2.5 transition-colors hover:border-neutral-900';
+  'flex flex-none items-center gap-2 rounded-full border border-neutral-300 bg-white py-1.5 pr-3.5 pl-1.5 transition-colors hover:border-neutral-900 md:gap-2.5 md:py-2.5 md:pr-4.5 md:pl-2.5';
+const CHIP_ICON = 'size-8 flex-none rounded-full md:size-10';
 
 export default function TemplateMarquee() {
   const { t, i18n } = useTranslation();
@@ -52,16 +53,16 @@ export default function TemplateMarquee() {
           <img
             src={import.meta.env.VITE_API_BASE_URL + item.iconPath}
             alt=""
-            className="size-10 flex-none rounded-full object-contain"
+            className={`${CHIP_ICON} object-contain`}
           />
         ) : (
-          <span className="size-10 flex-none rounded-full bg-neutral-100" />
+          <span className={`${CHIP_ICON} bg-neutral-100`} />
         )}
         <span className="flex flex-col">
-          <span className="text-ui-label whitespace-nowrap">
+          <span className="text-sm font-semibold whitespace-nowrap md:text-ui-label">
             {item.organizationName}
           </span>
-          <span className="text-ui-caption whitespace-nowrap text-neutral-600">
+          <span className="text-xs whitespace-nowrap text-neutral-600 md:text-ui-caption">
             {item.name}
           </span>
         </span>
@@ -93,7 +94,7 @@ export default function TemplateMarquee() {
   return (
     <div className="mt-3 flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h4 className="text-ui-title">{t('토론 템플릿')}</h4>
+        <h4 className="text-ui-label md:text-ui-title">{t('토론 템플릿')}</h4>
         <Link
           to={buildLangPath('/templates', lang)}
           className="px-1 py-2.5 text-ui-label hover:text-neutral-600"
@@ -103,9 +104,6 @@ export default function TemplateMarquee() {
         </Link>
       </div>
       {renderBody()}
-      <p className="text-ui-caption text-neutral-500">
-        {t('* 각 단체의 사용 여부와는 관계없어요')}
-      </p>
     </div>
   );
 }

@@ -40,9 +40,14 @@ export default function TemplateListPage() {
         </div>
       );
     }
+    // 한 행의 카드 높이가 비슷하도록 템플릿이 적은 단체부터 보여 줌. 개수가 같으면 서버 순서를 유지함
+    const organizations = [...data.organizations].sort(
+      (a, b) => a.templates.length - b.templates.length,
+    );
+
     return (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {data.organizations.map((organization) => (
+        {organizations.map((organization) => (
           <TemplateCard
             key={`${organization.organization}-${organization.affiliation}`}
             organization={organization}
@@ -84,11 +89,6 @@ export default function TemplateListPage() {
           </a>
         </div>
         {renderTemplates()}
-        <p className="text-ui-caption text-neutral-500">
-          {t(
-            '* 수록된 형식은 공개 자료를 바탕으로 재구성했으며, 각 단체의 디베이트 타이머 사용 여부와는 관계없어요.',
-          )}
-        </p>
       </main>
     </div>
   );
