@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../GlobalSettingsProvider/GlobalSettingsProvider';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -51,19 +52,21 @@ describe('렌더 오류 경계', () => {
       render(
         <StrictMode>
           <QueryClientProvider client={new QueryClient()}>
-            <MemoryRouter initialEntries={['/table/customize/1']}>
-              <Routes>
-                <Route
-                  path="/table/customize/1"
-                  element={
-                    <ErrorBoundary>
-                      <FailedScreen />
-                    </ErrorBoundary>
-                  }
-                />
-                <Route path="/home" element={<h1>복구된 홈 화면</h1>} />
-              </Routes>
-            </MemoryRouter>
+            <GlobalSettingsProvider>
+              <MemoryRouter initialEntries={['/table/customize/1']}>
+                <Routes>
+                  <Route
+                    path="/table/customize/1"
+                    element={
+                      <ErrorBoundary>
+                        <FailedScreen />
+                      </ErrorBoundary>
+                    }
+                  />
+                  <Route path="/home" element={<h1>복구된 홈 화면</h1>} />
+                </Routes>
+              </MemoryRouter>
+            </GlobalSettingsProvider>
           </QueryClientProvider>
         </StrictMode>,
       );

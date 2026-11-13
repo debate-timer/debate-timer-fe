@@ -33,12 +33,16 @@ import VolumeBar from '../../components/VolumeBar/VolumeBar';
 import { isLoggedIn } from '../../util/accessToken';
 import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerEventTypes } from '../../apis/sockets/type';
+import { isTimerEventType } from '../../apis/sockets/util';
 import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
 import useTranscriptRecorder from './hooks/useTranscriptRecorder';
 import TranscribeControl from './components/TranscribeControl';
+import TranscriptLeaveModal from './components/TranscriptLeaveModal';
+import useTranscriptLeaveGuard from './hooks/useTranscriptLeaveGuard';
+import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { toRecognitionLang } from '../../util/speechRecognition';
 
 // 피처 플래그
@@ -101,13 +105,23 @@ export default function TimerPage() {
 
   // 토론 기록: 타이머가 실행되는 동안의 발언을 현재 타임박스(자유토론은 현재 팀) 구간으로 기록한다.
   // 기록을 켤 때 크롬 실시간 인식(RPC)과 Soniox 구간 배치 전사 중 하나를 고른다.
-  const isTranscribeAvailable = isLoggedIn() && !isGuestFlow();
+  // 피쳐 플래그(TRANSCRIPT)를 부여받은 회원에게만 보여준다.
+  const isMemberFlow = isLoggedIn() && !isGuestFlow();
+  const { isEnabled: hasTranscriptFlag } = useFeatureFlag('TRANSCRIPT', {
+    enabled: isMemberFlow,
+  });
+  const isTranscribeAvailable = isMemberFlow && hasTranscriptFlag;
   const transcriber = useTranscriptRecorder({
     tableId,
     timeBoxIndex: index,
     team: timerType === 'TIME_BASED' ? prosConsSelected : null,
     isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
     lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+  });
+  // 토론 기록 중 화면을 벗어나면 속기록이 유실되므로 확인을 받은 뒤에만 나간다.
+  const transcriptLeaveGuard = useTranscriptLeaveGuard({
+    tableId,
+    isRecording: isTranscribeAvailable && transcriber.isEnabled,
   });
   const remainingTime = getRemainingTimeForShare({
     timerType,
@@ -228,7 +242,7 @@ export default function TimerPage() {
       return;
     }
 
-    if (eventType === 'FINISHED' || eventType === 'ERROR') {
+    if (!isTimerEventType(eventType)) {
       issueEvent(eventType, null);
       return;
     }
@@ -540,6 +554,13 @@ export default function TimerPage() {
       {isAnswerTimeGuideOpen && (
         <AnswerTimeGuideModal onClose={closeAnswerTimeGuideModal} />
       )}
+
+      {/* 토론 기록 중 화면 이탈 시 속기록 유실을 안내하는 모달이다. */}
+      <TranscriptLeaveModal
+        isOpen={transcriptLeaveGuard.isLeaveModalOpen}
+        onConfirm={transcriptLeaveGuard.confirmLeave}
+        onCancel={transcriptLeaveGuard.cancelLeave}
+      />
 
       {/* 토론 종료 후 로그인 저장 여부를 묻는 모달이다. */}
       <LoginAndStoreModal

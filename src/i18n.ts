@@ -13,8 +13,8 @@ i18n
 
     // 언어를 감지하는 순서와 방법
     detection: {
-      order: ['path', 'localStorage', 'navigator'],
-      caches: ['localStorage'],
+      order: ['path', 'navigator'],
+      caches: [],
     },
 
     // 번역 파일을 불러올 위치

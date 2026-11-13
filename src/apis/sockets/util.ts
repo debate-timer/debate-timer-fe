@@ -17,7 +17,11 @@ const TIMER_EVENT_TYPES: TimerEventTypes[] = [
   'SYNC',
 ];
 
-const NON_TIMER_EVENT_TYPES: NonTimerEventType[] = ['FINISHED', 'ERROR'];
+const NON_TIMER_EVENT_TYPES: NonTimerEventType[] = [
+  'FINISHED',
+  'ABORT',
+  'ERROR',
+];
 
 const SERVER_EVENT_TYPES: ServerEventType[] = ['CHAIRMAN_ABSENT'];
 

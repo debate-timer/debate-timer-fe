@@ -64,6 +64,28 @@ describe('AnalyticsManager', () => {
     expect(p2.trackPageView).toHaveBeenCalled();
   });
 
+  test('공유 링크 경로의 토큰은 page_path에 남기지 않는다', () => {
+    const provider = createMockProvider();
+    manager.addProvider(provider);
+    window.history.pushState({}, '', '/transcript/shared/secret-token');
+
+    try {
+      manager.trackPageView({
+        page_title: 'Shared',
+        previous_page_path: '',
+        referrer: '',
+      });
+    } finally {
+      window.history.pushState({}, '', '/');
+    }
+
+    expect(provider.trackPageView).toHaveBeenCalledWith(
+      expect.objectContaining({
+        page_path: '/transcript/shared/:shareToken',
+      }),
+    );
+  });
+
   test('setUserId를 모든 provider에 전파한다', () => {
     const p1 = createMockProvider('p1');
     const p2 = createMockProvider('p2');

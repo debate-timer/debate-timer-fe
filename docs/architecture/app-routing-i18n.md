@@ -4,9 +4,11 @@
 
 `src/main.tsx`가 앱 초기화를 소유함. `VITE_MOCK_API`가 활성화된 경우
 `src/mocks/browser.ts`의 worker 시작 완료 후 앱을 렌더링함. 이후
-`QueryClientProvider` → `GlobalPortal.Provider` → `RouterProvider` 순으로
+`QueryClientProvider` → `GlobalSettingsProvider` → `GlobalPortal.Provider` → `RouterProvider` 순으로
 조립함. Query와 Mutation의 기본 `throwOnError`는 `true`이며, 지역 오류 UI가
-필요한 조회 훅에서 개별 설정을 변경함. API 모방과 조회 경계는
+필요한 조회 훅과 화면이 실패를 직접 처리하는 변경 훅에서 개별 설정을 변경함.
+변경 훅 예시는 로그인 실패 시 메인으로 이동하는
+`src/hooks/mutations/usePostUser.ts`에 있음. API 모방과 조회 경계는
 [데이터 접근](data-access.md)이 소유함.
 
 `src/i18n.ts`가 번역 파일 로딩, 언어 감지, React 연결을 초기화함.
@@ -29,17 +31,28 @@
 `useNavigate`로 라우트 입력과 이동을 처리함. 숫자 식별자는 변환 후 유효성과 존재
 여부를 검사함. 언어를 보존하는 이동 경로는 `buildLangPath`로 만듦.
 
-| 단계           | 소유 코드                        | 결과                                        |
-| -------------- | -------------------------------- | ------------------------------------------- |
-| 라우트 선언    | `src/routes/routes.tsx`          | 경로·화면·인증 필요 여부를 한 항목에 보관함 |
-| 인증 판정      | `src/routes/ProtectedRoute.tsx`  | 미인증이면 언어별 홈으로 이동함             |
-| 언어 정규화    | `src/routes/LanguageWrapper.tsx` | 기본 언어 접두어를 없애고 i18n 상태를 맞춤  |
-| 화면 입력 처리 | 각 `src/page/` 컴포넌트          | URL 값을 검증한 뒤 기능 훅에 전달함         |
+| 단계           | 소유 코드                         | 결과                                          |
+| -------------- | --------------------------------- | --------------------------------------------- |
+| 라우트 선언    | `src/routes/routes.tsx`           | 경로·화면·인증 필요 여부를 한 항목에 보관함   |
+| 인증 판정      | `src/routes/ProtectedRoute.tsx`   | 미인증이면 언어별 홈으로 이동함               |
+| 기능 판정      | `src/routes/FeatureFlagRoute.tsx` | 피쳐 플래그가 없으면 언어별 대시보드로 이동함 |
+| 언어 정규화    | `src/routes/LanguageWrapper.tsx`  | 기본 언어 접두어를 없애고 i18n 상태를 맞춤    |
+| 화면 입력 처리 | 각 `src/page/` 컴포넌트           | URL 값을 검증한 뒤 기능 훅에 전달함           |
+
+### 피쳐 플래그
+
+회원별로 여는 기능은 `src/types/featureFlag.ts`의 `FeatureFlag`로 표현함.
+`src/hooks/useFeatureFlag.ts`가 `GET /api/member/feature-flags` 조회 결과로 보유
+여부를 판정하며, 조회 중이거나 실패하면 사용할 수 없는 것으로 봄. 기능 전용
+라우트는 `appRoutes`의 `element`를 `FeatureFlagRoute`로 감싸고, 화면 안의
+진입점은 같은 훅으로 숨김. 로그아웃하면 조회 결과를 지움. 현재 `TRANSCRIPT`가
+타이머 화면의 토론 기록 컨트롤, 대시보드의 토론 기록 탭, 속기록 상세 화면을
+제어함. 속기록 공유 링크 화면(`transcript/shared/:shareToken`)은 공유받은
+사람이 보는 화면이므로 로그인과 피쳐 플래그 없이 열림.
 
 ## 언어와 URL
 
-- `src/i18n.ts`의 지원 언어는 `ko`, `en`이며 기본 언어는 `ko`임. 감지 순서는
-  경로 → `localStorage` → 브라우저 언어임.
+- `src/i18n.ts`의 지원 언어는 `ko`, `en`이며 기본 언어는 `ko`임. 초기 감지는 경로 → 브라우저 언어이며 저장 설정의 적용은 전역 설정 계층이 소유함.
 - `src/util/languageRouting.ts`는 기본 언어의 `/ko` 접두어를 없애고 다른 언어에
   `/{lang}`을 붙이는 경로 함수를 소유함.
 - `src/routes/LanguageWrapper.tsx`는 URL과 i18n 상태를 맞추고 정규화 이동에
@@ -54,3 +67,7 @@
 `replace`를 사용함. 페이지 안에서 링크를 만들 때는 언어 접두어를 문자열로 직접
 이어 붙이지 않고 `buildLangPath`를 사용함. 지원하지 않는 언어가 URL에 들어온
 경우 `LanguageWrapper`와 경로 함수의 현재 처리 방식을 함께 확인함.
+
+## 전역 설정의 언어 연결
+
+언어 감지의 자동 localStorage 캐시를 끄고 명시 링크·직접 선택·계정/비회원 저장값을 구분함. LanguageWrapper가 공용 설정으로 i18n·문서 언어·URL을 맞추며 query·hash를 보존함. 언어 접두어만 변경하는 이동은 속기 이탈로 처리하지 않음.

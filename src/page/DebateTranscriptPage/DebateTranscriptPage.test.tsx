@@ -1,5 +1,6 @@
+import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -66,6 +67,7 @@ const doneTranscript: GetTranscriptResponseType = {
     },
   },
   errorMessage: null,
+  shareToken: null,
 };
 
 function renderPage(transcript: GetTranscriptResponseType) {
@@ -79,16 +81,20 @@ function renderPage(transcript: GetTranscriptResponseType) {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <GlobalPortal.Provider>
-        <MemoryRouter initialEntries={['/table/customize/1/end/transcript/9']}>
-          <Routes>
-            <Route
-              path="/table/customize/:tableId/end/transcript/:transcriptId"
-              element={<DebateTranscriptPage />}
-            />
-          </Routes>
-        </MemoryRouter>
-      </GlobalPortal.Provider>
+      <GlobalSettingsProvider>
+        <GlobalPortal.Provider>
+          <MemoryRouter
+            initialEntries={['/table/customize/1/end/transcript/9']}
+          >
+            <Routes>
+              <Route
+                path="/table/customize/:tableId/end/transcript/:transcriptId"
+                element={<DebateTranscriptPage />}
+              />
+            </Routes>
+          </MemoryRouter>
+        </GlobalPortal.Provider>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
 }
@@ -179,6 +185,115 @@ describe('토론 속기록 화면', () => {
       expect(stepState('속기록 보정 중')).toBe('done');
       expect(stepState('분석 보고서 발행 중')).toBe('active');
       expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('공유', () => {
+    it('공유 버튼을 누르면 공유 링크를 만들어 복사할 수 있다', async () => {
+      const user = userEvent.setup();
+      renderPage(doneTranscript);
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await user.click(
+        await screen.findByRole('button', { name: '공유 링크 복사' }),
+      );
+
+      await expect(navigator.clipboard.readText()).resolves.toMatch(
+        /\/transcript\/shared\/mock-share-token$/,
+      );
+    });
+
+    it('공유 중지를 누르면 공유를 해제하고 모달을 닫는다', async () => {
+      const user = userEvent.setup();
+      let deletedId: string | undefined;
+      server.use(
+        http.delete(
+          `${ApiUrl.transcript}/:transcriptId/share`,
+          ({ params }) => {
+            deletedId = String(params.transcriptId);
+            return new HttpResponse(null, { status: 204 });
+          },
+        ),
+      );
+      renderPage({ ...doneTranscript, shareToken: 'share-token' });
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await user.click(
+        await screen.findByRole('button', { name: '공유 중지' }),
+      );
+
+      await waitFor(() => expect(deletedId).toBe('9'));
+      expect(
+        screen.queryByRole('button', { name: '공유 링크 복사' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('공유를 중지하지 못하면 모달에 안내하고 다시 누를 수 있다', async () => {
+      const user = userEvent.setup();
+      server.use(
+        http.delete(`${ApiUrl.transcript}/:transcriptId/share`, () =>
+          HttpResponse.json({}, { status: 500 }),
+        ),
+      );
+      renderPage(doneTranscript);
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await user.click(
+        await screen.findByRole('button', { name: '공유 중지' }),
+      );
+
+      expect(
+        await screen.findByText(
+          '공유를 중지하지 못했어요. 다시 시도해 주세요.',
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '공유 중지' })).toBeEnabled();
+    });
+
+    it('다시 연 모달에서 링크 발급이 끝나기 전에는 공유를 중지할 수 없다', async () => {
+      const user = userEvent.setup();
+      renderPage(doneTranscript);
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+      await screen.findByRole('button', { name: '공유 링크 복사' });
+      await user.keyboard('{Escape}');
+      server.use(
+        http.post(
+          `${ApiUrl.transcript}/:transcriptId/share`,
+          () => new Promise<never>(() => {}),
+        ),
+      );
+
+      await user.click(screen.getByRole('button', { name: '공유하기' }));
+
+      expect(
+        await screen.findByRole('button', { name: '공유 중지' }),
+      ).toBeDisabled();
+    });
+
+    it('공유 링크를 만들지 못하면 다시 시도할 수 있다', async () => {
+      const user = userEvent.setup();
+      server.use(
+        http.post(`${ApiUrl.transcript}/:transcriptId/share`, () =>
+          HttpResponse.json({}, { status: 500 }),
+        ),
+      );
+      renderPage(doneTranscript);
+
+      await user.click(await screen.findByRole('button', { name: '공유하기' }));
+
+      expect(
+        await screen.findByText(/QR 코드를 불러오지 못했어요/),
+      ).toBeInTheDocument();
+    });
+
+    it('기록을 만드는 중이면 공유 버튼을 보여주지 않는다', async () => {
+      renderPage({ ...doneTranscript, status: 'PROCESSING', report: null });
+
+      await screen.findByText('토론 기록을 만들고 있어요');
+
+      expect(
+        screen.queryByRole('button', { name: '공유하기' }),
+      ).not.toBeInTheDocument();
     });
   });
 

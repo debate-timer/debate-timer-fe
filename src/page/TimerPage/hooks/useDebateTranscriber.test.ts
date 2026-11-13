@@ -198,4 +198,18 @@ describe('크롬 음성 인식 기록 훅', () => {
 
     expect(result.current.isSupported).toBe(false);
   });
+  it('폐기하면 마지막 문장을 받지 않고 이후 결과가 새 초안에 섞이지 않는다', () => {
+    const { result } = renderHook(() =>
+      useDebateTranscriber({ ...baseParams, isRunning: true }),
+    );
+    act(() => result.current.enable('en-US'));
+    const old = latest();
+    expect(old.lang).toBe('en-US');
+    act(() => result.current.discard());
+    expect(old.abort).toHaveBeenCalled();
+    expect(getTranscriptDraft(7)).toBeNull();
+    act(() => result.current.enable());
+    act(() => old.emit([{ text: '폐기된 문장', isFinal: true }]));
+    expect(getTranscriptDraft(7)?.segments).toEqual([]);
+  });
 });

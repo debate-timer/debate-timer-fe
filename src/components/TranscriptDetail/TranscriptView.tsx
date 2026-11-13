@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { Stance } from '../../../types/type';
-import { TranscriptLine } from '../../../types/transcript';
-import { formatOffset, groupTranscriptLines } from '../transcriptFormatting';
-import { STANCE_TEXT_CLASS } from '../stanceStyle';
+import { Stance } from '../../types/type';
+import { TranscriptLine } from '../../types/transcript';
+import { formatOffset, groupTranscriptLines } from './transcriptFormatting';
+import { STANCE_TEXT_CLASS } from './stanceStyle';
 
 interface TranscriptViewProps {
   lines: TranscriptLine[];

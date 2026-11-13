@@ -33,8 +33,14 @@ function renderControl(props: Partial<TranscribeControlProps> = {}) {
   return merged;
 }
 
+// 동의한 뒤 마이크 테스트 화면을 거쳐 기록을 시작한다.
+async function consentAndStart(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+  await user.click(screen.getByRole('button', { name: '기록 시작' }));
+}
+
 describe('토론 기록 켜기 컨트롤', () => {
-  it('기록이 꺼져 있을 때 누르면 동의를 받은 뒤 고른 모드로 기록을 켠다', async () => {
+  it('기록이 꺼져 있을 때 누르면 동의와 마이크 테스트를 거쳐 고른 모드로 기록을 켠다', async () => {
     const user = userEvent.setup();
     const props = renderControl();
 
@@ -44,7 +50,7 @@ describe('토론 기록 켜기 컨트롤', () => {
       screen.getByText('토론 음성 기록에 동의하시나요?'),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+    await consentAndStart(user);
 
     expect(props.onEnable).toHaveBeenCalledWith('RPC');
   });
@@ -60,7 +66,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     expect(
       screen.getByText(/발언 구간이 끝날 때마다 녹음한 오디오를 서버로 보내/),
     ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+    await consentAndStart(user);
 
     expect(props.onEnable).toHaveBeenCalledWith('SONIOX');
   });
@@ -86,7 +92,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
 
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+    await consentAndStart(user);
     expect(props.onEnable).toHaveBeenCalledWith('SONIOX');
   });
 
@@ -139,7 +145,7 @@ describe('토론 기록 켜기 컨트롤', () => {
     expect(
       screen.getByText('토론 음성 기록에 동의하시나요?'),
     ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+    await consentAndStart(user);
 
     expect(props.onEnable).toHaveBeenCalledWith('RPC');
   });
@@ -182,6 +188,31 @@ describe('토론 기록 켜기 컨트롤', () => {
 
     expect(
       screen.getByText('마이크 권한을 허용해야 토론을 기록할 수 있어요'),
+    ).toBeInTheDocument();
+  });
+  it('동의하면 바로 기록하지 않고 마이크 테스트 화면을 보여준다', async () => {
+    const user = userEvent.setup();
+    const props = renderControl();
+
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
+    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+
+    expect(screen.getByText('마이크 테스트')).toBeInTheDocument();
+    expect(props.onEnable).not.toHaveBeenCalled();
+  });
+
+  it('마이크 테스트 화면에서 취소하면 기록을 켜지 않고, 다시 열면 동의 화면부터 보여준다', async () => {
+    const user = userEvent.setup();
+    const props = renderControl();
+
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
+    await user.click(screen.getByRole('button', { name: '동의하고 기록하기' }));
+    await user.click(screen.getByRole('button', { name: '취소' }));
+
+    expect(props.onEnable).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
+    expect(
+      screen.getByText('토론 음성 기록에 동의하시나요?'),
     ).toBeInTheDocument();
   });
 });

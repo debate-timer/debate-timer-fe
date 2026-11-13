@@ -11,11 +11,15 @@ import {
 } from '../../../util/audioRecorder';
 import {
   appendSegmentUtterances,
+  clearTranscriptDraft,
+  isTranscriptDraftCurrent,
+  TranscriptDraftContext,
   failPendingSegment,
   markSegmentPending,
   SegmentKey,
   startTranscriptDraft,
 } from '../../../util/transcriptDraft';
+import { createRandomId } from '../../../util/randomId';
 import { TranscriberError } from './useDebateTranscriber';
 
 export interface UseSonioxTranscriberParams {
@@ -33,7 +37,10 @@ interface DesiredSegment {
 }
 
 interface RecordingSession {
-  tableId: number;
+  context: TranscriptDraftContext;
+  language: string;
+  // 이 구간을 녹음한 기록 세션. 기록을 끈 뒤 전사 요청이 나가도 녹음할 때의 세션으로 보낸다.
+  recordingSessionId: string;
   recorder: MediaRecorder;
   segment: SegmentKey;
   startedAt: number;
@@ -81,8 +88,12 @@ export default function useSonioxTranscriber(
   const isEnabledRef = useRef(false);
   const isRequestingMicrophoneRef = useRef(false);
   const isMountedRef = useRef(false);
-  const hasStartedDraftRef = useRef(false);
+  const draftContextRef = useRef<TranscriptDraftContext | null>(null);
+  const generationRef = useRef(0);
   const tableIdRef = useRef(tableId);
+  // 기록을 켤 때마다 새로 만드는 녹음 세션 식별자. 서버가 구간 오디오를 세션별로 묶어 보관한다.
+  // 동의를 철회했다가 다시 켜면 이어서 기록하더라도 새 세션으로 본다.
+  const recordingSessionIdRef = useRef('');
   const langRef = useRef(lang);
 
   // 렌더 중에 ref를 바꾸면 커밋되지 않은 렌더 값이 남을 수 있어 커밋 뒤에 맞춘다.
@@ -97,43 +108,72 @@ export default function useSonioxTranscriber(
       return;
     }
     session.isPendingMarked = true;
-    markSegmentPending(session.tableId, session.segment.id, Date.now());
+    markSegmentPending(session.context, session.segment.id, Date.now());
     setPendingCount((prev) => prev + 1);
   }, []);
 
   // 전사 대기는 구간을 끝낼 때 이미 기록했으므로, 결과를 저장하거나 실패로 남기며 대기를 푼다.
   // 빈 오디오나 너무 짧은 구간은 보내지 않고 문장 없는 구간으로 대기만 푼다.
   const transcribe = useCallback((session: RecordingSession, audio: Blob) => {
-    const { tableId: sessionTableId, segment, startedAt } = session;
+    const { context, language, recordingSessionId, segment, startedAt } =
+      session;
+    if (!isTranscriptDraftCurrent(context)) {
+      return;
+    }
     const isTooShort = Date.now() - startedAt < MIN_SEGMENT_DURATION_MS;
     if (audio.size === 0 || isTooShort) {
-      appendSegmentUtterances(sessionTableId, segment, startedAt, []);
+      appendSegmentUtterances(context, segment, startedAt, []);
       setPendingCount((prev) => prev - 1);
       return;
     }
-    postSonioxTranscription(audio, toAudioFileName(audio.type), langRef.current)
+    postSonioxTranscription(
+      audio,
+      toAudioFileName(audio.type),
+      language,
+      recordingSessionId,
+      context.memberId
+        ? {
+            expectedMemberId: context.memberId,
+            expectedAuthRevision: context.authRevision,
+          }
+        : {},
+    )
       .then(({ utterances }) => {
-        appendSegmentUtterances(sessionTableId, segment, startedAt, utterances);
+        appendSegmentUtterances(context, segment, startedAt, utterances);
+        if (!isTranscriptDraftCurrent(context)) {
+          return;
+        }
         setUtteranceCount((prev) => prev + utterances.length);
       })
       .catch(() => {
-        failPendingSegment(sessionTableId, segment.id);
+        failPendingSegment(context, segment.id);
+        if (!isTranscriptDraftCurrent(context)) {
+          return;
+        }
         setFailedCount((prev) => prev + 1);
       })
       .finally(() => {
-        setPendingCount((prev) => prev - 1);
+        if (isTranscriptDraftCurrent(context)) {
+          setPendingCount((prev) => prev - 1);
+        }
       });
   }, []);
 
   const startRecording = useCallback(
     (segment: SegmentKey, stream: MediaStream) => {
+      const context = draftContextRef.current;
+      if (!context || !isTranscriptDraftCurrent(context)) {
+        return;
+      }
       const mimeType = getRecorderMimeType();
       const recorder = new MediaRecorder(stream, {
         ...(mimeType ? { mimeType } : {}),
         audioBitsPerSecond: RECORDER_AUDIO_BITS_PER_SECOND,
       });
       const session: RecordingSession = {
-        tableId: tableIdRef.current,
+        context,
+        language: langRef.current,
+        recordingSessionId: recordingSessionIdRef.current,
         recorder,
         segment,
         startedAt: Date.now(),
@@ -192,9 +232,10 @@ export default function useSonioxTranscriber(
       return;
     }
     isRequestingMicrophoneRef.current = true;
+    const generation = generationRef.current;
     requestMicrophoneStream()
       .then((stream) => {
-        if (!isEnabledRef.current) {
+        if (!isEnabledRef.current || generation !== generationRef.current) {
           stopMediaStream(stream);
           return;
         }
@@ -208,6 +249,9 @@ export default function useSonioxTranscriber(
         }
       })
       .catch(() => {
+        if (generation !== generationRef.current) {
+          return;
+        }
         desiredRef.current = null;
         setError('not-allowed');
         setIsEnabled(false);
@@ -259,6 +303,7 @@ export default function useSonioxTranscriber(
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
+      generationRef.current += 1;
       isEnabledRef.current = false;
       desiredRef.current = null;
       stopRecording();
@@ -266,43 +311,95 @@ export default function useSonioxTranscriber(
     };
   }, [releaseMicrophone, stopRecording]);
 
-  // 페이지에서 처음 켤 때만 새 초안을 만들고, 껐다 켜면 이어서 기록한다.
-  const enable = useCallback(async () => {
-    if (!isSupported) {
-      setError('unsupported');
-      return;
-    }
-    try {
-      if (!streamRef.current?.active) {
-        const stream = await requestMicrophoneStream();
-        // 권한을 묻는 사이 화면을 떠났으면 받은 마이크를 바로 놓는다.
-        if (!isMountedRef.current) {
-          stopMediaStream(stream);
+  // 페이지에서 처음 켤 때만 새 초안을 만들고, 껐다 켜면 이어서 기록한다. 녹음 세션은 켤 때마다 새로 만든다.
+  const enable = useCallback(
+    async (recognitionLanguage?: string) => {
+      const generation = generationRef.current;
+      const language = recognitionLanguage ?? langRef.current;
+      if (!isSupported) {
+        setError('unsupported');
+        return;
+      }
+      try {
+        if (!streamRef.current?.active) {
+          const stream = await requestMicrophoneStream();
+          // 권한을 묻는 사이 화면을 떠났으면 받은 마이크를 바로 놓는다.
+          if (!isMountedRef.current || generation !== generationRef.current) {
+            stopMediaStream(stream);
+            return;
+          }
+          streamRef.current = stream;
+        }
+      } catch {
+        if (generation !== generationRef.current) {
           return;
         }
-        streamRef.current = stream;
+        setError('not-allowed');
+        return;
       }
-    } catch {
-      setError('not-allowed');
-      return;
-    }
-    if (!hasStartedDraftRef.current) {
-      startTranscriptDraft(tableIdRef.current, Date.now(), 'SONIOX');
-      hasStartedDraftRef.current = true;
-      setUtteranceCount(0);
-      setFailedCount(0);
-    }
-    setError(null);
-    setIsEnabled(true);
-  }, [isSupported]);
+      if (generation !== generationRef.current) {
+        return;
+      }
+      langRef.current = language;
+      if (!isEnabledRef.current) {
+        recordingSessionIdRef.current = createRandomId();
+      }
+      if (
+        !draftContextRef.current ||
+        !isTranscriptDraftCurrent(draftContextRef.current)
+      ) {
+        draftContextRef.current = startTranscriptDraft(
+          tableIdRef.current,
+          Date.now(),
+          'SONIOX',
+        );
+        setUtteranceCount(0);
+        setFailedCount(0);
+      }
+      setError(null);
+      isEnabledRef.current = true;
+      setIsEnabled(true);
+    },
+    [isSupported],
+  );
 
   const disable = useCallback(() => {
+    generationRef.current += 1;
+    isEnabledRef.current = false;
+    desiredRef.current = null;
     stopRecording();
     releaseMicrophone();
     setIsEnabled(false);
   }, [releaseMicrophone, stopRecording]);
 
+  const discard = useCallback(() => {
+    generationRef.current += 1;
+    isEnabledRef.current = false;
+    desiredRef.current = null;
+    const active = activeRef.current;
+    activeRef.current = null;
+    if (active) {
+      active.recorder.onstop = null;
+      active.recorder.ondataavailable = null;
+      if (active.recorder.state !== 'inactive') {
+        active.recorder.stop();
+      }
+    }
+    releaseMicrophone();
+    if (draftContextRef.current) {
+      clearTranscriptDraft(draftContextRef.current);
+    }
+    draftContextRef.current = null;
+    setIsEnabled(false);
+    setIsListening(false);
+    setPendingCount(0);
+    setUtteranceCount(0);
+    setFailedCount(0);
+    setError(null);
+  }, [releaseMicrophone]);
+
   return {
+    discard,
     isSupported,
     isEnabled,
     isListening,

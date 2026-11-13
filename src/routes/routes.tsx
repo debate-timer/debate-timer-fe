@@ -3,6 +3,7 @@ import TableListPage from '../page/TableListPage/TableListPage';
 import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
 import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
 import ProtectedRoute from './ProtectedRoute';
+import FeatureFlagRoute from './FeatureFlagRoute';
 import OAuth from '../page/OAuthPage/OAuth';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import TimerPage from '../page/TimerPage/TimerPage';
@@ -20,6 +21,7 @@ import RootLayout from './RootLayout';
 import AudienceSharePage from '../page/AudienceSharePage/AudienceSharePage';
 import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedPage';
 import DebateTranscriptPage from '../page/DebateTranscriptPage/DebateTranscriptPage';
+import SharedTranscriptPage from '../page/SharedTranscriptPage/SharedTranscriptPage';
 
 const appRoutes = [
   {
@@ -74,8 +76,18 @@ const appRoutes = [
   },
   {
     path: 'table/customize/:tableId/end/transcript/:transcriptId',
-    element: <DebateTranscriptPage />,
+    element: (
+      <FeatureFlagRoute flag="TRANSCRIPT">
+        <DebateTranscriptPage />
+      </FeatureFlagRoute>
+    ),
     requiresAuth: true,
+  },
+  {
+    // 공유 링크로 받은 사람은 로그인·피쳐 플래그 없이 본다.
+    path: 'transcript/shared/:shareToken',
+    element: <SharedTranscriptPage />,
+    requiresAuth: false,
   },
   {
     path: 'vote/:id',

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getAuthRevision } from '../../../util/accessToken';
 import { SttMode } from '../../../types/transcript';
 import useDebateTranscriber, {
   UseDebateTranscriberParams,
@@ -12,8 +13,13 @@ import useSonioxTranscriber from './useSonioxTranscriber';
 export default function useTranscriptRecorder(
   params: UseDebateTranscriberParams,
 ) {
-  const rpc = useDebateTranscriber(params);
-  const soniox = useSonioxTranscriber(params);
+  const recognitionLangRef = useRef<string | null>(null);
+  const stableParams = {
+    ...params,
+    lang: recognitionLangRef.current ?? params.lang,
+  };
+  const rpc = useDebateTranscriber(stableParams);
+  const soniox = useSonioxTranscriber(stableParams);
   const supportedModes: Record<SttMode, boolean> = {
     RPC: rpc.isSupported,
     SONIOX: soniox.isSupported,
@@ -32,20 +38,37 @@ export default function useTranscriptRecorder(
     }
   }, [isActiveEnabled]);
 
-  const { enable: enableRpc, disable: disableRpc } = rpc;
-  const { enable: enableSoniox, disable: disableSoniox } = soniox;
+  const { enable: enableRpc, disable: disableRpc, discard: discardRpc } = rpc;
+  const {
+    enable: enableSoniox,
+    disable: disableSoniox,
+    discard: discardSoniox,
+  } = soniox;
+  const [isPending, setIsPending] = useState(false);
+  const isPendingRef = useRef(false);
 
   const enable = useCallback(
     async (mode: SttMode) => {
+      if (isPendingRef.current) {
+        return;
+      }
+      recognitionLangRef.current ??= params.lang;
       const nextMode = isModeLocked ? sttMode : mode;
       setSttMode(nextMode);
       if (nextMode === 'SONIOX') {
-        await enableSoniox();
+        isPendingRef.current = true;
+        setIsPending(true);
+        try {
+          await enableSoniox(recognitionLangRef.current);
+        } finally {
+          isPendingRef.current = false;
+          setIsPending(false);
+        }
         return;
       }
-      enableRpc();
+      enableRpc(recognitionLangRef.current);
     },
-    [enableRpc, enableSoniox, isModeLocked, sttMode],
+    [enableRpc, enableSoniox, isModeLocked, sttMode, params.lang],
   );
 
   const disable = useCallback(() => {
@@ -55,6 +78,40 @@ export default function useTranscriptRecorder(
     }
     disableRpc();
   }, [disableRpc, disableSoniox, sttMode]);
+
+  const discard = useCallback(() => {
+    discardRpc();
+    discardSoniox();
+    isPendingRef.current = false;
+    setIsPending(false);
+  }, [discardRpc, discardSoniox]);
+
+  const identityRef = useRef({
+    tableId: params.tableId,
+    revision: getAuthRevision(),
+  });
+  useEffect(() => {
+    if (identityRef.current.tableId !== params.tableId) {
+      discard();
+      recognitionLangRef.current = null;
+      setIsModeLocked(false);
+      identityRef.current = {
+        tableId: params.tableId,
+        revision: getAuthRevision(),
+      };
+    }
+    const handleIdentity = () => {
+      if (identityRef.current.revision !== getAuthRevision()) {
+        discard();
+      }
+    };
+    window.addEventListener('auth-changed', handleIdentity);
+    window.addEventListener('storage', handleIdentity);
+    return () => {
+      window.removeEventListener('auth-changed', handleIdentity);
+      window.removeEventListener('storage', handleIdentity);
+    };
+  }, [discard, params.tableId]);
 
   const active =
     sttMode === 'SONIOX'
@@ -77,6 +134,8 @@ export default function useTranscriptRecorder(
 
   return {
     ...active,
+    isPending,
+    discard,
     sttMode,
     isModeLocked,
     supportedModes,

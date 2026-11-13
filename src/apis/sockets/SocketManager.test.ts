@@ -601,4 +601,44 @@ describe('소켓 관리자 테스트', () => {
       expect(listener).not.toHaveBeenCalled();
     });
   });
+  it('로컬 발행 여부를 반환하며 이전 소켓의 연결·오류 이벤트가 새 공유에 영향을 주지 않는다', () => {
+    const onConnect = vi.fn();
+    const onError = vi.fn();
+    socketManager.onConnectEvent(onConnect);
+    socketManager.onErrorEvent(onError);
+    try {
+      expect(
+        socketManager.publish('/app/event/1', {
+          eventType: 'ABORT',
+          data: null,
+        }),
+      ).toBe(false);
+      socketManager.connect();
+      const old = getLatestClient();
+      socketManager.disconnect();
+      socketManager.connect();
+      const current = getLatestClient();
+      current.connected = true;
+      current.config.onConnect?.({} as IFrame);
+      old.config.onConnect?.({} as IFrame);
+      old.config.onStompError?.({
+        headers: { message: '과거 오류' },
+        command: 'ERROR',
+        body: '',
+        isBinaryBody: false,
+        binaryBody: new Uint8Array(),
+      });
+      expect(onConnect).toHaveBeenCalledTimes(1);
+      expect(onError).not.toHaveBeenCalled();
+      expect(
+        socketManager.publish('/app/event/1', {
+          eventType: 'ABORT',
+          data: null,
+        }),
+      ).toBe(true);
+    } finally {
+      socketManager.offConnectEvent(onConnect);
+      socketManager.offErrorEvent(onError);
+    }
+  });
 });

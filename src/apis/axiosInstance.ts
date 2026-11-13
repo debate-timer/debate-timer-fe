@@ -1,7 +1,9 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig, CanceledError } from 'axios';
 import * as Sentry from '@sentry/react';
 import {
   getAccessToken,
+  getAuthRevision,
+  getMemberId,
   removeAccessToken,
   removeMemberId,
   setAccessToken,
@@ -23,6 +25,26 @@ import {
   shouldSkipApiError,
 } from '../util/sentry';
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    /** 서버에 전송하지 않는 요청 시작 계정 식별자임. */
+    expectedMemberId?: string;
+    expectedAuthRevision?: number;
+  }
+}
+
+function assertRequestAccount(config?: InternalAxiosRequestConfig): void {
+  if (
+    config?.expectedMemberId !== undefined &&
+    (getMemberId() !== config.expectedMemberId ||
+      !getAccessToken() ||
+      (config.expectedAuthRevision !== undefined &&
+        config.expectedAuthRevision !== getAuthRevision()))
+  ) {
+    throw new CanceledError('MEMBER_SETTINGS_ACCOUNT_CHANGED', config);
+  }
+}
+
 // Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
 const requestTimeoutMs = 5000;
@@ -42,6 +64,7 @@ export const axiosInstance = axios.create({
 
 // Request interceptor
 axiosInstance.interceptors.request.use((config) => {
+  assertRequestAccount(config);
   const accessToken = getAccessToken();
 
   // Access token을 헤더에 붙여 전송
@@ -99,9 +122,16 @@ function captureClientApiError(error: unknown) {
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    assertRequestAccount(response.config);
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
+    assertRequestAccount(originalRequest);
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
     if (
       error.response &&
       error.response.status === 401 &&
@@ -109,12 +139,16 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        // Refresh Token은 HttpOnly 쿠키에 있다고 가정 (JS 접근 X)
-        // => withCredentials로 자동 전송되거나, 백엔드가 쿠키로 다룸
+        // Refresh Token은 API 도메인 쿠키에 있으므로
+        // 교차 출처 요청에도 쿠키가 실리도록 withCredentials를 명시
         const refreshResponse = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/member/reissue`,
           null,
+          { withCredentials: true },
         );
+
+        // 재발급 대기 중 전환한 계정의 인증 상태와 서버 데이터를 보호함.
+        assertRequestAccount(originalRequest);
 
         // 새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정
         const headerAuth = refreshResponse.headers['authorization'] || '';
@@ -129,6 +163,7 @@ axiosInstance.interceptors.response.use(
         originalRequest.headers.Authorization = `${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        assertRequestAccount(originalRequest);
         if (
           axios.isAxiosError(refreshError) &&
           refreshError.response?.status !== 401 &&
@@ -142,9 +177,9 @@ axiosInstance.interceptors.response.use(
         const currentLang = i18n.resolvedLanguage ?? i18n.language;
         const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
         Sentry.setUser(null);
-        window.location.href = buildLangPath('/home', lang);
         removeAccessToken();
         removeMemberId();
+        window.location.href = buildLangPath('/home', lang);
         analyticsManager.reset();
         return Promise.reject(refreshError);
       }

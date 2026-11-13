@@ -16,9 +16,16 @@ export interface PatchPollResponseType extends PollInfo {
 }
 
 // GET /api/polls/{pollId}/votes
-export interface GetVoterPollInfoResponseType extends PollInfo {
+export interface GetVoterPollInfoResponseType extends BasePollInfo {
   id: number;
   participateCode: string;
+  totalCount: number;
+  prosCount: number;
+  consCount: number;
+  tableInfo: {
+    name: string;
+    agenda: string;
+  };
 }
 
 // POST /api/polls/{pollId}/votes

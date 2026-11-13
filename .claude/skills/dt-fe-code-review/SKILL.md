@@ -5,5 +5,4 @@ description: Debate Timer FE의 PR·브랜치·diff를 검토하고 분류별 �
 
 # 코드 리뷰
 
-[코드 리뷰 워크플로](../../../docs/workflows/dt-fe-code-review.md)를 읽고 적용함.
-요청된 범위를 먼저 확인하고, 발견 사항과 실제 검증 결과를 보고함.
+[코드 리뷰 워크플로](../../../docs/workflows/dt-fe-code-review.md)를 읽고 적용함. 요청된 범위를 먼저 확인하고, 발견 사항·문서 갱신 필요 여부·실제 검증 결과를 보고함.

@@ -80,7 +80,7 @@ export default function useSocket() {
    */
   const publish = useCallback(
     (destination: string, body: SocketMessage, headers?: StompHeaders) => {
-      socketManager.publish(destination, body, headers);
+      return socketManager.publish(destination, body, headers);
     },
     [],
   );

@@ -1,3 +1,4 @@
+import shouldIgnoreTimerHotkey from './shouldIgnoreTimerHotkey';
 import { useEffect } from 'react';
 import { TimerPageLogics } from './useTimerPageState';
 import { SocketEventType } from '../../../apis/sockets/type';
@@ -13,7 +14,9 @@ import { SocketEventType } from '../../../apis/sockets/type';
 export function useTimerHotkey(
   state: TimerPageLogics,
   onEvent: (invoke: () => void, eventType: SocketEventType) => void,
+  options: { isEnabled?: boolean } = {},
 ) {
+  const { isEnabled = true } = options;
   const {
     data,
     index,
@@ -29,13 +32,18 @@ export function useTimerHotkey(
 
   useEffect(() => {
     // 데이터가 아직 로딩 중이면 핫키 적용하지 않음
-    if (!data) return;
+    if (!data || !isEnabled) {
+      return;
+    }
     const boxType = data.table[index].boxType;
 
     /**
      * 키보드 이벤트 리스너 (핫키 처리)
      */
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (shouldIgnoreTimerHotkey(event)) {
+        return;
+      }
       // 핫키로 쓸 키 목록
       const keysToDisable = new Set([
         'Space',
@@ -143,6 +151,7 @@ export function useTimerHotkey(
     // 언마운트 시 리스너 해제
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
+    isEnabled,
     data,
     index,
     prosConsSelected,

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 // Integer 0-10, step = 1
 // Mute button available
+import useGlobalSettings from '../../hooks/useGlobalSettings';
 import { useEffect, useState } from 'react';
 import CustomRangeSlider from '../CustomRangeSlider/CustomRangeSlider';
 import DTVolume from '../icons/Volume';
@@ -22,6 +23,7 @@ export default function VolumeBar({
   className = '',
 }: VolumeBarProps) {
   const { t } = useTranslation();
+  const { controller } = useGlobalSettings();
   // 음소거 해제 시 가장 마지막의 볼륨 값을 복원하기 위함
   const [lastVolume, setLastVolume] = useState(volume > 0 ? volume : 5);
 
@@ -116,7 +118,10 @@ export default function VolumeBar({
       <div className="relative z-10 flex h-full w-full items-center justify-center px-4 pt-5 pb-2">
         <div className="flex w-full flex-row items-center gap-2">
           <button
-            onClick={handleMute}
+            onClick={() => {
+              handleMute();
+              void controller.flush();
+            }}
             className="size-[36px]"
             title={isNotMute ? t('음소거') : t('음소거 해제')}
             aria-label={isNotMute ? t('음소거') : t('음소거 해제')}
@@ -130,6 +135,8 @@ export default function VolumeBar({
           </button>
           <CustomRangeSlider
             value={volume}
+            ariaLabel={t('음량')}
+            onValueCommit={() => void controller.flush()}
             onValueChange={(value: number) => {
               onVolumeChange(value);
 

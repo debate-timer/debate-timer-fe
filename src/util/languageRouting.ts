@@ -2,6 +2,7 @@ const SUPPORTED_LANGS = ['ko', 'en'] as const;
 const DEFAULT_LANG = 'ko';
 
 type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+export type { SupportedLang };
 
 const isSupportedLang = (value?: string): value is SupportedLang =>
   !!value && SUPPORTED_LANGS.includes(value as SupportedLang);

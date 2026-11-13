@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { DebateReport, TranscriptLine } from '../../../types/transcript';
+import { DebateReport, TranscriptLine } from '../../types/transcript';
 import ReportView from './ReportView';
 
 const lines: TranscriptLine[] = [

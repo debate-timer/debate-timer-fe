@@ -133,6 +133,8 @@ describe('Soniox 구간 녹음 훅', () => {
       expect.any(Blob),
       'segment.webm',
       'ko-KR',
+      expect.any(String),
+      {},
     );
     expect(draft.segments).toEqual([
       expect.objectContaining({
@@ -392,5 +394,120 @@ describe('Soniox 구간 녹음 훅', () => {
     const draft = getTranscriptDraft(7)!;
     expect(draft.segments).toEqual([]);
     expect(countPendingSegments(draft, Date.now())).toBe(0);
+  });
+
+  it('한 번 기록을 켠 동안의 구간은 같은 녹음 세션 식별자로 보낸다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: true, timeBoxIndex: 1 });
+    rerender({ ...baseParams, isRunning: false, timeBoxIndex: 1 });
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(2));
+    const [first, second] = mockedPost.mock.calls.map((call) => call[3]);
+    expect(first).toMatch(/^[A-Za-z0-9_-]{1,64}$/);
+    expect(second).toBe(first);
+  });
+
+  it('기록을 껐다가 다시 켜면 새 녹음 세션 식별자로 보낸다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    act(() => result.current.disable());
+
+    // 타이머가 도는 중이라 다시 켜자마자 녹음을 시작하고, 타이머를 멈추면 그 구간을 보낸다.
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: false });
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(2));
+    const [beforeDisable, afterEnable] = mockedPost.mock.calls.map(
+      (call) => call[3],
+    );
+    expect(afterEnable).not.toBe(beforeDisable);
+  });
+
+  it('기록 중에 다시 켜도 녹음 세션 식별자를 바꾸지 않는다', async () => {
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: baseParams },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: false });
+
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: true });
+    rerender({ ...baseParams, isRunning: false });
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(2));
+    const [first, second] = mockedPost.mock.calls.map((call) => call[3]);
+    expect(second).toBe(first);
+  });
+  it('폐기는 마지막 전사를 요청하지 않고 마이크를 해제한다', async () => {
+    const { result } = renderHook(() =>
+      useSonioxTranscriber({ ...baseParams, isRunning: true }),
+    );
+    await act(() => result.current.enable());
+    act(() => result.current.discard());
+    expect(mockedPost).not.toHaveBeenCalled();
+    expect(trackStop).toHaveBeenCalled();
+    expect(getTranscriptDraft(7)).toBeNull();
+  });
+
+  it('폐기 전 시작한 서버 전사 결과는 이후 새 초안에 쓰지 않는다', async () => {
+    let release!: (value: {
+      utterances: { offsetMs: number; text: string }[];
+    }) => void;
+    mockedPost.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+    const { result, rerender } = renderHook(
+      (params) => useSonioxTranscriber(params),
+      { initialProps: { ...baseParams, isRunning: true } },
+    );
+    await act(() => result.current.enable());
+    rerender({ ...baseParams, isRunning: false });
+    expect(mockedPost).toHaveBeenCalledTimes(1);
+    act(() => result.current.discard());
+    await act(() => result.current.enable());
+    await act(async () => {
+      release({ utterances: [{ offsetMs: 0, text: '이전 토론' }] });
+    });
+    expect(getTranscriptDraft(7)?.segments).toEqual([]);
+    expect(result.current.pendingCount).toBe(0);
+    expect(result.current.utteranceCount).toBe(0);
+  });
+
+  it('권한 대기 중 폐기하면 늦게 받은 마이크를 즉시 해제한다', async () => {
+    let resolve!: (value: typeof fakeStream) => void;
+    getUserMedia.mockImplementationOnce(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    );
+    const { result } = renderHook(() => useSonioxTranscriber(baseParams));
+    let enabling!: Promise<void>;
+    act(() => {
+      enabling = result.current.enable();
+    });
+    act(() => result.current.discard());
+    await act(async () => {
+      resolve(fakeStream);
+      await enabling;
+    });
+    expect(result.current.isEnabled).toBe(false);
+    expect(getTranscriptDraft(7)).toBeNull();
+    expect(trackStop).toHaveBeenCalled();
   });
 });

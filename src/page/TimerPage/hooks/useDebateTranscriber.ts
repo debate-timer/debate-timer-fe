@@ -9,6 +9,9 @@ import {
 } from '../../../util/speechRecognition';
 import {
   appendUtterance,
+  clearTranscriptDraft,
+  isTranscriptDraftCurrent,
+  TranscriptDraftContext,
   SegmentKey,
   startTranscriptDraft,
 } from '../../../util/transcriptDraft';
@@ -22,7 +25,7 @@ export interface UseDebateTranscriberParams {
   lang: string;
 }
 
-export type TranscriberError = 'unsupported' | 'not-allowed';
+export type TranscriberError = 'unsupported' | 'not-allowed' | 'recognition';
 
 interface DesiredSegment {
   timeBoxIndex: number;
@@ -33,6 +36,7 @@ interface RecognitionSession {
   recognition: SpeechRecognitionLike;
   segment: SegmentKey;
   isCurrent: boolean;
+  context: TranscriptDraftContext;
 }
 
 const isSameSegment = (a: DesiredSegment, b: DesiredSegment) =>
@@ -67,7 +71,7 @@ export default function useDebateTranscriber(
 
   const desiredRef = useRef<DesiredSegment | null>(null);
   const activeRef = useRef<RecognitionSession | null>(null);
-  const hasStartedDraftRef = useRef(false);
+  const draftContextRef = useRef<TranscriptDraftContext | null>(null);
   const tableIdRef = useRef(tableId);
   const langRef = useRef(lang);
 
@@ -80,7 +84,12 @@ export default function useDebateTranscriber(
 
   const launch = useCallback(
     (segment: SegmentKey) => {
-      if (!RecognitionConstructor) {
+      const context = draftContextRef.current;
+      if (
+        !RecognitionConstructor ||
+        !context ||
+        !isTranscriptDraftCurrent(context)
+      ) {
         return;
       }
       const recognition = new RecognitionConstructor();
@@ -92,29 +101,33 @@ export default function useDebateTranscriber(
         recognition,
         segment,
         isCurrent: true,
+        context,
       };
 
       recognition.onresult = (event: SpeechRecognitionEventLike) => {
+        if (!isTranscriptDraftCurrent(session.context)) {
+          return;
+        }
         Array.from(event.results)
           .slice(event.resultIndex)
           .filter((result) => result.isFinal)
           .map((result) => result[0].transcript)
           .filter((text) => text.trim() !== '')
           .forEach((text) => {
-            appendUtterance(
-              tableIdRef.current,
-              session.segment,
-              text,
-              Date.now(),
-            );
+            appendUtterance(session.context, session.segment, text, Date.now());
             setUtteranceCount((prev) => prev + 1);
           });
       };
 
       recognition.onerror = (event) => {
-        if (isFatalSpeechError(event.error)) {
+        if (
+          isFatalSpeechError(event.error) ||
+          !['no-speech', 'aborted'].includes(event.error)
+        ) {
           desiredRef.current = null;
-          setError('not-allowed');
+          setError(
+            isFatalSpeechError(event.error) ? 'not-allowed' : 'recognition',
+          );
           setIsEnabled(false);
         }
       };
@@ -124,7 +137,7 @@ export default function useDebateTranscriber(
           activeRef.current = null;
         }
         const desired = desiredRef.current;
-        if (!desired) {
+        if (!desired || !isTranscriptDraftCurrent(session.context)) {
           setIsListening(false);
           return;
         }
@@ -141,6 +154,10 @@ export default function useDebateTranscriber(
         recognition.start();
         setIsListening(true);
       } catch {
+        desiredRef.current = null;
+        setError('recognition');
+        setIsEnabled(false);
+        setIsListening(false);
         activeRef.current = null;
       }
     },
@@ -183,25 +200,57 @@ export default function useDebateTranscriber(
   }, []);
 
   // 페이지에서 처음 켤 때만 새 초안을 만들고, 껐다 켜면 이어서 기록한다.
-  const enable = useCallback(() => {
-    if (!isSupported) {
-      setError('unsupported');
-      return;
-    }
-    if (!hasStartedDraftRef.current) {
-      startTranscriptDraft(tableIdRef.current, Date.now());
-      hasStartedDraftRef.current = true;
-      setUtteranceCount(0);
-    }
-    setError(null);
-    setIsEnabled(true);
-  }, [isSupported]);
+  const enable = useCallback(
+    (recognitionLanguage?: string) => {
+      if (recognitionLanguage) {
+        langRef.current = recognitionLanguage;
+      }
+      if (!isSupported) {
+        setError('unsupported');
+        return;
+      }
+      if (
+        !draftContextRef.current ||
+        !isTranscriptDraftCurrent(draftContextRef.current)
+      ) {
+        draftContextRef.current = startTranscriptDraft(
+          tableIdRef.current,
+          Date.now(),
+        );
+        setUtteranceCount(0);
+      }
+      setError(null);
+      setIsEnabled(true);
+    },
+    [isSupported],
+  );
 
   const disable = useCallback(() => {
     setIsEnabled(false);
   }, []);
 
+  const discard = useCallback(() => {
+    desiredRef.current = null;
+    const active = activeRef.current;
+    activeRef.current = null;
+    if (active) {
+      active.recognition.onresult = null;
+      active.recognition.onend = null;
+      active.recognition.onerror = null;
+      active.recognition.abort();
+    }
+    if (draftContextRef.current) {
+      clearTranscriptDraft(draftContextRef.current);
+    }
+    draftContextRef.current = null;
+    setIsEnabled(false);
+    setIsListening(false);
+    setUtteranceCount(0);
+    setError(null);
+  }, []);
+
   return {
+    discard,
     isSupported,
     isEnabled,
     isListening,

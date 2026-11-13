@@ -75,6 +75,41 @@ describe('useAudienceShareState', () => {
     });
   };
 
+  it('통신 기반에서 추가한 ABORT를 정상 종료나 타이머 payload로 오인하지 않는다', () => {
+    setSocketState({
+      latestMessage: { eventType: 'ABORT', data: null, version: 1 },
+    });
+    const { result } = renderHook(() => useAudienceShareState(1));
+    expect(result.current.status).toBe('waiting');
+    expect(mockDisconnect).not.toHaveBeenCalled();
+  });
+
+  it('새 종료 계약은 ABORT 사유를 보존하고 연결을 정리한 뒤 SYNC를 무시한다', () => {
+    setSocketState({
+      latestMessage: { eventType: 'ABORT', data: null, version: 1 },
+    });
+    const { result, rerender } = renderHook(() =>
+      useAudienceShareState(1, { handleAbort: true }),
+    );
+    expect(result.current).toMatchObject({
+      status: 'finished',
+      terminationReason: 'ABORT',
+    });
+    expect(mockDisconnect).toHaveBeenCalled();
+    setSocketState({
+      latestMessage: {
+        eventType: 'SYNC',
+        data: { timerType: 'NORMAL', remainingTime: 10, sequence: 0 },
+        version: 2,
+      },
+    });
+    rerender();
+    expect(result.current).toMatchObject({
+      status: 'finished',
+      terminationReason: 'ABORT',
+    });
+  });
+
   it('훅 마운트와 언마운트가 소켓 connect/disconnect 수명 주기를 각각 한 번 수행한다.', () => {
     const { unmount } = renderHook(() => useAudienceShareState(1));
     expect(mockConnect).toHaveBeenCalledTimes(1);

@@ -71,6 +71,7 @@ export function useModal(options: UseModalOptions = {}) {
       return (
         <GlobalPortal.Consumer>
           <div
+            data-timer-overlay
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             onClick={handleOverlayClick}
           >

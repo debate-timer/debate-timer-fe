@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
-import type { SeverityLevel } from '@sentry/react';
+import type { Breadcrumb, Event, SeverityLevel } from '@sentry/react';
+import { maskTranscriptShareToken } from './transcriptShare';
 
 export type DebateFeature =
   | 'landing'
@@ -174,7 +175,7 @@ export function buildSentryApiErrorMetadata(
     endpoint,
     feature,
     level: resolveApiErrorLevel(status, feature),
-    pathname,
+    pathname: maskTranscriptShareToken(pathname),
   };
 }
 
@@ -230,6 +231,23 @@ export function shouldSkipSentryEvent(
   return exceptionValue === 'Script error.';
 }
 
+// 수집 허용 스크립트 경로
+// 브라우저가 주입한 스크립트나 광고 스크립트에서 난 에러는 앱 번들 경로가 아니므로 제외된다.
+// 개발 서버는 번들 경로가 달라 빌드 결과물에만 적용한다.
+export function resolveSentryAllowUrls(
+  origin: string,
+  baseUrl: string,
+  isProductionBuild: boolean,
+) {
+  if (!isProductionBuild) {
+    return undefined;
+  }
+
+  const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+
+  return [`${origin}${normalizedBaseUrl}assets/`];
+}
+
 // 컨텍스트 마스킹
 export function sanitizeSentrySearch(search: string) {
   if (!search) {
@@ -258,15 +276,80 @@ export function sanitizeSentryUrl(url?: string) {
     const isAbsoluteUrl = /^[a-z][a-z\d+\-.]*:\/\//i.test(url);
     const parsedUrl = new URL(url, window.location.origin);
     const sanitizedSearch = sanitizeSentrySearch(parsedUrl.search);
-    const sanitizedPath = `${parsedUrl.pathname}${sanitizedSearch}${parsedUrl.hash}`;
+    const sanitizedPath = `${maskTranscriptShareToken(parsedUrl.pathname)}${sanitizedSearch}${parsedUrl.hash}`;
 
     return isAbsoluteUrl
       ? `${parsedUrl.origin}${sanitizedPath}`
       : sanitizedPath;
   } catch {
     const [pathname, search = ''] = url.split('?');
-    return `${pathname}${sanitizeSentrySearch(search ? `?${search}` : '')}`;
+    return `${maskTranscriptShareToken(pathname)}${sanitizeSentrySearch(search ? `?${search}` : '')}`;
   }
+}
+
+type SentryRequest = NonNullable<Event['request']>;
+
+// breadcrumb 주소 필드: 라우트 이동(from·to)과 fetch·xhr 요청(url)
+const BREADCRUMB_URL_KEYS = ['url', 'from', 'to'];
+
+// 공유 링크 토큰 마스킹: 라우트 이동과 API 요청 breadcrumb에 토큰이 담김
+export function sanitizeSentryBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
+  const sanitized: Breadcrumb = { ...breadcrumb };
+
+  if (typeof sanitized.message === 'string') {
+    sanitized.message = maskTranscriptShareToken(sanitized.message);
+  }
+  if (sanitized.data) {
+    sanitized.data = Object.fromEntries(
+      Object.entries(sanitized.data).map(([key, value]) => [
+        key,
+        BREADCRUMB_URL_KEYS.includes(key) && typeof value === 'string'
+          ? maskTranscriptShareToken(value)
+          : value,
+      ]),
+    );
+  }
+
+  return sanitized;
+}
+
+// 공유 링크 토큰 마스킹: 성능 추적이 현재 경로를 transaction 이름으로 씀
+export function sanitizeSentryEvent<T extends Event>(event: T): T {
+  const sanitized: T = { ...event };
+
+  if (sanitized.transaction) {
+    sanitized.transaction = maskTranscriptShareToken(sanitized.transaction);
+  }
+  if (sanitized.request) {
+    sanitized.request = sanitizeSentryRequest(sanitized.request);
+  }
+
+  return sanitized;
+}
+
+// 이벤트 페이지 주소 마스킹: 브라우저 SDK가 현재 주소와 query를 그대로 담아 OAuth 인가 코드가 남음
+export function sanitizeSentryRequest(request: SentryRequest): SentryRequest {
+  const { url, query_string: query } = request;
+  const sanitized: SentryRequest = { ...request };
+
+  if (url !== undefined) {
+    sanitized.url = sanitizeSentryUrl(url);
+  }
+  if (typeof query === 'string') {
+    sanitized.query_string = sanitizeSentrySearch(query).replace(/^\?/, '');
+  } else if (Array.isArray(query)) {
+    sanitized.query_string = query.map(([key, value]): [string, string] => [
+      key,
+      isSensitiveKey(key) ? filteredValue : value,
+    ]);
+  } else if (query && typeof query === 'object') {
+    sanitized.query_string = sanitizeSentryContext(query) as Record<
+      string,
+      string
+    >;
+  }
+
+  return sanitized;
 }
 
 // 요청/응답 데이터 마스킹

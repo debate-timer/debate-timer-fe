@@ -19,6 +19,8 @@ API를 직접 호출함. 구현 형식과 테스트 규칙은
 token을 붙임. 첫 401은 `_retry`로 제한하고 재발급에 성공하면 원래 요청을 다시
 보냄. 재발급이 실패하면 인증 상태를 정리하고 홈으로 이동함.
 
+계정에 결속해야 하는 요청은 `RequestOptions.expectedMemberId`에 시작 계정을 보존함. 이 값은 Axios 내부 메타데이터이며 HTTP header·body·query로 전송하지 않음. 해당 옵션이 있는 요청은 실제 전송 전·응답 수신·401 재발급 전후에 현재 회원 ID와 토큰 존재를 확인함. 계정 변경·로그아웃 시 취소하고, 이전 요청의 재발급 결과로 새 계정 토큰을 교체하거나 인증을 정리하지 않음. 같은 계정의 토큰 재발급은 허용하며 옵션 없는 기존 API의 재발급 동작은 유지함.
+
 `src/apis/primitives.ts`의 `request<T>(method, endpoint, data, params)`가 Axios
 호출과 `APIError` 변환을 담당함. 도메인 함수는 `src/apis/apis/{domain}.ts`에
 있으며 공통 URL을 `src/apis/endpoints.ts`의 `ApiUrl`에서 가져옴. 성공 결과는
@@ -56,6 +58,22 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 | 데이터 소스 전환이 필요한 토론 테이블 CRUD | `getRepository()`           | API 또는 Session 구현의 공통 응답 |
 | 직접 HTTP 계약 추가                        | `src/apis/apis/{domain}.ts` | 성공 body 또는 `APIError`         |
 
+## 회원 설정과 공개 투표
+
+회원 설정은 `GET/PATCH /api/member/settings`를 사용함. `getMemberSettings()`·`patchMemberSettings()`가 기존 HTTP 경계를 재사용하며, 응답은 `language: 'ko' | 'en' | null`·`volume: number`임. 부분 수정은 최소 한 필드가 필요하고 생략 필드는 전송하지 않음. 음량의 범위 검사·소수 1자리 반올림은 서버가 수행하며 FE API는 정규화된 최종 응답을 반환함.
+
+설정 API는 호출 시점에 로그인 계정을 확인하고 `expectedMemberId`로 HTTP 요청·재시도·응답까지 결속함. 훅의 진입 검사와 캐시 키 분리만으로 전송 계정의 일치를 보장하지 않음. 계정 변경에 따른 취소는 호출자에게 취소 오류로 전달하고 서버 오류로 변환하지 않음.
+
+`useGetMemberSettings(memberId)`는 `['MemberSettings', memberId]` 키로 계정별 캐시를 분리함. 회원 ID는 캐시 식별자이며 HTTP body·query로 보내지 않음. 현재 access token과 일치하는 회원 ID가 있어야 조회하며, 수동 재시도도 같은 인증 조건을 검사함. 자동 재시도·재마운트·포커스·재연결·주기 재조회를 끄고 `staleTime`·`gcTime`은 `Infinity`로 설정함.
+
+`usePatchMemberSettings(memberId)`는 요청 시작 계정을 보존함. 성공 시 해당 계정의 진행 중 조회를 취소해 지연 조회가 최종 저장값을 되돌리지 못하게 하고, 여전히 같은 계정으로 로그인한 경우에만 전체 최종 응답을 캐시에 반영함. 같은 계정의 토큰 재발급은 허용함. 실패 시 기존 캐시를 유지하고 두 훅 모두 `throwOnError: false`로 지역 복구 상태를 제공함.
+
+설정 훅은 공용 전역 설정 계층에서 사용함. 적용값·저장 지연·순서·계정별 조회 취소와 캐시 제거는 해당 계층이 소유함. 비회원 값이나 조회 실패의 기본값을 서버에 자동 저장하지 않음.
+
+공개 `GET /api/polls/{pollId}/votes`의 `GetVoterPollInfoResponseType`은 `tableInfo: { name: string; agenda: string }`를 포함함. `id`는 투표 ID이며 시간표 ID가 아님. 공개 응답에는 `voterNames`가 없고 사회자 조회의 이름 목록은 유지함. FE는 숫자 투표 ID를 인코딩해 URL 문자열로 전송하며 기존 `['VoterPoll', pollId]` 키를 유지함.
+
+회원 설정 MSW 핸들러는 모의 인증 토큰별로 저장 상태를 분리하며 `resetMemberSettings()`로 초기화함. 토큰 문자열은 개발·테스트용 계정 구분자임. 실제 서버의 토큰 검증·계정 저장 구현을 모방하는 계약은 아님. `setup.ts`가 각 테스트 뒤 상태를 초기화하고, 공개 투표의 진행·종료·빈 정보·오류는 테스트별 핸들러로 검증함.
+
 ## Repository와 MSW
 
 `src/repositories/DebateTableRepository.ts`가 토론 테이블 CRUD 계약과
@@ -74,3 +92,15 @@ STT 모드(`RPC`·`SONIOX`)와 Soniox 전사를 기다리는 구간을 함께 �
 
 API 실패의 사용자 복구와 Sentry 수집은 [오류와 관측](errors-observability.md)이
 소유함.
+
+## MP-02 저장 수명
+
+공용 설정 계층이 500ms 대기·조작 완료 저장·직렬 PATCH를 소유함. 직접 변경한 필드만 저장하고 실패한 변경은 다음 직접 변경 때 최신값과 합쳐 다시 저장함. 자동 반복 재시도는 하지 않음. 일반 로그아웃 직전에는 진행 중·미저장 필드를 합쳐 도메인 API로 즉시 발행하고 응답을 기다리지 않음. 이 발행은 직렬 큐를 기다리지 않으므로 최종 저장·서버 완료 순서를 보장하지 않으며 계정 결속 검사는 유지함. 설정 상태 UI·재시도 버튼·설정으로 인한 beforeunload 차단은 제공하지 않음. 인증 revision을 내부 요청 메타데이터로 함께 확인해 A→B→A의 이전 응답도 배제함. 브라우저 키는 guest-settings-language·timer-volume이며 회원 설정을 복제하지 않음.
+
+## MP-03 초안과 계정 결속
+
+초안은 테이블별 키 안에 `memberId`·`draftId`를 보존함. `startTranscriptDraft`가 반환한 `TranscriptDraftContext`는 계정·테이블·초안·인증 revision을 결합함. RPC·Soniox·제출 응답은 시작 문맥을 전달해 삭제·교체·계정 변경 뒤의 결과를 무시함. 소유 정보 없는 과거 초안은 자동 승계·제출하지 않음. 서버에 제출된 기록을 폐기하는 API는 추가하지 않음.
+
+STT·기록 제출 API는 선택적인 `expectedMemberId`·`expectedAuthRevision`을 기존 HTTP 경계에 전달함. 실제 기록·제출 훅은 시작 계정을 결속하고 이전 계정의 요청이 새 인증으로 전송·재시도되지 않게 함. 제출 성공 뒤의 초안 정리와 제출 ID 보관도 시작 문맥을 검사함. 일반 종료 후 전사 결과 반영은 유지하고 폐기된 초안은 지연 결과로 재생성하지 않음.
+
+명시적 공유의 토큰 Query는 테이블·계정·인증 revision으로 분리함. 기존 화면 어댑터는 종전 Query 키를 유지함. 연결 종료는 해당 테이블의 토큰 키 하위 항목까지 제거함. 토큰 조회 실패는 지역 오류로 처리함. 호출 흐름과 페이지 연결 경계는 [구조와 UI](structure-and-ui.md#토론-제어의-mp-04-연결-계약)를 따름.

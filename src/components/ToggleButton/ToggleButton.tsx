@@ -1,0 +1,60 @@
+import { ButtonHTMLAttributes } from 'react';
+import clsx from 'clsx';
+
+interface ToggleButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'onChange' | 'aria-pressed' | 'children'
+> {
+  'aria-label': string;
+  isPressed: boolean;
+  onPressedChange: (nextValue: boolean) => void;
+}
+
+const BUTTON_CLASS =
+  'inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:cursor-not-allowed';
+const TRACK_CLASS =
+  'flex h-7 w-12 items-center rounded-full border border-neutral-500 p-0.5 transition-colors motion-reduce:transition-none';
+const THUMB_CLASS =
+  'size-5 rounded-full bg-white shadow-sm ring-1 ring-neutral-500 transition-transform motion-reduce:transition-none';
+
+/** 호출자가 상태를 확정하고 조작 시 다음 값만 전달하는 공용 토글임. */
+export default function ToggleButton(props: ToggleButtonProps) {
+  const {
+    isPressed,
+    onPressedChange,
+    disabled,
+    className,
+    onClick,
+    type = 'button',
+    ...rest
+  } = props;
+  return (
+    <button
+      {...rest}
+      type={type}
+      disabled={disabled}
+      aria-pressed={isPressed}
+      className={clsx(BUTTON_CLASS, className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) {
+          onPressedChange(!isPressed);
+        }
+      }}
+    >
+      <span
+        aria-hidden="true"
+        className={clsx(
+          TRACK_CLASS,
+          disabled
+            ? 'bg-neutral-200 opacity-50'
+            : isPressed
+              ? 'bg-brand hover:bg-brand-hover'
+              : 'bg-neutral-300 hover:bg-neutral-400',
+        )}
+      >
+        <span className={clsx(THUMB_CLASS, isPressed && 'translate-x-5')} />
+      </span>
+    </button>
+  );
+}

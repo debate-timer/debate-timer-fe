@@ -1,8 +1,10 @@
 import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../../apis/endpoints';
 import {
+  GetSharedTranscriptResponseType,
   GetTranscriptResponseType,
   GetTranscriptsResponseType,
+  PostTranscriptShareResponseType,
 } from '../../apis/responses/transcript';
 
 const mockTranscript: GetTranscriptResponseType = {
@@ -89,6 +91,7 @@ const mockTranscript: GetTranscriptResponseType = {
     },
   },
   errorMessage: null,
+  shareToken: null,
 };
 
 const mockTranscripts: GetTranscriptsResponseType = {
@@ -133,5 +136,33 @@ export const transcriptHandlers = [
       ...mockTranscript,
       id: Number(params.transcriptId),
     });
+  }),
+
+  // POST /api/transcripts/{transcriptId}/share
+  http.post(ApiUrl.transcript + '/:transcriptId/share', () => {
+    const response: PostTranscriptShareResponseType = {
+      shareToken: 'mock-share-token',
+    };
+    return HttpResponse.json(response);
+  }),
+
+  // DELETE /api/transcripts/{transcriptId}/share
+  http.delete(ApiUrl.transcript + '/:transcriptId/share', () => {
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  // GET /api/shared-transcripts/{shareToken}
+  http.get(ApiUrl.sharedTranscript + '/:shareToken', () => {
+    const response: GetSharedTranscriptResponseType = {
+      tableName: mockTranscript.tableName,
+      agenda: mockTranscript.agenda,
+      prosTeamName: mockTranscript.prosTeamName,
+      consTeamName: mockTranscript.consTeamName,
+      status: mockTranscript.status,
+      refining: mockTranscript.refining,
+      lines: mockTranscript.lines,
+      report: mockTranscript.report,
+    };
+    return HttpResponse.json(response);
   }),
 ];

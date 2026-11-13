@@ -1,9 +1,54 @@
 import * as Sentry from '@sentry/react';
-import { setAccessToken } from '../../util/accessToken';
+import {
+  getAuthRevision,
+  getMemberId,
+  setAccessToken,
+} from '../../util/accessToken';
+import { assertMemberSettingsAccount } from '../../util/memberSettingsAccount';
 import { ApiUrl } from '../endpoints';
 import { request } from '../primitives';
-import { GetDebateTableListResponseType } from '../responses/member';
-import { PostUserResponseType } from '../responses/member';
+import {
+  GetDebateTableListResponseType,
+  GetMemberFeatureFlagsResponseType,
+  GetMemberSettingsResponseType,
+  PatchMemberSettingsResponseType,
+  PostUserResponseType,
+} from '../responses/member';
+import { PatchMemberSettingsRequestType } from '../requests/member';
+
+// GET /api/member/settings
+export async function getMemberSettings(): Promise<GetMemberSettingsResponseType> {
+  const identity = assertMemberSettingsAccount(getMemberId());
+  const response = await request<GetMemberSettingsResponseType>(
+    'GET',
+    ApiUrl.memberSettings,
+    null,
+    null,
+    {
+      expectedMemberId: identity.memberId,
+      expectedAuthRevision: getAuthRevision(),
+    },
+  );
+  return response.data;
+}
+
+// PATCH /api/member/settings
+export async function patchMemberSettings(
+  settings: PatchMemberSettingsRequestType,
+): Promise<PatchMemberSettingsResponseType> {
+  const identity = assertMemberSettingsAccount(getMemberId());
+  const response = await request<PatchMemberSettingsResponseType>(
+    'PATCH',
+    ApiUrl.memberSettings,
+    settings,
+    null,
+    {
+      expectedMemberId: identity.memberId,
+      expectedAuthRevision: getAuthRevision(),
+    },
+  );
+  return response.data;
+}
 
 // Template
 /*
@@ -64,7 +109,23 @@ export async function getDebateTableList(): Promise<GetDebateTableListResponseTy
 // POST /api/member/logout
 export async function logout(): Promise<boolean> {
   const requestUrl: string = ApiUrl.member;
-  const response = await request('POST', requestUrl + `/logout`, null, null);
+  const response = await request('POST', requestUrl + `/logout`, null, null, {
+    expectedMemberId: getMemberId() ?? undefined,
+    expectedAuthRevision: getAuthRevision(),
+  });
 
   return response.status === 204 ? true : false;
+}
+
+// GET /api/member/feature-flags
+export async function getMemberFeatureFlags(): Promise<GetMemberFeatureFlagsResponseType> {
+  const requestUrl = `${ApiUrl.member}/feature-flags`;
+  const response = await request<GetMemberFeatureFlagsResponseType>(
+    'GET',
+    requestUrl,
+    null,
+    null,
+  );
+
+  return response.data;
 }
