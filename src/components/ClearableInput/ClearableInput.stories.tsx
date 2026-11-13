@@ -41,7 +41,15 @@ export const Default: Story = {};
 export const Empty: Story = { args: { value: '' } };
 export const Disabled: Story = { args: { disabled: true } };
 export const WithoutClear: Story = {
-  render: (args) => <ClearableInput {...args} />,
+  render: function Render(args) {
+    const [, updateArgs] = useArgs();
+    return (
+      <ClearableInput
+        {...args}
+        onChange={(event) => updateArgs({ value: event.target.value })}
+      />
+    );
+  },
 };
 export const ErrorBorder: Story = { args: { isError: true } };
 export const WithCounter: Story = { args: { maxCount: 20 } };

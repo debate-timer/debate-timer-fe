@@ -129,7 +129,7 @@ export default function Table({
         </DialogModal>
       </ModalWrapper>
 
-      <TableShareModal />
+      {TableShareModal()}
     </>
   );
 }

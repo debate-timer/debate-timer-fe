@@ -146,7 +146,11 @@ export default function DropdownMenu<T>(props: DropdownMenuProps<T>) {
         ref={buttonRef}
         id={`${id}-trigger`}
         type="button"
-        aria-label={ariaLabel ?? selectedOptionLabel}
+        aria-label={
+          ariaLabel
+            ? `${ariaLabel}, ${selectedOptionLabel}`
+            : selectedOptionLabel
+        }
         aria-haspopup="listbox"
         aria-controls={isOpen ? `${id}-listbox` : undefined}
         aria-expanded={isOpen}

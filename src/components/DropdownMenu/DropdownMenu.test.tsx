@@ -105,4 +105,18 @@ describe('드롭다운 선택', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(onSelect).not.toHaveBeenCalled();
   });
+
+  it('aria-label이 전달되면 입력 목적과 현재 선택값을 함께 접근성 이름으로 제공한다', () => {
+    render(
+      <DropdownMenu
+        options={OPTIONS}
+        selectedValue="b"
+        onSelect={vi.fn()}
+        aria-label="발언 유형"
+      />,
+    );
+    expect(
+      screen.getByRole('button', { name: '발언 유형, 반론' }),
+    ).toBeInTheDocument();
+  });
 });

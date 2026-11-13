@@ -54,7 +54,7 @@ export default function ToggleButton(props: ToggleButtonProps) {
           isPressed ? 'border-0 p-1' : 'border-2 border-neutral-400 p-0.5',
           disabled
             ? isPressed
-              ? 'bg-neutral-200 opacity-50'
+              ? 'bg-neutral-400 opacity-50'
               : 'bg-neutral-100 opacity-50'
             : isPressed
               ? 'bg-brand hover:bg-brand-hover'

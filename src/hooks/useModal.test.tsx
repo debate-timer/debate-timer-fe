@@ -277,6 +277,35 @@ describe('useModal Hook 테스트', () => {
     expect(inputAfterRerender).toBe(inputBeforeRerender);
     expect(inputAfterRerender).toHaveValue('입력값');
   });
+
+  it('열린 모달 내부 자식이 교체되어 포커스된 요소가 사라지면 새 첫 요소로 포커스를 옮긴다', async () => {
+    const user = userEvent.setup();
+    function StepModal() {
+      const [isConfirmed, setIsConfirmed] = useState(false);
+      const { openModal, ModalWrapper } = useModal();
+      return (
+        <GlobalPortal.Provider>
+          <button onClick={openModal}>열기</button>
+          <ModalWrapper showCloseButton={isConfirmed}>
+            {isConfirmed ? (
+              <section key="result">
+                <button>결과 확인</button>
+              </section>
+            ) : (
+              <div key="confirm">
+                <button onClick={() => setIsConfirmed(true)}>네</button>
+              </div>
+            )}
+          </ModalWrapper>
+        </GlobalPortal.Provider>
+      );
+    }
+
+    render(<StepModal />);
+    await user.click(screen.getByRole('button', { name: '열기' }));
+    await user.click(screen.getByRole('button', { name: '네' }));
+    expect(screen.getByRole('button', { name: '모달 닫기' })).toHaveFocus();
+  });
 });
 
 function NestedModals() {

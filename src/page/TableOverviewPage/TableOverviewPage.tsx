@@ -242,7 +242,7 @@ export default function TableOverviewPage() {
         </DefaultLayout.StickyFooterWrapper>
       </DefaultLayout>
 
-      <TableShareModal />
+      {TableShareModal()}
       <ModalWrapper>
         <TeamSelectionModal
           onClose={closeModal}

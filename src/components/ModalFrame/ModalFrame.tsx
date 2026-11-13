@@ -139,6 +139,16 @@ export default function ModalFrame(props: ModalFrameProps) {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) {
+      return;
+    }
+    if (!panel.contains(document.activeElement)) {
+      (getFocusableElements(panel)[0] ?? panel).focus();
+    }
+  });
+
   return (
     <div
       data-timer-overlay
@@ -164,7 +174,7 @@ export default function ModalFrame(props: ModalFrameProps) {
         }
         aria-labelledby={hasDialogContent ? undefined : labelledBy}
         aria-describedby={hasDialogContent ? undefined : describedBy}
-        className="relative overflow-hidden rounded-[20px] bg-white shadow-lg outline-none"
+        className="relative max-h-[calc(100dvh-2rem)] overflow-x-hidden overflow-y-auto rounded-[20px] bg-white shadow-lg outline-none"
       >
         {showCloseButton && (
           <div className="flex justify-end px-3 pt-3">
