@@ -41,6 +41,8 @@ export function startTurnRecording(
   });
   const meter = startRecordingQualityMeter(stream);
   const startedAt = Date.now();
+  // 시스템 시각 보정에 흔들리지 않도록 녹음 길이는 단조 시계로 잰다.
+  const startedAtMonotonic = performance.now();
   const chunks: Blob[] = [];
 
   recorder.ondataavailable = (event) => {
@@ -50,7 +52,7 @@ export function startTurnRecording(
   };
   recorder.onstop = () => {
     const metrics = meter.stop();
-    const durationMs = Date.now() - startedAt;
+    const durationMs = performance.now() - startedAtMonotonic;
     const type = recorder.mimeType || mimeType || 'audio/webm';
     const audio = new Blob(chunks, { type });
     if (audio.size === 0 || durationMs < MIN_TURN_DURATION_MS) {
@@ -65,7 +67,12 @@ export function startTurnRecording(
       metrics,
     });
   };
-  recorder.start();
+  try {
+    recorder.start();
+  } catch (error) {
+    meter.stop();
+    throw error;
+  }
 
   return {
     stop: () => {

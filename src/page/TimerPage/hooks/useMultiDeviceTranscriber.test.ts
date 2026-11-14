@@ -34,7 +34,7 @@ class FakeMediaRecorder {
   });
   stop = vi.fn(() => {
     this.state = 'inactive';
-    vi.setSystemTime(Date.now() + 2_000);
+    vi.advanceTimersByTime(2_000);
     this.ondataavailable?.({
       data: new Blob(['audio'], { type: this.mimeType }),
     });
@@ -85,7 +85,7 @@ describe('다기기 녹음 사회자 훅', () => {
     sessionStorage.clear();
     segmentVersion = 500;
     FakeMediaRecorder.instances = [];
-    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.useFakeTimers({ toFake: ['Date', 'performance'] });
     vi.setSystemTime(1_000);
     vi.mocked(postRecordingSessionV2).mockReset().mockResolvedValue({
       sessionKey: 'session-1',

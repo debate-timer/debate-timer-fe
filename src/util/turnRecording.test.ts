@@ -101,4 +101,47 @@ describe('구간 녹음', () => {
     expect(FakeMediaRecorder.instances[0].state).toBe('inactive');
     expect(onFinish).not.toHaveBeenCalled();
   });
+
+  it('녹음 중 시스템 시각이 바뀌어도 녹음 길이는 실제 경과 시간이다', () => {
+    const onFinish = vi.fn<(turn: RecordedTurn | null) => void>();
+    const recording = startTurnRecording(stream, onFinish);
+    vi.advanceTimersByTime(5_000);
+    vi.setSystemTime(Date.now() - 60_000);
+
+    recording.stop();
+
+    expect(onFinish.mock.calls[0][0]?.durationMs).toBe(5_000);
+  });
+
+  it('녹음기를 시작하지 못하면 품질 측정을 정리하고 예외를 그대로 던진다', () => {
+    const close = vi.fn(async () => {});
+    vi.stubGlobal(
+      'AudioContext',
+      class {
+        resume = vi.fn(async () => {});
+        close = close;
+        createAnalyser = () => ({
+          fftSize: 0,
+          getFloatTimeDomainData: vi.fn(),
+        });
+        createMediaStreamSource = () => ({
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        });
+      },
+    );
+    const error = new DOMException('unsupported', 'NotSupportedError');
+    vi.stubGlobal(
+      'MediaRecorder',
+      class extends FakeMediaRecorder {
+        start = vi.fn(() => {
+          throw error;
+        });
+      },
+    );
+
+    expect(() => startTurnRecording(stream, vi.fn())).toThrow(error);
+    expect(close).toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });
