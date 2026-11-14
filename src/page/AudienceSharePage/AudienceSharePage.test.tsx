@@ -149,6 +149,8 @@ describe('AudienceSharePage', () => {
     mockUseAudienceShareState.mockReturnValue({
       chairmanPresence: 'present',
       connectionStatus: 'connected',
+      latestMessage: null,
+      latestMessageReceivedAt: null,
       status: 'connecting',
       error: null,
     });
@@ -208,6 +210,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'connecting',
         error: null,
       });
@@ -232,6 +236,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'waiting',
         error: null,
       });
@@ -256,10 +262,58 @@ describe('AudienceSharePage', () => {
       ).not.toBeInTheDocument();
     });
 
+    describe('다기기 녹음 참여', () => {
+      const mockWaiting = () =>
+        mockUseAudienceShareState.mockReturnValue({
+          chairmanPresence: 'present',
+          connectionStatus: 'connected',
+          latestMessage: null,
+          latestMessageReceivedAt: null,
+          status: 'waiting',
+          error: null,
+        });
+
+      beforeEach(() => {
+        vi.stubGlobal(
+          'MediaRecorder',
+          Object.assign(class {}, { isTypeSupported: () => true }),
+        );
+        vi.stubGlobal('navigator', {
+          ...navigator,
+          mediaDevices: { getUserMedia: vi.fn() },
+        });
+      });
+
+      afterEach(() => {
+        vi.unstubAllGlobals();
+      });
+
+      it('공유 링크에 녹음 참여 정보가 있으면 녹음 참여 버튼을 표시한다', async () => {
+        mockWaiting();
+        renderPage('/live/123#rec=session-1&code=join');
+
+        expect(
+          await screen.findByRole('button', { name: '녹음 참여' }),
+        ).toBeInTheDocument();
+      });
+
+      it('녹음 참여 정보가 없는 공유 링크에서는 녹음 참여를 표시하지 않는다', async () => {
+        mockWaiting();
+        renderPage('/live/123');
+
+        await screen.findByText('토론 시작을 대기 중입니다.');
+        expect(
+          screen.queryByRole('button', { name: '녹음 참여' }),
+        ).not.toBeInTheDocument();
+      });
+    });
+
     it('waiting 상태에서는 대기 중임을 알리는 아이콘을 함께 표시한다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'waiting',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'waiting',
         error: null,
       });
@@ -277,6 +331,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'waiting',
         error: null,
       });
@@ -309,6 +365,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'waiting',
         error: null,
       });
@@ -323,6 +381,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'waiting',
         error: null,
       });
@@ -339,6 +399,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -369,6 +431,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -396,6 +460,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -433,6 +499,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -469,6 +537,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -504,6 +574,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -551,6 +623,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'finished',
         error: null,
       });
@@ -598,6 +672,8 @@ describe('AudienceSharePage', () => {
         mockUseAudienceShareState.mockReturnValue({
           chairmanPresence: 'present',
           connectionStatus: 'connected',
+          latestMessage: null,
+          latestMessageReceivedAt: null,
           status: 'displaying',
           syncedAt: null,
           error: null,
@@ -637,6 +713,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -690,6 +768,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'waiting',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -706,6 +786,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -722,6 +804,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -743,6 +827,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -765,6 +851,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -820,6 +908,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -843,6 +933,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -875,6 +967,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'lost',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -901,6 +995,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'lost',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -920,6 +1016,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'lost',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -953,6 +1051,8 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
