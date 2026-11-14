@@ -5,7 +5,6 @@ import RootLayout from './RootLayout';
 vi.mock('../components/ErrorBoundary/ErrorBoundaryWrapper', () => ({
   default: () => <Outlet />,
 }));
-vi.mock('../components/BackActionHandler', () => ({ default: () => null }));
 
 describe('앱 루트 레이아웃', () => {
   afterEach(() => {

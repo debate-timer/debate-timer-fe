@@ -17,14 +17,24 @@ export default function ProtectedRoute(props: PropsWithChildren) {
   const location = useLocation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
-  const homePath = buildLangPath('/home', lang);
+  const homePath = buildLangPath('/', lang);
 
   if (!isAuthenticated) {
     setLoginTrigger({
       trigger_page: location.pathname,
       trigger_context: 'protected_route',
     });
-    return <Navigate to={homePath} state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to={homePath}
+        state={{
+          loginRequest: {
+            path: `${location.pathname}${location.search}${location.hash}`,
+          },
+        }}
+        replace
+      />
+    );
   }
 
   return children;
