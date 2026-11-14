@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import {
+  getRecordingSessionV2,
   postRecordingHostDeviceV2,
   postRecordingSessionV2,
   postRecordingTurnV2,
@@ -15,6 +16,7 @@ import useMultiDeviceTranscriber, {
 // jsdom의 FormData·Blob 업로드는 MSW에서 끝나지 않아 API 함수 경계를 대체한다.
 // 요청 형식은 src/apis/apis/recordingV2*.test.ts가 MSW로 검증한다.
 vi.mock('../../../apis/apis/recordingV2', () => ({
+  getRecordingSessionV2: vi.fn(),
   postRecordingSessionV2: vi.fn(),
   postRecordingHostDeviceV2: vi.fn(),
   postRecordingTurnV2: vi.fn(),
@@ -92,6 +94,13 @@ describe('다기기 녹음 사회자 훅', () => {
       deviceToken: 'host-token',
     });
     vi.mocked(postRecordingHostDeviceV2).mockReset();
+    vi.mocked(getRecordingSessionV2).mockReset().mockResolvedValue({
+      sessionKey: 'saved',
+      status: 'RECORDING',
+      transcriptId: null,
+      errorMessage: null,
+      turns: [],
+    });
     vi.mocked(postRecordingTurnV2).mockReset().mockResolvedValue();
     getUserMedia.mockClear();
     trackStop.mockClear();
@@ -135,6 +144,28 @@ describe('다기기 녹음 사회자 훅', () => {
 
       expect(postRecordingSessionV2).not.toHaveBeenCalled();
       expect(result.current.session?.sessionKey).toBe('saved');
+    });
+
+    it('이 탭에 남은 세션이 이미 끝났으면 새 세션을 연다', async () => {
+      saveHostRecordingV2(7, {
+        sessionKey: 'saved',
+        joinCode: 'saved-join',
+        deviceToken: 'saved-token',
+      });
+      vi.mocked(getRecordingSessionV2).mockResolvedValueOnce({
+        sessionKey: 'saved',
+        status: 'COMPLETED',
+        transcriptId: 3,
+        errorMessage: null,
+        turns: [],
+      });
+      const { result } = render();
+
+      await act(() => result.current.enable());
+
+      expect(postRecordingSessionV2).toHaveBeenCalledTimes(1);
+      expect(result.current.session?.sessionKey).toBe('session-1');
+      expect(getHostRecordingV2(7)?.sessionKey).toBe('session-1');
     });
 
     it('마이크 권한이 없으면 세션을 열지 않고 권한 오류를 알린다', async () => {

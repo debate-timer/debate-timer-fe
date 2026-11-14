@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  getRecordingSessionV2,
   postRecordingHostDeviceV2,
   postRecordingSessionV2,
 } from '../../../apis/apis/recordingV2';
@@ -40,7 +41,7 @@ interface ActiveTurn {
 }
 
 /**
- * 다기기 녹음 V2의 사회자 기기 녹음. 켜면 녹음 세션을 열고(이미 열었으면 이어서 씀),
+ * 다기기 녹음 V2의 사회자 기기 녹음. 켜면 녹음 세션을 열고(이 탭에서 연 세션이 아직 녹음 중이면 이어서 씀),
  * 타이머가 실행되는 동안 발언 구간마다 녹음해 끝날 때 턴으로 올린다.
  * 전사·속기록 생성은 서버가 하므로 이 기기는 초안을 만들지 않는다.
  * 턴 키는 청중 기기와 맞추려고 구간을 시작한 공유 이벤트의 version을 쓴다.
@@ -231,7 +232,10 @@ export default function useMultiDeviceTranscriber(
           }
           streamRef.current = stream;
         }
-        let host = getHostRecordingV2(tableIdRef.current);
+        let host = await findRecordingHost(tableIdRef.current);
+        if (!isCurrent()) {
+          return;
+        }
         if (!host) {
           host = await postRecordingSessionV2({
             tableId: tableIdRef.current,
@@ -299,6 +303,22 @@ export default function useMultiDeviceTranscriber(
     disable,
     discard,
   };
+}
+
+// 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다. 이전 토론에서 끝낸 세션이면 지운다.
+async function findRecordingHost(tableId: number) {
+  const host = getHostRecordingV2(tableId);
+  if (!host) {
+    return null;
+  }
+  const session = await getRecordingSessionV2(host.sessionKey).catch(
+    () => null,
+  );
+  if (session?.status === 'RECORDING') {
+    return host;
+  }
+  clearHostRecordingV2(tableId);
+  return null;
 }
 
 function toJoin(
