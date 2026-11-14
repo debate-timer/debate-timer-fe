@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import { useGetTranscripts } from '../../../hooks/query/useGetTranscripts';
-import { TranscriptSummary } from '../../../apis/responses/transcript';
-import LoadingIndicator from '../../../components/LoadingIndicator/LoadingIndicator';
-import ErrorIndicator from '../../../components/ErrorIndicator/ErrorIndicator';
+import { useGetTranscripts } from '../../hooks/query/useGetTranscripts';
+import { TranscriptSummary } from '../../apis/responses/transcript';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import {
   buildLangPath,
   DEFAULT_LANG,
   isSupportedLang,
-} from '../../../util/languageRouting';
+} from '../../util/languageRouting';
 
 // 노란 시간표 카드와 구분되도록 기본블랙(차콜) 카드에 테마 노랑으로 강조한다.
 const CARD_CLASS =
@@ -33,7 +33,7 @@ function isGenerating(transcript: TranscriptSummary): boolean {
   return transcript.refining || transcript.status === 'PROCESSING';
 }
 
-// 대시보드 토론 기록 탭. 서버가 준 최근 생성순으로 보여준다.
+// 별도 토론 기록 목록. 서버가 준 최근 생성순으로 보여준다.
 export default function TranscriptListContent() {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
