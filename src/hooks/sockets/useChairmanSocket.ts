@@ -124,6 +124,8 @@ export default function useChairmanSocket(
 
   // 마지막으로 발행한 이벤트의 version
   const versionRef = useRef(0);
+  // 청중에게 보낸 마지막 타이머 전환 이벤트(SYNC 제외)의 version. 다기기 녹음의 턴 키로 쓴다.
+  const lastTransitionVersionRef = useRef<number | null>(null);
 
   // 사용자가 공유를 시작했는지 여부 (탭 복귀 시 자동 재연결 여부를 가른다)
   const hasStartedSharingRef = useRef(false);
@@ -323,12 +325,26 @@ export default function useChairmanSocket(
       }
 
       versionRef.current = version;
-      return publish(destination, body, {
+      const isPublished = publish(destination, body, {
         Authorization: authToken,
         [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current,
       });
+      if (isPublished && isTimerEventType(eventType) && eventType !== 'SYNC') {
+        lastTransitionVersionRef.current = version;
+      }
+      return isPublished;
     },
     [roomId, publish, isReplaced],
+  );
+
+  /**
+   * 청중이 받은 마지막 타이머 전환 이벤트(재생·정지·이동·팀 전환 등, SYNC 제외)의 version.
+   * 청중 기기는 구간을 시작한 이벤트의 version으로 턴 키를 만들므로, 사회자 기기도 같은 값을 쓴다.
+   * 아직 보낸 적이 없으면 null이다.
+   */
+  const getLastTransitionVersion = useCallback(
+    () => lastTransitionVersionRef.current,
+    [],
   );
 
   return {
@@ -337,6 +353,7 @@ export default function useChairmanSocket(
     connect: connectChairmanSocket,
     disconnect: disconnectChairmanSocket,
     sendDebateEvent,
+    getLastTransitionVersion,
     isConnected,
     isReplaced,
     error,
