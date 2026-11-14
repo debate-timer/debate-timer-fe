@@ -133,4 +133,85 @@ describe('다기기 녹음 속기록 대기 훅', () => {
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(result.current.transcriptId).toBe(42);
   });
+
+  it('속기록 ID 없이 끝났다는 응답이 오면 계속 조회하고, 오래 이어지면 오류로 알린다', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    saveHostRecordingV2(5, {
+      sessionKey: 'session-1',
+      joinCode: 'join',
+      deviceToken: 'token',
+    });
+    const poll = vi.fn();
+    server.use(
+      http.post(
+        `${ApiUrl.recordingV2}/:sessionKey/finish`,
+        () => new HttpResponse(null, { status: 202 }),
+      ),
+      http.get(`${ApiUrl.recordingV2}/:sessionKey`, () => {
+        poll();
+        return HttpResponse.json(sessionResponse('COMPLETED'));
+      }),
+    );
+
+    try {
+      const { result } = renderHook(() => useMultiDeviceTranscriptResult(5), {
+        wrapper: createWrapper(),
+      });
+      await waitFor(() => expect(poll).toHaveBeenCalledTimes(2), {
+        timeout: 5000,
+      });
+      expect(result.current.status).toBe('transcribing');
+
+      await vi.advanceTimersByTimeAsync(40_000);
+
+      await waitFor(() => expect(result.current.status).toBe('error'));
+      const polls = poll.mock.calls.length;
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(poll).toHaveBeenCalledTimes(polls);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('테이블이 바뀌면 그 테이블의 녹음 세션을 끝내고, 이전 세션 결과를 쓰지 않는다', async () => {
+    saveHostRecordingV2(5, {
+      sessionKey: 'session-1',
+      joinCode: 'join',
+      deviceToken: 'token',
+    });
+    saveHostRecordingV2(6, {
+      sessionKey: 'session-2',
+      joinCode: 'join',
+      deviceToken: 'token',
+    });
+    const finish = vi.fn();
+    server.use(
+      http.post(`${ApiUrl.recordingV2}/:sessionKey/finish`, ({ params }) => {
+        finish(params.sessionKey);
+        return new HttpResponse(null, { status: 202 });
+      }),
+      http.get(`${ApiUrl.recordingV2}/:sessionKey`, ({ params }) =>
+        HttpResponse.json(
+          params.sessionKey === 'session-1'
+            ? sessionResponse('COMPLETED', 41)
+            : sessionResponse('FINISHING'),
+        ),
+      ),
+    );
+
+    const { result, rerender } = renderHook(
+      ({ tableId }: { tableId: number }) =>
+        useMultiDeviceTranscriptResult(tableId),
+      { wrapper: createWrapper(), initialProps: { tableId: 5 } },
+    );
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+
+    rerender({ tableId: 6 });
+
+    expect(result.current.status).toBe('transcribing');
+    expect(result.current.transcriptId).toBeNull();
+    await waitFor(() =>
+      expect(finish.mock.calls).toEqual([['session-1'], ['session-2']]),
+    );
+  });
 });
