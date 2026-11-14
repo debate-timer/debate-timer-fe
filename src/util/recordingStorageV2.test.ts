@@ -62,4 +62,27 @@ describe('다기기 녹음 세션 보관', () => {
     expect(getAudienceDeviceTokenV2('session-1')).toBe('token');
     expect(getAudienceDeviceTokenV2('session-2')).toBeNull();
   });
+
+  it('저장소에 쓰지 못하면 이번 탭 메모리에서 읽는다', () => {
+    const setItem = vi
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('QuotaExceededError');
+      });
+    const host = {
+      sessionKey: 'session-1',
+      joinCode: 'join',
+      deviceToken: 'token',
+    };
+
+    saveHostRecordingV2(7, host);
+    saveAudienceDeviceTokenV2('session-1', 'audience-token');
+
+    expect(getHostRecordingV2(7)).toEqual(host);
+    expect(getAudienceDeviceTokenV2('session-1')).toBe('audience-token');
+
+    clearHostRecordingV2(7);
+    expect(getHostRecordingV2(7)).toBeNull();
+    setItem.mockRestore();
+  });
 });
