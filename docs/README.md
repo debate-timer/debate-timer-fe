@@ -12,13 +12,13 @@
 
 ### 정책·도메인 위키
 
-[위키](wiki/README.md)는 기능의 목적·개념·관계·제품 정책과 사용 예시를 연결함. 기능 문서는 `docs/wiki/feature/{기능}.md`에 작성함. 현재 기능 목록은 위키 안내에서 찾으며, 타이머 진행과 [전역 설정](wiki/feature/settings.md)의 정책·근거·현재 구현 차이를 문서화했음. 전역 설정에는 MP-02에서 확정한 보완 정책과 일반 화면 연결·후속 작업 경계를 구분했음. [토론 메뉴와 진행 수명](wiki/feature/debate-controls.md)은 MP-03의 승인된 중단·초안 폐기 정책과 MP-04 연결 경계를 소유함.
+[위키](wiki/README.md)는 기능의 목적·개념·관계·제품 정책과 사용 예시를 연결함. 기능 문서는 `docs/wiki/feature/{기능}.md`에 작성함. 현재 기능 목록은 위키 안내에서 찾으며, 타이머 진행과 [전역 설정](wiki/feature/settings.md)의 정책·근거·현재 구현 차이를 문서화했음. 전역 설정에는 MP-02에서 확정한 보완 정책과 일반 화면 연결·후속 작업 경계를 구분했음. [토론 메뉴와 진행 수명](wiki/feature/debate-controls.md)은 MP-03의 승인된 중단·초안 폐기 정책과 MP-04의 실제 화면 연결 경계를 소유함. [헤더와 탐색](wiki/feature/navigation.md)은 역할별 헤더·새 경로·로그인 복귀·청중 완료 정보 정책을 소유함.
 
-| 문서 | 읽을 때 |
-| --- | --- |
-| [위키 안내](wiki/README.md) | 기능별 문서의 위치와 기존 문서와의 역할을 찾을 때 |
-| [위키 유지보수](wiki/maintenance.md) | 지식의 상태·근거·갱신 조건·불일치를 판단할 때 |
-| [기능 문서 양식](wiki/templates/feature.md) | 기능 설명·개념·정책·선택적인 사용 예시를 작성할 때 |
+| 문서                                                          | 읽을 때                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------ |
+| [위키 안내](wiki/README.md)                                   | 기능별 문서의 위치와 기존 문서와의 역할을 찾을 때      |
+| [위키 유지보수](wiki/maintenance.md)                          | 지식의 상태·근거·갱신 조건·불일치를 판단할 때          |
+| [기능 문서 양식](wiki/templates/feature.md)                   | 기능 설명·개념·정책·선택적인 사용 예시를 작성할 때     |
 | [결정 기록 기준](wiki/maintenance.md#결정-기록을-남기는-조건) | 결정의 기록 여부·PR 단위·번호·근거·대체 관계를 정할 때 |
 
 위키의 공용 작성·운영 규칙과 근거가 있는 확정 정책을 적용함. 구현에서 확인한 사실과 미확정 질문은 확정 계약으로 편입하지 않음. 정책 승인·구현 반영·배포 완료는 구분하며, 불명확한 정책을 임의로 확정하지 않음. 상태별 효력과 근거는 [위키 유지보수](wiki/maintenance.md#지식의-상태와-근거)가 소유함.
@@ -27,16 +27,16 @@
 
 ## 2. 현재 기술과 계층 지도
 
-| 영역 | 현재 기술 또는 경계 | 대표 코드 |
-| --- | --- | --- |
-| 앱 실행·UI | React 19, Vite, TypeScript strict | `src/main.tsx`, `src/page/`, `src/components/` |
-| 라우팅·언어 | React Router v7, i18next | `src/routes/routes.tsx`, `src/i18n.ts` |
-| 서버 상태·HTTP | TanStack Query 5, Axios | `src/hooks/query/`, `src/apis/primitives.ts` |
-| 실시간 통신 | STOMP, SockJS | `src/apis/sockets/`, `src/hooks/sockets/` |
-| 데이터 소스 | API·Session Repository | `src/repositories/` |
-| 스타일·애니메이션 | Tailwind CSS 4, Framer Motion | `src/components/`, `src/index.css` |
-| 오류 관측 | Sentry | `src/instrument.ts`, `src/util/sentry.ts` |
-| 테스트·Story | Vitest, Testing Library, MSW, Storybook | `setup.ts`, `src/mocks/`, `*.stories.tsx` |
+| 영역              | 현재 기술 또는 경계                     | 대표 코드                                      |
+| ----------------- | --------------------------------------- | ---------------------------------------------- |
+| 앱 실행·UI        | React 19, Vite, TypeScript strict       | `src/main.tsx`, `src/page/`, `src/components/` |
+| 라우팅·언어       | React Router v7, i18next                | `src/routes/routes.tsx`, `src/i18n.ts`         |
+| 서버 상태·HTTP    | TanStack Query 5, Axios                 | `src/hooks/query/`, `src/apis/primitives.ts`   |
+| 실시간 통신       | STOMP, SockJS                           | `src/apis/sockets/`, `src/hooks/sockets/`      |
+| 데이터 소스       | API·Session Repository                  | `src/repositories/`                            |
+| 스타일·애니메이션 | Tailwind CSS 4, Framer Motion           | `src/components/`, `src/index.css`             |
+| 오류 관측         | Sentry                                  | `src/instrument.ts`, `src/util/sentry.ts`      |
+| 테스트·Story      | Vitest, Testing Library, MSW, Storybook | `setup.ts`, `src/mocks/`, `*.stories.tsx`      |
 
 ```text
 main.tsx → Router → page → 기능 전용 UI·hooks → 공용 UI·hooks
@@ -46,6 +46,10 @@ main.tsx → Router → page → 기능 전용 UI·hooks → 공용 UI·hooks
 ```
 
 화면 조립과 기능 상태는 `page/`에서 시작함. 재사용 UI와 훅은 `components/`, `hooks/`에 있음. 공용 도메인 타입은 `src/types/`, 순수 계산·브라우저 경계는 `src/util/`에 있음. API 요청·응답 계약은 `src/apis/`의 전용 위치에 둠. 정확한 책임과 예외는 각 상세 문서가 소유함.
+
+### 문의 링크 설정
+
+선택적인 공개 문의 URL은 [`.env.example`](../.env.example)의 세 변수를 사용함. 로컬은 `.env`에, 개발·미리보기·운영은 기존 환경별 `vars.ENV`·`secrets.ENV` 또는 같은 이름의 공개 GitHub Variables에 설정함. 별도 Variables가 비어 있으면 기존 `.env` 값을 덮어쓰지 않음. Storybook 배포는 공개 Variables의 세 값만 전달함. trim 후 미설정·공백 항목과 비어 있는 문의 메뉴·영역은 숨김. 헤더와 설정 모달은 같은 공용 목록을 사용함.
 
 ### 실행 환경 설정
 
@@ -57,30 +61,30 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은 [workflow](../.git
 
 ## 3. 아키텍처 상세 계약
 
-| 문서 | 읽을 때 |
-| --- | --- |
-| [구조와 UI](architecture/structure-and-ui.md) | 화면·공용 UI·훅·타입·유틸의 책임과 상태 소유권을 정할 때 |
-| [앱·라우팅·국제화](architecture/app-routing-i18n.md) | 앱 초기화, Provider, 경로, 인증, 언어 동기화를 바꿀 때 |
-| [데이터 접근](architecture/data-access.md) | Axios, 도메인 API, Query·Mutation, Repository, MSW, 회원 설정의 null 유지 정책·공개 투표의 시간표 ID·주제 정규화를 바꿀 때 |
-| [실시간 통신](architecture/realtime.md) | 소켓 연결·구독·검증·재연결·동기화와 ABORT 기본 통신·후속 연동 경계를 바꿀 때 |
-| [오류와 관측](architecture/errors-observability.md) | 지역 복구, ErrorBoundary, Sentry 수집·마스킹을 바꿀 때 |
+| 문서                                                 | 읽을 때                                                                                                                    |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| [구조와 UI](architecture/structure-and-ui.md)        | 화면·공용 UI·훅·타입·유틸의 책임과 상태 소유권을 정할 때                                                                   |
+| [앱·라우팅·국제화](architecture/app-routing-i18n.md) | 앱 초기화, Provider, 경로, 인증, 언어 동기화를 바꿀 때                                                                     |
+| [데이터 접근](architecture/data-access.md)           | Axios, 도메인 API, Query·Mutation, Repository, MSW, 회원 설정의 null 유지 정책·공개 투표의 시간표 ID·주제 정규화를 바꿀 때 |
+| [실시간 통신](architecture/realtime.md)              | 소켓 연결·구독·검증·재연결·동기화와 ABORT 기본 통신·후속 연동 경계를 바꿀 때                                               |
+| [오류와 관측](architecture/errors-observability.md)  | 지역 복구, ErrorBoundary, Sentry 수집·마스킹을 바꿀 때                                                                     |
 
 ## 4. 코드와 문서 컨벤션
 
-| 문서 | 소유하는 규칙 |
-| --- | --- |
-| [문서 작성](conventions/docs.md) | Markdown 형식, 길이, 문체, 중복, 링크·갱신 |
-| [TypeScript·구조](conventions/typescript-and-structure.md) | 이름·선언·타입·파일 배치·주석 |
-| [React·UI](conventions/react-and-ui.md) | 컴포넌트·Props·훅·effect·스타일·국제화·접근성 |
-| [공통 디자인](conventions/design.md) | 시각 방향·색상·타이포그래피·형태·공간 대응·움직임 |
-| [데이터·실시간](conventions/data-and-realtime.md) | Query·Mutation·API·MSW·Repository·소켓 작성 형식 |
-| [테스트·Storybook](conventions/testing-and-storybook.md) | TDD, 테스트·모킹·Story 작성, Storybook 10 설정·수동 검증 |
+| 문서                                                       | 소유하는 규칙                                            |
+| ---------------------------------------------------------- | -------------------------------------------------------- |
+| [문서 작성](conventions/docs.md)                           | Markdown 형식, 길이, 문체, 중복, 링크·갱신               |
+| [TypeScript·구조](conventions/typescript-and-structure.md) | 이름·선언·타입·파일 배치·주석                            |
+| [React·UI](conventions/react-and-ui.md)                    | 컴포넌트·Props·훅·effect·스타일·국제화·접근성            |
+| [공통 디자인](conventions/design.md)                       | 시각 방향·색상·타이포그래피·형태·공간 대응·움직임        |
+| [데이터·실시간](conventions/data-and-realtime.md)          | Query·Mutation·API·MSW·Repository·소켓 작성 형식         |
+| [테스트·Storybook](conventions/testing-and-storybook.md)   | TDD, 테스트·모킹·Story 작성, Storybook 10 설정·수동 검증 |
 
 ## 5. 스킬 워크플로
 
-| 문서 | 읽을 때 |
-| --- | --- |
-| [코드 리뷰](workflows/dt-fe-code-review.md) | PR·브랜치·diff를 검토하고 보고서를 작성할 때 |
+| 문서                                            | 읽을 때                                           |
+| ----------------------------------------------- | ------------------------------------------------- |
+| [코드 리뷰](workflows/dt-fe-code-review.md)     | PR·브랜치·diff를 검토하고 보고서를 작성할 때      |
 | [일반 PR 생성](workflows/dt-fe-pull-request.md) | 작업 브랜치에서 `develop`으로 PR을 준비·생성할 때 |
 
 ## 6. 작업별 필수 읽기와 갱신
@@ -89,20 +93,20 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은 [workflow](../.git
 
 기능 동작을 다루는 작업은 관련 위키의 기능 문서를 확인함. 의미·조건·결과가 바뀌면 [위키 유지보수](wiki/maintenance.md#언제-갱신하는가)에 따라 갱신 필요 여부를 판단함. 관련 위키가 없으면 기존 기술 계약을 따르고 문서화 공백을 작업 보고나 리뷰에 기록함. 문서 부재만으로 작업을 차단하거나 전체 기능 문서화를 강제하지 않음.
 
-| 작업 | 읽을 상세 문서 | 계약 변경 시 갱신할 문서 |
-| --- | --- | --- |
-| 페이지·공용 UI·상태 훅 | 구조와 UI, React·UI, TypeScript·구조, 공통 디자인 | 구조와 UI, React·UI 또는 공통 디자인 |
-| 디자인·타이포그래피 | 공통 디자인, React·UI, 테스트·Storybook의 조합 Story·시각 검증, 문서 작성 | 공통 디자인 |
-| 라우트·인증·언어 | 앱·라우팅·국제화, React·UI | 앱·라우팅·국제화 |
-| HTTP·Query·Mutation·Repository·MSW | 데이터 접근, 데이터·실시간, 테스트·Storybook | 데이터 접근 또는 데이터·실시간 |
-| 소켓·타이머 공유 상태 | 실시간 통신, 데이터·실시간, 테스트·Storybook | 실시간 통신 또는 데이터·실시간 |
-| 오류 UI·Sentry | 오류와 관측, React·UI, 테스트·Storybook | 오류와 관측 |
-| 테스트·Story | 테스트·Storybook, 대상 기능의 아키텍처·컨벤션 | 테스트·Storybook 또는 대상 문서 |
-| 문서·템플릿 | 문서 작성, 이 문서, 관련 상세 문서 | 원칙 변경은 헌법, 계약 변경은 소유 문서 |
-| 정책·도메인 위키 | 문서 작성, 위키 안내·유지보수, 기능 문서 양식·관련 기능 문서 | 관련 기능 문서, 필요 시 위키 진입점 |
-| 실행 환경·의존성·workflow | 실행 환경 설정, 테스트·Storybook, 문서 작성 | 실행 환경 설정 |
-| 코드 리뷰·리뷰 보고서 | 코드 리뷰, 변경 영역의 상세 문서 | 코드 리뷰 또는 해당 상세 문서 |
-| 일반 PR 준비·생성 | 일반 PR 생성, 코드 리뷰, 문서 작성 | 일반 PR 생성 또는 코드 리뷰 |
+| 작업                               | 읽을 상세 문서                                                            | 계약 변경 시 갱신할 문서                |
+| ---------------------------------- | ------------------------------------------------------------------------- | --------------------------------------- |
+| 페이지·공용 UI·상태 훅             | 구조와 UI, React·UI, TypeScript·구조, 공통 디자인                         | 구조와 UI, React·UI 또는 공통 디자인    |
+| 디자인·타이포그래피                | 공통 디자인, React·UI, 테스트·Storybook의 조합 Story·시각 검증, 문서 작성 | 공통 디자인                             |
+| 라우트·인증·언어                   | 앱·라우팅·국제화, React·UI                                                | 앱·라우팅·국제화                        |
+| HTTP·Query·Mutation·Repository·MSW | 데이터 접근, 데이터·실시간, 테스트·Storybook                              | 데이터 접근 또는 데이터·실시간          |
+| 소켓·타이머 공유 상태              | 실시간 통신, 데이터·실시간, 테스트·Storybook                              | 실시간 통신 또는 데이터·실시간          |
+| 오류 UI·Sentry                     | 오류와 관측, React·UI, 테스트·Storybook                                   | 오류와 관측                             |
+| 테스트·Story                       | 테스트·Storybook, 대상 기능의 아키텍처·컨벤션                             | 테스트·Storybook 또는 대상 문서         |
+| 문서·템플릿                        | 문서 작성, 이 문서, 관련 상세 문서                                        | 원칙 변경은 헌법, 계약 변경은 소유 문서 |
+| 정책·도메인 위키                   | 문서 작성, 위키 안내·유지보수, 기능 문서 양식·관련 기능 문서              | 관련 기능 문서, 필요 시 위키 진입점     |
+| 실행 환경·의존성·workflow          | 실행 환경 설정, 테스트·Storybook, 문서 작성                               | 실행 환경 설정                          |
+| 코드 리뷰·리뷰 보고서              | 코드 리뷰, 변경 영역의 상세 문서                                          | 코드 리뷰 또는 해당 상세 문서           |
+| 일반 PR 준비·생성                  | 일반 PR 생성, 코드 리뷰, 문서 작성                                        | 일반 PR 생성 또는 코드 리뷰             |
 
 표의 항목은 1~5절의 설정 설명과 문서 링크를 가리킴. 정확히 일치하는 행이 없으면 변경 대상과 소비자를 기준으로 관련 문서를 선택함. 경로·기술·작업 분류가 바뀌면 이 문서의 지도와 읽기 표를 갱신함.
 
