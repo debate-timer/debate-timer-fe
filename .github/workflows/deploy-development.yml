@@ -22,9 +22,16 @@ jobs:
           node-version-file: '.node-version'
 
       - name: Setup .env
+        env:
+          GENERAL_INQUIRY_URL: ${{ vars.VITE_GENERAL_INQUIRY_URL }}
+          TEMPLATE_REQUEST_URL: ${{ vars.VITE_TEMPLATE_REQUEST_URL }}
+          PARTNERSHIP_INQUIRY_URL: ${{ vars.VITE_PARTNERSHIP_INQUIRY_URL }}
         run: |
           echo "${{ vars.ENV }}" > .env
           echo "${{ secrets.ENV }}" >> .env
+          if [ -n "$GENERAL_INQUIRY_URL" ]; then printf 'VITE_GENERAL_INQUIRY_URL=%s\n' "$GENERAL_INQUIRY_URL" >> .env; fi
+          if [ -n "$TEMPLATE_REQUEST_URL" ]; then printf 'VITE_TEMPLATE_REQUEST_URL=%s\n' "$TEMPLATE_REQUEST_URL" >> .env; fi
+          if [ -n "$PARTNERSHIP_INQUIRY_URL" ]; then printf 'VITE_PARTNERSHIP_INQUIRY_URL=%s\n' "$PARTNERSHIP_INQUIRY_URL" >> .env; fi
 
       - name: Install Dependencies
         run: npm ci
