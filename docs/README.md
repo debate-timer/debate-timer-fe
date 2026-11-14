@@ -61,7 +61,7 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은 [workflow](../.git
 | --- | --- |
 | [구조와 UI](architecture/structure-and-ui.md) | 화면·공용 UI·훅·타입·유틸의 책임과 상태 소유권을 정할 때 |
 | [앱·라우팅·국제화](architecture/app-routing-i18n.md) | 앱 초기화, Provider, 경로, 인증, 언어 동기화를 바꿀 때 |
-| [데이터 접근](architecture/data-access.md) | Axios, 도메인 API, Query·Mutation, Repository, MSW, 회원 설정·공개 투표 응답을 바꿀 때 |
+| [데이터 접근](architecture/data-access.md) | Axios, 도메인 API, Query·Mutation, Repository, MSW, 회원 설정의 null 유지 정책·공개 투표의 시간표 ID·주제 정규화를 바꿀 때 |
 | [실시간 통신](architecture/realtime.md) | 소켓 연결·구독·검증·재연결·동기화와 ABORT 기본 통신·후속 연동 경계를 바꿀 때 |
 | [오류와 관측](architecture/errors-observability.md) | 지역 복구, ErrorBoundary, Sentry 수집·마스킹을 바꿀 때 |
 

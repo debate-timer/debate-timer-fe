@@ -68,9 +68,7 @@ export async function patchEndPoll(
 }
 
 // GET /api/polls/{pollId}/votes
-export async function getVoterPollInfo(
-  pollId: number,
-): Promise<GetVoterPollInfoResponseType> {
+export async function getVoterPollInfo(pollId: number) {
   const requestUrl: string = ApiUrl.poll;
   const response = await request<GetVoterPollInfoResponseType>(
     'GET',
@@ -79,7 +77,13 @@ export async function getVoterPollInfo(
     null,
   );
 
-  return response.data;
+  return {
+    ...response.data,
+    tableInfo: {
+      ...response.data.tableInfo,
+      agenda: response.data.tableInfo.agenda ?? '',
+    },
+  };
 }
 
 // POST /api/polls/{pollId}/votes

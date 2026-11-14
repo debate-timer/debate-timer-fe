@@ -23,8 +23,9 @@ export interface GetVoterPollInfoResponseType extends BasePollInfo {
   prosCount: number;
   consCount: number;
   tableInfo: {
+    id: number;
     name: string;
-    agenda: string;
+    agenda: string | null;
   };
 }
 
