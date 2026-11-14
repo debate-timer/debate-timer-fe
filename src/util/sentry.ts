@@ -68,11 +68,11 @@ export function normalizeEndpoint(url?: string) {
 export function resolveFeatureFromPathname(pathname: string): DebateFeature {
   const path = removeLanguagePrefix(pathname);
 
-  if (path === '/home') {
+  if (path === '/' || path === '/home') {
     return 'landing';
   }
 
-  if (path === '/') {
+  if (path === '/dashboard' || path === '/records') {
     return 'table-list';
   }
 
