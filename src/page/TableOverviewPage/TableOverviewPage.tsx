@@ -2,8 +2,7 @@ import { useTranslation } from 'react-i18next';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../components/ProsAndConsTitle/PropsAndConsTitle';
 import { useNavigate, useParams } from 'react-router-dom';
-import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
-import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
+import HeaderDebateInfo from '../../layout/components/header/HeaderDebateInfo';
 import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
@@ -109,36 +108,16 @@ export default function TableOverviewPage() {
   return (
     <>
       <DefaultLayout>
-        <DefaultLayout.Header>
-          <DefaultLayout.Header.Left>
-            {!isLoading && data && (
-              <HeaderTableInfo
-                name={
-                  data.info.name.trim() === ''
-                    ? t('테이블 이름 없음')
-                    : t(data.info.name)
-                }
-              />
-            )}
-          </DefaultLayout.Header.Left>
-          <DefaultLayout.Header.Center>
-            {!isLoading && data && (
-              <HeaderTitle
-                title={
-                  data.info.agenda.trim() === ''
-                    ? t('주제 없음')
-                    : t(data.info.agenda)
-                }
-              />
-            )}
-          </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right />
-        </DefaultLayout.Header>
-
         <DefaultLayout.ContentContainer>
           {isLoading && <LoadingIndicator />}
           {!isLoading && (
             <section className="mx-auto flex w-full max-w-4xl flex-col justify-center">
+              <div className="mb-4">
+                <HeaderDebateInfo
+                  name={data?.info.name}
+                  agenda={data?.info.agenda}
+                />
+              </div>
               <PropsAndConsTitle
                 prosTeamName={
                   data !== undefined

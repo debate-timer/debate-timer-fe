@@ -101,19 +101,14 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
 
   return (
     <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left />
-        <DefaultLayout.Header.Center>
+      <DefaultLayout.ContentContainer>
+        <div className="mb-4 w-full max-w-4xl">
           <HeaderTitle
             title={t('토론 정보를 {{val0}}해주세요', {
               val0: isEdit ? t('수정') : t('설정'),
             })}
           />
-        </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
-
-      <DefaultLayout.ContentContainer>
+        </div>
         <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
           <label className="flex items-center text-base font-semibold md:text-2xl">
             {t('토론 시간표 이름')}
