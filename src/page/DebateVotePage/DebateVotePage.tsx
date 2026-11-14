@@ -1,3 +1,8 @@
+import { parsePositiveId } from '../../util/headerNavigation';
+import { buildPublicUrl } from '../../util/publicUrl';
+import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
+import TimerHeader from '../../layout/components/header/TimerHeader';
+import TimerHeaderTools from '../../layout/components/header/TimerHeaderTools';
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,24 +24,27 @@ export default function DebateVotePage() {
   const navigate = useNavigate();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
-  const baseUrl =
-    import.meta.env.MODE !== 'production'
-      ? undefined
-      : import.meta.env.VITE_SHARE_BASE_URL;
 
   // 매개변수 검증
   const { pollId: rawPollId, tableId: rawTableId } = useParams();
   const pollId = rawPollId ? Number(rawPollId) : NaN;
-  const isPollIdValid = !!rawPollId && !Number.isNaN(pollId);
+  const isPollIdValid = parsePositiveId(rawPollId) !== undefined;
   const tableId = rawTableId ? Number(rawTableId) : NaN;
-  const isTableIdValid = !!rawTableId && !Number.isNaN(tableId);
+  const isTableIdValid = parsePositiveId(rawTableId) !== undefined;
   const isArgsValid = isPollIdValid && isTableIdValid;
+  const tableQuery = useGetDebateTableData(
+    tableId,
+    Number.isSafeInteger(tableId) && tableId > 0,
+  );
+  const header = (
+    <TimerHeader
+      name={tableQuery.data?.info.name}
+      agenda={tableQuery.data?.info.agenda}
+      actions={<TimerHeaderTools />}
+    />
+  );
 
-  const voteUrl = useMemo(() => {
-    const basePath = import.meta.env.VITE_BASE_PATH;
-    const pathPrefix = basePath && basePath !== '/' ? basePath : '';
-    return `${baseUrl}${pathPrefix}/vote/${pollId}`;
-  }, [baseUrl, pollId]);
+  const voteUrl = useMemo(() => buildPublicUrl(`/vote/${pollId}`), [pollId]);
 
   const handleGoToResult = () => {
     navigate(
@@ -76,7 +84,7 @@ export default function DebateVotePage() {
 
   if (isError) {
     return (
-      <DefaultLayout>
+      <DefaultLayout header={header}>
         <DefaultLayout.ContentContainer>
           <ErrorIndicator onClickRetry={() => refetch()} />
         </DefaultLayout.ContentContainer>
@@ -86,7 +94,7 @@ export default function DebateVotePage() {
 
   if (!isArgsValid) {
     return (
-      <DefaultLayout>
+      <DefaultLayout header={header}>
         <DefaultLayout.ContentContainer>
           <ErrorIndicator
             onClickRetry={() => navigate(buildLangPath('/', lang))}
@@ -99,9 +107,9 @@ export default function DebateVotePage() {
   }
 
   return (
-    <DefaultLayout>
+    <DefaultLayout header={header}>
       <DefaultLayout.ContentContainer noPadding={true}>
-        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-brandBackground px-6 py-10">
+        <div className="flex min-h-full w-full flex-col items-center justify-center bg-brandBackground px-6 py-10">
           <header className="flex w-full max-w-[1120px] flex-col items-center gap-2 text-center">
             <h1 className="text-3xl font-bold text-default-black lg:text-4xl xl:text-display-raw">
               {t('승패투표')}

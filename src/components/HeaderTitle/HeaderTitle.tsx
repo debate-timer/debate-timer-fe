@@ -1,7 +1,6 @@
 import Skeleton from '../Skeleton/Skeleton';
 
-const HEADER_TITLE_CLASS_NAME =
-  'w-full max-w-[50vw] overflow-hidden text-xl leading-tight text-ellipsis whitespace-nowrap md:text-3xl md:leading-[36px] short:text-xl short:leading-[28px]';
+const HEADER_TITLE_CLASS_NAME = 'w-full break-words text-ui-headline';
 
 interface HeaderTitleProps {
   title?: string;

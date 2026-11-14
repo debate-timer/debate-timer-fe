@@ -57,13 +57,9 @@ describe('설정 모달', () => {
     '/table/customize/1',
     '/table/customize/1/end/feedback',
     '/table/customize/1/end/vote/2',
-    '/live/1',
-    '/vote/2',
-  ])('후속 연결 화면 %s에는 진입점을 추가하지 않는다', (path) => {
+  ])('타이머 화면 %s에도 설정 진입점을 연결한다', (path) => {
     renderSettings(path);
-    expect(
-      screen.queryByRole('button', { name: '설정' }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '설정' })).toBeInTheDocument();
   });
 });
 

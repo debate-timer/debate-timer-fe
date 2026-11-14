@@ -1,4 +1,4 @@
-import Header from './components/Header';
+import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
 import HeroSection from './components/HeroSection';
 import UsingOrganizationsSection from './components/UsingOrganizationsSection';
 import TimelineSection from './components/TimelineSection';
@@ -14,14 +14,13 @@ export default function LandingPage() {
   const {
     handleStartWithoutLogin,
     handleDashboardButtonClick,
-    handleHeaderLoginButtonClick,
     handleLoginStart,
   } = useLandingPageHandlers();
 
   return (
     <>
       <div className="flex w-full flex-col items-center bg-default-white">
-        <Header onLoginButtonClicked={handleHeaderLoginButtonClick} />
+        <GeneralHeaderContainer />
 
         <main className="flex w-full flex-col items-center">
           <HeroSection
