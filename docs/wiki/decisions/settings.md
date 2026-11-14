@@ -23,7 +23,7 @@
 
 ### SETTINGS-DEC-002 — 회원 설정 PATCH의 null 의미
 
-결정일: 2026-11-14 · 상태: 승인 · 작업: [#567](https://github.com/debate-timer/debate-timer-fe/issues/567), `fix/#567-api-contract-null-handling`
+결정일: 2026-11-14 · 상태: 승인 · PR: [#568](https://github.com/debate-timer/debate-timer-fe/pull/568) · 이슈: [#567](https://github.com/debate-timer/debate-timer-fe/issues/567)
 
 근거: 백엔드 PR #332 사양 대조 대화에서 사용자가 명시적 `null`을 기존 값 유지로 처리하는 서버 동작을 수용하고 프론트 코드·문서 수정과 이슈 생성을 요청했음.
 
