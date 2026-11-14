@@ -85,6 +85,9 @@ export default function DebateMenu(props: DebateMenuProps) {
     );
   const isShareConsent = controls.overlay === 'share-consent';
   const isMicCheck = controls.overlay === 'mic-check';
+  const availableModes = (['RPC', 'SONIOX'] as const).filter(
+    (mode) => controls.transcript.supportedModes[mode],
+  );
   const SHARE_ERROR_MESSAGES = {
     token: '사회자 인증 토큰 발급에 실패했어요...',
     replaced:
@@ -360,28 +363,28 @@ export default function DebateMenu(props: DebateMenuProps) {
                       <p className="mb-4 text-ui-body">
                         {t('참여자 모두에게 녹음 동의를 받아 주세요.')}
                       </p>
-                      <fieldset className="space-y-3">
-                        <legend className="text-ui-label">
-                          {t('음성 인식 방식')}
-                        </legend>
-                        {(['RPC', 'SONIOX'] as const).map((mode) => (
-                          <label key={mode} className="flex gap-3">
-                            <input
-                              type="radio"
-                              name={transcriptId}
-                              checked={controls.selectedMode === mode}
-                              disabled={
-                                controls.transcript.isModeLocked ||
-                                !controls.transcript.supportedModes[mode]
-                              }
-                              onChange={() => controls.changeMode(mode)}
-                            />
-                            {mode === 'RPC'
-                              ? t('크롬 실시간 인식')
-                              : t('Soniox 구간 전사')}
-                          </label>
-                        ))}
-                      </fieldset>
+                      {/* 이 브라우저에서 쓸 수 없는 방식은 보여주지 않고, 하나만 남으면 선택지를 생략한다. */}
+                      {availableModes.length > 1 && (
+                        <fieldset className="space-y-3">
+                          <legend className="text-ui-label">
+                            {t('음성 인식 방식')}
+                          </legend>
+                          {availableModes.map((mode) => (
+                            <label key={mode} className="flex gap-3">
+                              <input
+                                type="radio"
+                                name={transcriptId}
+                                checked={controls.selectedMode === mode}
+                                disabled={controls.transcript.isModeLocked}
+                                onChange={() => controls.changeMode(mode)}
+                              />
+                              {mode === 'RPC'
+                                ? t('크롬 실시간 인식')
+                                : t('Soniox 구간 전사')}
+                            </label>
+                          ))}
+                        </fieldset>
+                      )}
                     </>
                   )}
                   {controls.transcript.isPending && (
