@@ -176,11 +176,15 @@ export default function useMultiDeviceTranscriber(
       startTurn(timeBoxIndex, team, stream);
       return;
     }
-    // 장치 분리 등으로 마이크를 잃었으면 다시 받는다. 받는 사이 끄거나 구간이 바뀌면 이번 구간은 건너뛴다.
+    // 장치 분리 등으로 마이크를 잃었으면 다시 받는다. 받는 사이 끄거나 정지·구간 이동으로 이 effect가 정리되면
+    // 늦게 받은 마이크는 놓고 이번 구간은 건너뛴다.
     const generation = generationRef.current;
+    let isCancelled = false;
+    const isCurrent = () =>
+      !isCancelled && generation === generationRef.current;
     requestMicrophoneStream()
       .then((nextStream) => {
-        if (generation !== generationRef.current) {
+        if (!isCurrent()) {
           stopMediaStream(nextStream);
           return;
         }
@@ -190,11 +194,14 @@ export default function useMultiDeviceTranscriber(
         }
       })
       .catch(() => {
-        if (generation === generationRef.current) {
+        if (isCurrent()) {
           setError('not-allowed');
           setIsEnabled(false);
         }
       });
+    return () => {
+      isCancelled = true;
+    };
   }, [shouldRecord, timeBoxIndex, team, startTurn, stopTurn]);
 
   // 화면을 떠나면 녹음 중이던 구간까지 올리고 마이크를 놓는다.

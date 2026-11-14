@@ -349,6 +349,34 @@ describe('다기기 녹음 사회자 훅', () => {
       expect(result.current.session).toBeNull();
     });
 
+    it('잃은 마이크를 다시 받는 사이 타이머가 멈추면 늦게 받은 마이크를 놓고 녹음하지 않는다', async () => {
+      const lostTrackStop = vi.fn();
+      getUserMedia.mockResolvedValueOnce({
+        active: false,
+        getTracks: () => [{ stop: lostTrackStop }],
+      });
+      let resolveStream: (stream: unknown) => void = () => {};
+      getUserMedia.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveStream = resolve;
+        }) as never,
+      );
+      const { result, rerender } = render();
+      await act(() => result.current.enable());
+
+      rerender({ ...baseParams, isRunning: true });
+      expect(getUserMedia).toHaveBeenCalledTimes(2);
+      rerender({ ...baseParams, isRunning: false });
+
+      await act(async () => {
+        resolveStream({ active: true, getTracks: () => [{ stop: trackStop }] });
+      });
+
+      expect(FakeMediaRecorder.instances).toHaveLength(0);
+      expect(trackStop).toHaveBeenCalled();
+      expect(result.current.isListening).toBe(false);
+    });
+
     it('기기 토큰을 다시 받는 사이 세션이 바뀌면 지금 세션 기록을 덮지 않는다', async () => {
       vi.mocked(postRecordingTurnV2)
         .mockRejectedValueOnce(new APIError('forbidden', 403, null))
