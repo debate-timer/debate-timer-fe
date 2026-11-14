@@ -169,6 +169,76 @@ describe('다기기 녹음 사회자 훅', () => {
       expect(getHostRecordingV2(7)?.sessionKey).toBe('session-1');
     });
 
+    it('서버에 없는 세션이면 지우고 새 세션을 연다', async () => {
+      saveHostRecordingV2(7, {
+        sessionKey: 'saved',
+        joinCode: 'saved-join',
+        deviceToken: 'saved-token',
+      });
+      vi.mocked(getRecordingSessionV2).mockRejectedValueOnce(
+        new APIError('not found', 404, null),
+      );
+      const { result } = render();
+
+      await act(() => result.current.enable());
+
+      expect(postRecordingSessionV2).toHaveBeenCalledTimes(1);
+      expect(getHostRecordingV2(7)?.sessionKey).toBe('session-1');
+    });
+
+    it('세션 조회에 실패하면 보관한 세션을 지우지 않고 세션 오류를 알린다', async () => {
+      const saved = {
+        sessionKey: 'saved',
+        joinCode: 'saved-join',
+        deviceToken: 'saved-token',
+      };
+      saveHostRecordingV2(7, saved);
+      vi.mocked(getRecordingSessionV2).mockRejectedValueOnce(
+        new APIError('server error', 500, null),
+      );
+      const { result } = render();
+
+      await act(() => result.current.enable());
+
+      expect(postRecordingSessionV2).not.toHaveBeenCalled();
+      expect(getHostRecordingV2(7)).toEqual(saved);
+      expect(result.current.error).toBe('session');
+      expect(result.current.isEnabled).toBe(false);
+      expect(trackStop).toHaveBeenCalled();
+    });
+
+    it('켜는 중에 끄면 시작 중 상태를 풀고 늦게 끝난 켜기를 반영하지 않는다', async () => {
+      let resolveSession: (value: never) => void = () => {};
+      vi.mocked(postRecordingSessionV2).mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveSession = resolve as (value: never) => void;
+        }),
+      );
+      const { result } = render();
+
+      let enabling: Promise<void> = Promise.resolve();
+      act(() => {
+        enabling = result.current.enable();
+      });
+      await waitFor(() => expect(postRecordingSessionV2).toHaveBeenCalled());
+      expect(result.current.isStarting).toBe(true);
+
+      act(() => result.current.disable());
+      expect(result.current.isStarting).toBe(false);
+
+      await act(async () => {
+        resolveSession({
+          sessionKey: 'session-1',
+          joinCode: 'join',
+          deviceId: 'host',
+          deviceToken: 'host-token',
+        } as never);
+        await enabling;
+      });
+      expect(result.current.isStarting).toBe(false);
+      expect(result.current.isEnabled).toBe(false);
+    });
+
     it('마이크 권한이 없으면 세션을 열지 않고 권한 오류를 알린다', async () => {
       getUserMedia.mockRejectedValueOnce(new Error('denied'));
       const { result } = render();

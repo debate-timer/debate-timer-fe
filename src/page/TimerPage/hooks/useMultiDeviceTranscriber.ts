@@ -4,6 +4,7 @@ import {
   postRecordingHostDeviceV2,
   postRecordingSessionV2,
 } from '../../../apis/apis/recordingV2';
+import { APIError } from '../../../apis/primitives';
 import useRecordingTurnUploaderV2 from '../../../hooks/useRecordingTurnUploaderV2';
 import { TimeBasedStance } from '../../../types/type';
 import {
@@ -233,8 +234,16 @@ export default function useMultiDeviceTranscriber(
           }
           streamRef.current = stream;
         }
-        let host = await findRecordingHost(tableIdRef.current);
+        // 세션 조회에 실패하면 보관한 세션을 지우지 않고 켜기를 멈춘다.
+        let host = await findRecordingHost(tableIdRef.current).catch(
+          () => undefined,
+        );
         if (!isCurrent()) {
+          return;
+        }
+        if (host === undefined) {
+          setError('session');
+          releaseMicrophone();
           return;
         }
         if (!host) {
@@ -274,6 +283,7 @@ export default function useMultiDeviceTranscriber(
     stopTurn();
     releaseMicrophone();
     setIsEnabled(false);
+    setIsStarting(false);
   }, [releaseMicrophone, stopTurn]);
 
   // 녹음을 버린다. 녹음 중인 구간은 올리지 않고, 이 탭에 보관한 녹음 세션도 지운다.
@@ -287,6 +297,7 @@ export default function useMultiDeviceTranscriber(
     uploader.reset();
     setSession(null);
     setIsEnabled(false);
+    setIsStarting(false);
     setIsListening(false);
     setError(null);
   }, [releaseMicrophone, uploader]);
@@ -306,14 +317,20 @@ export default function useMultiDeviceTranscriber(
   };
 }
 
-// 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다. 이전 토론에서 끝낸 세션이면 지운다.
+// 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다.
+// 이전 토론에서 끝냈거나 서버에 없는 세션으로 확인되면 지우고, 조회 자체가 실패하면 지우지 않고 오류를 던진다.
 async function findRecordingHost(tableId: number) {
   const host = getHostRecordingV2(tableId);
   if (!host) {
     return null;
   }
   const session = await getRecordingSessionV2(host.sessionKey).catch(
-    () => null,
+    (error: unknown) => {
+      if (error instanceof APIError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    },
   );
   if (session?.status === 'RECORDING') {
     return host;
