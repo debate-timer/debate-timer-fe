@@ -1,3 +1,5 @@
+import { parsePositiveId } from '../../util/headerNavigation';
+import AudienceHeaderContainer from '../../layout/components/header/AudienceHeaderContainer';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +14,6 @@ import ConnectionLostNotice from './components/ConnectionLostNotice';
 import DebateWaitingNotice from './components/DebateWaitingNotice';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
-import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';
 import { resolveAudienceScreenState } from './hooks/AudienceScreenState';
 import {
@@ -64,14 +64,18 @@ function ErrorContent({ message, onReload }: ErrorContentProps) {
 
 export default function AudienceSharePage() {
   const { id } = useParams();
+  return <AudienceShareSession key={id} />;
+}
+
+function AudienceShareSession() {
+  const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
   const tableId = Number(id);
-  const isValidTableId =
-    !!id && !isNaN(tableId) && tableId > 0 && Number.isInteger(tableId);
+  const isValidTableId = parsePositiveId(id) !== undefined;
   const debateTableQuery = useGetDebateTableDataForShare(
     isValidTableId ? tableId : undefined,
   );
@@ -80,6 +84,7 @@ export default function AudienceSharePage() {
   const state = useAudienceShareState(tableId, {
     enabled: isValidTableId && !!debateTableQuery.data,
     table: debateTableQuery.data?.table,
+    handleAbort: true,
   });
 
   const viewState = resolveAudienceScreenState(
@@ -135,13 +140,20 @@ export default function AudienceSharePage() {
 
   // 토론이 종료되면 종료 안내 페이지로 이동 (뒤로 가기로 돌아오지 않도록 replace)
   const isFinished = viewState.type === 'FINISHED';
+  const terminationReason =
+    state.status === 'finished' ? state.terminationReason : undefined;
   useEffect(() => {
     if (!isFinished) {
       return;
     }
 
-    navigate(buildLangPath(`/live/${tableId}/end`, lang), { replace: true });
-  }, [isFinished, lang, navigate, tableId]);
+    navigate(buildLangPath(`/live/${tableId}/end`, lang), {
+      replace: true,
+      state: terminationReason
+        ? { audienceTermination: { tableId, reason: terminationReason } }
+        : undefined,
+    });
+  }, [isFinished, lang, navigate, tableId, terminationReason]);
 
   if (!isValidTableId) {
     throw new Error(t('유효하지 않은 토론방 ID입니다.'));
@@ -240,46 +252,18 @@ export default function AudienceSharePage() {
   const shouldShowAbsentNotice =
     isTimerVisible && isChairmanAbsent && !isConnectionLost;
 
-  const isHeaderVisible =
-    viewState.type === 'WAITING' ||
-    viewState.type === 'NORMAL_TIMER' ||
-    viewState.type === 'TIME_BASED_TIMER';
-
   const tableInfo = debateTableQuery.data?.info;
-  const tableNameLabel =
-    !tableInfo?.name || tableInfo.name.trim() === ''
-      ? t('테이블 이름 없음')
-      : t(tableInfo.name);
-  const agendaLabel =
-    !tableInfo?.agenda || tableInfo.agenda.trim() === ''
-      ? t('주제 없음')
-      : t(tableInfo.agenda);
-  const shouldShowHeader = isHeaderVisible && !!tableInfo;
-
   return (
-    <DefaultLayout>
-      {shouldShowHeader ? (
-        <DefaultLayout.Header>
-          <DefaultLayout.Header.Left>
-            <HeaderTableInfo name={tableNameLabel} />
-          </DefaultLayout.Header.Left>
-          {/* 세로 모드 모바일에서는 헤더 공간이 좁아 주제를 본문 상단에 표시 */}
-          <DefaultLayout.Header.Center className="hidden md:flex short:flex">
-            <HeaderTitle title={agendaLabel} />
-          </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right />
-        </DefaultLayout.Header>
-      ) : null}
+    <DefaultLayout
+      header={
+        <AudienceHeaderContainer
+          name={tableInfo?.name}
+          agenda={tableInfo?.agenda}
+        />
+      }
+    >
       <DefaultLayout.ContentContainer>
         <div className="relative flex h-full w-full flex-col">
-          {shouldShowHeader ? (
-            <p
-              data-testid="mobile-agenda"
-              className="line-clamp-2 shrink-0 pb-2 text-center text-lg font-semibold break-keep text-default-black md:hidden short:hidden"
-            >
-              {agendaLabel}
-            </p>
-          ) : null}
           {shouldShowWaitingNotice ? (
             <div className="shrink-0 pb-2">
               <ChairmanStatusNotice variant="waiting" />
