@@ -31,9 +31,21 @@ describe('다기기 녹음 세션 보관', () => {
       deviceToken: 'old',
     });
 
-    updateHostDeviceTokenV2(5, 'new');
+    updateHostDeviceTokenV2(5, 'session-1', 'new');
 
     expect(getHostRecordingV2(5)?.deviceToken).toBe('new');
+  });
+
+  it('토큰을 받는 사이 세션이 바뀌었으면 지금 세션 기록을 덮지 않는다', () => {
+    saveHostRecordingV2(5, {
+      sessionKey: 'session-2',
+      joinCode: 'join',
+      deviceToken: 'current',
+    });
+
+    updateHostDeviceTokenV2(5, 'session-1', 'stale');
+
+    expect(getHostRecordingV2(5)?.deviceToken).toBe('current');
   });
 
   it('지운 세션은 다시 읽지 않는다', () => {

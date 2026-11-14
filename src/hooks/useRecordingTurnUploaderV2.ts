@@ -5,11 +5,13 @@ import { PostRecordingTurnV2RequestType } from '../apis/requests/recordingV2';
 
 export type RecordingTurnUploadOutcome = 'uploaded' | 'rejected' | 'failed';
 
+// 업로드가 끝나기 전에 세션이 바뀔 수 있으므로, 두 함수는 업로드한 턴의 세션 키 기준으로만 토큰을 다룬다.
 interface UseRecordingTurnUploaderV2Options {
-  // 지금 쓸 기기 토큰. 아직 없으면 null이다.
-  getDeviceToken: () => string | null;
-  // 서버가 기기 토큰을 거절하면(재시작으로 참가 기록을 잃음 등) 다시 참가해 새 토큰을 받는다.
-  renewDeviceToken: () => Promise<string>;
+  // 이 세션에서 쓸 기기 토큰. 아직 없으면 null이다.
+  getDeviceToken: (sessionKey: string) => string | null;
+  // 서버가 기기 토큰을 거절하면(재시작으로 참가 기록을 잃음 등) 이 세션에 다시 참가해 새 토큰을 받는다.
+  // 이 세션에 더는 참가할 수 없으면 거부한다.
+  renewDeviceToken: (sessionKey: string) => Promise<string>;
 }
 
 interface RecordingTurnUpload {
@@ -42,8 +44,8 @@ export default function useRecordingTurnUploaderV2({
       const isCurrent = () => generation === generationRef.current;
       setPendingCount((prev) => prev + 1);
       const outcome = await uploadWithRecovery(
-        () => getDeviceToken(),
-        renewDeviceToken,
+        () => getDeviceToken(sessionKey),
+        () => renewDeviceToken(sessionKey),
         (deviceToken) =>
           postRecordingTurnV2(sessionKey, turnKey, deviceToken, turn),
       );

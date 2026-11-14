@@ -5,6 +5,7 @@ import {
   postRecordingSessionV2,
   postRecordingTurnV2,
 } from '../../../apis/apis/recordingV2';
+import { APIError } from '../../../apis/primitives';
 import {
   getHostRecordingV2,
   saveHostRecordingV2,
@@ -276,6 +277,36 @@ describe('다기기 녹음 사회자 훅', () => {
       expect(postRecordingTurnV2).not.toHaveBeenCalled();
       expect(getHostRecordingV2(7)).toBeNull();
       expect(result.current.session).toBeNull();
+    });
+
+    it('기기 토큰을 다시 받는 사이 세션이 바뀌면 지금 세션 기록을 덮지 않는다', async () => {
+      vi.mocked(postRecordingTurnV2)
+        .mockRejectedValueOnce(new APIError('forbidden', 403, null))
+        .mockResolvedValue();
+      let resolveToken: (value: never) => void = () => {};
+      vi.mocked(postRecordingHostDeviceV2).mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveToken = resolve as (value: never) => void;
+        }),
+      );
+      const { result, rerender } = render();
+      await act(() => result.current.enable());
+      rerender({ ...baseParams, isRunning: true });
+      rerender({ ...baseParams, isRunning: false });
+      await waitFor(() => expect(postRecordingHostDeviceV2).toHaveBeenCalled());
+
+      const next = {
+        sessionKey: 'session-2',
+        joinCode: 'join-2',
+        deviceToken: 'next-token',
+      };
+      saveHostRecordingV2(7, next);
+      await act(async () => {
+        resolveToken({ deviceId: 'host', deviceToken: 'renewed' } as never);
+      });
+
+      expect(postRecordingHostDeviceV2).toHaveBeenCalledWith('session-1');
+      expect(getHostRecordingV2(7)).toEqual(next);
     });
 
     it('화면을 떠나면 녹음 중이던 구간까지 올리고 마이크를 놓는다', async () => {

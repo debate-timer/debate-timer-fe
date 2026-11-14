@@ -63,19 +63,21 @@ export default function useAudienceTurnRecorder({
     joinRef.current = join;
   }, [join]);
 
-  const getDeviceToken = useCallback(() => {
+  // 기기 토큰은 업로드한 턴의 세션 기준으로 읽는다. 다시 참가할 때 쓰는 참가 코드는 지금 참가 정보가
+  // 같은 세션일 때만 있으므로, 녹음 중 참가 정보가 바뀌었으면 이전 세션에는 다시 참가하지 않는다.
+  const getDeviceToken = useCallback(
+    (sessionKey: string) => getAudienceDeviceTokenV2(sessionKey),
+    [],
+  );
+  const renewDeviceToken = useCallback(async (sessionKey: string) => {
     const current = joinRef.current;
-    return current ? getAudienceDeviceTokenV2(current.sessionKey) : null;
-  }, []);
-  const renewDeviceToken = useCallback(async () => {
-    const current = joinRef.current;
-    if (!current) {
+    if (current?.sessionKey !== sessionKey) {
       throw new Error('녹음 참가 정보가 없습니다.');
     }
-    const { deviceToken } = await postRecordingDeviceV2(current.sessionKey, {
+    const { deviceToken } = await postRecordingDeviceV2(sessionKey, {
       joinCode: current.joinCode,
     });
-    saveAudienceDeviceTokenV2(current.sessionKey, deviceToken);
+    saveAudienceDeviceTokenV2(sessionKey, deviceToken);
     return deviceToken;
   }, []);
   const uploader = useRecordingTurnUploaderV2({
@@ -221,7 +223,9 @@ export default function useAudienceTurnRecorder({
     }
     streamRef.current = stream;
     if (!getAudienceDeviceTokenV2(join.sessionKey)) {
-      const joined = await renewDeviceToken().catch(() => null);
+      const joined = await renewDeviceToken(join.sessionKey).catch(
+        () => null,
+      );
       if (!isCurrent()) {
         return;
       }

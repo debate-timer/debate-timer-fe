@@ -38,9 +38,14 @@ export function getHostRecordingV2(tableId: number): HostRecordingV2 | null {
   }
 }
 
-export function updateHostDeviceTokenV2(tableId: number, deviceToken: string) {
+// 토큰을 다시 받는 사이 이 탭의 세션이 바뀌었으면, 지금 세션 기록을 이전 세션 토큰으로 덮지 않는다.
+export function updateHostDeviceTokenV2(
+  tableId: number,
+  sessionKey: string,
+  deviceToken: string,
+) {
   const host = getHostRecordingV2(tableId);
-  if (host) {
+  if (host?.sessionKey === sessionKey) {
     saveHostRecordingV2(tableId, { ...host, deviceToken });
   }
 }

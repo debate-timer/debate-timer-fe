@@ -55,10 +55,11 @@ describe('다기기 녹음 턴 업로드 훅', () => {
     vi.mocked(postRecordingTurnV2)
       .mockRejectedValueOnce(new APIError('forbidden', 403, null))
       .mockResolvedValueOnce();
+    const getDeviceToken = vi.fn(() => 'old-token');
     const renewDeviceToken = vi.fn(async () => 'new-token');
     const { result } = renderHook(() =>
       useRecordingTurnUploaderV2({
-        getDeviceToken: () => 'old-token',
+        getDeviceToken,
         renewDeviceToken,
       }),
     );
@@ -69,7 +70,10 @@ describe('다기기 녹음 턴 업로드 훅', () => {
     });
 
     expect(outcome).toBe('uploaded');
+    // 업로드한 턴의 세션 기준으로 토큰을 읽고 다시 받는다.
+    expect(getDeviceToken).toHaveBeenCalledWith(upload.sessionKey);
     expect(renewDeviceToken).toHaveBeenCalledTimes(1);
+    expect(renewDeviceToken).toHaveBeenCalledWith(upload.sessionKey);
     expect(vi.mocked(postRecordingTurnV2).mock.calls[1][2]).toBe('new-token');
   });
 

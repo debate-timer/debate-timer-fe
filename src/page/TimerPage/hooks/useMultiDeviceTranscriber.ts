@@ -74,17 +74,18 @@ export default function useMultiDeviceTranscriber(
     getSegmentVersionRef.current = getSegmentVersion;
   }, [tableId, getSegmentVersion]);
 
-  const getDeviceToken = useCallback(
-    () => getHostRecordingV2(tableIdRef.current)?.deviceToken ?? null,
-    [],
-  );
-  const renewDeviceToken = useCallback(async () => {
-    const current = getHostRecordingV2(tableIdRef.current);
-    if (!current) {
-      throw new Error('녹음 세션이 없습니다.');
+  // 업로드한 턴의 세션이 이 탭에 보관한 세션과 같을 때만 그 토큰을 쓴다.
+  const getDeviceToken = useCallback((sessionKey: string) => {
+    const host = getHostRecordingV2(tableIdRef.current);
+    return host?.sessionKey === sessionKey ? host.deviceToken : null;
+  }, []);
+  const renewDeviceToken = useCallback(async (sessionKey: string) => {
+    const tableId = tableIdRef.current;
+    if (getHostRecordingV2(tableId)?.sessionKey !== sessionKey) {
+      throw new Error('녹음 세션이 바뀌었습니다.');
     }
-    const { deviceToken } = await postRecordingHostDeviceV2(current.sessionKey);
-    updateHostDeviceTokenV2(tableIdRef.current, deviceToken);
+    const { deviceToken } = await postRecordingHostDeviceV2(sessionKey);
+    updateHostDeviceTokenV2(tableId, sessionKey, deviceToken);
     return deviceToken;
   }, []);
   const uploader = useRecordingTurnUploaderV2({

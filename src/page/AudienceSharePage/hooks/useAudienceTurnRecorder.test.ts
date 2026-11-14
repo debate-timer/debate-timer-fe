@@ -221,6 +221,28 @@ describe('다기기 녹음 청중 훅', () => {
       expect(uploadedTurnKeys()).toEqual(['0-300']);
     });
 
+    it('녹음 중 참가 정보가 바뀌어도 이전 세션 턴은 그 세션의 토큰으로 올리고 새 세션에 다시 참가하지 않는다', async () => {
+      const rendered = render();
+      await act(() => rendered.result.current.start());
+      receive(rendered, message('PLAY', normal(0, true), 310));
+
+      saveAudienceDeviceTokenV2('session-2', 'other-token');
+      rendered.rerender({
+        join: { sessionKey: 'session-2', joinCode: 'join-2' },
+        latestMessage: message('STOP', normal(0, false), 311),
+        latestMessageReceivedAt: Date.now(),
+      });
+
+      await waitFor(() => expect(postRecordingTurnV2).toHaveBeenCalledTimes(1));
+      const [sessionKey, , deviceToken] =
+        vi.mocked(postRecordingTurnV2).mock.calls[0];
+      expect([sessionKey, deviceToken]).toEqual([
+        'session-1',
+        'audience-token',
+      ]);
+      expect(postRecordingDeviceV2).toHaveBeenCalledTimes(1);
+    });
+
     it('자유토론에서 실행 중 팀이 바뀌면 팀 전환 이벤트의 version으로 새 턴을 시작한다', async () => {
       const rendered = render();
       await act(() => rendered.result.current.start());
