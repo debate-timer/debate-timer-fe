@@ -36,7 +36,7 @@ const RECORD_BUTTON_CLASS =
 const STATUS_PILL_CLASS =
   'flex w-fit items-center gap-2 rounded-full bg-default-black/80 px-3 py-1.5 text-sm font-semibold text-default-white';
 const MODE_OPTION_CLASS =
-  'flex cursor-pointer items-start gap-3 rounded-[12px] border-2 px-4 py-3 text-left has-disabled:cursor-not-allowed has-disabled:opacity-40';
+  'flex cursor-pointer items-start gap-3 rounded-[12px] border-2 px-4 py-3 text-left';
 
 // 타이머 화면에서 토론 음성 기록을 켜고 끄며, 기록 모드와 인식·전사 상태를 보여준다.
 export default function TranscribeControl(props: TranscribeControlProps) {
@@ -61,7 +61,9 @@ export default function TranscribeControl(props: TranscribeControlProps) {
   const [selectedMode, setSelectedMode] = useState<SttMode>(sttMode);
   const [promptStep, setPromptStep] = useState<PromptStep>('consent');
   const hasPromptedRef = useRef(false);
-  const isAnyModeSupported = STT_MODES.some((mode) => supportedModes[mode]);
+  // 이 브라우저에서 쓸 수 없는 모드는 선택지에 보여주지 않는다.
+  const availableModes = STT_MODES.filter((mode) => supportedModes[mode]);
+  const isAnyModeSupported = availableModes.length > 0;
 
   // 처음 들어왔을 때 한 번만 묻는다. 취소하면 마이크 버튼으로 다시 켤 수 있다.
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function TranscribeControl(props: TranscribeControlProps) {
       return;
     }
     if (!isModeLocked && !supportedModes[selectedMode]) {
-      setSelectedMode(STT_MODES.find((mode) => supportedModes[mode]) ?? 'RPC');
+      setSelectedMode(availableModes[0] ?? 'RPC');
     }
     setPromptStep('consent');
     openModal();
@@ -223,12 +225,13 @@ export default function TranscribeControl(props: TranscribeControlProps) {
               <p className="text-xl font-bold">
                 {t('토론 음성 기록에 동의하시나요?')}
               </p>
-              {!isModeLocked && (
+              {/* 고를 수 있는 방식이 하나뿐이면 선택지 없이 설명만 보여준다. */}
+              {!isModeLocked && availableModes.length > 1 && (
                 <fieldset className="flex flex-col gap-2">
                   <legend className="mb-2 text-sm font-semibold">
                     {t('음성 인식 방식')}
                   </legend>
-                  {STT_MODES.map((mode) => (
+                  {availableModes.map((mode) => (
                     <label
                       key={mode}
                       className={clsx(
@@ -243,7 +246,6 @@ export default function TranscribeControl(props: TranscribeControlProps) {
                         name="stt-mode"
                         value={mode}
                         checked={selectedMode === mode}
-                        disabled={!supportedModes[mode]}
                         onChange={() => setSelectedMode(mode)}
                         className="mt-1"
                       />

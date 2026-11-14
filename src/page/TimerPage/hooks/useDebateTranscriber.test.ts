@@ -57,15 +57,25 @@ const baseParams: UseDebateTranscriberParams = {
   lang: 'ko-KR',
 };
 
+// jsdom에는 navigator.userAgentData가 없어 브라우저 브랜드를 직접 심는다.
+const stubBrands = (brands: string[] | undefined) => {
+  Object.defineProperty(navigator, 'userAgentData', {
+    value: brands && { brands: brands.map((brand) => ({ brand })) },
+    configurable: true,
+  });
+};
+
 describe('크롬 음성 인식 기록 훅', () => {
   beforeEach(() => {
     sessionStorage.clear();
     FakeRecognition.instances = [];
     vi.stubGlobal('webkitSpeechRecognition', FakeRecognition);
+    stubBrands(['Google Chrome', 'Chromium']);
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    stubBrands(undefined);
   });
 
   it('기록을 켜도 타이머가 멈춰 있으면 인식을 시작하지 않는다', () => {
@@ -193,6 +203,14 @@ describe('크롬 음성 인식 기록 훅', () => {
     vi.unstubAllGlobals();
     vi.stubGlobal('webkitSpeechRecognition', undefined);
     vi.stubGlobal('SpeechRecognition', undefined);
+
+    const { result } = renderHook(() => useDebateTranscriber(baseParams));
+
+    expect(result.current.isSupported).toBe(false);
+  });
+
+  it('구글 크롬이 아닌 크로미움 브라우저는 음성 인식을 노출해도 지원하지 않는다', () => {
+    stubBrands(['Whale', 'Chromium']);
 
     const { result } = renderHook(() => useDebateTranscriber(baseParams));
 
