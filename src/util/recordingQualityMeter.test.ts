@@ -72,4 +72,35 @@ describe('녹음 품질 측정기', () => {
   it('잰 프레임이 없으면 지표 없이 끝낸다', () => {
     expect(startRecordingQualityMeter(stream).stop()).toBeNull();
   });
+
+  it('오디오 컨텍스트를 열지 못해도 예외 없이 지표 없는 측정기를 돌려준다', () => {
+    vi.stubGlobal(
+      'AudioContext',
+      class {
+        constructor() {
+          throw new DOMException('limit', 'NotSupportedError');
+        }
+      },
+    );
+
+    const meter = startRecordingQualityMeter(stream);
+
+    expect(meter.stop()).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('분석기 연결에 실패하면 연 오디오 컨텍스트를 닫는다', () => {
+    class BrokenAudioContext extends FakeAudioContext {
+      createMediaStreamSource = (): never => {
+        throw new Error('broken');
+      };
+    }
+    vi.stubGlobal('AudioContext', BrokenAudioContext);
+
+    const meter = startRecordingQualityMeter(stream);
+
+    expect(meter.stop()).toBeNull();
+    expect(FakeAudioContext.instances[0].close).toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });

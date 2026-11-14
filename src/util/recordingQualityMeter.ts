@@ -21,12 +21,22 @@ export function startRecordingQualityMeter(
   if (typeof AudioContext === 'undefined') {
     return { stop: () => null };
   }
-  const audioContext = new AudioContext();
-  void audioContext.resume();
-  const analyser = audioContext.createAnalyser();
-  analyser.fftSize = ANALYSER_FFT_SIZE;
-  const source = audioContext.createMediaStreamSource(stream);
-  source.connect(analyser);
+  // 생성 한도 초과 등으로 Web Audio를 열지 못해도 녹음은 이어 가고 품질 지표만 뺀다.
+  let audioContext: AudioContext | null = null;
+  let analyser: AnalyserNode;
+  let source: MediaStreamAudioSourceNode;
+  try {
+    audioContext = new AudioContext();
+    void audioContext.resume();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = ANALYSER_FFT_SIZE;
+    source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+  } catch {
+    void audioContext?.close().catch(() => undefined);
+    return { stop: () => null };
+  }
+  const context = audioContext;
   const samples = new Float32Array(analyser.fftSize);
   const frames: RecordingFrame[] = [];
   const intervalId = setInterval(() => {
@@ -38,7 +48,7 @@ export function startRecordingQualityMeter(
     stop: () => {
       clearInterval(intervalId);
       source.disconnect();
-      void audioContext.close();
+      void context.close();
       return summarizeRecordingQuality(frames);
     },
   };
