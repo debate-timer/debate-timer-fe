@@ -480,5 +480,8 @@
   "토론 녹음에 참여할까요?": "Join the debate recording?",
   "이 기기의 마이크로 발언을 녹음해 속기록을 만드는 데 씁니다.": "This device's microphone will record the speeches to build the transcript.",
   "여러 기기의 녹음 중 가장 깨끗한 녹음만 서버에 보관하고 글로 바꿉니다.": "Only the clearest recording among the devices is stored on the server and transcribed.",
-  "주변의 대화도 함께 녹음될 수 있습니다.": "Nearby conversations may also be recorded."
+  "주변의 대화도 함께 녹음될 수 있습니다.": "Nearby conversations may also be recorded.",
+  "Soniox 다기기 녹음": "Soniox multi-device recording",
+  "이 링크로 들어온 청중은 녹음에 참여할 수 있어요.": "Audience members who join with this link can take part in the recording.",
+  "실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.": "Devices of audience members who join via the live share link also record, and the clearest recording is used for the transcript."
 }

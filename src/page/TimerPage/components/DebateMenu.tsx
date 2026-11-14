@@ -81,11 +81,11 @@ export default function DebateMenu(props: DebateMenuProps) {
   }, [panel]);
   const handleCopy = async () =>
     setCopyStatus(
-      (await copyToClipboard(controls.share.shareUrl)) ? 'copied' : 'failed',
+      (await copyToClipboard(controls.shareUrl)) ? 'copied' : 'failed',
     );
   const isShareConsent = controls.overlay === 'share-consent';
   const isMicCheck = controls.overlay === 'mic-check';
-  const availableModes = (['RPC', 'SONIOX'] as const).filter(
+  const availableModes = (['RPC', 'SONIOX', 'MULTI_DEVICE'] as const).filter(
     (mode) => controls.transcript.supportedModes[mode],
   );
   const SHARE_ERROR_MESSAGES = {
@@ -212,8 +212,15 @@ export default function DebateMenu(props: DebateMenuProps) {
                     {controls.share.isSharing && (
                       <>
                         <p className="text-ui-caption break-all">
-                          {controls.share.shareUrl}
+                          {controls.shareUrl}
                         </p>
+                        {controls.transcript.multiDeviceSession && (
+                          <p className="text-ui-caption text-neutral-700">
+                            {t(
+                              '이 링크로 들어온 청중은 녹음에 참여할 수 있어요.',
+                            )}
+                          </p>
+                        )}
                         <button
                           type="button"
                           aria-label={t('링크 복사')}
@@ -380,10 +387,19 @@ export default function DebateMenu(props: DebateMenuProps) {
                               />
                               {mode === 'RPC'
                                 ? t('크롬 실시간 인식')
-                                : t('Soniox 구간 전사')}
+                                : mode === 'SONIOX'
+                                  ? t('Soniox 구간 전사')
+                                  : t('Soniox 다기기 녹음')}
                             </label>
                           ))}
                         </fieldset>
+                      )}
+                      {controls.selectedMode === 'MULTI_DEVICE' && (
+                        <p className="mt-3 text-ui-caption text-neutral-700">
+                          {t(
+                            '실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.',
+                          )}
+                        </p>
                       )}
                     </>
                   )}

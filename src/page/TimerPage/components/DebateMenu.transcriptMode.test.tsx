@@ -2,9 +2,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GlobalPortal } from '../../../util/GlobalPortal';
-import { SttMode } from '../../../types/transcript';
 import useDebateControls from '../hooks/useDebateControls';
-import useTranscriptRecorder from '../hooks/useTranscriptRecorder';
+import useTranscriptRecorder, {
+  TranscriptRecorderMode,
+} from '../hooks/useTranscriptRecorder';
 import DebateMenu from './DebateMenu';
 
 vi.mock('../../../hooks/sockets/useChairmanSocket', () => ({
@@ -19,10 +20,19 @@ vi.mock('../../../hooks/sockets/useChairmanSocket', () => ({
 }));
 vi.mock('../hooks/useTranscriptRecorder');
 
-const mockRecorder = (supportedModes: Record<SttMode, boolean>) => {
+const mockRecorder = (
+  modes: Partial<Record<TranscriptRecorderMode, boolean>>,
+) => {
+  const supportedModes = {
+    RPC: false,
+    SONIOX: false,
+    MULTI_DEVICE: false,
+    ...modes,
+  };
   vi.mocked(useTranscriptRecorder).mockReturnValue({
     sttMode: supportedModes.RPC ? 'RPC' : 'SONIOX',
     supportedModes,
+    multiDeviceSession: null,
     isModeLocked: false,
     isEnabled: false,
     isListening: false,
@@ -74,6 +84,24 @@ describe('토론 메뉴 음성 인식 방식 선택지', () => {
     ).toBeChecked();
     expect(
       screen.getByRole('radio', { name: 'Soniox 구간 전사' }),
+    ).toBeInTheDocument();
+  });
+
+  it('다기기 녹음을 고를 수 있으면 선택지와 청중 참여 안내를 보여준다', async () => {
+    mockRecorder({ RPC: true, SONIOX: true, MULTI_DEVICE: true });
+
+    await openTranscriptConsent();
+    await userEvent.click(
+      screen.getByRole('radio', { name: 'Soniox 다기기 녹음' }),
+    );
+
+    expect(
+      screen.getByRole('radio', { name: 'Soniox 다기기 녹음' }),
+    ).toBeChecked();
+    expect(
+      screen.getByText(
+        '실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.',
+      ),
     ).toBeInTheDocument();
   });
 
