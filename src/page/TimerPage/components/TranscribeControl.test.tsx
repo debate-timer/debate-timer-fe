@@ -71,18 +71,17 @@ describe('토론 기록 켜기 컨트롤', () => {
     expect(props.onEnable).toHaveBeenCalledWith('SONIOX');
   });
 
-  it('지원하지 않는 모드는 고를 수 없다', async () => {
+  it('지원하지 않는 모드는 선택지에 보여주지 않고 남은 모드로 기록한다', async () => {
     const user = userEvent.setup();
-    renderControl({ supportedModes: { RPC: false, SONIOX: true } });
+    const props = renderControl({
+      supportedModes: { RPC: false, SONIOX: true },
+    });
 
     await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
 
-    expect(
-      screen.getByRole('radio', { name: /실시간 인식 \(크롬\)/ }),
-    ).toBeDisabled();
-    expect(
-      screen.getByRole('radio', { name: /발언 후 일괄 인식 \(Soniox\)/ }),
-    ).toBeChecked();
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    await consentAndStart(user);
+    expect(props.onEnable).toHaveBeenCalledWith('SONIOX');
   });
 
   it('이미 기록을 시작한 모드는 다시 켤 때 바꿀 수 없다', async () => {
