@@ -97,6 +97,7 @@ function AudienceShareSession() {
     join: recordingJoin,
     latestMessage: state.latestMessage,
     latestMessageReceivedAt: state.latestMessageReceivedAt,
+    isConnected: state.isSocketConnected,
   });
 
   const viewState = resolveAudienceScreenState(

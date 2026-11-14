@@ -64,6 +64,8 @@ export function useAudienceShareState(
   // 다기기 녹음이 구간을 나눌 때 쓰는 검증된 최근 메시지와 수신 시각
   latestMessage: SocketMessage | null;
   latestMessageReceivedAt: number | null;
+  // 소켓 연결 여부. 다기기 녹음이 재연결 뒤 동기화로 진행 중인 구간을 잇지 않도록 쓴다.
+  isSocketConnected: boolean;
 } {
   const { enabled = true, table, handleAbort = false } = options;
   const {
@@ -274,6 +276,7 @@ export function useAudienceShareState(
       connectionStatus,
       latestMessage,
       latestMessageReceivedAt,
+      isSocketConnected: isConnected,
     };
   }
 
@@ -285,5 +288,6 @@ export function useAudienceShareState(
     connectionStatus,
     latestMessage,
     latestMessageReceivedAt,
+    isSocketConnected: isConnected,
   };
 }
