@@ -53,15 +53,10 @@ export default function DebateTranscriptPage() {
 
   return (
     <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left />
-        <DefaultLayout.Header.Center>
-          <HeaderTitle title={t('토론 기록')} />
-        </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
-
       <DefaultLayout.ContentContainer>
+        <div className="mb-4 w-full max-w-4xl">
+          <HeaderTitle title={t('토론 기록')} />
+        </div>
         {isLoading && <LoadingIndicator />}
         {isError && <ErrorIndicator onClickRetry={() => refetch()} />}
         {/* 보정·분석이 끝나기 전에는 내용 대신 진행 단계만 보여준다. */}

@@ -1,7 +1,7 @@
 import Skeleton from '../Skeleton/Skeleton';
 
 const HEADER_TABLE_NAME_CLASS_NAME =
-  'truncate text-lg leading-tight md:text-2xl md:leading-[32px] short:text-lg short:leading-[28px]';
+  'break-words text-ui-caption text-neutral-600';
 
 interface HeaderTitleProps {
   name?: string;
@@ -21,7 +21,7 @@ export default function HeaderTableInfo(props: HeaderTitleProps) {
       )}
       {!isLoading && (
         <div className="flex min-w-0 flex-col space-y-[4px]">
-          <h1 className={HEADER_TABLE_NAME_CLASS_NAME}>{name}</h1>
+          <p className={HEADER_TABLE_NAME_CLASS_NAME}>{name}</p>
         </div>
       )}
     </>

@@ -10,6 +10,7 @@ interface TimerViewProps {
   state: TimerPageLogics;
   onEvent: (invoke: () => void, eventType: SocketEventType) => void;
   answerTime: number;
+  pauseAdditionalRevision?: number;
   isAnswerTimeEnabled?: boolean;
   isInputBlocked?: boolean;
 }
@@ -19,6 +20,7 @@ export default function TimerView(props: TimerViewProps) {
     state,
     onEvent,
     answerTime,
+    pauseAdditionalRevision = 0,
     isAnswerTimeEnabled = true,
     isInputBlocked = false,
   } = props;
@@ -52,6 +54,7 @@ export default function TimerView(props: TimerViewProps) {
   if (data && data.table[index].boxType === 'NORMAL') {
     return (
       <NormalTimer
+        pauseAdditionalRevision={pauseAdditionalRevision}
         normalTimerInstance={{
           timer: normalTimer.timer,
           isAdditionalTimerOn: normalTimer.isAdditionalTimerOn,

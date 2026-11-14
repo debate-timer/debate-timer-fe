@@ -27,15 +27,23 @@ function CompactTimeoutTimerButton({
 
 interface CompactTimeoutTimerProps {
   onClose: () => void;
+  pauseRevision?: number;
   className: string;
 }
 
 export default function CompactTimeoutTimer({
+  pauseRevision = 0,
   onClose,
   className,
 }: CompactTimeoutTimerProps) {
   const { t } = useTranslation();
   const state = useNormalTimer();
+  const { pauseTimer } = state;
+  useEffect(() => {
+    if (pauseRevision > 0) {
+      pauseTimer();
+    }
+  }, [pauseRevision, pauseTimer]);
   const minute = Formatting.formatTwoDigits(
     Math.floor(Math.abs(state.timer ?? 0) / 60),
   );

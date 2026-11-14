@@ -1,6 +1,7 @@
+import { RiSettings3Line } from 'react-icons/ri';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useGlobalSettings from '../../hooks/useGlobalSettings';
 import useLogout from '../../hooks/mutations/useLogout';
 import { GlobalPortal } from '../../util/GlobalPortal';
@@ -10,7 +11,7 @@ import { INQUIRY_LINKS } from '../../constants/urls';
 
 const PANEL_CLASS =
   'relative max-h-[90dvh] w-[min(92vw,560px)] overflow-y-auto rounded-2xl bg-white p-6 text-ui-body text-neutral-900 shadow-xl';
-/** 일반 화면의 전역 설정 진입점과 접근 가능한 모달임. */
+/** 일반·타이머 화면의 전역 설정 진입점과 접근 가능한 모달임. */
 interface SettingsModalProps {
   onLogin?: () => void;
   onLogout?: () => Promise<void>;
@@ -31,11 +32,10 @@ export default function SettingsModal(props: SettingsModalProps) {
   const trigger = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const location = useLocation();
   const lang = isSupportedLang(i18n.language) ? i18n.language : 'ko';
   const logout = useLogout(() => {
     setOpen(false);
-    navigate(buildLangPath('/home', lang));
+    navigate(buildLangPath('/', lang));
   });
   const handleClose = useCallback(() => {
     void controller.flush();
@@ -110,24 +110,17 @@ export default function SettingsModal(props: SettingsModalProps) {
       setBusy(false);
     }
   };
-  // 타이머·청중의 헤더와 인증 동작은 MP-03/04에서 연결함.
-  const path = buildLangPath(location.pathname, 'ko');
-  if (
-    path.startsWith('/live/') ||
-    path.startsWith('/vote/') ||
-    /^\/table\/customize\/[^/]+(?:\/end\/(?:feedback|vote\/[^/]+))?$/.test(path)
-  ) {
-    return null;
-  }
   return (
     <>
       <button
         ref={trigger}
         type="button"
         aria-label={t('설정')}
+        title={t('설정')}
+        className="flex size-11 items-center justify-center rounded-xl border border-neutral-300 p-2"
         onClick={() => setOpen(true)}
       >
-        {t('설정')}
+        <RiSettings3Line className="size-6" aria-hidden="true" />
       </button>
       {open && (
         <GlobalPortal.Consumer>

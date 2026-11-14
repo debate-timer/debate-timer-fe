@@ -29,15 +29,10 @@ export default function SharedTranscriptPage() {
 
   return (
     <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left />
-        <DefaultLayout.Header.Center>
-          <HeaderTitle title={t('공유된 토론 기록')} />
-        </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
-
       <DefaultLayout.ContentContainer>
+        <div className="mb-4 w-full max-w-4xl">
+          <HeaderTitle title={t('공유된 토론 기록')} />
+        </div>
         {isLoading && <LoadingIndicator />}
         {isError && !data && (
           <ErrorIndicator onClickRetry={() => refetch()}>

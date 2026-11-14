@@ -109,32 +109,30 @@ export default function TableCompositionPage() {
   // If no error or on loading, print contents
   // Only pass isLoading because isError is used right above this code line
   return (
-    <DefaultLayout>
-      <Funnel
-        step={{
-          NameAndType: (
-            <TableNameAndType
-              info={formData.info}
-              isLoading={isLoading}
-              isEdit={mode === 'edit'}
-              onInfoChange={updateInfo}
-              onButtonClick={() => goToStep('TimeBox')}
-            />
-          ),
+    <Funnel
+      step={{
+        NameAndType: (
+          <TableNameAndType
+            info={formData.info}
+            isLoading={isLoading}
+            isEdit={mode === 'edit'}
+            onInfoChange={updateInfo}
+            onButtonClick={() => goToStep('TimeBox')}
+          />
+        ),
 
-          TimeBox: (
-            <TimeBoxStep
-              initData={formData}
-              isLoading={isLoading}
-              isEdit={mode === 'edit'}
-              onTimeBoxChange={updateTable}
-              onFinishButtonClick={handleButtonClick}
-              onEditTableInfoButtonClick={() => goToStep('NameAndType')}
-              isSubmitting={mode === 'edit' ? isModifyingTable : isAddingTable}
-            />
-          ),
-        }}
-      />
-    </DefaultLayout>
+        TimeBox: (
+          <TimeBoxStep
+            initData={formData}
+            isLoading={isLoading}
+            isEdit={mode === 'edit'}
+            onTimeBoxChange={updateTable}
+            onFinishButtonClick={handleButtonClick}
+            onEditTableInfoButtonClick={() => goToStep('NameAndType')}
+            isSubmitting={mode === 'edit' ? isModifyingTable : isAddingTable}
+          />
+        ),
+      }}
+    />
   );
 }

@@ -1,3 +1,4 @@
+import GlobalSettingsProvider from '../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -12,19 +13,21 @@ function renderRoute() {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/records/1']}>
-        <Routes>
-          <Route
-            path="/records/1"
-            element={
-              <FeatureFlagRoute flag="TRANSCRIPT">
-                <p>토론 기록 화면</p>
-              </FeatureFlagRoute>
-            }
-          />
-          <Route path="/" element={<p>대시보드</p>} />
-        </Routes>
-      </MemoryRouter>
+      <GlobalSettingsProvider>
+        <MemoryRouter initialEntries={['/records/1']}>
+          <Routes>
+            <Route
+              path="/records/1"
+              element={
+                <FeatureFlagRoute flag="TRANSCRIPT">
+                  <p>토론 기록 화면</p>
+                </FeatureFlagRoute>
+              }
+            />
+            <Route path="/dashboard" element={<p>대시보드</p>} />
+          </Routes>
+        </MemoryRouter>
+      </GlobalSettingsProvider>
     </QueryClientProvider>,
   );
 }

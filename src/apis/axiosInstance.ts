@@ -179,7 +179,7 @@ axiosInstance.interceptors.response.use(
         Sentry.setUser(null);
         removeAccessToken();
         removeMemberId();
-        window.location.href = buildLangPath('/home', lang);
+        window.location.href = buildLangPath('/', lang);
         analyticsManager.reset();
         return Promise.reject(refreshError);
       }

@@ -1,3 +1,4 @@
+import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAnalytics from '../../hooks/useAnalytics';
@@ -66,55 +67,62 @@ export default function DebateEndPage() {
   }
 
   return (
-    <div
-      style={backgroundStyle}
-      className="relative flex h-screen w-full flex-col items-center justify-center p-4"
-    >
-      <div className="mb-12 flex items-center justify-center gap-4 text-center lg:mb-16 xl:mb-24">
-        <h1 className="text-3xl font-semibold text-default-black md:text-4xl lg:text-5xl xl:text-display-raw">
-          {t('토론을 모두 마치셨습니다')}
-        </h1>
-        <img
-          src={clapImage}
-          alt={t('박수')}
-          className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 xl:h-20 xl:w-20"
-        />
-      </div>
+    <DefaultLayout>
+      <DefaultLayout.ContentContainer noPadding>
+        <div
+          style={backgroundStyle}
+          className="relative flex min-h-full w-full flex-col items-center justify-center p-4"
+        >
+          <div className="mb-12 flex items-center justify-center gap-4 text-center lg:mb-16 xl:mb-24">
+            <h1 className="text-3xl font-semibold text-default-black md:text-4xl lg:text-5xl xl:text-display-raw">
+              {t('토론을 모두 마치셨습니다')}
+            </h1>
+            <img
+              src={clapImage}
+              alt={t('박수')}
+              className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 xl:h-20 xl:w-20"
+            />
+          </div>
 
-      {transcript.status !== 'none' && (
-        <div className="mb-8 flex w-full justify-center lg:mb-10">
-          <TranscriptBanner
-            status={transcript.status}
-            pendingCount={transcript.pendingCount}
-            onOpen={handleOpenTranscript}
-            onRetry={transcript.retry}
-          />
+          {transcript.status !== 'none' && (
+            <div className="mb-8 flex w-full justify-center lg:mb-10">
+              <TranscriptBanner
+                status={transcript.status}
+                pendingCount={transcript.pendingCount}
+                onOpen={handleOpenTranscript}
+                onRetry={transcript.retry}
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-10 lg:gap-12 xl:gap-20">
+            <MenuCard
+              title={t('피드백 타이머')}
+              description={t('심사평 및 Q&A용 타이머 →')}
+              imgSrc={feedbackTimerImage}
+              imgAlt={t('피드백 타이머')}
+              onClick={handleFeedbackClick}
+              ariaLabel={t('피드백 타이머로 이동')}
+            />
+
+            <MenuCard
+              title={t('승패투표 진행하기')}
+              description={t('QR 코드를 통해 투표 페이지로 이동해요.')}
+              imgSrc={voteStampImage}
+              imgAlt={t('승패투표')}
+              onClick={() => mutate(tableId)}
+              ariaLabel={t('승패투표 생성 및 진행')}
+            />
+          </div>
+
+          <div className="fixed bottom-[8%] xl:bottom-[12%]">
+            <GoToOverviewButton
+              tableId={Number(tableId)}
+              className="w-[478px]"
+            />
+          </div>
         </div>
-      )}
-
-      <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-10 lg:gap-12 xl:gap-20">
-        <MenuCard
-          title={t('피드백 타이머')}
-          description={t('심사평 및 Q&A용 타이머 →')}
-          imgSrc={feedbackTimerImage}
-          imgAlt={t('피드백 타이머')}
-          onClick={handleFeedbackClick}
-          ariaLabel={t('피드백 타이머로 이동')}
-        />
-
-        <MenuCard
-          title={t('승패투표 진행하기')}
-          description={t('QR 코드를 통해 투표 페이지로 이동해요.')}
-          imgSrc={voteStampImage}
-          imgAlt={t('승패투표')}
-          onClick={() => mutate(tableId)}
-          ariaLabel={t('승패투표 생성 및 진행')}
-        />
-      </div>
-
-      <div className="fixed bottom-[8%] xl:bottom-[12%]">
-        <GoToOverviewButton tableId={Number(tableId)} className="w-[478px]" />
-      </div>
-    </div>
+      </DefaultLayout.ContentContainer>
+    </DefaultLayout>
   );
 }

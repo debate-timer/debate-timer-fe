@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { isLoggedIn } from '../../../util/accessToken';
 import { oAuthLogin } from '../../../util/googleAuth';
-import useLogout from '../../../hooks/mutations/useLogout';
 import { createTableShareUrlFromTable } from '../../../util/arrayEncoding';
 import { SAMPLE_TABLE_DATA } from '../../../constants/sample_table';
 import { useCallback } from 'react';
@@ -23,9 +22,8 @@ const useLandingPageHandlers = () => {
   const { i18n } = useTranslation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
-  const homePath = buildLangPath('/home', lang);
-  const rootPath = buildLangPath('/', lang);
-  const { mutate: logoutMutate } = useLogout(() => navigate(homePath));
+  const homePath = buildLangPath('/', lang);
+  const rootPath = buildLangPath('/dashboard', lang);
   const { trackEvent } = useAnalytics();
 
   // 비회원 체험용 샘플 테이블 공유 링크로 바로 이동한다.
@@ -57,28 +55,10 @@ const useLandingPageHandlers = () => {
   const handleDashboardButtonClick = useCallback(() => {
     navigate(rootPath);
   }, [navigate, rootPath]);
-  // 헤더 로그인 버튼 진입 시 login_started 이벤트를 기록하거나 로그아웃을 수행한다.
-  const handleHeaderLoginButtonClick = useCallback(() => {
-    if (!isLoggedIn()) {
-      trackEvent('login_started', {
-        trigger_page: homePath,
-        trigger_context: 'landing_header',
-      });
-      setLoginTrigger({
-        trigger_page: homePath,
-        trigger_context: 'landing_header',
-      });
-      oAuthLogin();
-    } else {
-      logoutMutate();
-    }
-  }, [homePath, logoutMutate, trackEvent]);
-
   return {
     handleStartWithoutLogin,
     handleLoginStart,
     handleDashboardButtonClick,
-    handleHeaderLoginButtonClick,
   };
 };
 

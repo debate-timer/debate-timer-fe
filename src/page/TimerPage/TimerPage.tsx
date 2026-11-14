@@ -1,9 +1,19 @@
+import { parsePositiveId } from '../../util/headerNavigation';
+import TimerHeader from '../../layout/components/header/TimerHeader';
+import TimerHeaderTools from '../../layout/components/header/TimerHeaderTools';
+import DebateMenu from './components/DebateMenu';
+import DebateFeatureIndicators from './components/DebateFeatureIndicators';
+import DebateLogoutDialog from './components/DebateLogoutDialog';
+import useDebateControls from './hooks/useDebateControls';
+import useDebateLogout from './hooks/useDebateLogout';
+import useGlobalSettings from '../../hooks/useGlobalSettings';
+import useLoginPrompt from '../../hooks/useLoginPrompt';
+import LoginPrompt from '../../components/LoginPrompt/LoginPrompt';
+import { buildLangPath, isSupportedLang } from '../../util/languageRouting';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import HeaderTableInfo from '../../components/HeaderTableInfo/HeaderTableInfo';
-import HeaderTitle from '../../components/HeaderTitle/HeaderTitle';
 import { useTimerPageState } from './hooks/useTimerPageState';
 import { useTimerHotkey } from './hooks/useTimerHotkey';
 import useDebateTracking from './hooks/useDebateTracking';
@@ -11,8 +21,6 @@ import RoundControlRow from './components/RoundControlRow';
 import TimerView from './components/TimerView';
 import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
-import LiveShareButton from './components/LiveShareButton';
-import LiveShareModal from './components/LiveShareModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../types/type';
 import DTHelp from '../../components/icons/Help';
@@ -23,23 +31,12 @@ import { isGuestFlow } from '../../util/sessionStorage';
 import { useEnsureGuestTable } from '../../hooks/useEnsureGuestTable';
 import useAnalytics from '../../hooks/useAnalytics';
 import { consumeTemplateOrigin } from '../../util/analytics/templateOrigin';
-import {
-  RiFullscreenExitFill,
-  RiFullscreenFill,
-  RiVolumeMuteFill,
-} from 'react-icons/ri';
-import DTVolume from '../../components/icons/Volume';
-import VolumeBar from '../../components/VolumeBar/VolumeBar';
 import { isLoggedIn } from '../../util/accessToken';
-import { useLiveShare } from './hooks/useLiveShare';
 import { SocketEventType, TimerEventTypes } from '../../apis/sockets/type';
 import { isTimerEventType } from '../../apis/sockets/util';
-import AnswerTimeSetting from './components/AnswerTimeSetting';
 import AnswerTimeGuideModal from './components/AnswerTimeGuideModal';
 import { getRemainingTimeForShare } from './getRemainingTimeForShare';
 import { buildTimerPayloadForShare } from './buildTimerPayloadForShare';
-import useTranscriptRecorder from './hooks/useTranscriptRecorder';
-import TranscribeControl from './components/TranscribeControl';
 import TranscriptLeaveModal from './components/TranscriptLeaveModal';
 import useTranscriptLeaveGuard from './hooks/useTranscriptLeaveGuard';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
@@ -56,8 +53,22 @@ interface SharedTimes {
 }
 
 export default function TimerPage() {
+  const { id } = useParams();
+  const { t } = useTranslation();
+  if (id !== 'guest' && parsePositiveId(id) === undefined) {
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <ErrorIndicator>{t('테이블 ID가 올바르지 않습니다.')}</ErrorIndicator>
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
+  }
+  return <TimerPageSession key={id} />;
+}
+
+function TimerPageSession() {
   const { t, i18n } = useTranslation();
-  const [answerTime, setAnswerTime] = useState(30);
   const pathParams = useParams();
   useEnsureGuestTable(pathParams.id);
   const tableId = Number(pathParams.id);
@@ -65,6 +76,8 @@ export default function TimerPage() {
     openUseTooltipModal,
     UseToolTipWrapper,
     isAnswerTimeGuideOpen,
+    isUseTooltipOpen,
+    isLoginAndStoreOpen,
     closeUseTooltipModal,
     closeAnswerTimeGuideModal,
     LoginAndStoreModalWrapper,
@@ -79,7 +92,6 @@ export default function TimerPage() {
   const { trackEvent } = useAnalytics();
 
   const timerStartedRef = useRef(false);
-  const isMuted = state.volume === 0;
   const {
     data,
     bg,
@@ -88,14 +100,8 @@ export default function TimerPage() {
     isLoading,
     isError,
     refetch,
-    isVolumeBarOpen,
-    toggleVolumeBar,
-    volume,
-    setVolume,
     isFullscreen,
     setFullscreen,
-    toggleFullscreen,
-    volumeRef,
     prosConsSelected,
     timer1,
     timer2,
@@ -111,17 +117,51 @@ export default function TimerPage() {
     enabled: isMemberFlow,
   });
   const isTranscribeAvailable = isMemberFlow && hasTranscriptFlag;
-  const transcriber = useTranscriptRecorder({
+  const [pauseAdditionalRevision, setPauseAdditionalRevision] = useState(0);
+  const { pauseTimer: pauseNormalTimer } = normalTimer;
+  const { pauseTimer: pauseProsTimer } = timer1;
+  const { pauseTimer: pauseConsTimer } = timer2;
+  const stopTimers = useCallback(() => {
+    pauseNormalTimer();
+    pauseProsTimer();
+    pauseConsTimer();
+    setPauseAdditionalRevision((current) => current + 1);
+  }, [pauseNormalTimer, pauseProsTimer, pauseConsTimer]);
+  const login = useLoginPrompt();
+  const { controller: settingsController } = useGlobalSettings();
+  const navigate = useNavigate();
+  const syncRequestHandlerRef = useRef<() => void>(() => {});
+  const controls = useDebateControls({
     tableId,
     timeBoxIndex: index,
     team: timerType === 'TIME_BASED' ? prosConsSelected : null,
     isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
     lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+    canShare: IS_LIVE_SHARE_ENABLED && isMemberFlow && !!data,
+    canTranscribe: isTranscribeAvailable && !!data,
+    stopTimers,
+    isInputBlocked: isUseTooltipOpen || isLoginAndStoreOpen || login.isOpen,
+    onSyncRequest: () => syncRequestHandlerRef.current(),
   });
-  // 토론 기록 중 화면을 벗어나면 속기록이 유실되므로 확인을 받은 뒤에만 나간다.
+  const logout = useDebateLogout({
+    interrupt: controls.interrupt,
+    stopSharing: controls.share.stopSharing,
+    exitFullscreen: async () => {
+      await setFullscreen(false);
+    },
+    issueSettings: () => settingsController.issueBeforeLogout(),
+    onSuccess: () => {
+      const lang = isSupportedLang(i18n.language) ? i18n.language : 'ko';
+      navigate(buildLangPath('/', lang), { replace: true });
+    },
+  });
+  const isInputBlocked = controls.isInputBlocked || logout.isConfirmOpen;
   const transcriptLeaveGuard = useTranscriptLeaveGuard({
     tableId,
-    isRecording: isTranscribeAvailable && transcriber.isEnabled,
+    isRecording:
+      isTranscribeAvailable &&
+      controls.transcript.isEnabled &&
+      !controls.isInterrupted,
   });
   const remainingTime = getRemainingTimeForShare({
     timerType,
@@ -134,30 +174,7 @@ export default function TimerPage() {
   // 토론 종료 이벤트를 발행했는지 여부 (이후 상태 공유 요청에는 FINISHED로 응답)
   const isDebateFinishedRef = useRef(false);
 
-  // 서버의 상태 공유 요청을 처리할 최신 핸들러 (소켓 훅보다 뒤에서 정의되므로 ref로 연결)
-  const syncRequestHandlerRef = useRef<() => void>(() => {});
-
-  const {
-    isLiveShareModalOpen,
-    toggleLiveShareModal,
-    liveShareModalRef,
-    issueEvent,
-    // connect, 나중에 명시적 연결이 필요할 때를 대비하여 주석으로 남겨둠
-    // disconnect, 나중에 명시적 연결 종료가 필요할 때를 대비하여 주석으로 남겨둠
-    isSocketConnected,
-    shareUrl: liveShareUrl,
-    isLoading: isSocketLoading,
-    isError: isSocketError,
-    errorType: socketErrorType,
-    restartLiveShare,
-  } = useLiveShare(tableId, {
-    onSyncRequest: () => syncRequestHandlerRef.current(),
-  });
-
-  const handleChangeAnswerTime = (time: number) => {
-    setAnswerTime(time);
-  };
-
+  const { issueEvent, isSocketConnected } = controls.share;
   // 현재 타이머 상태로 청중 공유용 페이로드 생성
   const isNormalTimerRunning = normalTimer.isRunning;
   const isProsTimerRunning = timer1.isRunning;
@@ -231,6 +248,9 @@ export default function TimerPage() {
 
   // 타이머 이벤트를 핸들링하는 래퍼 함수 선언
   const handleTimerEvent = (invoke: () => void, eventType: SocketEventType) => {
+    if (isInputBlocked) {
+      return;
+    }
     // 이벤트 실행
     invoke();
 
@@ -326,7 +346,7 @@ export default function TimerPage() {
     };
   }, [buildSyncPayload, issueEvent]);
 
-  useTimerHotkey(state, handleTimerEvent);
+  useTimerHotkey(state, handleTimerEvent, { isEnabled: !isInputBlocked });
 
   // timer_started 이벤트 발화 (데이터 로드 후 1회)
   useEffect(() => {
@@ -357,163 +377,81 @@ export default function TimerPage() {
     }
   }, [index, data, updateProgress]);
 
-  // 오류가 발생하면 재시도 가능한 에러 화면을 노출한다.
-  if (isError) {
-    return (
-      <DefaultLayout>
-        <DefaultLayout.ContentContainer>
-          <ErrorIndicator onClickRetry={() => refetch()} />
-        </DefaultLayout.ContentContainer>
-      </DefaultLayout>
-    );
-  }
+  const header = (
+    <TimerHeader
+      name={data?.info.name}
+      agenda={data?.info.agenda}
+      isGuest={isGuestFlow()}
+      actions={
+        <TimerHeaderTools
+          onLogin={() => login.requestLogin()}
+          onLogout={logout.requestLogout}
+        >
+          <DebateFeatureIndicators statuses={controls.statuses} />
+          <span
+            className="h-6 w-px shrink-0 bg-neutral-300"
+            aria-hidden="true"
+          />
+          <DebateMenu
+            controls={controls}
+            shareUnavailableReason={
+              !isMemberFlow ? t('회원만 사용할 수 있는 기능입니다.') : undefined
+            }
+            transcriptUnavailableReason={
+              !isMemberFlow
+                ? t('회원만 사용할 수 있는 기능입니다.')
+                : !hasTranscriptFlag
+                  ? t('사용 권한이 필요한 기능입니다.')
+                  : undefined
+            }
+            onLogin={
+              !isMemberFlow
+                ? () => {
+                    controls.closeOverlay();
+                    login.requestLogin();
+                  }
+                : undefined
+            }
+          />
+          <button
+            type="button"
+            aria-label={t('도움말')}
+            title={t('도움말')}
+            className="flex size-11 items-center justify-center rounded-xl border border-neutral-300 p-2"
+            onClick={openUseTooltipModal}
+          >
+            <DTHelp className="size-6" />
+          </button>
+        </TimerHeaderTools>
+      }
+    />
+  );
 
   // 로딩 또는 정상 상태에 맞는 타이머 화면을 렌더링한다.
   return (
     <>
-      <DefaultLayout>
-        <DefaultLayout.Header>
-          <DefaultLayout.Header.Left>
-            {!isLoading && data && (
-              <HeaderTableInfo
-                name={
-                  data.info.name.trim() === ''
-                    ? t('테이블 이름 없음')
-                    : t(data.info.name)
-                }
-              />
-            )}
-          </DefaultLayout.Header.Left>
-          <DefaultLayout.Header.Center>
-            {!isLoading && data && (
-              <HeaderTitle
-                title={
-                  data.info.agenda.trim() === ''
-                    ? t('주제 없음')
-                    : t(data.info.agenda)
-                }
-              />
-            )}
-          </DefaultLayout.Header.Center>
-          <DefaultLayout.Header.Right>
-            <AnswerTimeSetting
-              answerTime={answerTime}
-              onChangeAnswerTime={handleChangeAnswerTime}
-            />
-            <button
-              className="flex h-full items-center justify-center p-[4px]"
-              aria-label={t('도움말')}
-              title={t('도움말')}
-              onClick={openUseTooltipModal}
-            >
-              <DTHelp className="h-full" />
-            </button>
-            <button
-              className="flex aspect-square h-full items-center justify-center p-[4px]"
-              title={t('전체 화면')}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <RiFullscreenExitFill className="h-full w-full" />
-              ) : (
-                <RiFullscreenFill className="h-full w-full" />
-              )}
-            </button>
-            <div className="relative flex h-full flex-col" ref={volumeRef}>
-              <button
-                className="flex aspect-square h-full items-center justify-center p-[4px]"
-                aria-label={t('볼륨 조절')}
-                title={t('볼륨 조절')}
-                onClick={toggleVolumeBar}
-              >
-                {isMuted ? (
-                  <RiVolumeMuteFill
-                    className="h-full w-full"
-                    data-testid="volume-icon-muted"
-                  />
-                ) : (
-                  <DTVolume
-                    className="h-full w-full"
-                    data-testid="volume-icon-normal"
-                  />
-                )}
-              </button>
-
-              {isVolumeBarOpen && (
-                <div className="absolute top-[48px] -right-[60px]">
-                  <VolumeBar
-                    volume={volume}
-                    onVolumeChange={(value: number) => setVolume(value)}
-                  />
-                </div>
-              )}
-            </div>
-          </DefaultLayout.Header.Right>
-        </DefaultLayout.Header>
-
+      <DefaultLayout header={header}>
         {/* Containers */}
         <DefaultLayout.ContentContainer noPadding={true}>
+          {isError && <ErrorIndicator onClickRetry={() => refetch()} />}
           {isLoading && <LoadingIndicator />}
-          {!isLoading && (
+          {!isLoading && !isError && data && (
             <div
+              inert={isInputBlocked}
+              aria-disabled={isInputBlocked}
               className={clsx(
-                'relative flex h-full w-full flex-col items-center justify-center space-y-[32px] pb-[66px] xl:space-y-[60px]',
+                'relative flex min-h-full w-full flex-col items-center justify-center space-y-[32px] pb-[66px] xl:space-y-[60px]',
                 bgColorMap[bg],
               )}
             >
-              {/* 라이브 공유 버튼 및 모달 (화면이 작아져도 타이머와 라운드 버튼 위에 보이고 클릭되도록 레이어를 올린다) */}
-              {IS_LIVE_SHARE_ENABLED && isLoggedIn() && (
-                <div
-                  className="absolute top-4 right-4 z-20 flex"
-                  ref={liveShareModalRef}
-                >
-                  {!isLiveShareModalOpen && (
-                    <LiveShareButton
-                      onClick={toggleLiveShareModal}
-                      isSharing={isSocketConnected}
-                    />
-                  )}
-
-                  {isLiveShareModalOpen && (
-                    <div className="absolute right-0">
-                      <LiveShareModal
-                        shareUrl={liveShareUrl}
-                        isLoading={isSocketLoading}
-                        isError={isSocketError}
-                        errorType={socketErrorType}
-                        toggleModal={toggleLiveShareModal}
-                        onRestart={restartLiveShare}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 토론 기록 켜기/끄기와 녹음 상태. 라이브 공유 버튼(top-4, 96px) 바로 밑에 둔다. */}
-              {isTranscribeAvailable && (
-                <div className="absolute top-[116px] right-4 z-10 pr-[4px]">
-                  <TranscribeControl
-                    supportedModes={transcriber.supportedModes}
-                    sttMode={transcriber.sttMode}
-                    isModeLocked={transcriber.isModeLocked}
-                    isEnabled={transcriber.isEnabled}
-                    isListening={transcriber.isListening}
-                    utteranceCount={transcriber.utteranceCount}
-                    pendingCount={transcriber.pendingCount}
-                    failedCount={transcriber.failedCount}
-                    error={transcriber.error}
-                    shouldPromptOnMount
-                    onEnable={transcriber.enable}
-                    onDisable={transcriber.disable}
-                  />
-                </div>
-              )}
-
               {/* 타이머 두 개 + ENTER 버튼 */}
               <TimerView
                 state={state}
                 onEvent={handleTimerEvent}
-                answerTime={answerTime}
+                answerTime={controls.answerTime}
+                isAnswerTimeEnabled={controls.isAnswerTimeEnabled}
+                isInputBlocked={isInputBlocked}
+                pauseAdditionalRevision={pauseAdditionalRevision}
               />
               {/* Round control buttons on the bottom side */}
               {data && (
@@ -523,6 +461,7 @@ export default function TimerPage() {
                   goToOtherItem={goToOtherItem}
                   onEvent={handleTimerEvent}
                   openDoneModal={() => {
+                    stopTimers();
                     // 전체 화면 상태에서 토론을 끝낼 경우, 전체 화면을 비활성화
                     if (isFullscreen) {
                       setFullscreen(false);
@@ -543,6 +482,9 @@ export default function TimerPage() {
           )}
         </DefaultLayout.ContentContainer>
       </DefaultLayout>
+
+      <LoginPrompt login={login} />
+      <DebateLogoutDialog logout={logout} />
 
       {/* 첫 사용자를 위한 타이머 사용 안내 모달이다. */}
       <FirstUseToolTipModal

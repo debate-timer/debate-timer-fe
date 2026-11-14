@@ -4,7 +4,7 @@
 
 기본 타이머의 실시간 공유·속기록·답변 시간과 토론 중 로그아웃의 동작을 정의함. 피드백·사회자 투표·종료 화면에는 토론 메뉴를 제공하지 않음. 타이머 자체의 진행 규칙은 [타이머 위키](timer.md), 공용 언어·음량은 [설정 위키](settings.md)가 소유함.
 
-**지식 상태:** 2026-11-12 MP-03 계획 대화와 구현 요청으로 승인한 목표 정책임. MP-03은 독립 UI·훅·Story와 연결 계약을 준비하며, 실제 헤더·페이지 연결·기존 버튼과 자동 속기 동의 팝업 교체는 MP-04에서 수행함. 구현·서버 연동·배포 완료는 구분함.
+**지식 상태:** 2026-11-12 MP-03 계획 대화와 구현 요청으로 승인한 목표 정책임. MP-03의 독립 UI·훅·Story를 MP-04에서 실제 헤더·페이지에 연결하고 기존 버튼·자동 속기 동의 팝업을 교체했음. 구현·서버 연동·배포 완료는 구분함.
 
 ## 기능별 정책
 
@@ -38,7 +38,9 @@
 
 ## 현재 연결 상태와 근거
 
-- [제어 훅](../../../src/page/TimerPage/hooks/useDebateControls.ts)·[메뉴](../../../src/page/TimerPage/components/DebateMenu.tsx)·[로그아웃 훅](../../../src/page/TimerPage/hooks/useDebateLogout.ts)을 MP-04에서 페이지 수명에 연결함.
-- 현재 타이머의 기존 공유·속기 버튼과 헤더 인증 진입점은 유지함. 새 연결 계약을 준비한 것을 현재 화면의 안전한 로그아웃 적용 완료로 보지 않음.
-- 청중의 `handleAbort`를 켜면 중단 사유를 보존하고 연결을 정리함. 종료 안내 페이지와의 연결·새로고침 후 서버 사유 복원은 후속 범위임.
+- [제어 훅](../../../src/page/TimerPage/hooks/useDebateControls.ts)·[메뉴](../../../src/page/TimerPage/components/DebateMenu.tsx)·[로그아웃 훅](../../../src/page/TimerPage/hooks/useDebateLogout.ts)을 MP-04에서 페이지 수명에 연결했음.
+- 기본 타이머는 메뉴에서 공유·속기·답변 시간을 조작하며 설정 로그아웃을 중단 콜백으로 연결함. 실제 계정·마이크·서버 검증과 배포 완료는 별도로 확인함.
+- 청중의 `handleAbort`를 실제 화면에서 켜고 수신 사유를 같은 테이블의 종료 방문에 전달함. 없는 사유를 서버에서 복원하지 않으며 직접 방문은 [중립 안내](navigation.md#완료종료-안내)를 표시함.
 - 정책 변경 근거는 [결정 기록](../decisions/debate-controls.md#debate-controls-dec-001--mp-03-준비-범위와-중단-정책), 기술 계약은 [구조와 UI](../../architecture/structure-and-ui.md)·[데이터 접근](../../architecture/data-access.md)·[실시간 통신](../../architecture/realtime.md)을 따름.
+
+MP-04의 실제 연결·서버 보장 범위와 승인 근거는 [공통 결정](../decisions/shared.md#shared-dec-001--mp-04-헤더탐색청중-완료-연결)을 따름.

@@ -22,7 +22,7 @@ interface UseDebateControlsOptions extends UseDebateTranscriberParams {
  *
  * `useDebateControls`는 테이블·현재 차례·진영·실행 여부·인식 언어 후보, 공유/속기 허용 여부와 `stopTimers`·`onSyncRequest`를 받음. `DebateMenu`·`DebateFeatureIndicators`는 반환한 표시 상태·콜백만 소비함. 훅을 오버레이 밖의 페이지 수명에 배치하며 테이블 변경 시 페이지 조립 경계를 새로 마운트함. 메뉴 개폐는 기능을 재생성하지 않음.
  *
- * 목표 계약: `answerTime`·`isAnswerTimeEnabled`·`isInputBlocked`를 `TimerView`에 연결하고, `useTimerHotkey`에도 입력 가능 여부를 전달해야 함. 현재 `TimerPage.tsx`는 `isAnswerTimeEnabled`·`isInputBlocked`를 `TimerView`에 넘기지 않으며, `useTimerHotkey`는 입력 차단 인자를 받지 않음.
+ * 페이지는 `answerTime`·`isAnswerTimeEnabled`·`isInputBlocked`를 `TimerView`와 본문 입력 경계에 연결하고 `useTimerHotkey.isEnabled`에도 같은 입력 가능 여부를 전달함. `interrupt`는 입력 차단·타이머 정지·기록 폐기를 한 번 수행하며 `useDebateLogout.interrupt`에 전달함.
  *
  */
 export default function useDebateControls(options: UseDebateControlsOptions) {
@@ -61,6 +61,9 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
   }, [discard, stopSharing, options.stopTimers]);
 
   const interrupt = useCallback(() => {
+    if (interruptedRef.current) {
+      return;
+    }
     operationRef.current += 1;
     interruptedRef.current = true;
     setIsInterrupted(true);
@@ -73,6 +76,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
   useEffect(() => {
     const handleIdentity = () => {
       if (identityRef.current !== getAuthRevision()) {
+        identityRef.current = getAuthRevision();
         interrupt();
         actionsRef.current.stopSharing();
       }

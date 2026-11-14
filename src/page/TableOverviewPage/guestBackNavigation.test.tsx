@@ -38,7 +38,7 @@ function renderWithRouter(initialEntry: string) {
     [
       { path: '/share', element: <TableSharingPage /> },
       { path: '/overview/:type/:id', element: <TableOverviewPage /> },
-      { path: '/home', element: <div>HOME</div> },
+      { path: '/', element: <div>HOME</div> },
     ],
     { initialEntries: [initialEntry] },
   );
@@ -83,8 +83,10 @@ describe('비회원 테이블 개요 페이지 - 세션 데이터 유실', () =>
     await screen.findByText('공유받은 테이블');
 
     // 헤더 홈 버튼은 게스트 세션 데이터를 삭제한다.
-    await userEvent.click(screen.getAllByLabelText('홈으로 이동')[0]);
-    await waitFor(() => expect(router.state.location.pathname).toBe('/home'));
+    await userEvent.click(
+      screen.getAllByRole('link', { name: '서비스 소개' })[0],
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe('/'));
     expect(sessionStorage.getItem('DebateTableData')).toBeNull();
 
     await act(async () => {

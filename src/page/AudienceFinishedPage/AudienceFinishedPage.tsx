@@ -1,5 +1,11 @@
+import { useEffect, useRef } from 'react';
+import useGetCompletionInfo from '../../hooks/query/useGetCompletionInfo';
+import AudienceHeaderContainer from '../../layout/components/header/AudienceHeaderContainer';
+import { parsePositiveId } from '../../util/headerNavigation';
+import { getAudienceTermination } from '../../util/loginReturn';
+import CompletionInfoNotice from '../../components/CompletionInfoNotice/CompletionInfoNotice';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import CheckBox from '../../components/icons/CheckBox';
 import {
@@ -12,6 +18,22 @@ import {
 export default function AudienceFinishedPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const tableId = parsePositiveId(id);
+  const location = useLocation();
+  const info = useGetCompletionInfo('live', tableId);
+  const termination = tableId
+    ? getAudienceTermination(location.state?.audienceTermination, tableId)
+    : undefined;
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current !== null) {
+        clearTimeout(closeTimerRef.current);
+      }
+    },
+    [],
+  );
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
@@ -20,14 +42,26 @@ export default function AudienceFinishedPage() {
     window.close();
 
     // 페이지를 못 닫을 경우 현재 언어의 홈으로
-    setTimeout(() => {
-      navigate(buildLangPath('/home', lang), { replace: true });
+    closeTimerRef.current = setTimeout(() => {
+      navigate(buildLangPath('/', lang), { replace: true });
     }, 100);
   };
 
   return (
-    <DefaultLayout>
+    <DefaultLayout
+      header={
+        <AudienceHeaderContainer
+          name={info.data?.name}
+          agenda={info.data?.agenda}
+        />
+      }
+    >
       <DefaultLayout.ContentContainer noPadding>
+        <CompletionInfoNotice
+          isError={info.isError}
+          isFetching={info.isFetching}
+          onRetry={() => void info.refetch()}
+        />
         <div className="flex w-full flex-1 items-center justify-center bg-white px-6 py-10">
           <div className="flex w-full max-w-md flex-col items-center gap-4 text-center md:gap-6">
             {/* 체크 아이콘 배지 */}
@@ -39,7 +73,13 @@ export default function AudienceFinishedPage() {
 
             {/* 종료 안내 문구 */}
             <h1 className="text-2xl font-bold break-keep text-gray-800 md:text-3xl xl:text-5xl">
-              {t('토론이 종료되었습니다.')}
+              {t(
+                termination?.reason === 'ABORT'
+                  ? '실시간 공유가 중단되었습니다.'
+                  : termination?.reason === 'FINISHED'
+                    ? '토론이 종료되었습니다.'
+                    : '공유가 종료되었습니다.',
+              )}
             </h1>
             <p className="text-base break-keep text-gray-500 md:text-lg xl:text-xl">
               {t('참여해 주셔서 감사합니다.')}

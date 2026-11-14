@@ -7,6 +7,8 @@ const meta: Meta<typeof AudienceFinishedPage> = {
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
+    route: '/live/1/end',
+    routePattern: '/live/:id/end',
   },
 };
 
@@ -36,4 +38,17 @@ export const Mobile: Story = {
     },
   },
   globals: { viewport: { value: 'mobile375', isRotated: false } },
+};
+
+export const Aborted: Story = {
+  ...Default,
+  parameters: {
+    routeState: { audienceTermination: { tableId: 1, reason: 'ABORT' } },
+  },
+};
+export const Finished: Story = {
+  ...Default,
+  parameters: {
+    routeState: { audienceTermination: { tableId: 1, reason: 'FINISHED' } },
+  },
 };

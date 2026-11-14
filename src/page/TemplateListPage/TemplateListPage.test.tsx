@@ -107,7 +107,7 @@ describe('토론 템플릿 전체보기 페이지', () => {
 
     expect(screen.getByRole('link', { name: '메인으로' })).toHaveAttribute(
       'href',
-      '/home',
+      '/',
     );
   });
 });

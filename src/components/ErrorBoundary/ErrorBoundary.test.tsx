@@ -63,7 +63,7 @@ describe('렌더 오류 경계', () => {
                       </ErrorBoundary>
                     }
                   />
-                  <Route path="/home" element={<h1>복구된 홈 화면</h1>} />
+                  <Route path="/" element={<h1>복구된 홈 화면</h1>} />
                 </Routes>
               </MemoryRouter>
             </GlobalSettingsProvider>

@@ -59,7 +59,7 @@ TimerPage·AudienceSharePage
 
 사회자는 기존 `/app/event/{roomId}`에 사회자 토큰·`X-Chairman-Session`·증가하는 `version`으로 발행함. 청중 훅은 기존 `/room/{roomId}`에서 유효한 `ABORT`를 수신하고 기존 version 규칙을 거쳐 `latestMessage`로 전달함. `serverTime`·version의 기존 선택·nullable 형식과 다른 이벤트의 의미를 변경하지 않음.
 
-MP-01의 통신 범위는 발행·수신 기반까지임. 발행 함수는 서버의 중단 성공 여부를 반환하지 않고 발행 직후 disconnect를 수행하지 않음. 청중 화면의 중단 안내·기능 정리·재연결 차단은 후속 화면 연동 범위이며 현재 `ABORT`의 null payload를 타이머나 정상 종료로 해석하지 않음.
+MP-01의 통신 범위는 발행·수신 기반까지임. 발행 함수는 서버의 중단 성공 여부를 반환하지 않고 발행 직후 disconnect를 수행하지 않음. MP-01 당시 청중 화면의 중단 안내·기능 정리·재연결 차단은 후속 범위였으며 MP-04 연결은 아래 현행 범위를 따름.
 
 사회자 성공 확인·재시도·종료 상태 복원·새 청중 차단·구버전 중단 안내는 후속 통신 보완 사항임. 별도 목적지·`scope`·처리 결과 이벤트·공유 세션 필드는 추가하지 않았음. 모의 테스트 통과를 실제 서버 WS 연동 완료로 해석하지 않음.
 
@@ -78,12 +78,20 @@ MP-01의 통신 범위는 발행·수신 기반까지임. 발행 함수는 서�
 
 ## MP-03 명시적 공유 제어
 
-`useLiveShareSession`이 오버레이와 독립된 `startSharing`·`stopSharing`·재시작을 제공함. `useLiveShare`는 MP-04까지 현재 모달 기반 화면 API를 유지하는 어댑터임. 새로운 시작은 확인 이후에만 호출하며, 시작 의사를 취소하면 지연 토큰으로 연결하거나 현재 상태를 다시 발행하지 않음.
+`useLiveShareSession`이 오버레이와 독립된 `startSharing`·`stopSharing`·재시작을 제공함. MP-04에서 모달 기반 호환 어댑터를 제거하고 기본 타이머가 제어 훅을 통해 명시적 공유를 사용함. 새로운 시작은 확인 이후에만 호출하며, 시작 의사를 취소하면 지연 토큰으로 연결하거나 현재 상태를 다시 발행하지 않음.
 
 `SocketManager.publish` → `useSocket.publish` → `useChairmanSocket.sendDebateEvent`는 로컬 STOMP 발행 여부를 boolean으로 전달함. 연결 부재·교체된 사회자·잘못된 타이머 payload는 발행하지 않음. 이 값은 서버의 명령 처리 성공을 뜻하지 않음.
 
 MP-03에서 승인한 축소 범위에 따라 `stopSharing`은 연결 중 `ABORT`를 발행한 뒤 로컬 연결·구독·자동 재연결을 정리함. 발행 실패는 지역 오류로 남기고 로컬 정리는 수행함. 토큰 대기 취소는 중단 명령 실패로 표시하지 않음. 서버 성공 확인·상태 복원·새 청중 차단·이전 서버 세션의 지연 명령 차단은 후속 계약임. 기존 `STOP`·`FINISHED`의 의미와 payload는 유지함.
 
-청중 상태 훅의 `handleAbort: true`는 `ABORT` 수신 시 종료 상태에 `terminationReason: 'ABORT'`를 보존하고 disconnect해 재연결을 막음. 이후 메시지는 반영하지 않음. 정상 종료는 `FINISHED` 사유로 구분함. 기본값은 기존 페이지 동작을 유지하며 MP-04에서 새 종료 안내에 연결함. 새로고침 뒤의 사유 복원은 보장하지 않음.
+청중 상태 훅의 `handleAbort: true`는 `ABORT` 수신 시 종료 상태에 `terminationReason: 'ABORT'`를 보존하고 disconnect해 재연결을 막음. 이후 메시지는 반영하지 않음. 정상 종료는 `FINISHED` 사유로 구분함. MP-04의 실제 청중 페이지는 이 옵션을 켜고 같은 테이블의 종료 화면에 수신 사유를 전달함. 해당 방문의 history state가 없는 새 방문에서 서버 사유를 복원하지 않음.
 
 명시적 공유의 연결 실패는 로컬 연결 정리가 소켓 오류를 초기화해도 보존함. 사용자의 재시작 전에는 다시 연결하지 않으며 이전 소켓의 늦은 연결·오류·종료 이벤트는 현재 연결에 반영하지 않음.
+
+## MP-04와 BE PR 328의 정합 범위
+
+[BE PR #328](https://github.com/debate-timer/debate-timer-be/pull/328)의 병합 HEAD `fe7c82753cd458e955d397c41e58898fa5e32b9d`를 확인했음. 기존 `/app/event/{roomId}`·`/room/{roomId}`와 인증·세션·version을 유지함. 발행 ABORT에는 version이 필요하고 payload는 null임. 새 청중에게 재전송하는 서버 종료 메시지는 version이 없을 수 있으며 기존 수신의 선택적 version 계약을 유지함.
+
+서버는 활성 사회자·증가 version을 검사하고 정상 종료 뒤의 ABORT·중복 중단을 무시함. 중단 상태의 다른 이벤트는 버리며 사회자 재구독으로 재개함. 종료 사유 보존·새 청중에 대한 ABORT 재전송은 5분 TTL 범위임. 사회자 처리 결과·오류 응답과 종료 상태 조회 API·공유 세션 식별자를 추가한 계약이 아님. FE는 발행 후 로컬 정리를 수행하며 서버 처리 성공·영구 새 청중 차단을 표시하지 않음.
+
+청중은 수신한 종료 사유를 테이블 ID와 함께 해당 방문에 보존하고 종료 화면으로 replace 이동함. 이후 연결·재연결을 정리함. 종료 페이지는 소켓을 시작하지 않으며 history state가 없으면 중립 안내를 표시함. BE 선배포 → FE 청중 ABORT 활성화 순서와 실제 서버·별도 창 검증은 출시 전 확인 사항임. PR 병합 확인은 운영 배포·실제 송수신 검증의 근거가 아님.

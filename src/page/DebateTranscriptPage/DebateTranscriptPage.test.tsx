@@ -169,7 +169,7 @@ describe('토론 속기록 화면', () => {
       expect(stepState('속기록 보정 중')).toBe('active');
       expect(
         screen.getByRole('link', { name: '토론 기록으로 가기' }),
-      ).toHaveAttribute('href', '/?tab=records');
+      ).toHaveAttribute('href', '/records');
       expect(stepState('분석 보고서 발행 중')).toBe('waiting');
       expect(screen.queryByRole('tab')).not.toBeInTheDocument();
       expect(

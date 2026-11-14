@@ -1,3 +1,4 @@
+import { buildPublicUrl } from '../../../util/publicUrl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { socketManager } from '../../../apis/sockets/SocketManager';
 import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
@@ -25,8 +26,6 @@ export type LiveShareErrorType = 'token' | 'replaced' | 'disconnected' | 'else';
 
 interface UseLiveShareSessionOptions {
   onSyncRequest?: () => void;
-  /** MP-04에서 제거할 기존 화면 호환용임. 새 소비자는 기본값을 사용함. */
-  isLegacy?: boolean;
 }
 
 /** 오버레이와 독립적으로 공유 시작·로컬 중단·재연결 수명을 소유함. */
@@ -34,7 +33,7 @@ export default function useLiveShareSession(
   tableId: number,
   options: UseLiveShareSessionOptions = {},
 ) {
-  const { onSyncRequest, isLegacy = false } = options;
+  const { onSyncRequest } = options;
   const isValidTableId = Number.isSafeInteger(tableId) && tableId > 0;
   const hasConnectedRef = useRef(false);
   const desiredRef = useRef(false);
@@ -55,16 +54,10 @@ export default function useLiveShareSession(
     isPending: isTokenPending,
     isError: isTokenError,
     refetch: refetchChairmanToken,
-  } = useGetChairmanToken(
-    String(tableId),
-    isRequested && isValidTableId,
-    isLegacy
-      ? undefined
-      : {
-          memberId: getAccessToken() ? getMemberId() : null,
-          revision: getAuthRevision(),
-        },
-  );
+  } = useGetChairmanToken(String(tableId), isRequested && isValidTableId, {
+    memberId: getAccessToken() ? getMemberId() : null,
+    revision: getAuthRevision(),
+  });
 
   // 사회자 채널을 (재)구독할 때 최신 사회자 토큰을 첨부하기 위해 ref로 보관
   const chairmanTokenRef = useRef(chairmanToken);
@@ -83,23 +76,16 @@ export default function useLiveShareSession(
     error: socketError,
   } = useChairmanSocket(tableId, {
     onSyncRequest: () => {
-      if (desiredRef.current || isLegacy) {
+      if (desiredRef.current) {
         onSyncRequest?.();
       }
     },
     getAuthToken,
-    enabled: isRequested || isLegacy,
+    enabled: isRequested,
   });
 
   // 공유용 URL
-  const shareUrl = useMemo(() => {
-    const baseUrl =
-      import.meta.env.VITE_SHARE_BASE_URL || window.location.origin;
-    const normalizedBaseUrl = baseUrl.endsWith('/')
-      ? baseUrl.slice(0, -1)
-      : baseUrl;
-    return `${normalizedBaseUrl}/live/${tableId}`;
-  }, [tableId]);
+  const shareUrl = useMemo(() => buildPublicUrl(`/live/${tableId}`), [tableId]);
 
   // 반환용 값들
   const isLoading =
@@ -112,7 +98,7 @@ export default function useLiveShareSession(
     (isTokenPending || Boolean(chairmanToken)) &&
     !isSocketConnected;
   const isError =
-    ((isRequested || isLegacy) &&
+    (isRequested &&
       (!isValidTableId ||
         isTokenError ||
         Boolean(socketError) ||

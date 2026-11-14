@@ -21,7 +21,7 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
   const navigate = useNavigate();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
-  const homePath = buildLangPath('/home', lang);
+  const homePath = buildLangPath('/', lang);
   const goToHome = () => {
     onReset();
     navigate(homePath, { replace: true });
@@ -42,12 +42,6 @@ export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
 
   return (
     <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left />
-        <DefaultLayout.Header.Center />
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
-
       <DefaultLayout.ContentContainer>
         <div className="flex w-full flex-col items-start justify-start px-8 py-10">
           <div className="mb-20 flex flex-col font-bold">

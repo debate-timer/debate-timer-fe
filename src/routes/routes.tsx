@@ -1,4 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
+import RecordsPage from '../page/RecordsPage/RecordsPage';
+import CompatibilityRoute from './CompatibilityRoute';
+import { getHeaderRole } from '../util/headerNavigation';
 import TableListPage from '../page/TableListPage/TableListPage';
 import TableOverviewPage from '../page/TableOverviewPage/TableOverviewPage';
 import TableCompositionPage from '../page/TableComposition/TableCompositionPage';
@@ -23,11 +26,21 @@ import AudienceFinishedPage from '../page/AudienceFinishedPage/AudienceFinishedP
 import DebateTranscriptPage from '../page/DebateTranscriptPage/DebateTranscriptPage';
 import SharedTranscriptPage from '../page/SharedTranscriptPage/SharedTranscriptPage';
 
-const appRoutes = [
+const APP_ROUTES = [
   {
     path: 'home',
     element: <LandingPage />,
     requiresAuth: false,
+  },
+  { path: '', element: <LandingPage />, requiresAuth: false },
+  {
+    path: 'records',
+    element: (
+      <FeatureFlagRoute flag="TRANSCRIPT">
+        <RecordsPage />
+      </FeatureFlagRoute>
+    ),
+    requiresAuth: true,
   },
   {
     path: 'templates',
@@ -35,7 +48,7 @@ const appRoutes = [
     requiresAuth: false,
   },
   {
-    path: '',
+    path: 'dashboard',
     element: <TableListPage />,
     requiresAuth: true,
   },
@@ -127,12 +140,17 @@ const appRoutes = [
 ];
 
 // 인증 보호 로직을 적용한 라우트
-const protectedAppRoutes = appRoutes.map((route) => ({
+export const protectedAppRoutes = APP_ROUTES.map((route) => ({
   ...route,
-  element: route.requiresAuth ? (
-    <ProtectedRoute>{route.element}</ProtectedRoute>
-  ) : (
-    route.element
+  handle: { headerRole: getHeaderRole(`/${route.path}`) },
+  element: (
+    <CompatibilityRoute>
+      {route.requiresAuth ? (
+        <ProtectedRoute>{route.element}</ProtectedRoute>
+      ) : (
+        route.element
+      )}
+    </CompatibilityRoute>
   ),
 }));
 
