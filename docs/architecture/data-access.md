@@ -60,7 +60,7 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 
 ## 회원 설정과 공개 투표
 
-회원 설정은 `GET/PATCH /api/member/settings`를 사용함. `getMemberSettings()`·`patchMemberSettings()`가 기존 HTTP 경계를 재사용하며, 응답은 `language: 'ko' | 'en' | null`·`volume: number`임. 부분 수정은 최소 한 필드가 필요하고 생략 필드는 전송하지 않음. 음량의 범위 검사·소수 1자리 반올림은 서버가 수행하며 FE API는 정규화된 최종 응답을 반환함.
+회원 설정은 `GET/PATCH /api/member/settings`를 사용함. `getMemberSettings()`·`patchMemberSettings()`가 기존 HTTP 경계를 재사용하며, 응답은 `language: 'ko' | 'en' | null`·`volume: number`임. 부분 수정은 최소 한 필드에 `null`이 아닌 유효한 변경값이 필요함. 생략과 명시적 `null`은 해당 필드의 기존 값 유지이며 API는 전달받은 `null`을 그대로 전송함. 빈 객체·모든 필드가 생략 또는 `null`인 요청은 유효한 수정이 아님. 음량의 범위 검사·소수 1자리 반올림은 서버가 수행하며 FE API는 정규화된 최종 응답을 반환함. 정책 근거는 [설정 결정 기록](../wiki/decisions/settings.md#settings-dec-002--회원-설정-patch의-null-의미)을 따름.
 
 설정 API는 호출 시점에 로그인 계정을 확인하고 `expectedMemberId`로 HTTP 요청·재시도·응답까지 결속함. 훅의 진입 검사와 캐시 키 분리만으로 전송 계정의 일치를 보장하지 않음. 계정 변경에 따른 취소는 호출자에게 취소 오류로 전달하고 서버 오류로 변환하지 않음.
 
@@ -70,7 +70,7 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 
 설정 훅은 공용 전역 설정 계층에서 사용함. 적용값·저장 지연·순서·계정별 조회 취소와 캐시 제거는 해당 계층이 소유함. 비회원 값이나 조회 실패의 기본값을 서버에 자동 저장하지 않음.
 
-공개 `GET /api/polls/{pollId}/votes`의 `GetVoterPollInfoResponseType`은 `tableInfo: { name: string; agenda: string }`를 포함함. `id`는 투표 ID이며 시간표 ID가 아님. 공개 응답에는 `voterNames`가 없고 사회자 조회의 이름 목록은 유지함. FE는 숫자 투표 ID를 인코딩해 URL 문자열로 전송하며 기존 `['VoterPoll', pollId]` 키를 유지함.
+공개 `GET /api/polls/{pollId}/votes`의 서버 응답 타입 `GetVoterPollInfoResponseType`은 `tableInfo: { id: number; name: string; agenda: string | null }`를 포함함. 최상위 `id`는 투표 ID이며 `tableInfo.id`는 시간표 ID임. `getVoterPollInfo()`는 응답의 `agenda`가 `null`이면 빈 문자열로 변환해 반환하며 조회 훅도 이 반환 타입을 추론함. 공개 응답에는 `voterNames`가 없고 사회자 조회의 이름 목록은 유지함. FE는 숫자 투표 ID를 인코딩해 URL 문자열로 전송하며 기존 `['VoterPoll', pollId]` 키를 유지함.
 
 회원 설정 MSW 핸들러는 모의 인증 토큰별로 저장 상태를 분리하며 `resetMemberSettings()`로 초기화함. 토큰 문자열은 개발·테스트용 계정 구분자임. 실제 서버의 토큰 검증·계정 저장 구현을 모방하는 계약은 아님. `setup.ts`가 각 테스트 뒤 상태를 초기화하고, 공개 투표의 진행·종료·빈 정보·오류는 테스트별 핸들러로 검증함.
 

@@ -106,8 +106,30 @@ describe('회원 설정 API', () => {
   });
 
   it.each([
+    {
+      body: { language: null, volume: 0 },
+      expected: { language: 'en', volume: 0 },
+    },
+    {
+      body: { language: 'ko', volume: null },
+      expected: { language: 'ko', volume: 0.8 },
+    },
+  ] as const)(
+    '명시적 null 필드를 유지하고 나머지 설정을 수정한다: %j',
+    async ({ body, expected }) => {
+      await patchMemberSettings({ language: 'en', volume: 0.8 });
+      expect(await patchMemberSettings(body)).toEqual(expected);
+      expect(await getMemberSettings()).toEqual(expected);
+    },
+  );
+
+  it.each([
     {},
     { language: null },
+    { volume: null },
+    { language: null, volume: null },
+    { language: null, volume: 1.04 },
+    { language: 'fr', volume: null },
     { language: 'fr' },
     { volume: '0.5' },
     { volume: -0.1 },

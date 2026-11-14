@@ -9,6 +9,7 @@ describe('공개 투표 조회 API', () => {
     const response = await getVoterPollInfo(7);
     expect(response.id).toBe(7);
     expect(response.tableInfo).toEqual({
+      id: 12,
       name: '정기 토론회',
       agenda: '공유 토론 주제',
     });
@@ -30,7 +31,7 @@ describe('공개 투표 조회 API', () => {
         prosCount: 0,
         consCount: 0,
         participateCode: 'code',
-        tableInfo: { name: '', agenda: '' },
+        tableInfo: { id: 12, name: '', agenda: '' },
       };
       server.use(
         http.get('/api/polls/:pollId/votes', ({ request, params }) => {
@@ -41,6 +42,38 @@ describe('공개 투표 조회 API', () => {
         }),
       );
       expect(await getVoterPollInfo(37)).toEqual(response);
+    },
+  );
+
+  it.each(['PROGRESS', 'DONE'] as const)(
+    '%s 투표의 null 주제를 빈 문자열로 반환하고 시간표 ID를 보존한다',
+    async (status) => {
+      server.use(
+        http.get('/api/polls/:pollId/votes', () =>
+          HttpResponse.json({
+            id: 37,
+            status,
+            prosTeamName: '찬성',
+            consTeamName: '반대',
+            totalCount: 0,
+            prosCount: 0,
+            consCount: 0,
+            participateCode: 'code',
+            tableInfo: { id: 12, name: '정기 토론회', agenda: null },
+          }),
+        ),
+      );
+      const response = await getVoterPollInfo(37);
+      expect(response.id).toBe(37);
+      expect(response.tableInfo).toEqual({
+        id: 12,
+        name: '정기 토론회',
+        agenda: '',
+      });
+      expectTypeOf<
+        GetVoterPollInfoResponseType['tableInfo']['id']
+      >().toEqualTypeOf<number>();
+      expectTypeOf(response.tableInfo.agenda).toEqualTypeOf<string>();
     },
   );
 
