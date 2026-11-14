@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
+import { SocketMessage } from '../../../apis/sockets/type';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
 import { TimeBoxInfo } from '../../../types/type';
 import { isSocketError } from '../../../apis/sockets/error';
@@ -60,6 +61,9 @@ export function useAudienceShareState(
 ): AudienceShareState & {
   chairmanPresence: ChairmanPresence;
   connectionStatus: AudienceConnectionStatus;
+  // 다기기 녹음이 구간을 나눌 때 쓰는 검증된 최근 메시지와 수신 시각
+  latestMessage: SocketMessage | null;
+  latestMessageReceivedAt: number | null;
 } {
   const { enabled = true, table, handleAbort = false } = options;
   const {
@@ -268,6 +272,8 @@ export function useAudienceShareState(
       syncedAt,
       chairmanPresence,
       connectionStatus,
+      latestMessage,
+      latestMessageReceivedAt,
     };
   }
 
@@ -277,5 +283,7 @@ export function useAudienceShareState(
     error,
     chairmanPresence,
     connectionStatus,
+    latestMessage,
+    latestMessageReceivedAt,
   };
 }

@@ -483,5 +483,14 @@
   "주변의 대화도 함께 녹음될 수 있습니다.": "Nearby conversations may also be recorded.",
   "Soniox 다기기 녹음": "Soniox multi-device recording",
   "이 링크로 들어온 청중은 녹음에 참여할 수 있어요.": "Audience members who join with this link can take part in the recording.",
-  "실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.": "Devices of audience members who join via the live share link also record, and the clearest recording is used for the transcript."
+  "실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.": "Devices of audience members who join via the live share link also record, and the clearest recording is used for the transcript.",
+  "마이크 권한을 허용해야 녹음에 참여할 수 있어요.": "Allow microphone access to join the recording.",
+  "녹음에 참여하지 못했어요. 링크를 다시 확인해 주세요.": "Couldn't join the recording. Please check the link again.",
+  "이 브라우저에서는 녹음에 참여할 수 없어요.": "This browser can't join the recording.",
+  "이 기기로 녹음하는 중이에요.": "Recording on this device.",
+  "녹음에 참여 중이에요. 타이머가 시작되면 녹음해요.": "You've joined the recording. Recording starts when the timer starts.",
+  "{{count}}개 구간을 올리지 못했어요.": "Failed to upload {{count}} segment(s).",
+  "녹음 참여 그만하기": "Stop recording",
+  "녹음 참여": "Join recording",
+  "녹음 준비 중": "Preparing to record"
 }
