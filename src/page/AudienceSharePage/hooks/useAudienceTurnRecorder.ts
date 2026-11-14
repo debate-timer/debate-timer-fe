@@ -21,6 +21,8 @@ export interface UseAudienceTurnRecorderParams {
   join: RecordingJoin | null;
   latestMessage: SocketMessage | null;
   latestMessageReceivedAt: number | null;
+  // 소켓 연결 상태. 끊긴 사이 놓친 이벤트가 있을 수 있어, 다시 연결된 뒤 받은 SYNC로는 진행 중인 구간을 잇지 않는다.
+  isConnected: boolean;
 }
 
 export type AudienceRecorderStatus = 'idle' | 'starting' | 'recording';
@@ -40,12 +42,15 @@ interface ActiveTurn extends Segment {
  * - 실행 상태로 바뀌는 이벤트(재생, 실행 중 팀 전환)를 받은 구간만 녹음하고, 그 이벤트의 version으로 턴 키를 만든다.
  *   사회자 기기도 같은 version을 쓰므로 같은 구간이 같은 턴으로 모인다.
  * - 중도 입장·재연결로 상태 동기화(SYNC)만 받은 진행 중 구간은 시작 version을 모르므로 건너뛴다.
+ * - 연결이 끊긴 사이 정지·재생을 놓쳤을 수 있으므로, 재연결 뒤 처음 받은 SYNC에서 진행 중인 구간을 끝내고
+ *   다음 시작 이벤트를 기다린다. 연결이 유지된 SYNC는 진행 중인 구간을 그대로 잇는다.
  * - 정지·차례 이동·팀 전환·종료·중단 이벤트에서 구간을 끝내고 올린다.
  */
 export default function useAudienceTurnRecorder({
   join,
   latestMessage,
   latestMessageReceivedAt,
+  isConnected,
 }: UseAudienceTurnRecorderParams) {
   const isSupported = useMemo(() => isAudioRecordingSupported(), []);
   const [status, setStatus] = useState<AudienceRecorderStatus>('idle');
@@ -56,12 +61,22 @@ export default function useAudienceTurnRecorder({
   const activeRef = useRef<ActiveTurn | null>(null);
   const joinRef = useRef(join);
   const generationRef = useRef(0);
+  // 참여 시작(마이크·기기 등록)을 기다리는 중이면 다시 시작하지 않는다.
+  const isStartingRef = useRef(false);
+  // 연결이 끊겼다가 다시 붙어 아직 SYNC를 받지 못했다.
+  const isResyncPendingRef = useRef(false);
   // 서버 시계 기준 녹음 시작 시각을 구하려고, 마지막 메시지로 잰 기기 시계와 서버 시계의 차이
   const clockOffsetRef = useRef(0);
 
   useEffect(() => {
     joinRef.current = join;
   }, [join]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      isResyncPendingRef.current = true;
+    }
+  }, [isConnected]);
 
   // 기기 토큰은 업로드한 턴의 세션 기준으로 읽는다. 다시 참가할 때 쓰는 참가 코드는 지금 참가 정보가
   // 같은 세션일 때만 있으므로, 녹음 중 참가 정보가 바뀌었으면 이전 세션에는 다시 참가하지 않는다.
@@ -134,6 +149,12 @@ export default function useAudienceTurnRecorder({
   }, []);
 
   useEffect(() => {
+    // 녹음하지 않는 동안 받은 SYNC도 재연결 동기화를 마친 것으로 본다.
+    const isResync =
+      latestMessage?.eventType === 'SYNC' && isResyncPendingRef.current;
+    if (latestMessage?.eventType === 'SYNC') {
+      isResyncPendingRef.current = false;
+    }
     if (status !== 'recording' || !latestMessage) {
       return;
     }
@@ -166,7 +187,8 @@ export default function useAudienceTurnRecorder({
     const active = activeRef.current;
     if (
       active &&
-      (!isRunning ||
+      (isResync ||
+        !isRunning ||
         active.timeBoxIndex !== segment.timeBoxIndex ||
         active.team !== segment.team)
     ) {
@@ -199,8 +221,9 @@ export default function useAudienceTurnRecorder({
   }, [releaseMicrophone, stopTurn]);
 
   // 녹음 참여에 동의한 뒤 부른다. 마이크를 받고, 이 탭에서 처음 참가하면 참가 코드로 기기 토큰을 받는다.
+  // 이미 시작 중이거나 참여 중이면 무시한다. 다시 시작하려면 먼저 stop()을 부른다.
   const start = useCallback(async () => {
-    if (!join) {
+    if (!join || isStartingRef.current || streamRef.current?.active) {
       return;
     }
     if (!isSupported) {
@@ -209,39 +232,48 @@ export default function useAudienceTurnRecorder({
     }
     const generation = ++generationRef.current;
     const isCurrent = () => generation === generationRef.current;
+    isStartingRef.current = true;
     setStatus('starting');
     setError(null);
-    const stream = await requestMicrophoneStream().catch(() => null);
-    if (!isCurrent()) {
-      stopMediaStream(stream);
-      return;
-    }
-    if (!stream) {
-      setError('not-allowed');
-      setStatus('idle');
-      return;
-    }
-    streamRef.current = stream;
-    if (!getAudienceDeviceTokenV2(join.sessionKey)) {
-      const joined = await renewDeviceToken(join.sessionKey).catch(
-        () => null,
-      );
+    try {
+      const stream = await requestMicrophoneStream().catch(() => null);
       if (!isCurrent()) {
+        stopMediaStream(stream);
         return;
       }
-      if (!joined) {
-        releaseMicrophone();
-        setError('join');
+      if (!stream) {
+        setError('not-allowed');
         setStatus('idle');
         return;
       }
+      releaseMicrophone();
+      streamRef.current = stream;
+      if (!getAudienceDeviceTokenV2(join.sessionKey)) {
+        const joined = await renewDeviceToken(join.sessionKey).catch(
+          () => null,
+        );
+        if (!isCurrent()) {
+          return;
+        }
+        if (!joined) {
+          releaseMicrophone();
+          setError('join');
+          setStatus('idle');
+          return;
+        }
+      }
+      setStatus('recording');
+    } finally {
+      if (isCurrent()) {
+        isStartingRef.current = false;
+      }
     }
-    setStatus('recording');
   }, [isSupported, join, releaseMicrophone, renewDeviceToken]);
 
   // 녹음 참여를 멈춘다. 진행 중이던 구간은 올린다.
   const stop = useCallback(() => {
     generationRef.current += 1;
+    isStartingRef.current = false;
     stopTurn();
     releaseMicrophone();
     setStatus('idle');

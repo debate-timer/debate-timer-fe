@@ -87,17 +87,23 @@ const render = () =>
         join,
         latestMessage: null,
         latestMessageReceivedAt: null,
+        isConnected: true,
       } as UseAudienceTurnRecorderParams,
     },
   );
 
 type Rendered = ReturnType<typeof render>;
 
-const receive = (rendered: Rendered, latestMessage: SocketMessage) =>
+const receive = (
+  rendered: Rendered,
+  latestMessage: SocketMessage | null,
+  isConnected = true,
+) =>
   rendered.rerender({
     join,
     latestMessage,
     latestMessageReceivedAt: Date.now(),
+    isConnected,
   });
 
 const uploadedTurnKeys = () =>
@@ -160,6 +166,23 @@ describe('다기기 녹음 청중 훅', () => {
       expect(trackStop).toHaveBeenCalled();
     });
 
+    it('참여를 시작하는 중에 다시 불러도 마이크를 한 번만 받는다', async () => {
+      const rendered = render();
+
+      await act(async () => {
+        await Promise.all([
+          rendered.result.current.start(),
+          rendered.result.current.start(),
+        ]);
+      });
+
+      expect(getUserMedia).toHaveBeenCalledTimes(1);
+      expect(rendered.result.current.status).toBe('recording');
+
+      act(() => rendered.result.current.stop());
+      expect(trackStop).toHaveBeenCalledTimes(1);
+    });
+
     it('마이크 권한이 없으면 권한 오류를 알린다', async () => {
       getUserMedia.mockRejectedValueOnce(new Error('denied'));
       const rendered = render();
@@ -209,7 +232,7 @@ describe('다기기 녹음 청중 훅', () => {
       expect(uploadedTurnKeys()).toEqual(['1-203']);
     });
 
-    it('녹음 중 재연결로 같은 구간의 동기화를 받으면 그대로 이어서 녹음한다', async () => {
+    it('연결이 유지된 채 같은 구간의 동기화를 받으면 그대로 이어서 녹음한다', async () => {
       const rendered = render();
       await act(() => rendered.result.current.start());
 
@@ -219,6 +242,28 @@ describe('다기기 녹음 청중 훅', () => {
 
       await waitFor(() => expect(postRecordingTurnV2).toHaveBeenCalledTimes(1));
       expect(uploadedTurnKeys()).toEqual(['0-300']);
+    });
+
+    it('재연결 뒤 받은 동기화에서는 진행 중인 구간을 끝내고 다음 시작 이벤트를 기다린다', async () => {
+      const rendered = render();
+      await act(() => rendered.result.current.start());
+
+      receive(rendered, message('PLAY', normal(0, true), 300));
+      // 끊긴 사이 STOP v301, PLAY v302를 놓쳤다.
+      receive(rendered, null, false);
+      receive(rendered, null, true);
+      receive(rendered, message('SYNC', normal(0, true), 9_999));
+
+      await waitFor(() => expect(postRecordingTurnV2).toHaveBeenCalledTimes(1));
+      expect(uploadedTurnKeys()).toEqual(['0-300']);
+      expect(rendered.result.current.isListening).toBe(false);
+
+      receive(rendered, message('STOP', normal(0, false), 303));
+      receive(rendered, message('PLAY', normal(0, true), 304));
+      receive(rendered, message('STOP', normal(0, false), 305));
+
+      await waitFor(() => expect(postRecordingTurnV2).toHaveBeenCalledTimes(2));
+      expect(uploadedTurnKeys()).toEqual(['0-300', '0-304']);
     });
 
     it('녹음 중 참가 정보가 바뀌어도 이전 세션 턴은 그 세션의 토큰으로 올리고 새 세션에 다시 참가하지 않는다', async () => {
@@ -231,6 +276,7 @@ describe('다기기 녹음 청중 훅', () => {
         join: { sessionKey: 'session-2', joinCode: 'join-2' },
         latestMessage: message('STOP', normal(0, false), 311),
         latestMessageReceivedAt: Date.now(),
+        isConnected: true,
       });
 
       await waitFor(() => expect(postRecordingTurnV2).toHaveBeenCalledTimes(1));
@@ -299,6 +345,7 @@ describe('다기기 녹음 청중 훅', () => {
         join: null,
         latestMessage: null,
         latestMessageReceivedAt: null,
+        isConnected: true,
       }),
     );
 
