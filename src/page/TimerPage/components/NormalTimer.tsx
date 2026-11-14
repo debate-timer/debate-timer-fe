@@ -23,6 +23,7 @@ type NormalTimerInstance = {
 };
 
 interface NormalTimerProps {
+  pauseAdditionalRevision?: number;
   normalTimerInstance: NormalTimerInstance;
   isAdditionalTimerAvailable: boolean;
   item: TimeBoxInfo;
@@ -31,6 +32,7 @@ interface NormalTimerProps {
 }
 
 export default function NormalTimer({
+  pauseAdditionalRevision,
   normalTimerInstance,
   isAdditionalTimerAvailable,
   item,
@@ -135,6 +137,7 @@ export default function NormalTimer({
 
         {isAdditionalTimerAvailable && isAdditionalTimerOn && (
           <CompactTimeoutTimer
+            pauseRevision={pauseAdditionalRevision}
             onClose={handleCloseAdditionalTimer}
             className="mt-[56px]"
           />

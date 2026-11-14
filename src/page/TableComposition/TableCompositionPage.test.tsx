@@ -79,12 +79,14 @@ describe('TableComposition', () => {
     ).toBeInTheDocument();
 
     // Go to next step - TimeBoxStep
+    expect(screen.getAllByRole('banner')).toHaveLength(1);
     await userEvent.click(await screen.findByRole('button', { name: '다음' }));
     expect(
       await screen.findByRole('heading', { name: '주제 없음' }),
     ).toBeInTheDocument();
 
     // Check whether finish button is disabled
+    expect(screen.getAllByRole('banner')).toHaveLength(1);
     const finishButton = await screen.findByRole('button', {
       name: '추가하기',
     });

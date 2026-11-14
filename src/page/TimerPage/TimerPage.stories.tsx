@@ -1,23 +1,16 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import TimerPage from './TimerPage';
 
-const meta: Meta<typeof TimerPage> = {
-  title: 'page/TimerPage',
+const META: Meta<typeof TimerPage> = {
+  title: 'Timer/IntegratedPage',
   component: TimerPage,
-  tags: ['autodocs'],
   parameters: {
-    layout: 'fullscreen', // Storybook에서 전체 화면으로 표시
+    layout: 'fullscreen',
+    route: '/table/customize/5',
+    routePattern: '/table/customize/:id',
   },
+  tags: ['autodocs'],
 };
-
-export default meta;
-
-type Story = StoryObj<typeof TimerPage>;
-
-export const Default: Story = {
-  render: () => (
-    <div style={{ height: '100vh', width: '100vw', overflow: 'hidden' }}>
-      <TimerPage />
-    </div>
-  ),
-};
+export default META;
+type Story = StoryObj<typeof META>;
+export const Default: Story = {};

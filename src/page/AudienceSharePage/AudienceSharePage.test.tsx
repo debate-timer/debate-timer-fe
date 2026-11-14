@@ -196,6 +196,7 @@ describe('AudienceSharePage', () => {
       expect(mockUseAudienceShareState).toHaveBeenCalledWith(123, {
         enabled: false,
         table: undefined,
+        handleAbort: true,
       });
       expect(
         screen.getByRole('status', { name: '데이터를 불러오고 있습니다...' }),
@@ -216,12 +217,13 @@ describe('AudienceSharePage', () => {
         expect(mockUseAudienceShareState).toHaveBeenCalledWith(123, {
           enabled: true,
           table: mockDebateTableData.table,
+          handleAbort: true,
         });
       });
       expect(
         screen.getByRole('status', { name: '데이터를 불러오고 있습니다...' }),
       ).toBeInTheDocument();
-      expect(screen.queryByText('공유 토론 테이블')).not.toBeInTheDocument();
+      expect(screen.getByText('공유 토론 테이블')).toBeInTheDocument();
       expect(screen.queryByText('남은 시간')).not.toBeInTheDocument();
       expect(screen.queryByText('찬성')).not.toBeInTheDocument();
     });
@@ -239,14 +241,12 @@ describe('AudienceSharePage', () => {
         await screen.findByText('토론 시작을 대기 중입니다.'),
       ).toBeInTheDocument();
       expect(screen.getByText('공유 토론 테이블')).toBeInTheDocument();
-      expect(
-        screen.getByRole('heading', { name: '공유 토론 주제' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('공유 토론 주제')).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: '언어 선택' }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: '홈으로 이동' }),
+        screen.getByRole('link', { name: '서비스 소개' }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: '로그인' }),
@@ -315,13 +315,11 @@ describe('AudienceSharePage', () => {
 
       renderPage('/live/123');
 
-      expect(await screen.findByText('테이블 이름 없음')).toBeInTheDocument();
-      expect(
-        screen.getByRole('heading', { name: '주제 없음' }),
-      ).toBeInTheDocument();
+      expect(await screen.findByText('시간표 이름 없음')).toBeInTheDocument();
+      expect(screen.getByText('주제 없음')).toBeInTheDocument();
     });
 
-    it('모바일에서는 헤더 대신 본문 상단에 주제를 표시한다', async () => {
+    it('모바일도 헤더 안에서 주제를 한 번 표시하고 펼칠 수 있다', async () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
@@ -330,13 +328,11 @@ describe('AudienceSharePage', () => {
       });
       renderPage('/live/123');
 
-      const mobileAgenda = await screen.findByTestId('mobile-agenda');
-
-      expect(mobileAgenda).toHaveTextContent('공유 토론 주제');
-      expect(mobileAgenda).toHaveClass('md:hidden');
+      expect(await screen.findByText('공유 토론 주제')).toBeInTheDocument();
       expect(
-        screen.getByRole('heading', { name: '공유 토론 주제' }).parentElement,
-      ).toHaveClass('hidden', 'md:flex');
+        screen.getByRole('button', { name: '토론 정보 펼치기' }),
+      ).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.queryByTestId('mobile-agenda')).not.toBeInTheDocument();
     });
 
     it('displaying 상태 (NORMAL)에서는 AudienceNormalTimer에 올바른 props가 전달된다', async () => {
@@ -572,6 +568,7 @@ describe('AudienceSharePage', () => {
         name: '배열 범위를 벗어난 sequence',
         sequence: 10,
         table: mockDebateTableData.table,
+        handleAbort: true,
       },
       {
         name: 'TIME_BASED API 항목',
@@ -973,6 +970,7 @@ describe('AudienceSharePage', () => {
         expect(mockUseAudienceShareState).toHaveBeenCalledWith(123, {
           enabled: true,
           table: mockDebateTableData.table,
+          handleAbort: true,
         });
       });
 
@@ -984,6 +982,7 @@ describe('AudienceSharePage', () => {
         expect(mockUseAudienceShareState).toHaveBeenCalledWith(123, {
           enabled: true,
           table: mockDebateTableData.table,
+          handleAbort: true,
         });
       });
       expect(await screen.findByTestId('timer-value')).toBeInTheDocument();

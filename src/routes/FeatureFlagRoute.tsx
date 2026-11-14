@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
+import DefaultLayout from '../layout/defaultLayout/DefaultLayout';
 import LoadingIndicator from '../components/LoadingIndicator/LoadingIndicator';
 import useFeatureFlag from '../hooks/useFeatureFlag';
 import { FeatureFlag } from '../types/featureFlag';
@@ -21,12 +22,18 @@ export default function FeatureFlagRoute(props: FeatureFlagRouteProps) {
   const { isEnabled, isLoading } = useFeatureFlag(flag);
 
   if (isLoading) {
-    return <LoadingIndicator />;
+    return (
+      <DefaultLayout>
+        <DefaultLayout.ContentContainer>
+          <LoadingIndicator />
+        </DefaultLayout.ContentContainer>
+      </DefaultLayout>
+    );
   }
   if (!isEnabled) {
     const currentLang = i18n.resolvedLanguage ?? i18n.language;
     const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
-    return <Navigate to={buildLangPath('/', lang)} replace />;
+    return <Navigate to={buildLangPath('/dashboard', lang)} replace />;
   }
 
   return children;

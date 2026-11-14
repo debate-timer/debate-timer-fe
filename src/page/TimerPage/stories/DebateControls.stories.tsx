@@ -103,8 +103,7 @@ function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
     stopTimers: () => setIsRunning(false),
   });
   const logout = useDebateLogout({
-    stopTimers: () => setIsRunning(false),
-    discardTranscript: controls.interrupt,
+    interrupt: controls.interrupt,
     stopSharing: controls.share.stopSharing,
     exitFullscreen: async () => {
       if (document.fullscreenElement) {

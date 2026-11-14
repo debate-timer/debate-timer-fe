@@ -1,3 +1,5 @@
+import AudienceHeaderContainer from '../../layout/components/header/AudienceHeaderContainer';
+import { parsePositiveId } from '../../util/headerNavigation';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -27,8 +29,9 @@ export default function VoteParticipationPage() {
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   // 1) pollId 파싱 + 유효성 체크
-  const pollId = pollIdParam ? Number(pollIdParam) : NaN;
-  const isValidPollId = !!pollIdParam && !Number.isNaN(pollId);
+  const parsedPollId = parsePositiveId(pollIdParam);
+  const pollId = parsedPollId ?? NaN;
+  const isValidPollId = parsedPollId !== undefined;
 
   const { trackEvent } = useAnalytics();
   const [participantName, setParticipantName] = useState('');
@@ -50,7 +53,7 @@ export default function VoteParticipationPage() {
     participantName.trim().length === 0 || selectedTeam === null;
 
   const { mutate } = usePostVoterPollInfo(() =>
-    navigate(buildLangPath('/vote/end', lang)),
+    navigate(`${buildLangPath('/vote/end', lang)}?pollId=${pollId}`),
   );
 
   // 유효한 입력이 모였을 때 poll_voted 이벤트를 기록하고 투표를 제출한다.
@@ -72,7 +75,14 @@ export default function VoteParticipationPage() {
 
   if (isError) {
     return (
-      <DefaultLayout>
+      <DefaultLayout
+        header={
+          <AudienceHeaderContainer
+            name={data?.tableInfo.name}
+            agenda={data?.tableInfo.agenda}
+          />
+        }
+      >
         <DefaultLayout.ContentContainer>
           <ErrorIndicator onClickRetry={() => refetch()} />
         </DefaultLayout.ContentContainer>
@@ -82,7 +92,14 @@ export default function VoteParticipationPage() {
 
   if (!isValidPollId) {
     return (
-      <DefaultLayout>
+      <DefaultLayout
+        header={
+          <AudienceHeaderContainer
+            name={data?.tableInfo.name}
+            agenda={data?.tableInfo.agenda}
+          />
+        }
+      >
         <DefaultLayout.ContentContainer>
           <ErrorIndicator
             onClickRetry={() => navigate(buildLangPath('/', lang))}
@@ -95,7 +112,14 @@ export default function VoteParticipationPage() {
   }
 
   return (
-    <DefaultLayout>
+    <DefaultLayout
+      header={
+        <AudienceHeaderContainer
+          name={data?.tableInfo.name}
+          agenda={data?.tableInfo.agenda}
+        />
+      }
+    >
       <DefaultLayout.ContentContainer noPadding={true}>
         {isLoading && <LoadingIndicator />}
         {!isLoading && (

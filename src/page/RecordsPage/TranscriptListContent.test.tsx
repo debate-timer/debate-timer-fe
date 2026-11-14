@@ -3,9 +3,9 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { ApiUrl } from '../../../apis/endpoints';
-import { GetTranscriptsResponseType } from '../../../apis/responses/transcript';
-import { server } from '../../../mocks/server';
+import { ApiUrl } from '../../apis/endpoints';
+import { GetTranscriptsResponseType } from '../../apis/responses/transcript';
+import { server } from '../../mocks/server';
 import TranscriptListContent from './TranscriptListContent';
 
 const transcripts: GetTranscriptsResponseType = {

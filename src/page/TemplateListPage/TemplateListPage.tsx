@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import Header from '../LandingPage/components/Header';
-import useLandingPageHandlers from '../LandingPage/hooks/useLandingPageHandlers';
+import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
 import TemplateCard from '../../components/TemplateCard/TemplateCard';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
@@ -14,7 +13,6 @@ const INQUIRY_BUTTON =
 
 export default function TemplateListPage() {
   const { t, i18n } = useTranslation();
-  const { handleHeaderLoginButtonClick } = useLandingPageHandlers();
   const { data, isError } = useGetOrganizationTemplates();
   const lang = getSelectedLang(i18n.resolvedLanguage ?? i18n.language);
 
@@ -57,12 +55,13 @@ export default function TemplateListPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full justify-center bg-default-white">
-      {/* TODO: 헤더 개편이 반영되면 공용 헤더로 교체함 */}
-      <Header onLoginButtonClicked={handleHeaderLoginButtonClick} />
-      <main className="flex w-full max-w-[1200px] flex-col gap-8 px-4 pt-28 pb-24">
+    <div className="flex min-h-screen w-full flex-col items-center bg-white">
+      <div className="sticky top-0 z-30 w-full">
+        <GeneralHeaderContainer />
+      </div>
+      <main className="flex w-full max-w-[1200px] flex-col gap-8 px-4 pt-8 pb-24">
         <Link
-          to={buildLangPath('/home', lang)}
+          to={buildLangPath('/', lang)}
           className="self-start py-2 text-ui-label text-neutral-600 hover:text-neutral-900"
           aria-label={t('메인으로')}
         >

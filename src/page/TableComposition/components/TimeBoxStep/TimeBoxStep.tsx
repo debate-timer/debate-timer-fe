@@ -201,8 +201,8 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
 
   return (
     <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>
+      <DefaultLayout.ContentContainer>
+        <div className="mb-4 w-full max-w-4xl">
           {!isLoading && initData && (
             <HeaderTableInfo
               name={
@@ -212,8 +212,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
               }
             />
           )}
-        </DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center>
+
           {!isLoading && (
             <HeaderTitle
               title={
@@ -223,11 +222,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
               }
             />
           )}
-        </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
-
-      <DefaultLayout.ContentContainer>
+        </div>
         {isLoading && <LoadingIndicator />}
         {!isLoading && (
           <div

@@ -6,7 +6,9 @@ const meta: Meta<typeof VoteCompletePage> = {
   component: VoteCompletePage,
   tags: ['autodocs'],
   parameters: {
-    layout: 'fullscreen', // Storybook에서 전체 화면으로 표시
+    layout: 'fullscreen',
+    route: '/vote/end?pollId=1',
+    routePattern: '/vote/end', // Storybook에서 전체 화면으로 표시
   },
 };
 

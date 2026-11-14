@@ -1,3 +1,4 @@
+import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -153,7 +154,8 @@ export default function TableSharingPage() {
 
   return (
     <>
-      <div className="flex min-h-screen w-full flex-col items-center justify-center space-y-8">
+      <GeneralHeaderContainer />
+      <div className="flex min-h-[60dvh] w-full flex-col items-center justify-center space-y-8">
         <LoadingSpinner size={'size-24'} color={'text-brand-main'} />
 
         <p className="text-2xl">{t('데이터를 처리하고 있습니다...')}</p>

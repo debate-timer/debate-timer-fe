@@ -1,9 +1,9 @@
+import TimerHeader from '../../../layout/components/header/TimerHeader';
+import TimerHeaderTools from '../../../layout/components/header/TimerHeaderTools';
 // NormalTimerTestPage.stories.tsx
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { TimeBoxInfo } from '../../../types/type';
 import DefaultLayout from '../../../layout/defaultLayout/DefaultLayout';
-import HeaderTableInfo from '../../../components/HeaderTableInfo/HeaderTableInfo';
-import HeaderTitle from '../../../components/HeaderTitle/HeaderTitle';
 import NormalTimer from '../components/NormalTimer';
 import RoundControlButton from '../../../components/RoundControlButton/RoundControlButton';
 const item: TimeBoxInfo = {
@@ -19,17 +19,16 @@ const item: TimeBoxInfo = {
 
 function NormalTimerTestPage() {
   return (
-    <DefaultLayout>
+    <DefaultLayout
+      header={
+        <TimerHeader
+          name="테스트 시간표"
+          agenda="일반타이머 테스트입니다"
+          actions={<TimerHeaderTools />}
+        />
+      }
+    >
       {/* Header */}
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left>
-          <HeaderTableInfo name="테스트 시간표" />
-        </DefaultLayout.Header.Left>
-        <DefaultLayout.Header.Center>
-          <HeaderTitle title="일반타이머 테스트입니다" />
-        </DefaultLayout.Header.Center>
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
 
       {/* Content */}
       <DefaultLayout.ContentContainer noPadding>

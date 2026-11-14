@@ -17,12 +17,6 @@ export default function NotFoundPage() {
 
   return (
     <DefaultLayout>
-      <DefaultLayout.Header>
-        <DefaultLayout.Header.Left />
-        <DefaultLayout.Header.Center />
-        <DefaultLayout.Header.Right />
-      </DefaultLayout.Header>
-
       <DefaultLayout.ContentContainer>
         <div className="flex w-full flex-col items-start justify-start px-8 py-10">
           <div className="mb-20 flex flex-col font-bold">

@@ -15,24 +15,26 @@ function getSettings(token: string): GetMemberSettingsResponseType {
 }
 
 function isSettingsPatch(value: unknown): value is {
-  language?: 'ko' | 'en';
-  volume?: number;
+  language?: 'ko' | 'en' | null;
+  volume?: number | null;
 } {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return false;
   }
   const body = value as Record<string, unknown>;
-  if (!('language' in body) && !('volume' in body)) {
+  if (body.language == null && body.volume == null) {
     return false;
   }
   if (
     'language' in body &&
+    body.language !== null &&
     (typeof body.language !== 'string' || !isSupportedLang(body.language))
   ) {
     return false;
   }
   if (
     'volume' in body &&
+    body.volume !== null &&
     (typeof body.volume !== 'number' ||
       !Number.isFinite(body.volume) ||
       body.volume < 0 ||
@@ -67,7 +69,7 @@ export const memberHandlers = [
     const settings: GetMemberSettingsResponseType = {
       language: body.language ?? previous.language,
       volume:
-        body.volume === undefined
+        body.volume == null
           ? previous.volume
           : Math.round(body.volume * 10) / 10,
     };

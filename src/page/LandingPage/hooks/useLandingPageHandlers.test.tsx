@@ -47,7 +47,7 @@ describe('랜딩 페이지 로그인 시작', () => {
       act(() => result.current.handleLoginStart(triggerContext));
 
       const expected = {
-        trigger_page: '/home',
+        trigger_page: '/',
         trigger_context: triggerContext,
       };
       expect(analyticsManager.trackEvent).toHaveBeenCalledWith(
@@ -69,6 +69,6 @@ describe('랜딩 페이지 로그인 시작', () => {
 
     expect(analyticsManager.trackEvent).not.toHaveBeenCalled();
     expect(oAuthLogin).not.toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 });
