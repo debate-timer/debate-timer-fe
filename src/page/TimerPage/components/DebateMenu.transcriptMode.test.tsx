@@ -105,6 +105,18 @@ describe('토론 메뉴 음성 인식 방식 선택지', () => {
     ).toBeInTheDocument();
   });
 
+  it('다기기 녹음을 고를 수 있는데 다른 방식을 고르면 청중 녹음이 열리지 않음을 알려준다', async () => {
+    mockRecorder({ RPC: true, SONIOX: true, MULTI_DEVICE: true });
+
+    await openTranscriptConsent();
+
+    expect(
+      screen.getByText(
+        "청중 기기도 함께 녹음하려면 'Soniox 다기기 녹음'을 골라 주세요.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('크롬 실시간 인식을 지원하지 않으면 선택지를 보여주지 않는다', async () => {
     mockRecorder({ RPC: false, SONIOX: true });
 

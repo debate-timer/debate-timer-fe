@@ -432,12 +432,21 @@ export default function DebateMenu(props: DebateMenuProps) {
                       ))}
                     </fieldset>
                   )}
-                  {controls.selectedMode === 'MULTI_DEVICE' && (
+                  {controls.selectedMode === 'MULTI_DEVICE' ? (
                     <p className="mt-3 text-ui-caption text-neutral-700">
                       {t(
                         '실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.',
                       )}
                     </p>
+                  ) : (
+                    // 다른 방식으로 켜면 청중 화면에 녹음 참여가 열리지 않으므로 고를 수 있을 때 알려 준다.
+                    availableModes.includes('MULTI_DEVICE') && (
+                      <p className="mt-3 text-ui-caption text-neutral-700">
+                        {t(
+                          "청중 기기도 함께 녹음하려면 'Soniox 다기기 녹음'을 골라 주세요.",
+                        )}
+                      </p>
+                    )
                   )}
                 </>
               )}

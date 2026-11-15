@@ -498,5 +498,6 @@
   "녹음 참여": "Join recording",
   "녹음 준비 중": "Preparing to record",
   "QR 코드 보기": "Show QR code",
-  "실시간 공유 QR 코드": "Live share QR code"
+  "실시간 공유 QR 코드": "Live share QR code",
+  "청중 기기도 함께 녹음하려면 'Soniox 다기기 녹음'을 골라 주세요.": "To record on audience devices too, choose 'Soniox multi-device recording'."
 }
