@@ -214,7 +214,7 @@ export default function DropdownMenu<T>(props: DropdownMenuProps<T>) {
       aria-labelledby={`${id}-trigger`}
       className={clsx(
         MENU_CLASS,
-        renderInPortal ? 'fixed z-[60]' : 'absolute z-10 mt-1 max-h-60 w-full',
+        renderInPortal ? 'fixed z-[60]' : 'absolute z-20 mt-1 max-h-60 w-full',
       )}
       style={renderInPortal ? menuStyle : undefined}
       onKeyDown={handleListKeyDown}

@@ -26,7 +26,7 @@ const LINK_CLASS =
   'inline-flex min-h-11 items-center rounded-xl px-3.5 py-2 text-neutral-700 no-underline transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 aria-[current=page]:bg-brand aria-[current=page]:text-neutral-900 aria-[current=page]:hover:bg-brand motion-reduce:transition-none';
 const INQUIRY_BUTTON_CLASS =
   'inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3.5 py-2 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 motion-reduce:transition-none';
-const INQUIRY_CLASS = 'absolute left-0 z-40 mt-2 w-64 space-y-2';
+const INQUIRY_CLASS = 'absolute left-0 z-40 mt-2 w-[320px] space-y-2';
 
 /**
  * 일반 화면의 탐색과 받은 계정 조작을 배치하며 통신·로그인을 시작하지 않음.
