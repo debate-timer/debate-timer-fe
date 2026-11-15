@@ -30,8 +30,14 @@ export const recordingV2Handlers = [
   }),
 
   // POST /api/v2/recordings/{sessionKey}/devices
-  http.post(`${ApiUrl.recordingV2}/:sessionKey/devices`, () =>
-    HttpResponse.json(nextDevice(), { status: 201 }),
+  // 취소한 세션에는 서버처럼 참가를 거절한다(RECORDING_SESSION_CLOSED).
+  http.post(`${ApiUrl.recordingV2}/:sessionKey/devices`, ({ params }) =>
+    statuses.get(params.sessionKey as string) === 'CANCELED'
+      ? HttpResponse.json(
+          { message: '이미 끝난 녹음 세션입니다.' },
+          { status: 409 },
+        )
+      : HttpResponse.json(nextDevice(), { status: 201 }),
   ),
 
   // POST /api/v2/recordings/{sessionKey}/host-device
@@ -40,9 +46,14 @@ export const recordingV2Handlers = [
   ),
 
   // POST /api/v2/recordings/{sessionKey}/turns/{turnKey}
-  http.post(
-    `${ApiUrl.recordingV2}/:sessionKey/turns/:turnKey`,
-    () => new HttpResponse(null, { status: 202 }),
+  // 취소한 세션은 서버가 기기를 지우므로 업로드를 거절한다(INVALID_RECORDING_DEVICE).
+  http.post(`${ApiUrl.recordingV2}/:sessionKey/turns/:turnKey`, ({ params }) =>
+    statuses.get(params.sessionKey as string) === 'CANCELED'
+      ? HttpResponse.json(
+          { message: '녹음에 참가한 기기가 아닙니다.' },
+          { status: 403 },
+        )
+      : new HttpResponse(null, { status: 202 }),
   ),
 
   // POST /api/v2/recordings/{sessionKey}/finish
