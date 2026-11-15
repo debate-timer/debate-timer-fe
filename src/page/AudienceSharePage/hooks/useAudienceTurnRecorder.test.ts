@@ -3,6 +3,7 @@ import {
   postRecordingDeviceV2,
   postRecordingTurnV2,
 } from '../../../apis/apis/recordingV2';
+import { APIError } from '../../../apis/primitives';
 import { SocketMessage, TimerDataPayload } from '../../../apis/sockets/type';
 import {
   getAudienceDeviceTokenV2,
@@ -166,6 +167,20 @@ describe('다기기 녹음 청중 훅', () => {
       expect(trackStop).toHaveBeenCalled();
     });
 
+    it('참가하려던 세션이 이미 끝났으면 그 세션으로는 참여할 수 없게 한다', async () => {
+      vi.mocked(postRecordingDeviceV2).mockRejectedValueOnce(
+        new APIError('이미 끝난 녹음 세션입니다.', 409, {}),
+      );
+      const rendered = render();
+
+      await act(() => rendered.result.current.start());
+
+      expect(rendered.result.current.status).toBe('idle');
+      expect(rendered.result.current.error).toBeNull();
+      expect(rendered.result.current.isAvailable).toBe(false);
+      expect(trackStop).toHaveBeenCalled();
+    });
+
     it('참여를 시작하는 중에 다시 불러도 마이크를 한 번만 받는다', async () => {
       const rendered = render();
 
@@ -287,6 +302,41 @@ describe('다기기 녹음 청중 훅', () => {
         'audience-token',
       ]);
       expect(postRecordingDeviceV2).toHaveBeenCalledTimes(1);
+    });
+
+    it('사회자가 녹음을 꺼 참가 정보가 사라지면 진행 중인 구간은 올리지 않고 참여를 멈춘다', async () => {
+      const rendered = render();
+      await act(() => rendered.result.current.start());
+      receive(rendered, message('PLAY', normal(0, true), 320));
+      expect(rendered.result.current.isListening).toBe(true);
+
+      rendered.rerender({
+        join: null,
+        latestMessage: message('PLAY', normal(0, true), 320),
+        latestMessageReceivedAt: Date.now(),
+        isConnected: true,
+      });
+
+      expect(rendered.result.current.status).toBe('idle');
+      expect(rendered.result.current.isListening).toBe(false);
+      expect(rendered.result.current.isAvailable).toBe(false);
+      expect(trackStop).toHaveBeenCalled();
+      expect(postRecordingTurnV2).not.toHaveBeenCalled();
+    });
+
+    it('참여 중에 다른 세션의 참가 정보를 받으면 참여를 멈추고 새 세션 참여를 기다린다', async () => {
+      const rendered = render();
+      await act(() => rendered.result.current.start());
+
+      rendered.rerender({
+        join: { sessionKey: 'session-2', joinCode: 'join-2' },
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isConnected: true,
+      });
+
+      expect(rendered.result.current.status).toBe('idle');
+      expect(rendered.result.current.isAvailable).toBe(true);
     });
 
     it('자유토론에서 실행 중 팀이 바뀌면 팀 전환 이벤트의 version으로 새 턴을 시작한다', async () => {
