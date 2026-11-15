@@ -6,6 +6,14 @@ import TimerProgressBar, {
   TimerProgressBarTeam,
 } from '../../../components/TimerProgressBar/TimerProgressBar';
 import { normalizeSpeechTypeKey } from '../../../util/speechType';
+import clsx from 'clsx';
+import AudienceStanceBadge from './AudienceStanceBadge';
+
+const STANCE_ICON_COLOR: Record<Stance, string> = {
+  PROS: 'text-stance-blue',
+  CONS: 'text-stance-red',
+  NEUTRAL: 'text-neutral-500',
+};
 
 interface AudienceNormalTimerProps {
   remainingTime: number;
@@ -49,6 +57,9 @@ export default function AudienceNormalTimer({
 
   return (
     <div className="flex h-full w-full flex-col items-center [justify-content:safe_center] justify-center md:px-4">
+      <div className="mb-3 flex justify-center short:mb-1">
+        <AudienceStanceBadge stance={stance} />
+      </div>
       <h1 className="text-center text-[36px] font-bold break-keep md:text-[52px] xl:text-[68px] short:text-[28px]">
         {speechTypeLabel}
       </h1>
@@ -59,7 +70,10 @@ export default function AudienceNormalTimer({
           data-testid="participant-row"
         >
           <DTDebate
-            className="h-[20px] shrink-0 md:h-[34px] short:h-[18px]"
+            className={clsx(
+              'h-[20px] shrink-0 md:h-[34px] short:h-[18px]',
+              STANCE_ICON_COLOR[stance],
+            )}
             data-testid="debate-icon"
             aria-hidden="true"
           />

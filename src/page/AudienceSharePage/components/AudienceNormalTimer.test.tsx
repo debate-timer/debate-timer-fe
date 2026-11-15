@@ -3,6 +3,25 @@ import { describe, expect, it } from 'vitest';
 import AudienceNormalTimer from './AudienceNormalTimer';
 
 describe('AudienceNormalTimer', () => {
+  it.each([
+    ['PROS', '찬성'],
+    ['CONS', '반대'],
+    ['NEUTRAL', '중립'],
+  ] as const)('정지 중에도 %s 진영을 배지로 표시한다', (stance, label) => {
+    render(
+      <AudienceNormalTimer
+        remainingTime={60}
+        totalTime={60}
+        speechType="입론"
+        stance={stance}
+        teamName="한빛"
+        speaker={null}
+        isRunning={false}
+      />,
+    );
+
+    expect(screen.getByText(label)).toBeVisible();
+  });
   it('발언 유형, 팀명, 토론자명과 포맷팅된 시간을 렌더링한다', () => {
     render(
       <AudienceNormalTimer

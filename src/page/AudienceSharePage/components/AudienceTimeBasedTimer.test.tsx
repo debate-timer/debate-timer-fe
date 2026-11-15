@@ -12,7 +12,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 describe('AudienceTimeBasedTimer', () => {
-  it('PROS를 왼쪽, CONS를 오른쪽의 동일 너비 영역에 표시한다', () => {
+  it('찬성 다음 반대 순서로 모바일은 상하, 넓은 화면은 좌우 배치한다', () => {
     render(
       <AudienceTimeBasedTimer
         prosTeamName="한빛"
@@ -30,6 +30,8 @@ describe('AudienceTimeBasedTimer', () => {
 
     const row = screen.getByTestId('time-based-timer-row');
     const [pros, cons] = Array.from(row.children);
+
+    expect(row).toHaveClass('flex-col', 'md:flex-row');
 
     expect(pros).toHaveAttribute('data-testid', 'pros-timer-display');
     expect(cons).toHaveAttribute('data-testid', 'cons-timer-display');
