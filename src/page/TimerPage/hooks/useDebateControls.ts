@@ -136,7 +136,11 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     }
     if (!next) {
       setAcknowledgedFailures(transcript.failedCount);
-      transcript.disable();
+      // 다기기 녹음을 끄면 세션이 끝나므로, 공유 화면의 청중이 녹음을 멈추도록 알린다.
+      const closedRecording = transcript.disable();
+      if (closedRecording && share.isSharing) {
+        share.issueEvent('RECORDING_CLOSED', null, closedRecording);
+      }
       return;
     }
     if (

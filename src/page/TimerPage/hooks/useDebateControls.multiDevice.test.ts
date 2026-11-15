@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import useDebateControls from './useDebateControls';
 import useLiveShareSession from './useLiveShareSession';
 import useTranscriptRecorder from './useTranscriptRecorder';
@@ -19,6 +19,8 @@ const mockShare = (isSharing: boolean) =>
     isError: false,
   } as unknown as ReturnType<typeof useLiveShareSession>);
 
+const disableTranscript = vi.fn();
+
 const mockRecorder = (
   multiDeviceSession: { sessionKey: string; joinCode: string } | null,
 ) =>
@@ -32,6 +34,7 @@ const mockRecorder = (
     failedCount: 0,
     error: null,
     discard: vi.fn(),
+    disable: disableTranscript,
   } as unknown as ReturnType<typeof useTranscriptRecorder>);
 
 const options = {
@@ -135,6 +138,50 @@ describe('토론 제어의 다기기 녹음 연결', () => {
       vi.mocked(useLiveShareSession).mock.lastCall![1]?.onSyncRequest?.();
 
       expect(recordingCalls()).toHaveLength(0);
+    });
+  });
+
+  describe('공유 화면에 녹음 종료 전파', () => {
+    const session = { sessionKey: 'session-1', joinCode: 'join' };
+    const closedCalls = () =>
+      issueEvent.mock.calls.filter(
+        (call: unknown[]) => call[0] === 'RECORDING_CLOSED',
+      );
+
+    beforeEach(() => {
+      disableTranscript.mockReset();
+    });
+
+    it('공유 중에 다기기 녹음을 끄면 끝낸 세션의 참가 정보로 종료를 발행한다', () => {
+      disableTranscript.mockReturnValue(session);
+      mockRecorder(session);
+      const { result } = renderHook(() => useDebateControls(options));
+
+      act(() => result.current.requestTranscript(false));
+
+      expect(closedCalls()).toEqual([['RECORDING_CLOSED', null, session]]);
+    });
+
+    it('공유하지 않으면 종료를 발행하지 않는다', () => {
+      disableTranscript.mockReturnValue(session);
+      mockShare(false);
+      mockRecorder(session);
+      const { result } = renderHook(() => useDebateControls(options));
+
+      act(() => result.current.requestTranscript(false));
+
+      expect(disableTranscript).toHaveBeenCalled();
+      expect(closedCalls()).toHaveLength(0);
+    });
+
+    it('끝낸 다기기 녹음 세션이 없으면 종료를 발행하지 않는다', () => {
+      disableTranscript.mockReturnValue(null);
+      mockRecorder(null);
+      const { result } = renderHook(() => useDebateControls(options));
+
+      act(() => result.current.requestTranscript(false));
+
+      expect(closedCalls()).toHaveLength(0);
     });
   });
 });
