@@ -172,6 +172,9 @@ export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
                 onValueCommit={() => void controller.flush()}
               />
             </div>
+            <output className="w-6 shrink-0 text-right text-ui-label text-neutral-700 tabular-nums">
+              {volumeLevel}
+            </output>
           </div>
         </Overlay>
       </div>
