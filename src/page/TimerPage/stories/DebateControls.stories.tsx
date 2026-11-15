@@ -119,6 +119,7 @@ function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
         <h1 className="text-ui-headline">토론 기능 검증</h1>
         <DebateMenu
           controls={controls}
+          hasTranscriptFlag={props.hasTranscript}
           shareUnavailableReason={
             props.isMember ? undefined : '로그인한 회원만 공유할 수 있습니다.'
           }

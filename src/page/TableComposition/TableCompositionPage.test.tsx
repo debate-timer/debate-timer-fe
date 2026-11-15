@@ -61,6 +61,20 @@ vi.mock('../../components/TimeBox/TimeBox', () => {
  */
 
 describe('TableComposition', () => {
+  it('작성 화면의 문서 이탈을 경고하고 언마운트 시 해제한다', () => {
+    const { unmount } = render(
+      <TestWrapper>
+        <TableCompositionPage />
+      </TestWrapper>,
+    );
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    unmount();
+    const afterLeave = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(afterLeave);
+    expect(afterLeave.defaultPrevented).toBe(false);
+  });
   beforeEach(() => {
     // 세션스토리지 초기화 등 필요한 작업
     sessionStorage.clear();

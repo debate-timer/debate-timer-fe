@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { BlockerFunction, useBlocker } from 'react-router-dom';
 import { buildLangPath, DEFAULT_LANG } from '../../../util/languageRouting';
 
@@ -16,7 +16,7 @@ function isDebateEndPath(pathname: string, tableId: number) {
 
 /**
  * 토론 기록 중 타이머 화면을 벗어나면 속기록이 유실되므로 이탈을 막고 확인을 받는다.
- * 앱 안의 화면 이동은 안내창으로, 새로고침·탭 닫기는 브라우저 기본 확인창으로 막는다.
+ * 앱 안의 화면 이동은 안내창으로 막으며 문서 이탈 경고는 TimerPage의 공용 훅이 소유한다.
  * 기록을 서버로 보내는 토론 종료 화면으로의 이동은 막지 않는다.
  */
 export default function useTranscriptLeaveGuard(
@@ -33,21 +33,6 @@ export default function useTranscriptLeaveGuard(
     [isRecording, tableId],
   );
   const blocker = useBlocker(shouldBlock);
-
-  useEffect(() => {
-    if (!isRecording) {
-      return;
-    }
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      // preventDefault만으로 확인창을 띄우지 않는 구형 Safari를 위한 설정
-      event.returnValue = '';
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [isRecording]);
 
   const confirmLeave = useCallback(() => {
     blocker.proceed?.();

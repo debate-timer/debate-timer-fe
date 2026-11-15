@@ -9,6 +9,34 @@ const OPTIONS = [
 ];
 
 describe('드롭다운 선택', () => {
+  it('포털 목록은 부모 영역 밖에 표시하고 선택·Tab·외부 클릭을 유지한다', async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    const { container } = render(
+      <>
+        <DropdownMenu
+          renderInPortal
+          options={OPTIONS}
+          selectedValue="a"
+          onSelect={onSelect}
+        />
+        <input aria-label="다음 입력" />
+      </>,
+    );
+    const button = screen.getByRole('button');
+    await user.click(button);
+    expect(container).not.toContainElement(screen.getByRole('listbox'));
+    await user.click(screen.getByRole('option', { name: '반론' }));
+    expect(onSelect).toHaveBeenCalledWith('b');
+    expect(button).toHaveFocus();
+    await user.click(button);
+    await user.tab();
+    expect(screen.getByRole('textbox')).toHaveFocus();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    await user.click(button);
+    await user.click(screen.getByRole('textbox'));
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
   it('위쪽 방향키로 마지막 항목에서 열고 Space로 선택한다', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();

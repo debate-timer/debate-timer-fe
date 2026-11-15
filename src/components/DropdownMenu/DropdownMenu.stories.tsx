@@ -40,6 +40,16 @@ export default META;
 type Story = StoryObj<typeof DropdownMenu>;
 
 export const Default: Story = {};
+export const InScrollContainer: Story = {
+  args: { renderInPortal: true },
+  decorators: [
+    (Story) => (
+      <div className="h-32 w-64 overflow-auto rounded-xl border border-neutral-300 p-5">
+        <Story />
+      </div>
+    ),
+  ],
+};
 export const OnSelected: Story = { args: { selectedValue: 'REBUTTAL' } };
 export const Placeholder: Story = { args: { selectedValue: null } };
 export const Disabled: Story = { args: { disabled: true } };

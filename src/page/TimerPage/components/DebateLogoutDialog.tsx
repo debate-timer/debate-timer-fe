@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlobalPortal } from '../../../util/GlobalPortal';
 import useDebateLogout from '../hooks/useDebateLogout';
-import useDebateOverlay from '../hooks/useDebateOverlay';
+import useDialogFocus from '../../../hooks/useDialogFocus';
 
 interface DebateLogoutDialogProps {
   logout: ReturnType<typeof useDebateLogout>;
@@ -16,7 +16,7 @@ export default function DebateLogoutDialog(props: DebateLogoutDialogProps) {
   const { t } = useTranslation();
   const titleId = useId();
   const [panel, setPanel] = useState<HTMLDivElement | null>(null);
-  useDebateOverlay(panel, logout.cancelLogout);
+  useDialogFocus(panel, logout.cancelLogout);
   if (!logout.isConfirmOpen) {
     return null;
   }

@@ -53,4 +53,23 @@ describe('공용 버튼', () => {
     await user.click(screen.getByRole('button'));
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it('href가 전달되면 링크 요소로 렌더링하고 target·rel·접근 가능한 이름을 유지한다', () => {
+    render(
+      <Button
+        href="https://example.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        variant="neutral"
+        shape="rounded"
+        aria-label="일반 문의"
+      >
+        일반 문의
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: '일반 문의' });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 });

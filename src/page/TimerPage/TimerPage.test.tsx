@@ -38,6 +38,16 @@ function renderTimerPage(id = '5') {
 }
 
 describe('TimerPage - 헤더 음소거 아이콘', () => {
+  it('속기록을 켜지 않아도 문서 이탈을 경고하고 언마운트 시 해제한다', () => {
+    const { unmount } = renderTimerPage();
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    unmount();
+    const afterLeave = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(afterLeave);
+    expect(afterLeave.defaultPrevented).toBe(false);
+  });
   beforeEach(() => {
     localStorage.clear();
     // 첫 방문 모달이 테스트를 방해하지 않도록 방문 기록 설정
@@ -144,7 +154,7 @@ describe('기본 타이머의 토론 메뉴 연결', () => {
     await user.keyboard('{Escape}');
     expect(screen.getByRole('button', { name: '토론 메뉴' })).toHaveFocus();
   });
-  it('권한 없는 회원에게 속기 실행 불가 이유를 제공한다', async () => {
+  it('속기록 피쳐 플래그가 없는 회원에게 메뉴 항목을 숨긴다', async () => {
     server.use(
       http.get(`${ApiUrl.member}/feature-flags`, () =>
         HttpResponse.json({ featureFlags: [] }),
@@ -153,10 +163,12 @@ describe('기본 타이머의 토론 메뉴 연결', () => {
     const user = userEvent.setup();
     renderTimerPage();
     await user.click(await screen.findByRole('button', { name: '토론 메뉴' }));
-    expect(screen.getByRole('button', { name: '속기록' })).toBeDisabled();
     expect(
-      screen.getByText('사용 권한이 필요한 기능입니다.'),
-    ).toBeInTheDocument();
+      screen.queryByRole('button', { name: '속기록' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: '속기록' }),
+    ).not.toBeInTheDocument();
   });
 });
 

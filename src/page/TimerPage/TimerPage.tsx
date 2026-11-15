@@ -1,4 +1,5 @@
 import { parsePositiveId } from '../../util/headerNavigation';
+import useBeforeUnloadGuard from '../../hooks/useBeforeUnloadGuard';
 import TimerHeader from '../../layout/components/header/TimerHeader';
 import IconButton from '../../components/IconButton/IconButton';
 import { HEADER_ICON_BUTTON_CLASS } from '../../layout/components/header/headerActionStyles';
@@ -70,6 +71,7 @@ export default function TimerPage() {
 }
 
 function TimerPageSession() {
+  useBeforeUnloadGuard();
   const { t, i18n } = useTranslation();
   const pathParams = useParams();
   useEnsureGuestTable(pathParams.id);
@@ -396,6 +398,7 @@ function TimerPageSession() {
           />
           <DebateMenu
             controls={controls}
+            hasTranscriptFlag={hasTranscriptFlag}
             shareUnavailableReason={
               !isMemberFlow ? t('회원만 사용할 수 있는 기능입니다.') : undefined
             }

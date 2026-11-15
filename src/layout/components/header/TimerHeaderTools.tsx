@@ -11,14 +11,14 @@ import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import DTVolume from '../../../components/icons/Volume';
 import TimerDashboardButton from './TimerDashboardButton';
 import IconButton from '../../../components/IconButton/IconButton';
+import Overlay from '../../../components/Overlay/Overlay';
 import { HEADER_ICON_BUTTON_CLASS } from './headerActionStyles';
 
 interface TimerHeaderToolsProps extends PropsWithChildren {
   onLogout?: () => Promise<void>;
   onLogin?: () => void;
 }
-const VOLUME_CLASS =
-  'absolute top-full right-0 z-40 mt-2 w-64 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg';
+const VOLUME_CLASS = 'absolute top-full right-0 z-40 mt-2 w-64';
 
 /** 세 타이머 화면의 전체 화면·공용 음량·대시보드 이동 확인·설정을 연결함. 토론 정리는 전달받은 콜백에 위임함. */
 export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
@@ -102,43 +102,45 @@ export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
             )
           }
         />
-        {isVolumeOpen && (
-          <div className={VOLUME_CLASS}>
-            <label className="flex flex-col gap-2">
-              {t('음량')}
-              <input
-                type="range"
-                min="0"
-                max="10"
-                step="1"
-                value={Math.round(volume * 10)}
-                onChange={(event) =>
-                  controller.change({ volume: Number(event.target.value) / 10 })
-                }
-                onPointerUp={() => void controller.flush()}
-                onKeyUp={() => void controller.flush()}
-                onBlur={() => void controller.flush()}
-              />
-              <output>{Math.round(volume * 10)}</output>
-            </label>
-            <button
-              type="button"
-              aria-label={t(volume === 0 ? '음소거 해제' : '음소거')}
-              title={t(volume === 0 ? '음소거 해제' : '음소거')}
-              onClick={() => {
-                if (volume > 0) {
-                  lastVolumeRef.current = volume;
-                }
-                controller.change({
-                  volume: volume > 0 ? 0 : lastVolumeRef.current,
-                });
-                void controller.flush();
-              }}
-            >
-              {t(volume === 0 ? '음소거 해제' : '음소거')}
-            </button>
-          </div>
-        )}
+        <Overlay
+          isOpen={isVolumeOpen}
+          className={VOLUME_CLASS}
+          direction="down"
+        >
+          <label className="flex flex-col gap-2">
+            {t('음량')}
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value={Math.round(volume * 10)}
+              onChange={(event) =>
+                controller.change({ volume: Number(event.target.value) / 10 })
+              }
+              onPointerUp={() => void controller.flush()}
+              onKeyUp={() => void controller.flush()}
+              onBlur={() => void controller.flush()}
+            />
+            <output>{Math.round(volume * 10)}</output>
+          </label>
+          <button
+            type="button"
+            aria-label={t(volume === 0 ? '음소거 해제' : '음소거')}
+            title={t(volume === 0 ? '음소거 해제' : '음소거')}
+            onClick={() => {
+              if (volume > 0) {
+                lastVolumeRef.current = volume;
+              }
+              controller.change({
+                volume: volume > 0 ? 0 : lastVolumeRef.current,
+              });
+              void controller.flush();
+            }}
+          >
+            {t(volume === 0 ? '음소거 해제' : '음소거')}
+          </button>
+        </Overlay>
       </div>
       <TimerDashboardButton />
       <SettingsModal
