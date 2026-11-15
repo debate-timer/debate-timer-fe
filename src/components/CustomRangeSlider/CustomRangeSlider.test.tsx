@@ -1,9 +1,57 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import CustomRangeSlider from './CustomRangeSlider';
+import { useState } from 'react';
 
 afterEach(cleanup);
 
 describe('CustomRangeSlider', () => {
+  it('손가락 이동을 값에 반영하고 영역 밖에서 놓아도 범위 끝에서 한 번만 커밋한다', () => {
+    const onCommit = vi.fn();
+    function Harness() {
+      const [value, setValue] = useState(2);
+      return (
+        <CustomRangeSlider
+          value={value}
+          min={0}
+          max={10}
+          onValueChange={setValue}
+          onValueCommit={onCommit}
+        />
+      );
+    }
+    render(<Harness />);
+    const slider = screen.getByRole('slider');
+    const capture = vi.fn();
+    Object.defineProperty(slider, 'setPointerCapture', { value: capture });
+    vi.spyOn(slider, 'getBoundingClientRect').mockReturnValue({
+      left: 10,
+      width: 100,
+    } as DOMRect);
+    fireEvent.pointerDown(slider, {
+      pointerType: 'touch',
+      isPrimary: true,
+      pointerId: 1,
+      clientX: 30,
+    });
+    fireEvent.pointerMove(slider, {
+      pointerType: 'touch',
+      isPrimary: true,
+      pointerId: 1,
+      clientX: 90,
+    });
+    expect(slider).toHaveValue('8');
+    expect(capture).toHaveBeenCalledWith(1);
+    expect(onCommit).not.toHaveBeenCalled();
+    fireEvent.pointerUp(slider, {
+      pointerType: 'touch',
+      isPrimary: true,
+      pointerId: 1,
+      clientX: 130,
+    });
+    expect(slider).toHaveValue('10');
+    fireEvent.blur(slider);
+    expect(onCommit).toHaveBeenCalledTimes(1);
+  });
   it('범위를 벗어난 value나 min > max 입력을 안전하게 보정한다', () => {
     render(
       <CustomRangeSlider
@@ -34,9 +82,9 @@ describe('CustomRangeSlider', () => {
     );
     const slider = screen.getByRole('slider', { name: '음량' });
 
-    fireEvent.pointerDown(slider, { pointerType: 'touch' });
+    fireEvent.pointerDown(slider, { pointerType: 'touch', isPrimary: true });
     fireEvent.change(slider, { target: { value: '8' } });
-    fireEvent.pointerUp(slider, { pointerType: 'touch' });
+    fireEvent.pointerUp(slider, { pointerType: 'touch', isPrimary: true });
     fireEvent.blur(slider);
 
     expect(onValueChange).toHaveBeenCalledWith(8);
@@ -77,14 +125,15 @@ describe('CustomRangeSlider', () => {
     );
     const slider = screen.getByRole('slider', { name: '음량' });
 
-    fireEvent.pointerDown(slider, { pointerType: 'touch' });
+    fireEvent.pointerDown(slider, { pointerType: 'touch', isPrimary: true });
     expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
     expect(screen.getByText('5')).toBeInTheDocument();
 
     fireEvent.change(slider, { target: { value: '7' } });
-    fireEvent.pointerCancel(slider, { pointerType: 'touch' });
+    fireEvent.pointerCancel(slider, { pointerType: 'touch', isPrimary: true });
 
     expect(onValueCommit).toHaveBeenCalledTimes(1);
+    fireEvent.blur(slider);
     expect(screen.queryByText('5')).not.toBeInTheDocument();
   });
 });
