@@ -152,6 +152,7 @@ describe('AudienceSharePage', () => {
       latestMessage: null,
       latestMessageReceivedAt: null,
       isSocketConnected: true,
+      recordingJoin: null,
       status: 'connecting',
       error: null,
     });
@@ -214,6 +215,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'connecting',
         error: null,
       });
@@ -241,6 +243,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'waiting',
         error: null,
       });
@@ -273,6 +276,7 @@ describe('AudienceSharePage', () => {
           latestMessage: null,
           latestMessageReceivedAt: null,
           isSocketConnected: true,
+          recordingJoin: null,
           status: 'waiting',
           error: null,
         });
@@ -301,6 +305,24 @@ describe('AudienceSharePage', () => {
         ).toBeInTheDocument();
       });
 
+      it('공유 링크에 참가 정보가 없어도 사회자가 보낸 참가 정보를 받으면 녹음 참여 버튼을 표시한다', async () => {
+        mockUseAudienceShareState.mockReturnValue({
+          chairmanPresence: 'present',
+          connectionStatus: 'connected',
+          latestMessage: null,
+          latestMessageReceivedAt: null,
+          isSocketConnected: true,
+          recordingJoin: { sessionKey: 'session-1', joinCode: 'join' },
+          status: 'waiting',
+          error: null,
+        });
+        renderPage('/live/123');
+
+        expect(
+          await screen.findByRole('button', { name: '녹음 참여' }),
+        ).toBeInTheDocument();
+      });
+
       it('녹음 참여 정보가 없는 공유 링크에서는 녹음 참여를 표시하지 않는다', async () => {
         mockWaiting();
         renderPage('/live/123');
@@ -319,6 +341,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'waiting',
         error: null,
       });
@@ -339,6 +362,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'waiting',
         error: null,
       });
@@ -374,6 +398,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'waiting',
         error: null,
       });
@@ -391,6 +416,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'waiting',
         error: null,
       });
@@ -410,6 +436,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -443,6 +470,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -473,6 +501,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -513,6 +542,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -552,6 +582,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -590,6 +621,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -640,6 +672,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'finished',
         error: null,
       });
@@ -690,6 +723,7 @@ describe('AudienceSharePage', () => {
           latestMessage: null,
           latestMessageReceivedAt: null,
           isSocketConnected: true,
+          recordingJoin: null,
           status: 'displaying',
           syncedAt: null,
           error: null,
@@ -732,6 +766,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -788,6 +823,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -807,6 +843,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -826,6 +863,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -850,6 +888,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -875,6 +914,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -933,6 +973,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -959,6 +1000,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -994,6 +1036,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -1023,6 +1066,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -1045,6 +1089,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -1081,6 +1126,7 @@ describe('AudienceSharePage', () => {
         latestMessage: null,
         latestMessageReceivedAt: null,
         isSocketConnected: true,
+        recordingJoin: null,
         status: 'displaying',
         syncedAt: null,
         error: null,
