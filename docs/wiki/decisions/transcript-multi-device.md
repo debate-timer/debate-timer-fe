@@ -28,7 +28,7 @@
 
 ### TRANSCRIPT-MULTI-DEVICE-DEC-003 — 공유 채널로 녹음 참가 정보 전파
 
-- 결정일: 2026-11-15, 상태: 승인임. 작업: FE #581, BE [PR #334](https://github.com/debate-timer/debate-timer-be/pull/334)임.
+- 결정일: 2026-11-15, 상태: 승인임. 작업: FE [PR #582](https://github.com/debate-timer/debate-timer-fe/pull/582)(이슈 #581), BE [PR #334](https://github.com/debate-timer/debate-timer-be/pull/334)임.
 - 승인 근거: 계획 대화에서 사용자가 "공유 → 다기기 녹음" 순서일 때 이미 열린 공유 화면에서도 바로 녹음할 수 있게 웹소켓 이벤트를 추가하자고 요청하고, 참가 코드 전파와 신호만 전파하는 안을 비교한 뒤 참가 코드 전파와 동기화마다 재전송을 선택했음.
 
 | 결정 | 이유·한계 | 현행 정책 |
