@@ -4,11 +4,12 @@ import clsx from 'clsx';
 type ButtonVariant =
   'primary' | 'secondary' | 'neutral' | 'dark' | 'light' | 'text';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   'aria-label': string;
   variant?: ButtonVariant;
   size?: 'default' | 'large';
-  shape?: 'pill' | 'icon';
+  shape?: 'pill' | 'rounded';
+  iconOnly?: boolean;
 }
 
 const BASE_CLASS =
@@ -34,7 +35,9 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
  *
  * 큰 버튼 전용 `text-ui-button-lg`는 24px·600 굵기·32px 행간이며 CSS 정의와 함께 갱신함.
  *
- * `size="default"`는 Label 문구와 20px 아이콘, 면이 있는 버튼의 최소 높이 52px를 사용함. `size="large"`는 `text-ui-button-lg` 문구와 24px 아이콘, 최소 높이 72px를 사용함. 큰 버튼의 글자 크기는 제목 역할과 분리함. `shape="icon"`은 기본 52px·큰 크기 72px의 원형이며 내부 패딩을 제거함. 일반 형태는 좌우 28px·상하 14px 여백을 사용하고 화면은 너비·배치를 소유함. 문구가 길면 최소 높이보다 확장할 수 있음. 아이콘과 문구를 항상 같은 크기로 맞추는 전역 규칙은 두지 않음.
+ * `shape="pill"`은 양끝이 둥근 형태(기본값), `rounded`는 반경 12px의 둥근 사각형임.
+ * `size="default"`는 Label 문구와 20px 아이콘, 면이 있는 버튼의 최소 높이 52px를 사용함. `size="large"`는 `text-ui-button-lg` 문구와 24px 아이콘, 최소 높이 72px를 사용함. 일반 형태는 좌우 28px·상하 14px 여백을 사용하고 문구가 길면 높이가 확장됨.
+ * `iconOnly`는 `IconButton`이 재사용하는 정사각형 치수로 기본 52px·큰 크기 72px이며 내부 패딩을 제거함. 아이콘 전용 호출은 형태 계약을 제공하는 `IconButton`을 사용함.
  *
  * 호출자는 번역된 접근 가능한 이름·문구·콜백을 전달하며 기본 `type`은 `button`임. 로그인·이동·분석 이벤트는 호출자가 소유함. LandingPage와 TableComposition·TableOverview의 하단 버튼에 적용했으며 나머지 기존 `.button` 사용처의 일괄 이전은 수행하지 않았음.
  *
@@ -46,6 +49,7 @@ export default function Button(props: ButtonProps) {
     variant = 'primary',
     size = 'default',
     shape = 'pill',
+    iconOnly = false,
     type = 'button',
     className,
     ...rest
@@ -57,8 +61,8 @@ export default function Button(props: ButtonProps) {
       className={clsx(
         BASE_CLASS,
         SIZE_CLASS[size],
-        'rounded-full',
-        shape === 'icon'
+        shape === 'pill' ? 'rounded-full' : 'rounded-xl',
+        iconOnly
           ? size === 'large'
             ? 'size-18 shrink-0 p-0'
             : 'size-13 shrink-0 p-0'

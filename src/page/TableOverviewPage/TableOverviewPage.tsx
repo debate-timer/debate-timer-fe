@@ -18,6 +18,7 @@ import Coins from '../../assets/teamSelection/coins.png';
 import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
 import { useModal } from '../../hooks/useModal';
 import Button from '../../components/Button/Button';
+import IconButton from '../../components/IconButton/IconButton';
 import { useState, useCallback } from 'react';
 import {
   buildLangPath,
@@ -158,11 +159,12 @@ export default function TableOverviewPage() {
 
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mt-2 mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
-            <Button
+            <IconButton
               variant="neutral"
               aria-label={t('공유하기')}
               size="large"
-              shape="icon"
+              shape="circle"
+              icon={<DTShare aria-hidden="true" />}
               disabled={isLoading}
               onClick={() => {
                 // 공유 버튼 클릭 시 table_shared 이벤트를 기록한다.
@@ -171,14 +173,13 @@ export default function TableOverviewPage() {
                 });
                 openShareModal();
               }}
-            >
-              <DTShare className="size-6" aria-hidden="true" />
-            </Button>
-            <Button
+            />
+            <IconButton
               variant="neutral"
               aria-label={t('토론 정보 수정하기')}
               size="large"
-              shape="icon"
+              shape="circle"
+              icon={<DTEdit aria-hidden="true" />}
               disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
@@ -197,9 +198,7 @@ export default function TableOverviewPage() {
                   );
                 }
               }}
-            >
-              <DTEdit className="size-6" aria-hidden="true" />
-            </Button>
+            />
             <div className="flex w-full space-x-2">
               <Button
                 aria-label={t('토론하기')}
