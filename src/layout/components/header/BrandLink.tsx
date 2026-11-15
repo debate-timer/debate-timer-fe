@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { buildLangPath, isSupportedLang } from '../../../util/languageRouting';
 
 const LINK_CLASS =
-  'flex min-w-0 items-center gap-2 rounded-lg text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2';
+  'flex min-w-0 items-center gap-2 rounded-lg text-xl leading-6 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2';
 
+/** 헤더 브랜드명을 20px·행간 24px·굵기 600·자간 -0.05em으로 표시함. */
 export default function BrandLink(props: { onNavigate?: () => void }) {
   const { t, i18n } = useTranslation();
   const lang = isSupportedLang(i18n.language) ? i18n.language : 'ko';
@@ -20,7 +21,7 @@ export default function BrandLink(props: { onNavigate?: () => void }) {
         alt=""
         className="size-8 shrink-0"
       />
-      <span>Debate Timer</span>
+      <span className="tracking-tighter">Debate Timer</span>
     </Link>
   );
 }

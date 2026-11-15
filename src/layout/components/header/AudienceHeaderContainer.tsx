@@ -1,9 +1,9 @@
-import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import useLoginPrompt from '../../../hooks/useLoginPrompt';
 import LoginPrompt from '../../../components/LoginPrompt/LoginPrompt';
 import AudienceHeader from './AudienceHeader';
+import HeaderLoginButton from './HeaderLoginButton';
 import LanguageSelector from './LanguageSelector';
 
 interface AudienceHeaderContainerProps {
@@ -15,7 +15,6 @@ interface AudienceHeaderContainerProps {
 export default function AudienceHeaderContainer(
   props: AudienceHeaderContainerProps,
 ) {
-  const { t } = useTranslation();
   const { memberId } = useGlobalSettings();
   const location = useLocation();
   const login = useLoginPrompt();
@@ -27,18 +26,13 @@ export default function AudienceHeaderContainer(
           <>
             <LanguageSelector />
             {!memberId && (
-              <button
-                type="button"
-                aria-label={t('로그인')}
-                className="min-h-11 rounded-xl bg-brand px-4 text-ui-label"
+              <HeaderLoginButton
                 onClick={() =>
                   login.requestLogin(
                     `${location.pathname}${location.search}${location.hash}`,
                   )
                 }
-              >
-                {t('로그인')}
-              </button>
+              />
             )}
           </>
         }

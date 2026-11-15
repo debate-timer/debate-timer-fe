@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HeaderFrame from './HeaderFrame';
 import BrandLink from './BrandLink';
@@ -19,11 +19,14 @@ const LAYOUT_CLASS =
 const NAV_CLASS =
   'order-3 col-span-2 flex w-full flex-wrap items-center gap-x-5 gap-y-2 text-ui-label md:order-none md:w-auto';
 const LINK_CLASS =
-  'rounded-md py-1 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
+  'rounded-md px-2 py-1 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 aria-[current=page]:bg-brand aria-[current=page]:underline';
 const INQUIRY_CLASS =
   'absolute left-0 z-40 mt-2 w-64 space-y-2 rounded-xl border border-neutral-200 bg-white p-4 shadow-lg';
 
-/** 일반 화면의 탐색과 받은 계정 조작을 배치하며 통신·로그인을 시작하지 않음. */
+/**
+ * 일반 화면의 탐색과 받은 계정 조작을 배치하며 통신·로그인을 시작하지 않음.
+ * 언어 접두어를 제외한 루트·템플릿·기록 경로만 각각 선택하고 나머지는 대시보드를 강조함.
+ */
 export default function GeneralHeader(props: GeneralHeaderProps) {
   const {
     isMember,
@@ -34,6 +37,12 @@ export default function GeneralHeader(props: GeneralHeaderProps) {
     inquiries = [],
   } = props;
   const { t, i18n } = useTranslation();
+  const { pathname } = useLocation();
+  const path = buildLangPath(pathname, 'ko');
+  const selectedPath =
+    path === '/' || path === '/templates' || path === '/records'
+      ? path
+      : '/dashboard';
   const lang = isSupportedLang(i18n.language) ? i18n.language : 'ko';
   const navigation = [
     { path: '/', label: '서비스 소개', requiresAuth: false },
@@ -53,6 +62,7 @@ export default function GeneralHeader(props: GeneralHeaderProps) {
             return (
               <Link
                 className={LINK_CLASS}
+                aria-current={item.path === selectedPath ? 'page' : undefined}
                 key={item.path}
                 to={destination}
                 onClick={(event) => {

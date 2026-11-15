@@ -3,11 +3,37 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import GeneralHeader from './GeneralHeader';
 import HeaderDebateInfo from './HeaderDebateInfo';
+import HeaderLoginButton from './HeaderLoginButton';
 import AudienceHeader from './AudienceHeader';
 
 afterEach(cleanup);
 
 describe('역할별 헤더', () => {
+  it.each([
+    ['/', '서비스 소개'],
+    ['/?from=header#intro', '서비스 소개'],
+    ['/templates', '템플릿'],
+    ['/templates?sort=recent#list', '템플릿'],
+    ['/dashboard', '대시보드'],
+    ['/records', '토론 기록'],
+    ['/records?sort=recent#list', '토론 기록'],
+    ['/en/records', '토론 기록'],
+    ['/templates/1', '대시보드'],
+    ['/unknown', '대시보드'],
+    ['/en', '서비스 소개'],
+    ['/en/', '서비스 소개'],
+    ['/en/templates', '템플릿'],
+    ['/en/records/1', '대시보드'],
+  ])('%s에서는 %s만 선택한다', (path, selectedLabel) => {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <GeneralHeader isMember canViewRecords onRequireLogin={vi.fn()} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('link', { current: 'page' })).toHaveAccessibleName(
+      selectedLabel,
+    );
+  });
   it.each([false, true])(
     '회원 여부 %s에서도 공개 템플릿 링크를 제공한다',
     async (isMember) => {
@@ -82,5 +108,19 @@ describe('역할별 헤더', () => {
     expect(
       screen.queryByRole('button', { name: '로그아웃' }),
     ).not.toBeInTheDocument();
+  });
+  it('헤더 로그인 버튼은 데스크톱 문구와 모바일 아이콘을 함께 제공하고 클릭 시 동작을 실행한다', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(<HeaderLoginButton onClick={onClick} />);
+    const button = screen.getByRole('button', { name: '로그인' });
+    const text = screen.getByText('로그인');
+    const icon = button.querySelector('svg');
+    expect(text).toHaveClass('hidden', 'md:inline');
+    expect(icon).not.toBeNull();
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(icon).toHaveClass('md:hidden');
+    await user.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
