@@ -51,6 +51,12 @@ export const recordingV2Handlers = [
     return new HttpResponse(null, { status: 202 });
   }),
 
+  // POST /api/v2/recordings/{sessionKey}/cancel
+  http.post(`${ApiUrl.recordingV2}/:sessionKey/cancel`, ({ params }) => {
+    statuses.set(params.sessionKey as string, 'CANCELED');
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   // GET /api/v2/recordings/{sessionKey}
   http.get(`${ApiUrl.recordingV2}/:sessionKey`, ({ params }) => {
     const sessionKey = params.sessionKey as string;
