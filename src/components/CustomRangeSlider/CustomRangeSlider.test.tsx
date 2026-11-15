@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 afterEach(cleanup);
 
-describe('CustomRangeSlider', () => {
+describe('범위 슬라이더 컴포넌트', () => {
   it('손가락 이동을 값에 반영하고 영역 밖에서 놓아도 범위 끝에서 한 번만 커밋한다', () => {
     const onCommit = vi.fn();
     function Harness() {
@@ -134,6 +134,31 @@ describe('CustomRangeSlider', () => {
 
     expect(onValueCommit).toHaveBeenCalledTimes(1);
     fireEvent.blur(slider);
+    expect(screen.queryByText('5')).not.toBeInTheDocument();
+  });
+
+  it('마우스 드래그 중 슬라이더 밖에서 포커스가 해제되면 수치 말풍선을 닫는다', () => {
+    render(
+      <CustomRangeSlider
+        value={5}
+        min={0}
+        max={10}
+        ariaLabel="음량"
+        onValueChange={vi.fn()}
+      />,
+    );
+    const slider = screen.getByRole('slider', { name: '음량' });
+
+    fireEvent.pointerDown(slider, {
+      pointerType: 'mouse',
+      isPrimary: true,
+      pointerId: 1,
+    });
+    expect(screen.getByText('5')).toBeInTheDocument();
+
+    fireEvent.mouseLeave(slider);
+    fireEvent.blur(slider);
+
     expect(screen.queryByText('5')).not.toBeInTheDocument();
   });
 });

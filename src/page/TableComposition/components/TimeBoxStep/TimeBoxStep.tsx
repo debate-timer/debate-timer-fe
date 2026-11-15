@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import TimeBox from '../../../../components/TimeBox/TimeBox';
 import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { useModal } from '../../../../hooks/useModal';
-import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
+import useDragAndDrop from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
 import PropsAndConsTitle from '../../../../components/ProsAndConsTitle/PropsAndConsTitle';
 import HeaderTableInfo from '../../../../components/HeaderTableInfo/HeaderTableInfo';
@@ -107,7 +107,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <TimeBox
         key={index}
         info={info as TimeBoxInfo}
-        onDragPointerDown={() => handlePointerDown(index)}
+        onDragPointerDown={(event) => handlePointerDown(index, event.pointerId)}
         actions={
           <TimeBoxManageButtons
             info={info}

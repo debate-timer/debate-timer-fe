@@ -150,6 +150,7 @@ export default function CustomRangeSlider(props: CustomRangeSliderProps) {
         onFocus={() => setIsFocused(true)}
         onBlur={() => {
           setIsFocused(false);
+          setIsDragging(false);
           commitValue();
         }}
         className="peer absolute inset-0 z-10 h-full w-full cursor-pointer touch-none opacity-0"

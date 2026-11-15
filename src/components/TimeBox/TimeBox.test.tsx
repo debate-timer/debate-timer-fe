@@ -26,7 +26,7 @@ const TIME_BASED_INFO: TimeBoxInfo = {
   bell: [],
 };
 
-describe('TimeBox', () => {
+describe('타임박스 컴포넌트', () => {
   it('찬성 타임박스의 발언 유형, 화자, 시간을 렌더링하고 루트 속성을 전달한다', () => {
     render(
       <TimeBox

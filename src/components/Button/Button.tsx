@@ -2,12 +2,7 @@ import { AnchorHTMLAttributes, ButtonHTMLAttributes, Ref } from 'react';
 import clsx from 'clsx';
 
 type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'neutral'
-  | 'dark'
-  | 'light'
-  | 'text';
+  'primary' | 'secondary' | 'neutral' | 'dark' | 'light' | 'text';
 
 export interface ButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,

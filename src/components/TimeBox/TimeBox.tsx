@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode } from 'react';
+import { HTMLAttributes, PointerEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoTimeSharp } from 'react-icons/io5';
 import clsx from 'clsx';
@@ -11,7 +11,7 @@ import SmallIconButtonContainer from '../SmallIconContainer/SmallIconContainer';
 interface TimeBoxProps extends HTMLAttributes<HTMLDivElement> {
   info: TimeBoxInfo;
   actions?: ReactNode;
-  onDragPointerDown?: () => void;
+  onDragPointerDown?: (event: PointerEvent<HTMLDivElement>) => void;
 }
 
 type TimeBoxVariant = 'pros' | 'cons' | 'neutralTimeout' | 'neutralCustom';

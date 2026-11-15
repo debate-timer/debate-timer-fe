@@ -7,7 +7,8 @@ interface UseDragAndDropProps<T> {
   throttleDelay?: number;
 }
 
-export function useDragAndDrop<T>({
+/** 포인터 기반 드래그 앤 드롭으로 목록 순서를 재정렬하는 훅. */
+export default function useDragAndDrop<T>({
   data,
   setData,
   throttleDelay = 50,
@@ -23,6 +24,14 @@ export function useDragAndDrop<T>({
   } | null>(null);
   const itemHeightRef = useRef<number>(0); // 아이템의 평균 높이
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // 호버 중인 인덱스
+
+  const isDifferentPointer = useCallback((pointerId?: number) => {
+    return (
+      activePointerIdRef.current !== null &&
+      pointerId !== undefined &&
+      pointerId !== activePointerIdRef.current
+    );
+  }, []);
 
   const handlePointerDown = useCallback((index: number, pointerId?: number) => {
     dragIndexRef.current = index;
@@ -57,10 +66,7 @@ export function useDragAndDrop<T>({
       if (dragIndexRef.current === null || itemCount <= 0) {
         return;
       }
-      if (
-        activePointerIdRef.current !== null &&
-        e.pointerId !== activePointerIdRef.current
-      ) {
+      if (isDifferentPointer(e.pointerId)) {
         return;
       }
 
@@ -77,7 +83,7 @@ export function useDragAndDrop<T>({
       hoverIndexRef.current = nextHoverIndex;
       setHoverIndex(nextHoverIndex);
     },
-    [computeHoverIndex],
+    [computeHoverIndex, isDifferentPointer],
   );
 
   const throttledHandlePointerMove = useThrottle(
@@ -87,11 +93,7 @@ export function useDragAndDrop<T>({
 
   const handlePointerUp = useCallback(
     (e?: React.PointerEvent<HTMLDivElement>) => {
-      if (
-        e &&
-        activePointerIdRef.current !== null &&
-        e.pointerId !== activePointerIdRef.current
-      ) {
+      if (e && isDifferentPointer(e.pointerId)) {
         return;
       }
       const dragIndex = dragIndexRef.current;
@@ -125,16 +127,12 @@ export function useDragAndDrop<T>({
       hoverIndexRef.current = null;
       setHoverIndex(null);
     },
-    [computeHoverIndex, setData],
+    [computeHoverIndex, isDifferentPointer, setData],
   );
 
   const handlePointerCancel = useCallback(
     (e?: React.PointerEvent<HTMLDivElement>) => {
-      if (
-        e &&
-        activePointerIdRef.current !== null &&
-        e.pointerId !== activePointerIdRef.current
-      ) {
+      if (e && isDifferentPointer(e.pointerId)) {
         return;
       }
       dragIndexRef.current = null;
@@ -143,7 +141,7 @@ export function useDragAndDrop<T>({
       hoverIndexRef.current = null;
       setHoverIndex(null);
     },
-    [],
+    [isDifferentPointer],
   );
 
   const getDraggingStyles = (index: number) => {
@@ -181,8 +179,7 @@ export function useDragAndDrop<T>({
           onPointerMove={(e) => {
             if (
               dragIndexRef.current !== null &&
-              (activePointerIdRef.current === null ||
-                e.pointerId === activePointerIdRef.current)
+              !isDifferentPointer(e.pointerId)
             ) {
               const rect = e.currentTarget.getBoundingClientRect();
               lastMoveRef.current = {
@@ -209,6 +206,7 @@ export function useDragAndDrop<T>({
       data.length,
       handlePointerCancel,
       handlePointerUp,
+      isDifferentPointer,
       throttledHandlePointerMove,
     ],
   );
