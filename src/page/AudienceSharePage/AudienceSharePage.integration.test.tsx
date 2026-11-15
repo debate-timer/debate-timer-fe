@@ -97,6 +97,7 @@ describe('AudienceSharePage 통합 - 청중이 사회자보다 먼저 입장', (
       disconnect: vi.fn(),
       latestMessage: null,
       latestMessageReceivedAt: null,
+      recordingJoin: null,
       lastReceivedAt: null,
       chairmanAbsentAt: null,
       isConnected: true,
