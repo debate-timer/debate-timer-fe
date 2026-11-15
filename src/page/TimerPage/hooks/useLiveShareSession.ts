@@ -73,6 +73,7 @@ export default function useLiveShareSession(
     isConnected: isSocketConnected,
     isReplaced,
     sendDebateEvent,
+    getLastTransitionVersion,
     error: socketError,
   } = useChairmanSocket(tableId, {
     onSyncRequest: () => {
@@ -284,6 +285,8 @@ export default function useLiveShareSession(
     connect,
     disconnect,
     shareUrl,
+    // 청중에게 보낸 마지막 타이머 전환 이벤트의 version. 다기기 녹음의 턴 키로 쓴다.
+    getLastTransitionVersion,
     isLoading,
     isError,
     errorType,
