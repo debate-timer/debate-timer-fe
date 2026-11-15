@@ -220,27 +220,6 @@
   @apply text-timer-raw font-bold;
 }
 
-/* Timebox styles */
-.timebox {
-  @apply relative flex flex-col items-center justify-center rounded-[12px] p-[12px] select-none;
-}
-
-.timebox.pros {
-  @apply w-1/2 bg-stance-blue/50;
-}
-
-.timebox.cons {
-  @apply w-1/2 bg-stance-red/50;
-}
-
-.timebox.neutral {
-  @apply w-full bg-default-neutral/60;
-}
-
-.timebox.time-based {
-  @apply w-full bg-brand/70;
-}
-
 /* Button styles */
 .button {
   @apply flex h-[72px] flex-row items-center justify-center text-subtitle-raw transition-colors duration-200;

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import TimeBox from '../TimeBox/TimeBox';
+import TimeBox from '../../../../components/TimeBox/TimeBox';
+import TimeBoxManageButtons from '../TimeBoxManageButtons/TimeBoxManageButtons';
 import { useModal } from '../../../../hooks/useModal';
 import { useDragAndDrop } from '../../../../hooks/useDragAndDrop';
 import DefaultLayout from '../../../../layout/defaultLayout/DefaultLayout';
@@ -51,7 +52,7 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
   const footerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
-  const { handleMouseDown, getDraggingStyles, DragAndDropWrapper } =
+  const { handlePointerDown, getDraggingStyles, DragAndDropWrapper } =
     useDragAndDrop({
       data: initTimeBox,
       setData: onTimeBoxChange,
@@ -106,15 +107,20 @@ export default function TimeBoxStep(props: TimeBoxStepProps) {
       <TimeBox
         key={index}
         info={info as TimeBoxInfo}
-        prosTeamName={initData.info.prosTeamName}
-        consTeamName={initData.info.consTeamName}
-        eventHandlers={{
-          onSubmitEdit: (updatedInfo: TimeBoxInfo) =>
-            handleSubmitEdit(index, updatedInfo),
-          onSubmitDelete: () => handleSubmitDelete(index),
-          onSubmitCopy: () => handleCopy(index),
-          onMouseDown: () => handleMouseDown(index),
-        }}
+        onDragPointerDown={() => handlePointerDown(index)}
+        actions={
+          <TimeBoxManageButtons
+            info={info}
+            prosTeamName={initData.info.prosTeamName}
+            consTeamName={initData.info.consTeamName}
+            eventHandlers={{
+              onSubmitEdit: (updatedInfo: TimeBoxInfo) =>
+                handleSubmitEdit(index, updatedInfo),
+              onSubmitDelete: () => handleSubmitDelete(index),
+              onSubmitCopy: () => handleCopy(index),
+            }}
+          />
+        }
       />
     );
   };

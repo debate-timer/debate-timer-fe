@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import HeaderDebateInfo from '../../layout/components/header/HeaderDebateInfo';
 import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
-import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
+import TimeBox from '../../components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
 import { CoinState, StanceToString } from '../../types/type';
 import { isGuestFlow } from '../../util/sessionStorage';
@@ -133,12 +133,7 @@ export default function TableOverviewPage() {
 
               <div className="flex w-full flex-col gap-2">
                 {data?.table.map((info, index) => (
-                  <TimeBox
-                    key={index}
-                    info={info}
-                    prosTeamName={data.info.prosTeamName}
-                    consTeamName={data.info.consTeamName}
-                  />
+                  <TimeBox key={index} info={info} />
                 ))}
               </div>
             </section>

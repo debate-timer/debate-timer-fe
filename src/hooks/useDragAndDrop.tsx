@@ -13,48 +13,67 @@ export function useDragAndDrop<T>({
   throttleDelay = 50,
 }: UseDragAndDropProps<T>) {
   const dragIndexRef = useRef<number | null>(null); // 드래그 중인 항목의 인덱스
+  const hoverIndexRef = useRef<number | null>(null); // 호버 중인 인덱스 ref
   const itemHeightRef = useRef<number>(0); // 아이템의 평균 높이
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // 호버 중인 인덱스
 
-  const handleMouseDown = useCallback((index: number) => {
+  const handlePointerDown = useCallback((index: number) => {
     dragIndexRef.current = index;
   }, []);
 
-  const handleMouseMove = useCallback(
+  const handlePointerMove = useCallback(
     (
-      e: React.MouseEvent<HTMLDivElement>,
+      e: React.PointerEvent<HTMLDivElement>,
       containerHeight: number,
       itemCount: number,
     ) => {
-      if (dragIndexRef.current === null || itemCount <= 0) return;
+      if (dragIndexRef.current === null || itemCount <= 0) {
+        return;
+      }
 
       const rect = e.currentTarget.getBoundingClientRect();
       const avgHeight = containerHeight / itemCount;
       itemHeightRef.current = avgHeight;
 
       const hoverPos = Math.floor((e.clientY - rect.top) / avgHeight);
-      setHoverIndex(
-        hoverPos < 0 ? 0 : hoverPos >= itemCount ? itemCount - 1 : hoverPos,
-      );
+      const nextHoverIndex =
+        hoverPos < 0 ? 0 : hoverPos >= itemCount ? itemCount - 1 : hoverPos;
+      hoverIndexRef.current = nextHoverIndex;
+      setHoverIndex(nextHoverIndex);
     },
     [],
   );
 
-  const throttledHandleMouseMove = useThrottle(handleMouseMove, throttleDelay);
+  const throttledHandlePointerMove = useThrottle(
+    handlePointerMove,
+    throttleDelay,
+  );
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback(() => {
     const dragIndex = dragIndexRef.current;
-    if (dragIndex !== null && hoverIndex !== null && dragIndex !== hoverIndex) {
+    const currentHoverIndex = hoverIndexRef.current;
+    if (
+      dragIndex !== null &&
+      currentHoverIndex !== null &&
+      dragIndex !== currentHoverIndex
+    ) {
       setData((prevData) => {
         const updatedData = [...prevData];
         const [movedItem] = updatedData.splice(dragIndex, 1);
-        updatedData.splice(hoverIndex, 0, movedItem);
+        updatedData.splice(currentHoverIndex, 0, movedItem);
         return updatedData;
       });
     }
     dragIndexRef.current = null;
+    hoverIndexRef.current = null;
     setHoverIndex(null);
-  }, [hoverIndex, setData]);
+  }, [setData]);
+
+  const handlePointerCancel = useCallback(() => {
+    dragIndexRef.current = null;
+    hoverIndexRef.current = null;
+    setHoverIndex(null);
+  }, []);
 
   const getDraggingStyles = (index: number) => {
     const dragIndex = dragIndexRef.current;
@@ -83,27 +102,36 @@ export function useDragAndDrop<T>({
     }
   };
 
-  const DragAndDropWrapper = ({ children }: { children: ReactNode }) => {
-    return (
-      <div
-        className="flex w-full flex-col gap-2"
-        onMouseMove={(e) =>
-          throttledHandleMouseMove(
-            e,
-            e.currentTarget.getBoundingClientRect().height,
-            data.length,
-          )
-        }
-        onMouseUp={handleMouseUp}
-      >
-        {children}
-      </div>
-    );
-  };
+  const DragAndDropWrapper = useCallback(
+    ({ children }: { children: ReactNode }) => {
+      return (
+        <div
+          className="flex w-full flex-col gap-2"
+          onPointerMove={(e) =>
+            throttledHandlePointerMove(
+              e,
+              e.currentTarget.getBoundingClientRect().height,
+              data.length,
+            )
+          }
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerCancel}
+        >
+          {children}
+        </div>
+      );
+    },
+    [
+      data.length,
+      handlePointerCancel,
+      handlePointerUp,
+      throttledHandlePointerMove,
+    ],
+  );
 
   return {
     data,
-    handleMouseDown,
+    handlePointerDown,
     DragAndDropWrapper,
     getDraggingStyles,
   };

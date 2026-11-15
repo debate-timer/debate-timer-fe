@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useThrottle = <T extends (...args: any[]) => void>(
@@ -7,14 +7,17 @@ const useThrottle = <T extends (...args: any[]) => void>(
 ): ((...args: Parameters<T>) => void) => {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  return (...args: Parameters<T>) => {
-    if (timer.current) return;
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timer.current) return;
 
-    callback(...args);
-    timer.current = setTimeout(() => {
-      timer.current = null;
-    }, throttleTime);
-  };
+      callback(...args);
+      timer.current = setTimeout(() => {
+        timer.current = null;
+      }, throttleTime);
+    },
+    [callback, throttleTime],
+  );
 };
 
 export default useThrottle;

@@ -44,7 +44,7 @@ function TestWrapper({
   );
 }
 
-vi.mock('./components/TimeBox/TimeBox', () => {
+vi.mock('../../components/TimeBox/TimeBox', () => {
   const DebatePanel = ({ children }: { children: React.ReactNode }) => (
     <div data-testid="timebox">{children}</div>
   );
