@@ -19,7 +19,7 @@ export default function TimerHeader(props: TimerHeaderProps) {
   return (
     <HeaderFrame>
       <div className={LAYOUT_CLASS}>
-        <div className="min-w-0 md:flex-1">
+        <div className="flex min-w-0 items-center md:flex-1">
           <HeaderDebateInfo name={name} agenda={agenda} />
         </div>
         <div className="flex flex-wrap items-center justify-end gap-3">
