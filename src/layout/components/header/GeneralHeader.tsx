@@ -71,7 +71,7 @@ export default function GeneralHeader(props: GeneralHeaderProps) {
   const navigation = [
     { path: '/', label: '서비스 소개', requiresAuth: false },
     { path: '/dashboard', label: '대시보드', requiresAuth: true },
-    ...(!isMember || canViewRecords
+    ...(isMember && canViewRecords
       ? [{ path: '/records', label: '토론 기록', requiresAuth: true }]
       : []),
     { path: '/templates', label: '템플릿', requiresAuth: false },

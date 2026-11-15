@@ -54,7 +54,7 @@ describe('역할별 헤더', () => {
       expect(onRequireLogin).not.toHaveBeenCalled();
     },
   );
-  it('비회원 탐색은 선택 목적지를 로그인에 전달한다', async () => {
+  it('비회원 탐색은 대시보드 선택 목적지를 로그인에 전달하고 토론 기록 메뉴를 숨긴다', async () => {
     const user = userEvent.setup();
     const onRequireLogin = vi.fn();
     render(
@@ -66,26 +66,36 @@ describe('역할별 헤더', () => {
         />
       </MemoryRouter>,
     );
-    await user.click(screen.getByRole('link', { name: '토론 기록' }));
-    expect(onRequireLogin).toHaveBeenCalledWith('/records');
+    await user.click(screen.getByRole('link', { name: '대시보드' }));
+    expect(onRequireLogin).toHaveBeenCalledWith('/dashboard');
     expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(
-      expect.arrayContaining(['서비스 소개', '대시보드', '토론 기록']),
-    );
-  });
-  it('권한 없는 회원에게 기록 메뉴를 제공하지 않는다', () => {
-    render(
-      <MemoryRouter>
-        <GeneralHeader
-          isMember
-          canViewRecords={false}
-          onRequireLogin={vi.fn()}
-        />
-      </MemoryRouter>,
+      expect.arrayContaining(['서비스 소개', '대시보드', '템플릿']),
     );
     expect(
       screen.queryByRole('link', { name: '토론 기록' }),
     ).not.toBeInTheDocument();
   });
+  it.each([
+    [false, false],
+    [false, true],
+    [true, false],
+  ])(
+    '회원(%s)·기록 권한(%s) 조건이 모두 참이 아니면 기록 메뉴를 제공하지 않는다',
+    (isMember, canViewRecords) => {
+      render(
+        <MemoryRouter>
+          <GeneralHeader
+            isMember={isMember}
+            canViewRecords={canViewRecords}
+            onRequireLogin={vi.fn()}
+          />
+        </MemoryRouter>,
+      );
+      expect(
+        screen.queryByRole('link', { name: '토론 기록' }),
+      ).not.toBeInTheDocument();
+    },
+  );
   it('긴 정보는 키보드로 펼치고 닫는다', async () => {
     const user = userEvent.setup();
     render(<HeaderDebateInfo name="긴 시간표 이름" agenda="긴 토론 주제" />);
