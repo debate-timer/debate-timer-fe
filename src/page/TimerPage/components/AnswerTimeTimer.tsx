@@ -22,6 +22,10 @@ export default function AnswerTimeTimer(props: AnswerTimeTimerProps) {
   } = props;
   const { t } = useTranslation();
 
+  if (!isEnabled) {
+    return null;
+  }
+
   return (
     <div className="flex h-[40px] w-full items-center justify-center">
       {answerTimerState?.owner === owner ? (
@@ -38,7 +42,7 @@ export default function AnswerTimeTimer(props: AnswerTimeTimerProps) {
             'flex h-[40px] w-[168px] shrink-0 items-center justify-center rounded-[44px] border border-default-disabled-hover bg-default-white leading-none font-semibold text-default-neutral xl:w-[208px]'
           }
           aria-label={t('답변시간 타이머 시작')}
-          disabled={!isEnabled || !isMainTimerRunning}
+          disabled={!isMainTimerRunning}
           onClick={() => onClick(owner, isMainTimerRunning)}
         >
           {t('답변시간 타이머 시작')}
