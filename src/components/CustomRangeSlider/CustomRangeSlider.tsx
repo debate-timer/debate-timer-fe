@@ -67,7 +67,7 @@ export default function CustomRangeSlider(props: CustomRangeSliderProps) {
       1,
       Math.max(0, (event.clientX - rect.left) / rect.width),
     );
-    const maxStepIndex = Math.max(0, Math.floor(range / safeStep));
+    const maxStepIndex = Math.max(0, Math.floor(range / safeStep + 1e-9));
     const stepIndex = Math.min(
       maxStepIndex,
       Math.max(0, Math.round((ratio * range) / safeStep)),

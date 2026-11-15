@@ -161,4 +161,64 @@ describe('범위 슬라이더 컴포넌트', () => {
 
     expect(screen.queryByText('5')).not.toBeInTheDocument();
   });
+
+  it('터치 드래그에서 0..0.3, step=0.1의 마지막 유효 값 0.3까지 선택할 수 있다', () => {
+    function Harness() {
+      const [value, setValue] = useState(0);
+      return (
+        <CustomRangeSlider
+          value={value}
+          min={0}
+          max={0.3}
+          step={0.1}
+          onValueChange={setValue}
+        />
+      );
+    }
+    render(<Harness />);
+    const slider = screen.getByRole('slider');
+    vi.spyOn(slider, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      width: 100,
+    } as DOMRect);
+
+    fireEvent.pointerDown(slider, {
+      pointerType: 'touch',
+      isPrimary: true,
+      pointerId: 1,
+      clientX: 100,
+    });
+
+    expect(slider).toHaveValue('0.3');
+  });
+
+  it('터치 드래그에서 0..10, step=4의 최대값은 8로 제한된다', () => {
+    function Harness() {
+      const [value, setValue] = useState(0);
+      return (
+        <CustomRangeSlider
+          value={value}
+          min={0}
+          max={10}
+          step={4}
+          onValueChange={setValue}
+        />
+      );
+    }
+    render(<Harness />);
+    const slider = screen.getByRole('slider');
+    vi.spyOn(slider, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      width: 100,
+    } as DOMRect);
+
+    fireEvent.pointerDown(slider, {
+      pointerType: 'touch',
+      isPrimary: true,
+      pointerId: 1,
+      clientX: 100,
+    });
+
+    expect(slider).toHaveValue('8');
+  });
 });
