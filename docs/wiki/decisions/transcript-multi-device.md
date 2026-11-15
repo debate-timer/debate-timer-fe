@@ -25,3 +25,14 @@
 | 속기 방식 선택에 "Soniox 다기기 녹음"을 세 번째 옵션으로 추가하고 플래그 회원에게만 보임 | V1 RPC·Soniox와 나란히 두어 비교·전환이 쉬움. 플래그가 있을 때 Soniox를 V2로 바꾸는 안은 V1과 비교하기 어려움 | [진입점과 청중 참여](../feature/transcript-multi-device.md#진입점과-청중-참여) |
 | 중도 입장·재연결 청중은 시작 이벤트를 직접 받은 구간부터 녹음함 | FE만으로 중복 전사를 막음. 동기화 응답에 시작 version을 싣는 안은 소켓·BE 계약 변경이 필요함. 입장 직후 진행 중인 구간은 그 기기 녹음이 빠짐 | [턴 키와 시간 기준](../feature/transcript-multi-device.md#턴-키와-시간-기준) |
 | 청중 녹음은 기본 고지·동의 후 시작하고 거절하면 보기만 계속함 | 문구 확정 전에도 녹음 사실을 알리고 동의를 받음. 문구는 번역 키로 두고 교체함 | [진입점과 청중 참여](../feature/transcript-multi-device.md#진입점과-청중-참여) |
+
+### TRANSCRIPT-MULTI-DEVICE-DEC-003 — 공유 채널로 녹음 참가 정보 전파
+
+- 결정일: 2026-11-15, 상태: 승인임. 작업: FE [PR #582](https://github.com/debate-timer/debate-timer-fe/pull/582)(이슈 #581), BE [PR #334](https://github.com/debate-timer/debate-timer-be/pull/334)임.
+- 승인 근거: 계획 대화에서 사용자가 "공유 → 다기기 녹음" 순서일 때 이미 열린 공유 화면에서도 바로 녹음할 수 있게 웹소켓 이벤트를 추가하자고 요청하고, 참가 코드 전파와 신호만 전파하는 안을 비교한 뒤 참가 코드 전파와 동기화마다 재전송을 선택했음.
+
+| 결정 | 이유·한계 | 현행 정책 |
+| --- | --- | --- |
+| 사회자가 `RECORDING_OPENED`로 참가 정보(sessionKey·joinCode)를 공유 채널에 보냄 | 링크를 다시 나눠주지 않아도 기존 청중이 바로 참여함. 청중 채널은 roomId만 알면 구독할 수 있어 참가 코드의 "링크를 받은 사람만" 보호가 약해짐. 정원 8대·동의 절차는 유지 | [진입점과 청중 참여](../feature/transcript-multi-device.md#진입점과-청중-참여) |
+| 상태 동기화에 응답할 때마다 참가 정보를 다시 보냄 | 녹음을 켠 뒤 들어오거나 재연결한 청중도 받음 | [진입점과 청중 참여](../feature/transcript-multi-device.md#진입점과-청중-참여) |
+

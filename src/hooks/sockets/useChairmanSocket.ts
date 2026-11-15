@@ -4,6 +4,7 @@ import { IMessage } from '@stomp/stompjs';
 import {
   CHAIRMAN_SESSION_HEADER,
   SocketEventType,
+  RecordingJoinPayload,
   SocketMessage,
   TimerDataPayload,
 } from '../../apis/sockets/type';
@@ -290,11 +291,13 @@ export default function useChairmanSocket(
   }, [error, resetSignalState]);
 
   // 사회자 권한으로 특정 제어 메시지를 발행하는 함수
+  // 녹음 참여 이벤트(RECORDING_OPENED)는 다기기 녹음 참가 정보(recording)를 함께 보냄
   const sendDebateEvent = useCallback(
     (
       eventType: SocketEventType,
       payload: TimerDataPayload | null,
       authToken: string,
+      recording?: RecordingJoinPayload,
     ) => {
       const destination = `/app/event/${roomId}`;
       let body: SocketMessage;
@@ -316,6 +319,17 @@ export default function useChairmanSocket(
             version,
           };
         }
+      } else if (eventType === 'RECORDING_OPENED') {
+        if (!recording) {
+          console.error('No recording join for recording event.');
+          return false;
+        }
+        body = {
+          eventType,
+          data: null,
+          version,
+          recording,
+        };
       } else {
         body = {
           eventType,

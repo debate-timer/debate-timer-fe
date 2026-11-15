@@ -92,7 +92,9 @@ function AudienceShareSession() {
   });
 
   // 사회자가 다기기 녹음 중이면 공유 링크 hash로 녹음 세션·참가 코드가 온다.
-  const recordingJoin = useMemo(() => parseRecordingJoin(hash), [hash]);
+  // 링크에 없으면 사회자가 공유 채널로 보낸 참가 정보(RECORDING_OPENED)를 쓴다.
+  const linkRecordingJoin = useMemo(() => parseRecordingJoin(hash), [hash]);
+  const recordingJoin = linkRecordingJoin ?? state.recordingJoin;
   const recorder = useAudienceTurnRecorder({
     join: recordingJoin,
     latestMessage: state.latestMessage,

@@ -1,6 +1,7 @@
 import {
   ChairmanNotice,
   NonTimerEventType,
+  RecordingJoinPayload,
   ServerEventType,
   SocketEventType,
   TimerEventTypes,
@@ -47,6 +48,18 @@ function isOptional<T>(
   guard: (value: unknown) => value is T,
 ): boolean {
   return value === undefined || value === null || guard(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0;
+}
+
+function isRecordingJoinPayload(value: unknown): value is RecordingJoinPayload {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return isNonEmptyString(obj.sessionKey) && isNonEmptyString(obj.joinCode);
 }
 
 function isBoolean(value: unknown): value is boolean {
@@ -127,6 +140,10 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
     }
 
     return true;
+  }
+
+  if (eventType === 'RECORDING_OPENED') {
+    return obj.data === null && isRecordingJoinPayload(obj.recording);
   }
 
   if (

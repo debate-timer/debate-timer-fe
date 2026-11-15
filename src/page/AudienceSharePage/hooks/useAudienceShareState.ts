@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
-import { SocketMessage } from '../../../apis/sockets/type';
+import {
+  RecordingJoinPayload,
+  SocketMessage,
+} from '../../../apis/sockets/type';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
 import { TimeBoxInfo } from '../../../types/type';
 import { isSocketError } from '../../../apis/sockets/error';
@@ -66,6 +69,8 @@ export function useAudienceShareState(
   latestMessageReceivedAt: number | null;
   // 소켓 연결 여부. 다기기 녹음이 재연결 뒤 동기화로 진행 중인 구간을 잇지 않도록 쓴다.
   isSocketConnected: boolean;
+  // 사회자가 공유 채널로 보낸 다기기 녹음 참가 정보
+  recordingJoin: RecordingJoinPayload | null;
 } {
   const { enabled = true, table, handleAbort = false } = options;
   const {
@@ -73,6 +78,7 @@ export function useAudienceShareState(
     disconnect,
     latestMessage,
     latestMessageReceivedAt,
+    recordingJoin,
     lastReceivedAt,
     chairmanAbsentAt,
     isConnected,
@@ -277,6 +283,7 @@ export function useAudienceShareState(
       latestMessage,
       latestMessageReceivedAt,
       isSocketConnected: isConnected,
+      recordingJoin,
     };
   }
 
@@ -289,5 +296,6 @@ export function useAudienceShareState(
     latestMessage,
     latestMessageReceivedAt,
     isSocketConnected: isConnected,
+    recordingJoin,
   };
 }
