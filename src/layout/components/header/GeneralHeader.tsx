@@ -17,9 +17,11 @@ interface GeneralHeaderProps {
 const LAYOUT_CLASS =
   'mx-auto grid w-full max-w-[1600px] grid-cols-[minmax(0,1fr)_auto] md:flex md:flex-wrap items-center justify-between gap-x-3 gap-y-3 md:gap-x-6';
 const NAV_CLASS =
-  'order-3 col-span-2 flex w-full flex-wrap items-center gap-x-5 gap-y-2 text-ui-label md:order-none md:w-auto';
+  'order-3 col-span-2 flex w-full flex-wrap items-center gap-x-2 gap-y-2 text-ui-label md:order-none md:w-auto';
 const LINK_CLASS =
-  'rounded-md px-2 py-1 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 aria-[current=page]:bg-brand aria-[current=page]:underline';
+  'inline-flex min-h-11 items-center rounded-xl px-3.5 py-2 text-neutral-700 no-underline transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 aria-[current=page]:bg-brand aria-[current=page]:text-neutral-900 aria-[current=page]:hover:bg-brand motion-reduce:transition-none';
+const INQUIRY_SUMMARY_CLASS =
+  'inline-flex min-h-11 cursor-pointer items-center rounded-xl px-3.5 py-2 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 motion-reduce:transition-none';
 const INQUIRY_CLASS =
   'absolute left-0 z-40 mt-2 w-64 space-y-2 rounded-xl border border-neutral-200 bg-white p-4 shadow-lg';
 
@@ -96,9 +98,7 @@ export default function GeneralHeader(props: GeneralHeaderProps) {
                 }
               }}
             >
-              <summary className="cursor-pointer rounded-md py-1">
-                {t('문의')}
-              </summary>
+              <summary className={INQUIRY_SUMMARY_CLASS}>{t('문의')}</summary>
               <div className={INQUIRY_CLASS}>
                 {inquiries.map((item) => (
                   <a
