@@ -112,6 +112,17 @@ describe('청중 녹음 참여 컨트롤', () => {
     ).toBeInTheDocument();
   });
 
+  it('지금 참여할 수 없으면 다시 시도할 수 있게 버튼과 안내를 함께 보여준다', () => {
+    renderControl({ error: 'unavailable' });
+
+    expect(
+      screen.getByText(
+        '지금은 녹음에 참여할 수 없어요. 녹음이 끝났거나 참여 기기가 가득 찼어요.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '녹음 참여' })).toBeEnabled();
+  });
+
   describe('녹음 동의 안내창 자동 열기', () => {
     it('새 녹음 세션의 참가 정보를 받으면 버튼을 누르지 않아도 안내창을 띄운다', () => {
       renderControl({ sessionKey: 'session-1' });

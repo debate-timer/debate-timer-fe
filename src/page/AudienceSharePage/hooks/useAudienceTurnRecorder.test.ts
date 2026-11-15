@@ -167,18 +167,33 @@ describe('다기기 녹음 청중 훅', () => {
       expect(trackStop).toHaveBeenCalled();
     });
 
-    it('참가하려던 세션이 이미 끝났으면 그 세션으로는 참여할 수 없게 한다', async () => {
+    it('참가가 409로 거절되면(세션 종료·정원 초과) 마이크를 놓고 지금은 참여할 수 없다고 알린다', async () => {
       vi.mocked(postRecordingDeviceV2).mockRejectedValueOnce(
-        new APIError('이미 끝난 녹음 세션입니다.', 409, {}),
+        new APIError('녹음에 참가할 수 있는 기기 수를 넘었습니다.', 409, {}),
       );
       const rendered = render();
 
       await act(() => rendered.result.current.start());
 
       expect(rendered.result.current.status).toBe('idle');
-      expect(rendered.result.current.error).toBeNull();
-      expect(rendered.result.current.isAvailable).toBe(false);
+      expect(rendered.result.current.error).toBe('unavailable');
+      expect(rendered.result.current.isAvailable).toBe(true);
       expect(trackStop).toHaveBeenCalled();
+    });
+
+    it('정원이 차 거절된 뒤 자리가 나면 같은 화면에서 다시 참여할 수 있다', async () => {
+      vi.mocked(postRecordingDeviceV2).mockRejectedValueOnce(
+        new APIError('녹음에 참가할 수 있는 기기 수를 넘었습니다.', 409, {}),
+      );
+      const rendered = render();
+      await act(() => rendered.result.current.start());
+      expect(rendered.result.current.error).toBe('unavailable');
+
+      await act(() => rendered.result.current.start());
+
+      expect(rendered.result.current.status).toBe('recording');
+      expect(rendered.result.current.error).toBeNull();
+      expect(getAudienceDeviceTokenV2('session-1')).toBe('audience-token');
     });
 
     it('참여를 시작하는 중에 다시 불러도 마이크를 한 번만 받는다', async () => {
@@ -299,7 +314,7 @@ describe('다기기 녹음 청중 훅', () => {
       expect(postRecordingDeviceV2).toHaveBeenCalledTimes(1);
     });
 
-    it('보관한 기기 토큰으로 참여한 세션이 이미 끝났으면 첫 구간을 올릴 때 알고 참여를 멈춘다', async () => {
+    it('보관한 기기 토큰으로 참여한 세션이 이미 끝났으면 첫 구간을 올리다 재참가가 거절될 때 참여를 멈춘다', async () => {
       saveAudienceDeviceTokenV2('session-1', 'stale-token');
       vi.mocked(postRecordingTurnV2).mockRejectedValueOnce(
         new APIError('녹음에 참가한 기기가 아닙니다.', 403, {}),
@@ -314,10 +329,8 @@ describe('다기기 녹음 청중 훅', () => {
 
       receive(rendered, message('STOP', normal(0, false), 331));
 
-      await waitFor(() =>
-        expect(rendered.result.current.isAvailable).toBe(false),
-      );
-      expect(rendered.result.current.status).toBe('idle');
+      await waitFor(() => expect(rendered.result.current.status).toBe('idle'));
+      expect(rendered.result.current.error).toBe('unavailable');
       expect(trackStop).toHaveBeenCalled();
     });
 

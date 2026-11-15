@@ -76,7 +76,11 @@ export default function AudienceRecordingControl(
         ? t('녹음에 참여하지 못했어요. 링크를 다시 확인해 주세요.')
         : error === 'unsupported'
           ? t('이 브라우저에서는 녹음에 참여할 수 없어요.')
-          : null;
+          : error === 'unavailable'
+            ? t(
+                '지금은 녹음에 참여할 수 없어요. 녹음이 끝났거나 참여 기기가 가득 찼어요.',
+              )
+            : null;
 
   return (
     <div className="flex flex-col items-center gap-2 text-center text-ui-body">

@@ -499,5 +499,6 @@
   "녹음 준비 중": "Preparing to record",
   "QR 코드 보기": "Show QR code",
   "실시간 공유 QR 코드": "Live share QR code",
-  "청중 기기도 함께 녹음하려면 'Soniox 다기기 녹음'을 골라 주세요.": "To record on audience devices too, choose 'Soniox multi-device recording'."
+  "청중 기기도 함께 녹음하려면 'Soniox 다기기 녹음'을 골라 주세요.": "To record on audience devices too, choose 'Soniox multi-device recording'.",
+  "지금은 녹음에 참여할 수 없어요. 녹음이 끝났거나 참여 기기가 가득 찼어요.": "You can't join the recording right now. It has ended or the device limit has been reached."
 }
