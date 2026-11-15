@@ -133,7 +133,12 @@ describe('타이머와 명시적 공유의 연결', () => {
     expect(
       within(qrDialog).getByRole('button', { name: '링크 복사' }),
     ).toBeInTheDocument();
-    await user.keyboard('{Escape}');
+    await user.click(
+      within(qrDialog).getByRole('button', { name: '모달 닫기' }),
+    );
+    expect(
+      screen.queryByRole('dialog', { name: '토론 타이머 화면 공유' }),
+    ).not.toBeInTheDocument();
 
     const menu = screen.getByRole('dialog', { name: '토론 메뉴' });
     expect(

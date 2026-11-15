@@ -381,6 +381,7 @@ export default function DebateMenu(props: DebateMenuProps) {
             aria-labelledby={confirmationTitleId}
             onClose={controls.cancelConfirmation}
             closeOnOverlayClick
+            showCloseButton
           >
             <LiveShareQrPanel
               shareUrl={controls.shareUrl}
