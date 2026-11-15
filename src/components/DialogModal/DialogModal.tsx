@@ -14,10 +14,12 @@ interface DialogModalProps extends PropsWithChildren {
 }
 
 const CONTAINER_CLASS =
-  'flex w-full max-w-[500px] flex-col overflow-hidden rounded-[20px] bg-white text-ui-body text-neutral-900';
+  'flex w-[min(500px,calc(100vw-32px))] max-w-full flex-col overflow-hidden rounded-[20px] bg-white text-ui-body text-neutral-900';
 
 /**
  * 확인창의 본문과 행동 버튼을 표시하며 열림·닫힘과 모달 포커스 관리는 상위에서 담당함.
+ * 기본 너비는 500px이며 화면 양옆 16px 여백과 상위 영역 너비 안으로 제한함.
+ * 내용이 짧아도 포털 안에서 너비가 줄어들지 않으며 버튼 영역이 충분하면 가로 배치함.
  *
  * `DialogModal`은 20px 모서리의 흰 면을 사용하며 외곽 테두리·버튼 영역 배경·구분선을 두지 않음. 떠 있는 면의 그림자는 상위 모달 컨테이너가 소유함. 하단의 여백 있는 공용 `Button`은 왼쪽 보조 행동에 `neutral`(기본 `neutral-100`, 호버 `neutral-200`), 오른쪽 주요 행동에 `primary`를 사용함. `isBold`는 Label, 그 외 문구는 Body 역할로 표시함. 버튼은 같은 너비를 공유하며 좁은 영역에서는 세로로 재배치함. 본문의 내용·여백과 제목 수준은 호출자가 소유함.
  *

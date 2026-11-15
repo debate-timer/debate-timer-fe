@@ -9,6 +9,7 @@ import useFullscreen from '../../../hooks/useFullscreen';
 import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import DTVolume from '../../../components/icons/Volume';
+import TimerDashboardButton from './TimerDashboardButton';
 
 interface TimerHeaderToolsProps extends PropsWithChildren {
   onLogout?: () => Promise<void>;
@@ -19,7 +20,7 @@ const BUTTON_CLASS =
 const VOLUME_CLASS =
   'absolute top-full right-0 z-40 mt-2 w-64 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg';
 
-/** 세 타이머 화면의 전체 화면·공용 음량·설정을 연결함. 토론 정리는 전달받은 콜백에 위임함. */
+/** 세 타이머 화면의 전체 화면·공용 음량·대시보드 이동 확인·설정을 연결함. 토론 정리는 전달받은 콜백에 위임함. */
 export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
   const { children, onLogin, onLogout } = props;
   const { t } = useTranslation();
@@ -140,6 +141,7 @@ export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
           </div>
         )}
       </div>
+      <TimerDashboardButton className={BUTTON_CLASS} />
       <SettingsModal onLogin={onLogin} onLogout={onLogout} />
     </>
   );
