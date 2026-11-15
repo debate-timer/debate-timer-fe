@@ -291,7 +291,7 @@ export default function useChairmanSocket(
   }, [error, resetSignalState]);
 
   // 사회자 권한으로 특정 제어 메시지를 발행하는 함수
-  // 녹음 참여 이벤트(RECORDING_OPENED)는 다기기 녹음 참가 정보(recording)를 함께 보냄
+  // 녹음 참여·종료 이벤트(RECORDING_OPENED·RECORDING_CLOSED)는 다기기 녹음 참가 정보(recording)를 함께 보냄
   const sendDebateEvent = useCallback(
     (
       eventType: SocketEventType,
@@ -319,7 +319,10 @@ export default function useChairmanSocket(
             version,
           };
         }
-      } else if (eventType === 'RECORDING_OPENED') {
+      } else if (
+        eventType === 'RECORDING_OPENED' ||
+        eventType === 'RECORDING_CLOSED'
+      ) {
         if (!recording) {
           console.error('No recording join for recording event.');
           return false;

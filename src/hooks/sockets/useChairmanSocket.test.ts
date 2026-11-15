@@ -316,6 +316,30 @@ describe('useChairmanSocket', () => {
       expect(result.current.getLastTransitionVersion()).toBeNull();
     });
 
+    it('녹음 종료도 녹음 참가 정보를 담아 version과 함께 발행한다', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(8000);
+      publish.mockReturnValue(true);
+      const { result } = renderHook(() => useChairmanSocket(123));
+
+      act(() => {
+        result.current.sendDebateEvent('RECORDING_CLOSED', null, 'token', {
+          sessionKey: 'session-1',
+          joinCode: 'join',
+        });
+      });
+
+      expect(publish).toHaveBeenCalledWith(
+        '/app/event/123',
+        {
+          eventType: 'RECORDING_CLOSED',
+          data: null,
+          version: 8000,
+          recording: { sessionKey: 'session-1', joinCode: 'join' },
+        },
+        expect.objectContaining({ Authorization: 'token' }),
+      );
+    });
+
     it('녹음 참가 정보가 없으면 발행하지 않는다', () => {
       const { result } = renderHook(() => useChairmanSocket(123));
 

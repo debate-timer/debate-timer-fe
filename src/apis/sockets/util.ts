@@ -142,7 +142,7 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
     return true;
   }
 
-  if (eventType === 'RECORDING_OPENED') {
+  if (eventType === 'RECORDING_OPENED' || eventType === 'RECORDING_CLOSED') {
     return obj.data === null && isRecordingJoinPayload(obj.recording);
   }
 
