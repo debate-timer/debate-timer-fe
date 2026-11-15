@@ -7,6 +7,7 @@ import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import LanguageSelector from './LanguageSelector';
 import GeneralHeader from './GeneralHeader';
 import HeaderLoginButton from './HeaderLoginButton';
+import { HEADER_ICON_BUTTON_CLASS } from './headerActionStyles';
 import {
   deleteSessionCustomizeTableData,
   isGuestFlow,
@@ -38,7 +39,10 @@ export default function GeneralHeaderContainer() {
         actions={
           <>
             <LanguageSelector />
-            <SettingsModal onLogin={() => login.requestLogin()} />
+            <SettingsModal
+              triggerClassName={HEADER_ICON_BUTTON_CLASS}
+              onLogin={() => login.requestLogin()}
+            />
             {!isMember && (
               <HeaderLoginButton onClick={() => login.requestLogin()} />
             )}

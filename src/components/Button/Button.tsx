@@ -1,10 +1,11 @@
-import { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, Ref } from 'react';
 import clsx from 'clsx';
 
 type ButtonVariant =
   'primary' | 'secondary' | 'neutral' | 'dark' | 'light' | 'text';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  ref?: Ref<HTMLButtonElement>;
   'aria-label': string;
   variant?: ButtonVariant;
   size?: 'default' | 'large';

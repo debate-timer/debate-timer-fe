@@ -8,11 +8,14 @@ import { GlobalPortal } from '../../util/GlobalPortal';
 import { oAuthLogin } from '../../util/googleAuth';
 import { buildLangPath, isSupportedLang } from '../../util/languageRouting';
 import { INQUIRY_LINKS } from '../../constants/urls';
+import IconButton from '../IconButton/IconButton';
 
 const PANEL_CLASS =
   'relative max-h-[90dvh] w-[min(92vw,560px)] overflow-y-auto rounded-2xl bg-white p-6 text-ui-body text-neutral-900 shadow-xl';
 /** 일반·타이머 화면의 전역 설정 진입점과 접근 가능한 모달임. */
 interface SettingsModalProps {
+  /** 호출자가 설정 진입 버튼의 배치 맥락에 맞는 스타일을 전달함. */
+  triggerClassName?: string;
   onLogin?: () => void;
   onLogout?: () => Promise<void>;
 }
@@ -21,7 +24,7 @@ interface SettingsModalProps {
  *
  */
 export default function SettingsModal(props: SettingsModalProps) {
-  const { onLogin, onLogout } = props;
+  const { onLogin, onLogout, triggerClassName } = props;
   const { t, i18n } = useTranslation();
   const settings = useGlobalSettings();
   const { controller } = settings;
@@ -112,16 +115,16 @@ export default function SettingsModal(props: SettingsModalProps) {
   };
   return (
     <>
-      <button
+      <IconButton
+        className={triggerClassName}
         ref={trigger}
-        type="button"
+        variant="secondary"
+        shape="rounded"
         aria-label={t('설정')}
         title={t('설정')}
-        className="flex size-11 items-center justify-center rounded-xl border border-neutral-300 p-2"
         onClick={() => setOpen(true)}
-      >
-        <RiSettings3Line className="size-6" aria-hidden="true" />
-      </button>
+        icon={<RiSettings3Line aria-hidden="true" />}
+      />
       {open && (
         <GlobalPortal.Consumer>
           <div

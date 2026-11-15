@@ -6,6 +6,8 @@ import { DebateControls } from '../hooks/useDebateControls';
 import useDebateOverlay from '../hooks/useDebateOverlay';
 import MicCheckPanel from './MicCheckPanel';
 import { copyToClipboard } from '../../../util/clipboard';
+import Button from '../../../components/Button/Button';
+import { HEADER_BUTTON_CLASS } from '../../../layout/components/header/headerActionStyles';
 
 interface DebateMenuProps {
   controls: DebateControls;
@@ -16,8 +18,9 @@ interface DebateMenuProps {
 
 const PANEL_CLASS =
   'fixed inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-2xl border border-neutral-300 bg-white p-6 text-ui-body text-neutral-900 shadow-xl md:inset-x-auto md:top-[var(--debate-menu-top)] md:right-[var(--debate-menu-right)] md:bottom-auto md:max-h-[calc(100dvh-var(--debate-menu-top)-16px)] md:w-[min(92vw,480px)] md:rounded-2xl';
-const ACTION_CLASS =
-  'min-h-11 rounded-xl border border-neutral-400 px-4 py-2 text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50';
+const ACTION_BASE_CLASS =
+  'min-h-11 rounded-xl border px-4 py-2 text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50';
+const ACTION_CLASS = `${ACTION_BASE_CLASS} border-neutral-400`;
 
 /** 기능 수명은 전달받은 제어 훅에 두고 토론 메뉴·확인·복구 입력만 표시함. */
 export default function DebateMenu(props: DebateMenuProps) {
@@ -102,18 +105,20 @@ export default function DebateMenu(props: DebateMenuProps) {
 
   return (
     <>
-      <button
+      <Button
+        className={HEADER_BUTTON_CLASS}
         ref={triggerRef}
+        variant="secondary"
+        shape="rounded"
         type="button"
         aria-label={t('토론 메뉴')}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         disabled={controls.isInterrupted}
-        className={ACTION_CLASS}
         onClick={controls.openMenu}
       >
         {t('토론 메뉴')}
-      </button>
+      </Button>
       {isOpen && (
         <GlobalPortal.Consumer>
           <div

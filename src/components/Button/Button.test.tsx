@@ -1,8 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Button from './Button';
+import { createRef } from 'react';
 
 describe('공용 버튼', () => {
+  it('외부 ref로 버튼에 포커스를 복귀시킬 수 있다', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(
+      <Button ref={ref} aria-label="설정">
+        설정
+      </Button>,
+    );
+    ref.current?.focus();
+    expect(screen.getByRole('button', { name: '설정' })).toHaveFocus();
+  });
   it('폼 안에서도 기본 클릭으로 제출하지 않고 이름과 속성을 전달한다', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();

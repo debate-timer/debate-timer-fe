@@ -9,10 +9,7 @@ function renderHeader(path = '/timer') {
     <GlobalPortal.Provider>
       <MemoryRouter initialEntries={[path]}>
         <Routes>
-          <Route
-            path="/:lang?/timer"
-            element={<TimerDashboardButton className="" />}
-          />
+          <Route path="/:lang?/timer" element={<TimerDashboardButton />} />
           <Route path="/dashboard" element={<p>한국어 대시보드</p>} />
           <Route path="/en/dashboard" element={<p>영어 대시보드</p>} />
         </Routes>

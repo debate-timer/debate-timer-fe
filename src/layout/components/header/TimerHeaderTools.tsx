@@ -10,13 +10,13 @@ import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import DTVolume from '../../../components/icons/Volume';
 import TimerDashboardButton from './TimerDashboardButton';
+import IconButton from '../../../components/IconButton/IconButton';
+import { HEADER_ICON_BUTTON_CLASS } from './headerActionStyles';
 
 interface TimerHeaderToolsProps extends PropsWithChildren {
   onLogout?: () => Promise<void>;
   onLogin?: () => void;
 }
-const BUTTON_CLASS =
-  'flex size-11 shrink-0 items-center justify-center rounded-xl border border-neutral-300 p-2 text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2';
 const VOLUME_CLASS =
   'absolute top-full right-0 z-40 mt-2 w-64 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg';
 
@@ -64,45 +64,44 @@ export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
   return (
     <>
       {children}
-      <button
-        type="button"
+      <IconButton
+        className={HEADER_ICON_BUTTON_CLASS}
+        variant="secondary"
+        shape="rounded"
         aria-label={t(isFullscreen ? '전체 화면 해제' : '전체 화면')}
-        className={BUTTON_CLASS}
         onClick={() => void toggleFullscreen()}
-      >
-        {isFullscreen ? (
-          <RiFullscreenExitFill className="size-6" aria-hidden="true" />
-        ) : (
-          <RiFullscreenFill className="size-6" aria-hidden="true" />
-        )}
-      </button>
+        icon={
+          isFullscreen ? (
+            <RiFullscreenExitFill aria-hidden="true" />
+          ) : (
+            <RiFullscreenFill aria-hidden="true" />
+          )
+        }
+      />
       <div
         ref={volumeRef}
         className="relative"
         data-timer-overlay={isVolumeOpen ? '' : undefined}
       >
-        <button
+        <IconButton
+          className={HEADER_ICON_BUTTON_CLASS}
           ref={volumeTrigger}
-          type="button"
+          variant="secondary"
+          shape="rounded"
           aria-label={t('볼륨 조절')}
           aria-expanded={isVolumeOpen}
-          className={BUTTON_CLASS}
           onClick={() => setIsVolumeOpen((current) => !current)}
-        >
-          {volume === 0 ? (
-            <RiVolumeMuteFill
-              data-testid="volume-icon-muted"
-              className="size-6"
-              aria-hidden="true"
-            />
-          ) : (
-            <DTVolume
-              data-testid="volume-icon-normal"
-              className="size-6"
-              aria-hidden="true"
-            />
-          )}
-        </button>
+          icon={
+            volume === 0 ? (
+              <RiVolumeMuteFill
+                data-testid="volume-icon-muted"
+                aria-hidden="true"
+              />
+            ) : (
+              <DTVolume data-testid="volume-icon-normal" aria-hidden="true" />
+            )
+          }
+        />
         {isVolumeOpen && (
           <div className={VOLUME_CLASS}>
             <label className="flex flex-col gap-2">
@@ -141,8 +140,12 @@ export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
           </div>
         )}
       </div>
-      <TimerDashboardButton className={BUTTON_CLASS} />
-      <SettingsModal onLogin={onLogin} onLogout={onLogout} />
+      <TimerDashboardButton />
+      <SettingsModal
+        triggerClassName={HEADER_ICON_BUTTON_CLASS}
+        onLogin={onLogin}
+        onLogout={onLogout}
+      />
     </>
   );
 }

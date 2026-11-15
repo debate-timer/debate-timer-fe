@@ -1,5 +1,7 @@
 import { parsePositiveId } from '../../util/headerNavigation';
 import TimerHeader from '../../layout/components/header/TimerHeader';
+import IconButton from '../../components/IconButton/IconButton';
+import { HEADER_ICON_BUTTON_CLASS } from '../../layout/components/header/headerActionStyles';
 import TimerHeaderTools from '../../layout/components/header/TimerHeaderTools';
 import DebateMenu from './components/DebateMenu';
 import DebateFeatureIndicators from './components/DebateFeatureIndicators';
@@ -413,15 +415,15 @@ function TimerPageSession() {
                 : undefined
             }
           />
-          <button
-            type="button"
+          <IconButton
+            className={HEADER_ICON_BUTTON_CLASS}
+            variant="secondary"
+            shape="rounded"
             aria-label={t('도움말')}
             title={t('도움말')}
-            className="flex size-11 items-center justify-center rounded-xl border border-neutral-300 p-2"
             onClick={openUseTooltipModal}
-          >
-            <DTHelp className="size-6" />
-          </button>
+            icon={<DTHelp aria-hidden="true" />}
+          />
         </TimerHeaderTools>
       }
     />
