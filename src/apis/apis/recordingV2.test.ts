@@ -9,6 +9,7 @@ import {
 import {
   getRecordingSessionV2,
   postRecordingDeviceV2,
+  postRecordingCancelV2,
   postRecordingFinishV2,
   postRecordingHostDeviceV2,
   postRecordingSessionV2,
@@ -87,6 +88,20 @@ describe('다기기 녹음 V2 API', () => {
     await postRecordingFinishV2('session-1');
 
     expect(finishedSessionKey).toBe('session-1');
+  });
+
+  it('녹음 세션을 취소한다', async () => {
+    let canceledSessionKey: string | undefined;
+    server.use(
+      http.post(`${ApiUrl.recordingV2}/:sessionKey/cancel`, ({ params }) => {
+        canceledSessionKey = params.sessionKey as string;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    await postRecordingCancelV2('session-1');
+
+    expect(canceledSessionKey).toBe('session-1');
   });
 
   it('녹음 세션과 턴별 처리 상태를 조회한다', async () => {

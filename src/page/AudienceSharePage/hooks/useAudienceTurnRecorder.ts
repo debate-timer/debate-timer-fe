@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { postRecordingDeviceV2 } from '../../../apis/apis/recordingV2';
+import { APIError } from '../../../apis/primitives';
 import { SocketMessage } from '../../../apis/sockets/type';
 import useRecordingTurnUploaderV2 from '../../../hooks/useRecordingTurnUploaderV2';
 import { TimeBasedStance } from '../../../types/type';
@@ -26,7 +27,9 @@ export interface UseAudienceTurnRecorderParams {
 }
 
 export type AudienceRecorderStatus = 'idle' | 'starting' | 'recording';
-export type AudienceRecorderError = 'unsupported' | 'not-allowed' | 'join';
+// unavailable: 서버가 참가를 409로 거절함(세션이 끝났거나 기기 정원이 참). 두 경우를 상태 코드로 구분할 수 없어 다시 시도할 수 있게 둔다.
+export type AudienceRecorderError =
+  'unsupported' | 'not-allowed' | 'join' | 'unavailable';
 
 interface Segment {
   timeBoxIndex: number;
@@ -45,6 +48,11 @@ interface ActiveTurn extends Segment {
  * - 연결이 끊긴 사이 정지·재생을 놓쳤을 수 있으므로, 재연결 뒤 처음 받은 SYNC에서 진행 중인 구간을 끝내고
  *   다음 시작 이벤트를 기다린다. 연결이 유지된 SYNC는 진행 중인 구간을 그대로 잇는다.
  * - 정지·차례 이동·팀 전환·종료·중단 이벤트에서 구간을 끝내고 올린다.
+ * - 참여 중인 세션의 참가 정보가 사라지거나(사회자가 녹음을 끔) 다른 세션으로 바뀌면 녹음을 멈춘다.
+ *   끝난 세션이므로 진행 중인 구간은 올리지 않는다.
+ * - 참가하거나 기기 토큰을 다시 받으려다 409(세션 종료 또는 기기 정원 초과)를 받으면 참여를 멈추고 알린다.
+ *   정원이 돌아올 수 있으므로 그 세션을 막지는 않고 다시 참여할 수 있게 둔다.
+ *   이 탭에 보관한 기기 토큰으로 끝난 세션에 참여했다면 첫 구간을 올릴 때 서버가 거절해 이 경로로 알게 된다.
  */
 export default function useAudienceTurnRecorder({
   join,
@@ -63,6 +71,12 @@ export default function useAudienceTurnRecorder({
   const generationRef = useRef(0);
   // 참여 시작(마이크·기기 등록)을 기다리는 중이면 다시 시작하지 않는다.
   const isStartingRef = useRef(false);
+  // 참여(시작 중 포함)한 녹음 세션. 참여하지 않으면 null이다.
+  const participatingKeyRef = useRef<string | null>(null);
+  // 참여 중인 세션에 더 참가할 수 없을 때 참여를 끝낸다. 업로드 복구 경로에서도 부르므로 ref로 둔다.
+  const endParticipationRef = useRef<
+    (sessionKey: string, nextError: AudienceRecorderError | null) => void
+  >(() => {});
   // 연결이 끊겼다가 다시 붙어 아직 SYNC를 받지 못했다.
   const isResyncPendingRef = useRef(false);
   // 서버 시계 기준 녹음 시작 시각을 구하려고, 마지막 메시지로 잰 기기 시계와 서버 시계의 차이
@@ -91,6 +105,12 @@ export default function useAudienceTurnRecorder({
     }
     const { deviceToken } = await postRecordingDeviceV2(sessionKey, {
       joinCode: current.joinCode,
+    }).catch((joinError: unknown) => {
+      // 세션이 끝났거나(종료 알림을 놓친 경우) 정원이 차 이 세션에 더 참가할 수 없으면 녹음을 멈춘다.
+      if (joinError instanceof APIError && joinError.status === 409) {
+        endParticipationRef.current(sessionKey, 'unavailable');
+      }
+      throw joinError;
     });
     saveAudienceDeviceTokenV2(sessionKey, deviceToken);
     return deviceToken;
@@ -147,6 +167,41 @@ export default function useAudienceTurnRecorder({
     stopMediaStream(streamRef.current);
     streamRef.current = null;
   }, []);
+
+  // 참여를 끝낸다. 더 받지 않는 세션이므로 진행 중인 구간은 올리지 않는다.
+  const { reset: resetUploads } = uploader;
+  const endParticipation = useCallback(
+    (sessionKey: string, nextError: AudienceRecorderError | null) => {
+      if (participatingKeyRef.current !== sessionKey) {
+        return;
+      }
+      participatingKeyRef.current = null;
+      generationRef.current += 1;
+      isStartingRef.current = false;
+      const active = activeRef.current;
+      activeRef.current = null;
+      active?.recording.cancel();
+      setIsListening(false);
+      releaseMicrophone();
+      resetUploads();
+      setError(nextError);
+      setStatus('idle');
+    },
+    [releaseMicrophone, resetUploads],
+  );
+  useEffect(() => {
+    endParticipationRef.current = endParticipation;
+  }, [endParticipation]);
+
+  // 참여 중인 세션이 끝나거나 바뀌면 녹음을 멈춘다.
+  // 같은 렌더에 정지 이벤트가 함께 와도 끝난 세션의 구간이 올라가지 않도록 타이머 이벤트 처리보다 먼저 둔다.
+  const joinSessionKey = join?.sessionKey ?? null;
+  useEffect(() => {
+    const participatingKey = participatingKeyRef.current;
+    if (participatingKey !== null && participatingKey !== joinSessionKey) {
+      endParticipation(participatingKey, null);
+    }
+  }, [endParticipation, joinSessionKey]);
 
   useEffect(() => {
     // 녹음하지 않는 동안 받은 SYNC도 재연결 동기화를 마친 것으로 본다.
@@ -233,6 +288,7 @@ export default function useAudienceTurnRecorder({
     const generation = ++generationRef.current;
     const isCurrent = () => generation === generationRef.current;
     isStartingRef.current = true;
+    participatingKeyRef.current = join.sessionKey;
     setStatus('starting');
     setError(null);
     try {
@@ -242,6 +298,7 @@ export default function useAudienceTurnRecorder({
         return;
       }
       if (!stream) {
+        participatingKeyRef.current = null;
         setError('not-allowed');
         setStatus('idle');
         return;
@@ -249,6 +306,7 @@ export default function useAudienceTurnRecorder({
       releaseMicrophone();
       streamRef.current = stream;
       if (!getAudienceDeviceTokenV2(join.sessionKey)) {
+        // 409이면 재참가 경로가 이미 참여를 끝내고 알렸으므로 아래에서 다시 처리하지 않는다.
         const joined = await renewDeviceToken(join.sessionKey).catch(
           () => null,
         );
@@ -256,6 +314,7 @@ export default function useAudienceTurnRecorder({
           return;
         }
         if (!joined) {
+          participatingKeyRef.current = null;
           releaseMicrophone();
           setError('join');
           setStatus('idle');
@@ -274,6 +333,7 @@ export default function useAudienceTurnRecorder({
   const stop = useCallback(() => {
     generationRef.current += 1;
     isStartingRef.current = false;
+    participatingKeyRef.current = null;
     stopTurn();
     releaseMicrophone();
     setStatus('idle');

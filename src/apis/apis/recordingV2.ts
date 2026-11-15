@@ -103,6 +103,12 @@ export async function postRecordingFinishV2(sessionKey: string): Promise<void> {
   await request<void>('POST', `${sessionUrl(sessionKey)}/finish`, null, null);
 }
 
+// POST /api/v2/recordings/{sessionKey}/cancel
+// 속기록을 만들지 않고 세션을 버린다. 이후 청중 기기의 참가·업로드는 거부된다.
+export async function postRecordingCancelV2(sessionKey: string): Promise<void> {
+  await request<void>('POST', `${sessionUrl(sessionKey)}/cancel`, null, null);
+}
+
 // GET /api/v2/recordings/{sessionKey}
 export async function getRecordingSessionV2(
   sessionKey: string,

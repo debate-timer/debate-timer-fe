@@ -50,6 +50,7 @@ export function useGetRecordingSessionV2(
       if (
         query.state.error instanceof MissingTranscriptIdError ||
         data?.status === 'FAILED' ||
+        data?.status === 'CANCELED' ||
         (data?.status === 'COMPLETED' && data.transcriptId !== null)
       ) {
         return false;

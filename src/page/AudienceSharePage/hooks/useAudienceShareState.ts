@@ -71,6 +71,8 @@ export function useAudienceShareState(
   isSocketConnected: boolean;
   // 사회자가 공유 채널로 보낸 다기기 녹음 참가 정보
   recordingJoin: RecordingJoinPayload | null;
+  // 사회자가 공유 채널로 끝났다고 알린 녹음 세션 키
+  closedRecordingSessionKeys: ReadonlySet<string>;
 } {
   const { enabled = true, table, handleAbort = false } = options;
   const {
@@ -79,6 +81,7 @@ export function useAudienceShareState(
     latestMessage,
     latestMessageReceivedAt,
     recordingJoin,
+    closedRecordingSessionKeys,
     lastReceivedAt,
     chairmanAbsentAt,
     isConnected,
@@ -284,6 +287,7 @@ export function useAudienceShareState(
       latestMessageReceivedAt,
       isSocketConnected: isConnected,
       recordingJoin,
+      closedRecordingSessionKeys,
     };
   }
 
@@ -297,5 +301,6 @@ export function useAudienceShareState(
     latestMessageReceivedAt,
     isSocketConnected: isConnected,
     recordingJoin,
+    closedRecordingSessionKeys,
   };
 }

@@ -131,6 +131,45 @@ describe('useAudienceSocket', () => {
       expect(result.current.recordingJoin).toBeNull();
     });
 
+    it('같은 세션의 녹음 종료를 받으면 참가 정보를 지우고 끝난 세션으로 기록한다', () => {
+      const { result } = renderHook(() => useAudienceSocket(123));
+      const receive = subscribe.mock.calls[0][1] as (message: IMessage) => void;
+
+      act(() => {
+        receive({ body: JSON.stringify(recordingOpened(11)) } as IMessage);
+        receive({
+          body: JSON.stringify({
+            ...recordingOpened(12),
+            eventType: 'RECORDING_CLOSED',
+          }),
+        } as IMessage);
+      });
+
+      expect(result.current.recordingJoin).toBeNull();
+      expect(result.current.closedRecordingSessionKeys.has('session-1')).toBe(
+        true,
+      );
+    });
+
+    it('다른 세션의 녹음 종료는 지금 참가 정보를 지우지 않는다', () => {
+      const { result } = renderHook(() => useAudienceSocket(123));
+      const receive = subscribe.mock.calls[0][1] as (message: IMessage) => void;
+
+      act(() => {
+        receive({
+          body: JSON.stringify(recordingOpened(11, 'session-2')),
+        } as IMessage);
+        receive({
+          body: JSON.stringify({
+            ...recordingOpened(12, 'session-1'),
+            eventType: 'RECORDING_CLOSED',
+          }),
+        } as IMessage);
+      });
+
+      expect(result.current.recordingJoin?.sessionKey).toBe('session-2');
+    });
+
     it('재연결로 메시지를 초기화해도 받은 녹음 참가 정보는 유지한다', () => {
       const { result } = renderHook(() => useAudienceSocket(123));
       const receive = subscribe.mock.calls[0][1] as (message: IMessage) => void;

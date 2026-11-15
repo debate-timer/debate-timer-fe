@@ -8,8 +8,14 @@ import { UseDebateTranscriberParams } from './useDebateTranscriber';
 import useLiveShareSession from './useLiveShareSession';
 
 export type DebateFeatureStatus = 'inactive' | 'active' | 'error';
+// share-qr: 공유 링크의 QR 코드와 링크 복사를 보여주는 창
 export type DebateOverlay =
-  'closed' | 'menu' | 'share-consent' | 'transcript-consent' | 'mic-check';
+  | 'closed'
+  | 'menu'
+  | 'share-consent'
+  | 'share-qr'
+  | 'transcript-consent'
+  | 'mic-check';
 
 interface UseDebateControlsOptions extends UseDebateTranscriberParams {
   stopTimers: () => void;
@@ -60,6 +66,8 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
   const retryFailuresRef = useRef<number | null>(null);
   const interruptedRef = useRef(false);
   const pendingRef = useRef(false);
+  // 사용자가 공유를 시작했으면 연결된 순간 QR 창을 띄운다. 자동 재연결로 다시 공유될 때는 띄우지 않는다.
+  const shouldShowShareQrRef = useRef(false);
   const operationRef = useRef(0);
   const identityRef = useRef(getAuthRevision());
   const { discard } = transcript;
@@ -123,6 +131,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
       return;
     }
     if (!next) {
+      shouldShowShareQrRef.current = false;
       share.stopSharing();
       return;
     }
@@ -136,7 +145,11 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     }
     if (!next) {
       setAcknowledgedFailures(transcript.failedCount);
-      transcript.disable();
+      // 다기기 녹음을 끄면 세션이 끝나므로, 공유 화면의 청중이 녹음을 멈추도록 알린다.
+      const closedRecording = transcript.disable();
+      if (closedRecording && share.isSharing) {
+        share.issueEvent('RECORDING_CLOSED', null, closedRecording);
+      }
       return;
     }
     if (
@@ -156,6 +169,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
       } else {
         share.startSharing();
       }
+      shouldShowShareQrRef.current = true;
       setOverlay('menu');
     } else if (overlay === 'transcript-consent' && canTranscribe) {
       setOverlay('mic-check');
@@ -182,6 +196,21 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
   };
   const getStatus = (active: boolean, error: boolean): DebateFeatureStatus =>
     error ? 'error' : active ? 'active' : 'inactive';
+
+  const { isSharing: isShareConnected, isError: isShareError } = share;
+  useEffect(() => {
+    if (!shouldShowShareQrRef.current) {
+      return;
+    }
+    if (isShareError) {
+      shouldShowShareQrRef.current = false;
+      return;
+    }
+    if (isShareConnected && !interruptedRef.current) {
+      shouldShowShareQrRef.current = false;
+      setOverlay('share-qr');
+    }
+  }, [isShareConnected, isShareError]);
 
   // 이미 공유 화면을 보고 있는 청중도 다기기 녹음에 참여할 수 있도록 참가 정보를 공유 채널로 보낸다.
   const recordingSession = transcript.multiDeviceSession;
@@ -237,6 +266,11 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
       }
     },
     closeOverlay: () => setOverlay('closed'),
+    openShareQr: () => {
+      if (!interruptedRef.current && share.isSharing) {
+        setOverlay('share-qr');
+      }
+    },
     cancelConfirmation: () => {
       operationRef.current += 1;
       if (pendingRef.current) {

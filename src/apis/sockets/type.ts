@@ -11,9 +11,10 @@ export type NonTimerEventType = 'FINISHED' | 'ABORT' | 'ERROR';
 // - `CHAIRMAN_ABSENT`: 룸에 활성 사회자가 없음을 청중에게 알림
 export type ServerEventType = 'CHAIRMAN_ABSENT';
 
-// 사회자가 연 다기기 녹음의 참가 정보를 이미 공유 화면을 보고 있는 청중에게 알리는 이벤트
-// - data는 null이고 참가 정보는 `recording`에 담음
-export type RecordingEventType = 'RECORDING_OPENED';
+// 다기기 녹음 참가 정보를 담는 이벤트 (data는 null이고 참가 정보는 `recording`에 담음)
+// - `RECORDING_OPENED`: 사회자가 연 녹음 세션의 참가 정보를 이미 공유 화면을 보고 있는 청중에게 알림
+// - `RECORDING_CLOSED`: 사회자가 녹음을 끝내 해당 세션에 더는 참여할 수 없음을 알림
+export type RecordingEventType = 'RECORDING_OPENED' | 'RECORDING_CLOSED';
 
 // 데이터가 반드시 포함되는 이벤트
 export type SocketEventType =

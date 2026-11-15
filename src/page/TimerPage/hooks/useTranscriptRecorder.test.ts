@@ -62,6 +62,8 @@ describe('STT 모드 선택 기록 훅', () => {
     soniox.enable.mockClear();
     multiDevice.enable.mockClear();
     multiDevice.discard.mockClear();
+    soniox.discard.mockClear();
+    rpc.enable.mockClear();
   });
 
   it('처음에는 RPC 모드이고 모드를 바꿀 수 있다', () => {
@@ -207,6 +209,47 @@ describe('STT 모드 선택 기록 훅', () => {
 
     expect(rpc.enable).not.toHaveBeenCalled();
     expect(soniox.enable).toHaveBeenCalledTimes(2);
+  });
+
+  it('끄면 모드 잠금이 풀려 다른 모드로 켤 수 있고 이전 모드의 기록은 버린다', async () => {
+    const { result, rerender } = renderHook(() =>
+      useTranscriptRecorder(params),
+    );
+    await act(() => result.current.enable('SONIOX'));
+    vi.mocked(useSonioxTranscriber).mockReturnValue({
+      ...soniox,
+      isEnabled: true,
+    });
+    rerender();
+    expect(result.current.isModeLocked).toBe(true);
+
+    act(() => {
+      result.current.disable();
+    });
+    vi.mocked(useSonioxTranscriber).mockReturnValue({ ...soniox });
+    rerender();
+    expect(result.current.isModeLocked).toBe(false);
+
+    await act(() => result.current.enable('RPC'));
+
+    expect(soniox.discard).toHaveBeenCalled();
+    expect(rpc.enable).toHaveBeenCalled();
+  });
+
+  it('다기기 녹음을 끄면 끝낸 세션의 참가 정보를 돌려준다', async () => {
+    const closed = { sessionKey: 'session-1', joinCode: 'join' };
+    multiDevice.disable.mockReturnValueOnce(closed);
+    const { result } = renderHook(() =>
+      useTranscriptRecorder({ ...params, isMultiDeviceAllowed: true }),
+    );
+    await act(() => result.current.enable('MULTI_DEVICE'));
+
+    let returned: unknown;
+    act(() => {
+      returned = result.current.disable();
+    });
+
+    expect(returned).toEqual(closed);
   });
 });
 

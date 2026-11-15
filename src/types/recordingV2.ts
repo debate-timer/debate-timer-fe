@@ -1,7 +1,8 @@
 // 다기기 녹음 V2의 세션·턴 상태와 녹음 품질 지표. 서버 recording-v2 API 계약과 같은 값을 쓴다.
 
+// CANCELED: 사회자가 녹음을 끄거나 타이머 화면을 떠나 속기록 없이 버린 세션
 export type RecordingSessionStatusV2 =
-  'RECORDING' | 'FINISHING' | 'COMPLETED' | 'FAILED';
+  'RECORDING' | 'FINISHING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
 
 export type RecordingTurnStatusV2 = 'PROCESSING' | 'DONE' | 'FAILED';
 
