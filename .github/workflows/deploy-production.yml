@@ -51,7 +51,11 @@ jobs:
           BUCKET_NAME: ${{secrets.AWS_PROD_BUCKET_NAME}}
           aws-access-key-id: ${{secrets.AWS_PROD_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_PROD_SECRET_ACCESS_KEY}}
-        run: aws s3 sync ./dist s3://$BUCKET_NAME --delete
+        # 같은 버킷의 BE STT 오디오(stt-audio/, stt-audio-v2/)는 dist에 없으므로 --delete 대상에서 제외한다
+        run: |
+          aws s3 sync ./dist s3://$BUCKET_NAME --delete \
+            --exclude "stt-audio/*" \
+            --exclude "stt-audio-v2/*"
 
       - name: Invalidate AWS Cloudfront Cache
         run: |
