@@ -38,6 +38,49 @@ function renderTimerPage(id = '5') {
 }
 
 describe('TimerPage - 헤더 음소거 아이콘', () => {
+  it('슬라이더로 0이 된 뒤 마지막 양수 볼륨을 복원하고 다시 음소거한다', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem('timer-volume', '0.8');
+    renderTimerPage();
+    await user.click(screen.getByRole('button', { name: '볼륨 조절' }));
+    expect(screen.getByRole('heading', { name: '음량' })).toBeInTheDocument();
+    const slider = screen.getByRole('slider', { name: '음량' });
+    fireEvent.change(slider, { target: { value: '7' } });
+    fireEvent.change(slider, { target: { value: '0' } });
+    await user.click(screen.getByRole('button', { name: '음소거 해제' }));
+    expect(slider).toHaveValue('7');
+    await user.click(screen.getByRole('button', { name: '음소거' }));
+    expect(slider).toHaveValue('0');
+  });
+
+  it('처음부터 음소거이면 기본 볼륨 5로 복원한다', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem('timer-volume', '0');
+    renderTimerPage();
+    await user.click(screen.getByRole('button', { name: '볼륨 조절' }));
+    await user.click(screen.getByRole('button', { name: '음소거 해제' }));
+    expect(screen.getByRole('slider', { name: '음량' })).toHaveValue('5');
+  });
+
+  it.each([
+    [0, 'mute'],
+    [1, 'low'],
+    [3, 'low'],
+    [4, 'medium'],
+    [6, 'medium'],
+    [7, 'high'],
+    [10, 'high'],
+  ])('볼륨 %s에 맞는 %s 아이콘을 표시한다', async (level, icon) => {
+    const user = userEvent.setup();
+    renderTimerPage();
+    await user.click(screen.getByRole('button', { name: '볼륨 조절' }));
+    fireEvent.change(screen.getByRole('slider', { name: '음량' }), {
+      target: { value: String(level) },
+    });
+    expect(
+      screen.getByTestId(`volume-control-icon-${icon}`),
+    ).toBeInTheDocument();
+  });
   it('속기록을 켜지 않아도 문서 이탈을 경고하고 언마운트 시 해제한다', () => {
     const { unmount } = renderTimerPage();
     const event = new Event('beforeunload', { cancelable: true });
