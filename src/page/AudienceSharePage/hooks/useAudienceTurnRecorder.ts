@@ -48,7 +48,8 @@ interface ActiveTurn extends Segment {
  * - 정지·차례 이동·팀 전환·종료·중단 이벤트에서 구간을 끝내고 올린다.
  * - 참여 중인 세션의 참가 정보가 사라지거나(사회자가 녹음을 끔) 다른 세션으로 바뀌면 녹음을 멈춘다.
  *   끝난 세션이므로 진행 중인 구간은 올리지 않는다.
- * - 종료 알림을 놓쳐 참가하려던 세션이 이미 끝났으면(409) 그 세션으로는 참여할 수 없게 한다.
+ * - 종료 알림을 놓쳐 참가하거나 기기 토큰을 다시 받으려던 세션이 이미 끝났으면(409) 참여를 멈추고 그 세션으로는 참여할 수 없게 한다.
+ *   이 탭에 보관한 기기 토큰으로 시작했다면 첫 구간을 올릴 때 서버가 거절해 이 경로로 알게 된다.
  */
 export default function useAudienceTurnRecorder({
   join,
@@ -99,6 +100,12 @@ export default function useAudienceTurnRecorder({
     }
     const { deviceToken } = await postRecordingDeviceV2(sessionKey, {
       joinCode: current.joinCode,
+    }).catch((joinError: unknown) => {
+      // 종료 알림을 놓쳤어도 서버가 끝난 세션이라고 하면 이 세션으로는 더 녹음하지 않는다.
+      if (joinError instanceof APIError && joinError.status === 409) {
+        setClosedSessionKey(sessionKey);
+      }
+      throw joinError;
     });
     saveAudienceDeviceTokenV2(sessionKey, deviceToken);
     return deviceToken;
@@ -155,6 +162,29 @@ export default function useAudienceTurnRecorder({
     stopMediaStream(streamRef.current);
     streamRef.current = null;
   }, []);
+
+  // 참여 중인 세션이 끝나거나 바뀌면 녹음을 멈춘다. 끝난 세션이라 진행 중인 구간은 올리지 않는다.
+  // 같은 렌더에 정지 이벤트가 함께 와도 끝난 세션의 구간이 올라가지 않도록 타이머 이벤트 처리보다 먼저 둔다.
+  const joinSessionKey =
+    join && join.sessionKey !== closedSessionKey ? join.sessionKey : null;
+  const { reset: resetUploads } = uploader;
+  useEffect(() => {
+    const participatingKey = participatingKeyRef.current;
+    if (participatingKey === null || participatingKey === joinSessionKey) {
+      return;
+    }
+    participatingKeyRef.current = null;
+    generationRef.current += 1;
+    isStartingRef.current = false;
+    const active = activeRef.current;
+    activeRef.current = null;
+    active?.recording.cancel();
+    setIsListening(false);
+    releaseMicrophone();
+    resetUploads();
+    setError(null);
+    setStatus('idle');
+  }, [joinSessionKey, releaseMicrophone, resetUploads]);
 
   useEffect(() => {
     // 녹음하지 않는 동안 받은 SYNC도 재연결 동기화를 마친 것으로 본다.
@@ -218,27 +248,6 @@ export default function useAudienceTurnRecorder({
       stream,
     );
   }, [latestMessage, latestMessageReceivedAt, status, startTurn, stopTurn]);
-
-  // 참여 중인 세션이 끝나거나 바뀌면 녹음을 멈춘다. 끝난 세션이라 진행 중인 구간은 올리지 않는다.
-  const joinSessionKey = join?.sessionKey ?? null;
-  const { reset: resetUploads } = uploader;
-  useEffect(() => {
-    const participatingKey = participatingKeyRef.current;
-    if (participatingKey === null || participatingKey === joinSessionKey) {
-      return;
-    }
-    participatingKeyRef.current = null;
-    generationRef.current += 1;
-    isStartingRef.current = false;
-    const active = activeRef.current;
-    activeRef.current = null;
-    active?.recording.cancel();
-    setIsListening(false);
-    releaseMicrophone();
-    resetUploads();
-    setError(null);
-    setStatus('idle');
-  }, [joinSessionKey, releaseMicrophone, resetUploads]);
 
   // 화면을 떠나면 녹음 중이던 구간까지 올리고 마이크를 놓는다.
   useEffect(() => {

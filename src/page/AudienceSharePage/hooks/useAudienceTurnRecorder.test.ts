@@ -281,7 +281,7 @@ describe('다기기 녹음 청중 훅', () => {
       expect(uploadedTurnKeys()).toEqual(['0-300', '0-304']);
     });
 
-    it('녹음 중 참가 정보가 바뀌어도 이전 세션 턴은 그 세션의 토큰으로 올리고 새 세션에 다시 참가하지 않는다', async () => {
+    it('녹음 중 참가 정보가 바뀌면 정지 이벤트가 함께 와도 끝난 세션의 구간은 올리지 않고 새 세션에 바로 참가하지 않는다', async () => {
       const rendered = render();
       await act(() => rendered.result.current.start());
       receive(rendered, message('PLAY', normal(0, true), 310));
@@ -294,14 +294,31 @@ describe('다기기 녹음 청중 훅', () => {
         isConnected: true,
       });
 
-      await waitFor(() => expect(postRecordingTurnV2).toHaveBeenCalledTimes(1));
-      const [sessionKey, , deviceToken] =
-        vi.mocked(postRecordingTurnV2).mock.calls[0];
-      expect([sessionKey, deviceToken]).toEqual([
-        'session-1',
-        'audience-token',
-      ]);
+      expect(rendered.result.current.status).toBe('idle');
+      expect(postRecordingTurnV2).not.toHaveBeenCalled();
       expect(postRecordingDeviceV2).toHaveBeenCalledTimes(1);
+    });
+
+    it('보관한 기기 토큰으로 참여한 세션이 이미 끝났으면 첫 구간을 올릴 때 알고 참여를 멈춘다', async () => {
+      saveAudienceDeviceTokenV2('session-1', 'stale-token');
+      vi.mocked(postRecordingTurnV2).mockRejectedValueOnce(
+        new APIError('녹음에 참가한 기기가 아닙니다.', 403, {}),
+      );
+      vi.mocked(postRecordingDeviceV2).mockRejectedValueOnce(
+        new APIError('이미 끝난 녹음 세션입니다.', 409, {}),
+      );
+      const rendered = render();
+      await act(() => rendered.result.current.start());
+      expect(rendered.result.current.status).toBe('recording');
+      receive(rendered, message('PLAY', normal(0, true), 330));
+
+      receive(rendered, message('STOP', normal(0, false), 331));
+
+      await waitFor(() =>
+        expect(rendered.result.current.isAvailable).toBe(false),
+      );
+      expect(rendered.result.current.status).toBe('idle');
+      expect(trackStop).toHaveBeenCalled();
     });
 
     it('사회자가 녹음을 꺼 참가 정보가 사라지면 진행 중인 구간은 올리지 않고 참여를 멈춘다', async () => {
