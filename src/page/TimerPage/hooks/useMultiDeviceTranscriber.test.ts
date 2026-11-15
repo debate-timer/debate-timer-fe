@@ -202,6 +202,41 @@ describe('다기기 녹음 사회자 훅', () => {
       expect(getHostRecordingV2(7)?.sessionKey).toBe('session-1');
     });
 
+    it('남은 세션을 조회하는 사이 화면을 다시 열어 다른 세션이 저장되면 늦게 끝난 조회가 그 기록을 지우지 않는다', async () => {
+      saveHostRecordingV2(7, {
+        sessionKey: 'saved',
+        joinCode: 'saved-join',
+        deviceToken: 'saved-token',
+      });
+      let rejectLookup: (error: unknown) => void = () => {};
+      vi.mocked(getRecordingSessionV2).mockReturnValueOnce(
+        new Promise((_, reject) => {
+          rejectLookup = reject;
+        }),
+      );
+      const { result, unmount } = render();
+
+      let enabling: Promise<void> = Promise.resolve();
+      act(() => {
+        enabling = result.current.enable();
+      });
+      await waitFor(() => expect(getRecordingSessionV2).toHaveBeenCalled());
+      unmount();
+      const next = {
+        sessionKey: 'next',
+        joinCode: 'next-join',
+        deviceToken: 'next-token',
+      };
+      saveHostRecordingV2(7, next);
+      await act(async () => {
+        rejectLookup(new APIError('not found', 404, null));
+        await enabling;
+      });
+
+      expect(getHostRecordingV2(7)).toEqual(next);
+      expect(postRecordingSessionV2).not.toHaveBeenCalled();
+    });
+
     it('세션 조회에 실패하면 보관한 세션을 지우지 않고 세션 오류를 알린다', async () => {
       const saved = {
         sessionKey: 'saved',
@@ -383,14 +418,17 @@ describe('다기기 녹음 사회자 훅', () => {
       });
     });
 
-    it('기록을 버리면 진행 중인 구간을 올리지 않고 보관한 세션을 지운다', async () => {
+    it('기록을 버리면 진행 중인 구간을 올리지 않고 보관한 세션을 취소해 지운다', async () => {
       const { result, rerender } = render();
       await act(() => result.current.enable());
       rerender({ ...baseParams, isRunning: true });
 
-      act(() => result.current.discard());
+      act(() => {
+        result.current.discard();
+      });
 
       expect(postRecordingTurnV2).not.toHaveBeenCalled();
+      expect(postRecordingCancelV2).toHaveBeenCalledWith('session-1');
       expect(getHostRecordingV2(7)).toBeNull();
       expect(result.current.session).toBeNull();
     });

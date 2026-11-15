@@ -290,13 +290,18 @@ export default function useMultiDeviceTranscriber(
     [isSupported, lang, releaseMicrophone],
   );
 
-  // 녹음을 버린다. 녹음 중인 구간은 올리지 않고, 이 탭에 보관한 녹음 세션도 지운다.
-  const discard = useCallback(() => {
+  // 녹음을 버린다. 녹음 중인 구간은 올리지 않고, 이 탭에 보관한 녹음 세션은 서버에서 취소한 뒤 지운다.
+  // 저장소에서 지운 세션은 화면을 떠날 때 찾을 수 없으므로 여기서 취소한다. 버린 세션의 참가 정보를 돌려준다.
+  const discard = useCallback((): RecordingJoin | null => {
     generationRef.current += 1;
     activeRef.current?.recording.cancel();
     activeRef.current = null;
     releaseMicrophone();
+    const host = getHostRecordingV2(tableIdRef.current);
     clearHostRecordingV2(tableIdRef.current);
+    if (host) {
+      cancelSession(host.sessionKey);
+    }
     usedTurnKeysRef.current.clear();
     uploader.reset();
     setSession(null);
@@ -304,20 +309,14 @@ export default function useMultiDeviceTranscriber(
     setIsStarting(false);
     setIsListening(false);
     setError(null);
+    return toJoin(host);
   }, [releaseMicrophone, uploader]);
 
   /**
-   * 녹음을 끈다. 끄면 세션을 끝내므로 진행 중인 구간은 올리지 않고 서버 세션을 취소한 뒤 이 탭의 기록도 지운다.
+   * 녹음을 끈다. 끄면 세션을 끝내므로 버리기와 같이 진행 중인 구간은 올리지 않고 서버 세션을 취소한 뒤 이 탭의 기록도 지운다.
    * 청중에게 종료를 알릴 수 있도록 끝낸 세션의 참가 정보를 돌려준다.
    */
-  const disable = useCallback((): RecordingJoin | null => {
-    const host = getHostRecordingV2(tableIdRef.current);
-    discard();
-    if (host) {
-      cancelSession(host.sessionKey);
-    }
-    return toJoin(host);
-  }, [discard]);
+  const disable = discard;
 
   // 토론 종료 화면이 아닌 곳으로 떠나면 이 탭에 남은 세션을 취소한다.
   // 새로고침은 언마운트 정리가 돌지 않아 세션이 남고, 다시 켜면 이어서 쓴다.
@@ -356,13 +355,14 @@ export default function useMultiDeviceTranscriber(
   };
 }
 
-// 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다.
-// 이전 토론에서 끝냈거나 서버에 없는 세션으로 확인되면 지우고, 조회 자체가 실패하면 지우지 않고 오류를 던진다.
 // 취소는 실패해도 이 기기의 정리를 막지 않는다. 남은 세션은 서버가 오래되면 정리한다.
 function cancelSession(sessionKey: string) {
   void postRecordingCancelV2(sessionKey).catch(() => undefined);
 }
 
+// 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다.
+// 이전 토론에서 끝냈거나 서버에 없는 세션으로 확인되면 지우고, 조회 자체가 실패하면 지우지 않고 오류를 던진다.
+// 조회하는 사이 이 탭에 다른 세션이 저장됐으면 그 기록은 지우지 않는다.
 async function findRecordingHost(tableId: number) {
   const host = getHostRecordingV2(tableId);
   if (!host) {
@@ -379,7 +379,9 @@ async function findRecordingHost(tableId: number) {
   if (session?.status === 'RECORDING') {
     return host;
   }
-  clearHostRecordingV2(tableId);
+  if (getHostRecordingV2(tableId)?.sessionKey === host.sessionKey) {
+    clearHostRecordingV2(tableId);
+  }
   return null;
 }
 
