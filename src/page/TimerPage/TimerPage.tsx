@@ -25,7 +25,6 @@ import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../types/type';
-import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
@@ -43,6 +42,7 @@ import TranscriptLeaveModal from './components/TranscriptLeaveModal';
 import useTranscriptLeaveGuard from './hooks/useTranscriptLeaveGuard';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { toRecognitionLang } from '../../util/speechRecognition';
+import { IoHelpCircleSharp } from 'react-icons/io5';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = true;
@@ -422,7 +422,7 @@ function TimerPageSession() {
             aria-label={t('도움말')}
             title={t('도움말')}
             onClick={openUseTooltipModal}
-            icon={<DTHelp aria-hidden="true" />}
+            icon={<IoHelpCircleSharp aria-hidden="true" />}
           />
         </TimerHeaderTools>
       }

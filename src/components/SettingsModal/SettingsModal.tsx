@@ -1,4 +1,3 @@
-import { RiSettings3Line } from 'react-icons/ri';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +8,7 @@ import { oAuthLogin } from '../../util/googleAuth';
 import { buildLangPath, isSupportedLang } from '../../util/languageRouting';
 import { INQUIRY_LINKS } from '../../constants/urls';
 import IconButton from '../IconButton/IconButton';
+import { IoSettingsSharp } from 'react-icons/io5';
 
 const PANEL_CLASS =
   'relative max-h-[90dvh] w-[min(92vw,560px)] overflow-y-auto rounded-2xl bg-white p-6 text-ui-body text-neutral-900 shadow-xl';
@@ -123,7 +123,7 @@ export default function SettingsModal(props: SettingsModalProps) {
         aria-label={t('설정')}
         title={t('설정')}
         onClick={() => setOpen(true)}
-        icon={<RiSettings3Line aria-hidden="true" />}
+        icon={<IoSettingsSharp aria-hidden="true" />}
       />
       {open && (
         <GlobalPortal.Consumer>
