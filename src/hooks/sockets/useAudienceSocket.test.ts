@@ -88,6 +88,64 @@ describe('useAudienceSocket', () => {
     expect(disconnect).not.toHaveBeenCalled();
   });
 
+  describe('다기기 녹음 참여 이벤트', () => {
+    const stop = {
+      eventType: 'STOP',
+      data: { timerType: 'NORMAL', sequence: 0, remainingTime: 30 },
+      version: 10,
+    };
+    const recordingOpened = (version: number, sessionKey = 'session-1') => ({
+      eventType: 'RECORDING_OPENED',
+      data: null,
+      version,
+      recording: { sessionKey, joinCode: 'join' },
+    });
+
+    it('녹음 참가 정보만 갱신하고 화면에 반영할 최근 메시지는 바꾸지 않는다', () => {
+      const { result } = renderHook(() => useAudienceSocket(123));
+      const receive = subscribe.mock.calls[0][1] as (message: IMessage) => void;
+
+      act(() => {
+        receive({ body: JSON.stringify(stop) } as IMessage);
+        receive({ body: JSON.stringify(recordingOpened(11)) } as IMessage);
+      });
+
+      expect(result.current.latestMessage).toEqual(stop);
+      expect(result.current.recordingJoin).toEqual({
+        sessionKey: 'session-1',
+        joinCode: 'join',
+      });
+    });
+
+    it('오래된 version의 녹음 참여 이벤트는 반영하지 않는다', () => {
+      const { result } = renderHook(() => useAudienceSocket(123));
+      const receive = subscribe.mock.calls[0][1] as (message: IMessage) => void;
+
+      act(() => {
+        receive({ body: JSON.stringify(stop) } as IMessage);
+        receive({
+          body: JSON.stringify(recordingOpened(9, 'stale')),
+        } as IMessage);
+      });
+
+      expect(result.current.recordingJoin).toBeNull();
+    });
+
+    it('재연결로 메시지를 초기화해도 받은 녹음 참가 정보는 유지한다', () => {
+      const { result } = renderHook(() => useAudienceSocket(123));
+      const receive = subscribe.mock.calls[0][1] as (message: IMessage) => void;
+      const onConnected = addConnectionListener.mock.calls[0][0] as () => void;
+
+      act(() => {
+        receive({ body: JSON.stringify(recordingOpened(11)) } as IMessage);
+      });
+      act(() => onConnected());
+
+      expect(result.current.latestMessage).toBeNull();
+      expect(result.current.recordingJoin?.sessionKey).toBe('session-1');
+    });
+  });
+
   it('마운트 시 roomId 기반 채널을 구독해야 한다', () => {
     renderHook(() => useAudienceSocket(123));
 
