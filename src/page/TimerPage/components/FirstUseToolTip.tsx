@@ -72,7 +72,6 @@ export default function FirstUseToolTip({ onClose }: FirstUseToolTipProps) {
         <div className="text-m flex flex-col space-y-1 md:text-lg">
           <ListItem>{t('스페이스 바로 타이머를 시작 및 일시정지')}</ListItem>
           <ListItem>{t('R 키로 타이머 초기화')}</ListItem>
-          <ListItem>{t('좌우 방향키로 이전/다음 차례로 이동')}</ListItem>
           <ListItem>{t('A/L 키로 토론 진영 변경')}</ListItem>
           <ListItem>{t('Enter 키로 상대 진영으로 변경')}</ListItem>
         </div>
