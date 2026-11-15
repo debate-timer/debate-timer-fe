@@ -286,6 +286,53 @@ describe('useChairmanSocket', () => {
     );
   });
 
+  describe('다기기 녹음 참여 이벤트', () => {
+    it('녹음 참가 정보를 담아 version과 함께 발행하고 타이머 전환 version은 바꾸지 않는다', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(7000);
+      publish.mockReturnValue(true);
+      const { result } = renderHook(() => useChairmanSocket(123));
+
+      let returned: unknown;
+      act(() => {
+        returned = result.current.sendDebateEvent(
+          'RECORDING_OPENED',
+          null,
+          'token',
+          { sessionKey: 'session-1', joinCode: 'join' },
+        );
+      });
+
+      expect(returned).toBe(true);
+      expect(publish).toHaveBeenCalledWith(
+        '/app/event/123',
+        {
+          eventType: 'RECORDING_OPENED',
+          data: null,
+          version: 7000,
+          recording: { sessionKey: 'session-1', joinCode: 'join' },
+        },
+        expect.objectContaining({ Authorization: 'token' }),
+      );
+      expect(result.current.getLastTransitionVersion()).toBeNull();
+    });
+
+    it('녹음 참가 정보가 없으면 발행하지 않는다', () => {
+      const { result } = renderHook(() => useChairmanSocket(123));
+
+      let returned: unknown;
+      act(() => {
+        returned = result.current.sendDebateEvent(
+          'RECORDING_OPENED',
+          null,
+          'token',
+        );
+      });
+
+      expect(returned).toBe(false);
+      expect(publish).not.toHaveBeenCalled();
+    });
+  });
+
   describe('다기기 녹음 구간 version', () => {
     const payload: TimerDataPayload = {
       timerType: 'NORMAL',

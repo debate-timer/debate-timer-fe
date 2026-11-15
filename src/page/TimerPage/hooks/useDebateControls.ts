@@ -36,7 +36,14 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     onSyncRequest,
     isInputBlocked = false,
   } = options;
-  const share = useLiveShareSession(options.tableId, { onSyncRequest });
+  // 상태 동기화 응답 뒤에 다기기 녹음 참가 정보도 다시 보내, 녹음을 켠 뒤 들어오거나 재연결한 청중도 참여할 수 있게 한다.
+  const recordingSyncRef = useRef<() => void>(() => {});
+  const share = useLiveShareSession(options.tableId, {
+    onSyncRequest: () => {
+      onSyncRequest?.();
+      recordingSyncRef.current();
+    },
+  });
   const transcript = useTranscriptRecorder({
     ...options,
     isMultiDeviceAllowed: options.canUseMultiDevice ?? false,
@@ -175,6 +182,27 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
   };
   const getStatus = (active: boolean, error: boolean): DebateFeatureStatus =>
     error ? 'error' : active ? 'active' : 'inactive';
+
+  // 이미 공유 화면을 보고 있는 청중도 다기기 녹음에 참여할 수 있도록 참가 정보를 공유 채널로 보낸다.
+  const recordingSession = transcript.multiDeviceSession;
+  const { issueEvent, isSharing } = share;
+  useEffect(() => {
+    recordingSyncRef.current = () => {
+      if (recordingSession) {
+        issueEvent('RECORDING_OPENED', null, recordingSession);
+      }
+    };
+  }, [issueEvent, recordingSession]);
+  const recordingSessionKey = recordingSession?.sessionKey;
+  const recordingJoinCode = recordingSession?.joinCode;
+  useEffect(() => {
+    if (isSharing && recordingSessionKey && recordingJoinCode) {
+      issueEvent('RECORDING_OPENED', null, {
+        sessionKey: recordingSessionKey,
+        joinCode: recordingJoinCode,
+      });
+    }
+  }, [isSharing, issueEvent, recordingJoinCode, recordingSessionKey]);
 
   // 다기기 녹음 중이면 청중이 녹음에 참여할 수 있도록 공유 링크에 녹음 세션·참가 코드를 붙인다.
   const shareUrl = transcript.multiDeviceSession
