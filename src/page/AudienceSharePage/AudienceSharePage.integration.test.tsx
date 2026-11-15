@@ -98,6 +98,7 @@ describe('AudienceSharePage 통합 - 청중이 사회자보다 먼저 입장', (
       latestMessage: null,
       latestMessageReceivedAt: null,
       recordingJoin: null,
+      closedRecordingSessionKeys: new Set<string>(),
       lastReceivedAt: null,
       chairmanAbsentAt: null,
       isConnected: true,

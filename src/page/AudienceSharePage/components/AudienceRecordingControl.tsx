@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '../../../hooks/useModal';
 import {
@@ -10,8 +11,10 @@ import RecordingConsentDialog, {
 } from './RecordingConsentDialog';
 
 export interface AudienceRecordingControlProps {
-  // 공유 링크에 녹음 세션·참가 코드가 있으면 true
+  // 공유 링크나 공유 채널로 녹음 세션·참가 코드를 받았으면 true
   isAvailable: boolean;
+  // 참여할 녹음 세션 키. 새 세션을 받으면 동의 대화상자를 한 번 바로 연다.
+  sessionKey: string | null;
   isSupported: boolean;
   status: AudienceRecorderStatus;
   isListening: boolean;
@@ -27,13 +30,14 @@ const ACTION_CLASS =
 /**
  * 공유 화면의 청중이 다기기 녹음에 참여하고 상태를 확인하는 영역을 표시함.
  *
- * 참여 버튼은 녹음 동의 대화상자를 열고, 동의하면 `onStart`를 실행함. 거절하면 보기만 계속함. 참여 중에는 녹음 여부·업로드 실패 수와 그만두기 버튼을 표시함. 녹음 참여 정보가 없는 링크에서는 아무것도 표시하지 않음.
+ * 새 녹음 세션의 참가 정보를 받으면 녹음 동의 대화상자를 세션마다 한 번 바로 열고, 닫은 뒤에는 참여 버튼으로 다시 열 수 있음. 동의하면 `onStart`를 실행함. 거절하면 보기만 계속함. 참가 정보가 사라지면(사회자가 녹음을 끔) 열린 대화상자도 닫음. 참여 중에는 녹음 여부·업로드 실패 수와 그만두기 버튼을 표시함. 녹음 참여 정보가 없는 링크에서는 아무것도 표시하지 않음.
  */
 export default function AudienceRecordingControl(
   props: AudienceRecordingControlProps,
 ) {
   const {
     isAvailable,
+    sessionKey,
     isSupported,
     status,
     isListening,
@@ -46,6 +50,20 @@ export default function AudienceRecordingControl(
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
+  const promptedSessionKeyRef = useRef<string | null>(null);
+  const canPrompt =
+    isAvailable && isSupported && status === 'idle' && sessionKey !== null;
+
+  useEffect(() => {
+    if (!isAvailable) {
+      closeModal();
+      return;
+    }
+    if (canPrompt && promptedSessionKeyRef.current !== sessionKey) {
+      promptedSessionKeyRef.current = sessionKey;
+      openModal();
+    }
+  }, [canPrompt, closeModal, isAvailable, openModal, sessionKey]);
 
   if (!isAvailable) {
     return null;

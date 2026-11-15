@@ -7,6 +7,7 @@ import AudienceRecordingControl, {
 
 const baseProps: AudienceRecordingControlProps = {
   isAvailable: true,
+  sessionKey: null,
   isSupported: true,
   status: 'idle',
   isListening: false,
@@ -109,5 +110,75 @@ describe('청중 녹음 참여 컨트롤', () => {
     expect(
       screen.getByText('이 브라우저에서는 녹음에 참여할 수 없어요.'),
     ).toBeInTheDocument();
+  });
+
+  describe('녹음 동의 안내창 자동 열기', () => {
+    it('새 녹음 세션의 참가 정보를 받으면 버튼을 누르지 않아도 안내창을 띄운다', () => {
+      renderControl({ sessionKey: 'session-1' });
+
+      expect(
+        screen.getByRole('dialog', { name: '토론 녹음에 참여할까요?' }),
+      ).toBeInTheDocument();
+    });
+
+    it('닫은 뒤 같은 세션으로 다시 그려도 다시 띄우지 않는다', async () => {
+      const user = userEvent.setup();
+      const { rerender } = renderControl({ sessionKey: 'session-1' });
+      await user.click(screen.getByRole('button', { name: '참여하지 않기' }));
+
+      rerender(
+        <GlobalPortal.Provider>
+          <AudienceRecordingControl {...baseProps} sessionKey="session-1" />
+        </GlobalPortal.Provider>,
+      );
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: '녹음 참여' }),
+      ).toBeInTheDocument();
+    });
+
+    it('다른 세션의 참가 정보를 받으면 다시 띄운다', async () => {
+      const user = userEvent.setup();
+      const { rerender } = renderControl({ sessionKey: 'session-1' });
+      await user.click(screen.getByRole('button', { name: '참여하지 않기' }));
+
+      rerender(
+        <GlobalPortal.Provider>
+          <AudienceRecordingControl {...baseProps} sessionKey="session-2" />
+        </GlobalPortal.Provider>,
+      );
+
+      expect(
+        screen.getByRole('dialog', { name: '토론 녹음에 참여할까요?' }),
+      ).toBeInTheDocument();
+    });
+
+    it('이미 녹음 중이면 띄우지 않는다', () => {
+      renderControl({ sessionKey: 'session-1', status: 'recording' });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('참가 정보가 사라지면 열린 안내창을 닫는다', () => {
+      const { rerender } = renderControl({ sessionKey: 'session-1' });
+
+      rerender(
+        <GlobalPortal.Provider>
+          <AudienceRecordingControl
+            {...baseProps}
+            isAvailable={false}
+            sessionKey={null}
+          />
+        </GlobalPortal.Provider>,
+      );
+      rerender(
+        <GlobalPortal.Provider>
+          <AudienceRecordingControl {...baseProps} sessionKey={null} />
+        </GlobalPortal.Provider>,
+      );
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
 });

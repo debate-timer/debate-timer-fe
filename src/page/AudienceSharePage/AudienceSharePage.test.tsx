@@ -12,6 +12,7 @@ import AudienceSharePage from './AudienceSharePage';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
 import { AudienceShareError } from './error';
 import { GetDebateTableDataForShareResponseType } from '../../apis/responses/live';
+import { GlobalPortal } from '../../util/GlobalPortal';
 
 // 모의 (Mock)
 vi.mock('./hooks/useAudienceShareState');
@@ -117,17 +118,19 @@ describe('AudienceSharePage', () => {
     const createPage = () => (
       <QueryClientProvider client={queryClient}>
         <GlobalSettingsProvider>
-          <MemoryRouter initialEntries={[initialRoute]}>
-            <TestErrorBoundary onError={onError}>
-              <Routes>
-                <Route path="/live/:id" element={<AudienceSharePage />} />
-                <Route
-                  path="/live/:id/end"
-                  element={<div>종료 안내 페이지</div>}
-                />
-              </Routes>
-            </TestErrorBoundary>
-          </MemoryRouter>
+          <GlobalPortal.Provider>
+            <MemoryRouter initialEntries={[initialRoute]}>
+              <TestErrorBoundary onError={onError}>
+                <Routes>
+                  <Route path="/live/:id" element={<AudienceSharePage />} />
+                  <Route
+                    path="/live/:id/end"
+                    element={<div>종료 안내 페이지</div>}
+                  />
+                </Routes>
+              </TestErrorBoundary>
+            </MemoryRouter>
+          </GlobalPortal.Provider>
         </GlobalSettingsProvider>
       </QueryClientProvider>
     );
@@ -153,6 +156,7 @@ describe('AudienceSharePage', () => {
       latestMessageReceivedAt: null,
       isSocketConnected: true,
       recordingJoin: null,
+      closedRecordingSessionKeys: new Set<string>(),
       status: 'connecting',
       error: null,
     });
@@ -216,6 +220,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'connecting',
         error: null,
       });
@@ -244,6 +249,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -277,6 +283,7 @@ describe('AudienceSharePage', () => {
           latestMessageReceivedAt: null,
           isSocketConnected: true,
           recordingJoin: null,
+          closedRecordingSessionKeys: new Set<string>(),
           status: 'waiting',
           error: null,
         });
@@ -296,16 +303,39 @@ describe('AudienceSharePage', () => {
         vi.unstubAllGlobals();
       });
 
-      it('공유 링크에 녹음 참여 정보가 있으면 녹음 참여 버튼을 표시한다', async () => {
+      it('공유 링크에 녹음 참여 정보가 있으면 녹음 동의 안내창을 바로 띄운다', async () => {
         mockWaiting();
         renderPage('/live/123#rec=session-1&code=join');
 
         expect(
-          await screen.findByRole('button', { name: '녹음 참여' }),
+          await screen.findByRole('dialog', {
+            name: '토론 녹음에 참여할까요?',
+          }),
         ).toBeInTheDocument();
       });
 
-      it('공유 링크에 참가 정보가 없어도 사회자가 보낸 참가 정보를 받으면 녹음 참여 버튼을 표시한다', async () => {
+      it('사회자가 끝낸 녹음 세션의 공유 링크로는 녹음 참여를 표시하지 않는다', async () => {
+        mockUseAudienceShareState.mockReturnValue({
+          chairmanPresence: 'present',
+          connectionStatus: 'connected',
+          latestMessage: null,
+          latestMessageReceivedAt: null,
+          isSocketConnected: true,
+          recordingJoin: null,
+          closedRecordingSessionKeys: new Set(['session-1']),
+          status: 'waiting',
+          error: null,
+        });
+        renderPage('/live/123#rec=session-1&code=join');
+
+        await screen.findByText('토론 시작을 대기 중입니다.');
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('button', { name: '녹음 참여' }),
+        ).not.toBeInTheDocument();
+      });
+
+      it('공유 링크에 참가 정보가 없어도 사회자가 보낸 참가 정보를 받으면 녹음 동의 안내창을 띄운다', async () => {
         mockUseAudienceShareState.mockReturnValue({
           chairmanPresence: 'present',
           connectionStatus: 'connected',
@@ -313,13 +343,16 @@ describe('AudienceSharePage', () => {
           latestMessageReceivedAt: null,
           isSocketConnected: true,
           recordingJoin: { sessionKey: 'session-1', joinCode: 'join' },
+          closedRecordingSessionKeys: new Set<string>(),
           status: 'waiting',
           error: null,
         });
         renderPage('/live/123');
 
         expect(
-          await screen.findByRole('button', { name: '녹음 참여' }),
+          await screen.findByRole('dialog', {
+            name: '토론 녹음에 참여할까요?',
+          }),
         ).toBeInTheDocument();
       });
 
@@ -342,6 +375,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -363,6 +397,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -399,6 +434,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -417,6 +453,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -437,6 +474,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -471,6 +509,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -502,6 +541,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -543,6 +583,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -583,6 +624,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -622,6 +664,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -673,6 +716,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'finished',
         error: null,
       });
@@ -724,6 +768,7 @@ describe('AudienceSharePage', () => {
           latestMessageReceivedAt: null,
           isSocketConnected: true,
           recordingJoin: null,
+          closedRecordingSessionKeys: new Set<string>(),
           status: 'displaying',
           syncedAt: null,
           error: null,
@@ -767,6 +812,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -824,6 +870,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -844,6 +891,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -864,6 +912,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -889,6 +938,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -915,6 +965,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -974,6 +1025,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -1001,6 +1053,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -1037,6 +1090,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -1067,6 +1121,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -1090,6 +1145,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -1127,6 +1183,7 @@ describe('AudienceSharePage', () => {
         latestMessageReceivedAt: null,
         isSocketConnected: true,
         recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
