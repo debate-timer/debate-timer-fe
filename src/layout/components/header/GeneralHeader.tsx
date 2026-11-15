@@ -1,8 +1,12 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+import { IoChevronDown, IoOpenOutline } from 'react-icons/io5';
 import HeaderFrame from './HeaderFrame';
 import BrandLink from './BrandLink';
+import Button from '../../../components/Button/Button';
+import Overlay from '../../../components/Overlay/Overlay';
 import { buildLangPath, isSupportedLang } from '../../../util/languageRouting';
 
 interface GeneralHeaderProps {
@@ -20,10 +24,9 @@ const NAV_CLASS =
   'order-3 col-span-2 flex w-full flex-wrap items-center gap-x-2 gap-y-2 text-ui-label md:order-none md:w-auto';
 const LINK_CLASS =
   'inline-flex min-h-11 items-center rounded-xl px-3.5 py-2 text-neutral-700 no-underline transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 aria-[current=page]:bg-brand aria-[current=page]:text-neutral-900 aria-[current=page]:hover:bg-brand motion-reduce:transition-none';
-const INQUIRY_SUMMARY_CLASS =
-  'inline-flex min-h-11 cursor-pointer items-center rounded-xl px-3.5 py-2 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 motion-reduce:transition-none';
-const INQUIRY_CLASS =
-  'absolute left-0 z-40 mt-2 w-64 space-y-2 rounded-xl border border-neutral-200 bg-white p-4 shadow-lg';
+const INQUIRY_BUTTON_CLASS =
+  'inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3.5 py-2 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 motion-reduce:transition-none';
+const INQUIRY_CLASS = 'absolute left-0 z-40 mt-2 w-64 space-y-2';
 
 /**
  * 일반 화면의 탐색과 받은 계정 조작을 배치하며 통신·로그인을 시작하지 않음.
@@ -40,6 +43,25 @@ export default function GeneralHeader(props: GeneralHeaderProps) {
   } = props;
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
+  const [isInquiriesOpen, setIsInquiriesOpen] = useState(false);
+  const inquiryContainerRef = useRef<HTMLDivElement>(null);
+  const inquiryButtonRef = useRef<HTMLButtonElement>(null);
+  const inquiryMenuId = useId();
+  useEffect(() => {
+    if (!isInquiriesOpen) {
+      return;
+    }
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !inquiryContainerRef.current?.contains(event.target)
+      ) {
+        setIsInquiriesOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [isInquiriesOpen]);
   const path = buildLangPath(pathname, 'ko');
   const selectedPath =
     path === '/' || path === '/templates' || path === '/records'
@@ -82,37 +104,70 @@ export default function GeneralHeader(props: GeneralHeaderProps) {
             );
           })}
           {inquiries.length > 0 && (
-            <details
+            <div
+              ref={inquiryContainerRef}
               className="relative"
               onKeyDown={(event) => {
-                if (event.key === 'Escape') {
+                if (event.key === 'Escape' && isInquiriesOpen) {
                   event.preventDefault();
                   event.stopPropagation();
-                  event.currentTarget.open = false;
-                  event.currentTarget.querySelector('summary')?.focus();
+                  setIsInquiriesOpen(false);
+                  inquiryButtonRef.current?.focus();
                 }
               }}
               onBlur={(event) => {
                 if (!event.currentTarget.contains(event.relatedTarget)) {
-                  event.currentTarget.open = false;
+                  setIsInquiriesOpen(false);
                 }
               }}
             >
-              <summary className={INQUIRY_SUMMARY_CLASS}>{t('문의')}</summary>
-              <div className={INQUIRY_CLASS}>
+              <button
+                ref={inquiryButtonRef}
+                type="button"
+                aria-label={t('문의')}
+                aria-expanded={isInquiriesOpen}
+                aria-controls={isInquiriesOpen ? inquiryMenuId : undefined}
+                className={clsx(
+                  INQUIRY_BUTTON_CLASS,
+                  isInquiriesOpen && 'bg-neutral-100 text-neutral-900',
+                )}
+                onClick={() => setIsInquiriesOpen((current) => !current)}
+              >
+                {t('문의')}
+                <IoChevronDown
+                  className={clsx(
+                    'size-4 shrink-0 transition-transform duration-150 motion-reduce:transition-none',
+                    isInquiriesOpen && 'rotate-180',
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+              <Overlay
+                isOpen={isInquiriesOpen}
+                direction="down"
+                id={inquiryMenuId}
+                className={INQUIRY_CLASS}
+              >
                 {inquiries.map((item) => (
-                  <a
+                  <Button
                     key={item.label}
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block underline"
+                    variant="neutral"
+                    shape="rounded"
+                    aria-label={t(item.label)}
+                    className="w-full justify-between px-4 py-3 no-underline"
                   >
-                    {t(item.label)}
-                  </a>
+                    <span>{t(item.label)}</span>
+                    <IoOpenOutline
+                      className="text-neutral-500"
+                      aria-hidden="true"
+                    />
+                  </Button>
                 ))}
-              </div>
-            </details>
+              </Overlay>
+            </div>
           )}
         </nav>
         <div className="flex flex-wrap items-center justify-end gap-2">

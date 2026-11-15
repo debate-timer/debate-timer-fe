@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import GeneralHeader from './GeneralHeader';
@@ -122,5 +122,39 @@ describe('역할별 헤더', () => {
     expect(icon).toHaveClass('md:hidden');
     await user.click(button);
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+  it('문의 버튼을 누르면 Overlay로 외부 링크를 열고 Escape로 닫는다', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <GeneralHeader
+          isMember
+          canViewRecords
+          onRequireLogin={vi.fn()}
+          inquiries={[{ label: '일반 문의', url: 'https://example.com' }]}
+        />
+      </MemoryRouter>,
+    );
+    const trigger = screen.getByRole('button', { name: '문의' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    const link = screen.getByRole('link', { name: '일반 문의' });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).not.toHaveClass('underline');
+    expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+
+    await user.keyboard('{Escape}');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).toHaveFocus();
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('link', { name: '일반 문의' }),
+      ).not.toBeInTheDocument(),
+    );
   });
 });
