@@ -31,11 +31,14 @@ describe('완료 정보 조회', () => {
           : { id: 12, info: { name: '시간표', agenda: '주제' }, table: [] };
       client.setQueryData(key, data, { updatedAt: 1 });
       let requests = 0;
+      // 번역 파일 등 이 훅과 무관한 GET이 같은 시점에 올 수 있어, 완료 정보 API만 센다.
+      const countRequest = () => {
+        requests += 1;
+        return HttpResponse.json({}, { status: 500 });
+      };
       server.use(
-        http.get('*', () => {
-          requests += 1;
-          return HttpResponse.json({}, { status: 500 });
-        }),
+        http.get(`${ApiUrl.poll}/12/votes`, countRequest),
+        http.get(`${ApiUrl.live}/table/customize/12`, countRequest),
       );
       const { result } = renderHook(() => useGetCompletionInfo(kind, 12), {
         wrapper: createWrapper(client),
