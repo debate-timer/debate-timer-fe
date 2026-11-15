@@ -1,6 +1,6 @@
 import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
 import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
@@ -59,8 +59,17 @@ export default function TableSharingPage() {
   const { trackEvent } = useAnalytics();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  const [asyncError, setAsyncError] = useState<Error | null>(null);
+  const processedKeyRef = useRef<string | null>(null);
+  const isActionHandledRef = useRef(false);
+  const handleModalDismiss = useCallback(() => {
+    if (!isActionHandledRef.current) {
+      navigate(buildLangPath('/dashboard', lang), { replace: true });
+    }
+  }, [lang, navigate]);
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
+    onClose: handleModalDismiss,
   });
   const [searchParams] = useSearchParams();
   const encodedData = searchParams.get('data');
@@ -71,6 +80,10 @@ export default function TableSharingPage() {
   );
   const source = searchParams.get('source');
   const isTemplateEntry = source === 'template';
+
+  if (asyncError) {
+    throw asyncError;
+  }
 
   // 공유 링크 유입 추적: encodedData/isTemplateEntry에만 의존해 1회만 발화한다.
   useEffect(() => {
@@ -96,8 +109,16 @@ export default function TableSharingPage() {
 
   // 로그인 상태와 URL 형태에 따라 저장 모달, 게스트 복사, 즉시 저장 플로우를 분기한다.
   useEffect(() => {
-    if (isLoggedIn()) {
-      if (isGuestFlow() && encodedData === null) {
+    const loggedIn = isLoggedIn();
+    const guestFlow = isGuestFlow();
+    const effectKey = `${loggedIn}:${guestFlow}:${encodedData ?? ''}`;
+    if (processedKeyRef.current === effectKey) {
+      return;
+    }
+
+    if (loggedIn) {
+      if (guestFlow && encodedData === null) {
+        processedKeyRef.current = effectKey;
         // URL == /BASE_URL/share일 때, 즉 data 쿼리 파라미터가 없을 때
         // OAuth 리다이렉트 후 세션 저장소에 있는 테이블 바로 저장
         sessionDebateTableRepository.getTable().then(
@@ -106,30 +127,38 @@ export default function TableSharingPage() {
               .addTable(value as PostDebateTableResponseType)
               .then(
                 // 저장 성공 시
-                (value: PostDebateTableResponseType) => {
+                (savedValue: PostDebateTableResponseType) => {
+                  isActionHandledRef.current = true;
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
                   navigate(
-                    buildLangPath(`/overview/customize/${value.id}`, lang),
+                    buildLangPath(`/overview/customize/${savedValue.id}`, lang),
                   );
                 },
                 // 저장 실패 시
                 () => {
+                  isActionHandledRef.current = true;
                   closeModal();
-                  throw new Error(t('공유받은 테이블을 저장하지 못했어요.'));
+                  setAsyncError(
+                    new Error(t('공유받은 테이블을 저장하지 못했어요.')),
+                  );
                 },
               );
           },
           () => {
             // 세션 저장소에서 테이블을 불러오지 못할 때
+            isActionHandledRef.current = true;
             closeModal();
-            throw new Error(t('테이블 데이터를 확인할 수 없어요.'));
+            setAsyncError(new Error(t('테이블 데이터를 확인할 수 없어요.')));
           },
         );
+      } else if (encodedData === null) {
+        processedKeyRef.current = effectKey;
+        navigate(buildLangPath('/dashboard', lang), { replace: true });
+      } else if (!decodedData) {
+        throw new Error(t('공유된 데이터가 비어 있어요.'));
       } else {
-        // URL == /BASE_URL/share?data=something일 때,
-        // 즉 data 쿼리 파라미터가 없을 때
-        // 로그인 사용자가 공유 URL로 접속할 때를 의미
+        processedKeyRef.current = effectKey;
         openModal();
       }
     } else {
@@ -137,16 +166,18 @@ export default function TableSharingPage() {
       if (!decodedData) {
         throw new Error(t('공유된 데이터가 비어 있어요.'));
       }
-
+      processedKeyRef.current = effectKey;
       sessionDebateTableRepository.deleteTable();
       sessionDebateTableRepository.addTable(decodedData).then(
         () => {
           // On success
-          navigate(buildLangPath(`/overview/customize/guest`, lang));
+          navigate(buildLangPath('/overview/customize/guest', lang));
         },
         () => {
           // Handling error
-          throw new Error(t('공유된 토론 테이블을 DB에 저장하지 못했어요.'));
+          setAsyncError(
+            new Error(t('공유된 토론 테이블을 DB에 저장하지 못했어요.')),
+          );
         },
       );
     }
@@ -156,7 +187,7 @@ export default function TableSharingPage() {
     <>
       <GeneralHeaderContainer />
       <div className="flex min-h-[60dvh] w-full flex-col items-center justify-center space-y-8">
-        <LoadingSpinner size={'size-24'} color={'text-brand-main'} />
+        <LoadingSpinner size={'size-24'} color={'text-brand'} />
 
         <p className="text-2xl">{t('데이터를 처리하고 있습니다...')}</p>
       </div>
@@ -169,6 +200,7 @@ export default function TableSharingPage() {
               // 공유받은 테이블을 계정에 저장한 뒤 개요 화면으로 이동한다.
               apiDebateTableRepository.addTable(decodedData).then(
                 (value) => {
+                  isActionHandledRef.current = true;
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
                   navigate(
@@ -176,8 +208,11 @@ export default function TableSharingPage() {
                   );
                 },
                 () => {
+                  isActionHandledRef.current = true;
                   closeModal();
-                  throw new Error(t('공유받은 테이블을 저장하지 못했어요.'));
+                  setAsyncError(
+                    new Error(t('공유받은 테이블을 저장하지 못했어요.')),
+                  );
                 },
               );
             }}
@@ -185,12 +220,16 @@ export default function TableSharingPage() {
               // 공유받은 테이블을 세션에만 저장하고 게스트 플로우로 이어간다.
               sessionDebateTableRepository.addTable(decodedData).then(
                 () => {
+                  isActionHandledRef.current = true;
                   closeModal();
                   navigate(buildLangPath('/overview/customize/guest', lang));
                 },
                 () => {
+                  isActionHandledRef.current = true;
                   closeModal();
-                  throw new Error(t('공유받은 데이터 처리에 실패했어요.'));
+                  setAsyncError(
+                    new Error(t('공유받은 데이터 처리에 실패했어요.')),
+                  );
                 },
               );
             }}
