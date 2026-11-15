@@ -1,6 +1,12 @@
 import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { useState } from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  within,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
@@ -90,6 +96,10 @@ describe('타이머와 명시적 공유의 연결', () => {
     await user.click(screen.getByRole('button', { name: '실시간 공유' }));
     await user.click(screen.getByRole('button', { name: '공유 시작' }));
     expect(START).toHaveBeenCalledTimes(1);
+    expect(
+      await screen.findByRole('dialog', { name: '토론 타이머 화면 공유' }),
+    ).toBeInTheDocument();
+    await user.keyboard('{Escape}');
     await user.keyboard('{Escape}');
     expect(
       screen.getByRole('button', { name: '일시정지' }),
@@ -104,6 +114,39 @@ describe('타이머와 명시적 공유의 연결', () => {
     await waitFor(() => expect(STOP).toHaveBeenCalledTimes(1));
     expect(
       screen.getByRole('button', { name: '일시정지' }),
+    ).toBeInTheDocument();
+  });
+  it('공유를 켜면 QR 창을 띄우고, 메뉴에는 링크 대신 링크 복사·QR 아이콘을 둔다', async () => {
+    const user = userEvent.setup();
+    renderTimerPage();
+    await screen.findAllByRole('button', { name: '재생' });
+    await user.click(screen.getByRole('button', { name: '토론 메뉴' }));
+    await user.click(screen.getByRole('button', { name: '실시간 공유' }));
+    await user.click(screen.getByRole('button', { name: '공유 시작' }));
+
+    const qrDialog = await screen.findByRole('dialog', {
+      name: '토론 타이머 화면 공유',
+    });
+    expect(
+      within(qrDialog).getByRole('img', { name: '실시간 공유 QR 코드' }),
+    ).toBeInTheDocument();
+    expect(
+      within(qrDialog).getByRole('button', { name: '링크 복사' }),
+    ).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    const menu = screen.getByRole('dialog', { name: '토론 메뉴' });
+    expect(
+      within(menu).queryByText('https://example.com/live/5'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(menu).getByRole('button', { name: '링크 복사' }),
+    ).toBeInTheDocument();
+    await user.click(
+      within(menu).getByRole('button', { name: 'QR 코드 보기' }),
+    );
+    expect(
+      await screen.findByRole('dialog', { name: '토론 타이머 화면 공유' }),
     ).toBeInTheDocument();
   });
 });

@@ -5,6 +5,8 @@ import ToggleButton from '../../../components/ToggleButton/ToggleButton';
 import { DebateControls } from '../hooks/useDebateControls';
 import useDebateOverlay from '../hooks/useDebateOverlay';
 import MicCheckPanel from './MicCheckPanel';
+import LiveShareQrPanel from './LiveShareQrPanel';
+import { IoLinkOutline, IoQrCodeOutline } from 'react-icons/io5';
 import { copyToClipboard } from '../../../util/clipboard';
 import Button from '../../../components/Button/Button';
 import Overlay from '../../../components/Overlay/Overlay';
@@ -28,6 +30,8 @@ const OPEN_TRIGGER_CLASS =
 const ACTION_BASE_CLASS =
   'min-h-11 rounded-xl border px-4 py-2 text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50';
 const ACTION_CLASS = `${ACTION_BASE_CLASS} border-neutral-400`;
+const ICON_ACTION_CLASS =
+  'flex size-11 items-center justify-center rounded-xl border border-neutral-400 focus-visible:outline-2 focus-visible:outline-offset-2';
 
 /** 버튼 아래 메뉴는 유지하고 활성화 확인은 별도 모달에 표시함. 속기록은 피쳐 플래그가 있을 때만 노출함. */
 export default function DebateMenu(props: DebateMenuProps) {
@@ -103,6 +107,7 @@ export default function DebateMenu(props: DebateMenuProps) {
       (await copyToClipboard(controls.shareUrl)) ? 'copied' : 'failed',
     );
   const isShareConsent = controls.overlay === 'share-consent';
+  const isShareQr = controls.overlay === 'share-qr';
   const isMicCheck = controls.overlay === 'mic-check';
   const availableModes = (['RPC', 'SONIOX', 'MULTI_DEVICE'] as const).filter(
     (mode) => controls.transcript.supportedModes[mode],
@@ -211,22 +216,31 @@ export default function DebateMenu(props: DebateMenuProps) {
               )}
               {controls.share.isSharing && (
                 <>
-                  <p className="text-ui-caption break-all">
-                    {controls.shareUrl}
-                  </p>
                   {controls.transcript.multiDeviceSession && (
                     <p className="text-ui-caption text-neutral-700">
                       {t('이 링크로 들어온 청중은 녹음에 참여할 수 있어요.')}
                     </p>
                   )}
-                  <button
-                    type="button"
-                    aria-label={t('링크 복사')}
-                    className={ACTION_CLASS}
-                    onClick={() => void handleCopy()}
-                  >
-                    {t('링크 복사')}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      aria-label={t('링크 복사')}
+                      title={t('링크 복사')}
+                      className={ICON_ACTION_CLASS}
+                      onClick={() => void handleCopy()}
+                    >
+                      <IoLinkOutline className="size-5" aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={t('QR 코드 보기')}
+                      title={t('QR 코드 보기')}
+                      className={ICON_ACTION_CLASS}
+                      onClick={controls.openShareQr}
+                    >
+                      <IoQrCodeOutline className="size-5" aria-hidden />
+                    </button>
+                  </div>
                   <p role="status">
                     {copyStatus === 'copied'
                       ? t('링크 복사됨')
@@ -362,7 +376,19 @@ export default function DebateMenu(props: DebateMenuProps) {
               )}
           </div>
         </Overlay>
-        {isOpen && !isMenu && (
+        {isShareQr && (
+          <ModalFrame
+            aria-labelledby={confirmationTitleId}
+            onClose={controls.cancelConfirmation}
+            closeOnOverlayClick
+          >
+            <LiveShareQrPanel
+              shareUrl={controls.shareUrl}
+              titleId={confirmationTitleId}
+            />
+          </ModalFrame>
+        )}
+        {isOpen && !isMenu && !isShareQr && (
           <ModalFrame
             aria-labelledby={confirmationTitleId}
             onClose={controls.cancelConfirmation}

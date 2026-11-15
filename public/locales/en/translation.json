@@ -496,5 +496,7 @@
   "{{count}}개 구간을 올리지 못했어요.": "Failed to upload {{count}} segment(s).",
   "녹음 참여 그만하기": "Stop recording",
   "녹음 참여": "Join recording",
-  "녹음 준비 중": "Preparing to record"
+  "녹음 준비 중": "Preparing to record",
+  "QR 코드 보기": "Show QR code",
+  "실시간 공유 QR 코드": "Live share QR code"
 }
