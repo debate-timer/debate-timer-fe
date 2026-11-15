@@ -1,10 +1,12 @@
 import { act, renderHook } from '@testing-library/react';
 import useDebateTranscriber from './useDebateTranscriber';
+import useMultiDeviceTranscriber from './useMultiDeviceTranscriber';
 import useSonioxTranscriber from './useSonioxTranscriber';
 import useTranscriptRecorder from './useTranscriptRecorder';
 
 vi.mock('./useDebateTranscriber', () => ({ default: vi.fn() }));
 vi.mock('./useSonioxTranscriber', () => ({ default: vi.fn() }));
+vi.mock('./useMultiDeviceTranscriber', () => ({ default: vi.fn() }));
 
 const rpc = {
   isSupported: true,
@@ -29,6 +31,20 @@ const soniox = {
   discard: vi.fn(),
 };
 
+const multiDevice = {
+  isSupported: true,
+  isEnabled: false,
+  isStarting: false,
+  isListening: false,
+  pendingCount: 1,
+  failedCount: 0,
+  error: null,
+  session: null as { sessionKey: string; joinCode: string } | null,
+  enable: vi.fn(async () => {}),
+  disable: vi.fn(),
+  discard: vi.fn(),
+};
+
 const params = {
   tableId: 7,
   timeBoxIndex: 0,
@@ -41,8 +57,11 @@ describe('STT 모드 선택 기록 훅', () => {
   beforeEach(() => {
     vi.mocked(useDebateTranscriber).mockReturnValue({ ...rpc });
     vi.mocked(useSonioxTranscriber).mockReturnValue({ ...soniox });
+    vi.mocked(useMultiDeviceTranscriber).mockReturnValue({ ...multiDevice });
     rpc.enable.mockClear();
     soniox.enable.mockClear();
+    multiDevice.enable.mockClear();
+    multiDevice.discard.mockClear();
   });
 
   it('처음에는 RPC 모드이고 모드를 바꿀 수 있다', () => {
@@ -50,7 +69,70 @@ describe('STT 모드 선택 기록 훅', () => {
 
     expect(result.current.sttMode).toBe('RPC');
     expect(result.current.isModeLocked).toBe(false);
-    expect(result.current.supportedModes).toEqual({ RPC: true, SONIOX: true });
+    expect(result.current.supportedModes).toEqual({
+      RPC: true,
+      SONIOX: true,
+      MULTI_DEVICE: false,
+    });
+  });
+
+  describe('다기기 녹음', () => {
+    const multiDeviceParams = {
+      ...params,
+      isMultiDeviceAllowed: true,
+      getSegmentVersion: () => 7,
+    };
+
+    it('다기기 녹음 플래그가 있을 때만 다기기 녹음을 고를 수 있다', () => {
+      const { result } = renderHook(() =>
+        useTranscriptRecorder(multiDeviceParams),
+      );
+
+      expect(result.current.supportedModes.MULTI_DEVICE).toBe(true);
+    });
+
+    it('공유 이벤트 version을 다기기 녹음에 넘긴다', () => {
+      renderHook(() => useTranscriptRecorder(multiDeviceParams));
+
+      const passed = vi.mocked(useMultiDeviceTranscriber).mock.lastCall![0];
+      expect(passed.getSegmentVersion()).toBe(7);
+    });
+
+    it('다기기 녹음으로 켜면 다기기 녹음만 켜고 그 상태와 녹음 세션을 보여준다', async () => {
+      const { result, rerender } = renderHook(() =>
+        useTranscriptRecorder(multiDeviceParams),
+      );
+
+      await act(() => result.current.enable('MULTI_DEVICE'));
+      vi.mocked(useMultiDeviceTranscriber).mockReturnValue({
+        ...multiDevice,
+        isEnabled: true,
+        session: { sessionKey: 'session-1', joinCode: 'join' },
+      });
+      rerender();
+
+      expect(multiDevice.enable).toHaveBeenCalledWith('ko-KR');
+      expect(soniox.enable).not.toHaveBeenCalled();
+      expect(rpc.enable).not.toHaveBeenCalled();
+      expect(result.current.sttMode).toBe('MULTI_DEVICE');
+      expect(result.current.isModeLocked).toBe(true);
+      expect(result.current.pendingCount).toBe(1);
+      expect(result.current.multiDeviceSession).toEqual({
+        sessionKey: 'session-1',
+        joinCode: 'join',
+      });
+    });
+
+    it('다른 방식으로 켜면 이 탭에 남은 다기기 녹음 세션을 지운다', async () => {
+      const { result } = renderHook(() =>
+        useTranscriptRecorder(multiDeviceParams),
+      );
+
+      await act(() => result.current.enable('SONIOX'));
+
+      expect(multiDevice.discard).toHaveBeenCalled();
+      expect(multiDevice.enable).not.toHaveBeenCalled();
+    });
   });
 
   it('크롬 음성 인식을 지원하지 않으면 Soniox 모드로 시작한다', () => {

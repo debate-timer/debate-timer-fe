@@ -422,6 +422,50 @@ describe('소켓 메시지 여부 검증', () => {
   });
 });
 
+describe('녹음 참여 이벤트 검증', () => {
+  const recording = { sessionKey: 'session-1', joinCode: 'join-code' };
+
+  it('data가 null이고 녹음 참가 정보가 있으면 통과한다', () => {
+    expect(
+      isSocketMessage({
+        eventType: 'RECORDING_OPENED',
+        data: null,
+        version: 1,
+        serverTime: 2,
+        recording,
+      }),
+    ).toBe(true);
+  });
+
+  it.each([
+    ['참가 정보가 없음', { data: null }],
+    ['참가 정보가 null', { data: null, recording: null }],
+    [
+      '세션 키가 빈 문자열',
+      { data: null, recording: { ...recording, sessionKey: '' } },
+    ],
+    [
+      '참가 코드가 문자열이 아님',
+      { data: null, recording: { ...recording, joinCode: 1 } },
+    ],
+    ['data가 있음', { data: {}, recording }],
+  ])('%s이면 거부된다', (_, message) => {
+    expect(
+      isSocketMessage({
+        eventType: 'RECORDING_OPENED',
+        version: 1,
+        ...message,
+      }),
+    ).toBe(false);
+  });
+
+  it('다른 이벤트에 서버가 채운 recording: null은 통과한다', () => {
+    expect(
+      isSocketMessage({ eventType: 'FINISHED', data: null, recording: null }),
+    ).toBe(true);
+  });
+});
+
 describe('사회자 부재 이벤트 검증', () => {
   it('CHAIRMAN_ABSENT는 data가 null일 때만 런타임 검증을 통과한다', () => {
     expect(

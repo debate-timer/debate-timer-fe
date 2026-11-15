@@ -100,10 +100,13 @@ export default function DebateMenu(props: DebateMenuProps) {
   }, [panel]);
   const handleCopy = async () =>
     setCopyStatus(
-      (await copyToClipboard(controls.share.shareUrl)) ? 'copied' : 'failed',
+      (await copyToClipboard(controls.shareUrl)) ? 'copied' : 'failed',
     );
   const isShareConsent = controls.overlay === 'share-consent';
   const isMicCheck = controls.overlay === 'mic-check';
+  const availableModes = (['RPC', 'SONIOX', 'MULTI_DEVICE'] as const).filter(
+    (mode) => controls.transcript.supportedModes[mode],
+  );
   const SHARE_ERROR_MESSAGES = {
     token: '사회자 인증 토큰 발급에 실패했어요...',
     replaced:
@@ -209,8 +212,13 @@ export default function DebateMenu(props: DebateMenuProps) {
               {controls.share.isSharing && (
                 <>
                   <p className="text-ui-caption break-all">
-                    {controls.share.shareUrl}
+                    {controls.shareUrl}
                   </p>
+                  {controls.transcript.multiDeviceSession && (
+                    <p className="text-ui-caption text-neutral-700">
+                      {t('이 링크로 들어온 청중은 녹음에 참여할 수 있어요.')}
+                    </p>
+                  )}
                   <button
                     type="button"
                     aria-label={t('링크 복사')}
@@ -374,28 +382,37 @@ export default function DebateMenu(props: DebateMenuProps) {
                   <p className="mb-4 text-ui-body">
                     {t('참여자 모두에게 녹음 동의를 받아 주세요.')}
                   </p>
-                  <fieldset className="space-y-3">
-                    <legend className="text-ui-label">
-                      {t('음성 인식 방식')}
-                    </legend>
-                    {(['RPC', 'SONIOX'] as const).map((mode) => (
-                      <label key={mode} className="flex gap-3">
-                        <input
-                          type="radio"
-                          name={transcriptId}
-                          checked={controls.selectedMode === mode}
-                          disabled={
-                            controls.transcript.isModeLocked ||
-                            !controls.transcript.supportedModes[mode]
-                          }
-                          onChange={() => controls.changeMode(mode)}
-                        />
-                        {mode === 'RPC'
-                          ? t('크롬 실시간 인식')
-                          : t('Soniox 구간 전사')}
-                      </label>
-                    ))}
-                  </fieldset>
+                  {/* 이 브라우저에서 쓸 수 없는 방식은 보여주지 않고, 하나만 남으면 선택지를 생략한다. */}
+                  {availableModes.length > 1 && (
+                    <fieldset className="space-y-3">
+                      <legend className="text-ui-label">
+                        {t('음성 인식 방식')}
+                      </legend>
+                      {availableModes.map((mode) => (
+                        <label key={mode} className="flex gap-3">
+                          <input
+                            type="radio"
+                            name={transcriptId}
+                            checked={controls.selectedMode === mode}
+                            disabled={controls.transcript.isModeLocked}
+                            onChange={() => controls.changeMode(mode)}
+                          />
+                          {mode === 'RPC'
+                            ? t('크롬 실시간 인식')
+                            : mode === 'SONIOX'
+                              ? t('Soniox 구간 전사')
+                              : t('Soniox 다기기 녹음')}
+                        </label>
+                      ))}
+                    </fieldset>
+                  )}
+                  {controls.selectedMode === 'MULTI_DEVICE' && (
+                    <p className="mt-3 text-ui-caption text-neutral-700">
+                      {t(
+                        '실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.',
+                      )}
+                    </p>
+                  )}
                 </>
               )}
               {controls.transcript.isPending && (

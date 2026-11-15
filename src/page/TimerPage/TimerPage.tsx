@@ -121,6 +121,11 @@ function TimerPageSession() {
     enabled: isMemberFlow,
   });
   const isTranscribeAvailable = isMemberFlow && hasTranscriptFlag;
+  // 다기기 녹음(MULTI_DEVICE_RECORDING) 플래그가 있으면 기록 방식에 청중 기기 녹음을 더한다.
+  const { isEnabled: hasMultiDeviceFlag } = useFeatureFlag(
+    'MULTI_DEVICE_RECORDING',
+    { enabled: isMemberFlow },
+  );
   const [pauseAdditionalRevision, setPauseAdditionalRevision] = useState(0);
   const { pauseTimer: pauseNormalTimer } = normalTimer;
   const { pauseTimer: pauseProsTimer } = timer1;
@@ -143,6 +148,7 @@ function TimerPageSession() {
     lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
     canShare: IS_LIVE_SHARE_ENABLED && isMemberFlow && !!data,
     canTranscribe: isTranscribeAvailable && !!data,
+    canUseMultiDevice: isTranscribeAvailable && hasMultiDeviceFlag,
     stopTimers,
     isInputBlocked: isUseTooltipOpen || isLoginAndStoreOpen || login.isOpen,
     onSyncRequest: () => syncRequestHandlerRef.current(),

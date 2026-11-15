@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { IMessage } from '@stomp/stompjs';
 import useSocket from './useSocket';
 import { socketManager } from '../../apis/sockets/SocketManager';
-import { SocketMessage } from '../../apis/sockets/type';
+import { RecordingJoinPayload, SocketMessage } from '../../apis/sockets/type';
 import { isSocketMessage } from '../../apis/sockets/util';
 import useDocumentVisibility from '../useDocumentVisibility';
 
@@ -24,6 +24,7 @@ const VISIBILITY_RESYNC_THROTTLE_MS = 3000;
  * @returns {Object} 청중 소켓 상태와 제어 함수를 반환합니다.
  * @returns {SocketMessage | null} returns.latestMessage - 검증된 가장 최근의 수신 메시지입니다.
  * @returns {number | null} returns.latestMessageReceivedAt - `latestMessage`를 수신한 시각입니다. 네트워크 지연 보정의 기준으로 사용합니다.
+ * @returns {RecordingJoinPayload | null} returns.recordingJoin - 사회자가 `RECORDING_OPENED`로 보낸 다기기 녹음 참가 정보입니다. `latestMessage`에는 넣지 않으며 재연결해도 유지합니다.
  * @returns {number | null} returns.lastReceivedAt - 형식이 올바른 사회자 메시지를 마지막으로 수신한 시각입니다. version이 오래되어 반영하지 않은 메시지도 포함합니다.
  * @returns {number | null} returns.chairmanAbsentAt - 서버로부터 활성 사회자가 없다는 알림(`CHAIRMAN_ABSENT`)을 마지막으로 받은 시각입니다.
  * @returns {boolean} returns.isConnected - 소켓 연결 상태입니다.
@@ -49,6 +50,9 @@ export default function useAudienceSocket(
     isConnected,
     error,
   } = useSocket();
+  // 사회자가 공유 채널로 보낸 다기기 녹음 참가 정보. 재연결해 메시지를 초기화해도 유지한다.
+  const [recordingJoin, setRecordingJoin] =
+    useState<RecordingJoinPayload | null>(null);
   const [latestMessage, setLatestMessage] = useState<SocketMessage | null>(
     null,
   );
@@ -137,6 +141,12 @@ export default function useAudienceSocket(
           lastVersionRef.current = version;
         }
 
+        // 녹음 참가 정보는 타이머 화면 상태가 아니므로 최근 메시지를 바꾸지 않고 따로 보관한다
+        if (parsedData.eventType === 'RECORDING_OPENED') {
+          setRecordingJoin(parsedData.recording);
+          return;
+        }
+
         setLatestMessage(parsedData);
         setLatestMessageReceivedAt(receivedAt);
       } else {
@@ -212,6 +222,7 @@ export default function useAudienceSocket(
   return {
     latestMessage,
     latestMessageReceivedAt,
+    recordingJoin,
     lastReceivedAt,
     chairmanAbsentAt,
     isConnected,

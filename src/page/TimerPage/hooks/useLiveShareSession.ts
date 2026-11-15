@@ -3,7 +3,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { socketManager } from '../../../apis/sockets/SocketManager';
 import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
 import useGetChairmanToken from '../../../hooks/query/useGetChairmanToken';
-import { SocketEventType, TimerDataPayload } from '../../../apis/sockets/type';
+import {
+  SocketEventType,
+  TimerDataPayload,
+  RecordingJoinPayload,
+} from '../../../apis/sockets/type';
 import { isSocketError } from '../../../apis/sockets/error';
 import {
   getAccessToken,
@@ -73,6 +77,7 @@ export default function useLiveShareSession(
     isConnected: isSocketConnected,
     isReplaced,
     sendDebateEvent,
+    getLastTransitionVersion,
     error: socketError,
   } = useChairmanSocket(tableId, {
     onSyncRequest: () => {
@@ -121,7 +126,11 @@ export default function useLiveShareSession(
   // 기기가 절전 상태였다가 깨어나는 등 갱신 시점을 놓쳐 토큰이 만료됐다면 곧바로 새 토큰을 요청한다
   // (이번 이벤트는 거부될 수 있지만, 새 토큰을 받은 뒤 heartbeat가 현재 상태를 다시 공유한다)
   const issueEvent = useCallback(
-    (eventType: SocketEventType, payload: TimerDataPayload | null) => {
+    (
+      eventType: SocketEventType,
+      payload: TimerDataPayload | null,
+      recording?: RecordingJoinPayload,
+    ) => {
       const expiresAt = chairmanToken ? getJwtExpiresAt(chairmanToken) : null;
       if (
         eventType !== 'ABORT' &&
@@ -131,7 +140,10 @@ export default function useLiveShareSession(
         void refetchChairmanToken();
       }
 
-      return sendDebateEvent(eventType, payload, chairmanToken ?? '');
+      const authToken = chairmanToken ?? '';
+      return recording
+        ? sendDebateEvent(eventType, payload, authToken, recording)
+        : sendDebateEvent(eventType, payload, authToken);
     },
     [chairmanToken, refetchChairmanToken, sendDebateEvent],
   );
@@ -284,6 +296,8 @@ export default function useLiveShareSession(
     connect,
     disconnect,
     shareUrl,
+    // 청중에게 보낸 마지막 타이머 전환 이벤트의 version. 다기기 녹음의 턴 키로 쓴다.
+    getLastTransitionVersion,
     isLoading,
     isError,
     errorType,

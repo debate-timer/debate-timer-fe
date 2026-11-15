@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getAuthRevision } from '../../../util/accessToken';
-import { SttMode } from '../../../types/transcript';
-import useTranscriptRecorder from './useTranscriptRecorder';
+import { appendRecordingJoin } from '../../../util/recordingJoinLink';
+import useTranscriptRecorder, {
+  TranscriptRecorderMode,
+} from './useTranscriptRecorder';
 import { UseDebateTranscriberParams } from './useDebateTranscriber';
 import useLiveShareSession from './useLiveShareSession';
 
@@ -13,6 +15,8 @@ interface UseDebateControlsOptions extends UseDebateTranscriberParams {
   stopTimers: () => void;
   canShare: boolean;
   canTranscribe: boolean;
+  // 다기기 녹음 피쳐 플래그가 있으면 true
+  canUseMultiDevice?: boolean;
   isInputBlocked?: boolean;
   onSyncRequest?: () => void;
 }
@@ -32,13 +36,26 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     onSyncRequest,
     isInputBlocked = false,
   } = options;
-  const share = useLiveShareSession(options.tableId, { onSyncRequest });
-  const transcript = useTranscriptRecorder(options);
+  // 상태 동기화 응답 뒤에 다기기 녹음 참가 정보도 다시 보내, 녹음을 켠 뒤 들어오거나 재연결한 청중도 참여할 수 있게 한다.
+  const recordingSyncRef = useRef<() => void>(() => {});
+  const share = useLiveShareSession(options.tableId, {
+    onSyncRequest: () => {
+      onSyncRequest?.();
+      recordingSyncRef.current();
+    },
+  });
+  const transcript = useTranscriptRecorder({
+    ...options,
+    isMultiDeviceAllowed: options.canUseMultiDevice ?? false,
+    getSegmentVersion: share.getLastTransitionVersion,
+  });
   const [overlay, setOverlay] = useState<DebateOverlay>('closed');
   const [answerTime, setAnswerTime] = useState(30);
   const [isAnswerTimeEnabled, setIsAnswerTimeEnabled] = useState(true);
   const [isInterrupted, setIsInterrupted] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<SttMode>(transcript.sttMode);
+  const [selectedMode, setSelectedMode] = useState<TranscriptRecorderMode>(
+    transcript.sttMode,
+  );
   const [acknowledgedFailures, setAcknowledgedFailures] = useState(0);
   const retryFailuresRef = useRef<number | null>(null);
   const interruptedRef = useRef(false);
@@ -158,7 +175,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
       }
     }
   };
-  const changeMode = (mode: SttMode) => {
+  const changeMode = (mode: TranscriptRecorderMode) => {
     if (!transcript.isModeLocked && transcript.supportedModes[mode]) {
       setSelectedMode(mode);
     }
@@ -166,10 +183,37 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
   const getStatus = (active: boolean, error: boolean): DebateFeatureStatus =>
     error ? 'error' : active ? 'active' : 'inactive';
 
+  // 이미 공유 화면을 보고 있는 청중도 다기기 녹음에 참여할 수 있도록 참가 정보를 공유 채널로 보낸다.
+  const recordingSession = transcript.multiDeviceSession;
+  const { issueEvent, isSharing } = share;
+  useEffect(() => {
+    recordingSyncRef.current = () => {
+      if (recordingSession) {
+        issueEvent('RECORDING_OPENED', null, recordingSession);
+      }
+    };
+  }, [issueEvent, recordingSession]);
+  const recordingSessionKey = recordingSession?.sessionKey;
+  const recordingJoinCode = recordingSession?.joinCode;
+  useEffect(() => {
+    if (isSharing && recordingSessionKey && recordingJoinCode) {
+      issueEvent('RECORDING_OPENED', null, {
+        sessionKey: recordingSessionKey,
+        joinCode: recordingJoinCode,
+      });
+    }
+  }, [isSharing, issueEvent, recordingJoinCode, recordingSessionKey]);
+
+  // 다기기 녹음 중이면 청중이 녹음에 참여할 수 있도록 공유 링크에 녹음 세션·참가 코드를 붙인다.
+  const shareUrl = transcript.multiDeviceSession
+    ? appendRecordingJoin(share.shareUrl, transcript.multiDeviceSession)
+    : share.shareUrl;
+
   return {
     canShare,
     canTranscribe,
     share,
+    shareUrl,
     transcript,
     overlay,
     answerTime,

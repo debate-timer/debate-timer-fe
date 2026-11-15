@@ -17,4 +17,5 @@ export const ApiUrl = {
   transcript: makeUrl('/transcripts'),
   sharedTranscript: makeUrl('/shared-transcripts'),
   stt: makeUrl('/stt'),
+  recordingV2: makeUrl('/v2/recordings'),
 };

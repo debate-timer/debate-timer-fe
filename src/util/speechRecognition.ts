@@ -38,7 +38,21 @@ interface SpeechRecognitionWindow {
   webkitSpeechRecognition?: SpeechRecognitionConstructor;
 }
 
+interface UserAgentDataNavigator {
+  userAgentData?: { brands: { brand: string }[] };
+}
+
+// 웨일·브레이브 같은 다른 크로미움 브라우저도 SpeechRecognition을 노출하지만,
+// 구글 음성 서버 인증이 없어 빈 결과만 돌아오므로 구글 크롬에서만 쓴다.
+export function isGoogleChrome(): boolean {
+  const brands = (navigator as UserAgentDataNavigator).userAgentData?.brands;
+  return brands?.some(({ brand }) => brand === 'Google Chrome') ?? false;
+}
+
 export function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (!isGoogleChrome()) {
+    return null;
+  }
   const speechWindow = window as unknown as SpeechRecognitionWindow;
   return (
     speechWindow.SpeechRecognition ??

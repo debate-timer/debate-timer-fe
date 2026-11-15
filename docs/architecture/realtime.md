@@ -95,3 +95,12 @@ MP-03에서 승인한 축소 범위에 따라 `stopSharing`은 연결 중 `ABORT
 서버는 활성 사회자·증가 version을 검사하고 정상 종료 뒤의 ABORT·중복 중단을 무시함. 중단 상태의 다른 이벤트는 버리며 사회자 재구독으로 재개함. 종료 사유 보존·새 청중에 대한 ABORT 재전송은 5분 TTL 범위임. 사회자 처리 결과·오류 응답과 종료 상태 조회 API·공유 세션 식별자를 추가한 계약이 아님. FE는 발행 후 로컬 정리를 수행하며 서버 처리 성공·영구 새 청중 차단을 표시하지 않음.
 
 청중은 수신한 종료 사유를 테이블 ID와 함께 해당 방문에 보존하고 종료 화면으로 replace 이동함. 이후 연결·재연결을 정리함. 종료 페이지는 소켓을 시작하지 않으며 history state가 없으면 중립 안내를 표시함. BE 선배포 → FE 청중 ABORT 활성화 순서와 실제 서버·별도 창 검증은 출시 전 확인 사항임. PR 병합 확인은 운영 배포·실제 송수신 검증의 근거가 아님.
+
+## 다기기 녹음 참여 이벤트
+
+`RECORDING_OPENED`는 사회자가 연 다기기 녹음의 참가 정보를 이미 공유 화면을 보고 있는 청중에게 알리는 데이터 없는 이벤트임([BE PR #334](https://github.com/debate-timer/debate-timer-be/pull/334)). `data`는 null이고 `recording: { sessionKey, joinCode }`가 필수이며, 참가 정보가 유효할 때만 수신 검증을 통과함. 사회자가 발행할 때는 version이 필수이고 서버는 version 없는 요청을 중계하지 않음. 청중의 수신 검증은 다른 메시지처럼 version을 선택 사항으로 보며, version 없는 메시지는 [수신 계약과 순서](#수신-계약과-순서)대로 version 기준이 생기기 전에만 반영함. 형태는 `src/apis/sockets/type.ts`의 `RecordingEventType`·`RecordingJoinPayload`가 정의함.
+
+사회자는 `useChairmanSocket.sendDebateEvent`의 `recording` 인자로 발행함. 다기기 녹음 세션이 생기거나 바뀔 때 공유가 연결돼 있으면 한 번, 그리고 상태 동기화 응답 뒤에 세션이 있으면 매번 다시 발행함(`useDebateControls`). 타이머 이벤트가 아니므로 다기기 녹음 턴 키에 쓰는 마지막 전환 version에는 반영하지 않음.
+
+청중 훅은 다른 이벤트와 같은 version 규칙을 거친 뒤 `latestMessage`로 넘기지 않고 `recordingJoin`에만 보관함. 따라서 타이머 화면 해석과 청중 녹음의 구간 판단에 영향을 주지 않으며, 재연결로 메시지를 초기화해도 참가 정보는 유지함. 청중 채널은 roomId만 알면 구독할 수 있어 참가 코드가 공유 링크를 받지 않은 구독자에게도 전달되는 한계가 있음([결정 기록](../wiki/decisions/transcript-multi-device.md#transcript-multi-device-dec-003--공유-채널로-녹음-참가-정보-전파)).
+

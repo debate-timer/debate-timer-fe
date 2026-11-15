@@ -1,7 +1,7 @@
 import { parsePositiveId } from '../../util/headerNavigation';
 import AudienceHeaderContainer from '../../layout/components/header/AudienceHeaderContainer';
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdErrorOutline } from 'react-icons/md';
 import { useAudienceShareState } from './hooks/useAudienceShareState';
@@ -12,6 +12,9 @@ import AudienceTimeBasedTimer from './components/AudienceTimeBasedTimer';
 import ChairmanStatusNotice from './components/ChairmanStatusNotice';
 import ConnectionLostNotice from './components/ConnectionLostNotice';
 import DebateWaitingNotice from './components/DebateWaitingNotice';
+import AudienceRecordingControl from './components/AudienceRecordingControl';
+import useAudienceTurnRecorder from './hooks/useAudienceTurnRecorder';
+import { parseRecordingJoin } from '../../util/recordingJoinLink';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import { useGetDebateTableDataForShare } from '../../hooks/query/useGetDebateTableDataForShare';
@@ -71,6 +74,7 @@ function AudienceShareSession() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { hash } = useLocation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
 
@@ -85,6 +89,17 @@ function AudienceShareSession() {
     enabled: isValidTableId && !!debateTableQuery.data,
     table: debateTableQuery.data?.table,
     handleAbort: true,
+  });
+
+  // 사회자가 다기기 녹음 중이면 공유 링크 hash로 녹음 세션·참가 코드가 온다.
+  // 링크에 없으면 사회자가 공유 채널로 보낸 참가 정보(RECORDING_OPENED)를 쓴다.
+  const linkRecordingJoin = useMemo(() => parseRecordingJoin(hash), [hash]);
+  const recordingJoin = linkRecordingJoin ?? state.recordingJoin;
+  const recorder = useAudienceTurnRecorder({
+    join: recordingJoin,
+    latestMessage: state.latestMessage,
+    latestMessageReceivedAt: state.latestMessageReceivedAt,
+    isConnected: state.isSocketConnected,
   });
 
   const viewState = resolveAudienceScreenState(
@@ -278,6 +293,20 @@ function AudienceShareSession() {
               <ConnectionLostNotice onReload={handleReload} />
             ) : null}
           </div>
+          {!isFinished ? (
+            <div className="shrink-0 pt-2">
+              <AudienceRecordingControl
+                isAvailable={recorder.isAvailable}
+                isSupported={recorder.isSupported}
+                status={recorder.status}
+                isListening={recorder.isListening}
+                error={recorder.error}
+                failedCount={recorder.failedCount}
+                onStart={() => void recorder.start()}
+                onStop={recorder.stop}
+              />
+            </div>
+          ) : null}
         </div>
       </DefaultLayout.ContentContainer>
     </DefaultLayout>
