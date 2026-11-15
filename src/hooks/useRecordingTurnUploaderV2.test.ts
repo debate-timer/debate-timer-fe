@@ -136,6 +136,127 @@ describe('다기기 녹음 턴 업로드 훅', () => {
     expect(vi.mocked(postRecordingTurnV2).mock.calls[0][2]).toBe('new-token');
   });
 
+  describe('여러 업로드가 함께 403을 받으면', () => {
+    const forbidden = () => new APIError('forbidden', 403, null);
+    let storedToken: string;
+    let validToken: string;
+
+    beforeEach(() => {
+      storedToken = 'old-token';
+      validToken = 'new-token';
+      vi.mocked(postRecordingTurnV2).mockImplementation(
+        async (_sessionKey, _turnKey, deviceToken) => {
+          if (deviceToken !== validToken) {
+            throw forbidden();
+          }
+        },
+      );
+    });
+
+    // 저장소처럼 재참가로 받은 토큰을 기억한다. 재참가 응답은 다음 작업 차례에 와서 두 업로드가 모두 기다리게 한다.
+    const renderUploader = (renew: () => Promise<string>) =>
+      renderHook(() =>
+        useRecordingTurnUploaderV2({
+          getDeviceToken: () => storedToken,
+          renewDeviceToken: vi.fn(async () => {
+            storedToken = await renew();
+            return storedToken;
+          }),
+        }),
+      );
+    const later = <T>(value: () => T) =>
+      new Promise<T>((resolve, reject) =>
+        setTimeout(() => {
+          try {
+            resolve(value());
+          } catch (error) {
+            reject(error);
+          }
+        }, 0),
+      );
+
+    it('재참가는 한 번만 하고 두 업로드 모두 새 토큰으로 다시 올린다', async () => {
+      const renew = vi.fn(() => later(() => 'new-token'));
+      const { result } = renderUploader(renew);
+
+      let outcomes: string[] = [];
+      await act(async () => {
+        outcomes = await Promise.all([
+          result.current.upload(upload),
+          result.current.upload({ ...upload, turnKey: '0-2' }),
+        ]);
+      });
+
+      expect(outcomes).toEqual(['uploaded', 'uploaded']);
+      expect(renew).toHaveBeenCalledTimes(1);
+      const retriedTokens = vi
+        .mocked(postRecordingTurnV2)
+        .mock.calls.slice(2)
+        .map((call) => call[2]);
+      expect(retriedTokens).toEqual(['new-token', 'new-token']);
+    });
+
+    it('다른 업로드가 이미 새 토큰을 받았으면 재참가하지 않고 그 토큰으로 다시 올린다', async () => {
+      vi.mocked(postRecordingTurnV2).mockImplementationOnce(async () => {
+        // 이 요청이 거절되기 전에 다른 업로드가 재참가를 마쳤다.
+        storedToken = 'new-token';
+        throw forbidden();
+      });
+      const renew = vi.fn(async () => 'another-token');
+      const { result } = renderUploader(renew);
+
+      let outcome;
+      await act(async () => {
+        outcome = await result.current.upload(upload);
+      });
+
+      expect(outcome).toBe('uploaded');
+      expect(renew).not.toHaveBeenCalled();
+      expect(vi.mocked(postRecordingTurnV2).mock.calls[1][2]).toBe('new-token');
+    });
+
+    it('함께 기다린 재참가가 실패하면 두 업로드 모두 같은 결과로 끝난다', async () => {
+      const renew = vi.fn(() =>
+        later<string>(() => {
+          throw new APIError('conflict', 409, null);
+        }),
+      );
+      const { result } = renderUploader(renew);
+
+      let outcomes: string[] = [];
+      await act(async () => {
+        outcomes = await Promise.all([
+          result.current.upload(upload),
+          result.current.upload({ ...upload, turnKey: '0-2' }),
+        ]);
+      });
+
+      expect(outcomes).toEqual(['rejected', 'rejected']);
+      expect(renew).toHaveBeenCalledTimes(1);
+      expect(result.current.failedCount).toBe(0);
+    });
+
+    it('재참가가 끝난 뒤 다시 403을 받으면 새로 재참가한다', async () => {
+      let issued = 0;
+      const renew = vi.fn(async () => `new-token-${++issued}`);
+      validToken = 'new-token-1';
+      const { result } = renderUploader(renew);
+      await act(async () => {
+        await result.current.upload(upload);
+      });
+
+      // 서버가 다시 재시작되어 받은 토큰도 잊었다.
+      validToken = 'new-token-2';
+      let outcome;
+      await act(async () => {
+        outcome = await result.current.upload({ ...upload, turnKey: '0-2' });
+      });
+
+      expect(outcome).toBe('uploaded');
+      expect(renew).toHaveBeenCalledTimes(2);
+    });
+  });
+
   it('초기화하면 실패 수를 지운다', async () => {
     vi.mocked(postRecordingTurnV2).mockRejectedValue(new Error('network'));
     const { result } = renderHook(() =>
