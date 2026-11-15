@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   getRecordingSessionV2,
+  postRecordingCancelV2,
   postRecordingHostDeviceV2,
   postRecordingSessionV2,
 } from '../../../apis/apis/recordingV2';
@@ -20,6 +21,7 @@ import {
   updateHostDeviceTokenV2,
 } from '../../../util/recordingStorageV2';
 import { startTurnRecording, TurnRecording } from '../../../util/turnRecording';
+import { isDebateEndPath, isTimerPath } from './useTranscriptLeaveGuard';
 
 export interface UseMultiDeviceTranscriberParams {
   tableId: number;
@@ -42,8 +44,10 @@ interface ActiveTurn {
 }
 
 /**
- * 다기기 녹음 V2의 사회자 기기 녹음. 켜면 녹음 세션을 열고(이 탭에서 연 세션이 아직 녹음 중이면 이어서 씀),
+ * 다기기 녹음 V2의 사회자 기기 녹음. 켜면 녹음 세션을 열고(새로고침 전에 이 탭에서 연 세션이 아직 녹음 중이면 이어서 씀),
  * 타이머가 실행되는 동안 발언 구간마다 녹음해 끝날 때 턴으로 올린다.
+ * 끄거나 토론 종료 화면이 아닌 곳으로 떠나면 세션을 취소한다. 다시 켜면 새 세션·새 참가 코드를 쓴다.
+ * `session`은 켜져 있는 동안의 세션만 담아, 꺼진 세션의 참가 정보가 청중에게 나가지 않게 한다.
  * 전사·속기록 생성은 서버가 하므로 이 기기는 초안을 만들지 않는다.
  * 턴 키는 청중 기기와 맞추려고 구간을 시작한 공유 이벤트의 version을 쓴다.
  */
@@ -58,9 +62,7 @@ export default function useMultiDeviceTranscriber(
   const [isStarting, setIsStarting] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<MultiDeviceTranscriberError | null>(null);
-  const [session, setSession] = useState<RecordingJoin | null>(() =>
-    toJoin(getHostRecordingV2(tableId)),
-  );
+  const [session, setSession] = useState<RecordingJoin | null>(null);
 
   const streamRef = useRef<MediaStream | null>(null);
   const activeRef = useRef<ActiveTurn | null>(null);
@@ -259,6 +261,10 @@ export default function useMultiDeviceTranscriber(
             language: recognitionLanguage ?? lang,
           }).catch(() => null);
           if (!isCurrent()) {
+            // 여는 사이 끄거나 떠났으면 늦게 열린 세션이 녹음 중으로 남지 않게 취소한다.
+            if (host) {
+              cancelSession(host.sessionKey);
+            }
             return;
           }
           if (!host) {
@@ -284,15 +290,6 @@ export default function useMultiDeviceTranscriber(
     [isSupported, lang, releaseMicrophone],
   );
 
-  // 녹음을 멈춘다. 녹음 세션은 그대로 두어 다시 켜거나 토론을 끝낼 때 쓴다.
-  const disable = useCallback(() => {
-    generationRef.current += 1;
-    stopTurn();
-    releaseMicrophone();
-    setIsEnabled(false);
-    setIsStarting(false);
-  }, [releaseMicrophone, stopTurn]);
-
   // 녹음을 버린다. 녹음 중인 구간은 올리지 않고, 이 탭에 보관한 녹음 세션도 지운다.
   const discard = useCallback(() => {
     generationRef.current += 1;
@@ -308,6 +305,41 @@ export default function useMultiDeviceTranscriber(
     setIsListening(false);
     setError(null);
   }, [releaseMicrophone, uploader]);
+
+  /**
+   * 녹음을 끈다. 끄면 세션을 끝내므로 진행 중인 구간은 올리지 않고 서버 세션을 취소한 뒤 이 탭의 기록도 지운다.
+   * 청중에게 종료를 알릴 수 있도록 끝낸 세션의 참가 정보를 돌려준다.
+   */
+  const disable = useCallback((): RecordingJoin | null => {
+    const host = getHostRecordingV2(tableIdRef.current);
+    discard();
+    if (host) {
+      cancelSession(host.sessionKey);
+    }
+    return toJoin(host);
+  }, [discard]);
+
+  // 토론 종료 화면이 아닌 곳으로 떠나면 이 탭에 남은 세션을 취소한다.
+  // 새로고침은 언마운트 정리가 돌지 않아 세션이 남고, 다시 켜면 이어서 쓴다.
+  // 지금 주소가 아직 타이머 화면이면(개발 모드의 재마운트 등) 떠난 것이 아니다.
+  useEffect(() => {
+    return () => {
+      const { pathname } = window.location;
+      const tableId = tableIdRef.current;
+      if (
+        isTimerPath(pathname, tableId) ||
+        isDebateEndPath(pathname, tableId)
+      ) {
+        return;
+      }
+      const host = getHostRecordingV2(tableId);
+      if (!host) {
+        return;
+      }
+      clearHostRecordingV2(tableId);
+      cancelSession(host.sessionKey);
+    };
+  }, []);
 
   return {
     isSupported,
@@ -326,6 +358,11 @@ export default function useMultiDeviceTranscriber(
 
 // 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다.
 // 이전 토론에서 끝냈거나 서버에 없는 세션으로 확인되면 지우고, 조회 자체가 실패하면 지우지 않고 오류를 던진다.
+// 취소는 실패해도 이 기기의 정리를 막지 않는다. 남은 세션은 서버가 오래되면 정리한다.
+function cancelSession(sessionKey: string) {
+  void postRecordingCancelV2(sessionKey).catch(() => undefined);
+}
+
 async function findRecordingHost(tableId: number) {
   const host = getHostRecordingV2(tableId);
   if (!host) {

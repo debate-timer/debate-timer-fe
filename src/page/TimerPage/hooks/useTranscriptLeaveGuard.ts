@@ -8,9 +8,16 @@ interface UseTranscriptLeaveGuardParams {
 }
 
 // 언어 접두어와 관계없이 이 테이블의 토론 종료 화면인지 판정한다.
-function isDebateEndPath(pathname: string, tableId: number) {
+export function isDebateEndPath(pathname: string, tableId: number) {
   return (
     buildLangPath(pathname, DEFAULT_LANG) === `/table/customize/${tableId}/end`
+  );
+}
+
+// 언어 접두어와 관계없이 이 테이블의 타이머 화면인지 판정한다.
+export function isTimerPath(pathname: string, tableId: number) {
+  return (
+    buildLangPath(pathname, DEFAULT_LANG) === `/table/customize/${tableId}`
   );
 }
 
