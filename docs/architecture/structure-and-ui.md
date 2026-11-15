@@ -35,6 +35,52 @@ layout → 공용 화면 틀
 3. 다른 화면에서도 같은 호출 계약이 필요해지면 공용 `components/`·`hooks/`로 올림.
 4. UI 없이 계산 가능한 변환·검증은 순수 함수로 분리함.
 
+### 공용 컴포넌트 목록
+
+에이전트가 새 UI를 작성할 때 기존 공용 컴포넌트를 먼저 확인·재사용할 수 있도록 `src/components/`의 이름·위치·용도를 정리함. 새로운 공용 컴포넌트를 `src/components/`에 추가하면 아래 표에 이름·위치·용도를 함께 추가하고, 개별 컴포넌트의 자세한 디자인·Props·호출 계약은 해당 선언의 JSDoc에 작성함.
+
+| 이름 | 위치 | 용도 |
+| --- | --- | --- |
+| `Button` | `src/components/Button/` | 기본 버튼 및 링크(`href`) 공용 액션 |
+| `IconButton` | `src/components/IconButton/` | 아이콘 전용 공용 버튼 |
+| `FloatingActionButton` | `src/components/FloatingActionButton/` | 화면 우하단 등에 떠 있는 액션 버튼 |
+| `RoundControlButton` | `src/components/RoundControlButton/` | 둥근 형태의 보조 제어 버튼 |
+| `GoToDebateEndButton` | `src/components/GoToDebateEndButton/` | 토론 종료 화면으로 이동하는 버튼 |
+| `ToggleButton` | `src/components/ToggleButton/` | 켜기/끄기 상태를 전환하는 스위치 |
+| `Chip` | `src/components/Chip/` | 상태나 짧은 보조 정보를 표시하는 비조작 배지 |
+| `NotificationBadge` | `src/components/NotificationBadge/` | 숫자 기반 알림 카운트 배지 |
+| `Overlay` | `src/components/Overlay/` | 방향별 등장·종료 애니메이션을 제공하는 공용 떠 있는 면 |
+| `ModalFrame` | `src/components/ModalFrame/` | 모달 배경·포커스·닫기 경계를 제공하는 틀 |
+| `DialogModal` | `src/components/DialogModal/` | 확인/취소 등 일반 대화상자 모달 |
+| `SettingsModal` | `src/components/SettingsModal/` | 전역 설정(언어·볼륨·계정·문의) 진입 버튼과 모달 |
+| `ShareModal` | `src/components/ShareModal/` | 시간표 공유 링크 생성·복사 모달 |
+| `UpdateModal` | `src/components/UpdateModal/` | 서비스 업데이트·공지 안내 모달 |
+| `LoginPrompt` | `src/components/LoginPrompt/` | OAuth 로그인 전 계정/게스트 진행 확인 모달 |
+| `DropdownMenu` | `src/components/DropdownMenu/` | 선택 목록을 여닫는 공용 드롭다운 |
+| `ClearableInput` | `src/components/ClearableInput/` | 초기화 버튼이 포함된 텍스트 입력 |
+| `LabeledCheckBox` | `src/components/LabeledCheckBox/` | 레이블 클릭 영역을 포함한 체크박스 |
+| `LabeledRadioButton` | `src/components/LabeledRadioButton/` | 레이블 클릭 영역을 포함한 라디오 버튼 |
+| `CustomRangeSlider` | `src/components/CustomRangeSlider/` | 마우스·터치 드래그와 툴팁을 지원하는 범위 슬라이더 |
+| `VolumeBar` | `src/components/VolumeBar/` | 음소거 토글이 포함된 볼륨 조절 바 |
+| `TimeBox` | `src/components/TimeBox/` | 토론 시간표의 단일 발언·작전시간·자유토론 블록 |
+| `TemplateCard` | `src/components/TemplateCard/` | 프리셋·템플릿 요약 카드 |
+| `TimerProgressBar` | `src/components/TimerProgressBar/` | 타이머 진행률 막대 표시 |
+| `ProsAndConsTitle` | `src/components/ProsAndConsTitle/` | 찬성/반대 진영 제목 표시 |
+| `HeaderTitle` | `src/components/HeaderTitle/` | 헤더 중앙/좌측 제목 표시 |
+| `HeaderTableInfo` | `src/components/HeaderTableInfo/` | 헤더 내 토론 시간표 정보 표시 |
+| `LoadingIndicator` | `src/components/LoadingIndicator/` | 로딩 안내 래퍼 |
+| `LoadingSpinner` | `src/components/LoadingSpinner/` | 회전 로딩 스피너 아이콘 |
+| `Skeleton` | `src/components/Skeleton/` | 로딩 중 자리 표시자 스켈레톤 |
+| `ErrorBoundary` | `src/components/ErrorBoundary/` | 렌더링·비동기 오류 포착 경계 및 오류/404 화면 |
+| `ErrorIndicator` | `src/components/ErrorIndicator/` | 오류 상태 안내 및 재시도 표시 |
+| `CompletionInfoNotice` | `src/components/CompletionInfoNotice/` | 완료·종료 화면의 정보 조회 실패 시 지연 복구 안내 |
+| `GlobalSettingsProvider` | `src/components/GlobalSettingsProvider/` | 전역 설정 컨텍스트·저장소 수명 제공자 |
+| `TranscriptDetail` | `src/components/TranscriptDetail/` | 속기록·AI 요약 보고서 상세 보기 공용 묶음 |
+| `KeyIcon` | `src/components/KeyIcon/` | 단축키 키캡 아이콘 표시 |
+| `SmallIconContainer` | `src/components/SmallIconContainer/` | 작은 아이콘 버튼 감싸기 컨테이너 |
+| `icons` | `src/components/icons/` | 서비스 전용 SVG 아이콘 묶음 |
+| `DesignSystemSample` | `src/components/DesignSystemSample/` | 디자인 시스템 색상 견본 Storybook 보조 컴포넌트 |
+
 ## 상태와 부수 효과
 
 | 상태 종류                                      | 소유 위치                |

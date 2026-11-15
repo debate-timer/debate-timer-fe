@@ -87,7 +87,9 @@ describe('테이블 공유 페이지', () => {
       ).not.toBeInTheDocument(),
     );
     expect(
-      screen.queryByText('공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?'),
+      screen.queryByText(
+        '공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?',
+      ),
     ).not.toBeInTheDocument();
     spy.mockRestore();
   });

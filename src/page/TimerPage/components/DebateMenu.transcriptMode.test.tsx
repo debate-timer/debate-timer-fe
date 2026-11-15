@@ -57,7 +57,7 @@ function Harness() {
     canTranscribe: true,
     stopTimers: () => {},
   });
-  return <DebateMenu controls={controls} />;
+  return <DebateMenu controls={controls} hasTranscriptFlag />;
 }
 
 async function openTranscriptConsent() {
