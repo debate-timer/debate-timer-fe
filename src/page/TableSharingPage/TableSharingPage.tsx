@@ -62,8 +62,10 @@ export default function TableSharingPage() {
   const [asyncError, setAsyncError] = useState<Error | null>(null);
   const processedKeyRef = useRef<string | null>(null);
   const isActionHandledRef = useRef(false);
+  const isDismissedRef = useRef(false);
   const handleModalDismiss = useCallback(() => {
     if (!isActionHandledRef.current) {
+      isDismissedRef.current = true;
       navigate(buildLangPath('/dashboard', lang), { replace: true });
     }
   }, [lang, navigate]);
@@ -200,6 +202,9 @@ export default function TableSharingPage() {
               // 공유받은 테이블을 계정에 저장한 뒤 개요 화면으로 이동한다.
               apiDebateTableRepository.addTable(decodedData).then(
                 (value) => {
+                  if (isDismissedRef.current) {
+                    return;
+                  }
                   isActionHandledRef.current = true;
                   closeModal();
                   sessionDebateTableRepository.deleteTable();
@@ -208,6 +213,9 @@ export default function TableSharingPage() {
                   );
                 },
                 () => {
+                  if (isDismissedRef.current) {
+                    return;
+                  }
                   isActionHandledRef.current = true;
                   closeModal();
                   setAsyncError(
@@ -220,11 +228,17 @@ export default function TableSharingPage() {
               // 공유받은 테이블을 세션에만 저장하고 게스트 플로우로 이어간다.
               sessionDebateTableRepository.addTable(decodedData).then(
                 () => {
+                  if (isDismissedRef.current) {
+                    return;
+                  }
                   isActionHandledRef.current = true;
                   closeModal();
                   navigate(buildLangPath('/overview/customize/guest', lang));
                 },
                 () => {
+                  if (isDismissedRef.current) {
+                    return;
+                  }
                   isActionHandledRef.current = true;
                   closeModal();
                   setAsyncError(

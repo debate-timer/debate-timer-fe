@@ -192,12 +192,17 @@ export default function DropdownMenu<T>(props: DropdownMenuProps<T>) {
             document.querySelectorAll<HTMLElement>(
               'button,input,select,textarea,a[href],[tabindex]',
             ),
-          ).filter(
-            (element) =>
-              element.tabIndex >= 0 &&
-              !element.matches(':disabled') &&
-              !element.closest('[hidden],[inert]'),
-          );
+          ).filter((element) => {
+            if (
+              element.tabIndex < 0 ||
+              element.matches(':disabled') ||
+              element.closest('[hidden],[inert]')
+            ) {
+              return false;
+            }
+            const style = getComputedStyle(element);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+          });
           const index = items.indexOf(buttonRef.current!);
           handleClose();
           items[index + 1]?.focus();

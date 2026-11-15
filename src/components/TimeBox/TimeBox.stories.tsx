@@ -8,21 +8,27 @@ import DTCopy from '../icons/Copy';
 
 const SAMPLE_ACTIONS = (
   <div className="flex items-center gap-1.5">
-    <button type="button" aria-label="수정하기">
-      <SmallIconButtonContainer className="size-[28px] p-[8px]">
-        <DTEdit className="h-full" />
-      </SmallIconButtonContainer>
-    </button>
-    <button type="button" aria-label="삭제하기">
-      <SmallIconButtonContainer className="size-[28px] p-[8px]">
-        <DTDelete className="h-full" />
-      </SmallIconButtonContainer>
-    </button>
-    <button type="button" aria-label="복사하기">
-      <SmallIconButtonContainer className="size-[28px] p-[8px]">
-        <DTCopy className="h-full" />
-      </SmallIconButtonContainer>
-    </button>
+    <SmallIconButtonContainer
+      type="button"
+      aria-label="수정하기"
+      className="size-[28px] p-[8px]"
+    >
+      <DTEdit className="h-full" />
+    </SmallIconButtonContainer>
+    <SmallIconButtonContainer
+      type="button"
+      aria-label="삭제하기"
+      className="size-[28px] p-[8px]"
+    >
+      <DTDelete className="h-full" />
+    </SmallIconButtonContainer>
+    <SmallIconButtonContainer
+      type="button"
+      aria-label="복사하기"
+      className="size-[28px] p-[8px]"
+    >
+      <DTCopy className="h-full" />
+    </SmallIconButtonContainer>
   </div>
 );
 

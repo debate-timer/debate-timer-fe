@@ -67,8 +67,12 @@ export default function CustomRangeSlider(props: CustomRangeSliderProps) {
       1,
       Math.max(0, (event.clientX - rect.left) / rect.width),
     );
-    const stepped = min + Math.round((ratio * range) / safeStep) * safeStep;
-    const next = Number(Math.min(safeMax, Math.max(min, stepped)).toFixed(10));
+    const maxStepIndex = Math.max(0, Math.floor(range / safeStep));
+    const stepIndex = Math.min(
+      maxStepIndex,
+      Math.max(0, Math.round((ratio * range) / safeStep)),
+    );
+    const next = Number((min + stepIndex * safeStep).toFixed(10));
     if (next !== clampedValue) {
       hasUncommittedChangeRef.current = true;
       onValueChange(next);

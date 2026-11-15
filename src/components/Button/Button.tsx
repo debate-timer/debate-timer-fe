@@ -1,16 +1,27 @@
-import { ButtonHTMLAttributes, Ref } from 'react';
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, Ref } from 'react';
 import clsx from 'clsx';
 
 type ButtonVariant =
-  'primary' | 'secondary' | 'neutral' | 'dark' | 'light' | 'text';
+  | 'primary'
+  | 'secondary'
+  | 'neutral'
+  | 'dark'
+  | 'light'
+  | 'text';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  ref?: Ref<HTMLButtonElement>;
+export interface ButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'onClick'
+> {
+  ref?: Ref<HTMLButtonElement> | Ref<HTMLAnchorElement>;
   'aria-label': string;
   variant?: ButtonVariant;
   size?: 'default' | 'large';
   shape?: 'pill' | 'rounded';
   iconOnly?: boolean;
+  onClick?:
+    | ButtonHTMLAttributes<HTMLButtonElement>['onClick']
+    | AnchorHTMLAttributes<HTMLAnchorElement>['onClick'];
   /** 전달 시 시맨틱 `<a>` 링크 요소로 렌더링함. */
   href?: string;
   target?: string;
@@ -68,6 +79,7 @@ export default function Button(props: ButtonProps) {
     href,
     target,
     rel,
+    disabled,
     className,
     ...rest
   } = props;
@@ -88,19 +100,32 @@ export default function Button(props: ButtonProps) {
     className,
   );
   if (isLink) {
+    const { ref, ...anchorRest } =
+      rest as AnchorHTMLAttributes<HTMLAnchorElement> & {
+        ref?: Ref<HTMLAnchorElement>;
+      };
     return (
       <a
+        {...anchorRest}
+        ref={ref}
         href={href}
         target={target}
         rel={rel}
-        aria-label={rest['aria-label']}
-        title={rest.title}
-        id={rest.id}
         className={classes}
-      >
-        {rest.children}
-      </a>
+      />
     );
   }
-  return <button {...rest} type={type} className={classes} />;
+  const { ref, ...buttonRest } =
+    rest as ButtonHTMLAttributes<HTMLButtonElement> & {
+      ref?: Ref<HTMLButtonElement>;
+    };
+  return (
+    <button
+      {...buttonRest}
+      ref={ref}
+      type={type}
+      disabled={disabled}
+      className={classes}
+    />
+  );
 }

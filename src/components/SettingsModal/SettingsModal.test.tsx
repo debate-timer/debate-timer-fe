@@ -15,6 +15,23 @@ import { MemoryRouter } from 'react-router-dom';
 import SettingsModal from './SettingsModal';
 import GlobalSettingsProvider from '../GlobalSettingsProvider/GlobalSettingsProvider';
 import { GlobalPortal } from '../../util/GlobalPortal';
+
+const { mockInquiryLinks } = vi.hoisted(() => ({
+  mockInquiryLinks: [
+    { label: '문의하기', url: 'https://example.com/inquiry' },
+    { label: '서비스 개선 의견', url: 'https://example.com/feedback' },
+  ] as Array<{ label: string; url: string }>,
+}));
+
+vi.mock('../../constants/urls', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../constants/urls')>();
+  return {
+    ...actual,
+    get INQUIRY_LINKS() {
+      return mockInquiryLinks;
+    },
+  };
+});
 function renderSettings(path = '/home', onLogout?: () => Promise<void>) {
   return render(
     <QueryClientProvider client={new QueryClient()}>

@@ -79,13 +79,12 @@ describe('테이블 공유 페이지', () => {
   it('로그인 상태에서 잘못된 data로 진입하면 빈 모달 대신 오류 화면을 표시한다', async () => {
     setAccessToken('token');
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    renderTableSharing('/share?data=invalid-data');
+    const router = renderTableSharing('/share?data=invalid-data');
 
-    await waitFor(() =>
-      expect(
-        screen.queryByText('데이터를 처리하고 있습니다...'),
-      ).not.toBeInTheDocument(),
-    );
+    expect(
+      await screen.findByText('공유된 데이터가 비어 있어요.'),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/share');
     expect(
       screen.queryByText(
         '공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?',
@@ -111,13 +110,12 @@ describe('테이블 공유 페이지', () => {
       new Error('network error'),
     );
 
-    renderTableSharing('/share');
+    const router = renderTableSharing('/share');
 
-    await waitFor(() =>
-      expect(
-        screen.queryByText('데이터를 처리하고 있습니다...'),
-      ).not.toBeInTheDocument(),
-    );
+    expect(
+      await screen.findByText('공유받은 테이블을 저장하지 못했어요.'),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/share');
     spy.mockRestore();
   });
 
