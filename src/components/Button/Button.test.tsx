@@ -1,8 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Button from './Button';
+import { createRef } from 'react';
 
 describe('공용 버튼', () => {
+  it('외부 ref로 버튼에 포커스를 복귀시킬 수 있다', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(
+      <Button ref={ref} aria-label="설정">
+        설정
+      </Button>,
+    );
+    ref.current?.focus();
+    expect(screen.getByRole('button', { name: '설정' })).toHaveFocus();
+  });
   it('폼 안에서도 기본 클릭으로 제출하지 않고 이름과 속성을 전달한다', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
@@ -41,5 +52,24 @@ describe('공용 버튼', () => {
     );
     await user.click(screen.getByRole('button'));
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('href가 전달되면 링크 요소로 렌더링하고 target·rel·접근 가능한 이름을 유지한다', () => {
+    render(
+      <Button
+        href="https://example.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        variant="neutral"
+        shape="rounded"
+        aria-label="일반 문의"
+      >
+        일반 문의
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: '일반 문의' });
+    expect(link).toHaveAttribute('href', 'https://example.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });

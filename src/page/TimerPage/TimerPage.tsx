@@ -1,5 +1,8 @@
 import { parsePositiveId } from '../../util/headerNavigation';
+import useBeforeUnloadGuard from '../../hooks/useBeforeUnloadGuard';
 import TimerHeader from '../../layout/components/header/TimerHeader';
+import IconButton from '../../components/IconButton/IconButton';
+import { HEADER_ICON_BUTTON_CLASS } from '../../layout/components/header/headerActionStyles';
 import TimerHeaderTools from '../../layout/components/header/TimerHeaderTools';
 import DebateMenu from './components/DebateMenu';
 import DebateFeatureIndicators from './components/DebateFeatureIndicators';
@@ -23,7 +26,6 @@ import { FirstUseToolTipModal } from './components/FirstUseToolTipModal';
 import { LoginAndStoreModal } from './components/LoginAndStoreModal';
 import { useTimerPageModal } from './hooks/useTimerPageModal';
 import { bgColorMap } from '../../types/type';
-import DTHelp from '../../components/icons/Help';
 import clsx from 'clsx';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
@@ -41,6 +43,7 @@ import TranscriptLeaveModal from './components/TranscriptLeaveModal';
 import useTranscriptLeaveGuard from './hooks/useTranscriptLeaveGuard';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { toRecognitionLang } from '../../util/speechRecognition';
+import { IoHelpCircleSharp } from 'react-icons/io5';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = true;
@@ -68,6 +71,7 @@ export default function TimerPage() {
 }
 
 function TimerPageSession() {
+  useBeforeUnloadGuard();
   const { t, i18n } = useTranslation();
   const pathParams = useParams();
   useEnsureGuestTable(pathParams.id);
@@ -400,6 +404,7 @@ function TimerPageSession() {
           />
           <DebateMenu
             controls={controls}
+            hasTranscriptFlag={hasTranscriptFlag}
             shareUnavailableReason={
               !isMemberFlow ? t('회원만 사용할 수 있는 기능입니다.') : undefined
             }
@@ -419,15 +424,15 @@ function TimerPageSession() {
                 : undefined
             }
           />
-          <button
-            type="button"
+          <IconButton
+            className={HEADER_ICON_BUTTON_CLASS}
+            variant="secondary"
+            shape="rounded"
             aria-label={t('도움말')}
             title={t('도움말')}
-            className="flex size-11 items-center justify-center rounded-xl border border-neutral-300 p-2"
             onClick={openUseTooltipModal}
-          >
-            <DTHelp className="size-6" />
-          </button>
+            icon={<IoHelpCircleSharp aria-hidden="true" />}
+          />
         </TimerHeaderTools>
       }
     />

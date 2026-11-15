@@ -1,34 +1,75 @@
 import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RiFullscreenExitFill, RiFullscreenFill } from 'react-icons/ri';
 import {
-  RiFullscreenExitFill,
-  RiFullscreenFill,
-  RiVolumeMuteFill,
-} from 'react-icons/ri';
+  IoVolumeMuteSharp,
+  IoVolumeLowSharp,
+  IoVolumeMediumSharp,
+  IoVolumeHighSharp,
+} from 'react-icons/io5';
 import useFullscreen from '../../../hooks/useFullscreen';
 import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import SettingsModal from '../../../components/SettingsModal/SettingsModal';
-import DTVolume from '../../../components/icons/Volume';
+import CustomRangeSlider from '../../../components/CustomRangeSlider/CustomRangeSlider';
+import TimerDashboardButton from './TimerDashboardButton';
+import IconButton from '../../../components/IconButton/IconButton';
+import Overlay from '../../../components/Overlay/Overlay';
+import { HEADER_ICON_BUTTON_CLASS } from './headerActionStyles';
 
 interface TimerHeaderToolsProps extends PropsWithChildren {
   onLogout?: () => Promise<void>;
   onLogin?: () => void;
 }
-const BUTTON_CLASS =
-  'flex size-11 shrink-0 items-center justify-center rounded-xl border border-neutral-300 p-2 text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2';
-const VOLUME_CLASS =
-  'absolute top-full right-0 z-40 mt-2 w-64 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg';
+const VOLUME_CLASS = 'absolute top-full right-0 z-40 mt-2 w-64';
 
-/** 세 타이머 화면의 전체 화면·공용 음량·설정을 연결함. 토론 정리는 전달받은 콜백에 위임함. */
+/**
+ * 세 타이머 화면의 전체 화면·공용 음량·대시보드 이동 확인·설정을 연결함.
+ * 음량은 제목 아래 아이콘 버튼과 공용 슬라이더를 가로로 배치하며 UI 0~10을 설정값 0~1로 변환함.
+ * 아이콘은 0·1~3·4~6·7~10을 음소거·작음·중간·큼으로 구분함.
+ * 음소거 해제는 이 헤더 수명에서 마지막 양수 음량을 복원하며 기록이 없으면 5를 사용함.
+ * 토론 정리는 전달받은 콜백에 위임함.
+ */
 export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
   const { children, onLogin, onLogout } = props;
   const { t } = useTranslation();
   const { isFullscreen, toggleFullscreen } = useFullscreen();
   const { volume, controller } = useGlobalSettings();
+  const volumeLevel = Math.round(volume * 10);
+  const volumeIconLevel =
+    volumeLevel === 0
+      ? 'mute'
+      : volumeLevel <= 3
+        ? 'low'
+        : volumeLevel <= 6
+          ? 'medium'
+          : 'high';
+  const VolumeIcon =
+    volumeIconLevel === 'mute'
+      ? IoVolumeMuteSharp
+      : volumeIconLevel === 'low'
+        ? IoVolumeLowSharp
+        : volumeIconLevel === 'medium'
+          ? IoVolumeMediumSharp
+          : IoVolumeHighSharp;
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
   const lastVolumeRef = useRef(0.5);
   const volumeRef = useRef<HTMLDivElement>(null);
   const volumeTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (volumeLevel > 0) {
+      lastVolumeRef.current = volume;
+    }
+  }, [volume, volumeLevel]);
+  const handleVolumeChange = (level: number) => {
+    if (level > 0) {
+      lastVolumeRef.current = level / 10;
+    }
+    controller.change({ volume: level / 10 });
+  };
+  const handleMute = () => {
+    controller.change({ volume: volumeLevel > 0 ? 0 : lastVolumeRef.current });
+    void controller.flush();
+  };
   useEffect(() => {
     if (!isVolumeOpen) {
       return;
@@ -63,84 +104,86 @@ export default function TimerHeaderTools(props: TimerHeaderToolsProps) {
   return (
     <>
       {children}
-      <button
-        type="button"
+      <IconButton
+        className={HEADER_ICON_BUTTON_CLASS}
+        variant="secondary"
+        shape="rounded"
         aria-label={t(isFullscreen ? '전체 화면 해제' : '전체 화면')}
-        className={BUTTON_CLASS}
         onClick={() => void toggleFullscreen()}
-      >
-        {isFullscreen ? (
-          <RiFullscreenExitFill className="size-6" aria-hidden="true" />
-        ) : (
-          <RiFullscreenFill className="size-6" aria-hidden="true" />
-        )}
-      </button>
+        icon={
+          isFullscreen ? (
+            <RiFullscreenExitFill aria-hidden="true" />
+          ) : (
+            <RiFullscreenFill aria-hidden="true" />
+          )
+        }
+      />
       <div
         ref={volumeRef}
         className="relative"
         data-timer-overlay={isVolumeOpen ? '' : undefined}
       >
-        <button
+        <IconButton
+          className={HEADER_ICON_BUTTON_CLASS}
           ref={volumeTrigger}
-          type="button"
+          variant="secondary"
+          shape="rounded"
           aria-label={t('볼륨 조절')}
           aria-expanded={isVolumeOpen}
-          className={BUTTON_CLASS}
           onClick={() => setIsVolumeOpen((current) => !current)}
+          icon={
+            <VolumeIcon
+              data-testid={
+                volumeLevel === 0 ? 'volume-icon-muted' : 'volume-icon-normal'
+              }
+              aria-hidden="true"
+            />
+          }
+        />
+        <Overlay
+          isOpen={isVolumeOpen}
+          className={VOLUME_CLASS}
+          direction="down"
         >
-          {volume === 0 ? (
-            <RiVolumeMuteFill
-              data-testid="volume-icon-muted"
-              className="size-6"
-              aria-hidden="true"
+          <h3 className="mb-3 text-ui-label">{t('음량')}</h3>
+          <div className="flex items-center gap-1">
+            <IconButton
+              variant="text"
+              shape="rounded"
+              className="size-11! shrink-0 [&>svg]:size-6!"
+              aria-label={t(volumeLevel === 0 ? '음소거 해제' : '음소거')}
+              title={t(volumeLevel === 0 ? '음소거 해제' : '음소거')}
+              onClick={handleMute}
+              icon={
+                <VolumeIcon
+                  data-testid={`volume-control-icon-${volumeIconLevel}`}
+                  aria-hidden="true"
+                />
+              }
             />
-          ) : (
-            <DTVolume
-              data-testid="volume-icon-normal"
-              className="size-6"
-              aria-hidden="true"
-            />
-          )}
-        </button>
-        {isVolumeOpen && (
-          <div className={VOLUME_CLASS}>
-            <label className="flex flex-col gap-2">
-              {t('음량')}
-              <input
-                type="range"
-                min="0"
-                max="10"
-                step="1"
-                value={Math.round(volume * 10)}
-                onChange={(event) =>
-                  controller.change({ volume: Number(event.target.value) / 10 })
-                }
-                onPointerUp={() => void controller.flush()}
-                onKeyUp={() => void controller.flush()}
-                onBlur={() => void controller.flush()}
+            <div className="flex min-w-0 flex-1">
+              <CustomRangeSlider
+                ariaLabel={t('음량')}
+                min={0}
+                max={10}
+                step={1}
+                value={volumeLevel}
+                onValueChange={handleVolumeChange}
+                onValueCommit={() => void controller.flush()}
               />
-              <output>{Math.round(volume * 10)}</output>
-            </label>
-            <button
-              type="button"
-              aria-label={t(volume === 0 ? '음소거 해제' : '음소거')}
-              title={t(volume === 0 ? '음소거 해제' : '음소거')}
-              onClick={() => {
-                if (volume > 0) {
-                  lastVolumeRef.current = volume;
-                }
-                controller.change({
-                  volume: volume > 0 ? 0 : lastVolumeRef.current,
-                });
-                void controller.flush();
-              }}
-            >
-              {t(volume === 0 ? '음소거 해제' : '음소거')}
-            </button>
+            </div>
+            <output className="w-6 shrink-0 text-right text-ui-label text-neutral-700 tabular-nums">
+              {volumeLevel}
+            </output>
           </div>
-        )}
+        </Overlay>
       </div>
-      <SettingsModal onLogin={onLogin} onLogout={onLogout} />
+      <TimerDashboardButton />
+      <SettingsModal
+        triggerClassName={HEADER_ICON_BUTTON_CLASS}
+        onLogin={onLogin}
+        onLogout={onLogout}
+      />
     </>
   );
 }

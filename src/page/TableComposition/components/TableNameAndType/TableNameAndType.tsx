@@ -24,6 +24,11 @@ interface TableNameAndTypeProps {
   onButtonClick: () => void;
 }
 
+const FORM_GRID_CLASS =
+  'mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] items-start gap-x-4 gap-y-12 p-6 md:p-8';
+const FIELD_LABEL_CLASS =
+  'flex min-h-12 items-center text-ui-label md:text-ui-title';
+
 export default function TableNameAndType(props: TableNameAndTypeProps) {
   const { t } = useTranslation();
   const {
@@ -109,10 +114,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             })}
           />
         </div>
-        <section className="mx-auto grid w-full max-w-4xl grid-cols-[180px_1fr] gap-x-4 gap-y-12 p-6 md:p-8">
-          <label className="flex items-center text-base font-semibold md:text-2xl">
-            {t('토론 시간표 이름')}
-          </label>
+        <section className={FORM_GRID_CLASS}>
+          <label className={FIELD_LABEL_CLASS}>{t('토론 시간표 이름')}</label>
           <ClearableInput
             id="table-name"
             value={t(info.name)}
@@ -125,9 +128,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
             maxCount={TABLE_FIELD_LIMITS.name}
           />
 
-          <label className="flex items-center text-base font-semibold md:text-2xl">
-            {t('토론 주제')}
-          </label>
+          <label className={FIELD_LABEL_CLASS}>{t('토론 주제')}</label>
           <ClearableInput
             id="table-agenda"
             value={t(info.agenda)}
@@ -141,10 +142,8 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
           />
 
           <>
-            <label className="flex items-center text-base font-semibold md:text-2xl">
-              {t('팀명')}
-            </label>
-            <div className="flex items-center gap-8">
+            <label className={FIELD_LABEL_CLASS}>{t('팀명')}</label>
+            <div className="flex items-start gap-8">
               <ClearableInput
                 id="table-pros-team"
                 value={t(info.prosTeamName) || ''}
@@ -162,7 +161,7 @@ export default function TableNameAndType(props: TableNameAndTypeProps) {
                 maxCount={TABLE_FIELD_LIMITS.teamName}
               />
 
-              <span>vs.</span>
+              <span className="flex h-12 shrink-0 items-center">vs.</span>
               <ClearableInput
                 id="table-cons-team"
                 value={t(info.consTeamName) || ''}

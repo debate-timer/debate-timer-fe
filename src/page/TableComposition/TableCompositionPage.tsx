@@ -10,11 +10,13 @@ import { DebateInfo, TimeBoxInfo } from '../../types/type';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import { isGuestFlow } from '../../util/sessionStorage';
+import useBeforeUnloadGuard from '../../hooks/useBeforeUnloadGuard';
 
 export type TableCompositionStep = 'NameAndType' | 'TimeBox';
 type Mode = 'edit' | 'add';
 
 export default function TableCompositionPage() {
+  useBeforeUnloadGuard();
   const { t } = useTranslation();
   // URL 등으로부터 "editMode"와 "tableId"를 추출
   const [searchParams] = useSearchParams();

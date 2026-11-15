@@ -2,6 +2,7 @@ import { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import Button from './Button';
 import DTEdit from '../icons/Edit';
+import IconButton from '../IconButton/IconButton';
 
 const META: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -16,21 +17,17 @@ export const Primary: Story = {};
 export const Secondary: Story = { args: { variant: 'secondary' } };
 export const Neutral: Story = { args: { variant: 'neutral' } };
 export const Large: Story = { args: { size: 'large' } };
-export const Icon: Story = {
-  args: {
-    shape: 'icon',
-    variant: 'neutral',
-    children: <DTEdit aria-hidden="true" />,
-    'aria-label': '수정하기',
-  },
-};
-export const LargeIcon: Story = { args: { ...Icon.args, size: 'large' } };
+export const Rounded: Story = { args: { shape: 'rounded' } };
 export const FooterButtons: Story = {
   render: () => (
     <div className="flex w-[min(800px,calc(100vw-32px))] gap-2">
-      <Button size="large" shape="icon" variant="neutral" aria-label="수정하기">
-        <DTEdit aria-hidden="true" />
-      </Button>
+      <IconButton
+        size="large"
+        shape="circle"
+        variant="neutral"
+        aria-label="수정하기"
+        icon={<DTEdit aria-hidden="true" />}
+      />
       <Button size="large" className="min-w-0 flex-1" aria-label="토론하기">
         토론하기
       </Button>
@@ -65,4 +62,8 @@ export const LongLabel: Story = {
       </div>
     ),
   ],
+};
+export const RoundedLongLabel: Story = {
+  ...LongLabel,
+  args: { ...LongLabel.args, shape: 'rounded' },
 };

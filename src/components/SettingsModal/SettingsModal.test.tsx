@@ -15,6 +15,23 @@ import { MemoryRouter } from 'react-router-dom';
 import SettingsModal from './SettingsModal';
 import GlobalSettingsProvider from '../GlobalSettingsProvider/GlobalSettingsProvider';
 import { GlobalPortal } from '../../util/GlobalPortal';
+
+const { mockInquiryLinks } = vi.hoisted(() => ({
+  mockInquiryLinks: [
+    { label: '문의하기', url: 'https://example.com/inquiry' },
+    { label: '서비스 개선 의견', url: 'https://example.com/feedback' },
+  ] as Array<{ label: string; url: string }>,
+}));
+
+vi.mock('../../constants/urls', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../constants/urls')>();
+  return {
+    ...actual,
+    get INQUIRY_LINKS() {
+      return mockInquiryLinks;
+    },
+  };
+});
 function renderSettings(path = '/home', onLogout?: () => Promise<void>) {
   return render(
     <QueryClientProvider client={new QueryClient()}>
@@ -42,6 +59,56 @@ describe('설정 모달', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+  it('드롭다운 메뉴로 언어를 변경할 수 있고 열린 상태에서 Escape는 드롭다운만 닫는다', async () => {
+    const user = userEvent.setup();
+    renderSettings();
+    await user.click(screen.getByRole('button', { name: '설정' }));
+
+    const languageTrigger = screen.getByRole('button', {
+      name: /언어 선택/,
+    });
+    await user.click(languageTrigger);
+
+    const listbox = screen.getByRole('listbox');
+    expect(listbox).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(languageTrigger).toHaveFocus();
+
+    await user.click(languageTrigger);
+    await user.click(screen.getByRole('option', { name: 'English' }));
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(languageTrigger).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('English'),
+    );
+  });
+  it('닫기 버튼은 텍스트 기호 대신 아이콘과 충분한 조작 영역을 사용한다', async () => {
+    const user = userEvent.setup();
+    renderSettings();
+    await user.click(screen.getByRole('button', { name: '설정' }));
+    const closeButton = screen.getByRole('button', { name: '모달 닫기' });
+    expect(closeButton).toHaveAttribute('type', 'button');
+    expect(closeButton).not.toHaveTextContent('×');
+    expect(closeButton.querySelector('svg')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+  });
+  it('문의 링크는 밑줄 대신 외부 링크 아이콘을 함께 표시한다', async () => {
+    const user = userEvent.setup();
+    renderSettings();
+    await user.click(screen.getByRole('button', { name: '설정' }));
+    const links = screen.getAllByRole('link');
+    expect(links.length).toBeGreaterThan(0);
+    links.forEach((link) => {
+      expect(link).not.toHaveClass('underline');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    });
   });
   it('음량 변경을 닫을 때 저장하고 다시 열어 유지한다', async () => {
     const user = userEvent.setup();

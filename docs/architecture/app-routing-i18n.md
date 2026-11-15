@@ -39,6 +39,8 @@
 | 언어 정규화    | `src/routes/LanguageWrapper.tsx`  | 기본 언어 접두어를 없애고 i18n 상태를 맞춤    |
 | 화면 입력 처리 | 각 `src/page/` 컴포넌트           | URL 값을 검증한 뒤 기능 훅에 전달함           |
 
+기본 타이머와 시간표 작성 화면의 문서 이탈 경고는 공용 `src/hooks/useBeforeUnloadGuard.ts`가 `beforeunload` 구독·해제를 소유함. SPA 내부 이동은 처리하지 않으며 적용 정책과 브라우저 한계는 [탐색 위키](../wiki/feature/navigation.md#브라우저-문서-이탈-보호)를 따름. 속기록의 앱 내부 이탈 보호는 기존 페이지 전용 훅이 소유함.
+
 ### 피쳐 플래그
 
 회원별로 여는 기능은 `src/types/featureFlag.ts`의 `FeatureFlag`로 표현함.

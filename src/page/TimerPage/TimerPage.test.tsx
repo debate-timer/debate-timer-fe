@@ -38,6 +38,59 @@ function renderTimerPage(id = '5') {
 }
 
 describe('TimerPage - 헤더 음소거 아이콘', () => {
+  it('슬라이더로 0이 된 뒤 마지막 양수 볼륨을 복원하고 다시 음소거한다', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem('timer-volume', '0.8');
+    renderTimerPage();
+    await user.click(screen.getByRole('button', { name: '볼륨 조절' }));
+    expect(screen.getByRole('heading', { name: '음량' })).toBeInTheDocument();
+    const slider = screen.getByRole('slider', { name: '음량' });
+    fireEvent.change(slider, { target: { value: '7' } });
+    fireEvent.change(slider, { target: { value: '0' } });
+    await user.click(screen.getByRole('button', { name: '음소거 해제' }));
+    expect(slider).toHaveValue('7');
+    await user.click(screen.getByRole('button', { name: '음소거' }));
+    expect(slider).toHaveValue('0');
+  });
+
+  it('처음부터 음소거이면 기본 볼륨 5로 복원한다', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem('timer-volume', '0');
+    renderTimerPage();
+    await user.click(screen.getByRole('button', { name: '볼륨 조절' }));
+    await user.click(screen.getByRole('button', { name: '음소거 해제' }));
+    expect(screen.getByRole('slider', { name: '음량' })).toHaveValue('5');
+  });
+
+  it.each([
+    [0, 'mute'],
+    [1, 'low'],
+    [3, 'low'],
+    [4, 'medium'],
+    [6, 'medium'],
+    [7, 'high'],
+    [10, 'high'],
+  ])('볼륨 %s에 맞는 %s 아이콘을 표시한다', async (level, icon) => {
+    const user = userEvent.setup();
+    renderTimerPage();
+    await user.click(screen.getByRole('button', { name: '볼륨 조절' }));
+    fireEvent.change(screen.getByRole('slider', { name: '음량' }), {
+      target: { value: String(level) },
+    });
+    expect(
+      screen.getByTestId(`volume-control-icon-${icon}`),
+    ).toBeInTheDocument();
+  });
+  it('속기록을 켜지 않아도 문서 이탈을 경고하고 언마운트 시 해제한다', () => {
+    const { unmount } = renderTimerPage();
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    unmount();
+    const afterLeave = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(afterLeave);
+    expect(afterLeave.defaultPrevented).toBe(false);
+  });
   beforeEach(() => {
     localStorage.clear();
     // 첫 방문 모달이 테스트를 방해하지 않도록 방문 기록 설정
@@ -144,7 +197,7 @@ describe('기본 타이머의 토론 메뉴 연결', () => {
     await user.keyboard('{Escape}');
     expect(screen.getByRole('button', { name: '토론 메뉴' })).toHaveFocus();
   });
-  it('권한 없는 회원에게 속기 실행 불가 이유를 제공한다', async () => {
+  it('속기록 피쳐 플래그가 없는 회원에게 메뉴 항목을 숨긴다', async () => {
     server.use(
       http.get(`${ApiUrl.member}/feature-flags`, () =>
         HttpResponse.json({ featureFlags: [] }),
@@ -153,10 +206,12 @@ describe('기본 타이머의 토론 메뉴 연결', () => {
     const user = userEvent.setup();
     renderTimerPage();
     await user.click(await screen.findByRole('button', { name: '토론 메뉴' }));
-    expect(screen.getByRole('button', { name: '속기록' })).toBeDisabled();
     expect(
-      screen.getByText('사용 권한이 필요한 기능입니다.'),
-    ).toBeInTheDocument();
+      screen.queryByRole('button', { name: '속기록' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: '속기록' }),
+    ).not.toBeInTheDocument();
   });
 });
 

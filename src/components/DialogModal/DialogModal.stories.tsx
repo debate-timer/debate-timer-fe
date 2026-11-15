@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import DialogModal from './DialogModal';
+import { useModal } from '../../hooks/useModal';
 
 const meta: Meta<typeof DialogModal> = {
   title: 'components/DialogModal',
@@ -30,6 +31,31 @@ export default meta;
 type Story = StoryObj<typeof DialogModal>;
 
 export const Default: Story = {};
+export const InModalWrapper: Story = {
+  render: function DialogInModalWrapper(args) {
+    const { openModal, closeModal, ModalWrapper } = useModal({
+      isCloseButtonExist: false,
+    });
+    return (
+      <>
+        <button type="button" aria-label="확인창 열기" onClick={openModal}>
+          확인창 열기
+        </button>
+        <ModalWrapper aria-label="이탈 확인">
+          <DialogModal
+            {...args}
+            left={{ text: '취소', onClick: closeModal }}
+            right={{ text: '확인', onClick: closeModal }}
+          >
+            <p className="p-6 text-ui-body">
+              토론이 진행 중입니다. 이탈하시겠습니까?
+            </p>
+          </DialogModal>
+        </ModalWrapper>
+      </>
+    );
+  },
+};
 export const SingleRightButton: Story = { args: { left: undefined } };
 export const SingleLeftButton: Story = { args: { right: undefined } };
 export const WithoutButtons: Story = {

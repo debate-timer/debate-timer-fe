@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import HeaderDebateInfo from '../../layout/components/header/HeaderDebateInfo';
 import usePatchDebateTable from '../../hooks/mutations/usePatchDebateTable';
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
-import TimeBox from '../TableComposition/components/TimeBox/TimeBox';
+import TimeBox from '../../components/TimeBox/TimeBox';
 import { useTableShare } from '../../hooks/useTableShare';
 import { CoinState, StanceToString } from '../../types/type';
 import { isGuestFlow } from '../../util/sessionStorage';
@@ -18,6 +18,7 @@ import Coins from '../../assets/teamSelection/coins.png';
 import TeamSelectionModal from './components/TeamSelectionModal/TeamSelectionModal';
 import { useModal } from '../../hooks/useModal';
 import Button from '../../components/Button/Button';
+import IconButton from '../../components/IconButton/IconButton';
 import { useState, useCallback } from 'react';
 import {
   buildLangPath,
@@ -133,12 +134,7 @@ export default function TableOverviewPage() {
 
               <div className="flex w-full flex-col gap-2">
                 {data?.table.map((info, index) => (
-                  <TimeBox
-                    key={index}
-                    info={info}
-                    prosTeamName={data.info.prosTeamName}
-                    consTeamName={data.info.consTeamName}
-                  />
+                  <TimeBox key={index} info={info} />
                 ))}
               </div>
             </section>
@@ -163,11 +159,12 @@ export default function TableOverviewPage() {
 
         <DefaultLayout.StickyFooterWrapper>
           <div className="mx-auto mt-2 mb-8 flex w-full max-w-4xl items-center justify-between gap-2">
-            <Button
+            <IconButton
               variant="neutral"
               aria-label={t('공유하기')}
               size="large"
-              shape="icon"
+              shape="circle"
+              icon={<DTShare aria-hidden="true" />}
               disabled={isLoading}
               onClick={() => {
                 // 공유 버튼 클릭 시 table_shared 이벤트를 기록한다.
@@ -176,14 +173,13 @@ export default function TableOverviewPage() {
                 });
                 openShareModal();
               }}
-            >
-              <DTShare className="size-6" aria-hidden="true" />
-            </Button>
-            <Button
+            />
+            <IconButton
               variant="neutral"
               aria-label={t('토론 정보 수정하기')}
               size="large"
-              shape="icon"
+              shape="circle"
+              icon={<DTEdit aria-hidden="true" />}
               disabled={isLoading}
               onClick={() => {
                 if (isGuestFlow()) {
@@ -202,9 +198,7 @@ export default function TableOverviewPage() {
                   );
                 }
               }}
-            >
-              <DTEdit className="size-6" aria-hidden="true" />
-            </Button>
+            />
             <div className="flex w-full space-x-2">
               <Button
                 aria-label={t('토론하기')}

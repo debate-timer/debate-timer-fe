@@ -1,4 +1,6 @@
 {
+  "토론이 진행 중입니다. 이탈하시겠습니까?": "A debate is in progress. Are you sure you want to leave?",
+  "범위 조절": "Adjust range",
   "입력 내용 지우기": "Clear input",
   "대화상자": "Dialog",
   "토론 타이머 화면 공유": "Share Debate Timer Screen",
@@ -431,6 +433,8 @@
   "English": "English",
   "실시간 공유": "Live sharing",
   "답변 시간": "Answer time",
+  "답변 시간 타이머": "Answer time timer",
+  "교차 조사 또는 주도권 토론 등에서 답변자에게 최소한의 답변 시간을 보장해줘야 할 때 사용합니다.": "Use this to guarantee respondents a minimum amount of time to answer during cross-examination or speaker-led discussions.",
   "토론 메뉴": "Debate menu",
   "토론 기능 상태": "Debate feature status",
   "비활성화": "Inactive",

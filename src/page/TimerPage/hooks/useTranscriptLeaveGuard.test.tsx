@@ -110,13 +110,13 @@ describe('토론 기록 이탈 방지 훅(useTranscriptLeaveGuard)은', () => {
       },
     );
 
-    it('새로고침·탭 닫기 시 브라우저 이탈 확인을 요청한다', () => {
+    it('문서 이탈 경고는 페이지에 위임하고 별도로 등록하지 않는다', () => {
       renderGuard(true);
       const event = new Event('beforeunload', { cancelable: true });
 
       window.dispatchEvent(event);
 
-      expect(event.defaultPrevented).toBe(true);
+      expect(event.defaultPrevented).toBe(false);
     });
   });
 

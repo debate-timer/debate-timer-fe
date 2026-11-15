@@ -8,7 +8,7 @@ interface HeaderDebateInfoProps {
 }
 
 const BUTTON_CLASS =
-  'w-full min-w-0 rounded-lg text-start focus-visible:outline-2 focus-visible:outline-offset-2';
+  'flex w-full min-w-0 items-center rounded-lg text-start focus-visible:outline-2 focus-visible:outline-offset-2';
 const EXPANDED_CLASS =
   'max-h-[40dvh] overflow-y-auto break-words whitespace-pre-wrap';
 
@@ -29,7 +29,7 @@ export default function HeaderDebateInfo(props: HeaderDebateInfoProps) {
     >
       <span
         id={contentId}
-        className={clsx('block', isExpanded && EXPANDED_CLASS)}
+        className={clsx('block w-full min-w-0', isExpanded && EXPANDED_CLASS)}
       >
         <span
           className={clsx(

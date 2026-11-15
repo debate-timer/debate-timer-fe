@@ -54,8 +54,8 @@ Tailwind CSS 4 설정은 `src/index.css`가 소유함. 공통 Vite 설정의
 `@tailwindcss/vite` 플러그인이 앱과 Storybook에 한 번씩 적용됨. 클래스 탐색은
 `source(none)`과 `@source './'`로 `src`에 한정함. 색상·글꼴·글자 크기·그림자·
 애니메이션은 `@theme`, 배경 이미지는 `@utility`로 등록함. `@apply`에는 등록된
-utility를 사용하며 일반 CSS 선택자를 참조하지 않음. 기존 `.button`·`.timebox`·
-글자 스타일 선택자는 우선순위를 유지하기 위해 계층 밖에 둠. 기본 문단 줄바꿈은
+utility를 사용하며 일반 CSS 선택자를 참조하지 않음. 기존 `.button`·글자 스타일
+선택자는 우선순위를 유지하기 위해 계층 밖에 둠. 기본 문단 줄바꿈은 `base` 계층에 두어
 `base` 계층에 두어 `truncate`·`whitespace-*` utility가 우선하도록 함.
 
 화면 조건은 `md` 768px 이상, `lg` 1280px 이상임. `xl`은 너비 1600px 이상이면서

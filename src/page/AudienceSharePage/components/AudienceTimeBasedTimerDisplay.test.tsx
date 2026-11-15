@@ -12,6 +12,37 @@ vi.mock('react-i18next', () => ({
 }));
 
 describe('AudienceTimeBasedTimerDisplay', () => {
+  it('배지는 진영만 표시하고 정지 중에도 현재 차례의 접근성 상태를 유지한다', () => {
+    const props = {
+      team: 'PROS' as const,
+      teamName: '한빛',
+      timePerTeam: 60,
+      timePerSpeaking: null,
+      totalRemainingTime: 60,
+      currentSpeakingRemainingTime: null,
+      isRunning: false,
+    };
+    const { rerender } = render(
+      <AudienceTimeBasedTimerDisplay {...props} isCurrentTeam={true} />,
+    );
+
+    expect(screen.getByText('찬성')).toBeVisible();
+    expect(screen.queryByText('현재 차례')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pros-timer-display')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+
+    rerender(
+      <AudienceTimeBasedTimerDisplay {...props} isCurrentTeam={false} />,
+    );
+
+    expect(screen.getByText('찬성')).toBeVisible();
+    expect(screen.queryByText('현재 차례')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pros-timer-display')).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
   it('1회당 발언 시간이 없으면 제목, 전체 타이머, 프로그레스 바를 표시한다', () => {
     render(
       <AudienceTimeBasedTimerDisplay

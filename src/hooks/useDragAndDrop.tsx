@@ -7,54 +7,142 @@ interface UseDragAndDropProps<T> {
   throttleDelay?: number;
 }
 
-export function useDragAndDrop<T>({
+/** 포인터 기반 드래그 앤 드롭으로 목록 순서를 재정렬하는 훅. */
+export default function useDragAndDrop<T>({
   data,
   setData,
   throttleDelay = 50,
 }: UseDragAndDropProps<T>) {
   const dragIndexRef = useRef<number | null>(null); // 드래그 중인 항목의 인덱스
+  const activePointerIdRef = useRef<number | null>(null); // 활성 드래그 포인터 ID
+  const hoverIndexRef = useRef<number | null>(null); // 호버 중인 인덱스 ref
+  const lastMoveRef = useRef<{
+    clientY: number;
+    rectTop: number;
+    containerHeight: number;
+    itemCount: number;
+  } | null>(null);
   const itemHeightRef = useRef<number>(0); // 아이템의 평균 높이
   const [hoverIndex, setHoverIndex] = useState<number | null>(null); // 호버 중인 인덱스
 
-  const handleMouseDown = useCallback((index: number) => {
-    dragIndexRef.current = index;
+  const isDifferentPointer = useCallback((pointerId?: number) => {
+    return (
+      activePointerIdRef.current !== null &&
+      pointerId !== undefined &&
+      pointerId !== activePointerIdRef.current
+    );
   }, []);
 
-  const handleMouseMove = useCallback(
+  const handlePointerDown = useCallback((index: number, pointerId?: number) => {
+    dragIndexRef.current = index;
+    activePointerIdRef.current = pointerId ?? null;
+    lastMoveRef.current = null;
+  }, []);
+
+  const computeHoverIndex = useCallback(
     (
-      e: React.MouseEvent<HTMLDivElement>,
+      clientY: number,
+      rectTop: number,
       containerHeight: number,
       itemCount: number,
     ) => {
-      if (dragIndexRef.current === null || itemCount <= 0) return;
-
-      const rect = e.currentTarget.getBoundingClientRect();
+      if (itemCount <= 0 || containerHeight <= 0) {
+        return null;
+      }
       const avgHeight = containerHeight / itemCount;
       itemHeightRef.current = avgHeight;
-
-      const hoverPos = Math.floor((e.clientY - rect.top) / avgHeight);
-      setHoverIndex(
-        hoverPos < 0 ? 0 : hoverPos >= itemCount ? itemCount - 1 : hoverPos,
-      );
+      const hoverPos = Math.floor((clientY - rectTop) / avgHeight);
+      return Math.min(itemCount - 1, Math.max(0, hoverPos));
     },
     [],
   );
 
-  const throttledHandleMouseMove = useThrottle(handleMouseMove, throttleDelay);
+  const handlePointerMove = useCallback(
+    (
+      e: React.PointerEvent<HTMLDivElement>,
+      containerHeight: number,
+      itemCount: number,
+    ) => {
+      if (dragIndexRef.current === null || itemCount <= 0) {
+        return;
+      }
+      if (isDifferentPointer(e.pointerId)) {
+        return;
+      }
 
-  const handleMouseUp = useCallback(() => {
-    const dragIndex = dragIndexRef.current;
-    if (dragIndex !== null && hoverIndex !== null && dragIndex !== hoverIndex) {
-      setData((prevData) => {
-        const updatedData = [...prevData];
-        const [movedItem] = updatedData.splice(dragIndex, 1);
-        updatedData.splice(hoverIndex, 0, movedItem);
-        return updatedData;
-      });
-    }
-    dragIndexRef.current = null;
-    setHoverIndex(null);
-  }, [hoverIndex, setData]);
+      const rect = e.currentTarget.getBoundingClientRect();
+      const nextHoverIndex = computeHoverIndex(
+        e.clientY,
+        rect.top,
+        containerHeight,
+        itemCount,
+      );
+      if (nextHoverIndex === null) {
+        return;
+      }
+      hoverIndexRef.current = nextHoverIndex;
+      setHoverIndex(nextHoverIndex);
+    },
+    [computeHoverIndex, isDifferentPointer],
+  );
+
+  const throttledHandlePointerMove = useThrottle(
+    handlePointerMove,
+    throttleDelay,
+  );
+
+  const handlePointerUp = useCallback(
+    (e?: React.PointerEvent<HTMLDivElement>) => {
+      if (e && isDifferentPointer(e.pointerId)) {
+        return;
+      }
+      const dragIndex = dragIndexRef.current;
+      let currentHoverIndex = hoverIndexRef.current;
+      if (lastMoveRef.current) {
+        const latestHover = computeHoverIndex(
+          lastMoveRef.current.clientY,
+          lastMoveRef.current.rectTop,
+          lastMoveRef.current.containerHeight,
+          lastMoveRef.current.itemCount,
+        );
+        if (latestHover !== null) {
+          currentHoverIndex = latestHover;
+        }
+      }
+      if (
+        dragIndex !== null &&
+        currentHoverIndex !== null &&
+        dragIndex !== currentHoverIndex
+      ) {
+        setData((prevData) => {
+          const updatedData = [...prevData];
+          const [movedItem] = updatedData.splice(dragIndex, 1);
+          updatedData.splice(currentHoverIndex, 0, movedItem);
+          return updatedData;
+        });
+      }
+      dragIndexRef.current = null;
+      activePointerIdRef.current = null;
+      lastMoveRef.current = null;
+      hoverIndexRef.current = null;
+      setHoverIndex(null);
+    },
+    [computeHoverIndex, isDifferentPointer, setData],
+  );
+
+  const handlePointerCancel = useCallback(
+    (e?: React.PointerEvent<HTMLDivElement>) => {
+      if (e && isDifferentPointer(e.pointerId)) {
+        return;
+      }
+      dragIndexRef.current = null;
+      activePointerIdRef.current = null;
+      lastMoveRef.current = null;
+      hoverIndexRef.current = null;
+      setHoverIndex(null);
+    },
+    [isDifferentPointer],
+  );
 
   const getDraggingStyles = (index: number) => {
     const dragIndex = dragIndexRef.current;
@@ -83,27 +171,49 @@ export function useDragAndDrop<T>({
     }
   };
 
-  const DragAndDropWrapper = ({ children }: { children: ReactNode }) => {
-    return (
-      <div
-        className="flex w-full flex-col gap-2"
-        onMouseMove={(e) =>
-          throttledHandleMouseMove(
-            e,
-            e.currentTarget.getBoundingClientRect().height,
-            data.length,
-          )
-        }
-        onMouseUp={handleMouseUp}
-      >
-        {children}
-      </div>
-    );
-  };
+  const DragAndDropWrapper = useCallback(
+    ({ children }: { children: ReactNode }) => {
+      return (
+        <div
+          className="flex w-full flex-col gap-2"
+          onPointerMove={(e) => {
+            if (
+              dragIndexRef.current !== null &&
+              !isDifferentPointer(e.pointerId)
+            ) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              lastMoveRef.current = {
+                clientY: e.clientY,
+                rectTop: rect.top,
+                containerHeight: rect.height,
+                itemCount: data.length,
+              };
+            }
+            throttledHandlePointerMove(
+              e,
+              e.currentTarget.getBoundingClientRect().height,
+              data.length,
+            );
+          }}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerCancel}
+        >
+          {children}
+        </div>
+      );
+    },
+    [
+      data.length,
+      handlePointerCancel,
+      handlePointerUp,
+      isDifferentPointer,
+      throttledHandlePointerMove,
+    ],
+  );
 
   return {
     data,
-    handleMouseDown,
+    handlePointerDown,
     DragAndDropWrapper,
     getDraggingStyles,
   };

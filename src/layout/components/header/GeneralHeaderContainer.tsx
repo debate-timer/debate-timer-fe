@@ -1,5 +1,4 @@
 import { INQUIRY_LINKS } from '../../../constants/urls';
-import { useTranslation } from 'react-i18next';
 import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import useFeatureFlag from '../../../hooks/useFeatureFlag';
 import useLoginPrompt from '../../../hooks/useLoginPrompt';
@@ -7,6 +6,8 @@ import LoginPrompt from '../../../components/LoginPrompt/LoginPrompt';
 import SettingsModal from '../../../components/SettingsModal/SettingsModal';
 import LanguageSelector from './LanguageSelector';
 import GeneralHeader from './GeneralHeader';
+import HeaderLoginButton from './HeaderLoginButton';
+import { HEADER_ICON_BUTTON_CLASS } from './headerActionStyles';
 import {
   deleteSessionCustomizeTableData,
   isGuestFlow,
@@ -14,7 +15,6 @@ import {
 
 /** 앱 수명의 설정·권한과 일반 헤더의 탐색 입력을 연결함. */
 export default function GeneralHeaderContainer() {
-  const { t } = useTranslation();
   const { memberId } = useGlobalSettings();
   const isMember = memberId !== null;
   const { isEnabled } = useFeatureFlag('TRANSCRIPT', { enabled: isMember });
@@ -39,16 +39,12 @@ export default function GeneralHeaderContainer() {
         actions={
           <>
             <LanguageSelector />
-            <SettingsModal onLogin={() => login.requestLogin()} />
+            <SettingsModal
+              triggerClassName={HEADER_ICON_BUTTON_CLASS}
+              onLogin={() => login.requestLogin()}
+            />
             {!isMember && (
-              <button
-                type="button"
-                aria-label={t('로그인')}
-                className="min-h-11 rounded-xl bg-brand px-4 text-ui-label"
-                onClick={() => login.requestLogin()}
-              >
-                {t('로그인')}
-              </button>
+              <HeaderLoginButton onClick={() => login.requestLogin()} />
             )}
           </>
         }

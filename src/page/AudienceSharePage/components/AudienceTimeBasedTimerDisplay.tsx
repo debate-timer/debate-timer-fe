@@ -3,6 +3,14 @@ import { useTranslation } from 'react-i18next';
 import TimerProgressBar from '../../../components/TimerProgressBar/TimerProgressBar';
 import { TimeBasedStance } from '../../../types/type';
 import { Formatting } from '../../../util/formatting';
+import AudienceStanceBadge from './AudienceStanceBadge';
+
+const DISPLAY_CLASS =
+  'flex min-w-0 flex-1 flex-col items-center [justify-content:safe_center] justify-center rounded-[16px] border-2 px-4 py-4 md:h-full md:px-6 md:py-8 short:py-2';
+const CURRENT_TEAM_CLASS: Record<TimeBasedStance, string> = {
+  PROS: 'border-stance-blue bg-stance-blue/5',
+  CONS: 'border-stance-red bg-stance-red/5',
+};
 
 interface AudienceTimeBasedTimerDisplayProps {
   team: TimeBasedStance;
@@ -78,10 +86,16 @@ export default function AudienceTimeBasedTimerDisplay({
 
   return (
     <section
-      className="flex h-full min-w-0 flex-1 flex-col items-center [justify-content:safe_center] justify-center rounded-[16px] px-1 py-4 md:px-6 md:py-8 short:py-2"
+      className={clsx(
+        DISPLAY_CLASS,
+        isCurrentTeam ? CURRENT_TEAM_CLASS[team] : 'border-transparent',
+      )}
       data-testid={`${teamId}-timer-display`}
       aria-current={isCurrentTeam ? 'step' : undefined}
     >
+      <div className="mb-3 flex w-full justify-center short:mb-1">
+        <AudienceStanceBadge stance={team} />
+      </div>
       {isCurrentTeam ? (
         <span className="sr-only" data-testid={`${teamId}-speaking-status`}>
           {t('현재 발언 중')}
