@@ -79,7 +79,9 @@ export const memberHandlers = [
   // GET /api/member/feature-flags
   // 개발 모드에서는 모든 기능을 볼 수 있도록 전부 내려준다.
   http.get(`${ApiUrl.member}/feature-flags`, () => {
-    return HttpResponse.json({ featureFlags: ['TRANSCRIPT'] });
+    return HttpResponse.json({
+      featureFlags: ['TRANSCRIPT', 'MULTI_DEVICE_RECORDING'],
+    });
   }),
 
   // POST "/api/member"

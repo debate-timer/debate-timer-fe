@@ -474,5 +474,11 @@
   "실시간 공유가 중단되었습니다.": "Live sharing has stopped.",
   "공유가 종료되었습니다.": "Sharing has ended.",
   "전체 화면 해제": "Exit full screen",
-  "화면을 닫아도 괜찮아요. 완료되면 토론 기록 페이지에서 볼 수 있어요.": "You can close this page. Your completed transcript will be available on the debate records page."
+  "화면을 닫아도 괜찮아요. 완료되면 토론 기록 페이지에서 볼 수 있어요.": "You can close this page. Your completed transcript will be available on the debate records page.",
+  "참여하지 않기": "Don't join",
+  "동의하고 참여": "Agree and join",
+  "토론 녹음에 참여할까요?": "Join the debate recording?",
+  "이 기기의 마이크로 발언을 녹음해 속기록을 만드는 데 씁니다.": "This device's microphone will record the speeches to build the transcript.",
+  "여러 기기의 녹음 중 가장 깨끗한 녹음만 서버에 보관하고 글로 바꿉니다.": "Only the clearest recording among the devices is stored on the server and transcribed.",
+  "주변의 대화도 함께 녹음될 수 있습니다.": "Nearby conversations may also be recorded."
 }

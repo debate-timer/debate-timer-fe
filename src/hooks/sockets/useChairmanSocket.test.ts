@@ -286,6 +286,54 @@ describe('useChairmanSocket', () => {
     );
   });
 
+  describe('다기기 녹음 구간 version', () => {
+    const payload: TimerDataPayload = {
+      timerType: 'NORMAL',
+      remainingTime: 30,
+      sequence: 1,
+      isRunning: true,
+    };
+
+    it('청중에게 보낸 마지막 타이머 전환 이벤트의 version을 돌려준다', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(5000);
+      publish.mockReturnValue(true);
+      const { result } = renderHook(() => useChairmanSocket(123));
+
+      expect(result.current.getLastTransitionVersion()).toBeNull();
+      act(() => {
+        result.current.sendDebateEvent('PLAY', payload, 'token');
+      });
+
+      expect(result.current.getLastTransitionVersion()).toBe(5000);
+    });
+
+    it('상태 동기화 SYNC와 데이터 없는 이벤트는 구간을 바꾸지 않으므로 반영하지 않는다', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(5000);
+      publish.mockReturnValue(true);
+      const { result } = renderHook(() => useChairmanSocket(123));
+
+      act(() => {
+        result.current.sendDebateEvent('PLAY', payload, 'token');
+        result.current.sendDebateEvent('SYNC', payload, 'token');
+        result.current.sendDebateEvent('FINISHED', null, 'token');
+      });
+
+      expect(result.current.getLastTransitionVersion()).toBe(5000);
+    });
+
+    it('발행하지 못한 이벤트는 청중이 받지 못했으므로 반영하지 않는다', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(5000);
+      publish.mockReturnValue(false);
+      const { result } = renderHook(() => useChairmanSocket(123));
+
+      act(() => {
+        result.current.sendDebateEvent('PLAY', payload, 'token');
+      });
+
+      expect(result.current.getLastTransitionVersion()).toBeNull();
+    });
+  });
+
   it('같은 시각에 연속 발행해도 version은 단조 증가해야 한다', () => {
     vi.spyOn(Date, 'now').mockReturnValue(1000);
 
