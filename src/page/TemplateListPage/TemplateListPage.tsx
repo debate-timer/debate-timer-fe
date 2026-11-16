@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
-import TemplateCard from '../../components/TemplateCard/TemplateCard';
+import TemplateCard from './components/TemplateCard';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import { useGetOrganizationTemplates } from '../../hooks/query/useGetOrganizationTemplates';
+import useGetOrganizationTemplates from '../../hooks/query/useGetOrganizationTemplates';
 import { LANDING_URLS } from '../../constants/urls';
 import { buildLangPath, getSelectedLang } from '../../util/languageRouting';
 
@@ -37,14 +37,9 @@ export default function TemplateListPage() {
         </div>
       );
     }
-    // 한 행의 카드 높이가 비슷하도록 템플릿이 적은 단체부터 보여 줌. 개수가 같으면 서버 순서를 유지함
-    const organizations = [...data.organizations].sort(
-      (a, b) => a.templates.length - b.templates.length,
-    );
-
     return (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {organizations.map((organization) => (
+        {data.organizations.map((organization) => (
           <TemplateCard
             key={`${organization.organization}-${organization.affiliation}`}
             organization={organization}
