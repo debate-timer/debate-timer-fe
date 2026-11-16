@@ -11,6 +11,10 @@ import { buildLangPath, getSelectedLang } from '../../util/languageRouting';
 const INQUIRY_BUTTON =
   'rounded-full border border-neutral-900 bg-white px-5 py-3 text-ui-label transition-colors hover:bg-neutral-100';
 
+/**
+ * 조직 응답의 복사본을 표시 언어 기준으로 정렬함.
+ * 한국어는 한글→영문, 영어는 영문→한글순이며 조직 안의 템플릿 순서는 유지함.
+ */
 export default function TemplateListPage() {
   const { t, i18n } = useTranslation();
   const { data, isError } = useGetOrganizationTemplates();
@@ -37,9 +41,14 @@ export default function TemplateListPage() {
         </div>
       );
     }
+    const organizations = [...data.organizations].sort((a, b) =>
+      a.organization.localeCompare(b.organization, lang, {
+        sensitivity: 'base',
+      }),
+    );
     return (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {data.organizations.map((organization) => (
+        {organizations.map((organization) => (
           <TemplateCard
             key={`${organization.organization}-${organization.affiliation}`}
             organization={organization}

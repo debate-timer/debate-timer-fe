@@ -208,8 +208,8 @@ describe('언어별 템플릿 노출', () => {
           const isEnglish =
             new URL(request.url).searchParams.get('language') === 'US_EN';
           const names = isEnglish
-            ? ['Zulu', 'alpha', 'Beta']
-            : ['한앎', '가나다'];
+            ? ['Zulu', '한앎', 'alpha', '가나다', 'Beta']
+            : [];
           return HttpResponse.json({
             organizations: names.map((organization) => ({
               organization,
@@ -234,8 +234,8 @@ describe('언어별 템플릿 노출', () => {
         );
       const names =
         language === 'en'
-          ? ['alpha', 'Beta', 'Zulu']
-          : ['alpha', 'Beta', 'Zulu', '가나다', '한앎'];
+          ? ['alpha', 'Beta', 'Zulu', '가나다', '한앎']
+          : ['가나다', '한앎', 'alpha', 'Beta', 'Zulu'];
       expect(labels).toEqual(
         names.flatMap((name) => [
           expect.stringContaining(name + ' 두번째'),

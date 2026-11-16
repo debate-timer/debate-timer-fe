@@ -106,6 +106,24 @@ describe('기관 템플릿 조회', () => {
     ).toEqual(MOCK_TEMPLATES_RESPONSE);
   });
 
+  it('소비처의 표시 정렬을 적용하지 않고 원본 응답과 캐시 순서를 유지한다', async () => {
+    const queryClient = createQueryClient();
+    const original = {
+      organizations: ['Zulu', '한앎', 'alpha'].map((organization) => ({
+        ...MOCK_TEMPLATES_RESPONSE.organizations[0],
+        organization,
+      })),
+    };
+    queryClient.setQueryData(['OrganizationTemplates', 'ALL'], original);
+    const { result } = renderHook(() => useGetOrganizationTemplates(false), {
+      wrapper: createWrapper(queryClient),
+    });
+    expect(result.current.data).toEqual(original);
+    expect(queryClient.getQueryData(['OrganizationTemplates', 'ALL'])).toEqual(
+      original,
+    );
+  });
+
   it('enabled=false 이면 API를 호출하지 않는다', () => {
     const queryClient = createQueryClient();
 

@@ -19,20 +19,26 @@ const CHIP =
   'flex flex-none items-center gap-2 rounded-full border border-neutral-300 bg-white py-1.5 pr-3.5 pl-1.5 transition-colors hover:border-neutral-900 md:gap-2.5 md:py-2.5 md:pr-4.5 md:pl-2.5';
 const CHIP_ICON = 'size-8 flex-none rounded-full md:size-10';
 
+/**
+ * 조직 응답의 복사본을 한국어는 한글→영문, 영어는 영문→한글순으로 정렬함.
+ * 각 조직의 템플릿 순서는 유지한 채 슬라이드 항목으로 펼침.
+ */
 export default function TemplateMarquee() {
   const { t, i18n } = useTranslation();
   const { trackEvent } = useAnalytics();
   const { data, isError } = useGetOrganizationTemplates();
   const lang = getSelectedLang(i18n.resolvedLanguage ?? i18n.language);
 
-  const items: MarqueeItem[] =
-    data?.organizations.flatMap((organization) =>
-      organization.templates.map((template) => ({
-        organizationName: organization.organization,
-        iconPath: organization.iconPath,
-        ...template,
-      })),
-    ) ?? [];
+  const organizations = [...(data?.organizations ?? [])].sort((a, b) =>
+    a.organization.localeCompare(b.organization, lang, { sensitivity: 'base' }),
+  );
+  const items: MarqueeItem[] = organizations.flatMap((organization) =>
+    organization.templates.map((template) => ({
+      organizationName: organization.organization,
+      iconPath: organization.iconPath,
+      ...template,
+    })),
+  );
 
   const renderChips = () =>
     items.map((item) => (
