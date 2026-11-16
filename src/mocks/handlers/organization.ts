@@ -1,13 +1,15 @@
 import { http, HttpResponse } from 'msw';
 import { ApiUrl } from '../../apis/endpoints';
+import { GetOrganizationTemplatesResponseType } from '../../apis/responses/organization';
 
 export const organizationHandlers = [
   // GET /api/organizations/templates
-  http.get(ApiUrl.organization + '/templates', () => {
-    return HttpResponse.json({
+  http.get(ApiUrl.organization + '/templates', ({ request }) => {
+    const korean: GetOrganizationTemplatesResponseType = {
       organizations: [
         {
           organization: '한앎',
+          category: 'ORGANIZATION',
           affiliation: '한양대',
           iconPath: '/icon/icon1.png',
           templates: [
@@ -23,6 +25,7 @@ export const organizationHandlers = [
         },
         {
           organization: '한모름',
+          category: 'TOURNAMENT',
           affiliation: '양한대',
           iconPath: '/icon/icon2.png',
           templates: [
@@ -37,6 +40,24 @@ export const organizationHandlers = [
           ],
         },
       ],
-    });
+    };
+    const english: GetOrganizationTemplatesResponseType = {
+      organizations: [
+        {
+          organization: 'Public Forum',
+          category: 'GENERAL',
+          affiliation: '',
+          iconPath: '',
+          templates: [
+            {
+              name: 'Public Forum',
+              data: korean.organizations[0].templates[0].data,
+            },
+          ],
+        },
+      ],
+    };
+    const language = new URL(request.url).searchParams.get('language');
+    return HttpResponse.json(language === 'US_EN' ? english : korean);
   }),
 ];

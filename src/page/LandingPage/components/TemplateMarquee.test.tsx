@@ -1,5 +1,6 @@
+import i18n from '../../../i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import type { PropsWithChildren } from 'react';
@@ -28,20 +29,26 @@ function Wrapper({ children }: PropsWithChildren) {
 }
 
 describe('토론 템플릿 슬라이드', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    i18n.addResourceBundle('ko', 'translation', { marker: '국문' });
+    i18n.addResourceBundle('en', 'translation', { marker: 'English' });
+    await i18n.changeLanguage('ko');
     vi.clearAllMocks();
     server.use(
-      http.get(ApiUrl.organization + '/templates', () =>
-        HttpResponse.json({
-          organizations: [
-            {
-              organization: '한토막',
-              affiliation: '한양대',
-              iconPath: '/icon/hantomak_icon.png',
-              templates: [TEMPLATE],
-            },
-          ],
-        }),
+      http.get(ApiUrl.organization + '/templates', ({ request }) =>
+        new URL(request.url).searchParams.get('language') === 'US_EN'
+          ? HttpResponse.json({ organizations: [] })
+          : HttpResponse.json({
+              organizations: [
+                {
+                  organization: '한토막',
+                  category: 'ORGANIZATION',
+                  affiliation: '한양대',
+                  iconPath: '/icon/hantomak_icon.png',
+                  templates: [TEMPLATE],
+                },
+              ],
+            }),
       ),
     );
   });
@@ -90,8 +97,10 @@ describe('토론 템플릿 슬라이드', () => {
 
   it('템플릿을 불러오지 못하면 오류 문구를 보여 준다', async () => {
     server.use(
-      http.get(ApiUrl.organization + '/templates', () =>
-        HttpResponse.json({}, { status: 500 }),
+      http.get(ApiUrl.organization + '/templates', ({ request }) =>
+        new URL(request.url).searchParams.get('language') === 'US_EN'
+          ? HttpResponse.json({ organizations: [] })
+          : HttpResponse.json({}, { status: 500 }),
       ),
     );
     render(<TemplateMarquee />, { wrapper: Wrapper });
@@ -102,4 +111,137 @@ describe('토론 템플릿 슬라이드', () => {
       ),
     ).toBeInTheDocument();
   });
+});
+
+describe('언어별 템플릿 노출', () => {
+  beforeEach(() => {
+    i18n.addResourceBundle('ko', 'translation', { marker: '국문' });
+    i18n.addResourceBundle('en', 'translation', { marker: 'English' });
+    server.use(
+      http.get(ApiUrl.organization + '/templates', ({ request }) => {
+        const isEnglish =
+          new URL(request.url).searchParams.get('language') === 'US_EN';
+        return HttpResponse.json({
+          organizations: [
+            {
+              organization: isEnglish ? 'English organization' : '국문 단체',
+              category: isEnglish ? 'GENERAL' : 'ORGANIZATION',
+              affiliation: '',
+              iconPath: '',
+              templates: [
+                {
+                  name: isEnglish ? 'Public Forum' : '국문 형식',
+                  data: 'encoded',
+                },
+              ],
+            },
+          ],
+        });
+      }),
+    );
+  });
+  afterEach(async () => {
+    await act(async () => {
+      await i18n.changeLanguage('ko');
+    });
+  });
+
+  it.each(['ko', 'en'])(
+    '%s 화면에서 필요한 언어의 템플릿만 표시한다',
+    async (language) => {
+      await i18n.changeLanguage(language);
+      render(<TemplateMarquee />, { wrapper: Wrapper });
+      const englishLink = await screen.findByRole('link', {
+        name: /Public Forum/,
+      });
+      expect(englishLink).toHaveAttribute(
+        'href',
+        expect.stringContaining('org=English%20organization'),
+      );
+      if (language === 'ko') {
+        expect(
+          screen.getByRole('link', { name: /국문 형식/ }),
+        ).toBeInTheDocument();
+      } else {
+        expect(
+          screen.queryByRole('link', { name: /국문 형식/ }),
+        ).not.toBeInTheDocument();
+      }
+    },
+  );
+
+  it('영문 조회만 실패하면 국문 부분 목록 대신 오류를 표시한다', async () => {
+    await i18n.changeLanguage('ko');
+    server.use(
+      http.get(ApiUrl.organization + '/templates', ({ request }) =>
+        new URL(request.url).searchParams.get('language') === 'US_EN'
+          ? HttpResponse.json({}, { status: 500 })
+          : HttpResponse.json({
+              organizations: [
+                {
+                  organization: '국문 단체',
+                  category: 'ORGANIZATION',
+                  affiliation: '',
+                  iconPath: '',
+                  templates: [{ name: '국문 형식', data: 'encoded' }],
+                },
+              ],
+            }),
+      ),
+    );
+    render(<TemplateMarquee />, { wrapper: Wrapper });
+    expect(
+      await screen.findByText(
+        '템플릿을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /국문 형식/ }),
+    ).not.toBeInTheDocument();
+  });
+  it.each(['ko', 'en'])(
+    '%s 화면에서 조직명을 알파벳순으로 정렬하고 조직 안의 템플릿 순서는 유지한다',
+    async (language) => {
+      await i18n.changeLanguage(language);
+      server.use(
+        http.get(ApiUrl.organization + '/templates', ({ request }) => {
+          const isEnglish =
+            new URL(request.url).searchParams.get('language') === 'US_EN';
+          const names = isEnglish
+            ? ['Zulu', 'alpha', 'Beta']
+            : ['한앎', '가나다'];
+          return HttpResponse.json({
+            organizations: names.map((organization) => ({
+              organization,
+              category: 'GENERAL',
+              affiliation: '',
+              iconPath: '',
+              templates: [
+                { name: organization + ' 두번째', data: 'encoded' },
+                { name: organization + ' 첫번째', data: 'encoded' },
+              ],
+            })),
+          });
+        }),
+      );
+      render(<TemplateMarquee />, { wrapper: Wrapper });
+      await screen.findByRole('link', { name: /Zulu 두번째/ });
+      const labels = screen
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('aria-label'))
+        .filter(
+          (label) => label?.includes('두번째') || label?.includes('첫번째'),
+        );
+      const names =
+        language === 'en'
+          ? ['alpha', 'Beta', 'Zulu']
+          : ['alpha', 'Beta', 'Zulu', '가나다', '한앎'];
+      expect(labels).toEqual(
+        names.flatMap((name) => [
+          expect.stringContaining(name + ' 두번째'),
+          expect.stringContaining(name + ' 첫번째'),
+        ]),
+      );
+    },
+  );
 });

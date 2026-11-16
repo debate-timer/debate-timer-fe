@@ -1,17 +1,18 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { http, HttpResponse } from 'msw';
 import { server } from '../../mocks/server';
 import { ApiUrl } from '../../apis/endpoints';
 import { GetOrganizationTemplatesResponseType } from '../../apis/responses/organization';
-import { useGetOrganizationTemplates } from './useGetOrganizationTemplates';
+import useGetOrganizationTemplates from './useGetOrganizationTemplates';
 import i18n from '../../i18n';
 
 const MOCK_TEMPLATES_RESPONSE: GetOrganizationTemplatesResponseType = {
   organizations: [
     {
       organization: '테스트 기관',
+      category: 'ORGANIZATION',
       affiliation: '테스트 대학',
       iconPath: '/icon/test.png',
       templates: [],
@@ -48,31 +49,33 @@ describe('기관 템플릿 조회', () => {
     await i18n.changeLanguage('ko');
   });
 
-  it('한국어(ko) 설정 시 language=KO_KR 파라미터로 요청한다', async () => {
+  it('한국어에서는 두 언어를 통합하고 별도 캐시에 보관한다', async () => {
     const queryClient = createQueryClient();
-    let capturedLanguage: string | null = null;
-
+    const languages: (string | null)[] = [];
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) => {
-        const url = new URL(request.url);
-        capturedLanguage = url.searchParams.get('language');
+        languages.push(new URL(request.url).searchParams.get('language'));
         return HttpResponse.json(MOCK_TEMPLATES_RESPONSE);
       }),
     );
-
     const { result } = renderHook(() => useGetOrganizationTemplates(), {
       wrapper: createWrapper(queryClient),
     });
-
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
-
-    expect(capturedLanguage).toBe('KO_KR');
-    expect(result.current.data).toEqual(MOCK_TEMPLATES_RESPONSE);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(languages.sort()).toEqual(['KO_KR', 'US_EN']);
+    const combined = {
+      organizations: [
+        ...MOCK_TEMPLATES_RESPONSE.organizations,
+        ...MOCK_TEMPLATES_RESPONSE.organizations,
+      ],
+    };
+    expect(result.current.data).toEqual(combined);
+    expect(queryClient.getQueryData(['OrganizationTemplates', 'ALL'])).toEqual(
+      combined,
+    );
     expect(
-      queryClient.getQueryData(['OrganizationTemplates', 'KO_KR']),
-    ).toEqual(MOCK_TEMPLATES_RESPONSE);
+      queryClient.getQueryData(['OrganizationTemplates', 'US_EN']),
+    ).toBeUndefined();
   });
 
   it('영어(en) 설정 시 language=US_EN 파라미터로 요청한다', async () => {
@@ -111,6 +114,71 @@ describe('기관 템플릿 조회', () => {
     });
 
     expect(result.current.fetchStatus).toBe('idle');
+    expect(queryClient.isFetching()).toBe(0);
+    expect(result.current.data).toBeUndefined();
+  });
+});
+
+describe('템플릿 조회 언어 전환과 실패', () => {
+  beforeAll(() => {
+    i18n.addResourceBundle('ko', 'translation', { marker: '국문' });
+    i18n.addResourceBundle('en', 'translation', { marker: 'English' });
+  });
+  afterEach(async () => {
+    await i18n.changeLanguage('ko');
+  });
+
+  it('마운트된 훅이 언어 변경을 구독하고 통합 캐시와 영문 캐시를 분리한다', async () => {
+    await i18n.changeLanguage('ko');
+    server.use(
+      http.get(ApiUrl.organization + '/templates', ({ request }) =>
+        HttpResponse.json(
+          new URL(request.url).searchParams.get('language') === 'US_EN'
+            ? { organizations: [] }
+            : MOCK_TEMPLATES_RESPONSE,
+        ),
+      ),
+    );
+    const queryClient = createQueryClient();
+    const { result } = renderHook(() => useGetOrganizationTemplates(), {
+      wrapper: createWrapper(queryClient),
+    });
+    await waitFor(() =>
+      expect(result.current.data).toEqual(MOCK_TEMPLATES_RESPONSE),
+    );
+    await act(async () => {
+      await i18n.changeLanguage('en');
+    });
+    await waitFor(() =>
+      expect(result.current.data).toEqual({ organizations: [] }),
+    );
+    expect(queryClient.getQueryData(['OrganizationTemplates', 'ALL'])).toEqual(
+      MOCK_TEMPLATES_RESPONSE,
+    );
+    expect(
+      queryClient.getQueryData(['OrganizationTemplates', 'US_EN']),
+    ).toEqual({ organizations: [] });
+    await act(async () => {
+      await i18n.changeLanguage('ko');
+    });
+    await waitFor(() =>
+      expect(result.current.data).toEqual(MOCK_TEMPLATES_RESPONSE),
+    );
+  });
+
+  it('영문 조회만 실패해도 통합 목록 대신 지역 오류 상태를 제공한다', async () => {
+    await i18n.changeLanguage('ko');
+    server.use(
+      http.get(ApiUrl.organization + '/templates', ({ request }) =>
+        new URL(request.url).searchParams.get('language') === 'US_EN'
+          ? HttpResponse.json({}, { status: 500 })
+          : HttpResponse.json(MOCK_TEMPLATES_RESPONSE),
+      ),
+    );
+    const { result } = renderHook(() => useGetOrganizationTemplates(), {
+      wrapper: createWrapper(createQueryClient()),
+    });
+    await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.data).toBeUndefined();
   });
 });

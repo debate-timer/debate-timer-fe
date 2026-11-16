@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { useGetOrganizationTemplates } from '../../../hooks/query/useGetOrganizationTemplates';
+import useGetOrganizationTemplates from '../../../hooks/query/useGetOrganizationTemplates';
 import useAnalytics from '../../../hooks/useAnalytics';
 import ErrorIndicator from '../../../components/ErrorIndicator/ErrorIndicator';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';

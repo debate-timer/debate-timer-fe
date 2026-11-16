@@ -63,7 +63,6 @@ layout → 공용 화면 틀
 | `CustomRangeSlider` | `src/components/CustomRangeSlider/` | 마우스·터치 드래그와 툴팁을 지원하는 범위 슬라이더 |
 | `VolumeBar` | `src/components/VolumeBar/` | 음소거 토글이 포함된 볼륨 조절 바 |
 | `TimeBox` | `src/components/TimeBox/` | 토론 시간표의 단일 발언·작전시간·자유토론 블록 |
-| `TemplateCard` | `src/components/TemplateCard/` | 프리셋·템플릿 요약 카드 |
 | `TimerProgressBar` | `src/components/TimerProgressBar/` | 타이머 진행률 막대 표시 |
 | `ProsAndConsTitle` | `src/components/ProsAndConsTitle/` | 찬성/반대 진영 제목 표시 |
 | `HeaderTitle` | `src/components/HeaderTitle/` | 헤더 중앙/좌측 제목 표시 |
