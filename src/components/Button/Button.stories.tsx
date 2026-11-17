@@ -15,6 +15,26 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {};
 export const Secondary: Story = { args: { variant: 'secondary' } };
+export const SecondaryStates: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-4 bg-white p-6">
+      <Button variant="secondary" aria-label="취소">
+        취소
+      </Button>
+      <Button variant="secondary" href="#secondary" aria-label="자세히 보기">
+        자세히 보기
+      </Button>
+      <IconButton
+        variant="secondary"
+        aria-label="수정하기"
+        icon={<DTEdit aria-hidden="true" />}
+      />
+      <Button variant="secondary" disabled aria-label="사용할 수 없음">
+        사용할 수 없음
+      </Button>
+    </div>
+  ),
+};
 export const Neutral: Story = { args: { variant: 'neutral' } };
 export const Large: Story = { args: { size: 'large' } };
 export const Rounded: Story = { args: { shape: 'rounded' } };

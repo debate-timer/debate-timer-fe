@@ -33,7 +33,7 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: 'bg-brand text-neutral-900 enabled:hover:bg-brand-hover',
   neutral: 'bg-neutral-100 text-neutral-900 enabled:hover:bg-neutral-200',
   secondary:
-    'border border-neutral-900 bg-white text-neutral-900 enabled:hover:bg-neutral-100',
+    'border border-neutral-200 bg-white text-neutral-900 enabled:hover:bg-neutral-100',
   dark: 'bg-neutral-900 text-white enabled:hover:bg-neutral-700',
   light: 'bg-white text-neutral-900 enabled:hover:bg-neutral-100',
   text: 'text-neutral-900 enabled:hover:text-neutral-600',
@@ -42,7 +42,7 @@ const ANCHOR_VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: 'bg-brand text-neutral-900 hover:bg-brand-hover',
   neutral: 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200',
   secondary:
-    'border border-neutral-900 bg-white text-neutral-900 hover:bg-neutral-100',
+    'border border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-100',
   dark: 'bg-neutral-900 text-white hover:bg-neutral-700',
   light: 'bg-white text-neutral-900 hover:bg-neutral-100',
   text: 'text-neutral-900 hover:text-neutral-600',
@@ -51,7 +51,7 @@ const ANCHOR_VARIANT_CLASS: Record<ButtonVariant, string> = {
 /**
  * 색상 변형과 상태 표현을 공유하며 동작의 의미와 처리는 호출자가 소유함.
  *
- * 공용 `Button`은 색상(`variant`)·크기(`size`)·형태(`shape`)를 별도로 선택함. 주요 행동은 `primary`, 차분한 보조 조작은 `neutral`, 존재감을 분명히 보여줄 대안 행동은 `secondary`를 사용함. `dark`·`light`는 브랜드색 배경에서 행동 위계를 유지하며 `text`는 면을 생략함. 선택 기준은 화면 경로가 아니라 해당 문맥의 행동 중요도임.
+ * 공용 `Button`은 색상(`variant`)·크기(`size`)·형태(`shape`)를 별도로 선택함. 주요 행동은 `primary`, 회색 면의 보조 조작은 `neutral`, 흰 배경과 neutral-200 회색 테두리의 보조 조작은 `secondary`를 사용함. `secondary`는 호버 시 neutral-100 배경을 사용하며 버튼·링크·아이콘에 같은 색상 기준을 적용함. `dark`·`light`는 브랜드색 배경에서 행동 위계를 유지하며 `text`는 면을 생략함. 선택 기준은 화면 경로가 아니라 해당 문맥의 행동 중요도임.
  *
  * 큰 버튼 전용 `text-ui-button-lg`는 24px·600 굵기·32px 행간이며 CSS 정의와 함께 갱신함.
  *

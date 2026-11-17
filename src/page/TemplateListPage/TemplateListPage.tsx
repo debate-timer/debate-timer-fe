@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Button from '../../components/Button/Button';
 import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
 import TemplateCard from './components/TemplateCard';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
@@ -7,9 +8,6 @@ import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import useGetOrganizationTemplates from '../../hooks/query/useGetOrganizationTemplates';
 import { LANDING_URLS } from '../../constants/urls';
 import { buildLangPath, getSelectedLang } from '../../util/languageRouting';
-
-const INQUIRY_BUTTON =
-  'rounded-full border border-neutral-900 bg-white px-5 py-3 text-ui-label transition-colors hover:bg-neutral-100';
 
 const TEMPLATE_CATEGORIES = [
   {
@@ -128,15 +126,16 @@ export default function TemplateListPage() {
               )}
             </p>
           </div>
-          <a
+          <Button
+            variant="secondary"
             href={LANDING_URLS.TEMPLATE_REGISTER_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={INQUIRY_BUTTON}
+            className="border-neutral-900!"
             aria-label={t('템플릿 문의하기')}
           >
             {t('템플릿 문의하기')}
-          </a>
+          </Button>
         </div>
         {renderTemplates()}
       </main>
