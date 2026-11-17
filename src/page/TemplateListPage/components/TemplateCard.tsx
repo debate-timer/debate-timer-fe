@@ -10,7 +10,7 @@ const CARD_CONTAINER =
   'flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5';
 
 const TEMPLATE_ROW =
-  'flex items-center justify-between gap-3 rounded-xl border border-neutral-200/80 bg-neutral-50 py-2 pr-2 pl-3.5';
+  'flex items-center justify-between gap-3 rounded-xl bg-neutral-100 py-2 pr-2 pl-3.5';
 
 const LOGO_IMAGE =
   'size-12 shrink-0 rounded-xl border border-neutral-100 bg-neutral-50 object-contain p-1.5 supports-[corner-shape:squircle]:rounded-[50%] [corner-shape:squircle]';
