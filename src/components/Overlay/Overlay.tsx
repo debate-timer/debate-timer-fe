@@ -6,6 +6,7 @@ import {
   useReducedMotion,
 } from 'framer-motion';
 import clsx from 'clsx';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 
 interface OverlayProps extends Omit<
   HTMLMotionProps<'div'>,
@@ -32,6 +33,8 @@ const INITIAL_OFFSET = {
  * 움직임 감소 설정에서는 즉시 표시·숨김 처리함.
  * 호출자는 컴포넌트를 유지한 채 isOpen(기본 true)으로 개폐해야 종료 애니메이션을 재생할 수 있음.
  * className으로 위치·크기를 지정하며 종료 중인 내용은 접근성과 조작 대상에서 제외함.
+ * 화면 네 변에서 16px 여백을 유지하도록 위치와 최대 크기를 제한함. 큰 내용은 줄바꿈·내부 스크롤로 처리함.
+ * 표시·내용 크기·화면 크기·스크롤·애니메이션 변화에 맞춰 보정하며 전달된 ref와 이벤트는 유지함.
  * 배경 차단·포털·바깥 클릭·Escape·포커스·접근성 역할은 호출자가 용도에 맞게 관리함.
  */
 export default function Overlay(props: OverlayProps) {
@@ -43,7 +46,95 @@ export default function Overlay(props: OverlayProps) {
 
 /** 종료 애니메이션 중에는 면을 유지하면서 조작·접근성 대상에서 제외함. */
 function OverlaySurface(props: Omit<OverlayProps, 'isOpen'>) {
-  const { children, className, direction = 'none', ...rest } = props;
+  const {
+    children,
+    className,
+    direction = 'none',
+    style,
+    ref,
+    onUpdate,
+    ...rest
+  } = props;
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const minWidth = style?.minWidth;
+  const minHeight = style?.minHeight;
+  const setRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      surfaceRef.current = node;
+      if (typeof ref === 'function') {
+        return ref(node);
+      }
+      if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref],
+  );
+  const constrainToViewport = useCallback(() => {
+    const node = surfaceRef.current;
+    if (!node) {
+      return;
+    }
+    const viewport = window.visualViewport;
+    const left = (viewport?.offsetLeft ?? 0) + 16;
+    const top = (viewport?.offsetTop ?? 0) + 16;
+    const width = Math.max(
+      0,
+      (viewport?.width ??
+        (document.documentElement.clientWidth || window.innerWidth)) - 32,
+    );
+    const height = Math.max(0, (viewport?.height ?? window.innerHeight) - 32);
+    node.style.setProperty('--overlay-available-width', `${width}px`);
+    node.style.setProperty('--overlay-available-height', `${height}px`);
+    // 호출자의 inline·class 최소 크기를 먼저 복원한 뒤 화면 제한만 적용함.
+    node.style.minWidth =
+      typeof minWidth === 'number'
+        ? `${minWidth}px`
+        : typeof minWidth === 'string'
+          ? minWidth
+          : '';
+    node.style.minHeight =
+      typeof minHeight === 'number'
+        ? `${minHeight}px`
+        : typeof minHeight === 'string'
+          ? minHeight
+          : '';
+    const computed = getComputedStyle(node);
+    if (parseFloat(computed.minWidth) > width) {
+      node.style.minWidth = `${width}px`;
+    }
+    if (parseFloat(computed.minHeight) > height) {
+      node.style.minHeight = `${height}px`;
+    }
+    const rect = node.getBoundingClientRect();
+    const baseX = rect.left - offsetRef.current.x;
+    const baseY = rect.top - offsetRef.current.y;
+    const x =
+      Math.max(left, Math.min(baseX, left + width - rect.width)) - baseX;
+    const y =
+      Math.max(top, Math.min(baseY, top + height - rect.height)) - baseY;
+    offsetRef.current = { x, y };
+    node.style.translate = `${x}px ${y}px`;
+  }, [minWidth, minHeight]);
+  useLayoutEffect(() => {
+    constrainToViewport();
+    const observer = new ResizeObserver(constrainToViewport);
+    if (surfaceRef.current) {
+      observer.observe(surfaceRef.current);
+    }
+    window.addEventListener('resize', constrainToViewport);
+    window.addEventListener('scroll', constrainToViewport, true);
+    window.visualViewport?.addEventListener('resize', constrainToViewport);
+    window.visualViewport?.addEventListener('scroll', constrainToViewport);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', constrainToViewport);
+      window.removeEventListener('scroll', constrainToViewport, true);
+      window.visualViewport?.removeEventListener('resize', constrainToViewport);
+      window.visualViewport?.removeEventListener('scroll', constrainToViewport);
+    };
+  }, [constrainToViewport, children, className, style]);
   const shouldReduceMotion = useReducedMotion();
   const isPresent = useIsPresent();
   const hasAnimation = direction !== 'none' && !shouldReduceMotion;
@@ -52,6 +143,18 @@ function OverlaySurface(props: Omit<OverlayProps, 'isOpen'>) {
   return (
     <motion.div
       {...rest}
+      ref={setRef}
+      style={{
+        ...style,
+        maxWidth: `min(${typeof style?.maxWidth === 'number' ? `${style.maxWidth}px` : (style?.maxWidth ?? '100vw')}, var(--overlay-available-width, calc(100vw - 2rem)))`,
+        maxHeight: `min(${typeof style?.maxHeight === 'number' ? `${style.maxHeight}px` : (style?.maxHeight ?? '100dvh')}, var(--overlay-available-height, calc(100dvh - 2rem)))`,
+        overflow: 'auto',
+        overflowWrap: 'anywhere',
+      }}
+      onUpdate={(latest) => {
+        constrainToViewport();
+        onUpdate?.(latest);
+      }}
       inert={!isPresent || rest.inert}
       aria-hidden={!isPresent || rest['aria-hidden']}
       className={clsx(CONTAINER_CLASS, className)}
