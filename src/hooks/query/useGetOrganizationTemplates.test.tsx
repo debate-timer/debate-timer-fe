@@ -36,9 +36,9 @@ function createQueryClient() {
 
 describe('기관 템플릿 조회', () => {
   beforeAll(() => {
-    // 이 테스트는 번역 파일 로딩 대신 언어별 API 요청과 캐시를 검증함.
-    i18n.addResourceBundle('ko', 'translation', {});
-    i18n.addResourceBundle('en', 'translation', {});
+    // 빈 리소스는 resolvedLanguage를 국문 fallback으로 남길 수 있어 두 언어에 실제 키를 등록함.
+    i18n.addResourceBundle('ko', 'translation', { marker: '국문' });
+    i18n.addResourceBundle('en', 'translation', { marker: 'English' });
   });
 
   beforeEach(async () => {
@@ -80,13 +80,14 @@ describe('기관 템플릿 조회', () => {
 
   it('영어(en) 설정 시 language=US_EN 파라미터로 요청한다', async () => {
     await i18n.changeLanguage('en');
+    expect(i18n.resolvedLanguage).toBe('en');
     const queryClient = createQueryClient();
-    let capturedLanguage: string | null = null;
+    const capturedLanguages: (string | null)[] = [];
 
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) => {
         const url = new URL(request.url);
-        capturedLanguage = url.searchParams.get('language');
+        capturedLanguages.push(url.searchParams.get('language'));
         return HttpResponse.json(MOCK_TEMPLATES_RESPONSE);
       }),
     );
@@ -99,7 +100,7 @@ describe('기관 템플릿 조회', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(capturedLanguage).toBe('US_EN');
+    expect(capturedLanguages).toEqual(['US_EN']);
     expect(result.current.data).toEqual(MOCK_TEMPLATES_RESPONSE);
     expect(
       queryClient.getQueryData(['OrganizationTemplates', 'US_EN']),
