@@ -42,7 +42,7 @@ describe('토론 템플릿 슬라이드', () => {
               organizations: [
                 {
                   organization: '한토막',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '한양대',
                   iconPath: '/icon/hantomak_icon.png',
                   templates: [TEMPLATE],
@@ -125,7 +125,7 @@ describe('언어별 템플릿 노출', () => {
           organizations: [
             {
               organization: isEnglish ? 'English organization' : '국문 단체',
-              category: isEnglish ? 'GENERAL' : 'ORGANIZATION',
+              category: isEnglish ? 'CLASSIC' : 'DEBATE_CLUB',
               affiliation: '',
               iconPath: '',
               templates: [
@@ -180,7 +180,7 @@ describe('언어별 템플릿 노출', () => {
               organizations: [
                 {
                   organization: '국문 단체',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '',
                   iconPath: '',
                   templates: [{ name: '국문 형식', data: 'encoded' }],
@@ -213,7 +213,7 @@ describe('언어별 템플릿 노출', () => {
           return HttpResponse.json({
             organizations: names.map((organization) => ({
               organization,
-              category: 'GENERAL',
+              category: 'CLASSIC',
               affiliation: '',
               iconPath: '',
               templates: [

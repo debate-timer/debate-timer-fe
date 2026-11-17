@@ -9,7 +9,7 @@ const KO_RESPONSE: GetOrganizationTemplatesResponseType = {
   organizations: [
     {
       organization: '국문 단체',
-      category: 'ORGANIZATION',
+      category: 'DEBATE_CLUB',
       affiliation: '',
       iconPath: '',
       templates: [],
@@ -27,7 +27,7 @@ const EN_RESPONSE: GetOrganizationTemplatesResponseType = {
   organizations: [
     {
       organization: 'English',
-      category: 'GENERAL',
+      category: 'CLASSIC',
       affiliation: '',
       iconPath: '',
       templates: [],

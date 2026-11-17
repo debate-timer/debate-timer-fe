@@ -96,7 +96,7 @@ export type DebateTemplate = {
   data: string; // 인코딩된 템플릿 데이터
 };
 
-export type TemplateCategory = 'TOURNAMENT' | 'ORGANIZATION' | 'GENERAL';
+export type TemplateCategory = 'TOURNAMENT' | 'DEBATE_CLUB' | 'CLASSIC';
 
 export interface Organization {
   organization: string; // 소분류 (e.g., 한앎)

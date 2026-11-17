@@ -12,7 +12,7 @@ const MOCK_TEMPLATES_RESPONSE: GetOrganizationTemplatesResponseType = {
   organizations: [
     {
       organization: '테스트 기관',
-      category: 'ORGANIZATION',
+      category: 'DEBATE_CLUB',
       affiliation: '테스트 대학',
       iconPath: '/icon/test.png',
       templates: [],

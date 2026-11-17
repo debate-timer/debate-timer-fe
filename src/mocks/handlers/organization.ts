@@ -9,7 +9,7 @@ export const organizationHandlers = [
       organizations: [
         {
           organization: '한앎',
-          category: 'ORGANIZATION',
+          category: 'DEBATE_CLUB',
           affiliation: '한양대',
           iconPath: '/icon/icon1.png',
           templates: [
@@ -45,7 +45,7 @@ export const organizationHandlers = [
       organizations: [
         {
           organization: 'Public Forum',
-          category: 'GENERAL',
+          category: 'CLASSIC',
           affiliation: '',
           iconPath: '',
           templates: [

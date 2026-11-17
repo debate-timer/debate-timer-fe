@@ -9,7 +9,7 @@ const meta: Meta<typeof TemplateCard> = {
     className: 'max-w-sm',
     organization: {
       organization: '한토막',
-      category: 'ORGANIZATION',
+      category: 'DEBATE_CLUB',
       affiliation: '한양대학교',
       iconPath: '',
       templates: [
