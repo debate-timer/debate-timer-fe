@@ -1,5 +1,32 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import TemplateCard from './TemplateCard';
+import { encodeDebateTableData } from '../../../util/arrayEncoding';
+
+const SAMPLE_DATA = encodeDebateTableData({
+  info: { name: '예시 시간표', agenda: '', prosTeamName: '', consTeamName: '' },
+  table: [
+    {
+      stance: 'PROS',
+      speechType: '입론',
+      boxType: 'NORMAL',
+      time: 180,
+      timePerTeam: null,
+      timePerSpeaking: null,
+      speaker: null,
+      bell: null,
+    },
+    {
+      stance: 'NEUTRAL',
+      speechType: '자유토론',
+      boxType: 'TIME_BASED',
+      time: null,
+      timePerTeam: 600,
+      timePerSpeaking: 60,
+      speaker: null,
+      bell: null,
+    },
+  ],
+});
 
 const meta: Meta<typeof TemplateCard> = {
   title: 'page/TemplateListPage/components/TemplateCard',
@@ -13,8 +40,8 @@ const meta: Meta<typeof TemplateCard> = {
       affiliation: '한양대학교',
       iconPath: '',
       templates: [
-        { name: 'CEDA 토론', data: 'sample-data-1' },
-        { name: '자유토론형 시간표', data: 'sample-data-2' },
+        { name: 'CEDA 토론', data: SAMPLE_DATA },
+        { name: '자유토론형 시간표', data: SAMPLE_DATA },
       ],
     },
   },
@@ -36,11 +63,11 @@ export const LongContent: Story = {
       templates: [
         {
           name: '2026 전국 대학생 의회식 자유토론 결승전 공식 시간표',
-          data: 'sample-long-data-1',
+          data: SAMPLE_DATA,
         },
         {
           name: '준결승 교차질의 포함 확장형 시간표',
-          data: 'sample-long-data-2',
+          data: SAMPLE_DATA,
         },
       ],
     },
