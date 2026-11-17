@@ -12,7 +12,7 @@ import { buildLangPath, isSupportedLang } from '../util/languageRouting';
 import { isGuestFlow } from '../util/sessionStorage';
 import { oAuthLogin } from '../util/googleAuth';
 
-/** 로그인 확인과 목적지 보존을 조립함. 참여 입력 등 임의 화면 상태는 저장하지 않음. */
+/** 로그인 확인·즉시 시작과 목적지 보존을 조립함. 즉시 시작은 게스트 시간표를 유지하며 참여 입력 등 임의 화면 상태는 저장하지 않음. */
 export default function useLoginPrompt() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,11 +53,12 @@ export default function useLoginPrompt() {
     [lang, location.state],
   );
   const cancel = useCallback(() => setDestination(null), []);
-  const start = () => {
-    if (!destination) {
-      return;
-    }
-    saveLoginReturn(destination);
+  const startOAuth = (
+    loginReturn: LoginReturn,
+    shouldKeepGuestTable: boolean,
+  ) => {
+    setHasError(false);
+    saveLoginReturn(loginReturn);
     if (buildLangPath(location.pathname, 'ko') === '/') {
       const trigger = {
         trigger_page: location.pathname,
@@ -73,7 +74,7 @@ export default function useLoginPrompt() {
     try {
       sessionStorage.setItem(
         'keepGuestTable',
-        String(hasGuestTable && keepGuestTable),
+        String(hasGuestTable && shouldKeepGuestTable),
       );
     } catch {
       // 저장소를 사용할 수 없어도 로그인을 진행함.
@@ -84,11 +85,21 @@ export default function useLoginPrompt() {
       setHasError(true);
     }
   };
+  const start = () => {
+    if (destination) {
+      startOAuth(destination, keepGuestTable);
+    }
+  };
+  const startDirect = () => {
+    setDestination(null);
+    startOAuth({ path: buildLangPath('/dashboard', lang) }, true);
+  };
   return {
     isOpen: destination !== null,
     requestLogin,
     cancel,
     start,
+    startDirect,
     hasGuestTable,
     keepGuestTable,
     setKeepGuestTable,

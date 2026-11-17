@@ -1,4 +1,5 @@
 import { INQUIRY_LINKS } from '../../../constants/urls';
+import { useTranslation } from 'react-i18next';
 import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import useFeatureFlag from '../../../hooks/useFeatureFlag';
 import useLoginPrompt from '../../../hooks/useLoginPrompt';
@@ -13,8 +14,9 @@ import {
   isGuestFlow,
 } from '../../../util/sessionStorage';
 
-/** 앱 수명의 설정·권한과 일반 헤더의 탐색 입력을 연결함. */
+/** 일반 헤더의 설정·권한·탐색을 연결함. Google 로그인 버튼은 확인창 없이 OAuth를 시작하며 보호 경로 진입은 기존 확인창을 유지함. */
 export default function GeneralHeaderContainer() {
+  const { t } = useTranslation();
   const { memberId } = useGlobalSettings();
   const isMember = memberId !== null;
   const { isEnabled } = useFeatureFlag('TRANSCRIPT', { enabled: isMember });
@@ -44,11 +46,19 @@ export default function GeneralHeaderContainer() {
               onLogin={() => login.requestLogin()}
             />
             {!isMember && (
-              <HeaderLoginButton onClick={() => login.requestLogin()} />
+              <HeaderLoginButton
+                label={t('Google로 로그인')}
+                onClick={login.startDirect}
+              />
             )}
           </>
         }
       />
+      {login.hasError && !login.isOpen && (
+        <p role="alert" className="px-4 py-2 text-ui-caption text-red-700">
+          {t('로그인을 시작하지 못했습니다. 다시 시도해 주세요.')}
+        </p>
+      )}
       <LoginPrompt login={login} />
     </>
   );
