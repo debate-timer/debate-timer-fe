@@ -22,6 +22,7 @@ interface TemplateCardProps {
 
 /**
  * 단체별 템플릿 목록과 토론 시작 링크를 보여 주는 카드.
+ * 단체 정보 왼쪽의 얇은 브랜드색 선으로 강조하고 로고와 목록은 중립색으로 유지함.
  * 템플릿을 고르면 `template_selected` 이벤트를 기록하고 공유 화면으로 이동함.
  */
 export default function TemplateCard(props: TemplateCardProps) {
@@ -34,7 +35,7 @@ export default function TemplateCard(props: TemplateCardProps) {
     <article className={clsx(CARD_CONTAINER, className)}>
       {/* 헤더 */}
       <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1 border-l-[3px] border-brand/70 pl-3">
           <h3 className="text-ui-title wrap-break-word text-neutral-900">
             {organization.organization}
           </h3>

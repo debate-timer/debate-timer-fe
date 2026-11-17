@@ -1,7 +1,8 @@
 import i18n from '../../i18n';
+import { readFileSync } from 'node:fs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import type { PropsWithChildren } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -36,14 +37,14 @@ describe('토론 템플릿 전체보기 페이지', () => {
               organizations: [
                 {
                   organization: '한토막',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '한양대',
                   iconPath: '',
                   templates: [{ name: 'CEDA 토론', data: 'a' }],
                 },
                 {
                   organization: '이감',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '경희대',
                   iconPath: '',
                   templates: [{ name: '하이브리드 토론', data: 'b' }],
@@ -63,6 +64,110 @@ describe('토론 템플릿 전체보기 페이지', () => {
     expect(screen.getByRole('heading', { name: '이감' })).toBeInTheDocument();
   });
 
+  it.each(['ko', 'en'])(
+    '%s 화면에서 서버 분류별 제목과 설명 아래에 카드를 묶는다',
+    async (language) => {
+      const translations = JSON.parse(
+        readFileSync(`public/locales/${language}/translation.json`, 'utf8'),
+      ) as Record<string, string>;
+      i18n.addResourceBundle(language, 'translation', translations, true, true);
+      await i18n.changeLanguage(language);
+      server.use(
+        http.get(ApiUrl.organization + '/templates', ({ request }) =>
+          HttpResponse.json({
+            organizations:
+              new URL(request.url).searchParams.get('language') === 'US_EN'
+                ? [
+                    {
+                      organization: 'Zulu Club',
+                      category: 'DEBATE_CLUB',
+                      affiliation: '',
+                      iconPath: '',
+                      templates: [],
+                    },
+                    {
+                      organization: 'Basic Format',
+                      category: 'CLASSIC',
+                      affiliation: '',
+                      iconPath: '',
+                      templates: [],
+                    },
+                    {
+                      organization: 'alpha Club',
+                      category: 'DEBATE_CLUB',
+                      affiliation: '',
+                      iconPath: '',
+                      templates: [],
+                    },
+                    {
+                      organization: 'Contest',
+                      category: 'TOURNAMENT',
+                      affiliation: '',
+                      iconPath: '',
+                      templates: [],
+                    },
+                  ]
+                : [],
+          }),
+        ),
+      );
+      render(<TemplateListPage />, { wrapper: Wrapper });
+      await screen.findByRole('heading', { name: 'Contest' });
+      const titles =
+        language === 'ko'
+          ? ['대회', '동아리', '고전 토론']
+          : ['Tournaments', 'Debate Clubs', 'Classics'];
+      expect(
+        screen
+          .getAllByRole('heading', { level: 2 })
+          .map((heading) => heading.textContent),
+      ).toEqual(titles);
+      const groups = titles.map((title) =>
+        within(screen.getByRole('region', { name: title })),
+      );
+      expect(
+        groups[0]
+          .getAllByRole('heading', { level: 3 })
+          .map((heading) => heading.textContent),
+      ).toEqual(['Contest']);
+      expect(
+        groups[1]
+          .getAllByRole('heading', { level: 3 })
+          .map((heading) => heading.textContent),
+      ).toEqual(['alpha Club', 'Zulu Club']);
+      expect(
+        groups[2]
+          .getAllByRole('heading', { level: 3 })
+          .map((heading) => heading.textContent),
+      ).toEqual(['Basic Format']);
+      const descriptions =
+        language === 'ko'
+          ? [
+              '토론 대회에서 사용하는 형식으로 토론을 준비해 보세요.',
+              '국내 토론 동아리에서 사용하는 다양한 토론 형식을 만나보세요.',
+              '오랫동안 이어져 온 기본 토론 형식으로 시작해 보세요.',
+            ]
+          : [
+              'Prepare for your debate with formats used in tournaments.',
+              'Explore a variety of formats used by debate clubs in Korea.',
+              'Start with the foundational debate formats that have stood the test of time.',
+            ];
+      descriptions.forEach((description, index) =>
+        expect(groups[index].getByText(description)).toBeInTheDocument(),
+      );
+    },
+  );
+
+  it('조직이 없는 카테고리는 표시하지 않는다', async () => {
+    render(<TemplateListPage />, { wrapper: Wrapper });
+    await screen.findByRole('heading', { name: '한토막' });
+    expect(
+      screen
+        .getAllByRole('heading', { level: 2 })
+        .map((heading) => heading.textContent),
+    ).toEqual(['동아리']);
+  });
+
   it('템플릿 개수와 무관하게 조직명순으로 보여 준다', async () => {
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) =>
@@ -72,14 +177,14 @@ describe('토론 템플릿 전체보기 페이지', () => {
               organizations: [
                 {
                   organization: '단체 가',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '',
                   iconPath: '',
                   templates: [{ name: '가1', data: 'a' }],
                 },
                 {
                   organization: '단체 나',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '',
                   iconPath: '',
                   templates: [
@@ -89,7 +194,7 @@ describe('토론 템플릿 전체보기 페이지', () => {
                 },
                 {
                   organization: '단체 다',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '',
                   iconPath: '',
                   templates: [{ name: '다1', data: 'd' }],
@@ -137,7 +242,7 @@ describe('언어별 템플릿 노출', () => {
           organizations: [
             {
               organization: isEnglish ? 'English organization' : '국문 단체',
-              category: isEnglish ? 'GENERAL' : 'ORGANIZATION',
+              category: isEnglish ? 'CLASSIC' : 'DEBATE_CLUB',
               affiliation: '',
               iconPath: '',
               templates: [
@@ -192,7 +297,7 @@ describe('언어별 템플릿 노출', () => {
               organizations: [
                 {
                   organization: '국문 단체',
-                  category: 'ORGANIZATION',
+                  category: 'DEBATE_CLUB',
                   affiliation: '',
                   iconPath: '',
                   templates: [{ name: '국문 형식', data: 'encoded' }],
@@ -225,7 +330,7 @@ describe('언어별 템플릿 노출', () => {
           return HttpResponse.json({
             organizations: names.map((organization) => ({
               organization,
-              category: 'GENERAL',
+              category: 'CLASSIC',
               affiliation: '',
               iconPath: '',
               templates: [
