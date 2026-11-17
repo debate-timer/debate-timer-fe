@@ -70,7 +70,7 @@ export default function TemplateCard(props: TemplateCardProps) {
                   organization.organization,
                   template,
                 )}
-                variant="neutral"
+                variant="secondary"
                 shape="circle"
                 className="size-[32px]"
                 icon={<IoArrowForwardSharp aria-hidden />}
