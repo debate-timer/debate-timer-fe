@@ -47,7 +47,7 @@ export default function GeneralHeaderContainer() {
             />
             {!isMember && (
               <HeaderLoginButton
-                label={t('Google로 로그인')}
+                label={t('Google 로그인')}
                 onClick={login.startDirect}
               />
             )}
