@@ -1,0 +1,392 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  getRecordingSessionV2,
+  postRecordingCancelV2,
+  postRecordingHostDeviceV2,
+  postRecordingSessionV2,
+} from '../../../apis/apis/recordingV2';
+import { APIError } from '../../../apis/primitives';
+import useRecordingTurnUploaderV2 from '../../../hooks/useRecordingTurnUploaderV2';
+import { TimeBasedStance } from '../../../types/type';
+import {
+  isAudioRecordingSupported,
+  requestMicrophoneStream,
+  stopMediaStream,
+} from '../../../util/audioRecorder';
+import { createTurnKey, RecordingJoin } from '../../../util/recordingJoinLink';
+import {
+  clearHostRecordingV2,
+  getHostRecordingV2,
+  saveHostRecordingV2,
+  updateHostDeviceTokenV2,
+} from '../../../util/recordingStorageV2';
+import { startTurnRecording, TurnRecording } from '../../../util/turnRecording';
+import { isDebateEndPath, isTimerPath } from './useTranscriptLeaveGuard';
+
+export interface UseMultiDeviceTranscriberParams {
+  tableId: number;
+  timeBoxIndex: number;
+  // 자유토론처럼 한 타임박스 안에서 발언 팀이 바뀌는 경우의 현재 팀
+  team: TimeBasedStance | null;
+  isRunning: boolean;
+  lang: string;
+  // 청중에게 보낸 마지막 타이머 전환 이벤트의 version. 공유하지 않으면 null이다.
+  getSegmentVersion: () => number | null;
+}
+
+export type MultiDeviceTranscriberError =
+  'unsupported' | 'not-allowed' | 'session';
+
+interface ActiveTurn {
+  timeBoxIndex: number;
+  team: TimeBasedStance | null;
+  recording: TurnRecording;
+}
+
+/**
+ * 다기기 녹음 V2의 사회자 기기 녹음. 켜면 녹음 세션을 열고(새로고침 전에 이 탭에서 연 세션이 아직 녹음 중이면 이어서 씀),
+ * 타이머가 실행되는 동안 발언 구간마다 녹음해 끝날 때 턴으로 올린다.
+ * 끄거나 토론 종료 화면이 아닌 곳으로 떠나면 세션을 취소한다. 다시 켜면 새 세션·새 참가 코드를 쓴다.
+ * `session`은 켜져 있는 동안의 세션만 담아, 꺼진 세션의 참가 정보가 청중에게 나가지 않게 한다.
+ * 전사·속기록 생성은 서버가 하므로 이 기기는 초안을 만들지 않는다.
+ * 턴 키는 청중 기기와 맞추려고 구간을 시작한 공유 이벤트의 version을 쓴다.
+ */
+export default function useMultiDeviceTranscriber(
+  params: UseMultiDeviceTranscriberParams,
+) {
+  const { tableId, timeBoxIndex, team, isRunning, lang, getSegmentVersion } =
+    params;
+  const isSupported = useMemo(() => isAudioRecordingSupported(), []);
+
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [error, setError] = useState<MultiDeviceTranscriberError | null>(null);
+  const [session, setSession] = useState<RecordingJoin | null>(null);
+
+  const streamRef = useRef<MediaStream | null>(null);
+  const activeRef = useRef<ActiveTurn | null>(null);
+  const usedTurnKeysRef = useRef(new Set<string>());
+  const generationRef = useRef(0);
+  const isMountedRef = useRef(false);
+  const tableIdRef = useRef(tableId);
+  const getSegmentVersionRef = useRef(getSegmentVersion);
+
+  useEffect(() => {
+    tableIdRef.current = tableId;
+    getSegmentVersionRef.current = getSegmentVersion;
+  }, [tableId, getSegmentVersion]);
+
+  // 업로드한 턴의 세션이 이 탭에 보관한 세션과 같을 때만 그 토큰을 쓴다.
+  const getDeviceToken = useCallback((sessionKey: string) => {
+    const host = getHostRecordingV2(tableIdRef.current);
+    return host?.sessionKey === sessionKey ? host.deviceToken : null;
+  }, []);
+  const renewDeviceToken = useCallback(async (sessionKey: string) => {
+    const tableId = tableIdRef.current;
+    if (getHostRecordingV2(tableId)?.sessionKey !== sessionKey) {
+      throw new Error('녹음 세션이 바뀌었습니다.');
+    }
+    const { deviceToken } = await postRecordingHostDeviceV2(sessionKey);
+    updateHostDeviceTokenV2(tableId, sessionKey, deviceToken);
+    return deviceToken;
+  }, []);
+  const uploader = useRecordingTurnUploaderV2({
+    getDeviceToken,
+    renewDeviceToken,
+  });
+  const { upload } = uploader;
+
+  // 공유하지 않거나, 공유를 끈 뒤 같은 version이 남아 이미 쓴 턴 키가 되면 이 기기만의 턴 키를 쓴다.
+  const nextTurnKey = useCallback((index: number, startedAt: number) => {
+    const version = getSegmentVersionRef.current();
+    const sharedKey = version === null ? null : createTurnKey(index, version);
+    const turnKey =
+      sharedKey && !usedTurnKeysRef.current.has(sharedKey)
+        ? sharedKey
+        : createTurnKey(index, startedAt);
+    usedTurnKeysRef.current.add(turnKey);
+    return turnKey;
+  }, []);
+
+  const startTurn = useCallback(
+    (index: number, turnTeam: TimeBasedStance | null, stream: MediaStream) => {
+      const host = getHostRecordingV2(tableIdRef.current);
+      if (!host) {
+        return;
+      }
+      const turnKey = nextTurnKey(index, Date.now());
+      const recording = startTurnRecording(stream, (recorded) => {
+        if (activeRef.current?.recording === recording) {
+          activeRef.current = null;
+          setIsListening(false);
+        }
+        if (!recorded) {
+          return;
+        }
+        void upload({
+          sessionKey: host.sessionKey,
+          turnKey,
+          turn: {
+            audio: recorded.audio,
+            fileName: recorded.fileName,
+            timeBoxIndex: index,
+            team: turnTeam,
+            durationMs: recorded.durationMs,
+            startedAtEpochMs: recorded.startedAt,
+            metrics: recorded.metrics,
+          },
+        });
+      });
+      activeRef.current = { timeBoxIndex: index, team: turnTeam, recording };
+      setIsListening(true);
+    },
+    [nextTurnKey, upload],
+  );
+
+  // 녹음 중인 구간을 끝낸다. 오디오는 녹음기가 멈춘 뒤 올라간다.
+  const stopTurn = useCallback(() => {
+    const active = activeRef.current;
+    activeRef.current = null;
+    setIsListening(false);
+    active?.recording.stop();
+  }, []);
+
+  const releaseMicrophone = useCallback(() => {
+    stopMediaStream(streamRef.current);
+    streamRef.current = null;
+  }, []);
+
+  const shouldRecord = isEnabled && isRunning && isSupported;
+
+  useEffect(() => {
+    const active = activeRef.current;
+    if (
+      shouldRecord &&
+      active &&
+      active.timeBoxIndex === timeBoxIndex &&
+      active.team === team
+    ) {
+      return;
+    }
+    stopTurn();
+    if (!shouldRecord) {
+      return;
+    }
+    const stream = streamRef.current;
+    if (stream?.active) {
+      startTurn(timeBoxIndex, team, stream);
+      return;
+    }
+    // 장치 분리 등으로 마이크를 잃었으면 다시 받는다. 받는 사이 끄거나 정지·구간 이동으로 이 effect가 정리되면
+    // 늦게 받은 마이크는 놓고 이번 구간은 건너뛴다.
+    const generation = generationRef.current;
+    let isCancelled = false;
+    const isCurrent = () =>
+      !isCancelled && generation === generationRef.current;
+    requestMicrophoneStream()
+      .then((nextStream) => {
+        if (!isCurrent()) {
+          stopMediaStream(nextStream);
+          return;
+        }
+        streamRef.current = nextStream;
+        if (!activeRef.current) {
+          startTurn(timeBoxIndex, team, nextStream);
+        }
+      })
+      .catch(() => {
+        if (isCurrent()) {
+          setError('not-allowed');
+          setIsEnabled(false);
+        }
+      });
+    return () => {
+      isCancelled = true;
+    };
+  }, [shouldRecord, timeBoxIndex, team, startTurn, stopTurn]);
+
+  // 화면을 떠나면 녹음 중이던 구간까지 올리고 마이크를 놓는다.
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      generationRef.current += 1;
+      stopTurn();
+      releaseMicrophone();
+    };
+  }, [releaseMicrophone, stopTurn]);
+
+  // 처음 켤 때 녹음 세션을 열고, 같은 탭에서 다시 켜면 열어 둔 세션에 이어서 올린다.
+  const enable = useCallback(
+    async (recognitionLanguage?: string) => {
+      if (!isSupported) {
+        setError('unsupported');
+        return;
+      }
+      const generation = generationRef.current;
+      const isCurrent = () =>
+        isMountedRef.current && generation === generationRef.current;
+      setIsStarting(true);
+      try {
+        if (!streamRef.current?.active) {
+          const stream = await requestMicrophoneStream().catch(() => null);
+          if (!stream) {
+            if (isCurrent()) {
+              setError('not-allowed');
+            }
+            return;
+          }
+          if (!isCurrent()) {
+            stopMediaStream(stream);
+            return;
+          }
+          streamRef.current = stream;
+        }
+        // 세션 조회에 실패하면 보관한 세션을 지우지 않고 켜기를 멈춘다.
+        let host = await findRecordingHost(tableIdRef.current).catch(
+          () => undefined,
+        );
+        if (!isCurrent()) {
+          return;
+        }
+        if (host === undefined) {
+          setError('session');
+          releaseMicrophone();
+          return;
+        }
+        if (!host) {
+          host = await postRecordingSessionV2({
+            tableId: tableIdRef.current,
+            language: recognitionLanguage ?? lang,
+          }).catch(() => null);
+          if (!isCurrent()) {
+            // 여는 사이 끄거나 떠났으면 늦게 열린 세션이 녹음 중으로 남지 않게 취소한다.
+            if (host) {
+              cancelSession(host.sessionKey);
+            }
+            return;
+          }
+          if (!host) {
+            setError('session');
+            releaseMicrophone();
+            return;
+          }
+          saveHostRecordingV2(tableIdRef.current, {
+            sessionKey: host.sessionKey,
+            joinCode: host.joinCode,
+            deviceToken: host.deviceToken,
+          });
+        }
+        setSession(toJoin(host));
+        setError(null);
+        setIsEnabled(true);
+      } finally {
+        if (isCurrent()) {
+          setIsStarting(false);
+        }
+      }
+    },
+    [isSupported, lang, releaseMicrophone],
+  );
+
+  // 녹음을 버린다. 녹음 중인 구간은 올리지 않고, 이 탭에 보관한 녹음 세션은 서버에서 취소한 뒤 지운다.
+  // 저장소에서 지운 세션은 화면을 떠날 때 찾을 수 없으므로 여기서 취소한다. 버린 세션의 참가 정보를 돌려준다.
+  const discard = useCallback((): RecordingJoin | null => {
+    generationRef.current += 1;
+    activeRef.current?.recording.cancel();
+    activeRef.current = null;
+    releaseMicrophone();
+    const host = getHostRecordingV2(tableIdRef.current);
+    clearHostRecordingV2(tableIdRef.current);
+    if (host) {
+      cancelSession(host.sessionKey);
+    }
+    usedTurnKeysRef.current.clear();
+    uploader.reset();
+    setSession(null);
+    setIsEnabled(false);
+    setIsStarting(false);
+    setIsListening(false);
+    setError(null);
+    return toJoin(host);
+  }, [releaseMicrophone, uploader]);
+
+  /**
+   * 녹음을 끈다. 끄면 세션을 끝내므로 버리기와 같이 진행 중인 구간은 올리지 않고 서버 세션을 취소한 뒤 이 탭의 기록도 지운다.
+   * 청중에게 종료를 알릴 수 있도록 끝낸 세션의 참가 정보를 돌려준다.
+   */
+  const disable = discard;
+
+  // 토론 종료 화면이 아닌 곳으로 떠나면 이 탭에 남은 세션을 취소한다.
+  // 새로고침은 언마운트 정리가 돌지 않아 세션이 남고, 다시 켜면 이어서 쓴다.
+  // 지금 주소가 아직 타이머 화면이면(개발 모드의 재마운트 등) 떠난 것이 아니다.
+  useEffect(() => {
+    return () => {
+      const { pathname } = window.location;
+      const tableId = tableIdRef.current;
+      if (
+        isTimerPath(pathname, tableId) ||
+        isDebateEndPath(pathname, tableId)
+      ) {
+        return;
+      }
+      const host = getHostRecordingV2(tableId);
+      if (!host) {
+        return;
+      }
+      clearHostRecordingV2(tableId);
+      cancelSession(host.sessionKey);
+    };
+  }, []);
+
+  return {
+    isSupported,
+    isEnabled,
+    isStarting,
+    isListening,
+    pendingCount: uploader.pendingCount,
+    failedCount: uploader.failedCount,
+    error,
+    session,
+    enable,
+    disable,
+    discard,
+  };
+}
+
+// 취소는 실패해도 이 기기의 정리를 막지 않는다. 남은 세션은 서버가 오래되면 정리한다.
+function cancelSession(sessionKey: string) {
+  void postRecordingCancelV2(sessionKey).catch(() => undefined);
+}
+
+// 이 탭에 남은 세션이 아직 녹음 중일 때만 이어서 쓴다.
+// 이전 토론에서 끝냈거나 서버에 없는 세션으로 확인되면 지우고, 조회 자체가 실패하면 지우지 않고 오류를 던진다.
+// 조회하는 사이 이 탭에 다른 세션이 저장됐으면 그 기록은 지우지 않는다.
+async function findRecordingHost(tableId: number) {
+  const host = getHostRecordingV2(tableId);
+  if (!host) {
+    return null;
+  }
+  const session = await getRecordingSessionV2(host.sessionKey).catch(
+    (error: unknown) => {
+      if (error instanceof APIError && error.status === 404) {
+        return null;
+      }
+      throw error;
+    },
+  );
+  if (session?.status === 'RECORDING') {
+    return host;
+  }
+  if (getHostRecordingV2(tableId)?.sessionKey === host.sessionKey) {
+    clearHostRecordingV2(tableId);
+  }
+  return null;
+}
+
+function toJoin(
+  host: { sessionKey: string; joinCode: string } | null,
+): RecordingJoin | null {
+  return host ? { sessionKey: host.sessionKey, joinCode: host.joinCode } : null;
+}

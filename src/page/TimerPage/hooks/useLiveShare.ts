@@ -2,7 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { socketManager } from '../../../apis/sockets/SocketManager';
 import useChairmanSocket from '../../../hooks/sockets/useChairmanSocket';
 import useGetChairmanToken from '../../../hooks/query/useGetChairmanToken';
-import { SocketEventType, TimerDataPayload } from '../../../apis/sockets/type';
+import {
+  RecordingEventType,
+  RecordingJoinPayload,
+  SocketEventType,
+  TimerDataPayload,
+} from '../../../apis/sockets/type';
 import { isSocketError } from '../../../apis/sockets/error';
 import { getJwtExpiresAt } from '../../../util/jwt';
 
@@ -63,6 +68,7 @@ export function useLiveShare(
     isConnected: isSocketConnected,
     isReplaced,
     sendDebateEvent,
+    getLastTransitionVersion,
     error: socketError,
   } = useChairmanSocket(tableId, { onSyncRequest, getAuthToken });
 
@@ -105,14 +111,24 @@ export function useLiveShare(
   // 토큰을 첨부하여 토론 이벤트를 전송하는 함수
   // 기기가 절전 상태였다가 깨어나는 등 갱신 시점을 놓쳐 토큰이 만료됐다면 곧바로 새 토큰을 요청한다
   // (이번 이벤트는 거부될 수 있지만, 새 토큰을 받은 뒤 heartbeat가 현재 상태를 다시 공유한다)
+  // 녹음 참여·종료 이벤트는 다기기 녹음 참가 정보(recording)를 함께 보낸다.
   const issueEvent = useCallback(
-    (eventType: SocketEventType, payload: TimerDataPayload | null) => {
+    (
+      eventType: SocketEventType | RecordingEventType,
+      payload: TimerDataPayload | null,
+      recording?: RecordingJoinPayload,
+    ) => {
       const expiresAt = chairmanToken ? getJwtExpiresAt(chairmanToken) : null;
       if (expiresAt !== null && expiresAt <= Date.now()) {
         void refetchChairmanToken();
       }
 
-      sendDebateEvent(eventType, payload, chairmanToken ?? '');
+      const authToken = chairmanToken ?? '';
+      if (recording) {
+        sendDebateEvent(eventType, payload, authToken, recording);
+        return;
+      }
+      sendDebateEvent(eventType, payload, authToken);
     },
     [chairmanToken, refetchChairmanToken, sendDebateEvent],
   );
@@ -262,6 +278,8 @@ export function useLiveShare(
     toggleLiveShareModal,
     liveShareModalRef,
     issueEvent,
+    // 청중에게 보낸 마지막 타이머 전환 이벤트의 version. 다기기 녹음의 턴 키로 쓴다.
+    getLastTransitionVersion,
     connect,
     disconnect,
     shareUrl,
