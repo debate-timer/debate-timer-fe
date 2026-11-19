@@ -90,7 +90,7 @@ function installFakeSocket(): FakeSocket {
         unsubscribe: () => subscriptions.delete(destination),
       } as StompSubscription;
     },
-    publish: () => {},
+    publish: () => true,
     onConnectEvent: (listener) => {
       connectListeners.add(listener);
     },

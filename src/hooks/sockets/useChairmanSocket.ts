@@ -3,6 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { IMessage } from '@stomp/stompjs';
 import {
   CHAIRMAN_SESSION_HEADER,
+  RecordingEventType,
+  RecordingJoinPayload,
   SocketEventType,
   SocketMessage,
   TimerDataPayload,
@@ -123,6 +125,8 @@ export default function useChairmanSocket(
 
   // 마지막으로 발행한 이벤트의 version
   const versionRef = useRef(0);
+  // 청중에게 보낸 마지막 타이머 전환 이벤트(SYNC 제외)의 version. 다기기 녹음의 턴 키로 쓴다.
+  const lastTransitionVersionRef = useRef<number | null>(null);
 
   // 사용자가 공유를 시작했는지 여부 (탭 복귀 시 자동 재연결 여부를 가른다)
   const hasStartedSharingRef = useRef(false);
@@ -276,13 +280,15 @@ export default function useChairmanSocket(
     resetSignalState();
   }, [error, resetSignalState]);
 
-  // 사회자 권한으로 특정 제어 메시지를 발행하는 함수
+  // 사회자 권한으로 특정 제어 메시지를 발행하는 함수. 연결되어 있어 발행했으면 true를 돌려준다.
+  // 녹음 참여·종료 이벤트(RECORDING_OPENED·RECORDING_CLOSED)는 다기기 녹음 참가 정보(recording)를 함께 보낸다.
   const sendDebateEvent = useCallback(
     (
-      eventType: SocketEventType,
+      eventType: SocketEventType | RecordingEventType,
       payload: TimerDataPayload | null,
       authToken: string,
-    ) => {
+      recording?: RecordingJoinPayload,
+    ): boolean => {
       const destination = `/app/event/${roomId}`;
       let body: SocketMessage;
 
@@ -292,14 +298,27 @@ export default function useChairmanSocket(
       if (isTimerEventType(eventType)) {
         if (payload === null) {
           console.error('No payload for timer event.');
-          return;
-        } else {
-          body = {
-            eventType,
-            data: payload,
-            version,
-          };
+          return false;
         }
+        body = {
+          eventType,
+          data: payload,
+          version,
+        };
+      } else if (
+        eventType === 'RECORDING_OPENED' ||
+        eventType === 'RECORDING_CLOSED'
+      ) {
+        if (!recording) {
+          console.error('No recording join for recording event.');
+          return false;
+        }
+        body = {
+          eventType,
+          data: null,
+          version,
+          recording,
+        };
       } else {
         body = {
           eventType,
@@ -309,12 +328,26 @@ export default function useChairmanSocket(
       }
 
       versionRef.current = version;
-      publish(destination, body, {
+      const isPublished = publish(destination, body, {
         Authorization: authToken,
         [CHAIRMAN_SESSION_HEADER]: chairmanSessionIdRef.current,
       });
+      if (isPublished && isTimerEventType(eventType) && eventType !== 'SYNC') {
+        lastTransitionVersionRef.current = version;
+      }
+      return isPublished;
     },
     [roomId, publish],
+  );
+
+  /**
+   * 청중이 받은 마지막 타이머 전환 이벤트(재생·정지·이동·팀 전환 등, SYNC 제외)의 version.
+   * 청중 기기는 구간을 시작한 이벤트의 version으로 턴 키를 만들므로, 사회자 기기도 같은 값을 쓴다.
+   * 아직 보낸 적이 없으면 null이다.
+   */
+  const getLastTransitionVersion = useCallback(
+    () => lastTransitionVersionRef.current,
+    [],
   );
 
   return {
@@ -323,6 +356,7 @@ export default function useChairmanSocket(
     connect: connectChairmanSocket,
     disconnect: disconnectChairmanSocket,
     sendDebateEvent,
+    getLastTransitionVersion,
     isConnected,
     isReplaced,
     error,

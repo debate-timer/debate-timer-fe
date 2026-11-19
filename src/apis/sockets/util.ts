@@ -1,4 +1,6 @@
 import {
+  RecordingEventType,
+  RecordingJoinPayload,
   ChairmanNotice,
   NonTimerEventType,
   ServerEventType,
@@ -22,13 +24,13 @@ const NON_TIMER_EVENT_TYPES: NonTimerEventType[] = ['FINISHED', 'ERROR'];
 const SERVER_EVENT_TYPES: ServerEventType[] = ['CHAIRMAN_ABSENT'];
 
 export function isTimerEventType(
-  event: SocketEventType,
+  event: SocketEventType | RecordingEventType,
 ): event is TimerEventTypes {
   return TIMER_EVENT_TYPES.includes(event as TimerEventTypes);
 }
 
 export function isNonTimerEventType(
-  event: SocketEventType,
+  event: SocketEventType | RecordingEventType,
 ): event is NonTimerEventType {
   return NON_TIMER_EVENT_TYPES.includes(event as NonTimerEventType);
 }
@@ -49,13 +51,25 @@ function isBoolean(value: unknown): value is boolean {
   return typeof value === 'boolean';
 }
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0;
+}
+
+function isRecordingJoinPayload(value: unknown): value is RecordingJoinPayload {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return isNonEmptyString(obj.sessionKey) && isNonEmptyString(obj.joinCode);
+}
+
 export function isSocketMessage(value: unknown): value is SocketMessage {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
 
   const obj = value as Record<string, unknown>;
-  const eventType = obj.eventType as SocketEventType;
+  const eventType = obj.eventType as SocketEventType | RecordingEventType;
 
   if (
     !isOptional(obj.version, isFiniteNumber) ||
@@ -123,6 +137,10 @@ export function isSocketMessage(value: unknown): value is SocketMessage {
     }
 
     return true;
+  }
+
+  if (eventType === 'RECORDING_OPENED' || eventType === 'RECORDING_CLOSED') {
+    return obj.data === null && isRecordingJoinPayload(obj.recording);
   }
 
   if (
