@@ -1,135 +1,88 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { getAuthRevision } from '../../../util/accessToken';
-import usePostTranscript from '../../../hooks/mutations/usePostTranscript';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  clearTranscriptDraft,
-  getTranscriptDraftContext,
-  isTranscriptDraftCurrent,
   countPendingSegments,
   getSubmittedTranscriptId,
   getTranscriptDraft,
   hasTranscriptDraft,
-  setSubmittedTranscriptId,
-  toSpeechSegments,
+  markTranscriptDraftEnded,
+  retryTranscriptSubmit,
+  TRANSCRIPT_DRAFT_CHANGE_EVENT,
 } from '../../../util/transcriptDraft';
 
 export type SubmitTranscriptStatus =
   'none' | 'transcribing' | 'submitting' | 'ready' | 'error';
 
-// Soniox 전사 결과는 타이머 화면에서 시작한 요청이 초안(sessionStorage)에 직접 쓰므로 주기적으로 다시 읽는다.
+// 전사 대기 만료는 초안 변경 없이 오므로 대기 중에는 주기적으로 다시 읽는다.
 export const PENDING_POLL_INTERVAL_MS = 500;
 
-function readPendingCount(tableId: number): number {
+interface SubmitSnapshot {
+  transcriptId: number | null;
+  pendingCount: number;
+  hasDraft: boolean;
+  isFailed: boolean;
+}
+
+function readSnapshot(tableId: number): SubmitSnapshot {
   const draft = getTranscriptDraft(tableId);
-  return draft ? countPendingSegments(draft, Date.now()) : 0;
+  return {
+    transcriptId: getSubmittedTranscriptId(tableId),
+    pendingCount: draft ? countPendingSegments(draft, Date.now()) : 0,
+    hasDraft: hasTranscriptDraft(tableId),
+    isFailed: draft?.isSubmitFailed ?? false,
+  };
+}
+
+function isSameSnapshot(a: SubmitSnapshot, b: SubmitSnapshot) {
+  return (
+    a.transcriptId === b.transcriptId &&
+    a.pendingCount === b.pendingCount &&
+    a.hasDraft === b.hasDraft &&
+    a.isFailed === b.isFailed
+  );
 }
 
 /**
- * 토론 종료 화면에 들어오면 타이머 화면에서 쌓은 기록 초안을 서버로 한 번 보낸다.
- * Soniox 모드에서 아직 전사 중인 구간이 있으면 모두 끝난 뒤 보낸다.
- * 받은 기록 ID는 테이블별로 보관해 새로고침해도 다시 보내지 않는다.
+ * 토론 종료 화면에 들어오면 타이머 화면에서 쌓은 기록 초안을 끝낸 것으로 표시한다.
+ * 제출은 앱 수명의 `useTranscriptDraftSubmitter`가 맡으므로 이 화면을 바로 떠나도 이어진다.
+ * 이 훅은 초안의 전사 대기·제출 결과를 읽어 표시 상태로 돌려준다.
  */
 export default function useSubmitTranscript(tableId: number) {
-  const [transcriptId, setTranscriptId] = useState<number | null>(() =>
-    getSubmittedTranscriptId(tableId),
-  );
-  const [hasDraft, setHasDraft] = useState(() => hasTranscriptDraft(tableId));
-  const [pendingCount, setPendingCount] = useState(() =>
-    readPendingCount(tableId),
-  );
-  const [isFailed, setIsFailed] = useState(false);
-  const hasRequestedRef = useRef(false);
-  const identityRef = useRef({ tableId, revision: getAuthRevision() });
+  const [snapshot, setSnapshot] = useState(() => readSnapshot(tableId));
 
   useEffect(() => {
-    if (identityRef.current.tableId !== tableId) {
-      identityRef.current = { tableId, revision: getAuthRevision() };
-      hasRequestedRef.current = false;
-      setTranscriptId(getSubmittedTranscriptId(tableId));
-      setHasDraft(hasTranscriptDraft(tableId));
-      setPendingCount(readPendingCount(tableId));
-      setIsFailed(false);
-    }
-    const handleIdentity = () => {
-      if (identityRef.current.revision !== getAuthRevision()) {
-        hasRequestedRef.current = true;
-        setTranscriptId(null);
-        setHasDraft(false);
-        setPendingCount(0);
-        setIsFailed(false);
-      }
-    };
-    window.addEventListener('auth-changed', handleIdentity);
-    window.addEventListener('storage', handleIdentity);
+    markTranscriptDraftEnded(tableId, Date.now());
+    const refresh = () =>
+      setSnapshot((previous) => {
+        const next = readSnapshot(tableId);
+        return isSameSnapshot(previous, next) ? previous : next;
+      });
+    refresh();
+    window.addEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, refresh);
+    window.addEventListener('auth-changed', refresh);
     return () => {
-      window.removeEventListener('auth-changed', handleIdentity);
-      window.removeEventListener('storage', handleIdentity);
+      window.removeEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, refresh);
+      window.removeEventListener('auth-changed', refresh);
     };
   }, [tableId]);
 
-  // 요청 상태는 Mutation 관찰자 대신 콜백으로 직접 관리한다.
-  // StrictMode의 effect 재실행 중 시작한 요청은 관찰자 상태가 갱신되지 않을 수 있다.
-  const { mutate, isPending } = usePostTranscript(
-    (id, context) => {
-      if (!isTranscriptDraftCurrent(context)) {
-        return;
-      }
-      setSubmittedTranscriptId(context, id);
-      clearTranscriptDraft(context);
-      if (context.tableId === identityRef.current.tableId) {
-        setTranscriptId(id);
-      }
-    },
-    (context) => {
-      if (
-        context.tableId === identityRef.current.tableId &&
-        isTranscriptDraftCurrent(context)
-      ) {
-        setIsFailed(true);
-      }
-    },
-  );
-
-  const submit = useCallback(() => {
-    const draft = getTranscriptDraft(tableId);
-    const context = getTranscriptDraftContext(tableId);
-    if (!draft || !context || isPending) {
-      return;
-    }
-    setIsFailed(false);
-    mutate({
-      context,
-      body: { segments: toSpeechSegments(draft), sttMode: draft.sttMode },
-    });
-  }, [isPending, mutate, tableId]);
+  const { transcriptId, pendingCount, hasDraft, isFailed } = snapshot;
 
   useEffect(() => {
     if (pendingCount === 0) {
       return;
     }
-    const timer = setInterval(() => {
-      const nextPendingCount = readPendingCount(tableId);
-      setPendingCount(nextPendingCount);
-      if (nextPendingCount === 0) {
-        setHasDraft(hasTranscriptDraft(tableId));
-      }
-    }, PENDING_POLL_INTERVAL_MS);
+    const timer = setInterval(
+      () =>
+        setSnapshot((previous) => {
+          const next = readSnapshot(tableId);
+          return isSameSnapshot(previous, next) ? previous : next;
+        }),
+      PENDING_POLL_INTERVAL_MS,
+    );
     return () => clearInterval(timer);
   }, [pendingCount, tableId]);
 
-  useEffect(() => {
-    if (
-      isPending ||
-      hasRequestedRef.current ||
-      transcriptId !== null ||
-      !hasDraft ||
-      pendingCount > 0
-    ) {
-      return;
-    }
-    hasRequestedRef.current = true;
-    submit();
-  }, [hasDraft, isPending, pendingCount, submit, transcriptId]);
+  const retry = useCallback(() => retryTranscriptSubmit(tableId), [tableId]);
 
   const getStatus = (): SubmitTranscriptStatus => {
     if (transcriptId !== null) {
@@ -147,5 +100,5 @@ export default function useSubmitTranscript(tableId: number) {
     return 'none';
   };
 
-  return { status: getStatus(), transcriptId, pendingCount, retry: submit };
+  return { status: getStatus(), transcriptId, pendingCount, retry };
 }
