@@ -9,8 +9,14 @@ import {
   getSubmittedTranscriptId,
   getTranscriptDraft,
   hasTranscriptDraft,
+  isSameTranscriptDraft,
+  listEndedTranscriptDrafts,
+  markTranscriptDraftEnded,
+  retryTranscriptSubmit,
   setSubmittedTranscriptId,
+  setTranscriptSubmitFailed,
   startTranscriptDraft,
+  TRANSCRIPT_DRAFT_CHANGE_EVENT,
 } from './transcriptDraft';
 
 describe('토론 기록 초안 저장소', () => {
@@ -27,6 +33,8 @@ describe('토론 기록 초안 저장소', () => {
       segments: [],
       pendingSegments: [],
       failedSegmentCount: 0,
+      endedAt: null,
+      isSubmitFailed: false,
     });
     expect(hasTranscriptDraft(3)).toBe(false);
   });
@@ -122,6 +130,59 @@ describe('토론 기록 초안 저장소', () => {
       sttMode: 'RPC',
       pendingSegments: [],
       failedSegmentCount: 0,
+    });
+  });
+
+  describe('종료한 초안의 제출 대기', () => {
+    const SEGMENT = { id: 's1', timeBoxIndex: 0, team: null };
+
+    it('토론을 끝내면 종료 시각을 한 번만 기록하고 제출 대기 목록에 올린다', () => {
+      startTranscriptDraft(3, 1000);
+      startTranscriptDraft(4, 1000);
+      expect(listEndedTranscriptDrafts()).toEqual([]);
+
+      markTranscriptDraftEnded(3, 5000);
+      markTranscriptDraftEnded(3, 9000);
+
+      expect(getTranscriptDraft(3)?.endedAt).toBe(5000);
+      expect(listEndedTranscriptDrafts()).toEqual([
+        { tableId: 3, draft: expect.objectContaining({ startedAt: 1000 }) },
+      ]);
+    });
+
+    it('시작 시각으로 같은 초안인지 구분한다', () => {
+      startTranscriptDraft(3, 1000);
+      expect(isSameTranscriptDraft(3, 1000)).toBe(true);
+
+      startTranscriptDraft(3, 9000);
+      expect(isSameTranscriptDraft(3, 1000)).toBe(false);
+    });
+
+    it('제출 실패를 같은 초안에만 기록하고 다시 시도하면 지운다', () => {
+      startTranscriptDraft(3, 1000);
+      appendUtterance(3, SEGMENT, '찬성 입론', 2000);
+      markTranscriptDraftEnded(3, 5000);
+
+      setTranscriptSubmitFailed(3, 999, true);
+      expect(getTranscriptDraft(3)?.isSubmitFailed).toBe(false);
+
+      setTranscriptSubmitFailed(3, 1000, true);
+      expect(getTranscriptDraft(3)?.isSubmitFailed).toBe(true);
+
+      retryTranscriptSubmit(3);
+      expect(getTranscriptDraft(3)?.isSubmitFailed).toBe(false);
+    });
+
+    it('초안이 바뀌면 변경 이벤트를 보낸다', () => {
+      const listener = vi.fn();
+      window.addEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, listener);
+
+      startTranscriptDraft(3, 1000);
+      markTranscriptDraftEnded(3, 5000);
+      clearTranscriptDraft(3);
+
+      window.removeEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, listener);
+      expect(listener).toHaveBeenCalledTimes(3);
     });
   });
 
