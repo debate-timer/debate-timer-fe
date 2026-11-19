@@ -3,10 +3,13 @@ import { SpeechSegment, SttMode, Utterance } from '../types/transcript';
 import { getAccessToken, getAuthRevision, getMemberId } from './accessToken';
 import { createRandomId } from './randomId';
 
-// 토론 기록 초안은 타이머 화면에서 쌓고, 종료 화면에서 서버로 보낸다.
+// 토론 기록 초안은 타이머 화면에서 쌓고, 토론을 끝내면 앱 수명의 제출기가 서버로 보낸다.
 // 화면 이동과 새로고침을 견디도록 테이블별 sessionStorage에 둔다.
+// 끝냈지만 아직 제출하지 못한 초안은 같은 테이블로 새 기록을 시작할 때 초안 ID 키로 옮겨 보관한다.
 const DRAFT_KEY_PREFIX = 'TranscriptDraft:';
 const SUBMITTED_KEY_PREFIX = 'TranscriptSubmitted:';
+// 초안이 바뀔 때 같은 탭의 제출기와 종료 화면에 알리는 이벤트
+export const TRANSCRIPT_DRAFT_CHANGE_EVENT = 'transcript-draft-change';
 // 서버 전사 제한 시간(3분)에 여유를 둔 값. 지나도 응답이 없으면 새로고침 등으로 요청이 끊긴 것으로 본다.
 export const PENDING_SEGMENT_TIMEOUT_MS = 4 * 60 * 1000;
 
@@ -28,6 +31,10 @@ export interface TranscriptDraft {
   // Soniox 모드에서 서버 전사를 기다리는 구간
   pendingSegments: PendingSegment[];
   failedSegmentCount: number;
+  // 토론을 끝낸 시각. 끝낸 초안만 제출한다.
+  endedAt: number | null;
+  // 자동 재시도까지 모두 실패해 사용자의 다시 시도를 기다리는지
+  isSubmitFailed: boolean;
 }
 
 /** 비동기 결과가 시작한 계정·초안에만 반영되도록 보존하는 호출 문맥임. */
@@ -62,20 +69,26 @@ export function getTranscriptDraftContext(
     : null;
 }
 
-/** 숫자 인자는 동기 호출용이며 비동기 작업에는 시작 시 확보한 문맥을 전달함. */
+/**
+ * 숫자 인자는 동기 호출용으로 테이블의 현재 초안만 찾음.
+ * 비동기 작업은 시작 시 확보한 문맥을 전달하며, 새 기록 시작으로 보관된 초안도 찾음.
+ */
 function resolveDraft(target: number | TranscriptDraftContext) {
-  const tableId = typeof target === 'number' ? target : target.tableId;
-  const draft = getTranscriptDraft(tableId);
-  if (
-    !draft ||
-    (typeof target !== 'number' &&
-      (target.draftId !== draft.draftId ||
-        target.memberId !== draft.memberId ||
-        target.authRevision !== getAuthRevision()))
-  ) {
+  if (typeof target === 'number') {
+    const draft = getTranscriptDraft(target);
+    return draft ? { tableId: target, key: draftKey(target), draft } : null;
+  }
+  if (target.authRevision !== getAuthRevision()) {
     return null;
   }
-  return { tableId, draft };
+  const { tableId, draftId, memberId } = target;
+  for (const key of [draftKey(tableId), archivedDraftKey(tableId, draftId)]) {
+    const draft = readDraft(key);
+    if (draft && draft.draftId === draftId && draft.memberId === memberId) {
+      return { tableId, key, draft };
+    }
+  }
+  return null;
 }
 
 export interface SegmentKey {
@@ -85,11 +98,21 @@ export interface SegmentKey {
 }
 
 const draftKey = (tableId: number) => `${DRAFT_KEY_PREFIX}${tableId}`;
+const archivedDraftKey = (tableId: number, draftId: string) =>
+  `${DRAFT_KEY_PREFIX}${tableId}:${draftId}`;
 const submittedKey = (tableId: number) => `${SUBMITTED_KEY_PREFIX}${tableId}`;
 
+function notifyDraftChange() {
+  window.dispatchEvent(new Event(TRANSCRIPT_DRAFT_CHANGE_EVENT));
+}
+
 export function getTranscriptDraft(tableId: number): TranscriptDraft | null {
+  return readDraft(draftKey(tableId));
+}
+
+function readDraft(key: string): TranscriptDraft | null {
   try {
-    const raw = sessionStorage.getItem(draftKey(tableId));
+    const raw = sessionStorage.getItem(key);
     if (!raw) {
       return null;
     }
@@ -110,18 +133,36 @@ export function getTranscriptDraft(tableId: number): TranscriptDraft | null {
       segments: draft.segments ?? [],
       pendingSegments: draft.pendingSegments ?? [],
       failedSegmentCount: draft.failedSegmentCount ?? 0,
+      endedAt: draft.endedAt ?? null,
+      isSubmitFailed: draft.isSubmitFailed ?? false,
     };
   } catch {
     return null;
   }
 }
 
-function saveDraft(tableId: number, draft: TranscriptDraft) {
+function saveDraft(key: string, draft: TranscriptDraft) {
   try {
-    sessionStorage.setItem(draftKey(tableId), JSON.stringify(draft));
+    sessionStorage.setItem(key, JSON.stringify(draft));
   } catch {
     /* 저장소 차단 시 다른 초안에 쓰지 않음. */
   }
+  notifyDraftChange();
+}
+
+function removeDraft(key: string) {
+  sessionStorage.removeItem(key);
+  notifyDraftChange();
+}
+
+// 끝냈지만 제출하지 못한 초안은 새 초안이 덮어쓰지 않도록 초안 ID 키로 옮긴다.
+// 끝내지 않은 초안은 지금처럼 새 초안으로 바꾼다.
+function archiveEndedDraft(tableId: number) {
+  const draft = getTranscriptDraft(tableId);
+  if (!draft || draft.endedAt === null) {
+    return;
+  }
+  saveDraft(archivedDraftKey(tableId, draft.draftId), draft);
 }
 
 export function startTranscriptDraft(
@@ -131,7 +172,8 @@ export function startTranscriptDraft(
 ) {
   const memberId = currentMemberId();
   const draftId = createRandomId();
-  saveDraft(tableId, {
+  archiveEndedDraft(tableId);
+  saveDraft(draftKey(tableId), {
     memberId,
     draftId,
     startedAt,
@@ -139,6 +181,8 @@ export function startTranscriptDraft(
     segments: [],
     pendingSegments: [],
     failedSegmentCount: 0,
+    endedAt: null,
+    isSubmitFailed: false,
   });
   sessionStorage.removeItem(submittedKey(tableId));
   return { tableId, memberId, draftId, authRevision: getAuthRevision() };
@@ -154,7 +198,7 @@ export function appendUtterance(
   if (!resolved) {
     return;
   }
-  const { tableId, draft } = resolved;
+  const { key, draft } = resolved;
   const trimmed = text.trim();
   if (!draft || trimmed === '') {
     return;
@@ -170,7 +214,7 @@ export function appendUtterance(
   } else {
     draft.segments.push({ ...segmentKey, utterances: [utterance] });
   }
-  saveDraft(tableId, draft);
+  saveDraft(key, draft);
 }
 
 export function markSegmentPending(
@@ -182,9 +226,9 @@ export function markSegmentPending(
   if (!resolved) {
     return;
   }
-  const { tableId, draft } = resolved;
+  const { key, draft } = resolved;
   draft.pendingSegments.push({ id: segmentId, requestedAt });
-  saveDraft(tableId, draft);
+  saveDraft(key, draft);
 }
 
 /**
@@ -201,7 +245,7 @@ export function appendSegmentUtterances(
   if (!resolved) {
     return;
   }
-  const { tableId, draft } = resolved;
+  const { key, draft } = resolved;
   const segmentOffsetMs = segmentStartedAt - draft.startedAt;
   const converted = utterances
     .map(({ offsetMs, text }) => ({
@@ -215,7 +259,7 @@ export function appendSegmentUtterances(
   draft.pendingSegments = draft.pendingSegments.filter(
     ({ id }) => id !== segmentKey.id,
   );
-  saveDraft(tableId, draft);
+  saveDraft(key, draft);
 }
 
 export function failPendingSegment(
@@ -226,12 +270,12 @@ export function failPendingSegment(
   if (!resolved) {
     return;
   }
-  const { tableId, draft } = resolved;
+  const { key, draft } = resolved;
   draft.pendingSegments = draft.pendingSegments.filter(
     ({ id }) => id !== segmentId,
   );
   draft.failedSegmentCount += 1;
-  saveDraft(tableId, draft);
+  saveDraft(key, draft);
 }
 
 export function countPendingSegments(
@@ -252,10 +296,7 @@ export function hasTranscriptDraft(
   if (!draft) {
     return false;
   }
-  return (
-    draft.segments.some(({ utterances }) => utterances.length) ||
-    countPendingSegments(draft, now) > 0
-  );
+  return hasDraftUtterances(draft) || countPendingSegments(draft, now) > 0;
 }
 
 // 서버 요청 형식으로 바꾼다. 구간 ID는 화면에서만 쓰는 값이라 뺀다.
@@ -269,21 +310,103 @@ export function toSpeechSegments(draft: TranscriptDraft): SpeechSegment[] {
 
 export function clearTranscriptDraft(target: number | TranscriptDraftContext) {
   const tableId = typeof target === 'number' ? target : target.tableId;
+  const keys =
+    typeof target === 'number'
+      ? [draftKey(tableId)]
+      : [draftKey(tableId), archivedDraftKey(tableId, target.draftId)];
   try {
     // 계정이 바뀐 직후에도 자신이 시작한 초안만 폐기할 수 있어야 함.
-    const raw = sessionStorage.getItem(draftKey(tableId));
-    const saved = raw ? JSON.parse(raw) : null;
-    if (
-      (typeof target === 'number' && saved?.memberId === currentMemberId()) ||
-      (typeof target !== 'number' &&
-        saved?.draftId === target.draftId &&
-        saved?.memberId === target.memberId)
-    ) {
-      sessionStorage.removeItem(draftKey(tableId));
+    for (const key of keys) {
+      const raw = sessionStorage.getItem(key);
+      const saved = raw ? JSON.parse(raw) : null;
+      if (
+        (typeof target === 'number' && saved?.memberId === currentMemberId()) ||
+        (typeof target !== 'number' &&
+          saved?.draftId === target.draftId &&
+          saved?.memberId === target.memberId)
+      ) {
+        removeDraft(key);
+        return;
+      }
     }
   } catch {
     /* 저장소 차단·손상은 새 초안 생성으로 보완하지 않음. */
   }
+}
+
+/** 토론을 끝낸 시각을 처음 한 번만 기록해 앱 수명의 제출기가 보내게 함. */
+export function markTranscriptDraftEnded(tableId: number, endedAt: number) {
+  const draft = getTranscriptDraft(tableId);
+  if (!draft || draft.endedAt !== null) {
+    return;
+  }
+  draft.endedAt = endedAt;
+  saveDraft(draftKey(tableId), draft);
+}
+
+export function setTranscriptSubmitFailed(
+  context: TranscriptDraftContext,
+  isSubmitFailed: boolean,
+) {
+  const resolved = resolveDraft(context);
+  if (!resolved) {
+    return;
+  }
+  resolved.draft.isSubmitFailed = isSubmitFailed;
+  saveDraft(resolved.key, resolved.draft);
+}
+
+/** 자동 재시도까지 실패한 테이블의 현재 초안을 다시 제출 대기로 돌림. */
+export function retryTranscriptSubmit(tableId: number) {
+  const draft = getTranscriptDraft(tableId);
+  if (!draft || !draft.isSubmitFailed) {
+    return;
+  }
+  draft.isSubmitFailed = false;
+  saveDraft(draftKey(tableId), draft);
+}
+
+export interface EndedTranscriptDraft {
+  context: TranscriptDraftContext;
+  draft: TranscriptDraft;
+  // 테이블의 현재 초안인지. 새 기록 시작으로 보관된 초안이면 false다.
+  isCurrent: boolean;
+}
+
+/** 현재 계정이 끝낸 초안을 현재·보관 초안 구분 없이 모음. */
+export function listEndedTranscriptDrafts(): EndedTranscriptDraft[] {
+  const drafts: EndedTranscriptDraft[] = [];
+  try {
+    for (let index = 0; index < sessionStorage.length; index += 1) {
+      const key = sessionStorage.key(index);
+      const match = key?.match(/^TranscriptDraft:(\d+)(:.+)?$/);
+      if (!key || !match) {
+        continue;
+      }
+      const draft = readDraft(key);
+      if (!draft || draft.endedAt === null) {
+        continue;
+      }
+      const tableId = Number(match[1]);
+      drafts.push({
+        context: {
+          tableId,
+          memberId: draft.memberId,
+          draftId: draft.draftId,
+          authRevision: getAuthRevision(),
+        },
+        draft,
+        isCurrent: match[2] === undefined,
+      });
+    }
+  } catch {
+    return [];
+  }
+  return drafts;
+}
+
+export function hasDraftUtterances(draft: TranscriptDraft): boolean {
+  return draft.segments.some(({ utterances }) => utterances.length);
 }
 
 export function setSubmittedTranscriptId(
@@ -291,13 +414,18 @@ export function setSubmittedTranscriptId(
   transcriptId: number,
 ) {
   const tableId = typeof target === 'number' ? target : target.tableId;
-  if (typeof target !== 'number' && !resolveDraft(target)) {
+  // 보관한 이전 초안의 ID를 남기면 같은 테이블의 새 토론이 이전 기록을 자기 기록으로 보여 준다.
+  if (
+    typeof target !== 'number' &&
+    resolveDraft(target)?.key !== draftKey(tableId)
+  ) {
     return;
   }
   sessionStorage.setItem(
     submittedKey(tableId),
     JSON.stringify({ memberId: currentMemberId(), transcriptId }),
   );
+  notifyDraftChange();
 }
 
 export function getSubmittedTranscriptId(tableId: number): number | null {

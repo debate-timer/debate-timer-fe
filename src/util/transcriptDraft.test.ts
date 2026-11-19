@@ -9,8 +9,13 @@ import {
   getSubmittedTranscriptId,
   getTranscriptDraft,
   hasTranscriptDraft,
+  listEndedTranscriptDrafts,
+  markTranscriptDraftEnded,
+  retryTranscriptSubmit,
   setSubmittedTranscriptId,
+  setTranscriptSubmitFailed,
   startTranscriptDraft,
+  TRANSCRIPT_DRAFT_CHANGE_EVENT,
 } from './transcriptDraft';
 import { setAccessToken, setMemberId } from './accessToken';
 
@@ -153,6 +158,106 @@ describe('토론 기록 초안 저장소', () => {
     );
     expect(getTranscriptDraft(3)?.segments).toEqual([]);
     localStorage.clear();
+  });
+
+  describe('종료한 초안의 제출 대기', () => {
+    const SEGMENT = { id: 's1', timeBoxIndex: 0, team: null };
+
+    it('토론을 끝내면 종료 시각을 한 번만 기록하고 제출 대기 목록에 올린다', () => {
+      const context = startTranscriptDraft(3, 1000);
+      expect(listEndedTranscriptDrafts()).toEqual([]);
+
+      markTranscriptDraftEnded(3, 5000);
+      markTranscriptDraftEnded(3, 9000);
+
+      expect(getTranscriptDraft(3)?.endedAt).toBe(5000);
+      expect(listEndedTranscriptDrafts()).toEqual([
+        {
+          context: { ...context, authRevision: expect.any(Number) },
+          draft: expect.objectContaining({ draftId: context.draftId }),
+          isCurrent: true,
+        },
+      ]);
+    });
+
+    it('끝낸 초안이 있는 테이블로 새 기록을 시작하면 이전 초안을 따로 보관한다', () => {
+      const previous = startTranscriptDraft(3, 1000, 'SONIOX');
+      markSegmentPending(previous, 's1', Date.now());
+      markTranscriptDraftEnded(3, 5000);
+
+      startTranscriptDraft(3, 9000);
+      appendSegmentUtterances(previous, SEGMENT, 2000, [
+        { offsetMs: 0, text: '지연 결과' },
+      ]);
+
+      expect(getTranscriptDraft(3)).toMatchObject({
+        startedAt: 9000,
+        segments: [],
+      });
+      const [archived] = listEndedTranscriptDrafts();
+      expect(archived.isCurrent).toBe(false);
+      expect(archived.context.draftId).toBe(previous.draftId);
+      expect(archived.draft.segments).toHaveLength(1);
+      expect(archived.draft.pendingSegments).toEqual([]);
+
+      clearTranscriptDraft(archived.context);
+      expect(listEndedTranscriptDrafts()).toEqual([]);
+      expect(getTranscriptDraft(3)?.startedAt).toBe(9000);
+    });
+
+    it('끝내지 않은 초안은 새 기록 시작 시 보관하지 않는다', () => {
+      startTranscriptDraft(3, 1000);
+      appendUtterance(3, SEGMENT, '중단한 토론', 2000);
+
+      startTranscriptDraft(3, 9000);
+
+      expect(listEndedTranscriptDrafts()).toEqual([]);
+    });
+
+    it('보관한 초안의 제출 ID는 현재 테이블의 제출 ID로 남기지 않는다', () => {
+      const previous = startTranscriptDraft(3, 1000);
+      appendUtterance(3, SEGMENT, '이전 토론', 2000);
+      markTranscriptDraftEnded(3, 5000);
+      startTranscriptDraft(3, 9000);
+
+      setSubmittedTranscriptId(previous, 77);
+
+      expect(getSubmittedTranscriptId(3)).toBeNull();
+    });
+
+    it('제출 실패를 기록하고 다시 시도하면 실패 표시를 지운다', () => {
+      const context = startTranscriptDraft(3, 1000);
+      markTranscriptDraftEnded(3, 5000);
+
+      setTranscriptSubmitFailed(context, true);
+      expect(getTranscriptDraft(3)?.isSubmitFailed).toBe(true);
+
+      retryTranscriptSubmit(3);
+      expect(getTranscriptDraft(3)?.isSubmitFailed).toBe(false);
+    });
+
+    it('다른 계정의 끝낸 초안은 제출 대기 목록에 올리지 않는다', () => {
+      setAccessToken('token');
+      setMemberId(1);
+      startTranscriptDraft(3, 1000);
+      markTranscriptDraftEnded(3, 5000);
+      setMemberId(2);
+
+      expect(listEndedTranscriptDrafts()).toEqual([]);
+      localStorage.clear();
+    });
+
+    it('초안이 바뀌면 변경 이벤트를 보낸다', () => {
+      const listener = vi.fn();
+      window.addEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, listener);
+
+      const context = startTranscriptDraft(3, 1000);
+      markTranscriptDraftEnded(3, 5000);
+      clearTranscriptDraft(context);
+
+      window.removeEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, listener);
+      expect(listener).toHaveBeenCalledTimes(3);
+    });
   });
 
   describe('Soniox 구간 배치 전사', () => {
