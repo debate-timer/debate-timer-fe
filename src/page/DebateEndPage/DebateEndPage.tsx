@@ -15,6 +15,7 @@ import {
 import { useGetDebateTableData } from '../../hooks/query/useGetDebateTableData';
 import TranscriptBanner from './components/TranscriptBanner';
 import useSubmitTranscript from './hooks/useSubmitTranscript';
+import useMultiDeviceTranscriptResult from './hooks/useMultiDeviceTranscriptResult';
 
 // 토론 종료 후 피드백 타이머와 투표 진행 액션을 제공하는 페이지다.
 export default function DebateEndPage() {
@@ -42,7 +43,13 @@ export default function DebateEndPage() {
   };
   const { mutate } = usePostPoll(handleVoteClick);
   // 타이머 화면에서 기록한 토론이 있으면 종료와 함께 서버로 보낸다.
-  const transcript = useSubmitTranscript(tableId);
+  // 다기기 녹음이면 녹음 세션을 끝내고 서버가 만든 속기록을 기다린다.
+  const singleDeviceTranscript = useSubmitTranscript(tableId);
+  const multiDeviceTranscript = useMultiDeviceTranscriptResult(tableId);
+  const transcript =
+    multiDeviceTranscript.status === 'none'
+      ? singleDeviceTranscript
+      : { ...multiDeviceTranscript, pendingCount: 0 };
   const handleOpenTranscript = () => {
     if (transcript.transcriptId === null) {
       return;
