@@ -8,6 +8,7 @@ import FeatureFlagRoute from './FeatureFlagRoute';
 import OAuth from '../page/OAuthPage/OAuth';
 import NotFoundPage from '../components/ErrorBoundary/NotFoundPage';
 import BackActionHandler from '../components/BackActionHandler';
+import TranscriptDraftSubmitter from './TranscriptDraftSubmitter';
 import TimerPage from '../page/TimerPage/TimerPage';
 import FeedbackTimerPage from '../page/TimerPage/FeedbackTimerPage';
 import LandingPage from '../page/LandingPage/LandingPage';
@@ -138,6 +139,7 @@ const router = createBrowserRouter(
         <>
           <ErrorBoundaryWrapper />
           <BackActionHandler />
+          <TranscriptDraftSubmitter />
         </>
       ),
       children: [

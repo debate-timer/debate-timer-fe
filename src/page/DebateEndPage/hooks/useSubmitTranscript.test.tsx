@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { ReactNode, StrictMode } from 'react';
 import { http, HttpResponse } from 'msw';
@@ -13,21 +12,20 @@ import {
   setSubmittedTranscriptId,
   startTranscriptDraft,
 } from '../../../util/transcriptDraft';
+import useTranscriptDraftSubmitter from '../../../hooks/useTranscriptDraftSubmitter';
 import useSubmitTranscript from './useSubmitTranscript';
 
 function createWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
   return function Wrapper({ children }: { children: ReactNode }) {
-    return (
-      <StrictMode>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </StrictMode>
-    );
+    return <StrictMode>{children}</StrictMode>;
   };
+}
+
+// 라우터 최상위의 제출기와 종료 화면을 함께 띄운 상태. 자동 재시도 없이 바로 실패를 표시한다.
+const NO_RETRY: number[] = [];
+function useEndPageTranscript(tableId: number) {
+  useTranscriptDraftSubmitter({ retryDelaysMs: NO_RETRY });
+  return useSubmitTranscript(tableId);
 }
 
 function prepareDraft() {
@@ -46,7 +44,7 @@ describe('토론 기록 초안 전송 훅', () => {
   });
 
   it('기록한 발언이 없으면 아무것도 보내지 않는다', () => {
-    const { result } = renderHook(() => useSubmitTranscript(5), {
+    const { result } = renderHook(() => useEndPageTranscript(5), {
       wrapper: createWrapper(),
     });
 
@@ -63,7 +61,7 @@ describe('토론 기록 초안 전송 훅', () => {
       }),
     );
 
-    const { result } = renderHook(() => useSubmitTranscript(5), {
+    const { result } = renderHook(() => useEndPageTranscript(5), {
       wrapper: createWrapper(),
     });
 
@@ -87,7 +85,7 @@ describe('토론 기록 초안 전송 훅', () => {
   it('이미 보낸 기록이 있으면 다시 보내지 않고 그 ID를 쓴다', () => {
     setSubmittedTranscriptId(5, 12);
 
-    const { result } = renderHook(() => useSubmitTranscript(5), {
+    const { result } = renderHook(() => useEndPageTranscript(5), {
       wrapper: createWrapper(),
     });
 
@@ -103,7 +101,7 @@ describe('토론 기록 초안 전송 훅', () => {
       ),
     );
 
-    const { result } = renderHook(() => useSubmitTranscript(5), {
+    const { result } = renderHook(() => useEndPageTranscript(5), {
       wrapper: createWrapper(),
     });
     await waitFor(() => expect(result.current.status).toBe('error'));
@@ -120,6 +118,39 @@ describe('토론 기록 초안 전송 훅', () => {
     expect(result.current.transcriptId).toBe(40);
   });
 
+  it('종료 화면을 떠나도 전사가 끝나면 앱의 제출기가 기록을 보낸다', async () => {
+    startTranscriptDraft(5, 1000, 'SONIOX');
+    markSegmentPending(5, 'p1', Date.now());
+    const handler = vi.fn();
+    server.use(
+      http.post(`${ApiUrl.transcript}/:tableId`, async ({ request }) => {
+        handler(await request.json());
+        return HttpResponse.json({ id: 88 }, { status: 201 });
+      }),
+    );
+    renderHook(() => useTranscriptDraftSubmitter({ retryDelaysMs: NO_RETRY }), {
+      wrapper: createWrapper(),
+    });
+    const endPage = renderHook(() => useSubmitTranscript(5), {
+      wrapper: createWrapper(),
+    });
+    expect(endPage.result.current.status).toBe('transcribing');
+
+    endPage.unmount();
+    act(() =>
+      appendSegmentUtterances(
+        5,
+        { id: 'p1', timeBoxIndex: 0, team: null },
+        2000,
+        [{ offsetMs: 0, text: '마지막 발언' }],
+      ),
+    );
+
+    await waitFor(() => expect(getSubmittedTranscriptId(5)).toBe(88));
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(getTranscriptDraft(5)).toBeNull();
+  });
+
   describe('Soniox 모드', () => {
     const SEGMENT = { id: 'p1', timeBoxIndex: 0, team: null };
 
@@ -134,7 +165,7 @@ describe('토론 기록 초안 전송 훅', () => {
         }),
       );
 
-      const { result } = renderHook(() => useSubmitTranscript(5), {
+      const { result } = renderHook(() => useEndPageTranscript(5), {
         wrapper: createWrapper(),
       });
 
@@ -173,7 +204,7 @@ describe('토론 기록 초안 전송 훅', () => {
         }),
       );
 
-      const { result } = renderHook(() => useSubmitTranscript(5), {
+      const { result } = renderHook(() => useEndPageTranscript(5), {
         wrapper: createWrapper(),
       });
       appendSegmentUtterances(5, SEGMENT, 2000, []);
