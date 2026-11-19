@@ -146,6 +146,11 @@ describe('AudienceSharePage', () => {
     mockUseAudienceShareState.mockReturnValue({
       chairmanPresence: 'present',
       connectionStatus: 'connected',
+      latestMessage: null,
+      latestMessageReceivedAt: null,
+      isSocketConnected: true,
+      recordingJoin: null,
+      closedRecordingSessionKeys: new Set<string>(),
       status: 'connecting',
       error: null,
     });
@@ -204,6 +209,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'connecting',
         error: null,
       });
@@ -227,6 +237,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -257,6 +272,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'waiting',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -274,6 +294,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -306,6 +331,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -322,6 +352,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'waiting',
         error: null,
       });
@@ -340,6 +375,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -370,6 +410,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -397,6 +442,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -434,6 +484,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -470,6 +525,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -505,6 +565,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -552,6 +617,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'finished',
         error: null,
       });
@@ -598,6 +668,11 @@ describe('AudienceSharePage', () => {
         mockUseAudienceShareState.mockReturnValue({
           chairmanPresence: 'present',
           connectionStatus: 'connected',
+          latestMessage: null,
+          latestMessageReceivedAt: null,
+          isSocketConnected: true,
+          recordingJoin: null,
+          closedRecordingSessionKeys: new Set<string>(),
           status: 'displaying',
           syncedAt: null,
           error: null,
@@ -637,6 +712,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -690,6 +770,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'waiting',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -706,6 +791,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -722,6 +812,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -743,6 +838,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -765,6 +865,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -820,6 +925,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -843,6 +953,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'connecting',
         error: new AudienceShareError('SOCKET_STOMP_ERROR'),
       });
@@ -875,6 +990,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'lost',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -901,6 +1021,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'lost',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -920,6 +1045,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'absent',
         connectionStatus: 'lost',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,
@@ -953,6 +1083,11 @@ describe('AudienceSharePage', () => {
       mockUseAudienceShareState.mockReturnValue({
         chairmanPresence: 'present',
         connectionStatus: 'connected',
+        latestMessage: null,
+        latestMessageReceivedAt: null,
+        isSocketConnected: true,
+        recordingJoin: null,
+        closedRecordingSessionKeys: new Set<string>(),
         status: 'displaying',
         syncedAt: null,
         error: null,

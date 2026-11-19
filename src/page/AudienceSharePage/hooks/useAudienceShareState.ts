@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import useAudienceSocket from '../../../hooks/sockets/useAudienceSocket';
+import {
+  RecordingJoinPayload,
+  SocketMessage,
+} from '../../../apis/sockets/type';
 import { AudienceShareError, AudienceShareErrorCode } from '../error';
 import { TimeBoxInfo } from '../../../types/type';
 import { isSocketError } from '../../../apis/sockets/error';
@@ -54,6 +58,15 @@ export function useAudienceShareState(
 ): AudienceShareState & {
   chairmanPresence: ChairmanPresence;
   connectionStatus: AudienceConnectionStatus;
+  // 다기기 녹음이 구간을 나눌 때 쓰는 검증된 최근 메시지와 수신 시각
+  latestMessage: SocketMessage | null;
+  latestMessageReceivedAt: number | null;
+  // 소켓 연결 여부. 다기기 녹음이 재연결 뒤 동기화로 진행 중인 구간을 잇지 않도록 쓴다.
+  isSocketConnected: boolean;
+  // 사회자가 공유 채널로 보낸 다기기 녹음 참가 정보
+  recordingJoin: RecordingJoinPayload | null;
+  // 사회자가 공유 채널로 끝났다고 알린 녹음 세션 키
+  closedRecordingSessionKeys: ReadonlySet<string>;
 } {
   const { enabled = true, table } = options;
   const {
@@ -61,6 +74,8 @@ export function useAudienceShareState(
     disconnect,
     latestMessage,
     latestMessageReceivedAt,
+    recordingJoin,
+    closedRecordingSessionKeys,
     lastReceivedAt,
     chairmanAbsentAt,
     isConnected,
@@ -254,6 +269,11 @@ export function useAudienceShareState(
       syncedAt,
       chairmanPresence,
       connectionStatus,
+      latestMessage,
+      latestMessageReceivedAt,
+      isSocketConnected: isConnected,
+      recordingJoin,
+      closedRecordingSessionKeys,
     };
   }
 
@@ -262,5 +282,10 @@ export function useAudienceShareState(
     error,
     chairmanPresence,
     connectionStatus,
+    latestMessage,
+    latestMessageReceivedAt,
+    isSocketConnected: isConnected,
+    recordingJoin,
+    closedRecordingSessionKeys,
   };
 }
