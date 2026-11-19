@@ -34,7 +34,8 @@ export interface UseTranscriptDraftSubmitterOptions {
 /**
  * 토론을 끝낸 기록 초안을 앱이 떠 있는 동안 서버로 보낸다.
  * 종료 화면을 바로 떠나도 Soniox 전사가 끝나면 이어서 제출하고, 실패하면 간격을 두고 다시 보낸다.
- * 자동 재시도까지 실패한 초안은 실패로 표시하고 종료 화면의 다시 시도를 기다린다.
+ * 자동 재시도까지 실패한 현재 초안은 실패로 표시하고 종료 화면의 다시 시도를 기다린다.
+ * 새 기록 시작으로 보관한 초안은 다시 시도할 화면이 없으므로 마지막 간격으로 계속 보낸다.
  * 앱 수명에 한 번만 연결한다.
  */
 export default function useTranscriptDraftSubmitter(
@@ -58,7 +59,7 @@ export default function useTranscriptDraftSubmitter(
     };
     const handleChange = () => scheduleCheck(0);
 
-    const submit = ({ context, draft }: EndedTranscriptDraft) => {
+    const submit = ({ context, draft, isCurrent }: EndedTranscriptDraft) => {
       inFlightDraftIds.add(draft.draftId);
       postTranscript(
         context.tableId,
@@ -80,14 +81,17 @@ export default function useTranscriptDraftSubmitter(
         })
         .catch(() => {
           const failures = (attempts.get(draft.draftId)?.failures ?? 0) + 1;
-          if (failures > retryDelaysMs.length) {
+          if (failures > retryDelaysMs.length && isCurrent) {
             attempts.delete(draft.draftId);
             setTranscriptSubmitFailed(context, true);
             return;
           }
+          const delayMs =
+            retryDelaysMs[Math.min(failures, retryDelaysMs.length) - 1] ??
+            CHECK_INTERVAL_MS;
           attempts.set(draft.draftId, {
             failures,
-            nextAt: Date.now() + retryDelaysMs[failures - 1],
+            nextAt: Date.now() + delayMs,
           });
         })
         .finally(() => {
@@ -102,7 +106,12 @@ export default function useTranscriptDraftSubmitter(
       let isWaiting = false;
       for (const ended of listEndedTranscriptDrafts()) {
         const { context, draft } = ended;
-        if (draft.isSubmitFailed || inFlightDraftIds.has(draft.draftId)) {
+        if (draft.isSubmitFailed) {
+          continue;
+        }
+        // 다시 연결된 effect도 이전 effect가 시작한 요청이 끝난 뒤 재시도를 확인하도록 기다린다.
+        if (inFlightDraftIds.has(draft.draftId)) {
+          isWaiting = true;
           continue;
         }
         if (countPendingSegments(draft, now) > 0) {

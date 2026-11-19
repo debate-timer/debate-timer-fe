@@ -236,6 +236,30 @@ describe('토론 기록 초안 저장소', () => {
       expect(getTranscriptDraft(3)?.isSubmitFailed).toBe(false);
     });
 
+    it('끝낸 초안을 보관하지 못하면 새 기록으로 덮어쓰지 않는다', () => {
+      const previous = startTranscriptDraft(3, 1000);
+      appendUtterance(3, SEGMENT, '이전 토론', 2000);
+      markTranscriptDraftEnded(3, 5000);
+      const originalSetItem = Storage.prototype.setItem;
+      const setItem = vi
+        .spyOn(Storage.prototype, 'setItem')
+        .mockImplementation(function (this: Storage, key, value) {
+          // 보관 키에만 저장 공간이 부족한 상황
+          if (key.startsWith(`TranscriptDraft:3:`)) {
+            throw new DOMException('full', 'QuotaExceededError');
+          }
+          originalSetItem.call(this, key, value);
+        });
+
+      startTranscriptDraft(3, 9000);
+      setItem.mockRestore();
+
+      expect(getTranscriptDraft(3)).toMatchObject({
+        draftId: previous.draftId,
+        startedAt: 1000,
+      });
+    });
+
     it('다른 계정의 끝낸 초안은 제출 대기 목록에 올리지 않는다', () => {
       setAccessToken('token');
       setMemberId(1);

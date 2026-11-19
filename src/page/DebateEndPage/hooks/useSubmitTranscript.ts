@@ -59,9 +59,12 @@ export default function useSubmitTranscript(tableId: number) {
     refresh();
     window.addEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, refresh);
     window.addEventListener('auth-changed', refresh);
+    // 다른 탭의 로그아웃·계정 변경은 storage 이벤트로만 온다.
+    window.addEventListener('storage', refresh);
     return () => {
       window.removeEventListener(TRANSCRIPT_DRAFT_CHANGE_EVENT, refresh);
       window.removeEventListener('auth-changed', refresh);
+      window.removeEventListener('storage', refresh);
     };
   }, [tableId]);
 

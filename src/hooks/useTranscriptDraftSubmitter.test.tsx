@@ -179,4 +179,58 @@ describe('토론 기록 초안 제출기', () => {
     await waitFor(() => expect(getSubmittedTranscriptId(5)).toBe(60));
     expect(getTranscriptDraft(5)).toBeNull();
   });
+
+  it('보관한 이전 초안은 자동 재시도가 모두 실패해도 실패로 멈추지 않고 계속 보낸다', async () => {
+    prepareEndedDraft(5, '이전 토론');
+    startTranscriptDraft(5, 9000);
+    let failures = 3;
+    server.use(
+      http.post(`${ApiUrl.transcript}/:tableId`, () => {
+        if (failures > 0) {
+          failures -= 1;
+          return HttpResponse.json({ message: 'error' }, { status: 500 });
+        }
+        return HttpResponse.json({ id: 70 }, { status: 201 });
+      }),
+    );
+
+    renderHook(
+      () => useTranscriptDraftSubmitter({ retryDelaysMs: [10, 10] }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(listEndedTranscriptDrafts()).toEqual([]));
+    expect(failures).toBe(0);
+    expect(getTranscriptDraft(5)?.isSubmitFailed).toBe(false);
+  });
+
+  it('요청 중에 다시 연결돼도 실패한 요청의 재시도를 이어 간다', async () => {
+    prepareEndedDraft(5);
+    let release!: () => void;
+    const firstRequest = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let calls = 0;
+    server.use(
+      http.post(`${ApiUrl.transcript}/:tableId`, async () => {
+        calls += 1;
+        if (calls === 1) {
+          await firstRequest;
+          return HttpResponse.json({ message: 'error' }, { status: 500 });
+        }
+        return HttpResponse.json({ id: 81 }, { status: 201 });
+      }),
+    );
+    const { rerender } = renderHook(
+      ({ delays }) => useTranscriptDraftSubmitter({ retryDelaysMs: delays }),
+      { initialProps: { delays: [10, 10] }, wrapper },
+    );
+    await waitFor(() => expect(calls).toBe(1));
+
+    rerender({ delays: [10, 10] });
+    act(() => release());
+
+    await waitFor(() => expect(getSubmittedTranscriptId(5)).toBe(81));
+    expect(calls).toBe(2);
+  });
 });

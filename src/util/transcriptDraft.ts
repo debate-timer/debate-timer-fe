@@ -141,13 +141,15 @@ function readDraft(key: string): TranscriptDraft | null {
   }
 }
 
-function saveDraft(key: string, draft: TranscriptDraft) {
+function saveDraft(key: string, draft: TranscriptDraft): boolean {
   try {
     sessionStorage.setItem(key, JSON.stringify(draft));
   } catch {
     /* 저장소 차단 시 다른 초안에 쓰지 않음. */
+    return false;
   }
   notifyDraftChange();
+  return true;
 }
 
 function removeDraft(key: string) {
@@ -156,13 +158,13 @@ function removeDraft(key: string) {
 }
 
 // 끝냈지만 제출하지 못한 초안은 새 초안이 덮어쓰지 않도록 초안 ID 키로 옮긴다.
-// 끝내지 않은 초안은 지금처럼 새 초안으로 바꾼다.
-function archiveEndedDraft(tableId: number) {
+// 끝내지 않은 초안은 지금처럼 새 초안으로 바꾼다. 옮기지 못하면 false를 돌려준다.
+function archiveEndedDraft(tableId: number): boolean {
   const draft = getTranscriptDraft(tableId);
   if (!draft || draft.endedAt === null) {
-    return;
+    return true;
   }
-  saveDraft(archivedDraftKey(tableId, draft.draftId), draft);
+  return saveDraft(archivedDraftKey(tableId, draft.draftId), draft);
 }
 
 export function startTranscriptDraft(
@@ -172,7 +174,11 @@ export function startTranscriptDraft(
 ) {
   const memberId = currentMemberId();
   const draftId = createRandomId();
-  archiveEndedDraft(tableId);
+  const context = { tableId, memberId, draftId, authRevision: getAuthRevision() };
+  // 끝낸 초안을 보관하지 못하면 덮어쓰지 않는다. 새 기록은 저장할 초안이 없어 반영되지 않는다.
+  if (!archiveEndedDraft(tableId)) {
+    return context;
+  }
   saveDraft(draftKey(tableId), {
     memberId,
     draftId,
@@ -185,7 +191,7 @@ export function startTranscriptDraft(
     isSubmitFailed: false,
   });
   sessionStorage.removeItem(submittedKey(tableId));
-  return { tableId, memberId, draftId, authRevision: getAuthRevision() };
+  return context;
 }
 
 export function appendUtterance(
