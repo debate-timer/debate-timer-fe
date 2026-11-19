@@ -1,5 +1,14 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom';
+import { http, HttpResponse } from 'msw';
+import { server } from '../mocks/server';
+import { ApiUrl } from '../apis/endpoints';
+import {
+  appendUtterance,
+  getSubmittedTranscriptId,
+  markTranscriptDraftEnded,
+  startTranscriptDraft,
+} from '../util/transcriptDraft';
 import RootLayout from './RootLayout';
 
 vi.mock('../components/ErrorBoundary/ErrorBoundaryWrapper', () => ({
@@ -33,5 +42,35 @@ describe('앱 루트 레이아웃', () => {
 
     expect(await screen.findByText('템플릿')).toBeInTheDocument();
     expect(scrollTo).toHaveBeenCalledWith(0, 0);
+  });
+
+  it('어느 화면에서든 끝낸 토론 기록을 제출한다', async () => {
+    startTranscriptDraft(5, 1000);
+    appendUtterance(
+      5,
+      { id: 's1', timeBoxIndex: 0, team: null },
+      '찬성 입론',
+      2000,
+    );
+    markTranscriptDraftEnded(5, 5000);
+    server.use(
+      http.post(`${ApiUrl.transcript}/:tableId`, () =>
+        HttpResponse.json({ id: 21 }, { status: 201 }),
+      ),
+    );
+    const router = createMemoryRouter(
+      [
+        {
+          element: <RootLayout />,
+          children: [{ path: '/overview', element: <div>시간표</div> }],
+        },
+      ],
+      { initialEntries: ['/overview'] },
+    );
+
+    render(<RouterProvider router={router} />);
+
+    expect(await screen.findByText('시간표')).toBeInTheDocument();
+    await waitFor(() => expect(getSubmittedTranscriptId(5)).toBe(21));
   });
 });

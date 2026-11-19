@@ -82,8 +82,16 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 인스턴스로 제공됨. 게스트 테이블 세션 저장의 브라우저 경계는
 `src/util/sessionStorage.ts`가 소유함. 타이머 화면에서 쌓아 종료 화면에서 보내는
 토론 기록 초안은 `src/util/transcriptDraft.ts`가 테이블별 키로 소유함. 초안은
-STT 모드(`RPC`·`SONIOX`)와 Soniox 전사를 기다리는 구간을 함께 저장하고, 종료
-화면은 대기 구간이 끝난 뒤 초안을 보냄.
+STT 모드(`RPC`·`SONIOX`)와 Soniox 전사를 기다리는 구간을 함께 저장함. 종료
+화면은 초안을 끝낸 것으로 표시하고 제출 상태만 읽음. 제출은 `RootLayout`이
+연결한 앱 수명의 `useTranscriptDraftSubmitter`가 대기 구간이 끝난 뒤 수행하므로
+종료 화면을 떠나도 이어짐. 실패하면 간격을 두고 자동으로 다시 보내고, 모두
+실패하면 초안에 실패를 표시해 종료 화면의 다시 시도를 기다림. 끝냈지만 제출 전인
+초안은 같은 테이블로 새 기록을 시작할 때 초안 ID 키로 옮겨 보관하고 함께 제출함.
+보관 초안의 제출 ID는 테이블의 제출 ID로 남기지 않음. 보관 초안은 다시 시도할
+화면이 없어 실패로 멈추지 않고 마지막 간격으로 계속 보냄. 보관에 실패하면 끝낸
+초안을 덮어쓰지 않음. 탭 닫기·새로고침으로 끊긴
+요청과 sessionStorage 유실은 복구하지 않음.
 
 `src/mocks/handlers/global.ts`의 `allHandlers`가 브라우저 개발 모드와 Node
 테스트의 공통 핸들러 집합임. `src/mocks/browser.ts`와 `src/mocks/server.ts`는
