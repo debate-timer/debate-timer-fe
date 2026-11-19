@@ -65,3 +65,11 @@ TimerPage·AudienceSharePage
 `src/hooks/sockets/useChairmanSocket.ts`에 있음. 타이머 이벤트의 payload 생성과
 화면 반영은 각 페이지의 코드가 맡음. 이 문서는 연결·구독·메시지 경계의 공통
 계약만 소유함.
+
+## 다기기 녹음 참여 이벤트
+
+`RECORDING_OPENED`는 사회자가 연 다기기 녹음의 참가 정보를 이미 공유 화면을 보고 있는 청중에게 알리는 데이터 없는 이벤트임([BE PR #334](https://github.com/debate-timer/debate-timer-be/pull/334)). `RECORDING_CLOSED`는 사회자가 녹음을 끝내 그 세션에 더는 참여할 수 없음을 알림([BE PR #336](https://github.com/debate-timer/debate-timer-be/pull/336)). 두 이벤트 모두 `data`는 null이고 `recording: { sessionKey, joinCode }`가 필수이며, 참가 정보가 유효할 때만 수신 검증을 통과함. 사회자가 발행할 때는 version이 필수임. 형태는 `src/apis/sockets/type.ts`의 `RecordingEventType`·`RecordingJoinPayload`가 정의하며, 타이머 이벤트용 `SocketEventType`과는 분리함.
+
+사회자는 `useChairmanSocket.sendDebateEvent`의 `recording` 인자로 발행함. TimerPage는 다기기 녹음 세션이 생기거나 바뀔 때 공유가 연결돼 있으면 한 번, 상태 동기화 응답 뒤에 세션이 있으면 매번 `RECORDING_OPENED`를 발행하고, 다기기 녹음을 끄면 `RECORDING_CLOSED`를 발행함. 녹음 이벤트는 다기기 녹음 턴 키에 쓰는 마지막 전환 version(`getLastTransitionVersion`)에 반영하지 않음. `sendDebateEvent`는 연결되어 있어 발행했으면 true를 돌려줌.
+
+청중 훅은 다른 이벤트와 같은 version 규칙을 거친 뒤 `latestMessage`로 넘기지 않고 `recordingJoin`에만 보관함. 같은 세션의 `RECORDING_CLOSED`를 받으면 `recordingJoin`을 지우고 `closedRecordingSessionKeys`에 기록해, 공유 링크에 남은 끝난 세션으로 참여하지 않게 함. 재연결로 메시지를 초기화해도 참가 정보는 유지함. 청중 채널은 roomId만 알면 구독할 수 있어 참가 코드가 공유 링크를 받지 않은 구독자에게도 전달되는 한계가 있음.

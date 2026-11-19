@@ -73,6 +73,8 @@ ID가 없어 시작 시각으로 구분하며, 제출 중 같은 테이블로 �
 응답은 새 초안을 지우지 않음. 탭 닫기·새로고침으로 끊긴 요청과 sessionStorage
 유실은 복구하지 않음.
 
+다기기 녹음 V2는 `src/apis/apis/recordingV2.ts`가 `/api/v2/recordings` 세션 생성·사회자 기기 토큰 재발급·청중 기기 참가·턴 업로드·마무리·취소·상태 조회를 담당함. 사회자 기기는 녹음 세션과 기기 토큰을 탭별 sessionStorage(`src/util/recordingStorageV2.ts`)에 보관해 새로고침 뒤 이어 씀. 서버가 턴별 후보 중 가장 깨끗한 녹음을 골라 전사하고 속기록을 만들므로, 다기기 녹음은 기록 초안을 만들지 않고 종료 화면이 세션을 마무리한 뒤 상태 조회로 속기록 ID를 기다림(`useMultiDeviceTranscriptResult`). V2 API는 BE 설정 `recording-v2.enabled`가 꺼져 있으면 404로 응답함.
+
 `src/mocks/handlers/global.ts`의 `allHandlers`가 브라우저 개발 모드와 Node
 테스트의 공통 핸들러 집합임. `src/mocks/browser.ts`와 `src/mocks/server.ts`는
 같은 집합을 사용함. 도메인별 핸들러는 실제 `ApiUrl`을 재사용함. 테스트별 응답
