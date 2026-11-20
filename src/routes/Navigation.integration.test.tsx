@@ -89,7 +89,7 @@ describe('새 탐색 경로와 인증 연결', () => {
         await screen.findByRole('button', {
           name: path.startsWith('/en')
             ? 'Sign in with Google'
-            : 'Google로 로그인',
+            : 'Google 로그인',
         }),
       );
       expect(oAuthLogin).toHaveBeenCalledTimes(1);
@@ -104,7 +104,7 @@ describe('새 탐색 경로와 인증 연결', () => {
     sessionStorage.setItem('DebateTableData', '{}');
     renderAt('/templates');
     await user.click(
-      await screen.findByRole('button', { name: 'Google로 로그인' }),
+      await screen.findByRole('button', { name: 'Google 로그인' }),
     );
     expect(oAuthLogin).toHaveBeenCalledTimes(1);
     expect(sessionStorage.getItem('keepGuestTable')).toBe('true');
