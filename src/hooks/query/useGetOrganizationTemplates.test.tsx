@@ -49,7 +49,7 @@ describe('기관 템플릿 조회', () => {
     await i18n.changeLanguage('ko');
   });
 
-  it('한국어에서는 두 언어를 통합하고 별도 캐시에 보관한다', async () => {
+  it('한국어에서는 국문만 조회하고 언어별 캐시에 보관한다', async () => {
     const queryClient = createQueryClient();
     const languages: (string | null)[] = [];
     server.use(
@@ -62,17 +62,11 @@ describe('기관 템플릿 조회', () => {
       wrapper: createWrapper(queryClient),
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(languages.sort()).toEqual(['KO_KR', 'US_EN']);
-    const combined = {
-      organizations: [
-        ...MOCK_TEMPLATES_RESPONSE.organizations,
-        ...MOCK_TEMPLATES_RESPONSE.organizations,
-      ],
-    };
-    expect(result.current.data).toEqual(combined);
-    expect(queryClient.getQueryData(['OrganizationTemplates', 'ALL'])).toEqual(
-      combined,
-    );
+    expect(languages.sort()).toEqual(['KO_KR']);
+    expect(result.current.data).toEqual(MOCK_TEMPLATES_RESPONSE);
+    expect(
+      queryClient.getQueryData(['OrganizationTemplates', 'KO_KR']),
+    ).toEqual(MOCK_TEMPLATES_RESPONSE);
     expect(
       queryClient.getQueryData(['OrganizationTemplates', 'US_EN']),
     ).toBeUndefined();
@@ -115,14 +109,14 @@ describe('기관 템플릿 조회', () => {
         organization,
       })),
     };
-    queryClient.setQueryData(['OrganizationTemplates', 'ALL'], original);
+    queryClient.setQueryData(['OrganizationTemplates', 'KO_KR'], original);
     const { result } = renderHook(() => useGetOrganizationTemplates(false), {
       wrapper: createWrapper(queryClient),
     });
     expect(result.current.data).toEqual(original);
-    expect(queryClient.getQueryData(['OrganizationTemplates', 'ALL'])).toEqual(
-      original,
-    );
+    expect(
+      queryClient.getQueryData(['OrganizationTemplates', 'KO_KR']),
+    ).toEqual(original);
   });
 
   it('enabled=false 이면 API를 호출하지 않는다', () => {
@@ -147,7 +141,7 @@ describe('템플릿 조회 언어 전환과 실패', () => {
     await i18n.changeLanguage('ko');
   });
 
-  it('마운트된 훅이 언어 변경을 구독하고 통합 캐시와 영문 캐시를 분리한다', async () => {
+  it('마운트된 훅이 언어 변경을 구독하고 국문 캐시와 영문 캐시를 분리한다', async () => {
     await i18n.changeLanguage('ko');
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) =>
@@ -171,9 +165,9 @@ describe('템플릿 조회 언어 전환과 실패', () => {
     await waitFor(() =>
       expect(result.current.data).toEqual({ organizations: [] }),
     );
-    expect(queryClient.getQueryData(['OrganizationTemplates', 'ALL'])).toEqual(
-      MOCK_TEMPLATES_RESPONSE,
-    );
+    expect(
+      queryClient.getQueryData(['OrganizationTemplates', 'KO_KR']),
+    ).toEqual(MOCK_TEMPLATES_RESPONSE);
     expect(
       queryClient.getQueryData(['OrganizationTemplates', 'US_EN']),
     ).toEqual({ organizations: [] });
@@ -185,7 +179,7 @@ describe('템플릿 조회 언어 전환과 실패', () => {
     );
   });
 
-  it('영문 조회만 실패해도 통합 목록 대신 지역 오류 상태를 제공한다', async () => {
+  it('영문 API가 실패해도 한국어에서는 국문만 정상 조회한다', async () => {
     await i18n.changeLanguage('ko');
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) =>
@@ -197,7 +191,7 @@ describe('템플릿 조회 언어 전환과 실패', () => {
     const { result } = renderHook(() => useGetOrganizationTemplates(), {
       wrapper: createWrapper(createQueryClient()),
     });
-    await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.data).toBeUndefined();
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(MOCK_TEMPLATES_RESPONSE);
   });
 });

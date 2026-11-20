@@ -27,7 +27,7 @@ const EN_RESPONSE: GetOrganizationTemplatesResponseType = {
   organizations: [
     {
       organization: 'English',
-      category: 'CLASSIC',
+      category: 'GLOBAL',
       affiliation: '',
       iconPath: '',
       templates: [],

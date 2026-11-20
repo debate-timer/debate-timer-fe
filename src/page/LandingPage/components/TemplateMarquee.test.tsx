@@ -125,7 +125,7 @@ describe('언어별 템플릿 노출', () => {
           organizations: [
             {
               organization: isEnglish ? 'English organization' : '국문 단체',
-              category: isEnglish ? 'CLASSIC' : 'DEBATE_CLUB',
+              category: isEnglish ? 'GLOBAL' : 'DEBATE_CLUB',
               affiliation: '',
               iconPath: '',
               templates: [
@@ -151,26 +151,19 @@ describe('언어별 템플릿 노출', () => {
     async (language) => {
       await i18n.changeLanguage(language);
       render(<TemplateMarquee />, { wrapper: Wrapper });
-      const englishLink = await screen.findByRole('link', {
-        name: /Public Forum/,
-      });
-      expect(englishLink).toHaveAttribute(
-        'href',
-        expect.stringContaining('org=English%20organization'),
-      );
-      if (language === 'ko') {
-        expect(
-          screen.getByRole('link', { name: /국문 형식/ }),
-        ).toBeInTheDocument();
-      } else {
-        expect(
-          screen.queryByRole('link', { name: /국문 형식/ }),
-        ).not.toBeInTheDocument();
-      }
+      const label = language === 'ko' ? /국문 형식/ : /Public Forum/;
+      expect(
+        await screen.findByRole('link', { name: label }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', {
+          name: language === 'ko' ? /Public Forum/ : /국문 형식/,
+        }),
+      ).not.toBeInTheDocument();
     },
   );
 
-  it('영문 조회만 실패하면 국문 부분 목록 대신 오류를 표시한다', async () => {
+  it('영문 API가 실패해도 국문 템플릿을 정상 표시한다', async () => {
     await i18n.changeLanguage('ko');
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) =>
@@ -191,12 +184,12 @@ describe('언어별 템플릿 노출', () => {
     );
     render(<TemplateMarquee />, { wrapper: Wrapper });
     expect(
-      await screen.findByText(
-        '템플릿을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
-      ),
+      await screen.findByRole('link', { name: /국문 형식/ }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /국문 형식/ }),
+      screen.queryByText(
+        '템플릿을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
+      ),
     ).not.toBeInTheDocument();
   });
   it.each(['ko', 'en'])(
@@ -204,16 +197,12 @@ describe('언어별 템플릿 노출', () => {
     async (language) => {
       await i18n.changeLanguage(language);
       server.use(
-        http.get(ApiUrl.organization + '/templates', ({ request }) => {
-          const isEnglish =
-            new URL(request.url).searchParams.get('language') === 'US_EN';
-          const names = isEnglish
-            ? ['Zulu', '한앎', 'alpha', '가나다', 'Beta']
-            : [];
+        http.get(ApiUrl.organization + '/templates', () => {
+          const names = ['Zulu', '한앎', 'alpha', '가나다', 'Beta'];
           return HttpResponse.json({
             organizations: names.map((organization) => ({
               organization,
-              category: 'CLASSIC',
+              category: 'GLOBAL',
               affiliation: '',
               iconPath: '',
               templates: [

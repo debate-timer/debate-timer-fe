@@ -45,7 +45,7 @@ export const organizationHandlers = [
       organizations: [
         {
           organization: 'Public Forum',
-          category: 'CLASSIC',
+          category: 'GLOBAL',
           affiliation: '',
           iconPath: '',
           templates: [

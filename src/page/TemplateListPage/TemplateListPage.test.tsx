@@ -76,7 +76,8 @@ describe('토론 템플릿 전체보기 페이지', () => {
         http.get(ApiUrl.organization + '/templates', ({ request }) =>
           HttpResponse.json({
             organizations:
-              new URL(request.url).searchParams.get('language') === 'US_EN'
+              new URL(request.url).searchParams.get('language') ===
+              (language === 'ko' ? 'KO_KR' : 'US_EN')
                 ? [
                     {
                       organization: 'Zulu Club',
@@ -87,7 +88,7 @@ describe('토론 템플릿 전체보기 페이지', () => {
                     },
                     {
                       organization: 'Basic Format',
-                      category: 'CLASSIC',
+                      category: 'GLOBAL',
                       affiliation: '',
                       iconPath: '',
                       templates: [],
@@ -115,8 +116,8 @@ describe('토론 템플릿 전체보기 페이지', () => {
       await screen.findByRole('heading', { name: 'Contest' });
       const titles =
         language === 'ko'
-          ? ['대회', '동아리', '고전 토론']
-          : ['Tournaments', 'Debate Clubs', 'Classics'];
+          ? ['대회', '동아리', '글로벌 토론']
+          : ['Tournaments', 'Debate Clubs', 'Global Debate Formats'];
       expect(
         screen
           .getAllByRole('heading', { level: 2 })
@@ -145,12 +146,12 @@ describe('토론 템플릿 전체보기 페이지', () => {
           ? [
               '토론 대회에서 사용하는 형식으로 토론을 준비해 보세요.',
               '국내 토론 동아리에서 사용하는 다양한 토론 형식을 만나보세요.',
-              '오랫동안 이어져 온 기본 토론 형식으로 시작해 보세요.',
+              '세계 여러 나라에서 사용하는 다양한 토론 형식을 만나보세요.',
             ]
           : [
               'Prepare for your debate with formats used in tournaments.',
               'Explore a variety of formats used by debate clubs in Korea.',
-              'Start with the foundational debate formats that have stood the test of time.',
+              'Explore a variety of debate formats used around the world.',
             ];
       descriptions.forEach((description, index) =>
         expect(groups[index].getByText(description)).toBeInTheDocument(),
@@ -242,7 +243,7 @@ describe('언어별 템플릿 노출', () => {
           organizations: [
             {
               organization: isEnglish ? 'English organization' : '국문 단체',
-              category: isEnglish ? 'CLASSIC' : 'DEBATE_CLUB',
+              category: isEnglish ? 'GLOBAL' : 'DEBATE_CLUB',
               affiliation: '',
               iconPath: '',
               templates: [
@@ -268,26 +269,19 @@ describe('언어별 템플릿 노출', () => {
     async (language) => {
       await i18n.changeLanguage(language);
       render(<TemplateListPage />, { wrapper: Wrapper });
-      const englishLink = await screen.findByRole('link', {
-        name: /Public Forum/,
-      });
-      expect(englishLink).toHaveAttribute(
-        'href',
-        expect.stringContaining('org=English%20organization'),
-      );
-      if (language === 'ko') {
-        expect(
-          screen.getByRole('link', { name: /국문 형식/ }),
-        ).toBeInTheDocument();
-      } else {
-        expect(
-          screen.queryByRole('link', { name: /국문 형식/ }),
-        ).not.toBeInTheDocument();
-      }
+      const label = language === 'ko' ? /국문 형식/ : /Public Forum/;
+      expect(
+        await screen.findByRole('link', { name: label }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', {
+          name: language === 'ko' ? /Public Forum/ : /국문 형식/,
+        }),
+      ).not.toBeInTheDocument();
     },
   );
 
-  it('영문 조회만 실패하면 국문 부분 목록 대신 오류를 표시한다', async () => {
+  it('영문 API가 실패해도 국문 템플릿을 정상 표시한다', async () => {
     await i18n.changeLanguage('ko');
     server.use(
       http.get(ApiUrl.organization + '/templates', ({ request }) =>
@@ -308,12 +302,12 @@ describe('언어별 템플릿 노출', () => {
     );
     render(<TemplateListPage />, { wrapper: Wrapper });
     expect(
-      await screen.findByText(
-        '템플릿을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
-      ),
+      await screen.findByRole('link', { name: /국문 형식/ }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /국문 형식/ }),
+      screen.queryByText(
+        '템플릿을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
+      ),
     ).not.toBeInTheDocument();
   });
   it.each(['ko', 'en'])(
@@ -321,16 +315,12 @@ describe('언어별 템플릿 노출', () => {
     async (language) => {
       await i18n.changeLanguage(language);
       server.use(
-        http.get(ApiUrl.organization + '/templates', ({ request }) => {
-          const isEnglish =
-            new URL(request.url).searchParams.get('language') === 'US_EN';
-          const names = isEnglish
-            ? ['Zulu', '한앎', 'alpha', '가나다', 'Beta']
-            : [];
+        http.get(ApiUrl.organization + '/templates', () => {
+          const names = ['Zulu', '한앎', 'alpha', '가나다', 'Beta'];
           return HttpResponse.json({
             organizations: names.map((organization) => ({
               organization,
-              category: 'CLASSIC',
+              category: 'GLOBAL',
               affiliation: '',
               iconPath: '',
               templates: [
