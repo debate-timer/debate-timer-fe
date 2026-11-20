@@ -96,12 +96,15 @@ export type DebateTemplate = {
   data: string; // 인코딩된 템플릿 데이터
 };
 
-export type Organization = {
+export type TemplateCategory = 'TOURNAMENT' | 'DEBATE_CLUB' | 'GLOBAL';
+
+export interface Organization {
   organization: string; // 소분류 (e.g., 한앎)
+  category: TemplateCategory;
   affiliation: string; // 대분류 (e.g., 한양대)
   iconPath: string;
   templates: DebateTemplate[];
-};
+}
 
 type TeamStyleConfig = {
   baseBg: string;

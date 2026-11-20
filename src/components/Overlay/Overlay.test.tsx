@@ -1,8 +1,57 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Overlay from './Overlay';
 
 describe('공용 오버레이', () => {
+  it('최소 너비를 보존하고 화면보다 클 때만 줄였다가 화면 확장 시 복원한다', () => {
+    render(
+      <Overlay aria-label="언어 목록" style={{ minWidth: 112 }}>
+        KR EN
+      </Overlay>,
+    );
+    const panel = screen.getByLabelText('언어 목록');
+    expect(panel.style.minWidth).toBe('112px');
+    const width = vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(120);
+    fireEvent.resize(window);
+    expect(panel.style.minWidth).toBe('88px');
+    width.mockReturnValue(1024);
+    fireEvent.resize(window);
+    expect(panel.style.minWidth).toBe('112px');
+    width.mockRestore();
+  });
+  it('화면 오른쪽을 넘으면 16px 여백 안으로 보정하고 resize 때 다시 계산한다', () => {
+    const rect = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({
+        left: 950,
+        right: 1150,
+        top: 40,
+        bottom: 140,
+        width: 200,
+        height: 100,
+        x: 950,
+        y: 40,
+        toJSON: () => ({}),
+      });
+    render(<Overlay aria-label="경계 패널">내용</Overlay>);
+    expect(screen.getByLabelText('경계 패널').style.translate).toBe(
+      '-142px 0px',
+    );
+    rect.mockReturnValue({
+      left: -122,
+      right: 78,
+      top: 40,
+      bottom: 140,
+      width: 200,
+      height: 100,
+      x: -122,
+      y: 40,
+      toJSON: () => ({}),
+    });
+    fireEvent.resize(window);
+    expect(screen.getByLabelText('경계 패널').style.translate).toBe('0px 0px');
+    rect.mockRestore();
+  });
   it('기본 방향은 애니메이션 없이 열리고 닫힌다', async () => {
     const { rerender } = render(
       <Overlay isOpen aria-label="패널">

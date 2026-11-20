@@ -1,16 +1,37 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Button from '../../components/Button/Button';
 import GeneralHeaderContainer from '../../layout/components/header/GeneralHeaderContainer';
-import TemplateCard from '../../components/TemplateCard/TemplateCard';
+import TemplateCard from './components/TemplateCard';
 import ErrorIndicator from '../../components/ErrorIndicator/ErrorIndicator';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import { useGetOrganizationTemplates } from '../../hooks/query/useGetOrganizationTemplates';
+import useGetOrganizationTemplates from '../../hooks/query/useGetOrganizationTemplates';
 import { LANDING_URLS } from '../../constants/urls';
 import { buildLangPath, getSelectedLang } from '../../util/languageRouting';
 
-const INQUIRY_BUTTON =
-  'rounded-full border border-neutral-900 bg-white px-5 py-3 text-ui-label transition-colors hover:bg-neutral-100';
+const TEMPLATE_CATEGORIES = [
+  {
+    category: 'TOURNAMENT',
+    title: '대회',
+    description: '토론 대회에서 사용하는 형식으로 토론을 준비해 보세요.',
+  },
+  {
+    category: 'DEBATE_CLUB',
+    title: '동아리',
+    description: '국내 토론 동아리에서 사용하는 다양한 토론 형식을 만나보세요.',
+  },
+  {
+    category: 'GLOBAL',
+    title: '글로벌 토론',
+    description: '세계 여러 나라에서 사용하는 다양한 토론 형식을 만나보세요.',
+  },
+] as const;
 
+/**
+ * 서버 분류에 따라 대회·동아리·글로벌 토론 순으로 묶고 빈 구역은 숨김.
+ * 각 구역은 번역된 제목·설명을 제공하고 응답의 복사본을 표시 언어 기준으로 정렬함.
+ * 한국어는 한글→영문, 영어는 영문→한글순이며 조직 안의 템플릿 순서는 유지함.
+ */
 export default function TemplateListPage() {
   const { t, i18n } = useTranslation();
   const { data, isError } = useGetOrganizationTemplates();
@@ -37,19 +58,48 @@ export default function TemplateListPage() {
         </div>
       );
     }
-    // 한 행의 카드 높이가 비슷하도록 템플릿이 적은 단체부터 보여 줌. 개수가 같으면 서버 순서를 유지함
-    const organizations = [...data.organizations].sort(
-      (a, b) => a.templates.length - b.templates.length,
+    const organizations = [...data.organizations].sort((a, b) =>
+      a.organization.localeCompare(b.organization, lang, {
+        sensitivity: 'base',
+      }),
     );
-
     return (
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {organizations.map((organization) => (
-          <TemplateCard
-            key={`${organization.organization}-${organization.affiliation}`}
-            organization={organization}
-          />
-        ))}
+      <div className="flex flex-col gap-12">
+        {TEMPLATE_CATEGORIES.map(({ category, title, description }) => {
+          const categoryOrganizations = organizations.filter(
+            (organization) => organization.category === category,
+          );
+          if (categoryOrganizations.length === 0) {
+            return null;
+          }
+          return (
+            <section
+              key={category}
+              aria-labelledby={`template-category-${category}`}
+              className="flex flex-col gap-5"
+            >
+              <div className="flex flex-col gap-2">
+                <h2
+                  id={`template-category-${category}`}
+                  className="text-ui-title text-neutral-900"
+                >
+                  {t(title)}
+                </h2>
+                <p className="text-ui-body text-neutral-600">
+                  {t(description)}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {categoryOrganizations.map((organization) => (
+                  <TemplateCard
+                    key={`${organization.organization}-${organization.affiliation}`}
+                    organization={organization}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
     );
   };
@@ -76,15 +126,16 @@ export default function TemplateListPage() {
               )}
             </p>
           </div>
-          <a
+          <Button
+            variant="secondary"
             href={LANDING_URLS.TEMPLATE_REGISTER_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={INQUIRY_BUTTON}
+            className="border-neutral-900!"
             aria-label={t('템플릿 문의하기')}
           >
             {t('템플릿 문의하기')}
-          </a>
+          </Button>
         </div>
         {renderTemplates()}
       </main>

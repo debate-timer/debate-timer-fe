@@ -58,6 +58,14 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 | 데이터 소스 전환이 필요한 토론 테이블 CRUD | `getRepository()`           | API 또는 Session 구현의 공통 응답 |
 | 직접 HTTP 계약 추가                        | `src/apis/apis/{domain}.ts` | 성공 body 또는 `APIError`         |
 
+## 조직 템플릿 조회
+
+`getOrganizationTemplates(language?)`는 `KO_KR`·`US_EN`을 지정하면 해당 언어만 조회함. 인자 생략·`undefined`·`null`은 두 언어를 병렬 요청하고 국문 조직 배열 다음에 영문 배열을 연결함. 최신 서버 계약은 HTTP `language` 생략·빈 값으로 전체 언어 조회를 지원함. 기존 FE 함수의 생략·null 통합 조회는 두 언어를 명시하는 병렬 요청을 유지함. 한쪽이라도 실패하면 부분 목록 대신 오류를 전달하며 이름으로 병합·중복 제거하지 않음.
+
+조직 응답의 `category`는 필수·Non-nullable이며 `TemplateCategory`의 `TOURNAMENT`·`DEBATE_CLUB`·`GLOBAL` 중 하나임. FE는 서버 분류를 그대로 보존하고 언어·이름·소속으로 추론하거나 기본값을 채우지 않음.
+
+`useGetOrganizationTemplates`가 표시 언어 변경을 구독하고 한국어는 `KO_KR` 조회, 영어는 `US_EN` 조회를 선택함. 캐시 키는 각각 `['OrganizationTemplates', 'KO_KR']`·`['OrganizationTemplates', 'US_EN']`이며 랜딩과 전체보기가 공유함. API 함수와 조회 훅은 응답 순서를 보존하며 표시 정렬을 수행하지 않음. 표시 순서는 응답을 직접 소비하는 화면이 원본 배열의 복사본에 적용함. 언어별 정렬 계약은 [전체보기](../../src/page/TemplateListPage/TemplateListPage.tsx)·[랜딩 템플릿](../../src/page/LandingPage/components/TemplateMarquee.tsx)의 JSDoc이 소유함. `enabled`로 자동 조회를 제어하고 오류는 기존 화면에서 처리함.
+
 ## 회원 설정과 공개 투표
 
 회원 설정은 `GET/PATCH /api/member/settings`를 사용함. `getMemberSettings()`·`patchMemberSettings()`가 기존 HTTP 경계를 재사용하며, 응답은 `language: 'ko' | 'en' | null`·`volume: number`임. 부분 수정은 최소 한 필드에 `null`이 아닌 유효한 변경값이 필요함. 생략과 명시적 `null`은 해당 필드의 기존 값 유지이며 API는 전달받은 `null`을 그대로 전송함. 빈 객체·모든 필드가 생략 또는 `null`인 요청은 유효한 수정이 아님. 음량의 범위 검사·소수 1자리 반올림은 서버가 수행하며 FE API는 정규화된 최종 응답을 반환함. 정책 근거는 [설정 결정 기록](../wiki/decisions/settings.md#settings-dec-002--회원-설정-patch의-null-의미)을 따름.
