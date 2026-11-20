@@ -40,7 +40,7 @@ function Harness(props: { canShare?: boolean }) {
         hasTranscriptFlag
         transcriptUnavailableReason="회원 전용"
       />
-      <DebateFeatureIndicators statuses={controls.statuses} />
+      <DebateFeatureIndicators statuses={controls.statuses} hasTranscriptFlag />
       <output>{controls.isInputBlocked ? '입력 차단' : '입력 허용'}</output>
     </>
   );

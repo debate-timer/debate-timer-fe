@@ -397,7 +397,10 @@ function TimerPageSession() {
           onLogin={() => login.requestLogin()}
           onLogout={logout.requestLogout}
         >
-          <DebateFeatureIndicators statuses={controls.statuses} />
+          <DebateFeatureIndicators
+            statuses={controls.statuses}
+            hasTranscriptFlag={hasTranscriptFlag}
+          />
           <span
             className="h-6 w-px shrink-0 bg-neutral-300"
             aria-hidden="true"

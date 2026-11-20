@@ -130,7 +130,10 @@ function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
           }
         />
       </div>
-      <DebateFeatureIndicators statuses={controls.statuses} />
+      <DebateFeatureIndicators
+        statuses={controls.statuses}
+        hasTranscriptFlag={props.hasTranscript}
+      />
       <div className="flex flex-wrap gap-4">
         <button
           type="button"
