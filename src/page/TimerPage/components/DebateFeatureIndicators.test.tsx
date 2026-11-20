@@ -8,6 +8,7 @@ describe('토론 기능 상태 표시', () => {
     const { rerender } = render(
       <DebateFeatureIndicators
         statuses={{ share: 'inactive', transcript: 'active', answer: 'error' }}
+        hasTranscriptFlag
       />,
     );
     expect(
@@ -32,10 +33,29 @@ describe('토론 기능 상태 표시', () => {
           transcript: 'inactive',
           answer: 'inactive',
         }}
+        hasTranscriptFlag
       />,
     );
     expect(
       screen.getByRole('listitem', { name: '실시간 공유: 활성화' }),
+    ).toBeInTheDocument();
+  });
+
+  it('속기록 피쳐 플래그가 없으면 속기록 상태 인디케이터를 숨긴다', () => {
+    render(
+      <DebateFeatureIndicators
+        statuses={{ share: 'inactive', transcript: 'active', answer: 'error' }}
+        hasTranscriptFlag={false}
+      />,
+    );
+    expect(
+      screen.getByRole('listitem', { name: '실시간 공유: 비활성화' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('listitem', { name: /속기록/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('listitem', { name: '답변 시간: 오류' }),
     ).toBeInTheDocument();
   });
 });

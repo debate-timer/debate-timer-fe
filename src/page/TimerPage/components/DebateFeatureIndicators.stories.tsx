@@ -6,6 +6,7 @@ const META: Meta<typeof DebateFeatureIndicators> = {
   component: DebateFeatureIndicators,
   args: {
     statuses: { share: 'inactive', transcript: 'active', answer: 'error' },
+    hasTranscriptFlag: true,
   },
 };
 export default META;
@@ -15,5 +16,10 @@ export const MixedStates: Story = {};
 export const Inactive: Story = {
   args: {
     statuses: { share: 'inactive', transcript: 'inactive', answer: 'inactive' },
+  },
+};
+export const WithoutTranscriptFlag: Story = {
+  args: {
+    hasTranscriptFlag: false,
   },
 };

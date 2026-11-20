@@ -6,7 +6,14 @@ import Chip from '../../../components/Chip/Chip';
 
 interface DebateFeatureIndicatorsProps {
   statuses: DebateControls['statuses'];
+  hasTranscriptFlag: boolean;
 }
+
+const FEATURES = [
+  ['share', '실시간 공유', PiBroadcast],
+  ['transcript', '속기록', IoMicSharp],
+  ['answer', '답변 시간', IoAlarmSharp],
+] as const;
 
 const ROW_CLASS =
   'group relative flex rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900';
@@ -27,26 +34,23 @@ const DOT_CLASS = {
 export default function DebateFeatureIndicators(
   props: DebateFeatureIndicatorsProps,
 ) {
-  const { statuses } = props;
+  const { statuses, hasTranscriptFlag } = props;
   const { t } = useTranslation();
   const LABELS = {
     inactive: t('비활성화'),
     active: t('활성화'),
     error: t('오류'),
   };
+  const visibleFeatures = hasTranscriptFlag
+    ? FEATURES
+    : FEATURES.filter(([key]) => key !== 'transcript');
   return (
     <ul
       aria-label={t('토론 기능 상태')}
       className="flex items-center gap-2"
       aria-live="polite"
     >
-      {(
-        [
-          ['share', '실시간 공유', PiBroadcast],
-          ['transcript', '속기록', IoMicSharp],
-          ['answer', '답변 시간', IoAlarmSharp],
-        ] as const
-      ).map(([key, label, Icon]) => (
+      {visibleFeatures.map(([key, label, Icon]) => (
         <li
           key={key}
           tabIndex={0}

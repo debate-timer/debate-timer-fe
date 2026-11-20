@@ -207,6 +207,9 @@ describe('기본 타이머의 토론 메뉴 연결', () => {
     renderTimerPage();
     await user.click(await screen.findByRole('button', { name: '토론 메뉴' }));
     expect(
+      screen.queryByRole('listitem', { name: /속기록/ }),
+    ).not.toBeInTheDocument();
+    expect(
       screen.queryByRole('button', { name: '속기록' }),
     ).not.toBeInTheDocument();
     expect(
