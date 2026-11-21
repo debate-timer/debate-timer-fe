@@ -42,8 +42,9 @@
 3. 이 링크로 들어온 청중 화면에 "녹음 참여" 버튼을 표시함. 공유를 먼저 켜 참가 정보 없는 링크로 이미 들어온 청중도, 사회자가 공유 채널로 보낸 `RECORDING_OPENED`([DEC-003](../decisions/transcript-multi-device.md#transcript-multi-device-dec-003--공유-채널로-녹음-참가-정보-전파))로 같은 버튼을 받음. 청중이 고지를 읽고 동의하면 FE가 마이크를 받고 `POST /api/v2/recordings/{sessionKey}/devices`로 기기 토큰을 받음. 로그인은 필요 없음.
 4. 사회자·청중 기기 모두 공유 이벤트에 맞춰 구간 녹음을 시작·종료하고, 구간이 끝나면 같은 턴 키로 `POST /api/v2/recordings/{sessionKey}/turns/{turnKey}`에 오디오와 품질 지표를 올림. 서버는 받아 두기만 하고 바로 202로 응답함.
 5. 서버는 참가 기기가 모두 올리거나 수집 창이 지나면 턴을 마감하고, 품질 점수가 가장 높은 후보 하나를 S3 `stt-audio-v2/` 경로에 보관한 뒤 Soniox로 전사함.
-6. 사회자가 토론을 끝내면 FE가 `POST /api/v2/recordings/{sessionKey}/finish`를 호출함. 서버는 수집 창 동안 늦은 업로드를 더 받고, 남은 턴 처리가 끝나면 전사된 턴으로 속기록을 만들고 기존 다듬기·분석을 이어감.
+6. 사회자가 토론을 끝내면 FE가 `POST /api/v2/recordings/{sessionKey}/finish`를 호출함. 서버는 끝내는 즉시 생성 중(`PROCESSING`) 속기록을 만들어 토론 기록 목록에 보이게 하고([BE PR #346](https://github.com/debate-timer/debate-timer-be/pull/346)), 수집 창 동안 늦은 업로드를 더 받은 뒤 남은 턴 처리가 끝나면 그 속기록에 발언을 채우고 기존 다듬기·분석을 이어감. 전사된 발언이 없으면 세션과 속기록을 함께 `FAILED`로 남김.
 7. 사회자 FE는 `GET /api/v2/recordings/{sessionKey}`를 폴링해 `COMPLETED`가 되면 `transcriptId`로 기존 속기록 화면으로 이동함.
+8. 세션이 `FAILED`로 끝나면 종료 화면은 "토론 기록을 만들지 못했어요"와 원인을 알리고 다시 보내기를 제공하지 않음. 끝내기 요청·상태 조회가 실패한 경우에만 다시 시도를 제공함. 토론 기록 목록은 `FAILED` 기록에 "실패" 칩을 붙이고, 상세의 속기록 탭은 발언이 없으면 실패 사유를 보여줌.
 
 V1과 달리 FE가 구간별 전사 결과를 모아 `POST /api/transcripts/{tableId}`로 제출하지 않음. 요청·응답 형식은 BE Swagger의 `Recording V2 API` 태그를 따름.
 
