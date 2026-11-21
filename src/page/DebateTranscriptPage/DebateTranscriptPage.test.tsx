@@ -172,6 +172,25 @@ describe('토론 속기록 화면', () => {
       ).not.toBeInTheDocument();
     });
 
+    it('실패한 기록은 다듬는 중 표시가 남아 있어도 진행 단계 대신 실패 사유를 보여준다', async () => {
+      renderPage({
+        ...doneTranscript,
+        status: 'FAILED',
+        refining: true,
+        lines: [],
+        report: null,
+        errorMessage: '전사된 발언이 없습니다.',
+      });
+
+      expect(
+        await screen.findByText('토론 기록을 만들지 못했어요'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('전사된 발언이 없습니다.')).toBeInTheDocument();
+      expect(
+        screen.queryByText('토론 기록을 만들고 있어요'),
+      ).not.toBeInTheDocument();
+    });
+
     it('보정이 끝나고 분석 중이면 보정 단계를 완료로, 보고서 단계를 진행 중으로 보여준다', async () => {
       renderPage({ ...doneTranscript, status: 'PROCESSING', report: null });
 

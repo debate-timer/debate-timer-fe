@@ -426,5 +426,8 @@
   "지금은 녹음에 참여할 수 없어요. 녹음이 끝났거나 참여 기기가 가득 찼어요.": "You can't join the recording right now. It has ended or the device limit has been reached.",
   "참여하지 않기": "Don't join",
   "토론 녹음에 참여할까요?": "Join the debate recording?",
-  "녹음 세션을 열지 못했어요. 다시 시도해 주세요.": "Couldn't open the recording session. Please try again."
+  "녹음 세션을 열지 못했어요. 다시 시도해 주세요.": "Couldn't open the recording session. Please try again.",
+  "실패": "Failed",
+  "토론 기록을 만들지 못했어요": "Couldn't create the debate record",
+  "녹음에서 인식된 발언이 없었거나 기록을 만드는 중 문제가 생겼어요.": "No speech was recognized in the recording, or something went wrong while creating the record."
 }

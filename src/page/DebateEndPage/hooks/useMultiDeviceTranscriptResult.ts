@@ -3,8 +3,10 @@ import usePostRecordingFinishV2 from '../../../hooks/mutations/usePostRecordingF
 import { useGetRecordingSessionV2 } from '../../../hooks/query/useGetRecordingSessionV2';
 import { getHostRecordingV2 } from '../../../util/recordingStorageV2';
 
+// 'error'는 끝내기 요청·상태 조회가 실패해 다시 시도할 수 있는 상태,
+// 'failed'는 서버가 세션을 실패로 끝내(전사된 발언 없음 등) 다시 시도해도 바뀌지 않는 상태다.
 export type MultiDeviceTranscriptStatus =
-  'none' | 'transcribing' | 'ready' | 'error';
+  'none' | 'transcribing' | 'ready' | 'error' | 'failed';
 
 /**
  * 토론 종료 화면에서 다기기 녹음 세션을 끝내고 서버가 속기록을 만들 때까지 기다린다.
@@ -67,7 +69,10 @@ export default function useMultiDeviceTranscriptResult(tableId: number) {
     if (sessionKey === null) {
       return 'none';
     }
-    if (isFinishFailed || sessionQuery.isError || data?.status === 'FAILED') {
+    if (data?.status === 'FAILED') {
+      return 'failed';
+    }
+    if (isFinishFailed || sessionQuery.isError) {
       return 'error';
     }
     if (data?.status === 'COMPLETED' && data.transcriptId !== null) {

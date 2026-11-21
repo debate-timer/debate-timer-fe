@@ -50,6 +50,22 @@ describe('토론 기록 전송 배너', () => {
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
+  it('서버가 기록을 만들지 못하고 끝냈으면 원인을 알리고 다시 보내기를 보여주지 않는다', () => {
+    render(
+      <TranscriptBanner status="failed" onOpen={vi.fn()} onRetry={vi.fn()} />,
+    );
+
+    expect(screen.getByText('토론 기록을 만들지 못했어요')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        '녹음에서 인식된 발언이 없었거나 기록을 만드는 중 문제가 생겼어요.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '다시 보내기' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('Soniox 전사를 기다리는 동안 남은 구간 수를 알린다', () => {
     render(
       <TranscriptBanner

@@ -9,6 +9,7 @@ import TranscriptGenerating from '../../components/TranscriptDetail/TranscriptGe
 import useGetSharedTranscript, {
   isShareStoppedError,
 } from '../../hooks/query/useGetSharedTranscript';
+import { isTranscriptGenerating } from '../../util/transcriptStatus';
 
 // 공유 링크를 받은 사람이 로그인 없이 속기록과 분석 보고서를 보는 화면이다.
 export default function SharedTranscriptPage() {
@@ -24,8 +25,7 @@ export default function SharedTranscriptPage() {
   // 공유가 중지(404)되면 이전에 받은 내용도 숨기고, 일시적인 오류면 받은 내용을 그대로 보여준다.
   const data = isShareStoppedError(error) ? undefined : lastData;
 
-  const isGenerating =
-    !!data && (data.refining || data.status === 'PROCESSING');
+  const isGenerating = !!data && isTranscriptGenerating(data);
 
   return (
     <DefaultLayout>

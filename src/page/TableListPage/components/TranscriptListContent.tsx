@@ -10,12 +10,15 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../../util/languageRouting';
+import { isTranscriptGenerating } from '../../../util/transcriptStatus';
 
 // 노란 시간표 카드와 구분되도록 기본블랙(차콜) 카드에 테마 노랑으로 강조한다.
 const CARD_CLASS =
   'm-5 flex h-[220px] w-[340px] flex-col gap-3 rounded-[28px] border-2 p-6 text-left text-default-white shadow-lg transition-all duration-300 hover:-translate-y-1';
 const GENERATING_CHIP_CLASS =
   'flex flex-none items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-default-black';
+const FAILED_CHIP_CLASS =
+  'flex flex-none items-center rounded-full bg-semantic-error px-2.5 py-1 text-xs font-bold text-default-white';
 
 // 생성 시각을 "10.23 (목) 01:39"처럼 보여준다.
 function formatCreatedAt(createdAt: string, lang: string): string {
@@ -29,8 +32,8 @@ function formatCreatedAt(createdAt: string, lang: string): string {
   return `${date.getMonth() + 1}.${date.getDate()} (${weekday}) ${time}`;
 }
 
-function isGenerating(transcript: TranscriptSummary): boolean {
-  return transcript.refining || transcript.status === 'PROCESSING';
+function isFailed(transcript: TranscriptSummary): boolean {
+  return transcript.status === 'FAILED';
 }
 
 // 대시보드 토론 기록 탭. 서버가 준 최근 생성순으로 보여준다.
@@ -70,7 +73,8 @@ export default function TranscriptListContent() {
       {/* 시간표 탭처럼 주제 길이와 상관없이 같은 크기의 카드를 줄 바꿈으로 놓는다. */}
       <div className="flex max-w-[1140px] flex-wrap justify-start">
         {data.transcripts.map((transcript) => {
-          const generating = isGenerating(transcript);
+          const generating = isTranscriptGenerating(transcript);
+          const failed = isFailed(transcript);
           return (
             <Link
               key={transcript.id}
@@ -83,6 +87,7 @@ export default function TranscriptListContent() {
                 generating
                   ? 'border-dashed border-brand/70 bg-default-black2'
                   : 'border-transparent bg-default-black hover:bg-neutral-800',
+                failed && 'opacity-70',
               )}
             >
               <span className="flex w-full items-center justify-between gap-2 text-sm text-neutral-300">
@@ -97,6 +102,9 @@ export default function TranscriptListContent() {
                     />
                     {t('생성 중')}
                   </span>
+                )}
+                {failed && (
+                  <span className={FAILED_CHIP_CLASS}>{t('실패')}</span>
                 )}
               </span>
               <span className="size-[10px] flex-none bg-brand" />
