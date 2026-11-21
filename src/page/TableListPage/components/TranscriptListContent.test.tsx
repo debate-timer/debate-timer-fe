@@ -76,6 +76,22 @@ describe('대시보드 토론 기록 목록', () => {
     expect(within(done).queryByText('생성 중')).not.toBeInTheDocument();
   });
 
+  it.each([
+    ['다듬기가 끝난 뒤 실패한 기록', false],
+    ['생성 중에 실패해 다듬는 중 표시가 남은 기록', true],
+  ])('%s에는 생성 중 대신 실패 태그를 붙인다', async (_, refining) => {
+    renderList({
+      transcripts: [
+        { ...transcripts.transcripts[0], status: 'FAILED', refining },
+      ],
+    });
+
+    const [card] = await screen.findAllByRole('link');
+
+    expect(within(card).getByText('실패')).toBeInTheDocument();
+    expect(within(card).queryByText('생성 중')).not.toBeInTheDocument();
+  });
+
   it('시간표가 삭제된 기록은 삭제된 시간표로 표시한다', async () => {
     renderList();
 
