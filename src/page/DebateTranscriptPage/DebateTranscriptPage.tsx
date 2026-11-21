@@ -11,6 +11,7 @@ import { SttMode } from '../../types/transcript';
 import DTShare from '../../components/icons/Share';
 import useTranscriptShare from './hooks/useTranscriptShare';
 import TranscriptShareModal from './components/TranscriptShareModal';
+import { isTranscriptGenerating } from '../../util/transcriptStatus';
 
 const SHARE_BUTTON_CLASS =
   'flex size-11 flex-none items-center justify-center rounded-full bg-default-white p-3 text-default-black transition hover:bg-brand';
@@ -43,8 +44,7 @@ export default function DebateTranscriptPage() {
     throw new Error(t('토론 기록 ID가 올바르지 않습니다.'));
   }
 
-  const isGenerating =
-    !!data && (data.refining || data.status === 'PROCESSING');
+  const isGenerating = !!data && isTranscriptGenerating(data);
 
   const sttModeLabels: Record<SttMode, string> = {
     RPC: t('실시간 인식 (크롬)'),

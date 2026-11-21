@@ -21,6 +21,15 @@ describe('공유 기록 재조회 주기', () => {
     ).toBe(false);
   });
 
+  it('실패한 기록은 다듬는 중 표시가 남아 있어도 다시 조회하지 않는다', () => {
+    expect(
+      getSharedTranscriptRefetchInterval(
+        { ...processing, status: 'FAILED', refining: true },
+        null,
+      ),
+    ).toBe(false);
+  });
+
   it('생성 중에 받은 응답이 남아 있어도 공유가 중지(404)되면 다시 조회하지 않는다', () => {
     expect(
       getSharedTranscriptRefetchInterval(

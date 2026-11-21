@@ -10,6 +10,7 @@ import {
   DEFAULT_LANG,
   isSupportedLang,
 } from '../../util/languageRouting';
+import { isTranscriptGenerating } from '../../util/transcriptStatus';
 
 // 노란 시간표 카드와 구분되도록 기본블랙(차콜) 카드에 테마 노랑으로 강조한다.
 const CARD_CLASS =
@@ -33,14 +34,6 @@ function formatCreatedAt(createdAt: string, lang: string): string {
 
 function isFailed(transcript: TranscriptSummary): boolean {
   return transcript.status === 'FAILED';
-}
-
-// 실패한 기록은 다듬는 중 표시가 남아 있어도 생성 중으로 보지 않는다.
-function isGenerating(transcript: TranscriptSummary): boolean {
-  return (
-    !isFailed(transcript) &&
-    (transcript.refining || transcript.status === 'PROCESSING')
-  );
 }
 
 // 별도 토론 기록 목록. 서버가 준 최근 생성순으로 보여준다.
@@ -80,7 +73,7 @@ export default function TranscriptListContent() {
       {/* 시간표 탭처럼 주제 길이와 상관없이 같은 크기의 카드를 줄 바꿈으로 놓는다. */}
       <div className="flex max-w-[1140px] flex-wrap justify-start">
         {data.transcripts.map((transcript) => {
-          const generating = isGenerating(transcript);
+          const generating = isTranscriptGenerating(transcript);
           const failed = isFailed(transcript);
           return (
             <Link

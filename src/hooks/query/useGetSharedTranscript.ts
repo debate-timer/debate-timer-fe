@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getSharedTranscript } from '../../apis/apis/transcript';
 import { GetSharedTranscriptResponseType } from '../../apis/responses/transcript';
 import { APIError } from '../../apis/primitives';
+import { isTranscriptGenerating } from '../../util/transcriptStatus';
 
 const POLLING_INTERVAL_MS = 2000;
 const MAX_RETRY_COUNT = 3;
@@ -11,7 +12,7 @@ export function isShareStoppedError(error: unknown): boolean {
 }
 
 /**
- * 공유받은 기록도 보정과 분석이 끝날 때까지(refining, PROCESSING) 주기적으로 다시 조회한다.
+ * 공유받은 기록도 보정과 분석이 끝날 때까지(refining, PROCESSING) 주기적으로 다시 조회한다. 실패하면 멈춘다.
  * 공유가 중지(404)되면 이전 응답이 남아 있어도 멈춘다.
  */
 export function getSharedTranscriptRefetchInterval(
@@ -21,9 +22,7 @@ export function getSharedTranscriptRefetchInterval(
   if (isShareStoppedError(error)) {
     return false;
   }
-  return data?.refining || data?.status === 'PROCESSING'
-    ? POLLING_INTERVAL_MS
-    : false;
+  return data && isTranscriptGenerating(data) ? POLLING_INTERVAL_MS : false;
 }
 
 export default function useGetSharedTranscript(
