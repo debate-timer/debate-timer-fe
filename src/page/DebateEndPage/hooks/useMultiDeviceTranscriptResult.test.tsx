@@ -82,7 +82,7 @@ describe('다기기 녹음 속기록 대기 훅', () => {
     expect(finish).toHaveBeenCalledWith('session-1');
   });
 
-  it('속기록을 만들지 못하면 오류로 알린다', async () => {
+  it('서버가 속기록을 만들지 못하고 끝내면 다시 시도할 수 없는 실패로 알린다', async () => {
     saveHostRecordingV2(5, {
       sessionKey: 'session-1',
       joinCode: 'join',
@@ -102,7 +102,7 @@ describe('다기기 녹음 속기록 대기 훅', () => {
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => expect(result.current.status).toBe('error'));
+    await waitFor(() => expect(result.current.status).toBe('failed'));
   });
 
   it('끝내기 요청이 실패하면 다시 시도할 수 있다', async () => {

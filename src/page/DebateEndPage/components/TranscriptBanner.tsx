@@ -32,13 +32,15 @@ export default function TranscriptBanner(props: TranscriptBannerProps) {
     submitting: t('토론 기록을 보내고 있어요'),
     ready: t('이번 토론이 자동으로 기록됐어요'),
     error: t('토론 기록을 보내지 못했어요'),
+    failed: t('토론 기록을 만들지 못했어요'),
   };
+  const isFailure = status === 'error' || status === 'failed';
 
   return (
     <div
       className={clsx(
         BANNER_CLASS,
-        status === 'error'
+        isFailure
           ? 'border-semantic-warning'
           : 'border-brand shadow-[0px_0px_22px_6px_#FECD4C40]',
       )}
@@ -57,7 +59,11 @@ export default function TranscriptBanner(props: TranscriptBannerProps) {
           {messages[status]}
         </span>
         <span className="block text-sm text-default-border md:text-base">
-          {t('찬·반 화자가 구분된 속기록과 AI 분석 보고서를 볼 수 있어요')}
+          {status === 'failed'
+            ? t(
+                '녹음에서 인식된 발언이 없었거나 기록을 만드는 중 문제가 생겼어요.',
+              )
+            : t('찬·반 화자가 구분된 속기록과 AI 분석 보고서를 볼 수 있어요')}
         </span>
       </span>
       {status === 'ready' && (

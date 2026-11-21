@@ -87,6 +87,26 @@ export default function TranscriptDetail(props: TranscriptDetailProps) {
     </button>
   );
 
+  // 발언 없이 실패한 기록(다기기 녹음에서 전사된 발언이 없는 경우 등)은 빈 속기록 대신 실패를 알린다.
+  const renderTranscript = () => {
+    if (status === 'FAILED' && lines.length === 0) {
+      return (
+        <div className={STATUS_BOX_CLASS}>
+          <p className="font-bold">{t('토론 기록을 만들지 못했어요')}</p>
+          {errorMessage && (
+            <p className="text-sm text-default-border">{errorMessage}</p>
+          )}
+        </div>
+      );
+    }
+    return (
+      <TranscriptView
+        lines={lines}
+        highlightedLineIndex={highlightedLineIndex}
+      />
+    );
+  };
+
   const renderReport = () => {
     if (status === 'FAILED' || !report) {
       return (
@@ -127,14 +147,7 @@ export default function TranscriptDetail(props: TranscriptDetailProps) {
 
       <div className="pt-2">
         {/* 속기록은 AI가 STT 원문을 보정한 결과다. 보정에 실패하면 서버가 원문을 준다. */}
-        {tab === 'transcript' ? (
-          <TranscriptView
-            lines={lines}
-            highlightedLineIndex={highlightedLineIndex}
-          />
-        ) : (
-          renderReport()
-        )}
+        {tab === 'transcript' ? renderTranscript() : renderReport()}
       </div>
     </div>
   );

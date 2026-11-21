@@ -9,8 +9,9 @@ import {
   TRANSCRIPT_DRAFT_CHANGE_EVENT,
 } from '../../../util/transcriptDraft';
 
+// 'error'는 다시 보낼 수 있는 실패, 'failed'는 서버가 기록을 만들지 못하고 끝내 다시 시도해도 바뀌지 않는 실패다.
 export type SubmitTranscriptStatus =
-  'none' | 'transcribing' | 'submitting' | 'ready' | 'error';
+  'none' | 'transcribing' | 'submitting' | 'ready' | 'error' | 'failed';
 
 // 전사 대기 만료는 초안 변경 없이 오므로 대기 중에는 주기적으로 다시 읽는다.
 export const PENDING_POLL_INTERVAL_MS = 500;
