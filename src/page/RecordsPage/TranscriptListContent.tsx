@@ -16,6 +16,8 @@ const CARD_CLASS =
   'm-5 flex h-[220px] w-[340px] flex-col gap-3 rounded-[28px] border-2 p-6 text-left text-default-white shadow-lg transition-all duration-300 hover:-translate-y-1';
 const GENERATING_CHIP_CLASS =
   'flex flex-none items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-default-black';
+const FAILED_CHIP_CLASS =
+  'flex flex-none items-center rounded-full bg-semantic-error px-2.5 py-1 text-xs font-bold text-default-white';
 
 // 생성 시각을 "10.23 (목) 01:39"처럼 보여준다.
 function formatCreatedAt(createdAt: string, lang: string): string {
@@ -29,8 +31,16 @@ function formatCreatedAt(createdAt: string, lang: string): string {
   return `${date.getMonth() + 1}.${date.getDate()} (${weekday}) ${time}`;
 }
 
+function isFailed(transcript: TranscriptSummary): boolean {
+  return transcript.status === 'FAILED';
+}
+
+// 실패한 기록은 다듬는 중 표시가 남아 있어도 생성 중으로 보지 않는다.
 function isGenerating(transcript: TranscriptSummary): boolean {
-  return transcript.refining || transcript.status === 'PROCESSING';
+  return (
+    !isFailed(transcript) &&
+    (transcript.refining || transcript.status === 'PROCESSING')
+  );
 }
 
 // 별도 토론 기록 목록. 서버가 준 최근 생성순으로 보여준다.
@@ -71,6 +81,7 @@ export default function TranscriptListContent() {
       <div className="flex max-w-[1140px] flex-wrap justify-start">
         {data.transcripts.map((transcript) => {
           const generating = isGenerating(transcript);
+          const failed = isFailed(transcript);
           return (
             <Link
               key={transcript.id}
@@ -83,6 +94,7 @@ export default function TranscriptListContent() {
                 generating
                   ? 'border-dashed border-brand/70 bg-default-black2'
                   : 'border-transparent bg-default-black hover:bg-neutral-800',
+                failed && 'opacity-70',
               )}
             >
               <span className="flex w-full items-center justify-between gap-2 text-sm text-neutral-300">
@@ -97,6 +109,9 @@ export default function TranscriptListContent() {
                     />
                     {t('생성 중')}
                   </span>
+                )}
+                {failed && (
+                  <span className={FAILED_CHIP_CLASS}>{t('실패')}</span>
                 )}
               </span>
               <span className="size-[10px] flex-none bg-brand" />
