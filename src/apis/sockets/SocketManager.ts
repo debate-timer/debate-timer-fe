@@ -327,15 +327,16 @@ class SocketManager {
    * @param destination - 목적지 채널  (e.g., '/chairman/{roomId})
    * @param body - 전송할 데이터 (객체 형태로 전달하면 내부에서 JSON 문자열로 변환됨)
    * @param headers - 추가적으로 첨부할 STOMP 헤더 (선택 사항)
+   * @returns 연결되어 있어 발행했으면 true
    */
   public publish(
     destination: string,
     body: SocketMessage,
     headers?: StompHeaders,
-  ): void {
+  ): boolean {
     if (!this.client || !this.client.connected) {
       console.warn('소켓이 연결되어 있지 않아 메시지를 보낼 수 없습니다.');
-      return;
+      return false;
     }
 
     this.client.publish({
@@ -343,6 +344,7 @@ class SocketManager {
       headers,
       body: JSON.stringify(body),
     });
+    return true;
   }
 
   /**

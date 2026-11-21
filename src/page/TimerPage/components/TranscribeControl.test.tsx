@@ -4,7 +4,7 @@ import { GlobalPortal } from '../../../util/GlobalPortal';
 import TranscribeControl, { TranscribeControlProps } from './TranscribeControl';
 
 const baseProps: TranscribeControlProps = {
-  supportedModes: { RPC: true, SONIOX: true },
+  supportedModes: { RPC: true, SONIOX: true, MULTI_DEVICE: false },
   sttMode: 'RPC',
   isModeLocked: false,
   isEnabled: false,
@@ -71,10 +71,47 @@ describe('토론 기록 켜기 컨트롤', () => {
     expect(props.onEnable).toHaveBeenCalledWith('SONIOX');
   });
 
+  it('다기기 녹음을 쓸 수 있으면 동의 화면에서 고를 수 있다', async () => {
+    const user = userEvent.setup();
+    const props = renderControl({
+      supportedModes: { RPC: true, SONIOX: true, MULTI_DEVICE: true },
+    });
+
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
+    await user.click(screen.getByRole('radio', { name: /Soniox 다기기 녹음/ }));
+    expect(
+      screen.getByText(
+        /실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고/,
+      ),
+    ).toBeInTheDocument();
+    await consentAndStart(user);
+
+    expect(props.onEnable).toHaveBeenCalledWith('MULTI_DEVICE');
+  });
+
+  it('다기기 녹음을 쓸 수 없으면 선택지에 보여주지 않는다', async () => {
+    const user = userEvent.setup();
+    renderControl();
+
+    await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
+
+    expect(
+      screen.queryByRole('radio', { name: /Soniox 다기기 녹음/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('녹음 세션을 열지 못하면 다시 시도하라고 알린다', () => {
+    renderControl({ error: 'session' });
+
+    expect(
+      screen.getByText('녹음 세션을 열지 못했어요. 다시 시도해 주세요.'),
+    ).toBeInTheDocument();
+  });
+
   it('지원하지 않는 모드는 선택지에 보여주지 않고 남은 모드로 기록한다', async () => {
     const user = userEvent.setup();
     const props = renderControl({
-      supportedModes: { RPC: false, SONIOX: true },
+      supportedModes: { RPC: false, SONIOX: true, MULTI_DEVICE: false },
     });
 
     await user.click(screen.getByRole('button', { name: '토론 녹화하기' }));
@@ -172,7 +209,9 @@ describe('토론 기록 켜기 컨트롤', () => {
   });
 
   it('브라우저가 어떤 기록 모드도 지원하지 않으면 버튼 대신 안내를 보여준다', () => {
-    renderControl({ supportedModes: { RPC: false, SONIOX: false } });
+    renderControl({
+      supportedModes: { RPC: false, SONIOX: false, MULTI_DEVICE: false },
+    });
 
     expect(
       screen.queryByRole('button', { name: '토론 녹화하기' }),

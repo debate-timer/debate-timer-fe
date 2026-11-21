@@ -4,13 +4,14 @@ import { RiMicFill } from 'react-icons/ri';
 import clsx from 'clsx';
 import { useModal } from '../../../hooks/useModal';
 import DialogModal from '../../../components/DialogModal/DialogModal';
-import { SttMode } from '../../../types/transcript';
 import { TranscriberError } from '../hooks/useDebateTranscriber';
+import { MultiDeviceTranscriberError } from '../hooks/useMultiDeviceTranscriber';
+import { TranscriptRecorderMode } from '../hooks/useTranscriptRecorder';
 import MicCheckPanel from './MicCheckPanel';
 
 export interface TranscribeControlProps {
-  supportedModes: Record<SttMode, boolean>;
-  sttMode: SttMode;
+  supportedModes: Record<TranscriptRecorderMode, boolean>;
+  sttMode: TranscriptRecorderMode;
   // 한 번 기록을 시작한 모드는 같은 초안에 섞이지 않도록 바꿀 수 없다.
   isModeLocked: boolean;
   isEnabled: boolean;
@@ -18,14 +19,14 @@ export interface TranscribeControlProps {
   utteranceCount: number;
   pendingCount: number;
   failedCount: number;
-  error: TranscriberError | null;
+  error: TranscriberError | MultiDeviceTranscriberError | null;
   // 타이머 화면에 처음 들어왔을 때 녹음할지 바로 묻는다.
   shouldPromptOnMount: boolean;
-  onEnable: (mode: SttMode) => void;
+  onEnable: (mode: TranscriptRecorderMode) => void;
   onDisable: () => void;
 }
 
-const STT_MODES: SttMode[] = ['RPC', 'SONIOX'];
+const STT_MODES: TranscriptRecorderMode[] = ['RPC', 'SONIOX', 'MULTI_DEVICE'];
 
 // 동의를 받은 뒤 기록을 켜기 전에 마이크 테스트 단계를 거친다.
 type PromptStep = 'consent' | 'mic-check';
@@ -58,7 +59,8 @@ export default function TranscribeControl(props: TranscribeControlProps) {
   const { openModal, closeModal, ModalWrapper } = useModal({
     isCloseButtonExist: false,
   });
-  const [selectedMode, setSelectedMode] = useState<SttMode>(sttMode);
+  const [selectedMode, setSelectedMode] =
+    useState<TranscriptRecorderMode>(sttMode);
   const [promptStep, setPromptStep] = useState<PromptStep>('consent');
   const hasPromptedRef = useRef(false);
   // 이 브라우저에서 쓸 수 없는 모드는 선택지에 보여주지 않는다.
@@ -91,16 +93,20 @@ export default function TranscribeControl(props: TranscribeControlProps) {
     openModal,
   ]);
 
-  const modeLabels: Record<SttMode, string> = {
+  const modeLabels: Record<TranscriptRecorderMode, string> = {
     RPC: t('실시간 인식 (크롬)'),
     SONIOX: t('발언 후 일괄 인식 (Soniox)'),
+    MULTI_DEVICE: t('Soniox 다기기 녹음'),
   };
-  const modeDescriptions: Record<SttMode, string> = {
+  const modeDescriptions: Record<TranscriptRecorderMode, string> = {
     RPC: t(
       '타이머가 실행되는 동안의 발언을 구글 음성 인식으로 텍스트로 바꿔요. 토론이 끝나면 속기록을 서버로 보내 AI가 분석 보고서를 만들어요.',
     ),
     SONIOX: t(
       '발언 구간이 끝날 때마다 녹음한 오디오를 서버로 보내 Soniox로 텍스트로 바꿔요. 토론이 끝나면 속기록을 서버로 보내 AI가 분석 보고서를 만들어요.',
+    ),
+    MULTI_DEVICE: t(
+      '실시간 공유 링크로 들어온 청중의 기기도 녹음에 참여하고, 가장 깨끗한 녹음으로 속기록을 만들어요.',
     ),
   };
 
@@ -191,6 +197,11 @@ export default function TranscribeControl(props: TranscribeControlProps) {
         {error === 'not-allowed' && (
           <p className={STATUS_PILL_CLASS}>
             {t('마이크 권한을 허용해야 토론을 기록할 수 있어요')}
+          </p>
+        )}
+        {error === 'session' && (
+          <p className={STATUS_PILL_CLASS}>
+            {t('녹음 세션을 열지 못했어요. 다시 시도해 주세요.')}
           </p>
         )}
       </div>

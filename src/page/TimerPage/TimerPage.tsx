@@ -43,6 +43,7 @@ import TranscriptLeaveModal from './components/TranscriptLeaveModal';
 import useTranscriptLeaveGuard from './hooks/useTranscriptLeaveGuard';
 import useFeatureFlag from '../../hooks/useFeatureFlag';
 import { toRecognitionLang } from '../../util/speechRecognition';
+import { appendRecordingJoin } from '../../util/recordingJoinLink';
 
 // 피처 플래그
 const IS_LIVE_SHARE_ENABLED = true;
@@ -110,12 +111,23 @@ export default function TimerPage() {
     enabled: isMemberFlow,
   });
   const isTranscribeAvailable = isMemberFlow && hasTranscriptFlag;
+  // 다기기 녹음(MULTI_DEVICE_RECORDING) 플래그가 있으면 기록 방식에 청중 기기 녹음을 더한다.
+  const { isEnabled: hasMultiDeviceFlag } = useFeatureFlag(
+    'MULTI_DEVICE_RECORDING',
+    { enabled: isMemberFlow },
+  );
+  // 다기기 녹음의 턴 키는 청중에게 보낸 마지막 타이머 전환 이벤트의 version이다.
+  // 라이브 공유 훅이 기록 훅보다 뒤에서 만들어지므로 ref로 연결한다.
+  const segmentVersionRef = useRef<() => number | null>(() => null);
+  const getSegmentVersion = useCallback(() => segmentVersionRef.current(), []);
   const transcriber = useTranscriptRecorder({
     tableId,
     timeBoxIndex: index,
     team: timerType === 'TIME_BASED' ? prosConsSelected : null,
     isRunning: normalTimer.isRunning || timer1.isRunning || timer2.isRunning,
     lang: toRecognitionLang(i18n.resolvedLanguage ?? i18n.language),
+    isMultiDeviceAllowed: isTranscribeAvailable && hasMultiDeviceFlag,
+    getSegmentVersion,
   });
   // 토론 기록 중 화면을 벗어나면 속기록이 유실되므로 확인을 받은 뒤에만 나간다.
   const transcriptLeaveGuard = useTranscriptLeaveGuard({
@@ -144,7 +156,8 @@ export default function TimerPage() {
     // connect, 나중에 명시적 연결이 필요할 때를 대비하여 주석으로 남겨둠
     // disconnect, 나중에 명시적 연결 종료가 필요할 때를 대비하여 주석으로 남겨둠
     isSocketConnected,
-    shareUrl: liveShareUrl,
+    shareUrl: baseLiveShareUrl,
+    getLastTransitionVersion,
     isLoading: isSocketLoading,
     isError: isSocketError,
     errorType: socketErrorType,
@@ -152,6 +165,36 @@ export default function TimerPage() {
   } = useLiveShare(tableId, {
     onSyncRequest: () => syncRequestHandlerRef.current(),
   });
+
+  useEffect(() => {
+    segmentVersionRef.current = getLastTransitionVersion;
+  }, [getLastTransitionVersion]);
+
+  // 다기기 녹음 중이면 청중이 녹음에 참여할 수 있도록 공유 링크에 녹음 세션·참가 코드를 붙인다.
+  const recordingSession = transcriber.multiDeviceSession;
+  const liveShareUrl = recordingSession
+    ? appendRecordingJoin(baseLiveShareUrl, recordingSession)
+    : baseLiveShareUrl;
+
+  // 이미 공유 화면을 보고 있는 청중도 다기기 녹음에 참여할 수 있도록 참가 정보를 공유 채널로 보낸다.
+  const recordingSessionKey = recordingSession?.sessionKey;
+  const recordingJoinCode = recordingSession?.joinCode;
+  useEffect(() => {
+    if (isSocketConnected && recordingSessionKey && recordingJoinCode) {
+      issueEvent('RECORDING_OPENED', null, {
+        sessionKey: recordingSessionKey,
+        joinCode: recordingJoinCode,
+      });
+    }
+  }, [isSocketConnected, issueEvent, recordingJoinCode, recordingSessionKey]);
+
+  // 다기기 녹음을 끄면 세션이 끝나므로, 공유 화면의 청중이 녹음을 멈추도록 알린다.
+  const disableTranscriber = () => {
+    const closedRecording = transcriber.disable();
+    if (closedRecording && isSocketConnected) {
+      issueEvent('RECORDING_CLOSED', null, closedRecording);
+    }
+  };
 
   const handleChangeAnswerTime = (time: number) => {
     setAnswerTime(time);
@@ -322,8 +365,12 @@ export default function TimerPage() {
       }
 
       issueEvent('SYNC', payload);
+      // 상태 동기화 응답 뒤에 다기기 녹음 참가 정보도 다시 보내, 녹음을 켠 뒤 들어오거나 재연결한 청중도 참여할 수 있게 한다.
+      if (recordingSession) {
+        issueEvent('RECORDING_OPENED', null, recordingSession);
+      }
     };
-  }, [buildSyncPayload, issueEvent]);
+  }, [buildSyncPayload, issueEvent, recordingSession]);
 
   useTimerHotkey(state, handleTimerEvent);
 
@@ -503,7 +550,7 @@ export default function TimerPage() {
                     error={transcriber.error}
                     shouldPromptOnMount
                     onEnable={transcriber.enable}
-                    onDisable={transcriber.disable}
+                    onDisable={disableTranscriber}
                   />
                 </div>
               )}

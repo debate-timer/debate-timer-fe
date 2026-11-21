@@ -49,6 +49,8 @@ describe('useAudienceShareState', () => {
       latestMessageReceivedAt: null,
       lastReceivedAt: null,
       chairmanAbsentAt: null,
+      recordingJoin: null,
+      closedRecordingSessionKeys: new Set<string>(),
       isConnected: false,
       error: null,
     });
@@ -69,6 +71,8 @@ describe('useAudienceShareState', () => {
       latestMessageReceivedAt: null,
       lastReceivedAt: null,
       chairmanAbsentAt: null,
+      recordingJoin: null,
+      closedRecordingSessionKeys: new Set<string>(),
       isConnected: true,
       error: null,
       ...state,

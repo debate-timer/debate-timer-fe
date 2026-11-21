@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { IMessage } from '@stomp/stompjs';
 import useSocket from './useSocket';
 import { socketManager } from '../../apis/sockets/SocketManager';
-import { SocketMessage } from '../../apis/sockets/type';
+import { RecordingJoinPayload, SocketMessage } from '../../apis/sockets/type';
 import { isSocketMessage } from '../../apis/sockets/util';
 import useDocumentVisibility from '../useDocumentVisibility';
 
@@ -26,6 +26,8 @@ const VISIBILITY_RESYNC_THROTTLE_MS = 3000;
  * @returns {number | null} returns.latestMessageReceivedAt - `latestMessage`를 수신한 시각입니다. 네트워크 지연 보정의 기준으로 사용합니다.
  * @returns {number | null} returns.lastReceivedAt - 형식이 올바른 사회자 메시지를 마지막으로 수신한 시각입니다. version이 오래되어 반영하지 않은 메시지도 포함합니다.
  * @returns {number | null} returns.chairmanAbsentAt - 서버로부터 활성 사회자가 없다는 알림(`CHAIRMAN_ABSENT`)을 마지막으로 받은 시각입니다.
+ * @returns {RecordingJoinPayload | null} returns.recordingJoin - 사회자가 `RECORDING_OPENED`로 보낸 다기기 녹음 참가 정보입니다. `latestMessage`에는 넣지 않으며 재연결해도 유지합니다. 같은 세션의 `RECORDING_CLOSED`를 받으면 null이 됩니다.
+ * @returns {ReadonlySet<string>} returns.closedRecordingSessionKeys - 사회자가 `RECORDING_CLOSED`로 끝낸 녹음 세션 키입니다. 링크에 담긴 끝난 세션으로 참여하지 않도록 씁니다.
  * @returns {boolean} returns.isConnected - 소켓 연결 상태입니다.
  * @returns {Function} returns.connect - `useSocket.connect`에 위임하기 전에 현재 메시지를 초기화합니다.
  * @returns {Function} returns.disconnect - `useSocket.disconnect`에 위임하기 전에 현재 메시지를 초기화합니다.
@@ -63,6 +65,12 @@ export default function useAudienceSocket(
 
   // 서버가 활성 사회자가 없다고 알린 시각 (사회자 메시지가 아니므로 lastReceivedAt과 따로 관리)
   const [chairmanAbsentAt, setChairmanAbsentAt] = useState<number | null>(null);
+  // 사회자가 공유 채널로 보낸 다기기 녹음 참가 정보. 재연결해 메시지를 초기화해도 유지한다.
+  const [recordingJoin, setRecordingJoin] =
+    useState<RecordingJoinPayload | null>(null);
+  const [closedRecordingSessionKeys, setClosedRecordingSessionKeys] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
 
   // 마지막으로 반영한 메시지의 version (이보다 작거나 같은 메시지는 오래된 것으로 간주)
   const lastVersionRef = useRef<number | null>(null);
@@ -135,6 +143,23 @@ export default function useAudienceSocket(
             return;
           }
           lastVersionRef.current = version;
+        }
+
+        // 녹음 참가 정보는 타이머 화면 상태가 아니므로 최근 메시지를 바꾸지 않고 따로 보관한다
+        if (parsedData.eventType === 'RECORDING_OPENED') {
+          setRecordingJoin(parsedData.recording);
+          return;
+        }
+        // 녹음이 끝나면 그 세션의 참가 정보를 지워 더는 녹음에 참여하지 않게 한다
+        if (parsedData.eventType === 'RECORDING_CLOSED') {
+          const { sessionKey } = parsedData.recording;
+          setRecordingJoin((prev) =>
+            prev?.sessionKey === sessionKey ? null : prev,
+          );
+          setClosedRecordingSessionKeys((prev) =>
+            prev.has(sessionKey) ? prev : new Set(prev).add(sessionKey),
+          );
+          return;
         }
 
         setLatestMessage(parsedData);
@@ -214,6 +239,8 @@ export default function useAudienceSocket(
     latestMessageReceivedAt,
     lastReceivedAt,
     chairmanAbsentAt,
+    recordingJoin,
+    closedRecordingSessionKeys,
     isConnected,
     error,
     connect: connectAudienceSocket,
