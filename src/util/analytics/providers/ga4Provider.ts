@@ -1,4 +1,4 @@
-import ReactGA from 'react-ga4';
+import ReactGA, { ReactGAImplementation } from 'react-ga4';
 import type {
   AnalyticsEventMap,
   AnalyticsEventName,
@@ -7,6 +7,60 @@ import type {
   EnrichedEventProperties,
   PageViewProperties,
 } from '../types';
+
+type ReactGAClient = Pick<
+  typeof ReactGA,
+  'initialize' | 'send' | 'event' | 'set'
+>;
+
+let cachedFallbackClient: ReactGAClient | null = null;
+
+function isReactGAClient(value: unknown): value is ReactGAClient {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'initialize' in value &&
+    typeof value.initialize === 'function' &&
+    'send' in value &&
+    typeof value.send === 'function' &&
+    'event' in value &&
+    typeof value.event === 'function' &&
+    'set' in value &&
+    typeof value.set === 'function'
+  );
+}
+
+// Vite 8 프로덕션 번들의 CJS/ESM interop에서 react-ga4가 이중 default로 감싸지는 경우를 안전하게 해석한다.
+function resolveReactGAClient(): ReactGAClient {
+  if (isReactGAClient(ReactGA)) {
+    return ReactGA;
+  }
+
+  const nestedDefault = (ReactGA as unknown as { default?: unknown }).default;
+  if (isReactGAClient(nestedDefault)) {
+    return nestedDefault;
+  }
+
+  if (cachedFallbackClient) {
+    return cachedFallbackClient;
+  }
+
+  const Implementation =
+    typeof ReactGAImplementation === 'function'
+      ? ReactGAImplementation
+      : (
+          ReactGA as unknown as {
+            ReactGAImplementation?: typeof ReactGAImplementation;
+          }
+        ).ReactGAImplementation;
+
+  if (typeof Implementation === 'function') {
+    cachedFallbackClient = new Implementation();
+    return cachedFallbackClient;
+  }
+
+  throw new Error('GA4 client is unavailable');
+}
 
 /** React GA4 SDK 호출을 프로젝트 공통 인터페이스로 감싸는 provider다. */
 export class GA4Provider implements AnalyticsProvider {
@@ -23,7 +77,7 @@ export class GA4Provider implements AnalyticsProvider {
    * 파라미터는 받지 않으며, 반환값은 없다.
    */
   init(): void {
-    ReactGA.initialize(this.gaId);
+    resolveReactGAClient().initialize(this.gaId);
   }
 
   /**
@@ -31,7 +85,7 @@ export class GA4Provider implements AnalyticsProvider {
    * `properties`는 공통 필드가 포함된 페이지뷰 속성이며 반환값은 없다.
    */
   trackPageView(properties: EnrichedEventProperties<PageViewProperties>): void {
-    ReactGA.send({
+    resolveReactGAClient().send({
       hitType: 'pageview',
       page: properties.page_path,
       title: properties.page_title,
@@ -46,7 +100,7 @@ export class GA4Provider implements AnalyticsProvider {
     eventName: T,
     properties: EnrichedEventProperties<AnalyticsEventMap[T]>,
   ): void {
-    ReactGA.event(eventName, properties);
+    resolveReactGAClient().event(eventName, properties);
   }
 
   /**
@@ -54,7 +108,7 @@ export class GA4Provider implements AnalyticsProvider {
    * `userId`는 서비스 사용자 ID이며, 반환값은 없다.
    */
   setUserId(userId: string): void {
-    ReactGA.set({ user_id: userId });
+    resolveReactGAClient().set({ user_id: userId });
   }
 
   /**
@@ -71,7 +125,7 @@ export class GA4Provider implements AnalyticsProvider {
    * 파라미터는 받지 않으며, 반환값은 없다.
    */
   reset(): void {
-    ReactGA.set({ user_id: null });
+    resolveReactGAClient().set({ user_id: null });
   }
 
   /**

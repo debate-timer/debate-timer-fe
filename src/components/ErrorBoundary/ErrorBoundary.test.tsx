@@ -2,13 +2,20 @@ import GlobalSettingsProvider from '../GlobalSettingsProvider/GlobalSettingsProv
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { StrictMode } from 'react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { ReactNode, StrictMode } from 'react';
+import {
+  createMemoryRouter,
+  MemoryRouter,
+  Route,
+  RouterProvider,
+  Routes,
+} from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as Sentry from '@sentry/react';
 import { APIError } from '../../apis/primitives';
 import { markSentryCaptured } from '../../util/sentry';
 import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundaryWrapper from './ErrorBoundaryWrapper';
 
 vi.mock('@sentry/react', () => ({
   captureException: vi.fn(),
@@ -86,6 +93,50 @@ describe('렌더 오류 경계', () => {
       expect(Sentry.captureException).toHaveBeenCalledTimes(captures);
     },
   );
+
+  it('실패하는 라우트에서 홈으로 돌아갈 때 구 라우트를 다시 렌더링하지 않고 한 번만 오류를 수집한다', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    const user = userEvent.setup();
+
+    function AlwaysThrowingShareScreen(): ReactNode {
+      throw new Error('공유된 데이터가 비어 있어요.');
+    }
+
+    const router = createMemoryRouter(
+      [
+        {
+          element: <ErrorBoundaryWrapper />,
+          children: [
+            { path: '/share', element: <AlwaysThrowingShareScreen /> },
+            { path: '/', element: <h1>정상 홈 화면</h1> },
+          ],
+        },
+      ],
+      { initialEntries: ['/share'] },
+    );
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <GlobalSettingsProvider>
+          <RouterProvider router={router} />
+        </GlobalSettingsProvider>
+      </QueryClientProvider>,
+    );
+
+    expect(
+      await screen.findByText('공유된 데이터가 비어 있어요.'),
+    ).toBeInTheDocument();
+    expect(Sentry.captureException).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: '홈으로 돌아가기' }));
+
+    expect(
+      await screen.findByRole('heading', { name: '정상 홈 화면' }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/');
+    expect(Sentry.captureException).toHaveBeenCalledTimes(1);
+  });
 });
 
 /** API 계층에서 수집한 오류의 표식을 동일하게 준비함. */

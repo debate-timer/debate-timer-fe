@@ -1,3 +1,4 @@
+import { deflate } from 'pako';
 import { DebateTableData } from '../types/type';
 import {
   createTableShareUrlFromEncodedData,
@@ -6,6 +7,16 @@ import {
   encodeDebateTableData,
   extractTableShareUrl,
 } from './arrayEncoding';
+
+/** 기존 표준 Base64(+/= 포함) 문자열을 생성해 하위 호환성 테스트에 사용한다. */
+function encodeLegacyStandardBase64(data: DebateTableData): string {
+  const compressed = deflate(JSON.stringify(data));
+  let binary = '';
+  compressed.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
 
 describe('토론 테이블 인코딩 유틸리티', () => {
   const sampleData: DebateTableData = {
@@ -139,5 +150,67 @@ describe('토론 테이블 인코딩 유틸리티', () => {
     const invalidURL = 'not-a-valid-url';
     const result = extractTableShareUrl(invalidURL);
     expect(result).toBeNull();
+  });
+
+  it('URL-safe Base64로 인코딩하며 +, /, = 문자를 포함하지 않는다', () => {
+    const encoded = encodeDebateTableData(sampleData);
+    expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(decodeDebateTableData(encoded)).toEqual(sampleData);
+  });
+
+  it('기존 표준 Base64와 encodeURIComponent 포맷의 데이터도 디코딩한다', () => {
+    const rawBase64 = encodeLegacyStandardBase64(sampleData);
+    expect(rawBase64).toContain('+');
+    expect(rawBase64).toContain('/');
+    expect(rawBase64).toContain('=');
+
+    const legacyEncoded = encodeURIComponent(rawBase64);
+    expect(decodeDebateTableData(legacyEncoded)).toEqual(sampleData);
+    expect(
+      extractTableShareUrl(`https://example.com/share?data=${legacyEncoded}`),
+    ).toEqual(sampleData);
+  });
+
+  it('쿼리의 +가 공백으로 변환되어도 원본 시간표 데이터로 복호화한다', () => {
+    const legacySample: DebateTableData = {
+      ...sampleData,
+      info: {
+        ...sampleData.info,
+        name: '기존 공유 링크 호환성 검증용 시간표 123',
+      },
+    };
+    const rawBase64 = encodeLegacyStandardBase64(legacySample);
+    expect(rawBase64).toContain('+');
+
+    // 메신저·브라우저 주소창 등에서 %2B 대신 리터럴 +가 남아 URLSearchParams가 공백으로 읽은 상황을 재현한다.
+    const corruptedUrl = `https://example.com/share?data=${rawBase64.replace(/\//g, '%2F').replace(/=/g, '%3D')}`;
+    const parsedDataParam = new URL(corruptedUrl).searchParams.get('data');
+    expect(parsedDataParam).toContain(' ');
+
+    expect(decodeDebateTableData(parsedDataParam!)).toEqual(legacySample);
+    expect(extractTableShareUrl(corruptedUrl)).toEqual(legacySample);
+  });
+
+  it('시간표 스키마가 아닌 JSON이나 손상된 문자열은 오류를 던진다', () => {
+    const invalidSchemaJson = JSON.stringify({ hello: 'world' });
+    const compressed = deflate(invalidSchemaJson);
+    let binary = '';
+    compressed.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    const encodedInvalid = btoa(binary)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+    expect(() => decodeDebateTableData(encodedInvalid)).toThrow(
+      '데이터 처리에 실패했어요.',
+    );
+    expect(
+      extractTableShareUrl(`https://example.com/share?data=${encodedInvalid}`),
+    ).toBeNull();
+    expect(() => decodeDebateTableData('not-base64%%%')).toThrow(
+      '데이터 처리에 실패했어요.',
+    );
   });
 });

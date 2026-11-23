@@ -10,6 +10,8 @@ import {
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  /** 라우트 변경 시 오류 상태를 자동으로 초기화하기 위한 키 */
+  resetKey?: string;
 }
 
 interface ErrorBoundaryState {
@@ -64,6 +66,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     }
 
     console.log(error, errorInfo);
+  }
+
+  componentDidUpdate(prevProps: ErrorBoundaryProps): void {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.resetError();
+    }
   }
 
   resetError = () => {

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { IoHome } from 'react-icons/io5';
 import DefaultLayout from '../../layout/defaultLayout/DefaultLayout';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { APIError } from '../../apis/primitives';
 import { ERROR_STATUS_TABLE } from '../../constants/errors';
 import {
@@ -19,11 +19,17 @@ interface ErrorPageProps {
 export default function ErrorPage({ error, stack, onReset }: ErrorPageProps) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const currentLang = i18n.resolvedLanguage ?? i18n.language;
   const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
   const homePath = buildLangPath('/', lang);
   const goToHome = () => {
-    onReset();
+    const currentPath = `${location.pathname}${location.search}`;
+    if (currentPath === homePath) {
+      onReset();
+      return;
+    }
+    // 라우트 전환이 커밋되기 전에 기존 실패 화면이 재렌더링되지 않도록 resetKey 변경으로 초기화한다.
     navigate(homePath, { replace: true });
   };
 
