@@ -9,5 +9,7 @@ export function useGetVoterPollInfo(
     queryKey: ['VoterPoll', pollId],
     queryFn: () => getVoterPollInfo(pollId),
     enabled: options?.enabled,
+    retry: false,
+    throwOnError: false,
   });
 }
