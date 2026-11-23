@@ -59,7 +59,7 @@ HTTP 경계와 공개 투표 응답·캐시 계약은 [데이터 접근](../../a
 - 토론 종료 화면([DebateEndPage](../../../src/page/DebateEndPage/DebateEndPage.tsx))에서 승패 투표 카드 클릭 시 `postPoll(tableId)` 성공 콜백으로 `poll_created` 분석 이벤트(`{ table_id, poll_id }`)를 기록하고 투표 진행 화면으로 이동함.
 - 진행 화면([DebateVotePage](../../../src/page/DebateVotePage/DebateVotePage.tsx))은 `tableId`와 `pollId`를 모두 `parsePositiveId`(양의 안전한 정수)로 검증함. 하나라도 유효하지 않으면 API 조회를 비활성화하고 `"유효하지 않은 투표 링크입니다."` 문구와 홈 이동 버튼을 가진 `ErrorIndicator`를 표시함.
 - 유효한 식별자일 때 `useGetDebateTableData`로 헤더의 토론 이름·주제를 표시하고, `useGetPollInfo(pollId, { refetchInterval: 5000, enabled: isArgsValid })`로 5초마다 투표 정보를 폴링함.
-- QR 코드는 `buildPublicUrl('/vote/${pollId}')`로 생성한 공개 참여 주소를 인코딩함.
+- QR 코드는 ``buildPublicUrl(`/vote/${pollId}`)``로 생성한 공개 참여 주소를 인코딩함.
 - 우측 참여자 영역은 `voterNames.length`로 참여 인원수를 표시하며, 로딩이 끝난 뒤 `voterNames`가 비어 있으면 `"등록된 토론자가 없어요."`를, 1명 이상이면 이름 목록을 순서대로 렌더링함.
 - 하단 `투표 결과 보기` 버튼을 누르면 마감 확인 모달(`"투표를 마감하시겠습니까?"`, `"투표를 마감하면 더이상 표를 받을 수 없습니다!"`)을 염. `마감하기` 클릭 시 `patchEndPoll(pollId)`를 호출하며, 성공 시 모달을 닫고 결과 화면으로 이동함. 실패 시 모달을 닫고 브라우저 `alert`로 `"투표 종료에 실패했습니다."`를 표시함.
 
