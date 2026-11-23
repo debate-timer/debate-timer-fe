@@ -9,6 +9,7 @@ import {
   Route,
   RouterProvider,
   Routes,
+  useNavigate,
 } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as Sentry from '@sentry/react';
@@ -135,6 +136,51 @@ describe('렌더 오류 경계', () => {
       await screen.findByRole('heading', { name: '정상 홈 화면' }),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/');
+    expect(Sentry.captureException).toHaveBeenCalledTimes(1);
+  });
+
+  it('정상 경로에서 실패하는 경로로 이동해 처음 오류가 발생해도 초기화하지 않고 한 번만 수집한다', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    const user = userEvent.setup();
+
+    function HomeWithLink() {
+      const navigate = useNavigate();
+      return (
+        <button type="button" onClick={() => navigate('/failing')}>
+          실패 경로 이동
+        </button>
+      );
+    }
+
+    function FailingRouteScreen(): ReactNode {
+      throw new Error('새 경로 렌더 오류');
+    }
+
+    const router = createMemoryRouter(
+      [
+        {
+          element: <ErrorBoundaryWrapper />,
+          children: [
+            { path: '/', element: <HomeWithLink /> },
+            { path: '/failing', element: <FailingRouteScreen /> },
+          ],
+        },
+      ],
+      { initialEntries: ['/'] },
+    );
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <GlobalSettingsProvider>
+          <RouterProvider router={router} />
+        </GlobalSettingsProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: '실패 경로 이동' }));
+
+    expect(await screen.findByText('새 경로 렌더 오류')).toBeInTheDocument();
     expect(Sentry.captureException).toHaveBeenCalledTimes(1);
   });
 });

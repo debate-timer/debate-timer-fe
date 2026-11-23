@@ -15,10 +15,10 @@ function normalizeBase64(encodedData: string): string {
   const uriDecoded = /%[0-9A-Fa-f]{2}/.test(encodedData)
     ? decodeURIComponent(encodedData)
     : encodedData;
-  // URLSearchParams는 인코딩되지 않은 +를 공백으로 디코딩하므로 Base64 복원 시 +로 되돌린다.
+  // URLSearchParams는 인코딩되지 않은 +를 공백으로 디코딩하므로 trim() 전에 +로 복원해 끝자리 + 손실을 막는다.
   const standardBase64 = uriDecoded
-    .trim()
     .replace(/ /g, '+')
+    .trim()
     .replace(/-/g, '+')
     .replace(/_/g, '/');
   const paddingLength = (4 - (standardBase64.length % 4)) % 4;

@@ -213,4 +213,32 @@ describe('토론 테이블 인코딩 유틸리티', () => {
       '데이터 처리에 실패했어요.',
     );
   });
+
+  it('끝 문자가 공백으로 변환된 +인 패딩 없는 Base64도 손실 없이 복호화한다', () => {
+    // 3바이트(deflate된 JSON 일부가 아니라 유효한 deflate 덩어리를 만들기 위해 끝 바이트 6비트가 0x3E(+)가 되는 입력을 찾는다)
+    let targetData: DebateTableData | null = null;
+    let unpaddedBase64EndingWithPlus = '';
+
+    for (let i = 0; i < 500; i += 1) {
+      const candidate: DebateTableData = {
+        ...sampleData,
+        info: { ...sampleData.info, name: `trailing-plus-${i}` },
+      };
+      const raw = encodeLegacyStandardBase64(candidate).replace(/=+$/, '');
+      if (raw.endsWith('+')) {
+        targetData = candidate;
+        unpaddedBase64EndingWithPlus = raw;
+        break;
+      }
+    }
+
+    expect(targetData).not.toBeNull();
+    expect(unpaddedBase64EndingWithPlus.endsWith('+')).toBe(true);
+
+    const parsedData = new URL(
+      `https://example.com/share?data=${unpaddedBase64EndingWithPlus}`,
+    ).searchParams.get('data');
+    expect(parsedData?.endsWith(' ')).toBe(true);
+    expect(decodeDebateTableData(parsedData!)).toEqual(targetData);
+  });
 });
