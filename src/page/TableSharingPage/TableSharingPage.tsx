@@ -5,7 +5,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
 import LoggedInStoreDBModal from './components/LoggedInStoreDBModal';
 import { decodeDebateTableData } from '../../util/arrayEncoding';
+import { MdErrorOutline } from 'react-icons/md';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import Button from '../../components/Button/Button';
 import { DebateTableData } from '../../types/type';
 import apiDebateTableRepository from '../../repositories/ApiDebateTableRepository';
 import sessionDebateTableRepository from '../../repositories/SessionDebateTableRepository';
@@ -82,17 +84,20 @@ export default function TableSharingPage() {
   );
   const source = searchParams.get('source');
   const isTemplateEntry = source === 'template';
+  const loggedIn = isLoggedIn();
+  // 비회원 상태에서 data가 없거나, data 디코딩에 실패한 경우 ErrorBoundary 대신 지역 복구 UI를 표시한다.
+  const isInvalidShareEntry = encodedData !== null ? !decodedData : !loggedIn;
 
   if (asyncError) {
     throw asyncError;
   }
 
-  // 공유 링크 유입 추적: encodedData/isTemplateEntry에만 의존해 1회만 발화한다.
+  // 공유 링크 유입 추적: 유효한 공유 데이터가 있을 때만 1회 발화한다.
   useEffect(() => {
-    if (encodedData && !isTemplateEntry) {
+    if (decodedData && !isTemplateEntry) {
       trackEvent('share_link_entered', { referrer: document.referrer });
     }
-  }, [encodedData, isTemplateEntry, trackEvent]);
+  }, [decodedData, isTemplateEntry, trackEvent]);
 
   // 템플릿 유입 정보는 decodedData가 유효할 때만 저장한다.
   useEffect(() => {
@@ -111,7 +116,10 @@ export default function TableSharingPage() {
 
   // 로그인 상태와 URL 형태에 따라 저장 모달, 게스트 복사, 즉시 저장 플로우를 분기한다.
   useEffect(() => {
-    const loggedIn = isLoggedIn();
+    if (isInvalidShareEntry) {
+      return;
+    }
+
     const guestFlow = isGuestFlow();
     const effectKey = `${loggedIn}:${guestFlow}:${encodedData ?? ''}`;
     if (processedKeyRef.current === effectKey) {
@@ -157,17 +165,12 @@ export default function TableSharingPage() {
       } else if (encodedData === null) {
         processedKeyRef.current = effectKey;
         navigate(buildLangPath('/dashboard', lang), { replace: true });
-      } else if (!decodedData) {
-        throw new Error(t('공유된 데이터가 비어 있어요.'));
-      } else {
+      } else if (decodedData) {
         processedKeyRef.current = effectKey;
         openModal();
       }
-    } else {
+    } else if (decodedData) {
       // On this case, getRepository() will automatically decide what data source to use
-      if (!decodedData) {
-        throw new Error(t('공유된 데이터가 비어 있어요.'));
-      }
       processedKeyRef.current = effectKey;
       sessionDebateTableRepository.deleteTable();
       sessionDebateTableRepository.addTable(decodedData).then(
@@ -183,7 +186,41 @@ export default function TableSharingPage() {
         },
       );
     }
-  }, [decodedData, navigate, openModal, closeModal, encodedData, lang, t]);
+  }, [
+    decodedData,
+    navigate,
+    openModal,
+    closeModal,
+    encodedData,
+    isInvalidShareEntry,
+    lang,
+    loggedIn,
+    t,
+  ]);
+
+  if (isInvalidShareEntry) {
+    return (
+      <>
+        <GeneralHeaderContainer />
+        <main className="flex min-h-[60dvh] w-full flex-col items-center justify-center gap-6 px-6 py-12">
+          <MdErrorOutline className="size-24 text-red-500" aria-hidden="true" />
+          <h1 className="text-center text-ui-title break-keep text-neutral-900">
+            {t('공유된 데이터가 비어 있어요.')}
+          </h1>
+          <Button
+            variant="primary"
+            shape="pill"
+            aria-label={t('홈으로 돌아가기')}
+            onClick={() =>
+              navigate(buildLangPath('/', lang), { replace: true })
+            }
+          >
+            {t('홈으로 돌아가기')}
+          </Button>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>

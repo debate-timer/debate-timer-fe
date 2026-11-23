@@ -1,3 +1,4 @@
+import { deflate } from 'pako';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -12,6 +13,15 @@ import { encodeDebateTableData } from '../../util/arrayEncoding';
 import { GlobalPortal } from '../../util/GlobalPortal';
 import { setSessionCustomizeTableData } from '../../util/sessionStorage';
 import TableSharingPage from './TableSharingPage';
+
+function encodeLegacyQueryWithUnescapedPlus(data: DebateTableData): string {
+  const compressed = deflate(JSON.stringify(data));
+  let binary = '';
+  compressed.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary).replace(/\//g, '%2F').replace(/=/g, '%3D');
+}
 
 const SAMPLE_TABLE: DebateTableData = {
   info: {
@@ -45,6 +55,7 @@ function renderTableSharing(initialEntry: string) {
           </ErrorBoundary>
         ),
       },
+      { path: '/', element: <div>홈 화면</div> },
       { path: '/dashboard', element: <div>대시보드</div> },
       { path: '/overview/:type/:id', element: <div>개요 화면</div> },
     ],
@@ -76,21 +87,64 @@ describe('테이블 공유 페이지', () => {
     sessionStorage.clear();
   });
 
-  it('로그인 상태에서 잘못된 data로 진입하면 빈 모달 대신 오류 화면을 표시한다', async () => {
+  it('로그인 상태에서 잘못된 data로 진입하면 ErrorBoundary 대신 지역 복구 UI를 표시하고 홈으로 이동할 수 있다', async () => {
     setAccessToken('token');
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
     const router = renderTableSharing('/share?data=invalid-data');
 
     expect(
       await screen.findByText('공유된 데이터가 비어 있어요.'),
     ).toBeInTheDocument();
+    expect(screen.queryByText('오류가 발생했어요...')).not.toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/share');
     expect(
       screen.queryByText(
         '공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?',
       ),
     ).not.toBeInTheDocument();
-    spy.mockRestore();
+
+    await user.click(screen.getByRole('button', { name: '홈으로 돌아가기' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/'));
+    expect(screen.getByText('홈 화면')).toBeInTheDocument();
+  });
+
+  it('비회원 상태에서 data 없이 진입하면 크래시 대신 지역 복구 UI를 표시하고 홈으로 이동할 수 있다', async () => {
+    const user = userEvent.setup();
+    const router = renderTableSharing('/share');
+
+    expect(
+      await screen.findByText('공유된 데이터가 비어 있어요.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('오류가 발생했어요...')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '홈으로 돌아가기' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/'));
+    expect(screen.getByText('홈 화면')).toBeInTheDocument();
+  });
+
+  it('로그인 상태에서 +가 공백으로 변환된 유효 data로 진입하면 정상 디코딩해 저장 모달을 연다', async () => {
+    setAccessToken('token');
+    const legacyQuery = encodeLegacyQueryWithUnescapedPlus(SAMPLE_TABLE);
+    expect(legacyQuery).toContain('+');
+
+    renderTableSharing(`/share?data=${legacyQuery}`);
+
+    expect(
+      await screen.findByText(
+        '공유받은 토론 시간표를 내 시간표 목록에 저장하시겠어요?',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('비회원 상태에서 +가 공백으로 변환된 유효 data로 진입하면 게스트 개요 화면으로 이동한다', async () => {
+    const legacyQuery = encodeLegacyQueryWithUnescapedPlus(SAMPLE_TABLE);
+    expect(legacyQuery).toContain('+');
+
+    const router = renderTableSharing(`/share?data=${legacyQuery}`);
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/overview/customize/guest'),
+    );
   });
 
   it('로그인 상태에서 data와 게스트 데이터가 모두 없으면 대시보드로 이동한다', async () => {

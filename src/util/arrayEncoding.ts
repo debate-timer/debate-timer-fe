@@ -1,20 +1,71 @@
 import { deflate, inflate } from 'pako';
 import { DebateTableData } from '../types/type';
 
-export function encodeDebateTableData(data: DebateTableData): string {
-  const json = JSON.stringify(data); // Deserialize
-  const compressed = deflate(json); // 압축
-  const base64 = btoa(String.fromCharCode(...compressed));
-  return encodeURIComponent(base64);
+function bytesToBinaryString(bytes: Uint8Array): string {
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return binary;
 }
 
+function normalizeBase64(encodedData: string): string {
+  // TemplateRow·테스트 등은 encodeURIComponent 문자열을 직접 넘기고, useSearchParams는 1차 디코딩된 문자열을 넘긴다.
+  const uriDecoded = /%[0-9A-Fa-f]{2}/.test(encodedData)
+    ? decodeURIComponent(encodedData)
+    : encodedData;
+  // URLSearchParams는 인코딩되지 않은 +를 공백으로 디코딩하므로 trim() 전에 +로 복원해 끝자리 + 손실을 막는다.
+  const standardBase64 = uriDecoded
+    .replace(/ /g, '+')
+    .trim()
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+  const paddingLength = (4 - (standardBase64.length % 4)) % 4;
+
+  return `${standardBase64}${'='.repeat(paddingLength)}`;
+}
+
+function isValidDebateTableData(value: unknown): value is DebateTableData {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  return (
+    'info' in value &&
+    typeof value.info === 'object' &&
+    value.info !== null &&
+    !Array.isArray(value.info) &&
+    'table' in value &&
+    Array.isArray(value.table)
+  );
+}
+
+/** 시간표 데이터를 메신저·브라우저 링크 변형에 안전한 URL-safe Base64로 압축 인코딩한다. */
+export function encodeDebateTableData(data: DebateTableData): string {
+  const json = JSON.stringify(data);
+  const compressed = deflate(json);
+  const base64 = btoa(bytesToBinaryString(compressed));
+
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
+ * 신규 URL-safe Base64와 기존 표준 Base64(퍼센트 인코딩 및 공백 치환된 + 포함)를 모두 복호화한다.
+ */
 export function decodeDebateTableData(encodedData: string): DebateTableData {
   try {
-    const base64 = decodeURIComponent(encodedData);
+    const base64 = normalizeBase64(encodedData);
     const binary = atob(base64);
     const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
     const decompressed = inflate(bytes, { to: 'string' });
-    return JSON.parse(decompressed);
+    const parsed: unknown = JSON.parse(decompressed);
+
+    if (!isValidDebateTableData(parsed)) {
+      throw new Error('Invalid debate table data');
+    }
+
+    return parsed;
   } catch {
     throw new Error('데이터 처리에 실패했어요.');
   }
