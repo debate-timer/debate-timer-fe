@@ -58,6 +58,7 @@
 | 개발           | `npm run dev`       |
 | MSW 개발       | `npm run dev-mock`  |
 | 테스트 1회     | `npx vitest run`    |
+| 변경분 테스트  | `npm run test:changed` |
 | lint·타입 검사 | `npm run lint`      |
 | 생산 빌드      | `npm run build`     |
 | Storybook      | `npm run storybook` |

@@ -4,7 +4,10 @@ import {
   mergeConfig,
   type PluginOption,
 } from 'vite';
-import { defineConfig as defineVitestConfig } from 'vitest/config';
+import {
+  defaultExclude,
+  defineConfig as defineVitestConfig,
+} from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
@@ -71,11 +74,65 @@ const viteConfig = defineViteConfig(({ mode }) => {
   };
 });
 
+const NODE_TEST_FILES = [
+  'src/apis/sockets/error.test.ts',
+  'src/apis/sockets/util.test.ts',
+  'src/components/TranscriptDetail/transcriptFormatting.test.ts',
+  'src/constants/patch_note.test.ts',
+  'src/constants/urls.test.ts',
+  'src/page/AudienceSharePage/error.test.ts',
+  'src/page/AudienceSharePage/hooks/AudienceScreenState.test.ts',
+  'src/page/AudienceSharePage/hooks/EventInterpreter.test.ts',
+  'src/page/AudienceSharePage/hooks/getNetworkDelayMs.test.ts',
+  'src/page/LandingPage/constants/landingSteps.test.ts',
+  'src/page/LandingPage/constants/usingOrganizations.test.ts',
+  'src/page/TimerPage/buildTimerPayloadForShare.test.ts',
+  'src/page/TimerPage/getRemainingTimeForShare.test.ts',
+  'src/util/apiPreconnect.test.ts',
+  'src/util/formatting.test.ts',
+  'src/util/headerNavigation.test.ts',
+  'src/util/jwt.test.ts',
+  'src/util/localizedAsset.test.ts',
+  'src/util/micLevel.test.ts',
+  'src/util/recordingJoinLink.test.ts',
+  'src/util/recordingQuality.test.ts',
+  'src/util/recordingQualityMeter.test.ts',
+  'src/util/settingsController.test.ts',
+  'src/util/transcriptStatus.test.ts',
+  'src/util/turnRecording.test.ts',
+];
+
 const vitestConfig = defineVitestConfig({
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./setup.ts'],
+    forceRerunTriggers: [
+      '**/{vite,vitest}.config.*',
+      '**/package.json',
+      '**/package-lock.json',
+      '**/.node-version',
+      '**/setup.ts',
+      '**/src/mocks/**',
+      '**/public/locales/**',
+    ],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          include: NODE_TEST_FILES,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'dom',
+          environment: 'jsdom',
+          exclude: [...defaultExclude, ...NODE_TEST_FILES],
+          setupFiles: ['./setup.ts'],
+        },
+      },
+    ],
   },
 });
 

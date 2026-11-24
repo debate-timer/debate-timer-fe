@@ -14,6 +14,28 @@
 `src/util/formatting.test.ts`, `src/apis/sockets/util.test.ts`,
 `src/hooks/useModal.test.tsx`에 있음.
 
+### 실행 명령
+
+| 실행 기준 | 명령 |
+| --- | --- |
+| TDD에서 대상 테스트 반복 확인 | `npx vitest run <테스트 파일 경로>` |
+| 스테이징·미스테이징·추적되지 않은 파일의 변경 영향 확인 | `npm run test:changed` |
+| `develop` 기준 브랜치 커밋과 작업 트리의 변경 영향 확인 | `npm run test -- --run --changed=origin/develop` |
+| 개별 테스트 프로젝트 진단 | `npm run test -- --run --project=node` 또는 `npm run test -- --run --project=dom` |
+| 로컬에서 변경을 감시하고 관련 테스트 재실행 | `npm run test` |
+| 작업 완료 전과 CI에서 전체 테스트 1회 실행 | `npx vitest run` 또는 `npm run test -- --run` |
+
+변경분 실행은 Git 변경 파일과 Vitest가 추적한 의존성을 기준으로 테스트를 선택하며, 관련 파일이 없으면 0개를 선택할 수 있음.
+Vite 설정·패키지 매니페스트·잠금 파일·`.node-version`·공통 setup·MSW·번역 리소스 변경은 전체 테스트를 선택함.
+
+### 새 테스트의 프로젝트 지정
+
+새 테스트를 추가할 때는 파일 단위로 소속 프로젝트를 반드시 정하고, Red 단계에서 해당 프로젝트로 대상 파일을 실행해 기대한 이유로 실패하는지 확인함.
+
+- `node`는 DOM·브라우저 API와 공통 setup 없이 검증할 수 있는 테스트에 사용함. 파일을 [Vite 설정](../../vite.config.ts)의 `NODE_TEST_FILES`에 추가함.
+- `dom`은 DOM·브라우저 API 또는 [공통 setup](../../setup.ts)의 MSW 서버·i18n·브라우저 보조 설정에 의존하는 테스트에 사용함. 기본 `jsdom` 환경과 기본 파일 탐색을 사용함.
+- 공통 setup을 사용하는 multipart 테스트에서 네이티브 `FormData`·`Blob`이 필요하면 `dom` 프로젝트에서 파일별 `// @vitest-environment node`를 사용함.
+
 ## 관찰과 경계
 
 - 컴포넌트는 Testing Library `render`·`screen`으로 사용자에게 보이는 결과를
@@ -30,8 +52,7 @@
 - 정상값뿐 아니라 null·잘못된 타입·경계값·중복 이벤트·재연결처럼 계약을 깨뜨릴
   수 있는 경로를 검사함. 같은 계약의 입력 조합은 `it.each`로 묶음.
 
-`setup.ts`가 MSW server와 공통 브라우저 보조 환경을 준비함. 직접 API 테스트의
-범위와 handler 공유 규칙은 [데이터·실시간 컨벤션](data-and-realtime.md)이
+직접 API 테스트의 범위와 handler 공유 규칙은 [데이터·실시간 컨벤션](data-and-realtime.md)이
 소유함. 근거는 `src/apis/apis/live.test.ts`,
 `src/hooks/sockets/useSocket.test.ts`,
 `src/components/DialogModal/DialogModal.test.tsx`에 있음.
