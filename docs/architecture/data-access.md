@@ -14,21 +14,24 @@ API를 직접 호출함. 구현 형식과 테스트 규칙은
 
 ## HTTP 경계
 
-`src/apis/axiosInstance.ts`가 단일 Axios 인스턴스의 base URL, timeout, JSON
+`src/apis/axiosInstance.ts`가 단일 Axios 인스턴스의 base URL, 기본 10초 timeout, JSON
 헤더, credential, 인증·응답 interceptor를 소유함. request interceptor가 access
 token을 붙임. 첫 401은 `_retry`로 제한하고 재발급에 성공하면 원래 요청을 다시
-보냄. 재발급이 실패하면 인증 상태를 정리하고 홈으로 이동함.
+보냄. 재발급이 실패하면 인증 상태를 정리하고 홈으로 이동함. 온라인 상태의 GET
+요청이 응답 없이 타임아웃(`ECONNABORTED`, `ETIMEDOUT`)으로 실패하면 Sentry 수집
+전에 `_timeoutRetry`로 1회 자동 재시도함. 비-GET·HTTP 응답 오류·취소·오프라인·계정
+전환 요청은 재시도하지 않으며, 재시도까지 실패한 경우에만 오류를 수집·전달함.
 
 계정에 결속해야 하는 요청은 `RequestOptions.expectedMemberId`에 시작 계정을 보존함. 이 값은 Axios 내부 메타데이터이며 HTTP header·body·query로 전송하지 않음. 해당 옵션이 있는 요청은 실제 전송 전·응답 수신·401 재발급 전후에 현재 회원 ID와 토큰 존재를 확인함. 계정 변경·로그아웃 시 취소하고, 이전 요청의 재발급 결과로 새 계정 토큰을 교체하거나 인증을 정리하지 않음. 같은 계정의 토큰 재발급은 허용하며 옵션 없는 기존 API의 재발급 동작은 유지함.
 
 `src/apis/primitives.ts`의 `request<T>(method, endpoint, data, params)`가 Axios
-호출과 `APIError` 변환을 담당함. 도메인 함수는 `src/apis/apis/{domain}.ts`에
+호출과 `APIError` 변환(오류 `code` 보존 포함)을 담당함. 도메인 함수는 `src/apis/apis/{domain}.ts`에
 있으며 공통 URL을 `src/apis/endpoints.ts`의 `ApiUrl`에서 가져옴. 성공 결과는
 AxiosResponse 전체 대신 `response.data`로 반환함. 요청·응답 계약은
 `src/apis/requests/`, `src/apis/responses/`에 배치함. 모든 요청 body를 별도 타입
 파일에 두는 규칙은 없음.
 
-파일 업로드처럼 기본 JSON 헤더·5초 제한 시간과 다른 요청은 다섯째 인자
+파일 업로드처럼 기본 JSON 헤더·10초 제한 시간과 다른 요청은 다섯째 인자
 `options`의 `headers`·`timeout`으로 덮어씀. FormData는 `Content-Type`을
 `multipart/form-data`로 지정해야 Axios가 JSON으로 바꾸지 않고 boundary를 붙임.
 `src/apis/apis/stt.ts`의 `postSonioxTranscription()`이 예시임. jsdom의
@@ -45,7 +48,9 @@ ID를 붙여 `request<GetChairmanTokenResponseType>('GET', endpoint, null, null)
 
 `src/hooks/query/`의 조회 훅은 배열 `queryKey`에 도메인과 매개변수를 포함함.
 `enabled`로 ID·화면 조건을 반영함. 자체 오류 UI가 있는 조회는
-`throwOnError: false`를 사용함. `src/hooks/mutations/`의 변경 훅은 `mutationFn`,
+`throwOnError: false`를 사용함. `QueryClient` 기본 조회 재시도는
+`src/util/queryRetry.ts`에서 관리하며 Axios가 처리한 타임아웃·네트워크 오류와
+4xx 클라이언트 오류는 중복 재시도하지 않음. `src/hooks/mutations/`의 변경 훅은 `mutationFn`,
 후속 `onSuccess`, 필요한 `onError`를 조립함. 중복 제출 차단이 필요한 변경은
 `usePreventDuplicateMutation`을 사용함. 예시는
 `src/hooks/query/useGetDebateTableData.ts`,

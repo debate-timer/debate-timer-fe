@@ -127,20 +127,26 @@ export function resolveFeatureFromPathname(pathname: string): DebateFeature {
   return 'unknown';
 }
 
+// 타임아웃 에러 코드 판별
+function isTimeoutErrorCode(code?: string) {
+  return code === 'ECONNABORTED' || code === 'ETIMEDOUT';
+}
+
 // API 에러 심각도
 export function resolveApiErrorLevel(
   status: number | undefined,
   feature: DebateFeature,
+  errorCode?: string,
 ): SeverityLevel {
+  if (status === undefined) {
+    return isTimeoutErrorCode(errorCode) ? 'error' : 'warning';
+  }
+
   if (status === 400 || status === 404 || status === 409 || status === 422) {
     return 'warning';
   }
 
-  if (
-    status !== undefined &&
-    status >= 500 &&
-    criticalFeatures.includes(feature)
-  ) {
+  if (status >= 500 && criticalFeatures.includes(feature)) {
     return 'fatal';
   }
 
@@ -170,11 +176,15 @@ export function buildSentryApiErrorMetadata(
 
   return {
     status,
-    statusLabel: status ? String(status) : 'network-error',
+    statusLabel: status
+      ? String(status)
+      : isTimeoutErrorCode(error.code)
+        ? 'timeout'
+        : 'network-error',
     method,
     endpoint,
     feature,
-    level: resolveApiErrorLevel(status, feature),
+    level: resolveApiErrorLevel(status, feature, error.code),
     pathname: maskTranscriptShareToken(pathname),
   };
 }
@@ -417,7 +427,7 @@ function isOfflineNetworkError(code?: string) {
   return (
     typeof navigator !== 'undefined' &&
     navigator.onLine === false &&
-    (code === 'ERR_NETWORK' || code === 'ECONNABORTED' || code === 'ETIMEDOUT')
+    (code === 'ERR_NETWORK' || isTimeoutErrorCode(code))
   );
 }
 
