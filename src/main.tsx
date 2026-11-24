@@ -16,6 +16,7 @@ import {
   removeMemberId,
 } from './util/accessToken';
 import { DEFAULT_LANG, isSupportedLang } from './util/languageRouting';
+import { shouldRetryQueryError } from './util/queryRetry';
 import i18n from './i18n';
 
 function resolveCurrentLang(lang?: string) {
@@ -89,6 +90,7 @@ function initializeApp() {
     defaultOptions: {
       queries: {
         throwOnError: true,
+        retry: shouldRetryQueryError,
       },
       mutations: {
         throwOnError: true,

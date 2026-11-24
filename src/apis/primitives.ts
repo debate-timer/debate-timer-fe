@@ -10,11 +10,13 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export class APIError extends Error {
   public readonly status: number;
   public readonly data: unknown;
+  public readonly code?: string;
 
-  constructor(message: string, status: number, data: unknown) {
+  constructor(message: string, status: number, data: unknown, code?: string) {
     super(message);
     this.status = status;
     this.data = data;
+    this.code = code;
     this.name = 'APIError';
   }
 }
@@ -67,6 +69,7 @@ export async function request<T>(
         message,
         error.response?.status || 500,
         responseData,
+        error.code,
       );
       // Axios 인터셉터에서 이미 보낸 에러는 APIError로 감싼 뒤에도
       // ErrorBoundary/전역 핸들러에서 중복 수집되지 않도록 캡처 상태를 전달한다.

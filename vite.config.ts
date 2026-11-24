@@ -1,8 +1,14 @@
-import { defineConfig as defineViteConfig, loadEnv, mergeConfig } from 'vite';
+import {
+  defineConfig as defineViteConfig,
+  loadEnv,
+  mergeConfig,
+  type PluginOption,
+} from 'vite';
 import { defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
+import { buildApiPreconnectTags } from './src/util/apiPreconnect.ts';
 
 const viteConfig = defineViteConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -10,7 +16,16 @@ const viteConfig = defineViteConfig(({ mode }) => {
   const hasSentryAuth =
     !!env.SENTRY_AUTH_TOKEN && !!env.SENTRY_ORG && !!env.SENTRY_PROJECT;
   const shouldUploadSourcemaps = isProductionBuild && hasSentryAuth;
-  const plugins = [react(), tailwindcss()];
+  const plugins: PluginOption[] = [
+    react(),
+    tailwindcss(),
+    {
+      name: 'debate-timer-api-preconnect',
+      transformIndexHtml() {
+        return buildApiPreconnectTags(env.VITE_API_BASE_URL);
+      },
+    },
+  ];
 
   if (shouldUploadSourcemaps) {
     plugins.push(

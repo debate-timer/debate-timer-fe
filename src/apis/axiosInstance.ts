@@ -30,7 +30,46 @@ declare module 'axios' {
     /** 서버에 전송하지 않는 요청 시작 계정 식별자임. */
     expectedMemberId?: string;
     expectedAuthRevision?: number;
+    _retry?: boolean;
+    _timeoutRetry?: boolean;
   }
+}
+
+const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
+const TIMEOUT_ERROR_CODES = new Set(['ECONNABORTED', 'ETIMEDOUT']);
+
+function isOnline(): boolean {
+  return typeof navigator === 'undefined' || navigator.onLine !== false;
+}
+
+function shouldRetryTimeoutGetRequest(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) {
+    return false;
+  }
+
+  const config = error.config;
+
+  if (
+    !config ||
+    config._timeoutRetry ||
+    config.expectedMemberId !== undefined
+  ) {
+    return false;
+  }
+
+  if (config.method?.toLowerCase() !== 'get') {
+    return false;
+  }
+
+  if (error.response !== undefined) {
+    return false;
+  }
+
+  if (!error.code || !TIMEOUT_ERROR_CODES.has(error.code)) {
+    return false;
+  }
+
+  return isOnline();
 }
 
 function assertRequestAccount(config?: InternalAxiosRequestConfig): void {
@@ -47,13 +86,12 @@ function assertRequestAccount(config?: InternalAxiosRequestConfig): void {
 
 // Get current mode (DEV, PROD or TEST)
 const currentMode = import.meta.env.MODE;
-const requestTimeoutMs = 5000;
 
 // Axios instance
 export const axiosInstance = axios.create({
   baseURL:
     currentMode === 'test' ? undefined : import.meta.env.VITE_API_BASE_URL,
-  timeout: requestTimeoutMs,
+  timeout: DEFAULT_REQUEST_TIMEOUT_MS,
   timeoutErrorMessage:
     '시간 초과로 인해 요청을 처리하지 못했어요... 잠시 후 다시 시도해 주세요.',
   headers: {
@@ -100,7 +138,7 @@ function captureClientApiError(error: unknown) {
       url: sanitizeSentryUrl(error.config?.url),
       method: error.config?.method,
       params: sanitizeSentryContext(error.config?.params),
-      timeout: error.config?.timeout ?? requestTimeoutMs,
+      timeout: error.config?.timeout ?? DEFAULT_REQUEST_TIMEOUT_MS,
       errorCode: error.code,
     });
     scope.setContext('response', {
@@ -183,6 +221,11 @@ axiosInstance.interceptors.response.use(
         analyticsManager.reset();
         return Promise.reject(refreshError);
       }
+    }
+
+    if (shouldRetryTimeoutGetRequest(error)) {
+      originalRequest._timeoutRetry = true;
+      return axiosInstance(originalRequest);
     }
 
     captureClientApiError(error);

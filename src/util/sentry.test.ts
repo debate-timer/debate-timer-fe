@@ -17,6 +17,7 @@ import {
   sanitizeSentryUrl,
   shouldSkipSentryEvent,
   shouldSkipApiError,
+  shouldSkipErrorBoundaryCapture,
 } from './sentry';
 
 describe('sentry 유틸', () => {
@@ -73,6 +74,17 @@ describe('sentry 유틸', () => {
     expect(resolveApiErrorLevel(422, 'table-composition')).toBe('warning');
   });
 
+  it('연결이 끊긴 네트워크 에러는 warning으로, 재시도까지 실패한 타임아웃은 error로 분류한다', () => {
+    expect(resolveApiErrorLevel(undefined, 'timer', 'ERR_NETWORK')).toBe(
+      'warning',
+    );
+    expect(resolveApiErrorLevel(undefined, 'landing')).toBe('warning');
+    expect(resolveApiErrorLevel(undefined, 'landing', 'ECONNABORTED')).toBe(
+      'error',
+    );
+    expect(resolveApiErrorLevel(undefined, 'timer', 'ETIMEDOUT')).toBe('error');
+  });
+
   it('토큰 재발급으로 복구될 수 있는 401은 즉시 대응 알림에서 제외한다', () => {
     const unauthorizedError = new AxiosError(
       'unauthorized',
@@ -104,6 +116,22 @@ describe('sentry 유틸', () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
 
     expect(shouldSkipApiError(onlineNetworkError)).toBe(false);
+  });
+
+  it('오프라인 API 오류와 이미 수집한 오류는 ErrorBoundary에서 fatal render-error로 다시 수집하지 않는다', () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    const offlineApiError = Object.assign(new Error('Network Error'), {
+      name: 'APIError',
+      code: 'ERR_NETWORK',
+    });
+
+    expect(shouldSkipErrorBoundaryCapture(offlineApiError)).toBe(true);
+
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    expect(shouldSkipErrorBoundaryCapture(offlineApiError)).toBe(false);
+    expect(shouldSkipErrorBoundaryCapture(new TypeError('render fail'))).toBe(
+      false,
+    );
   });
 
   it('SDK 내부 플래그와 앱 전용 플래그를 분리해 중복 캡처를 판단한다', () => {
@@ -278,17 +306,44 @@ describe('sentry 유틸', () => {
   });
 
   it('API 에러 알림 제목은 level, error type, feature, status, endpoint 순서로 구성한다', () => {
-    const error = new AxiosError('Request failed', undefined, {
+    const networkError = new AxiosError('Network Error', 'ERR_NETWORK', {
       method: 'post',
       url: '/api/live/123',
       headers: new AxiosHeaders(),
     });
-    const metadata = buildSentryApiErrorMetadata(error, '/ko/live/123');
+    const networkMetadata = buildSentryApiErrorMetadata(
+      networkError,
+      '/ko/live/123',
+    );
+    const networkSentryError = createSentryApiError(
+      networkError,
+      networkMetadata,
+    );
 
-    const sentryError = createSentryApiError(error, metadata);
+    expect(networkMetadata.level).toBe('warning');
+    expect(networkMetadata.statusLabel).toBe('network-error');
+    expect(networkSentryError.name).toBe(
+      'warning · api-error · live-share · [network-error] POST /api/live/:id',
+    );
 
-    expect(sentryError.name).toBe(
-      'error · api-error · live-share · [network-error] POST /api/live/:id',
+    const timeoutError = new AxiosError('timeout exceeded', 'ECONNABORTED', {
+      method: 'get',
+      url: '/api/organizations/templates',
+      headers: new AxiosHeaders(),
+    });
+    const timeoutMetadata = buildSentryApiErrorMetadata(
+      timeoutError,
+      '/en/home',
+    );
+    const timeoutSentryError = createSentryApiError(
+      timeoutError,
+      timeoutMetadata,
+    );
+
+    expect(timeoutMetadata.level).toBe('error');
+    expect(timeoutMetadata.statusLabel).toBe('timeout');
+    expect(timeoutSentryError.name).toBe(
+      'error · api-error · landing · [timeout] GET /api/organizations/templates',
     );
   });
 
