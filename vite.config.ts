@@ -111,6 +111,7 @@ const vitestConfig = defineVitestConfig({
       '**/package-lock.json',
       '**/.node-version',
       '**/setup.ts',
+      '**/src/i18n.ts',
       '**/src/mocks/**',
       '**/public/locales/**',
     ],
