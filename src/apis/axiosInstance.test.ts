@@ -178,4 +178,23 @@ describe('axiosInstance 응답 인터셉터', () => {
     expect(attempts).toBe(1);
     expect(captureExceptionMock).not.toHaveBeenCalled();
   });
+
+  it('같은 계정의 expectedMemberId가 설정된 GET 요청은 타임아웃이 발생해도 자동 재시도하지 않는다', async () => {
+    localStorage.setItem('memberId', '1');
+    localStorage.setItem('accessToken', 'token-a');
+    let attempts = 0;
+
+    await expect(
+      axiosInstance.get('/api/member/settings', {
+        expectedMemberId: '1',
+        adapter: async (config) => {
+          attempts += 1;
+          throw createTimeoutError(config);
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'ECONNABORTED' });
+
+    expect(attempts).toBe(1);
+    expect(captureExceptionMock).toHaveBeenCalledTimes(1);
+  });
 });

@@ -3,9 +3,9 @@ import * as Sentry from '@sentry/react';
 import ErrorPage from './ErrorPage';
 import {
   createSentryRenderError,
-  isSentryCaptured,
   resolveFeatureFromPathname,
   sanitizeSentrySearch,
+  shouldSkipErrorBoundaryCapture,
 } from '../../util/sentry';
 
 interface ErrorBoundaryProps {
@@ -40,9 +40,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // API 인터셉터에서 이미 커스텀 이벤트로 전송한 에러는 전역 beforeSend에서도 drop된다.
-    // ErrorBoundary에서는 아직 수집되지 않은 렌더링 에러만 render-error로 전송한다.
-    if (!isSentryCaptured(error)) {
+    // API 인터셉터에서 이미 수집했거나 수집 대상에서 제외한 오프라인 API 오류는 render-error로 다시 전송하지 않는다.
+    if (!shouldSkipErrorBoundaryCapture(error)) {
       const feature = resolveFeatureFromPathname(window.location.pathname);
       const sentryError = createSentryRenderError(error, feature);
 

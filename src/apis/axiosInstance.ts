@@ -49,7 +49,11 @@ function shouldRetryTimeoutGetRequest(error: unknown): boolean {
 
   const config = error.config;
 
-  if (!config || config._timeoutRetry) {
+  if (
+    !config ||
+    config._timeoutRetry ||
+    config.expectedMemberId !== undefined
+  ) {
     return false;
   }
 

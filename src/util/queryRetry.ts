@@ -1,4 +1,5 @@
 import { APIError } from '../apis/primitives';
+import { isOfflineNetworkError } from './sentry';
 
 const DEFAULT_QUERY_RETRY_COUNT = 3;
 const NON_RETRYABLE_ERROR_CODES = new Set([
@@ -8,8 +9,9 @@ const NON_RETRYABLE_ERROR_CODES = new Set([
 ]);
 
 /**
- * Axios 인터셉터에서 이미 처리한 타임아웃·네트워크 오류와 4xx 클라이언트 오류는
+ * 온라인 상태에서 Axios가 이미 처리한 타임아웃·네트워크 오류와 4xx 클라이언트 오류는
  * TanStack Query 레벨에서 중복 재시도하지 않도록 걸러냄.
+ * 오프라인 상태의 네트워크·타임아웃 오류는 TanStack Query가 재연결까지 대기 후 재시도할 수 있게 허용함.
  */
 export function shouldRetryQueryError(
   failureCount: number,
@@ -20,7 +22,11 @@ export function shouldRetryQueryError(
   }
 
   if (error instanceof APIError) {
-    if (error.code && NON_RETRYABLE_ERROR_CODES.has(error.code)) {
+    if (
+      error.code &&
+      NON_RETRYABLE_ERROR_CODES.has(error.code) &&
+      !isOfflineNetworkError(error.code)
+    ) {
       return false;
     }
 

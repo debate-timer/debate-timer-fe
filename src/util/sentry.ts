@@ -225,6 +225,25 @@ export function isSentryCaptured(error: unknown) {
   );
 }
 
+// ErrorBoundary 수집 제외
+export function shouldSkipErrorBoundaryCapture(error: unknown): boolean {
+  if (isSentryCaptured(error)) {
+    return true;
+  }
+
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+
+  const { name, code } = error as { name?: unknown; code?: unknown };
+
+  return (
+    name === 'APIError' &&
+    typeof code === 'string' &&
+    isOfflineNetworkError(code)
+  );
+}
+
 // 전역 이벤트 필터
 export function shouldSkipSentryEvent(
   originalException: unknown,
@@ -423,7 +442,7 @@ function isCanceledError(originalException: unknown) {
 }
 
 // 오프라인 네트워크 에러 판별
-function isOfflineNetworkError(code?: string) {
+export function isOfflineNetworkError(code?: string) {
   return (
     typeof navigator !== 'undefined' &&
     navigator.onLine === false &&

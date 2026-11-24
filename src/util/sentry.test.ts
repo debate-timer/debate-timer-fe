@@ -17,6 +17,7 @@ import {
   sanitizeSentryUrl,
   shouldSkipSentryEvent,
   shouldSkipApiError,
+  shouldSkipErrorBoundaryCapture,
 } from './sentry';
 
 describe('sentry 유틸', () => {
@@ -115,6 +116,22 @@ describe('sentry 유틸', () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
 
     expect(shouldSkipApiError(onlineNetworkError)).toBe(false);
+  });
+
+  it('오프라인 API 오류와 이미 수집한 오류는 ErrorBoundary에서 fatal render-error로 다시 수집하지 않는다', () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    const offlineApiError = Object.assign(new Error('Network Error'), {
+      name: 'APIError',
+      code: 'ERR_NETWORK',
+    });
+
+    expect(shouldSkipErrorBoundaryCapture(offlineApiError)).toBe(true);
+
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    expect(shouldSkipErrorBoundaryCapture(offlineApiError)).toBe(false);
+    expect(shouldSkipErrorBoundaryCapture(new TypeError('render fail'))).toBe(
+      false,
+    );
   });
 
   it('SDK 내부 플래그와 앱 전용 플래그를 분리해 중복 캡처를 판단한다', () => {
