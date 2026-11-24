@@ -49,6 +49,8 @@
 | `chore` | 파일 이동·이름 변경·삭제 등 파일 자체의 변경 |
 | `deploy` | `develop`에서 `main`으로 배포하는 PR에 사용함. 별도 이슈 작업 브랜치를 만들지 않음 |
 
+커밋 제목은 `label: message` 형식으로 작성함. 위 표에서 해당 커밋의 주된 목적에 맞는 레이블을 골라 영문 소문자로 쓰고, `message`에는 해당 커밋의 변경 내용을 요약함. 예시는 `docs: 커밋과 PR 제목 규칙 정리`임.
+
 여러 레이블에 해당하면 작업의 주된 목적을 브랜치 접두어로 선택함. 일반 작업의 PR 대상은 `develop`임. 배포 PR은 `develop`에서 `main`으로 보냄. 커밋·push·PR 전에는 실제 브랜치, staging 파일, 제외 파일을 확인함. 상태 변경 명령이 중단되면 실제 Git·파일 상태를 확인한 뒤 재시도함.
 
 ## 실행 명령
@@ -58,6 +60,7 @@
 | 개발           | `npm run dev`       |
 | MSW 개발       | `npm run dev-mock`  |
 | 테스트 1회     | `npx vitest run`    |
+| 변경분 테스트  | `npm run test:changed` |
 | lint·타입 검사 | `npm run lint`      |
 | 생산 빌드      | `npm run build`     |
 | Storybook      | `npm run storybook` |

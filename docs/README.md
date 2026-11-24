@@ -78,7 +78,7 @@ CI·개발·미리보기·생산·Storybook의 Node 설정은 [workflow](../.git
 | [React·UI](conventions/react-and-ui.md)                    | 컴포넌트·Props·훅·effect·스타일·국제화·접근성            |
 | [공통 디자인](conventions/design.md)                       | 시각 방향·색상·타이포그래피·형태·공간 대응·움직임        |
 | [데이터·실시간](conventions/data-and-realtime.md)          | Query·Mutation·API·MSW·Repository·소켓 작성 형식         |
-| [테스트·Storybook](conventions/testing-and-storybook.md)   | TDD, 테스트·모킹·Story 작성, Storybook 10 설정·수동 검증 |
+| [테스트·Storybook](conventions/testing-and-storybook.md)   | TDD, 테스트 실행 명령·환경, 모킹·Story 작성, Storybook 10 설정·수동 검증 |
 
 ## 5. 스킬 워크플로
 
