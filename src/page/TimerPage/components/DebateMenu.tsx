@@ -24,7 +24,7 @@ interface DebateMenuProps {
 }
 
 const PANEL_CLASS =
-  'fixed top-[var(--debate-menu-top)] left-[var(--debate-menu-left)] z-50 max-h-[calc(100dvh-var(--debate-menu-top)-16px)] w-[min(92vw,480px)] overflow-y-auto p-5! text-ui-body text-neutral-900';
+  'fixed top-[var(--debate-menu-top)] left-[var(--debate-menu-left)] z-50 max-h-[calc(100dvh-var(--debate-menu-top)-16px)] w-[min(92vw,480px)] text-ui-body text-neutral-900';
 const OPEN_TRIGGER_CLASS =
   'bg-brand/20! ring-1 ring-brand-hover enabled:hover:bg-brand/30!';
 const ACTION_BASE_CLASS =
@@ -153,6 +153,7 @@ export default function DebateMenu(props: DebateMenuProps) {
           tabIndex={-1}
           direction="down"
           className={PANEL_CLASS}
+          contentClassName="p-5!"
         >
           <div className="mb-5">
             <h2 id={titleId} className="text-ui-title">

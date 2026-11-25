@@ -5,6 +5,16 @@ import TimerHeader from './TimerHeader';
 import TimerHeaderTools from './TimerHeaderTools';
 import AudienceHeaderContainer from './AudienceHeaderContainer';
 import GeneralHeaderContainer from './GeneralHeaderContainer';
+import LanguageSelector from './LanguageSelector';
+import HeaderLoginButton from './HeaderLoginButton';
+import SettingsModal from '../../../components/SettingsModal/SettingsModal';
+import { HEADER_ICON_BUTTON_CLASS } from './headerActionStyles';
+
+const SAMPLE_INQUIRIES = [
+  { label: '일반 문의', url: 'https://example.com/general' },
+  { label: '템플릿 추가 요청', url: 'https://example.com/template' },
+  { label: '단체/제휴 문의', url: 'https://example.com/partnership' },
+];
 
 const META: Meta<typeof GeneralHeader> = {
   title: 'Layout/RoleHeaders',
@@ -63,4 +73,20 @@ export const Mobile: Story = {
     },
   },
   globals: { viewport: { value: 'mobile375', isRotated: false } },
+};
+export const MobileWithInquiries: Story = {
+  ...Mobile,
+  args: {
+    isMember: true,
+    canViewRecords: true,
+    inquiries: SAMPLE_INQUIRIES,
+    actions: (
+      <>
+        <LanguageSelector />
+        <SettingsModal triggerClassName={HEADER_ICON_BUTTON_CLASS} />
+        <HeaderLoginButton label="Google 로그인" onClick={fn()} />
+      </>
+    ),
+  },
+  render: (args) => <GeneralHeader {...args} />,
 };

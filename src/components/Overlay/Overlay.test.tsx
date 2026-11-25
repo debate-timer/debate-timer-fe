@@ -119,4 +119,24 @@ describe('공용 오버레이', () => {
     await user.click(screen.getByRole('button', { name: '적용' }));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('바깥 둥근 모서리 클리핑을 유지하고 내부 스크롤 영역에서 내용을 스크롤한다', () => {
+    render(
+      <Overlay
+        aria-label="스크롤 패널"
+        contentClassName="space-y-2 p-3!"
+        style={{ maxHeight: 200 }}
+      >
+        <div>첫 번째 항목</div>
+      </Overlay>,
+    );
+
+    const outer = screen.getByLabelText('스크롤 패널');
+    expect(outer).toHaveClass('overflow-hidden', 'rounded-xl');
+    expect(outer.style.overflow).not.toBe('auto');
+
+    const inner = screen.getByText('첫 번째 항목').parentElement;
+    expect(inner).not.toBe(outer);
+    expect(inner).toHaveClass('overflow-auto', 'space-y-2', 'p-3!');
+  });
 });

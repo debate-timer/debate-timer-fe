@@ -6,18 +6,22 @@ import {
   useReducedMotion,
 } from 'framer-motion';
 import clsx from 'clsx';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { ReactNode, useCallback, useLayoutEffect, useRef } from 'react';
 
 interface OverlayProps extends Omit<
   HTMLMotionProps<'div'>,
-  'initial' | 'animate' | 'exit' | 'transition'
+  'initial' | 'animate' | 'exit' | 'transition' | 'children'
 > {
   isOpen?: boolean;
   direction?: 'none' | 'up' | 'down' | 'left' | 'right';
+  /** 내부 스크롤 영역에 적용할 여백·간격 등 레이아웃 클래스임. */
+  contentClassName?: string;
+  children?: ReactNode;
 }
 
 const CONTAINER_CLASS =
-  'rounded-xl border border-neutral-300 bg-white p-4 shadow-lg';
+  'flex flex-col overflow-hidden rounded-xl border border-neutral-300 bg-white shadow-lg';
+const CONTENT_CLASS = 'min-h-0 flex-1 overflow-auto p-4';
 const INITIAL_OFFSET = {
   none: { x: 0, y: 0 },
   up: { x: 0, y: 8 },
@@ -32,7 +36,8 @@ const INITIAL_OFFSET = {
  * 네 방향은 반대편 8px에서 제자리로 0.16초 동안 페이드 인하고, 닫을 때 반대 방향으로 페이드 아웃함.
  * 움직임 감소 설정에서는 즉시 표시·숨김 처리함.
  * 호출자는 컴포넌트를 유지한 채 isOpen(기본 true)으로 개폐해야 종료 애니메이션을 재생할 수 있음.
- * className으로 위치·크기를 지정하며 종료 중인 내용은 접근성과 조작 대상에서 제외함.
+ * className으로 바깥 위치·크기를, contentClassName으로 내부 스크롤 영역의 여백·간격을 지정하며 종료 중인 내용은 접근성과 조작 대상에서 제외함.
+ * 바깥 면은 둥근 모서리로 클리핑하고 내부 스크롤 영역이 스크롤을 담당해 스크롤바가 모서리 형태를 훼손하지 않음.
  * 화면 네 변에서 16px 여백을 유지하도록 위치와 최대 크기를 제한함. 큰 내용은 줄바꿈·내부 스크롤로 처리함.
  * 표시·내용 크기·화면 크기·스크롤·애니메이션 변화에 맞춰 보정하며 전달된 ref와 이벤트는 유지함.
  * 배경 차단·포털·바깥 클릭·Escape·포커스·접근성 역할은 호출자가 용도에 맞게 관리함.
@@ -49,6 +54,7 @@ function OverlaySurface(props: Omit<OverlayProps, 'isOpen'>) {
   const {
     children,
     className,
+    contentClassName,
     direction = 'none',
     style,
     ref,
@@ -148,7 +154,6 @@ function OverlaySurface(props: Omit<OverlayProps, 'isOpen'>) {
         ...style,
         maxWidth: `min(${typeof style?.maxWidth === 'number' ? `${style.maxWidth}px` : (style?.maxWidth ?? '100vw')}, var(--overlay-available-width, calc(100vw - 2rem)))`,
         maxHeight: `min(${typeof style?.maxHeight === 'number' ? `${style.maxHeight}px` : (style?.maxHeight ?? '100dvh')}, var(--overlay-available-height, calc(100dvh - 2rem)))`,
-        overflow: 'auto',
         overflowWrap: 'anywhere',
       }}
       onUpdate={(latest) => {
@@ -163,7 +168,12 @@ function OverlaySurface(props: Omit<OverlayProps, 'isOpen'>) {
       exit={hasAnimation ? hiddenState : { opacity: 1, x: 0, y: 0 }}
       transition={{ duration: hasAnimation ? 0.16 : 0, ease: 'easeOut' }}
     >
-      {children}
+      <div
+        className={clsx(CONTENT_CLASS, contentClassName)}
+        style={{ overflowWrap: 'anywhere' }}
+      >
+        {children}
+      </div>
     </motion.div>
   );
 }
