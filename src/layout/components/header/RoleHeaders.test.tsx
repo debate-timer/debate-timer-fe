@@ -1,4 +1,11 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import GeneralHeader from './GeneralHeader';
@@ -6,7 +13,10 @@ import HeaderDebateInfo from './HeaderDebateInfo';
 import HeaderLoginButton from './HeaderLoginButton';
 import AudienceHeader from './AudienceHeader';
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  window.innerWidth = 1024;
+});
 
 describe('역할별 헤더', () => {
   it.each([
@@ -166,5 +176,200 @@ describe('역할별 헤더', () => {
         screen.queryByRole('link', { name: '일반 문의' }),
       ).not.toBeInTheDocument(),
     );
+  });
+});
+
+describe('모바일 일반 헤더 햄버거 메뉴', () => {
+  const SAMPLE_INQUIRIES = [
+    { label: '일반 문의', url: 'https://example.com/general' },
+    { label: '템플릿 추가 요청', url: 'https://example.com/template' },
+    { label: '단체/제휴 문의', url: 'https://example.com/partnership' },
+  ];
+
+  it('모바일에서는 일반 헤더 브랜드 문구와 인라인 탐색을 숨기고 햄버거 메뉴 버튼을 표시한다', () => {
+    window.innerWidth = 375;
+    render(
+      <MemoryRouter>
+        <GeneralHeader
+          isMember
+          canViewRecords
+          onRequireLogin={vi.fn()}
+          inquiries={SAMPLE_INQUIRIES}
+        />
+      </MemoryRouter>,
+    );
+
+    const menuButton = screen.getByRole('button', { name: '메뉴' });
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    expect(menuButton.querySelector('svg')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    expect(
+      screen.queryByRole('navigation', { name: '주요 탐색' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '문의' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Debate Timer')).toHaveClass('hidden', 'md:inline');
+  });
+
+  it('모바일 청중 헤더에서는 브랜드 문구를 계속 표시한다', () => {
+    window.innerWidth = 375;
+    render(
+      <MemoryRouter>
+        <AudienceHeader />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Debate Timer')).not.toHaveClass('hidden');
+  });
+
+  it('햄버거 버튼을 누르면 왼쪽 방향 Overlay 안에 탐색 링크와 문의 3종을 함께 표시한다', async () => {
+    window.innerWidth = 375;
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={['/templates']}>
+        <GeneralHeader
+          isMember
+          canViewRecords
+          onRequireLogin={vi.fn()}
+          inquiries={SAMPLE_INQUIRIES}
+        />
+      </MemoryRouter>,
+    );
+
+    const menuButton = screen.getByRole('button', { name: '메뉴' });
+    await user.click(menuButton);
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+
+    const panel = document.getElementById(
+      menuButton.getAttribute('aria-controls')!,
+    );
+    expect(panel).not.toBeNull();
+    expect(panel?.style.transform).toMatch(/^translateX\(\d/);
+    await waitFor(() =>
+      expect(panel).toHaveStyle({ opacity: '1', transform: 'none' }),
+    );
+
+    const nav = within(panel!).getByRole('navigation', { name: '주요 탐색' });
+    expect(
+      within(nav).getByRole('link', { current: 'page' }),
+    ).toHaveAccessibleName('템플릿');
+    expect(
+      within(nav).getByRole('link', { name: '토론 기록' }),
+    ).toBeInTheDocument();
+
+    expect(within(panel!).getByText('문의')).toBeInTheDocument();
+    expect(
+      within(panel!).queryByRole('button', { name: '문의' }),
+    ).not.toBeInTheDocument();
+    for (const item of SAMPLE_INQUIRIES) {
+      const link = within(panel!).getByRole('link', { name: item.label });
+      expect(link).toHaveAttribute('href', item.url);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    }
+  });
+
+  it('문의 항목이 비어 있으면 모바일 메뉴에 문의 영역을 표시하지 않는다', async () => {
+    window.innerWidth = 375;
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <GeneralHeader
+          isMember={false}
+          canViewRecords={false}
+          onRequireLogin={vi.fn()}
+          inquiries={[]}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: '메뉴' }));
+    expect(
+      screen.getByRole('navigation', { name: '주요 탐색' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('문의')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: '토론 기록' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('모바일 메뉴에서 비회원 대시보드를 누르면 로그인을 요청하고 메뉴를 닫는다', async () => {
+    window.innerWidth = 375;
+    const user = userEvent.setup();
+    const onRequireLogin = vi.fn();
+    render(
+      <MemoryRouter>
+        <GeneralHeader
+          isMember={false}
+          canViewRecords={false}
+          onRequireLogin={onRequireLogin}
+        />
+      </MemoryRouter>,
+    );
+
+    const menuButton = screen.getByRole('button', { name: '메뉴' });
+    await user.click(menuButton);
+    await user.click(screen.getByRole('link', { name: '대시보드' }));
+
+    expect(onRequireLogin).toHaveBeenCalledWith('/dashboard');
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('navigation', { name: '주요 탐색' }),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it('Escape·바깥 클릭·데스크톱 전환 시 모바일 메뉴를 닫는다', async () => {
+    window.innerWidth = 375;
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <div>
+          <GeneralHeader
+            isMember
+            canViewRecords={false}
+            onRequireLogin={vi.fn()}
+            inquiries={SAMPLE_INQUIRIES}
+          />
+          <button type="button">외부 영역</button>
+        </div>
+      </MemoryRouter>,
+    );
+
+    const menuButton = screen.getByRole('button', { name: '메뉴' });
+    await user.click(menuButton);
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+
+    await user.keyboard('{Escape}');
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    expect(menuButton).toHaveFocus();
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('navigation', { name: '주요 탐색' }),
+      ).not.toBeInTheDocument(),
+    );
+
+    await user.click(menuButton);
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+    await user.click(screen.getByRole('button', { name: '외부 영역' }));
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(menuButton);
+    act(() => {
+      window.innerWidth = 1024;
+      window.dispatchEvent(new Event('resize'));
+    });
+
+    expect(
+      screen.queryByRole('button', { name: '메뉴' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: '주요 탐색' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '문의' })).toBeInTheDocument();
   });
 });

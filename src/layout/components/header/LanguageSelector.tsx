@@ -17,8 +17,7 @@ const OPTIONS = [
   { value: 'ko', label: 'KR', name: '한국어' },
   { value: 'en', label: 'EN', name: 'English' },
 ] as const;
-const PANEL_CLASS =
-  'absolute top-full right-0 z-40 mt-2 min-w-28 space-y-1 p-1.5!';
+const PANEL_CLASS = 'absolute top-full right-0 z-40 mt-2 min-w-28';
 const OPTION_CLASS =
   'flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-ui-label text-neutral-900 transition-colors hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-brand-hover motion-reduce:transition-none';
 
@@ -135,6 +134,7 @@ export default function LanguageSelector() {
         role="listbox"
         aria-label={t('언어 선택')}
         className={PANEL_CLASS}
+        contentClassName="space-y-1 p-1.5!"
       >
         {OPTIONS.map((option) => (
           <button
