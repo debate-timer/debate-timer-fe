@@ -27,7 +27,9 @@ import DropdownMenu, { DropdownMenuItem } from '../DropdownMenu/DropdownMenu';
 import IconButton from '../IconButton/IconButton';
 
 const PANEL_CLASS =
-  'relative max-h-[90dvh] w-[min(92vw,520px)] overflow-x-hidden overflow-y-auto rounded-[20px] bg-white p-6 text-ui-body text-neutral-900 shadow-xl outline-none';
+  'relative flex max-h-[90dvh] w-[min(92vw,520px)] flex-col overflow-hidden rounded-[20px] bg-white text-ui-body text-neutral-900 shadow-xl outline-none';
+const PANEL_CONTENT_CLASS =
+  'min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-6';
 const CLOSE_BUTTON_CLASS =
   'flex size-11 shrink-0 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 motion-reduce:transition-none';
 const FOCUSABLE_SELECTOR =
@@ -185,146 +187,148 @@ export default function SettingsModal(props: SettingsModalProps) {
               className={PANEL_CLASS}
               onKeyDown={(event) => event.stopPropagation()}
             >
-              <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-4">
-                <h2
-                  id="settings-title"
-                  className="text-ui-title text-neutral-900"
-                >
-                  {t('설정')}
-                </h2>
-                <button
-                  type="button"
-                  aria-label={t('모달 닫기')}
-                  className={CLOSE_BUTTON_CLASS}
-                  onClick={handleClose}
-                >
-                  <IoClose className="size-6" aria-hidden="true" />
-                </button>
-              </div>
-              <div className="mt-5 space-y-6">
-                <section className="space-y-4">
-                  <h3 className="text-ui-label text-neutral-600">
-                    {t('일반 설정')}
-                  </h3>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="flex items-center gap-2 text-ui-body text-neutral-900">
-                      <IoGlobeOutline
-                        className="size-5 shrink-0 text-neutral-500"
-                        aria-hidden="true"
-                      />
-                      {t('언어 선택')}
-                    </span>
-                    <DropdownMenu
-                      options={languageOptions}
-                      selectedValue={lang}
-                      aria-label={t('언어 선택')}
-                      className="w-40 shrink-0"
-                      onSelect={(language) => {
-                        controller.change({ language });
-                        void controller.flush();
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="flex shrink-0 items-center gap-2 text-ui-body text-neutral-900">
-                      {volumeStep === 0 ? (
-                        <IoVolumeMuteOutline
-                          className="size-5 shrink-0 text-neutral-400"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <IoVolumeHighOutline
+              <div className={PANEL_CONTENT_CLASS}>
+                <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-4">
+                  <h2
+                    id="settings-title"
+                    className="text-ui-title text-neutral-900"
+                  >
+                    {t('설정')}
+                  </h2>
+                  <button
+                    type="button"
+                    aria-label={t('모달 닫기')}
+                    className={CLOSE_BUTTON_CLASS}
+                    onClick={handleClose}
+                  >
+                    <IoClose className="size-6" aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="mt-5 space-y-6">
+                  <section className="space-y-4">
+                    <h3 className="text-ui-label text-neutral-600">
+                      {t('일반 설정')}
+                    </h3>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex items-center gap-2 text-ui-body text-neutral-900">
+                        <IoGlobeOutline
                           className="size-5 shrink-0 text-neutral-500"
                           aria-hidden="true"
                         />
-                      )}
-                      {t('음량')}
-                    </span>
-                    <div className="flex min-w-0 flex-1 items-center">
-                      <CustomRangeSlider
-                        value={volumeStep}
-                        min={0}
-                        max={10}
-                        step={1}
-                        ariaLabel={t('음량')}
-                        onValueChange={(value) =>
-                          controller.change({
-                            volume: value / 10,
-                          })
-                        }
-                        onValueCommit={() => void controller.flush()}
+                        {t('언어 선택')}
+                      </span>
+                      <DropdownMenu
+                        options={languageOptions}
+                        selectedValue={lang}
+                        aria-label={t('언어 선택')}
+                        className="w-40 shrink-0"
+                        onSelect={(language) => {
+                          controller.change({ language });
+                          void controller.flush();
+                        }}
                       />
                     </div>
-                    <output className="w-6 shrink-0 text-right text-ui-label text-neutral-700 tabular-nums">
-                      {volumeStep}
-                    </output>
-                  </div>
-                </section>
-                {INQUIRY_LINKS.length > 0 && (
-                  <section className="space-y-3 border-t border-neutral-200 pt-5">
-                    <h3 className="text-ui-label text-neutral-600">
-                      {t('문의')}
-                    </h3>
-                    <div className="space-y-2">
-                      {INQUIRY_LINKS.map((item) => (
-                        <Button
-                          key={item.label}
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          variant="neutral"
-                          shape="rounded"
-                          aria-label={t(item.label)}
-                          className="w-full justify-between px-4 py-3 no-underline"
-                        >
-                          <span>{t(item.label)}</span>
-                          <IoOpenOutline
-                            className="text-neutral-500"
+                    <div className="flex items-center gap-3">
+                      <span className="flex shrink-0 items-center gap-2 text-ui-body text-neutral-900">
+                        {volumeStep === 0 ? (
+                          <IoVolumeMuteOutline
+                            className="size-5 shrink-0 text-neutral-400"
                             aria-hidden="true"
                           />
-                        </Button>
-                      ))}
+                        ) : (
+                          <IoVolumeHighOutline
+                            className="size-5 shrink-0 text-neutral-500"
+                            aria-hidden="true"
+                          />
+                        )}
+                        {t('음량')}
+                      </span>
+                      <div className="flex min-w-0 flex-1 items-center">
+                        <CustomRangeSlider
+                          value={volumeStep}
+                          min={0}
+                          max={10}
+                          step={1}
+                          ariaLabel={t('음량')}
+                          onValueChange={(value) =>
+                            controller.change({
+                              volume: value / 10,
+                            })
+                          }
+                          onValueCommit={() => void controller.flush()}
+                        />
+                      </div>
+                      <output className="w-6 shrink-0 text-right text-ui-label text-neutral-700 tabular-nums">
+                        {volumeStep}
+                      </output>
                     </div>
                   </section>
-                )}
-                <section className="space-y-3 border-t border-neutral-200 pt-5">
-                  <h3 className="text-ui-label text-neutral-600">
-                    {t('계정')}
-                  </h3>
-                  {settings.memberId ? (
-                    <Button
-                      variant="neutral"
-                      className="w-full"
-                      disabled={busy || logout.isPending}
-                      aria-label={t('로그아웃')}
-                      onClick={() => void handleLogout()}
-                    >
-                      <IoLogOutOutline aria-hidden="true" />
-                      {t('로그아웃')}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      className="w-full"
-                      aria-label={t('로그인')}
-                      onClick={() => {
-                        handleClose();
-                        (onLogin ?? oAuthLogin)();
-                      }}
-                    >
-                      <IoLogInOutline aria-hidden="true" />
-                      {t('로그인')}
-                    </Button>
+                  {INQUIRY_LINKS.length > 0 && (
+                    <section className="space-y-3 border-t border-neutral-200 pt-5">
+                      <h3 className="text-ui-label text-neutral-600">
+                        {t('문의')}
+                      </h3>
+                      <div className="space-y-2">
+                        {INQUIRY_LINKS.map((item) => (
+                          <Button
+                            key={item.label}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="neutral"
+                            shape="rounded"
+                            aria-label={t(item.label)}
+                            className="w-full justify-between px-4 py-3 no-underline"
+                          >
+                            <span>{t(item.label)}</span>
+                            <IoOpenOutline
+                              className="text-neutral-500"
+                              aria-hidden="true"
+                            />
+                          </Button>
+                        ))}
+                      </div>
+                    </section>
                   )}
-                  {failedLogout && (
-                    <p
-                      role="alert"
-                      className="rounded-lg bg-red-50 px-3 py-2 text-ui-caption text-red-600"
-                    >
-                      {t('로그아웃에 실패했습니다. 다시 시도해 주세요')}
-                    </p>
-                  )}
-                </section>
+                  <section className="space-y-3 border-t border-neutral-200 pt-5">
+                    <h3 className="text-ui-label text-neutral-600">
+                      {t('계정')}
+                    </h3>
+                    {settings.memberId ? (
+                      <Button
+                        variant="neutral"
+                        className="w-full"
+                        disabled={busy || logout.isPending}
+                        aria-label={t('로그아웃')}
+                        onClick={() => void handleLogout()}
+                      >
+                        <IoLogOutOutline aria-hidden="true" />
+                        {t('로그아웃')}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        className="w-full"
+                        aria-label={t('로그인')}
+                        onClick={() => {
+                          handleClose();
+                          (onLogin ?? oAuthLogin)();
+                        }}
+                      >
+                        <IoLogInOutline aria-hidden="true" />
+                        {t('로그인')}
+                      </Button>
+                    )}
+                    {failedLogout && (
+                      <p
+                        role="alert"
+                        className="rounded-lg bg-red-50 px-3 py-2 text-ui-caption text-red-600"
+                      >
+                        {t('로그아웃에 실패했습니다. 다시 시도해 주세요')}
+                      </p>
+                    )}
+                  </section>
+                </div>
               </div>
             </div>
           </div>
