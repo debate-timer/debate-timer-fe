@@ -199,6 +199,10 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
 
   const { isSharing: isShareConnected, isError: isShareError } = share;
   useEffect(() => {
+    if (overlay === 'share-qr' && !isShareConnected) {
+      setOverlay('menu');
+      return;
+    }
     if (!shouldShowShareQrRef.current) {
       return;
     }
@@ -210,7 +214,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
       shouldShowShareQrRef.current = false;
       setOverlay('share-qr');
     }
-  }, [isShareConnected, isShareError]);
+  }, [isShareConnected, isShareError, overlay]);
 
   // 이미 공유 화면을 보고 있는 청중도 다기기 녹음에 참여할 수 있도록 참가 정보를 공유 채널로 보낸다.
   const recordingSession = transcript.multiDeviceSession;
@@ -239,6 +243,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     : share.shareUrl;
 
   return {
+    isMainTimerRunning: options.isRunning,
     canShare,
     canTranscribe,
     share,
