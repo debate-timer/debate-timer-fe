@@ -1,13 +1,13 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import NotificationBadge from './NotificationBadge';
 
-const meta: Meta<typeof NotificationBadge> = {
+const META: Meta<typeof NotificationBadge> = {
   title: 'Components/NotificationBadge',
   component: NotificationBadge,
   tags: ['autodocs'],
 };
 
-export default meta;
+export default META;
 
 type Story = StoryObj<typeof NotificationBadge>;
 

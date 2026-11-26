@@ -761,14 +761,9 @@ export default function TimerCreationContent({
                   >
                     {/* 제목 및 종소리 횟수 배지 */}
                     <div className="flex w-full flex-row justify-between">
-                      <div className="relative flex items-center">
-                        <p className="text-body w-[80px] font-medium">
-                          {t('종소리 설정')}
-                        </p>
-                        <NotificationBadge
-                          count={bells.length}
-                          className="absolute -top-[4px] -right-[16px]"
-                        />
+                      <div className="flex items-center gap-1">
+                        <p className="text-ui-label">{t('종소리 설정')}</p>
+                        <NotificationBadge count={bells.length} />
                       </div>
 
                       <button
