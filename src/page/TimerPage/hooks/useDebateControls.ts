@@ -6,6 +6,7 @@ import useTranscriptRecorder, {
 } from './useTranscriptRecorder';
 import { UseDebateTranscriberParams } from './useDebateTranscriber';
 import useLiveShareSession from './useLiveShareSession';
+import useDebateMenuIssues from './useDebateMenuIssues';
 
 export type DebateFeatureStatus = 'inactive' | 'active' | 'error';
 // share-qr: 공유 링크의 QR 코드와 링크 복사를 보여주는 창
@@ -55,6 +56,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     isMultiDeviceAllowed: options.canUseMultiDevice ?? false,
     getSegmentVersion: share.getLastTransitionVersion,
   });
+  const menuIssues = useDebateMenuIssues({ share, transcript, canShare });
   const [overlay, setOverlay] = useState<DebateOverlay>('closed');
   const [answerTime, setAnswerTime] = useState(30);
   const [isAnswerTimeEnabled, setIsAnswerTimeEnabled] = useState(true);
@@ -249,6 +251,7 @@ export default function useDebateControls(options: UseDebateControlsOptions) {
     share,
     shareUrl,
     transcript,
+    menuIssues,
     overlay,
     answerTime,
     isAnswerTimeEnabled,

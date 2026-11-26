@@ -11,6 +11,7 @@ import { toRecognitionLang } from '../../../util/speechRecognition';
 import { appendRecordingJoin } from '../../../util/recordingJoinLink';
 import { ApiUrl } from '../../../apis/endpoints';
 import useDebateControls from '../hooks/useDebateControls';
+import useDebateMenuIssues from '../hooks/useDebateMenuIssues';
 import useDebateLogout from '../hooks/useDebateLogout';
 import useGlobalSettings from '../../../hooks/useGlobalSettings';
 import DebateMenu from '../components/DebateMenu';
@@ -24,6 +25,7 @@ function DebateControlsPreview(props: {
   isConnectionFailed: boolean;
   language: 'ko' | 'en';
   previewRecording?: boolean;
+  previewIssue?: 'share' | 'both' | 'segment';
 }) {
   const storyI18n = useMemo(() => {
     const instance = createInstance();
@@ -103,6 +105,7 @@ function Controls(props: {
   isMember: boolean;
   hasTranscript: boolean;
   previewRecording?: boolean;
+  previewIssue?: 'share' | 'both' | 'segment';
 }) {
   const [isRunning, setIsRunning] = useState(false);
   const [previewRecording, setPreviewRecording] = useState(
@@ -122,27 +125,62 @@ function Controls(props: {
   });
   // 실제 마이크 없이도 다기기 입장 주소와 전사 진행을 확인하는 Story용 세션.
   const recording = { sessionKey: 'preview', joinCode: 'sample' };
-  const previewControls = previewRecording
+  const share =
+    props.previewIssue === 'share' || props.previewIssue === 'both'
+      ? { ...controls.share, isError: true, errorType: 'disconnected' as const }
+      : controls.share;
+  const transcript = previewRecording
     ? {
-        ...controls,
-        requestTranscript: (next: boolean) => {
-          if (!next) setPreviewRecording(false);
+        ...controls.transcript,
+        sttMode: 'MULTI_DEVICE' as const,
+        isEnabled: true,
+        multiDeviceSession: recording,
+        pendingCount: 2,
+        supportedModes: {
+          ...controls.transcript.supportedModes,
+          MULTI_DEVICE: true,
         },
-        shareUrl: appendRecordingJoin(controls.shareUrl, recording),
-        transcript: {
-          ...controls.transcript,
-          sttMode: 'MULTI_DEVICE' as const,
-          isEnabled: true,
-          multiDeviceSession: recording,
-          pendingCount: 2,
-          supportedModes: {
-            ...controls.transcript.supportedModes,
-            MULTI_DEVICE: true,
-          },
-        },
-        statuses: { ...controls.statuses, transcript: 'active' as const },
       }
-    : controls;
+    : {
+        ...controls.transcript,
+        ...(props.previewIssue === 'segment' && {
+          sttMode: 'SONIOX' as const,
+          isEnabled: true,
+          failedCount: 2,
+        }),
+        ...(props.previewIssue === 'both' && { error: 'not-allowed' as const }),
+      };
+  const menuIssues = useDebateMenuIssues({
+    share,
+    transcript,
+    canShare: props.isMember,
+  });
+  const previewControls = {
+    ...controls,
+    share,
+    transcript,
+    menuIssues,
+    shareUrl: previewRecording
+      ? appendRecordingJoin(controls.shareUrl, recording)
+      : controls.shareUrl,
+    requestTranscript: (next: boolean) => {
+      if (previewRecording && !next) {
+        setPreviewRecording(false);
+      } else {
+        controls.requestTranscript(next);
+      }
+    },
+    statuses: {
+      ...controls.statuses,
+      share: share.isError ? ('error' as const) : controls.statuses.share,
+      transcript:
+        transcript.error || props.previewIssue === 'segment'
+          ? ('error' as const)
+          : previewRecording
+            ? ('active' as const)
+            : controls.statuses.transcript,
+    },
+  };
   const logout = useDebateLogout({
     interrupt: controls.interrupt,
     stopSharing: controls.share.stopSharing,
@@ -272,6 +310,15 @@ export const Interactive: Story = {};
 export const Guest: Story = { args: { isMember: false } };
 export const WithoutTranscript: Story = { args: { hasTranscript: false } };
 export const Failed: Story = { args: { isConnectionFailed: true } };
+export const ShareIssue: Story = { args: { previewIssue: 'share' } };
+export const BothIssues: Story = {
+  args: { previewIssue: 'both', language: 'en' },
+  globals: { viewport: { value: 'narrow', isRotated: false } },
+};
+export const RecordingWithoutSharing: Story = {
+  args: { previewRecording: true },
+};
+export const SegmentFailures: Story = { args: { previewIssue: 'segment' } };
 
 export const English: Story = { args: { language: 'en' } };
 export const Mobile: Story = {

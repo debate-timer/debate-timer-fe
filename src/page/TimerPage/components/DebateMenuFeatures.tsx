@@ -1,4 +1,4 @@
-import { Ref } from 'react';
+import { Ref, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoQrCodeSharp } from 'react-icons/io5';
 import Button from '../../../components/Button/Button';
@@ -34,12 +34,13 @@ export function ShareMenuSection(props: ShareMenuSectionProps) {
   const { controls, unavailableReason, onToggle, qrButtonRef, errorRef } =
     props;
   const { t } = useTranslation();
-  const { share, shareUrl } = controls;
+  const { share, shareUrl, menuIssues } = controls;
+  const { hasShareError } = menuIssues;
   const restriction =
     unavailableReason ??
     (!controls.canShare && t('회원만 사용할 수 있는 기능입니다.'));
   let status = t('비활성화');
-  if (share.isError) status = t('공유 오류');
+  if (hasShareError) status = t('공유 오류');
   else if (share.isLoading) status = t('공유 연결 중');
   else if (share.isSharing) status = t('공유 중');
 
@@ -49,7 +50,7 @@ export function ShareMenuSection(props: ShareMenuSectionProps) {
       ? t('이 기기에서 다시 시작')
       : t('공유 다시 시도');
   let details;
-  if (share.isError) {
+  if (hasShareError) {
     details = (
       <>
         <p ref={errorRef} role="alert" tabIndex={-1} className="text-red-800">
@@ -104,7 +105,7 @@ export function ShareMenuSection(props: ShareMenuSectionProps) {
       disabled={Boolean(restriction) || share.isLoading}
       onToggle={onToggle}
       status={status}
-      hasError={share.isError}
+      hasError={hasShareError}
       description={t(
         '청중에게 현재 타이머 상태를 실시간으로 공유해요. 활성화 시 제공되는 QR 코드나 링크를 통해 접속할 수 있어요.',
       )}
@@ -117,7 +118,9 @@ export function ShareMenuSection(props: ShareMenuSectionProps) {
 export function TranscriptMenuSection(props: FeatureProps) {
   const { controls, unavailableReason, onToggle } = props;
   const { t } = useTranslation();
-  const { transcript } = controls;
+  const { transcript, menuIssues } = controls;
+  const failureRef = useRef<HTMLParagraphElement>(null);
+  const shareAdviceRef = useRef<HTMLParagraphElement>(null);
   const unsupported = !Object.values(transcript.supportedModes).some(Boolean);
   const restriction =
     unavailableReason ??
@@ -148,7 +151,11 @@ export function TranscriptMenuSection(props: FeatureProps) {
     transcript.error && t(TRANSCRIPT_ERRORS[transcript.error]);
   const showErrorReason = errorReason && errorReason !== restriction;
   const hasDetails = Boolean(
-    restriction || hasError || figures.length || transcript.failedCount,
+    restriction ||
+    hasError ||
+    figures.length ||
+    transcript.failedCount ||
+    menuIssues.hasShareAdvice,
   );
   return (
     <DebateFeatureSection
@@ -170,11 +177,49 @@ export function TranscriptMenuSection(props: FeatureProps) {
             <div role={hasError ? 'alert' : undefined} className="text-red-800">
               {showErrorReason && <p>{errorReason}</p>}
               {transcript.failedCount > 0 && (
-                <p>
-                  {t('{{count}}개 구간 전사 실패', {
-                    count: transcript.failedCount,
-                  })}
-                </p>
+                <>
+                  <p ref={failureRef} tabIndex={-1}>
+                    {t(
+                      transcript.sttMode === 'MULTI_DEVICE'
+                        ? '사회자 기기에서 {{count}}개 구간 업로드 실패'
+                        : '{{count}}개 구간 전사 실패',
+                      { count: transcript.failedCount },
+                    )}
+                  </p>
+                  {menuIssues.hasUnseenFailures && (
+                    <Button
+                      variant="text"
+                      className="min-h-8 self-start"
+                      aria-label={t('구간 실패 확인')}
+                      onClick={() => {
+                        menuIssues.acknowledgeFailures();
+                        failureRef.current?.focus();
+                      }}
+                    >
+                      {t('확인')}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+          {menuIssues.hasShareAdvice && (
+            <div className="text-ui-caption text-neutral-700">
+              <p ref={shareAdviceRef} tabIndex={-1}>
+                {t('청중 기기도 녹음에 참여하려면 실시간 공유를 켜 주세요.')}
+              </p>
+              {menuIssues.hasUnseenShareAdvice && (
+                <Button
+                  variant="text"
+                  className="min-h-8"
+                  aria-label={t('실시간 공유 안내 확인')}
+                  onClick={() => {
+                    menuIssues.acknowledgeShareAdvice();
+                    shareAdviceRef.current?.focus();
+                  }}
+                >
+                  {t('확인')}
+                </Button>
               )}
             </div>
           )}

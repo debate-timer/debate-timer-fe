@@ -8,6 +8,7 @@ import MicCheckPanel from './MicCheckPanel';
 import LiveShareQrPanel from './LiveShareQrPanel';
 import { ShareMenuSection, TranscriptMenuSection } from './DebateMenuFeatures';
 import Button from '../../../components/Button/Button';
+import NotificationBadge from '../../../components/NotificationBadge/NotificationBadge';
 import Overlay from '../../../components/Overlay/Overlay';
 import ModalFrame from '../../../components/ModalFrame/ModalFrame';
 import DropdownMenu from '../../../components/DropdownMenu/DropdownMenu';
@@ -41,6 +42,7 @@ export default function DebateMenu(props: DebateMenuProps) {
   } = props;
   const { t } = useTranslation();
   const titleId = useId();
+  const issueDescriptionId = useId();
   const confirmationTitleId = useId();
   const qrButtonRef = useRef<HTMLButtonElement>(null);
   const shareErrorRef = useRef<HTMLParagraphElement>(null);
@@ -51,6 +53,15 @@ export default function DebateMenu(props: DebateMenuProps) {
   const [panel, setPanel] = useState<HTMLDivElement | null>(null);
   const isMenu = controls.overlay === 'menu';
   const isOpen = controls.overlay !== 'closed';
+  const { menuIssues } = controls;
+  const hasTranscriptIssue =
+    hasTranscriptFlag &&
+    (menuIssues.hasTranscriptError ||
+      menuIssues.hasUnseenFailures ||
+      menuIssues.hasUnseenShareAdvice);
+  const issueCount = controls.isInterrupted
+    ? 0
+    : Number(menuIssues.hasShareError) + Number(hasTranscriptIssue);
   const handleClose = () => {
     if (isMenu) {
       controls.closeOverlay();
@@ -119,19 +130,34 @@ export default function DebateMenu(props: DebateMenuProps) {
   return (
     <>
       <Button
-        className={clsx(HEADER_BUTTON_CLASS, isOpen && OPEN_TRIGGER_CLASS)}
+        className={clsx(
+          'relative',
+          HEADER_BUTTON_CLASS,
+          isOpen && OPEN_TRIGGER_CLASS,
+        )}
         ref={triggerRef}
         variant="secondary"
         shape="rounded"
         type="button"
         aria-label={t('토론 메뉴')}
+        aria-describedby={issueCount > 0 ? issueDescriptionId : undefined}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         disabled={controls.isInterrupted}
         onClick={isOpen ? handleClose : controls.openMenu}
       >
         {t('토론 메뉴')}
+        <NotificationBadge
+          count={issueCount}
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-2 -right-2"
+        />
       </Button>
+      {issueCount > 0 && (
+        <span id={issueDescriptionId} hidden>
+          {t('확인할 기능 개수', { count: issueCount })}
+        </span>
+      )}
       <GlobalPortal.Consumer>
         <Overlay
           isOpen={isOpen}

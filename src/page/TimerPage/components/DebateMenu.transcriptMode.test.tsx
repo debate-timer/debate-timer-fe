@@ -1,6 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createInstance } from 'i18next';
+import { I18nextProvider } from 'react-i18next';
+import ko from '../../../../public/locales/ko/translation.json';
 import { GlobalPortal } from '../../../util/GlobalPortal';
 import useDebateControls from '../hooks/useDebateControls';
 import useTranscriptRecorder, {
@@ -68,21 +71,102 @@ function Harness(props: {
     : controls.share;
   return (
     <DebateMenu
-      controls={{ ...controls, share }}
+      controls={{
+        ...controls,
+        share,
+        menuIssues: { ...controls.menuIssues, hasShareError: share.isError },
+      }}
       hasTranscriptFlag={props.hasTranscript ?? true}
     />
   );
 }
 
 function renderMenu(props: Parameters<typeof Harness>[0] = {}) {
-  return render(
-    <QueryClientProvider client={new QueryClient()}>
-      <GlobalPortal.Provider>
-        <Harness {...props} />
-      </GlobalPortal.Provider>
-    </QueryClientProvider>,
+  const client = new QueryClient();
+  const i18n = createInstance();
+  void i18n.init({
+    lng: 'ko',
+    initAsync: false,
+    resources: { ko: { translation: ko } },
+  });
+  const tree = (next: Parameters<typeof Harness>[0]) => (
+    <I18nextProvider i18n={i18n}>
+      <QueryClientProvider client={client}>
+        <GlobalPortal.Provider>
+          <Harness {...next} />
+        </GlobalPortal.Provider>
+      </QueryClientProvider>
+    </I18nextProvider>
   );
+  const view = render(tree(props));
+  return { update: (next = props) => view.rerender(tree(next)) };
 }
+
+it('확인할 기능만 세고 확인 후 도착한 구간 실패를 다시 알린다', async () => {
+  const user = userEvent.setup();
+  mockRecorder({ SONIOX: true });
+  const { update } = renderMenu();
+  const trigger = screen.getByRole('button', { name: '토론 메뉴' });
+  expect(trigger).not.toHaveAccessibleDescription();
+  mockRecorder({ SONIOX: true }, { failedCount: 3 });
+  update();
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 1개');
+  update({ shareFailed: true });
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 2개');
+  await user.click(trigger);
+  await user.keyboard('{Escape}');
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 2개');
+  await user.click(trigger);
+  await user.click(screen.getByRole('button', { name: '구간 실패 확인' }));
+  expect(screen.getByText('3개 구간 전사 실패')).toBeInTheDocument();
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 1개');
+  update();
+  expect(trigger).not.toHaveAccessibleDescription();
+  mockRecorder({ SONIOX: true }, { failedCount: 4 });
+  update();
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 1개');
+  update({ hasTranscript: false });
+  expect(trigger).not.toHaveAccessibleDescription();
+});
+
+it('다기기 업로드 실패와 공유 안내를 각각 확인하고 새 세션에서 다시 알린다', async () => {
+  const recordSession = (sessionKey: string) =>
+    mockRecorder(
+      { MULTI_DEVICE: true },
+      {
+        sttMode: 'MULTI_DEVICE',
+        isEnabled: true,
+        failedCount: 2,
+        multiDeviceSession: { sessionKey, joinCode: 'code' },
+      },
+    );
+  recordSession('first');
+  const user = userEvent.setup();
+  const { update } = renderMenu();
+  const trigger = screen.getByRole('button', { name: '토론 메뉴' });
+  const advice = '청중 기기도 녹음에 참여하려면 실시간 공유를 켜 주세요.';
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 1개');
+  await user.click(trigger);
+  expect(
+    screen.getByText('사회자 기기에서 2개 구간 업로드 실패'),
+  ).toBeInTheDocument();
+  expect(screen.getByText(advice)).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '구간 실패 확인' }));
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 1개');
+  await user.click(
+    screen.getByRole('button', { name: '실시간 공유 안내 확인' }),
+  );
+  expect(trigger).not.toHaveAccessibleDescription();
+  recordSession('second');
+  update();
+  expect(trigger).toHaveAccessibleDescription('확인할 기능 1개');
+  expect(
+    screen.getByRole('button', { name: '구간 실패 확인' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: '실시간 공유 안내 확인' }),
+  ).toBeInTheDocument();
+});
 
 async function openTranscriptConsent() {
   const user = userEvent.setup();
