@@ -1,11 +1,14 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { http, HttpResponse } from 'msw';
 import { socketManager } from '../../../apis/sockets/SocketManager';
 import { SocketError } from '../../../apis/sockets/error';
-import { useTranslation } from 'react-i18next';
-import i18n from '../../../i18n';
+import { I18nextProvider, useTranslation } from 'react-i18next';
+import { createInstance } from 'i18next';
+import en from '../../../../public/locales/en/translation.json';
+import ko from '../../../../public/locales/ko/translation.json';
 import { toRecognitionLang } from '../../../util/speechRecognition';
+import { appendRecordingJoin } from '../../../util/recordingJoinLink';
 import { ApiUrl } from '../../../apis/endpoints';
 import useDebateControls from '../hooks/useDebateControls';
 import useDebateLogout from '../hooks/useDebateLogout';
@@ -20,13 +23,17 @@ function DebateControlsPreview(props: {
   hasTranscript: boolean;
   isConnectionFailed: boolean;
   language: 'ko' | 'en';
+  previewRecording?: boolean;
 }) {
-  useEffect(() => {
-    const previous = i18n.language;
-    void i18n.changeLanguage(props.language ?? 'ko');
-    return () => {
-      void i18n.changeLanguage(previous);
-    };
+  const storyI18n = useMemo(() => {
+    const instance = createInstance();
+    void instance.init({
+      lng: props.language,
+      fallbackLng: 'ko',
+      initAsync: false,
+      resources: { ko: { translation: ko }, en: { translation: en } },
+    });
+    return instance;
   }, [props.language]);
   const [isReady, setIsReady] = useState(false);
   useEffect(() => {
@@ -85,11 +92,22 @@ function DebateControlsPreview(props: {
       Object.assign(socketManager, originals);
     };
   }, [props.isConnectionFailed]);
-  return isReady ? <Controls {...props} /> : null;
+  return isReady ? (
+    <I18nextProvider i18n={storyI18n}>
+      <Controls {...props} />
+    </I18nextProvider>
+  ) : null;
 }
 
-function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
+function Controls(props: {
+  isMember: boolean;
+  hasTranscript: boolean;
+  previewRecording?: boolean;
+}) {
   const [isRunning, setIsRunning] = useState(false);
+  const [previewRecording, setPreviewRecording] = useState(
+    props.previewRecording,
+  );
   const settings = useGlobalSettings();
   const { i18n } = useTranslation();
   const controls = useDebateControls({
@@ -102,6 +120,29 @@ function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
     canTranscribe: props.isMember && props.hasTranscript,
     stopTimers: () => setIsRunning(false),
   });
+  // 실제 마이크 없이도 다기기 입장 주소와 전사 진행을 확인하는 Story용 세션.
+  const recording = { sessionKey: 'preview', joinCode: 'sample' };
+  const previewControls = previewRecording
+    ? {
+        ...controls,
+        requestTranscript: (next: boolean) => {
+          if (!next) setPreviewRecording(false);
+        },
+        shareUrl: appendRecordingJoin(controls.shareUrl, recording),
+        transcript: {
+          ...controls.transcript,
+          sttMode: 'MULTI_DEVICE' as const,
+          isEnabled: true,
+          multiDeviceSession: recording,
+          pendingCount: 2,
+          supportedModes: {
+            ...controls.transcript.supportedModes,
+            MULTI_DEVICE: true,
+          },
+        },
+        statuses: { ...controls.statuses, transcript: 'active' as const },
+      }
+    : controls;
   const logout = useDebateLogout({
     interrupt: controls.interrupt,
     stopSharing: controls.share.stopSharing,
@@ -118,7 +159,7 @@ function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-ui-headline">토론 기능 검증</h1>
         <DebateMenu
-          controls={controls}
+          controls={previewControls}
           hasTranscriptFlag={props.hasTranscript}
           shareUnavailableReason={
             props.isMember ? undefined : '로그인한 회원만 공유할 수 있습니다.'
@@ -131,7 +172,7 @@ function Controls(props: { isMember: boolean; hasTranscript: boolean }) {
         />
       </div>
       <DebateFeatureIndicators
-        statuses={controls.statuses}
+        statuses={previewControls.statuses}
         hasTranscriptFlag={props.hasTranscript}
       />
       <div className="flex flex-wrap gap-4">
@@ -195,6 +236,10 @@ const META: Meta<typeof DebateControlsPreview> = {
           name: '768px',
           styles: { width: '768px', height: '700px' },
         },
+        projector: {
+          name: '투사 화면',
+          styles: { width: '1280px', height: '720px' },
+        },
         low: { name: '낮은 화면', styles: { width: '900px', height: '400px' } },
       },
     },
@@ -240,4 +285,12 @@ export const At768: Story = {
 };
 export const LowScreen: Story = {
   globals: { viewport: { value: 'low', isRotated: false } },
+};
+
+export const Projector: Story = {
+  globals: { viewport: { value: 'projector', isRotated: false } },
+};
+export const MultiDeviceProjection: Story = {
+  ...Projector,
+  args: { previewRecording: true },
 };

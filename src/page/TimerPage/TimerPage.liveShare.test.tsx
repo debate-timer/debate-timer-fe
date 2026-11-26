@@ -1,6 +1,7 @@
 import GlobalSettingsProvider from '../../components/GlobalSettingsProvider/GlobalSettingsProvider';
 import { useState } from 'react';
 import {
+  act,
   render,
   screen,
   waitFor,
@@ -16,9 +17,15 @@ import { GlobalPortal } from '../../util/GlobalPortal';
 const START = vi.hoisted(() => vi.fn());
 const STOP = vi.hoisted(() => vi.fn());
 const ISSUE = vi.hoisted(() => vi.fn(() => true));
+let loseConnection: () => void;
 vi.mock('./hooks/useLiveShareSession', () => ({
   default: function useMockLiveShareSession() {
     const [isSharing, setIsSharing] = useState(false);
+    const [isError, setError] = useState(false);
+    loseConnection = () => {
+      setIsSharing(false);
+      setError(true);
+    };
     return {
       startSharing: () => {
         START();
@@ -34,7 +41,7 @@ vi.mock('./hooks/useLiveShareSession', () => ({
       isSharing,
       isSocketConnected: isSharing,
       isLoading: false,
-      isError: false,
+      isError,
       hasStopError: false,
       errorType: 'else',
       restartLiveShare: vi.fn(),
@@ -97,7 +104,7 @@ describe('타이머와 명시적 공유의 연결', () => {
     await user.click(screen.getByRole('button', { name: '공유 시작' }));
     expect(START).toHaveBeenCalledTimes(1);
     expect(
-      await screen.findByRole('dialog', { name: '토론 타이머 화면 공유' }),
+      await screen.findByRole('dialog', { name: '청중 입장' }),
     ).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await user.keyboard('{Escape}');
@@ -116,7 +123,7 @@ describe('타이머와 명시적 공유의 연결', () => {
       screen.getByRole('button', { name: '일시정지' }),
     ).toBeInTheDocument();
   });
-  it('공유를 켜면 QR 창을 띄우고, 메뉴에는 링크 대신 링크 복사·QR 아이콘을 둔다', async () => {
+  it('공유를 켜면 QR 창을 띄우고, 메뉴에서 청중 입장 주소를 복사하거나 QR을 다시 열 수 있다', async () => {
     const user = userEvent.setup();
     renderTimerPage();
     await screen.findAllByRole('button', { name: '재생' });
@@ -125,7 +132,7 @@ describe('타이머와 명시적 공유의 연결', () => {
     await user.click(screen.getByRole('button', { name: '공유 시작' }));
 
     const qrDialog = await screen.findByRole('dialog', {
-      name: '토론 타이머 화면 공유',
+      name: '청중 입장',
     });
     expect(
       within(qrDialog).getByRole('img', { name: '실시간 공유 QR 코드' }),
@@ -137,21 +144,42 @@ describe('타이머와 명시적 공유의 연결', () => {
       within(qrDialog).getByRole('button', { name: '모달 닫기' }),
     );
     expect(
-      screen.queryByRole('dialog', { name: '토론 타이머 화면 공유' }),
+      screen.queryByRole('dialog', { name: '청중 입장' }),
     ).not.toBeInTheDocument();
 
     const menu = screen.getByRole('dialog', { name: '토론 메뉴' });
     expect(
-      within(menu).queryByText('https://example.com/live/5'),
-    ).not.toBeInTheDocument();
+      within(menu).getByRole('textbox', { name: '청중 입장 링크' }),
+    ).toHaveValue('https://example.com/live/5');
     expect(
       within(menu).getByRole('button', { name: '링크 복사' }),
     ).toBeInTheDocument();
     await user.click(
-      within(menu).getByRole('button', { name: 'QR 코드 보기' }),
+      within(menu).getByRole('button', { name: 'QR 크게 보기' }),
     );
     expect(
-      await screen.findByRole('dialog', { name: '토론 타이머 화면 공유' }),
+      await screen.findByRole('dialog', { name: '청중 입장' }),
     ).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(
+      within(menu).getByRole('button', { name: 'QR 크게 보기' }),
+    ).toHaveFocus();
+  });
+  it('QR을 투사하던 중 연결이 끊기면 메뉴의 오류 원인으로 포커스를 옮긴다', async () => {
+    const user = userEvent.setup();
+    renderTimerPage();
+    await user.click(await screen.findByRole('button', { name: '토론 메뉴' }));
+    await user.click(screen.getByRole('button', { name: '실시간 공유' }));
+    await user.click(screen.getByRole('button', { name: '공유 시작' }));
+    await screen.findByRole('dialog', { name: '청중 입장' });
+    act(() => loseConnection());
+    expect(
+      screen.queryByRole('dialog', { name: '청중 입장' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('region', { name: '실시간 공유' })).getByRole(
+        'alert',
+      ),
+    ).toHaveFocus();
   });
 });

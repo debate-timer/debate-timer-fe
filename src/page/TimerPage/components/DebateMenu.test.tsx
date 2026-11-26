@@ -70,7 +70,7 @@ describe('토론 메뉴와 실제 제어 훅 조립', () => {
     ).toBeInTheDocument();
     expect(
       within(menu).getByText(
-        '교차 조사 또는 주도권 토론 등에서 답변자에게 최소한의 답변 시간을 보장해줘야 할 때 사용합니다.',
+        '교차 조사 또는 주도권 토론 등에서 답변자에게 최소한의 답변 시간을 보장해줘야 할 때 사용해요.',
       ),
     ).toBeInTheDocument();
     expect(
@@ -78,7 +78,7 @@ describe('토론 메뉴와 실제 제어 훅 조립', () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '실시간 공유' }));
     expect(menu).toBeInTheDocument();
-    expect(menu).toHaveTextContent('답변 제한 시간');
+    expect(menu).toHaveTextContent('최소 답변 보장 시간');
     const modal = screen.getByRole('dialog', {
       name: '실시간 공유를 시작할까요?',
     });
@@ -112,7 +112,7 @@ describe('토론 메뉴와 실제 제어 훅 조립', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     await user.click(trigger);
     await user.click(
-      screen.getByRole('button', { name: '답변 제한 시간, 30초' }),
+      screen.getByRole('button', { name: '최소 답변 보장 시간, 30초' }),
     );
     await user.keyboard('{Escape}');
     expect(
@@ -164,13 +164,13 @@ describe('토론 메뉴와 실제 제어 훅 조립', () => {
     renderSubject();
     await user.click(screen.getByRole('button', { name: '토론 메뉴' }));
     await user.click(
-      screen.getByRole('button', { name: '답변 제한 시간, 30초' }),
+      screen.getByRole('button', { name: '최소 답변 보장 시간, 30초' }),
     );
     await user.keyboard('{ArrowDown}{Enter}');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '답변 시간' }));
     expect(
-      screen.getByRole('button', { name: '답변 제한 시간, 45초' }),
+      screen.getByRole('button', { name: '최소 답변 보장 시간, 45초' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '답변 시간' })).toHaveAttribute(
       'aria-pressed',
