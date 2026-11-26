@@ -128,6 +128,32 @@ describe('설정 모달', () => {
     renderSettings(path);
     expect(screen.getByRole('button', { name: '설정' })).toBeInTheDocument();
   });
+  it('바깥 다이얼로그 틀이 둥근 모서리 클리핑을 유지하고 내부 스크롤 영역에서 내용을 스크롤한다', async () => {
+    const user = userEvent.setup();
+    renderSettings();
+    await user.click(screen.getByRole('button', { name: '설정' }));
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveClass(
+      'flex',
+      'flex-col',
+      'overflow-hidden',
+      'rounded-[20px]',
+    );
+    expect(dialog).not.toHaveClass('overflow-y-auto');
+
+    const title = screen.getByRole('heading', { name: '설정' });
+    const scrollContainer = dialog.firstElementChild;
+    expect(scrollContainer).not.toBeNull();
+    expect(scrollContainer).not.toBe(dialog);
+    expect(scrollContainer).toContainElement(title);
+    expect(scrollContainer).toHaveClass(
+      'min-h-0',
+      'flex-1',
+      'overflow-x-hidden',
+      'overflow-y-auto',
+    );
+  });
 });
 
 it('조회·저장 실패에도 설정 상태와 재시도 버튼을 표시하지 않는다', async () => {
