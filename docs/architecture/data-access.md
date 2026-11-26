@@ -16,8 +16,12 @@ API를 직접 호출함. 구현 형식과 테스트 규칙은
 
 `src/apis/axiosInstance.ts`가 단일 Axios 인스턴스의 base URL, 기본 10초 timeout, JSON
 헤더, credential, 인증·응답 interceptor를 소유함. request interceptor가 access
-token을 붙임. 첫 401은 `_retry`로 제한하고 재발급에 성공하면 원래 요청을 다시
-보냄. 재발급이 실패하면 인증 상태를 정리하고 홈으로 이동함. 온라인 상태의 GET
+token을 붙임. 첫 401은 `_retry`로 제한하고, 요청 시 `Authorization` 헤더와 현재
+`accessToken`이 모두 있으며 인증 경계(`/api/member`, `/api/member/reissue`,
+`/api/member/logout`)가 아닌 경우에만 Single-flight(`inFlightReissue`)로 토큰을
+1회 재발급해 성공하면 대기 요청들을 다시 보냄. 재발급 요청도 기본 10초 timeout을
+적용하며, 비어 있지 않은 새 토큰을 받은 경우에만 저장함. 재발급이 실패하면 인증
+상태를 정리하고 홈으로 이동함. 온라인 상태의 GET
 요청이 응답 없이 타임아웃(`ECONNABORTED`, `ETIMEDOUT`)으로 실패하면 Sentry 수집
 전에 `_timeoutRetry`로 1회 자동 재시도함. 비-GET·`expectedMemberId` 결속 요청·HTTP 응답 오류·취소·오프라인·계정
 전환 요청은 재시도하지 않으며, 재시도까지 실패한 경우에만 오류를 수집·전달함.

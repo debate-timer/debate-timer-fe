@@ -142,7 +142,13 @@ export function resolveApiErrorLevel(
     return isTimeoutErrorCode(errorCode) ? 'error' : 'warning';
   }
 
-  if (status === 400 || status === 404 || status === 409 || status === 422) {
+  if (
+    status === 400 ||
+    status === 403 ||
+    status === 404 ||
+    status === 409 ||
+    status === 422
+  ) {
     return 'warning';
   }
 

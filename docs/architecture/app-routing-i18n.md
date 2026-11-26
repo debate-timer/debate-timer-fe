@@ -26,8 +26,8 @@
 화면으로 이동하면 맨 위부터 보여 주고, 뒤로가기·앞으로가기에서는 이전 스크롤
 위치를 복원함. 언어 전환도 새 경로로 이동하므로 맨 위로 올라감.
 
-`src/routes/ProtectedRoute.tsx`는 토큰이 없으면 현재 위치를 남기고 언어가 적용된
-소개 경로로 `replace` 이동하고 `loginRequest`에 원래 내부 목적지를 전달함. 소개 화면의 공용 로그인 확인이 이를 소비하며 취소 전에는 OAuth를 시작하지 않음. 화면은 `useParams`, `useSearchParams`,
+`src/routes/ProtectedRoute.tsx`는 `auth-changed`·`storage` 이벤트를 구독해 인증 상태를 동기화하며, 토큰이 없으면 현재 위치를 남기고 언어가 적용된
+소개 경로로 `replace` 이동하고 `loginRequest`에 원래 내부 목적지를 전달함. `overview/:type/:id`와 `table/customize/:id`는 `allowGuestId`로 `id === 'guest'` 경로만 비회원 접근을 허용하고 회원용 숫자 ID는 보호 경로로 다룸. 소개 화면의 공용 로그인 확인이 이를 소비하며 취소 전에는 OAuth를 시작하지 않음. 화면은 `useParams`, `useSearchParams`,
 `useNavigate`로 라우트 입력과 이동을 처리함. 숫자 식별자는 변환 후 유효성과 존재
 여부를 검사함. 언어를 보존하는 이동 경로는 `buildLangPath`로 만듦.
 

@@ -60,12 +60,14 @@ const APP_ROUTES = [
   {
     path: 'overview/:type/:id',
     element: <TableOverviewPage />,
-    requiresAuth: false,
+    requiresAuth: true,
+    allowGuestId: true,
   },
   {
     path: 'table/customize/:id',
     element: <TimerPage />,
-    requiresAuth: false,
+    requiresAuth: true,
+    allowGuestId: true,
   },
   {
     path: 'table/customize/:id/end',
@@ -146,7 +148,11 @@ export const protectedAppRoutes = APP_ROUTES.map((route) => ({
   element: (
     <CompatibilityRoute>
       {route.requiresAuth ? (
-        <ProtectedRoute>{route.element}</ProtectedRoute>
+        <ProtectedRoute
+          allowGuestId={'allowGuestId' in route && route.allowGuestId}
+        >
+          {route.element}
+        </ProtectedRoute>
       ) : (
         route.element
       )}
