@@ -46,10 +46,11 @@ query를 가린 뒤 전송함.
 
 `src/util/sentry.ts`는 동적 숫자 ID·UUID를 정규화한 endpoint와 언어 접두어를
 제거한 화면 경로로 기능을 분류함. 응답이 없는 비-타임아웃 네트워크 오류
-(`network-error`, 예: `ERR_NETWORK`)와 400·404·409·422는 warning, 재시도까지
+(`network-error`, 예: `ERR_NETWORK`)와 400·403·404·409·422는 warning, 재시도까지
 실패한 타임아웃(`timeout`, `ECONNABORTED`·`ETIMEDOUT`)과 일반 5xx는 error, 핵심
 화면의 5xx는 fatal 수준을 사용함. `shouldSkipApiError()`는 401, 400 미만 응답,
-오프라인 오류를 제외함. 수집 정책을 바꿀 때 이 분류·제외와 interceptor·Boundary의
+오프라인 오류를 제외함. `src/main.tsx` 초기화 시 `accessToken`·`memberId`가 모두
+있으면 `Sentry.setUser`를 복원함. 수집 정책을 바꿀 때 이 분류·제외와 interceptor·Boundary의
 중복 방지를 함께 확인함.
 
 ## 실패 가능한 브라우저 경계

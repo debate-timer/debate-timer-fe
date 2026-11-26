@@ -1,4 +1,5 @@
 import {
+  act,
   cleanup,
   render,
   screen,
@@ -189,5 +190,64 @@ describe('새 탐색 경로와 인증 연결', () => {
     expect(
       screen.queryByRole('link', { name: '토론 기록' }),
     ).not.toBeInTheDocument();
+  });
+
+  it.each(['/overview/customize/777', '/table/customize/468'])(
+    '비로그인 상태에서 회원 테이블 경로 %s에 직접 진입하면 API 조회 없이 소개로 이동해 로그인을 요청한다',
+    async (memberTablePath) => {
+      let tableRequests = 0;
+      server.use(
+        http.get(`${ApiUrl.customize}/:tableId`, () => {
+          tableRequests += 1;
+          return HttpResponse.json(null, { status: 401 });
+        }),
+      );
+
+      const router = renderAt(memberTablePath);
+
+      await screen.findByRole('dialog', { name: '로그인이 필요합니다' });
+      expect(router.state.location.pathname).toBe('/');
+      expect(router.state.historyAction).toBe('REPLACE');
+      expect(tableRequests).toBe(0);
+
+      const user = userEvent.setup();
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', {
+          name: '로그인',
+        }),
+      );
+      expect(consumeLoginReturn()).toEqual({ path: memberTablePath });
+    },
+  );
+
+  it.each(['/overview/customize/guest', '/table/customize/guest'])(
+    '비로그인 상태에서도 게스트 테이블 경로 %s는 리다이렉트 없이 진입할 수 있다',
+    async (guestPath) => {
+      const router = renderAt(guestPath);
+
+      await waitFor(() =>
+        expect(router.state.location.pathname).toBe(guestPath),
+      );
+      expect(
+        screen.queryByRole('dialog', { name: '로그인이 필요합니다' }),
+      ).not.toBeInTheDocument();
+    },
+  );
+
+  it('보호 경로에 머무는 중 다른 탭에서 로그아웃되면 즉시 소개 화면으로 이동한다', async () => {
+    localStorage.setItem('accessToken', 'test-token');
+    localStorage.setItem('memberId', '1');
+    const router = renderAt('/dashboard');
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/dashboard'),
+    );
+
+    act(() => {
+      localStorage.removeItem('accessToken');
+      window.dispatchEvent(new StorageEvent('storage', { key: 'accessToken' }));
+    });
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/'));
+    expect(router.state.historyAction).toBe('REPLACE');
   });
 });

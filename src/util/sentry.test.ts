@@ -69,6 +69,7 @@ describe('sentry 유틸', () => {
 
   it('사용자 입력이나 상태 충돌처럼 예상 가능한 에러는 즉시 대응 알림보다 낮은 우선순위로 분류한다', () => {
     expect(resolveApiErrorLevel(400, 'timer')).toBe('warning');
+    expect(resolveApiErrorLevel(403, 'table-overview')).toBe('warning');
     expect(resolveApiErrorLevel(404, 'vote')).toBe('warning');
     expect(resolveApiErrorLevel(409, 'live-share')).toBe('warning');
     expect(resolveApiErrorLevel(422, 'table-composition')).toBe('warning');
