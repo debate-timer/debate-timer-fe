@@ -65,6 +65,7 @@ function initializeApp() {
   // memberId 복원: accessToken + memberId 모두 존재 시 identity 설정
   const memberId = getMemberId();
   if (getAccessToken() && memberId) {
+    Sentry.setUser({ id: memberId });
     analyticsManager.setUserId(memberId);
     analyticsManager.setUserProperties({
       user_type: 'member',
@@ -72,6 +73,7 @@ function initializeApp() {
     });
   } else if (memberId) {
     // accessToken 없이 memberId만 있으면 비회원 처리
+    Sentry.setUser(null);
     removeMemberId();
   }
 

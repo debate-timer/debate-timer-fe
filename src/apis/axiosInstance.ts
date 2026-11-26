@@ -19,6 +19,7 @@ import {
   buildSentryApiErrorMetadata,
   createSentryApiError,
   markSentryCaptured,
+  normalizeEndpoint,
   sanitizeSentryContext,
   sanitizeSentrySearch,
   sanitizeSentryUrl,
@@ -37,6 +38,18 @@ declare module 'axios' {
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
 const TIMEOUT_ERROR_CODES = new Set(['ECONNABORTED', 'ETIMEDOUT']);
+const AUTH_ENDPOINTS_WITHOUT_REISSUE = new Set([
+  '/api/member',
+  '/api/member/reissue',
+  '/api/member/logout',
+]);
+
+interface InFlightReissue {
+  revision: number;
+  promise: Promise<string>;
+}
+
+let inFlightReissue: InFlightReissue | null = null;
 
 function isOnline(): boolean {
   return typeof navigator === 'undefined' || navigator.onLine !== false;
@@ -158,6 +171,96 @@ function captureClientApiError(error: unknown) {
   markSentryCaptured(error);
 }
 
+function shouldAttemptTokenReissue(error: unknown): boolean {
+  if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+    return false;
+  }
+
+  const originalRequest = error.config;
+  if (!originalRequest || originalRequest._retry) {
+    return false;
+  }
+
+  if (!originalRequest.headers?.Authorization || !getAccessToken()) {
+    return false;
+  }
+
+  return !AUTH_ENDPOINTS_WITHOUT_REISSUE.has(
+    normalizeEndpoint(originalRequest.url),
+  );
+}
+
+function clearAuthSessionAndRedirect(): void {
+  const currentLang = i18n.resolvedLanguage ?? i18n.language;
+  const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
+  Sentry.setUser(null);
+  removeAccessToken();
+  removeMemberId();
+  window.location.href = buildLangPath('/', lang);
+  analyticsManager.reset();
+}
+
+function requestTokenReissue(): Promise<string> {
+  const startedRevision = getAuthRevision();
+  if (inFlightReissue && inFlightReissue.revision === startedRevision) {
+    return inFlightReissue.promise;
+  }
+
+  let currentReissue: InFlightReissue | null = null;
+  const promise = (async () => {
+    try {
+      // Refresh Token은 API 도메인 쿠키에 있으므로
+      // 교차 출처 요청에도 쿠키가 실리도록 withCredentials를 명시
+      const refreshResponse = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/member/reissue`,
+        null,
+        { withCredentials: true, timeout: DEFAULT_REQUEST_TIMEOUT_MS },
+      );
+
+      // 새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정
+      const headerAuth = refreshResponse.headers['authorization'] || '';
+
+      // Authorization: Bearer <새토큰> 형태라면 "Bearer " 부분 제거
+      const newAccessToken = headerAuth.replace(/^Bearer\s+/i, '').trim();
+      if (!newAccessToken) {
+        throw new Error('EMPTY_ACCESS_TOKEN');
+      }
+
+      // 재발급 대기 중 전환한 계정의 인증 상태를 덮어쓰지 않음.
+      if (getAuthRevision() === startedRevision) {
+        setAccessToken(newAccessToken);
+      }
+
+      return newAccessToken;
+    } catch (refreshError) {
+      if (getAuthRevision() === startedRevision) {
+        if (
+          axios.isAxiosError(refreshError) &&
+          refreshError.response?.status !== 401 &&
+          refreshError.response?.status !== 403
+        ) {
+          captureClientApiError(refreshError);
+        }
+
+        console.error('Refresh Token is invalid or expired', refreshError);
+        clearAuthSessionAndRedirect();
+      }
+      throw refreshError;
+    } finally {
+      if (currentReissue && inFlightReissue === currentReissue) {
+        inFlightReissue = null;
+      }
+    }
+  })();
+
+  currentReissue = {
+    revision: startedRevision,
+    promise,
+  };
+  inFlightReissue = currentReissue;
+  return promise;
+}
+
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -170,55 +273,19 @@ axiosInstance.interceptors.response.use(
     if (axios.isCancel(error)) {
       return Promise.reject(error);
     }
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (shouldAttemptTokenReissue(error)) {
       originalRequest._retry = true;
       try {
-        // Refresh Token은 API 도메인 쿠키에 있으므로
-        // 교차 출처 요청에도 쿠키가 실리도록 withCredentials를 명시
-        const refreshResponse = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/member/reissue`,
-          null,
-          { withCredentials: true },
-        );
+        const newAccessToken = await requestTokenReissue();
 
         // 재발급 대기 중 전환한 계정의 인증 상태와 서버 데이터를 보호함.
         assertRequestAccount(originalRequest);
-
-        // 새 Access Token은 응답 헤더(Authorization)에 담겨 있다고 가정
-        const headerAuth = refreshResponse.headers['authorization'] || '';
-
-        // Authorization: Bearer <새토큰> 형태라면 "Bearer " 부분 제거
-        const newAccessToken = headerAuth.replace(/^Bearer\s+/i, '').trim();
-
-        // 로컬 스토리지에 저장
-        setAccessToken(newAccessToken);
 
         // 원본 요청 헤더도 새 토큰으로 교체 후 재요청
         originalRequest.headers.Authorization = `${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         assertRequestAccount(originalRequest);
-        if (
-          axios.isAxiosError(refreshError) &&
-          refreshError.response?.status !== 401 &&
-          refreshError.response?.status !== 403
-        ) {
-          captureClientApiError(refreshError);
-        }
-
-        console.error('Refresh Token is invalid or expired', refreshError);
-        // 재발급도 실패하면 -> 로그인 페이지 이동
-        const currentLang = i18n.resolvedLanguage ?? i18n.language;
-        const lang = isSupportedLang(currentLang) ? currentLang : DEFAULT_LANG;
-        Sentry.setUser(null);
-        removeAccessToken();
-        removeMemberId();
-        window.location.href = buildLangPath('/', lang);
-        analyticsManager.reset();
         return Promise.reject(refreshError);
       }
     }
