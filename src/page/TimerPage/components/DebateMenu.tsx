@@ -1,14 +1,14 @@
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlobalPortal } from '../../../util/GlobalPortal';
-import ToggleButton from '../../../components/ToggleButton/ToggleButton';
+import DebateFeatureSection from './DebateFeatureSection';
 import { DebateControls } from '../hooks/useDebateControls';
 import useDebateOverlay from '../hooks/useDebateOverlay';
 import MicCheckPanel from './MicCheckPanel';
 import LiveShareQrPanel from './LiveShareQrPanel';
-import { IoLinkOutline, IoQrCodeOutline } from 'react-icons/io5';
-import { copyToClipboard } from '../../../util/clipboard';
+import { ShareMenuSection, TranscriptMenuSection } from './DebateMenuFeatures';
 import Button from '../../../components/Button/Button';
+import NotificationBadge from '../../../components/NotificationBadge/NotificationBadge';
 import Overlay from '../../../components/Overlay/Overlay';
 import ModalFrame from '../../../components/ModalFrame/ModalFrame';
 import DropdownMenu from '../../../components/DropdownMenu/DropdownMenu';
@@ -30,8 +30,6 @@ const OPEN_TRIGGER_CLASS =
 const ACTION_BASE_CLASS =
   'min-h-11 rounded-xl border px-4 py-2 text-ui-label focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50';
 const ACTION_CLASS = `${ACTION_BASE_CLASS} border-neutral-400`;
-const ICON_ACTION_CLASS =
-  'flex size-11 items-center justify-center rounded-xl border border-neutral-400 focus-visible:outline-2 focus-visible:outline-offset-2';
 
 /** 버튼 아래 메뉴는 유지하고 활성화 확인은 별도 모달에 표시함. 속기록은 피쳐 플래그가 있을 때만 노출함. */
 export default function DebateMenu(props: DebateMenuProps) {
@@ -44,17 +42,26 @@ export default function DebateMenu(props: DebateMenuProps) {
   } = props;
   const { t } = useTranslation();
   const titleId = useId();
+  const issueDescriptionId = useId();
   const confirmationTitleId = useId();
-  const shareId = useId();
+  const qrButtonRef = useRef<HTMLButtonElement>(null);
+  const shareErrorRef = useRef<HTMLParagraphElement>(null);
+  const previousOverlay = useRef(controls.overlay);
   const transcriptId = useId();
   const lastFeatureRef = useRef<'share' | 'transcript' | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [panel, setPanel] = useState<HTMLDivElement | null>(null);
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>(
-    'idle',
-  );
   const isMenu = controls.overlay === 'menu';
   const isOpen = controls.overlay !== 'closed';
+  const { menuIssues } = controls;
+  const hasTranscriptIssue =
+    hasTranscriptFlag &&
+    (menuIssues.hasTranscriptError ||
+      menuIssues.hasUnseenFailures ||
+      menuIssues.hasUnseenShareAdvice);
+  const issueCount = controls.isInterrupted
+    ? 0
+    : Number(menuIssues.hasShareError) + Number(hasTranscriptIssue);
   const handleClose = () => {
     if (isMenu) {
       controls.closeOverlay();
@@ -64,10 +71,16 @@ export default function DebateMenu(props: DebateMenuProps) {
   };
   useDebateOverlay(panel, handleClose, triggerRef, isMenu);
   useLayoutEffect(() => {
+    const returningFromQr = previousOverlay.current === 'share-qr';
+    previousOverlay.current = controls.overlay;
     if (!panel || !isMenu) {
       return;
     }
-    if (isMenu && lastFeatureRef.current) {
+    if (returningFromQr) {
+      (shareErrorRef.current ?? qrButtonRef.current ?? panel).focus();
+      return;
+    }
+    if (lastFeatureRef.current) {
       const buttons = panel.querySelectorAll<HTMLButtonElement>(
         'button[aria-pressed]',
       );
@@ -102,23 +115,12 @@ export default function DebateMenu(props: DebateMenuProps) {
       window.removeEventListener('scroll', positionPanel, true);
     };
   }, [panel]);
-  const handleCopy = async () =>
-    setCopyStatus(
-      (await copyToClipboard(controls.shareUrl)) ? 'copied' : 'failed',
-    );
   const isShareConsent = controls.overlay === 'share-consent';
   const isShareQr = controls.overlay === 'share-qr';
   const isMicCheck = controls.overlay === 'mic-check';
   const availableModes = (['RPC', 'SONIOX', 'MULTI_DEVICE'] as const).filter(
     (mode) => controls.transcript.supportedModes[mode],
   );
-  const SHARE_ERROR_MESSAGES = {
-    token: '사회자 인증 토큰 발급에 실패했어요...',
-    replaced:
-      '다른 탭이나 기기에서 라이브 공유를 시작해서 이 화면의 공유를 멈췄어요.',
-    disconnected: '라이브 서버와 연결이 끊겼어요. 새로고침 해주세요.',
-    else: '공유 연결에 실패했습니다. 다시 시도해 주세요.',
-  };
   const title = isShareConsent
     ? t('실시간 공유를 시작할까요?')
     : isMicCheck
@@ -128,19 +130,34 @@ export default function DebateMenu(props: DebateMenuProps) {
   return (
     <>
       <Button
-        className={clsx(HEADER_BUTTON_CLASS, isOpen && OPEN_TRIGGER_CLASS)}
+        className={clsx(
+          'relative',
+          HEADER_BUTTON_CLASS,
+          isOpen && OPEN_TRIGGER_CLASS,
+        )}
         ref={triggerRef}
         variant="secondary"
         shape="rounded"
         type="button"
         aria-label={t('토론 메뉴')}
+        aria-describedby={issueCount > 0 ? issueDescriptionId : undefined}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         disabled={controls.isInterrupted}
         onClick={isOpen ? handleClose : controls.openMenu}
       >
         {t('토론 메뉴')}
+        <NotificationBadge
+          count={issueCount}
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-2 -right-2"
+        />
       </Button>
+      {issueCount > 0 && (
+        <span id={issueDescriptionId} hidden>
+          {t('확인할 기능 개수', { count: issueCount })}
+        </span>
+      )}
       <GlobalPortal.Consumer>
         <Overlay
           isOpen={isOpen}
@@ -161,198 +178,42 @@ export default function DebateMenu(props: DebateMenuProps) {
             </h2>
           </div>
           <div className="space-y-6">
-            <section aria-label={t('실시간 공유')} className="space-y-2">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-ui-label">{t('실시간 공유')}</h3>
-                <ToggleButton
-                  aria-label={t('실시간 공유')}
-                  aria-describedby={shareId}
-                  isPressed={controls.share.isSharing}
-                  onPressedChange={(next) => {
-                    lastFeatureRef.current = 'share';
-                    controls.requestShare(next);
-                  }}
-                  disabled={
-                    !controls.canShare ||
-                    Boolean(shareUnavailableReason) ||
-                    controls.share.isLoading
-                  }
-                />
-              </div>
-              <p id={shareId} className="text-ui-caption text-neutral-700">
-                {shareUnavailableReason ??
-                  (!controls.canShare
-                    ? t('회원만 사용할 수 있는 기능입니다.')
-                    : t('청중에게 현재 타이머를 실시간으로 공유합니다.'))}
-              </p>
-              <p className="text-ui-caption text-neutral-700">
-                {t(
-                  '끄면 이 기기의 공유 연결을 종료합니다. 서버의 중단 완료는 확인하지 않습니다.',
-                )}
-              </p>
-              {controls.share.isLoading && (
-                <p role="status">{t('공유 연결 중')}</p>
-              )}
-              {controls.share.isError && (
-                <div role="alert">
-                  <p>
-                    {t(
-                      controls.share.hasStopError
-                        ? '중단 명령을 발행하지 못했습니다. 이 기기의 공유 연결은 종료했습니다.'
-                        : SHARE_ERROR_MESSAGES[controls.share.errorType],
-                    )}
-                  </p>
-                  <button
-                    type="button"
-                    aria-label={t('공유 다시 시도')}
-                    className={ACTION_CLASS}
-                    onClick={() => controls.requestShare(true)}
-                    disabled={
-                      !controls.canShare || Boolean(shareUnavailableReason)
-                    }
-                  >
-                    {t('공유 다시 시도')}
-                  </button>
-                </div>
-              )}
-              {controls.share.isSharing && (
-                <>
-                  {controls.transcript.multiDeviceSession && (
-                    <p className="text-ui-caption text-neutral-700">
-                      {t('이 링크로 들어온 청중은 녹음에 참여할 수 있어요.')}
-                    </p>
-                  )}
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      aria-label={t('링크 복사')}
-                      title={t('링크 복사')}
-                      className={ICON_ACTION_CLASS}
-                      onClick={() => void handleCopy()}
-                    >
-                      <IoLinkOutline className="size-5" aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={t('QR 코드 보기')}
-                      title={t('QR 코드 보기')}
-                      className={ICON_ACTION_CLASS}
-                      onClick={controls.openShareQr}
-                    >
-                      <IoQrCodeOutline className="size-5" aria-hidden />
-                    </button>
-                  </div>
-                  <p role="status">
-                    {copyStatus === 'copied'
-                      ? t('링크 복사됨')
-                      : copyStatus === 'failed'
-                        ? t('링크 복사 실패')
-                        : ''}
-                  </p>
-                </>
-              )}
-            </section>
+            <ShareMenuSection
+              controls={controls}
+              unavailableReason={shareUnavailableReason}
+              qrButtonRef={qrButtonRef}
+              errorRef={shareErrorRef}
+              onToggle={(next) => {
+                lastFeatureRef.current = 'share';
+                controls.requestShare(next);
+              }}
+            />
             {hasTranscriptFlag && (
-              <section aria-label={t('속기록')} className="space-y-2">
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-ui-label">{t('속기록')}</h3>
-                  <ToggleButton
-                    aria-label={t('속기록')}
-                    aria-describedby={transcriptId}
-                    isPressed={controls.transcript.isEnabled}
-                    onPressedChange={(next) => {
-                      lastFeatureRef.current = 'transcript';
-                      controls.requestTranscript(next);
-                    }}
-                    disabled={
-                      !controls.canTranscribe ||
-                      Boolean(transcriptUnavailableReason) ||
-                      controls.transcript.isPending ||
-                      !Object.values(controls.transcript.supportedModes).some(
-                        Boolean,
-                      )
-                    }
-                  />
-                </div>
-                <p
-                  id={transcriptId}
-                  className="text-ui-caption text-neutral-700"
-                >
-                  {transcriptUnavailableReason ??
-                    (!controls.canTranscribe
-                      ? t('사용 권한이 필요한 기능입니다.')
-                      : t('타이머가 실행되는 동안 발언을 기록합니다.'))}
-                </p>
-                {!Object.values(controls.transcript.supportedModes).some(
-                  Boolean,
-                ) && (
-                  <p>{t('이 브라우저에서는 음성 기록을 지원하지 않습니다.')}</p>
-                )}
-                {controls.transcript.isEnabled && (
-                  <p>
-                    {controls.transcript.isListening
-                      ? t('{{count}}문장 기록', {
-                          count: controls.transcript.utteranceCount,
-                        })
-                      : t('타이머를 시작하면 기록해요')}
-                  </p>
-                )}
-                {controls.transcript.pendingCount > 0 && (
-                  <p role="status">
-                    {t('{{count}}개 구간 전사 중', {
-                      count: controls.transcript.pendingCount,
-                    })}
-                  </p>
-                )}
-                {controls.transcript.failedCount > 0 && (
-                  <p className="text-red-700">
-                    {t('{{count}}개 구간 전사 실패', {
-                      count: controls.transcript.failedCount,
-                    })}
-                  </p>
-                )}
-                {controls.statuses.transcript === 'error' && (
-                  <div role="alert">
-                    <p>
-                      {t(
-                        '음성 기록에 문제가 발생했습니다. 권한과 연결을 확인해 주세요.',
-                      )}
-                    </p>
-                    <button
-                      type="button"
-                      aria-label={t('속기 다시 시도')}
-                      className={ACTION_CLASS}
-                      disabled={
-                        !controls.canTranscribe ||
-                        Boolean(transcriptUnavailableReason)
-                      }
-                      onClick={() => controls.requestTranscript(true)}
-                    >
-                      {t('속기 다시 시도')}
-                    </button>
-                  </div>
-                )}
-              </section>
+              <TranscriptMenuSection
+                controls={controls}
+                unavailableReason={transcriptUnavailableReason}
+                onToggle={(next) => {
+                  lastFeatureRef.current = 'transcript';
+                  controls.requestTranscript(next);
+                }}
+              />
             )}
-            <section aria-label={t('답변 시간 타이머')} className="space-y-2">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-ui-label">{t('답변 시간 타이머')}</h3>
-                <ToggleButton
-                  aria-label={t('답변 시간')}
-                  isPressed={controls.isAnswerTimeEnabled}
-                  onPressedChange={controls.changeAnswerEnabled}
-                />
-              </div>
-              <p className="text-ui-caption text-neutral-700">
-                {t(
-                  '교차 조사 또는 주도권 토론 등에서 답변자에게 최소한의 답변 시간을 보장해줘야 할 때 사용합니다.',
-                )}
-              </p>
+            <DebateFeatureSection
+              title={t('답변 시간 타이머')}
+              toggleLabel={t('답변 시간')}
+              description={t(
+                '교차 조사 또는 주도권 토론 등에서 답변자에게 최소한의 답변 시간을 보장해줘야 할 때 사용해요.',
+              )}
+              active={controls.isAnswerTimeEnabled}
+              onToggle={controls.changeAnswerEnabled}
+            >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span>{t('답변 제한 시간')}</span>
+                <span className="text-ui-label">
+                  {t('최소 답변 보장 시간')}
+                </span>
                 <DropdownMenu
                   renderInPortal
-                  aria-label={t('답변 제한 시간')}
+                  aria-label={t('최소 답변 보장 시간')}
                   className="w-32"
                   selectedValue={controls.answerTime}
                   onSelect={controls.changeAnswerTime}
@@ -362,7 +223,7 @@ export default function DebateMenu(props: DebateMenuProps) {
                   }))}
                 />
               </div>
-            </section>
+            </DebateFeatureSection>
             {(shareUnavailableReason ||
               (hasTranscriptFlag && transcriptUnavailableReason)) &&
               onLogin && (
@@ -379,14 +240,14 @@ export default function DebateMenu(props: DebateMenuProps) {
         </Overlay>
         {isShareQr && (
           <ModalFrame
-            aria-labelledby={confirmationTitleId}
+            aria-label={t('청중 입장')}
             onClose={controls.cancelConfirmation}
             closeOnOverlayClick
             showCloseButton
           >
             <LiveShareQrPanel
+              key={controls.shareUrl}
               shareUrl={controls.shareUrl}
-              titleId={confirmationTitleId}
             />
           </ModalFrame>
         )}
@@ -402,7 +263,7 @@ export default function DebateMenu(props: DebateMenuProps) {
                 {title}
               </h2>
               {isShareConsent ? (
-                <p>{t('청중에게 현재 타이머를 실시간으로 공유합니다.')}</p>
+                <p>{t('청중에게 현재 타이머 상태를 실시간으로 공유합니다.')}</p>
               ) : isMicCheck ? (
                 <MicCheckPanel />
               ) : (

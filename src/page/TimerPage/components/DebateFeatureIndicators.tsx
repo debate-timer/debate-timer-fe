@@ -3,6 +3,7 @@ import { PiBroadcast } from 'react-icons/pi';
 import { IoMicSharp, IoAlarmSharp } from 'react-icons/io5';
 import { DebateControls } from '../hooks/useDebateControls';
 import Chip from '../../../components/Chip/Chip';
+import DebateFeatureDot from './DebateFeatureDot';
 
 interface DebateFeatureIndicatorsProps {
   statuses: DebateControls['statuses'];
@@ -24,11 +25,6 @@ const STATE_VARIANT = {
   active: 'primary',
   error: 'error',
 } as const;
-const DOT_CLASS = {
-  inactive: 'bg-neutral-400',
-  active: 'bg-brand-hover ring-2 ring-brand/30',
-  error: 'bg-red-600',
-};
 
 /** 32px 높이의 아이콘·상태 점을 표시하며 호버와 키보드 포커스에 이름·상태를 제공함. */
 export default function DebateFeatureIndicators(
@@ -59,10 +55,7 @@ export default function DebateFeatureIndicators(
         >
           <Chip variant={STATE_VARIANT[statuses[key]]} shape="rounded">
             <Icon aria-hidden="true" />
-            <span
-              className={`size-2 rounded-full ${DOT_CLASS[statuses[key]]}`}
-              aria-hidden="true"
-            />
+            <DebateFeatureDot status={statuses[key]} />
           </Chip>
           <span className={TOOLTIP_CLASS} aria-hidden="true">
             {t(label)}: {LABELS[statuses[key]]}
